@@ -1,0 +1,213 @@
+﻿<!--
+***********************************************************************************************
+Microsoft.WebApplication.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your web deploy projects from the command-line or the IDE.
+
+This file defines the steps in the standard build process for web deploy projects.
+
+Copyright (C) 2005 Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--UsingTask TaskName="Microsoft.WebApplication.Build.Tasks.CopyFilesToFolders"  AssemblyFile="Microsoft.WebApplication.Build.Tasks.dll" /-->
+  <!--UsingTask TaskName="Microsoft.Build.Tasks.Copy" AssemblyFile="Microsoft.Build.Tasks.dll" /-->
+
+  <PropertyGroup>
+    <IsDesktopBuild Condition="'$(IsDesktopBuild)'=='' And '$(TeamFoundationServerUrl)' != ''">False</IsDesktopBuild>
+    <ExeProjectOutputDirInsideProjectDefault>True</ExeProjectOutputDirInsideProjectDefault>
+    <ExeProjectOutputDirInsideProjectDefault Condition="('$(OutDir)' != '$(OutputPath)') Or ('$(IsDesktopBuild)' == 'False')" >False</ExeProjectOutputDirInsideProjectDefault>
+    <ExeProjectOutputDirInsideProject Condition="'$(ExeProjectOutputDirInsideProject)' == ''">$(ExeProjectOutputDirInsideProjectDefault)</ExeProjectOutputDirInsideProject>
+    <ExeProjectOutputDir>$(MSBuildProjectDirectory)</ExeProjectOutputDir>
+    <ExeProjectOutputDir Condition="!$(ExeProjectOutputDirInsideProject)">$(OutDir)_PublishedApplications\$(MSBuildProjectName)</ExeProjectOutputDir>
+    <DisableLinkInCopyExeApplicaton Condition="'$(DisableLinkInCopyExeApplicaton)'==''">False</DisableLinkInCopyExeApplicaton>
+    <Disable_CopyExeApplication Condition="'$(Disable_CopyExeApplication)' == ''">False</Disable_CopyExeApplication>
+    <CleanExeProjectOutputDir>True</CleanExeProjectOutputDir>
+    <CleanExeProjectOutputDir Condition="$(ExeProjectOutputDirInsideProject)" >False</CleanExeProjectOutputDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PrepareForRunDependsOn>
+      $(PrepareForRunDependsOn);
+    </PrepareForRunDependsOn>
+    <PrepareForRunDependsOn Condition="!$(Disable_CopyExeApplication)">
+      $(PrepareForRunDependsOn);
+      _CopyExeApplication;
+      _BuiltExeOutputGroupOutput
+    </PrepareForRunDependsOn>
+  </PropertyGroup>
+
+  <!--***************************************************************-->
+  <!--App.config -->
+  <!--***************************************************************-->
+  <Target Name="CopyAndRenameAppConfig">
+    <Copy
+      SourceFiles="@(AppConfigWithTargetPath)"
+      DestinationFiles="@(AppConfigWithTargetPath->'$(ExeProjectOutputDir)\$(AssemblyName).exe%(Extension)')"
+      Condition="Exists('%(RootDir)%(Directory)%(Filename)%(Extension)')"
+      />
+  </Target>
+
+  <!--***************************************************************-->
+  <!--Global setting for Clean target -->
+  <!--***************************************************************-->
+  <PropertyGroup>
+    <CleanDependsOn>
+      $(CleanDependsOn);
+      CleanExeProjectOutputDir;
+    </CleanDependsOn>
+  </PropertyGroup>
+
+  <!--********************************************************************-->
+  <!-- CleanExeProjectOutputDir  -->
+  <!-- ********************************************************************-->
+  <PropertyGroup>
+    <CleanExeProjectOutputDirDependsOn Condition="'$(CleanExeProjectOutputDirDependsOn)' == ''">
+    </CleanExeProjectOutputDirDependsOn>
+  </PropertyGroup>
+  <Target Name="CleanExeProjectOutputDir"
+          Condition="$(CleanExeProjectOutputDir)"
+          DependsOnTargets="$(CleanExeProjectOutputDirDependsOn)">
+    <!--Assertion check-->
+    <!--In the case of Clean Packaging/Publish, we simply delete the ExeProjectOutputDir-->
+    <RemoveDir Condition="Exists($(ExeProjectOutputDir))" Directories="$(ExeProjectOutputDir)" ContinueOnError="true" />
+  </Target>
+
+  <!--
+	============================================================
+	_CopyExeApplication
+
+	This target will copy the build outputs along with the 
+	content files into a _PublishedApplications folder.
+	
+	This Task is only necessary when $(OutDir) has been redirected
+	to a folder other than ~\bin such as is the case with Team Build.
+  
+  The original _CopyExeApplication is now a Legacy, you can still use it by setting $(UseWPP_CopyExeApplication) to true.
+  By default, it now change to use _WPPCopyWebApplication target in Microsoft.Web.Publish.targets.   It allow to leverage the app.config trsnaformation.
+	============================================================
+	-->
+
+  <PropertyGroup>
+    <!--This will be overwrite by ..\web\Microsoft.Web.Publishing.targets when $(UseWPP_CopyExeApplication) set to true-->
+    <OnBefore_CopyExeApplicationDefault>
+      _CopyExeApplicationLegacy;
+    </OnBefore_CopyExeApplicationDefault>
+    <OnBefore_CopyExeApplication Condition="'$(OnBefore_CopyExeApplication)'==''">
+      $(OnBefore_CopyExeApplicationDefault);
+    </OnBefore_CopyExeApplication>
+
+    <OnAfter_CopyExeApplication Condition="'$(OnAfter_CopyExeApplication)'==''">
+    </OnAfter_CopyExeApplication>
+
+    <_CopyExeApplicationDependsOn Condition="'$(_CopyExeApplicationDependsOn)'==''">
+      $(OnBefore_CopyExeApplication);
+    </_CopyExeApplicationDependsOn>
+
+  </PropertyGroup>
+  <Target Name="_CopyExeApplication"
+          Condition="!$(Disable_CopyExeApplication) And '$(OutDir)' != '$(OutputPath)'"
+          DependsOnTargets="$(_CopyExeApplicationDependsOn)">
+
+    <CallTarget Condition="'$(OnAfter_CopyExeApplication)' != ''" Targets="$(OnAfter_CopyExeApplication)" RunEachTargetSeparately="true" />
+
+  </Target>
+
+  <!--
+	============================================================
+	_CopyExeApplicationLegacy
+
+	This target will copy the build outputs along with the 
+	content files into a _PublishedApplications folder.
+	
+	This Task is only necessary when $(OutDir) has been redirected
+	to a folder other than ~\bin such as is the case with Team Build.
+	============================================================
+	-->
+  <Target Name="_CopyExeApplicationLegacy" Condition="!$(Disable_CopyExeApplication) And '$(OutDir)' != '$(OutputPath)'" >
+    <!-- Log tasks -->
+    <Message Text="Copying Application Project Files for $(MSBuildProjectName)" />
+
+    <!-- Create the _PublishedApplications\app folder -->
+    <MakeDir Directories="$(ExeProjectOutputDir)" />
+
+    <!-- ##### APP.CONFIG RENAME ##### -->
+    <CallTarget Targets="CopyAndRenameAppConfig" />
+
+    <!-- build outputs to _PublishedApplications\app folder -->
+    <!--Retries="2" 
+        RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)" -->
+    <Copy SourceFiles="@(IntermediateAssembly)" 
+          DestinationFolder="$(ExeProjectOutputDir)\"
+          SkipUnchangedFiles="true"/>
+    <Copy SourceFiles="@(AddModules)"
+          DestinationFolder="$(ExeProjectOutputDir)\"
+          SkipUnchangedFiles="true"/>
+    <Copy SourceFiles="$(IntermediateOutputPath)$(_SGenDllName)"
+          DestinationFolder="$(ExeProjectOutputDir)\%(Content.SubFolder)%(Content.RecursiveDir)"
+          SkipUnchangedFiles="true"
+          Condition="'$(_SGenDllCreated)'=='true'"/>
+    <Copy SourceFiles="$(IntermediateOutputPath)$(TargetName).pdb"
+          DestinationFolder="$(ExeProjectOutputDir)\"
+          SkipUnchangedFiles="true"
+          Condition="'$(_DebugSymbolsProduced)'=='true'"/>
+    <Copy SourceFiles="@(DocFileItem)"
+          DestinationFolder="$(ExeProjectOutputDir)\"
+          SkipUnchangedFiles="true"
+          Condition="'$(_DocumentationFileProduced)'=='true'"/>
+    <Copy SourceFiles="@(IntermediateSatelliteAssembliesWithTargetPath)"
+          DestinationFiles="@(IntermediateSatelliteAssembliesWithTargetPath->'$(ExeProjectOutputDir)\%(Culture)\$(TargetName).resources.dll')"
+          SkipUnchangedFiles="true"/>
+    <Copy SourceFiles="@(ReferenceComWrappersToCopyLocal); @(ResolvedIsolatedComModules); @(_DeploymentLooseManifestFile); @(NativeReferenceFile)"
+          DestinationFolder="$(ExeProjectOutputDir)"
+          SkipUnchangedFiles="true"/>
+
+    <!-- any referenced assemblies to _PublishedApplications\app folder -->
+    <Copy SourceFiles="@(ReferenceCopyLocalPaths)"
+          DestinationFiles="@(ReferenceCopyLocalPaths->'$(ExeProjectOutputDir)\%(DestinationSubDirectory)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true"/>
+
+    <!-- Copy content files recursively to _PublishedApplications\app\ folder -->
+    <Copy SourceFiles="@(Content)" Condition="'%(Content.Link)' == ''"
+          DestinationFolder="$(ExeProjectOutputDir)\%(Content.RelativeDir)"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(Content)" Condition="!$(DisableLinkInCopyExeApplicaton) And '%(Content.Link)' != ''"
+          DestinationFiles="$(ExeProjectOutputDir)\%(Content.Link)"
+          SkipUnchangedFiles="true"/>
+
+    <!--  items that have been marked to be copied to the bin folder -->
+    <Copy SourceFiles="@(_SourceItemsToCopyToOutputDirectory)"
+          DestinationFolder="$(ExeProjectOutputDir)"
+          SkipUnchangedFiles="true"/>
+    <Copy SourceFiles="@(_SourceItemsToCopyToOutputDirectoryAlways)"
+          DestinationFolder="$(ExeProjectOutputDir)"
+          SkipUnchangedFiles="false"/>
+
+  </Target>
+
+  <!--
+	============================================================
+	_BuiltExeOutputGroupOutput
+
+	This target creates and populates BuiltExeOutputGroupOutput
+	with contents of bin along with the @(Content) files
+	============================================================
+	-->
+  <Target Name ="_BuiltExeOutputGroupOutput"
+          Condition="!$(Disable_CopyExeApplication)"
+          Outputs="@(BuiltExeOutputGroupOutput)">
+    <CreateItem Include="$(ExeProjectOutputDir)\bin\**\*;@(Content->'%(FullPath)')" Condition="'$(OutDir)' == '$(OutputPath)'">
+      <Output ItemName="BuiltExeOutputGroupOutput" TaskParameter="Include"/>
+    </CreateItem>
+
+    <CreateItem Include="$(ExeProjectOutputDir)\**\*" Condition="'$(OutDir)' != '$(OutputPath)'">
+      <Output ItemName="BuiltExeOutputGroupOutput" TaskParameter="Include"/>
+    </CreateItem>
+  </Target>
+
+  <!--Import publishing target-->
+  <Import Project="..\Web\Microsoft.Web.Publishing.targets" Condition="Exists('..\Web\Microsoft.Web.Publishing.targets')" />
+
+</Project>
