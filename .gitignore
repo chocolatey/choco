@@ -1,23 +1,27 @@
 .svn
+.hg
 build_output
 code_drop
 bin
 obj
-_ReSharper*
-/packages
+
 
 *.suo
+*.sln.docstates
 *.user 
 *.csproj.user
+*.[rR]esharper.user
 *.DotSettings.user
-*.resharper.user
-*.ReSharper.user
+*.resharper
+_ReSharper*
 *.cache
 *~
 *.swp
+*.bak
 *.orig
 *.log
-*.sln.docstates
+*.pidb
+*userprefs
  
 TestResult.xml
 submit.xml
