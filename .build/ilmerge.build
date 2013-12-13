@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="ILMergeBuilder" default="go">
+  <!-- Project UppercuT - http://projectuppercut.org -->
+  <property name="build.config.settings" value="__NONE__" overwrite="false" />
+  <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
+  <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
+  <property name="file.current.no_extension" value="ilmerge" />
+  <property name="dirs.current" value="${directory::get-current-directory()}" />  
+  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />  
+  <property name="folder.build_scripts" value="build" overwrite="false" />
+  <property name="folder.build_scripts_custom" value="build.custom" overwrite="false" />
+  <property name="dirs.build_scripts_custom" value="${dirs.current}${path.separator}${folder.build_scripts_custom}" />
+  <property name="folder.code_drop" value="code_drop" overwrite="false" />
+  <property name="dirs.drop" value="${dirs.current}${path.separator}${folder.code_drop}" overwrite="false" />
+  <property name="folder.app.drop" value="${project.name}" overwrite="false" />
+  <property name="dirs.lib" value="${dirs.current}${path.separator}lib" overwrite="false" />
+  <property name="dirs.ilmerge.folder" value="${dirs.lib}${path.separator}ILMerge" />
+  <property name="app.ilmerge" value="${dirs.ilmerge.folder}${path.separator}ILMerge.exe" overwrite="false" />
+  <property name="dirs.merge.log" value="${dirs.drop}${path.separator}build_artifacts${path.separator}ilmerge" />
+  <property name="log.merge" value="ilmerge.log" />
+  <property name="file.uppercut.assembly" value="uppercut.tasks.dll" />
+  <property name="path.uppercut.assembly" value="${dirs.current.file}${path.separator}${file.uppercut.assembly}" />
+  <property name="app.ruby" value="C:\Ruby\bin\ruby.exe" overwrite="false" />
+  <property name="app.powershell" value="%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe" overwrite="false" />
+
+  <property name="dirs.merge.from" value="${dirs.drop}${path.separator}${folder.app.drop}" overwrite="false" />
+  <property name="dirs.merge.to" value="${dirs.drop}${path.separator}merge" overwrite="false" />
+  
+  <property name="file.internalize.ignore" value="ilmerge.internalize.ignore.txt" />
+  <property name="path.file.internalize.ignore" value="${dirs.build_scripts_custom}${path.separator}${file.internalize.ignore}" />
+  <property name="file.merge.name" value="__REPLACE__" overwrite="false" />
+  <!-- exe winexe dll -->
+  <property name="merge.target.type" value="__REPLACE__" overwrite="false" />
+  <property name="args.ilmerge" value="/internalize /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " />
+  <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
+
+  <property name="is.replaced" value="false" />
+  <property name="fail.build.on.error" value="true" />
+
+  <target name="go" depends="load_uppercut_assemblies, run_tasks" />
+
+  <target name="run_tasks">
+    <echo level="Warning" message="" />
+    <echo level="Warning" message="====================" />
+    <echo level="Warning" message="${project::get-name()}" />
+    <echo level="Warning" message="====================" />
+    <call target="prepare" if="${target::exists('prepare')}" />
+    <customExtension extends="${project::get-buildfile-path()}" type="pre" failonerror="${fail.build.on.error}" />
+    <customExtension extends="${project::get-buildfile-path()}" type="replace" failonerror="${fail.build.on.error}" />
+    <call target="run_normal_tasks" if="${not is.replaced}" />
+    <customExtension extends="${project::get-buildfile-path()}" type="post" failonerror="${fail.build.on.error}" />
+  </target>
+
+  <target name="run_normal_tasks"
+          depends="set_environment_variables, error_check, get_regular_dlls, run_ilmerge, copy_configs, remove_unneeded_assemblies, copy_from_merge, delete_merge_folder"
+          description="Running ILMerge with UppercuT default.build." />
+
+  <target name="set_environment_variables">
+    <property name="dirs.merge.from" value="${environment::get-variable('uc.dirs.merge.from')}" if="${environment::variable-exists('uc.dirs.merge.from')}" />
+    <property name="dirs.merge.to" value="${environment::get-variable('uc.dirs.merge.to')}" if="${environment::variable-exists('uc.dirs.merge.to')}" />
+    <property name="file.merge.name" value="${environment::get-variable('uc.file.merge.name')}" if="${environment::variable-exists('uc.file.merge.name')}" />
+    <property name="merge.target.type" value="${environment::get-variable('uc.merge.target.type')}" if="${environment::variable-exists('uc.merge.target.type')}" />
+    <property name="args.ilmerge" value="/internalize /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /ndebug /allowDup ${file.merge.name} " />
+    <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
+  </target>
+  
+  <target name="error_check">
+    <fail message="You must pass in the file.merge.name and the merge.target.type through the command line calling this build. Please do that and retry the build. You can also set up an ilmerge.pre.build and set these environment variables: uc.dirs.merge.from, uc.dirs.merge.to, uc.file.merge.name, and uc.merge.target.type"
+      if="${file.merge.name=='__REPLACE__' or merge.target.type=='__REPLACE__'}" />
+  </target>
+
+  <target name="prepare">
+    <mkdir dir="${dirs.merge.log}" />
+    <mkdir dir="${dirs.merge.to}" />
+  </target>
+
+  <target name="get_regular_dlls">
+    <echo level="Warning" message="Getting output dlls based on name in directory ${path::get-full-path(dirs.merge.from)}." />
+    <property name="dll.names" value="" />
+    <foreach item="File" property="dll.filename">
+      <in>
+        <items>
+          <exclude name="${dirs.merge.from}${path.separator}${file.merge.name}" />
+          <include name="${dirs.merge.from}${path.separator}*.dll" />
+          <include name="${dirs.merge.from}${path.separator}*.exe" />
+        </items>
+      </in>
+      <do>
+        <property name="dll.names" value="${dll.names + ' ' + path::get-file-name(dll.filename)}" />
+      </do>
+    </foreach>
+
+    <property name="dlls.regular" value="${dll.names}" />
+    <property name="args.ilmerge" value="${args.ilmerge} ${dlls.regular}" />
+  </target>
+
+  <target name="run_ilmerge">
+    <echo level="Warning" message="Merging the the contents of ${dirs.merge.from} into a single executable - ${dirs.merge.to}${path.separator}${file.merge.name}. This will fail if all dependencies are not resolved."/>
+    <echo level="Warning" message="Running this: ${app.ilmerge} ${args.ilmerge}"/>
+    <exec program="${app.ilmerge}"
+          workingdir="${dirs.merge.from}"
+          commandline="${args.ilmerge}" if="${platform::is-windows()}" />
+    <exec program="mono"
+          workingdir="${dirs.merge.from}"
+          commandline="'${app.ilmerge}' ${args.ilmerge}" if="${platform::is-unix()}"/>
+  </target>
+
+  <target name="copy_configs">
+    <copy todir="${dirs.merge.to}">
+      <fileset basedir="${dirs.merge.from}">
+        <include name="**/*.config" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="remove_unneeded_assemblies">
+    <echo level="Warning" message="Removing unneeded assemblies before moving the merged assembly back into ${dirs.merge.from}."/>
+    <delete>
+      <fileset basedir="${dirs.merge.from}" >
+        <include name="*.*" />
+      </fileset>
+    </delete>
+  </target>
+
+  <target name="copy_from_merge">
+    <copy todir="${dirs.merge.from}">
+      <fileset basedir="${dirs.merge.to}">
+        <include name="**/*.*" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="delete_merge_folder">
+    <delete dir="${dirs.merge.to}" failonerror="false"  />
+  </target>
+
+  <target name="load_uppercut_assemblies">
+    <loadtasks assembly="${path.uppercut.assembly}" if="${file::exists(path.uppercut.assembly)}" />
+  </target>
+  
+</project>

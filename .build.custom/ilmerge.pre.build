@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="ILMergeBuilder" default="go">
+  <!-- Project UppercuT - http://projectuppercut.org -->
+  <property name="build.config.settings" value="__NONE__" overwrite="false" />
+  <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
+  <property name="file.current.no_extension" value="ilmerge" />
+  <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <property name="path.to.toplevel" value=".." />
+  <property name="folder.build_scripts" value="build" overwrite="false" />
+  <property name="folder.build_scripts_custom" value="build.custom" overwrite="false" />
+  <property name="dirs.build_scripts_custom" value="${dirs.current}\..\${folder.build_scripts_custom}" />
+  <property name="folder.code_drop" value="code_drop" overwrite="false" />
+  <property name="dirs.drop" value="${dirs.current}\${path.to.toplevel}\${folder.code_drop}" overwrite="false" />
+  <property name="folder.app.drop" value="${project.name}" overwrite="false" />
+  
+  <property name="dirs.merge.from" value="${dirs.drop}\${folder.app.drop}" overwrite="false" />
+  <property name="dirs.merge.to" value="${dirs.drop}\merge" overwrite="false" />
+  <property name="file.merge.name" value="__REPLACE__" overwrite="false" />
+  <!-- exe winexe dll -->
+  <property name="merge.target.type" value="__REPLACE__" overwrite="false" />
+
+  <target name="go" depends="set_environment_variables, hold_license" />
+ 
+  <target name="set_environment_variables">
+    <property name="dirs.merge.from" value="${dirs.drop}${path.separator}${folder.app.drop}" />
+    <property name="file.merge.name" value="choco.exe" />
+    <property name="merge.target.type" value="exe" />
+    <setenv name="uc.dirs.merge.from" value="${dirs.drop}${path.separator}${folder.app.drop}"/>
+    <setenv name="uc.file.merge.name" value="choco.exe"/>
+    <setenv name="uc.merge.target.type" value="exe"/>
+  </target>
+  
+  <target name="hold_license">
+    <echo level="Warning" message="Copying out license.xml prior to merging." />
+    <copy todir="${dirs.drop}${path.separator}merge_holding">
+      <fileset basedir="${dirs.drop}${path.separator}${folder.app.drop}">
+        <include name="license.*" />
+      </fileset>
+    </copy>
+  </target>
+  
+</project>

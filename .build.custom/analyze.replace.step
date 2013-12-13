@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project name="CUSTOM REPLACE ANALYZE" default="go">
+  <!-- Project UppercuT - http://projectuppercut.org -->
+  <property name="build.config.settings" value="__NONE__" overwrite="false" />
+  <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
+  <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
+  <property name="dirs.current" value="${directory::get-current-directory()}" />
+  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <property name="folder.build_scripts" value="build" overwrite="false" />
+  <property name="dirs.build_scripts" value="${dirs.current}${path.separator}${folder.build_scripts}" />
+  <property name="folder.build_scripts_custom" value="build.custom" overwrite="false" />
+  <property name="dirs.build_scripts_custom" value="${dirs.current}${path.separator}${folder.build_scripts_custom}" />
+  <property name="folder.code_build" value="build_output" overwrite="false" />
+  <property name="dirs.build" value="${dirs.current}${path.separator}${folder.code_build}" />
+  <property name="folder.code_drop" value="code_drop" overwrite="false" />
+  <property name="dirs.drop" value="${dirs.current}${path.separator}${folder.code_drop}" overwrite="false" />
+  <property name="folder.app.drop" value="${project.name}" overwrite="false" />
+  <property name="folder.database" value="__DATABASE_FOLDER_NAME__" overwrite="false" />
+  <property name="dirs.database" value="${dirs.current}${path.separator}${folder.database}" overwrite="false" />
+  <property name="folder.reports" value="${project.name}.Reports" overwrite="false" />
+  <property name="dirs.reports" value="${dirs.current}${path.separator}${folder.reports}" overwrite="false" />
+  <property name="folder.file_server" value="file.server" overwrite="false" />
+  <property name="dirs.file_server" value="${dirs.current}${path.separator}${folder.file_server}" overwrite="false" />
+  <property name="folder.environment_files" value="environment.files" overwrite="false" />
+  <property name="dirs.environment_files" value="${dirs.current}${path.separator}${folder.environment_files}" overwrite="false" />
+  <property name="folder.deployment" value="deployment" overwrite="false" />
+  <property name="dirs.deployment" value="${dirs.current}${path.separator}${folder.deployment}" overwrite="false" />
+  <property name="folder.settings" value="settings" overwrite="false" />
+  <property name="dirs.settings" value="${dirs.current}${path.separator}${folder.settings}" overwrite="false" />
+  <property name="folder.documentation" value="docs" overwrite="false" />
+  <property name="dirs.docs" value="${dirs.current}${path.separator}${folder.documentation}" overwrite="false" />
+  <property name="folder.references" value="lib" overwrite="false" />
+  <property name="dirs.lib" value="${dirs.current}${path.separator}${folder.references}" overwrite="false" />
+  <target name="go" depends="run_analyzers" />
+  
+  <target name="run_analyzers">
+    <nant buildfile="${dirs.build_scripts}${path.separator}analyzers${path.separator}test.step" inheritall="true" />
+    <nant buildfile="${dirs.build_scripts}${path.separator}analyzers${path.separator}cover.step" inheritall="true" failonerror="false" />
+    <nant buildfile="${dirs.build_scripts}${path.separator}analyzers${path.separator}ndepend.step" inheritall="true" failonerror="false" />
+  </target>
+</project>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="BuildSettings">
+  <script language="C#" >
+    <references>
+      <include name="System.dll" />
+    </references>
+    <imports>
+      <import namespace="System" />
+      <import namespace="System.Diagnostics" />
+      <import namespace="System.IO" />
+      <import namespace="System.Reflection" />
+      <import namespace="Nant.Core" />
+      <import namespace="Nant.Core.Attributes" />
+    </imports>
+    <code>
+      <![CDATA[
+      
+        [TaskName("results")]
+        public class ResultsProcessTask : Task 
+        {
+            private string _display;
+
+            [TaskAttribute("display", Required = true)]
+            public string Display
+            {
+                get { return _display; }
+                set { _display = value; }
+            }
+
+            protected override void ExecuteTask()
+            {
+            	if (platformIsWindows())
+                	ExecuteProcess(CombinePaths(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),"Internet Explorer","iexplore.exe"), Display);
+                else
+                	ExecuteProcess(Display);
+            }
+
+            protected string CombinePaths(params string[] paths)
+            {
+                string combinedPath = string.Empty;
+
+                foreach (string path in paths)
+                {
+                    combinedPath = Path.Combine(combinedPath, path);
+                }
+
+                return combinedPath;
+            }
+
+            protected void ExecuteProcess(string file)
+            {
+            	ProcessStartInfo psi = new ProcessStartInfo(file, "");
+            	using (Process p = new Process())
+                {
+                    p.StartInfo = psi;
+                    p.Start();
+                }
+            }
+			
+            protected void ExecuteProcess(string process, string arguments)
+            {
+                ProcessStartInfo psi = new ProcessStartInfo(Path.GetFullPath(process), arguments);
+                psi.UseShellExecute = false;
+                psi.RedirectStandardOutput = false;
+                psi.CreateNoWindow = false;
+
+                using (Process p = new Process())
+                {
+                    p.StartInfo = psi;
+                    p.Start();
+                }
+
+            }
+            
+            protected bool platformIsWindows()
+			{
+				PlatformID platform = Environment.OSVersion.Platform;
+				return !(platform.Equals(PlatformID.Unix) || platform.Equals(PlatformID.MacOSX));
+			}
+        }
+       
+      ]]>
+    </code>
+  </script>
+</project>
