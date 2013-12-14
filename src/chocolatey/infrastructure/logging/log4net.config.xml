@@ -1,23 +1,23 @@
 ﻿<?xml version="1.0"?>
 <log4net>
-  <appender name="ColoredConsoleAppender" type="log4net.Appender.ColoredConsoleAppender">
+  <appender name="ColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
     <mapping>
       <level value="ERROR" />
-      <foreColor value="White, HighIntensity" />
+      <foreColor value="White" />
       <backColor value="Red" />
     </mapping>
     <mapping>
       <level value="WARN" />
       <foreColor value="Red" />
-      <backColor value="Yellow, HighIntensity" />
+      <backColor value="Yellow" />
     </mapping>
     <mapping>
       <level value="INFO" />
-      <foreColor value="Green, HighIntensity" />
+      <foreColor value="Green" />
     </mapping>
     <mapping>
       <level value="DEBUG" />
-      <foreColor value="Blue, HighIntensity" />
+      <foreColor value="Blue" />
     </mapping>
     <layout type="log4net.Layout.PatternLayout">
       <conversionPattern value="%message%newline" />
