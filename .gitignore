@@ -4,6 +4,7 @@ build_output
 code_drop
 bin
 obj
+/packages
 
 
 *.suo
