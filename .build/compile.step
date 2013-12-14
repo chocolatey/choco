@@ -34,6 +34,7 @@
   <property name="msbuild.outputpath" value="${dirs.build}${path.separator}${folder.app.drop}" overwrite="false" />
   <property name="msbuild.outputpath.windows.mono" value="${string::replace(msbuild.outputpath,'\','/')}" />
   <property name="solution.path" value="${dirs.current}${path.separator}${path_to_solution}${path.separator}${project.name}.sln" />
+  <property name="solution.path" value="${path::get-full-path(solution.path)}" />
   <property name="solution.path.windows.mono" value="${string::replace(dirs.current,'\','/')}/${string::replace(path_to_solution,'\','/')}/${project.name}.sln" />
   <property name="solution.path" value="${dirs.current}${path.separator}${path_to_solution}${path.separator}${project.name}.vbp" if="${microsoft.framework =='vb6'}" />
   <property name="nant.settings.currentframework" value="mono-4.0" if="${platform::is-unix()}" />
@@ -47,6 +48,8 @@
   <property name="fail.build.on.error" value="true" />
   <property name="app.ruby" value="C:\Ruby\bin\ruby.exe" overwrite="false" />
   <property name="app.powershell" value="%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe" overwrite="false" />
+  <property name="app.nuget" value="..${path.separator}..${path.separator}${folder.references}${path.separator}NuGet${path.separator}NuGet.exe" overwrite="false" />
+  <property name="app.nuget" value="${path::get-full-path(app.nuget)}" />
 
   <target name="go" depends="load_uppercut_assemblies, run_tasks" />
   
@@ -77,7 +80,7 @@
   </target>
 
   <target name="run_normal_tasks"
-          depends="error_check, set_vars, build_code, copy_documentation, copy_db"
+          depends="error_check, set_vars, restore_packages, build_code, copy_documentation, copy_db"
           description="Compiling project." />
 
   <target name="error_check">
@@ -103,6 +106,16 @@
     <setenv name="EnableNuGetPackageRestore" value="true"/>
   </target>
   
+  <target name="restore_packages" if="${file::exists(app.nuget)}">
+    <echo level="Warning" message="Finding and restoring all packages (${app.nuget} restore '${solution.path}')" />
+    <exec program="${app.nuget}"
+          workingdir="${dirs.build}"
+          commandline='restore "${solution.path}"' if="${platform::is-windows()}" />
+    <exec program="mono"
+          workingdir="${dirs.build}"
+          commandline="'${app.nuget}' restore '${solution.path}'" if="${platform::is-unix()}" />
+  </target>
+
   <target name="build_code" depends="" description="Building Library">
     <echo level="Warning" message="Compiling ${solution.path}."/>
     <call target="build_dotNET_code" if="${microsoft.framework !='vb6'}" />
