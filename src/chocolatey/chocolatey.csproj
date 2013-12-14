@@ -65,6 +65,8 @@
     <Compile Include="infrastructure\logging\Log4NetAppender.cs" />
     <Compile Include="infrastructure\logging\Log4NetLog.cs" />
     <Compile Include="infrastructure\logging\NullLog.cs" />
+    <Compile Include="infrastructure\platforms\Platform.cs" />
+    <Compile Include="infrastructure\platforms\PlatformType.cs" />
     <Compile Include="infrastructure\registration\Bootstrap.cs" />
     <Compile Include="infrastructure\runners\ChocolateyInstallRunner.cs" />
     <Compile Include="infrastructure\tokens\TokenReplacer.cs" />
