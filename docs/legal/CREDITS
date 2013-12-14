@@ -1,0 +1,15 @@
+Chocolatey has been the thoughts and work of the following people: 
+
+Committers & Contributors
+----------
+Rob Reynolds (https://github.com/ferventcoder), Vision, direction and main committer
+Nekresh (https://github.com/nekresh) - Contributing code and ideas on direction
+Chris Ortman (https://github.com/chrisortman) - package contributions and thoughts on where to take it
+Svein Arne Ackenhausen (https://github.com/acken) - suggestions and thoughts on features and packages
+Marcel Hoyer - suggestions on making this stuff work without administrative access to a machine
+Jason Jarrett (https://github.com/staxmanade) - contributing code and ideas
+
+
+Other Credits
+-------------
+Chocolatey name started as a joke as what you would name a framework that would sit on top of NuGet as an enhancement
