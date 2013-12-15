@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata>
+    <id>chocolatey</id>
+    <title>Chocolatey</title>
+    <version>0.9.8.23</version>
+    <authors>Rob Reynolds</authors>
+    <owners>Rob Reynolds</owners>
+    <summary>Chocolatey is your machine level NuGet repository. Think apt-get for Windows (executables/application packages), not library packages.</summary>
+    <description>Chocolatey - think executables/application packages (like apt-get for Windows), not library packages. This is what the Chocolatey NuGet goodness is for.
+Chocolatey allows you to install application nuggets and run executables from anywhere.
+======= Executable Nuggets =======
+For example, say you have an executable in the tools folder of your package named bob.exe. Then you can type
+'chocolatey install yourPackageName [-source source] [-version version]' OR 'cinst yourPackageName [-source source] [-version version]'
+and when it finishes you can type
+'bob'
+and it will run your application executable.
+======= Application Nuggets =======
+Full on double rainbow. For example, say you type
+'chocolatey install 7zip [-source source] [-version version]' OR 'cinst 7zip [-source source] [-version version]'
+- when it finishes you will have installed 7zip on your machine (in your add/remove programs).
+======= More? =======
+Check out the WIKI in the project URL for all the details of what you can do with chocolatey!
+</description>
+    <releaseNotes>
+See all - https://github.com/chocolatey/chocolatey/wiki/ReleaseNotes
+
+v0.9.8.23:
+
+BUG FIXES:
+
+ * Fix - Chocolatey 0.9.8.22 incorrectly reports version as alpha1 [#368](https://github.com/chocolatey/chocolatey/issues/368)
+ * Fix - Some chocolatey commands with no arguments error [#369](https://github.com/chocolatey/chocolatey/issues/369)
+
+    </releaseNotes>
+    <projectUrl>http://chocolatey.org</projectUrl>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>nuget apt-get machine repository chocolatey</tags>
+    <iconUrl>https://github.com/chocolatey/chocolatey/raw/master/docs/logo/chocolateyicon.gif</iconUrl>
+  </metadata>
+</package>

@@ -2,7 +2,7 @@
 .hg
 build_output
 code_drop
-bin
+[Bb]in
 obj
 /packages
 
@@ -28,3 +28,6 @@ TestResult.xml
 submit.xml
 SolutionVersion.cs
 SolutionVersion.vb
+
+.DS_Store
+*.db
