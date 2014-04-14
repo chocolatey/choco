@@ -11,7 +11,7 @@ namespace chocolatey
         /// <param name="input">The input.</param>
         /// <param name="formatting">The formatting.</param>
         /// <returns>A formatted string.</returns>
-        public static string FormatWith(this string input, params object[] formatting)
+        public static string format_with(this string input, params object[] formatting)
         {
             return string.Format(input, formatting);
         }
@@ -21,7 +21,7 @@ namespace chocolatey
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>
-        public static string TrimSafe(this string input)
+        public static string trim_safe(this string input)
         {
             if (string.IsNullOrWhiteSpace(input))
             {

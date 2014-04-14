@@ -3,18 +3,18 @@ namespace chocolatey.infrastructure.tokens
     using System.Collections.Generic;
     using System.Reflection;
     using System.Text.RegularExpressions;
-    using configuration;
+    using app.configuration;
 
     public class TokenReplacer
     {
-        public static string replace_tokens(ConfigurationSettings configuration, string text_to_replace)
+        public static string replace_tokens(ConfigurationSettings configuration, string textToReplace)
         {
-            if (string.IsNullOrEmpty(text_to_replace)) return string.Empty;
+            if (string.IsNullOrEmpty(textToReplace)) return string.Empty;
 
             IDictionary<string, string> dictionary = create_dictionary_from_configuration(configuration);
             var regex = new Regex("{{(?<key>\\w+)}}");
 
-            string output = regex.Replace(text_to_replace, m =>
+            string output = regex.Replace(textToReplace, m =>
                 {
                     string key = "";
 
@@ -33,13 +33,13 @@ namespace chocolatey.infrastructure.tokens
 
         private static IDictionary<string, string> create_dictionary_from_configuration(ConfigurationSettings configuration)
         {
-            var property_dictionary = new Dictionary<string, string>();
+            var propertyDictionary = new Dictionary<string, string>();
             foreach (PropertyInfo property in configuration.GetType().GetProperties())
             {
-                property_dictionary.Add(property.Name.to_lower(), property.GetValue(configuration, null).to_string());
+                propertyDictionary.Add(property.Name.to_lower(), property.GetValue(configuration, null).to_string());
             }
 
-            return property_dictionary;
+            return propertyDictionary;
         }
     }
 }

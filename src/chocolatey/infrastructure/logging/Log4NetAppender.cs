@@ -2,6 +2,7 @@ namespace chocolatey.infrastructure.logging
 {
     using System.IO;
     using System.Reflection;
+    using app;
     using log4net;
     using log4net.Appender;
     using log4net.Config;
@@ -43,7 +44,7 @@ namespace chocolatey.infrastructure.logging
 
                 var app = new RollingFileAppender
                     {
-                        Name = "{0}.changes.log.appender".FormatWith(ApplicationParameters.Name),
+                        Name = "{0}.changes.log.appender".format_with(ApplicationParameters.Name),
                         File = Path.Combine(Path.GetFullPath(outputDirectory), ApplicationParameters.LoggingFile),
                         Layout = layout,
                         AppendToFile = true,

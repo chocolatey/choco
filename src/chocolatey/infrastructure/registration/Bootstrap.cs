@@ -1,10 +1,7 @@
-﻿using log4net.Config;
-
-[assembly: XmlConfigurator(Watch = true)]
-
-namespace chocolatey.infrastructure.registration
+﻿namespace chocolatey.infrastructure.registration
 {
     using System;
+    using app;
     using log4net;
     using logging;
     using ILog = log4net.ILog;
@@ -21,6 +18,7 @@ namespace chocolatey.infrastructure.registration
         /// </summary>
         public static void initialize()
         {
+            Log.InitializeWith<Log4NetLog>();
             //initialization code 
             _logger.Debug("XmlConfiguration is now operational");
         }
@@ -32,8 +30,6 @@ namespace chocolatey.infrastructure.registration
         {
             AppDomain.CurrentDomain.UnhandledException += DomainUnhandledException;
             _logger.DebugFormat("Performing bootstrapping operations for '{0}'.", ApplicationParameters.Name);
-
-            Log.InitializeWith<Log4NetLog>();
         }
 
         /// <summary>

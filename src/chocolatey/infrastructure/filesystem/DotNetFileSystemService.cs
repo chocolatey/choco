@@ -103,7 +103,7 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="overwriteTheExistingFile">If there is an existing file already there, would you like to delete it?</param>
         public void file_copy(string sourceFileName, string destinationFileName, bool overwriteTheExistingFile)
         {
-            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".FormatWith(sourceFileName, destinationFileName));
+            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFileName, destinationFileName));
             File.Copy(sourceFileName, destinationFileName, overwriteTheExistingFile);
         }
 
@@ -115,7 +115,7 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="overwriteTheExistingFile">If there is an existing file already there, would you like to delete it?</param>
         public void file_copy_unsafe(string sourceFileName, string destinationFileName, bool overwriteTheExistingFile)
         {
-            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".FormatWith(sourceFileName, destinationFileName));
+            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFileName, destinationFileName));
             //Private Declare Function apiCopyFile Lib "kernel32" Alias "CopyFileA" _
             int success = CopyFileA(sourceFileName, destinationFileName, overwriteTheExistingFile ? 0 : 1);
 
@@ -159,11 +159,11 @@ namespace chocolatey.infrastructure.filesystem
                 //check the directory to be sure
                 DirectoryInfo directory_info = get_directory_info_from(file.DirectoryName);
                 isSystemFile = ((directory_info.Attributes & FileAttributes.System) == FileAttributes.System);
-                this.Log().Debug(() => "Is directory \"{0}\" a system directory? {1}".FormatWith(file.DirectoryName, isSystemFile.to_string()));
+                this.Log().Debug(() => "Is directory \"{0}\" a system directory? {1}".format_with(file.DirectoryName, isSystemFile.to_string()));
             }
             else
             {
-                this.Log().Debug(() => "File \"{0}\" is a system file.".FormatWith(file.FullName));
+                this.Log().Debug(() => "File \"{0}\" is a system file.".format_with(file.FullName));
             }
             return isSystemFile;
         }
@@ -176,7 +176,7 @@ namespace chocolatey.infrastructure.filesystem
         public bool is_encrypted_file(FileInfo file)
         {
             bool isEncrypted = ((file.Attributes & FileAttributes.Encrypted) == FileAttributes.Encrypted);
-            this.Log().Debug(() => "Is file \"{0}\" an encrypted file? {1}".FormatWith(file.FullName, isEncrypted.to_string()));
+            this.Log().Debug(() => "Is file \"{0}\" an encrypted file? {1}".format_with(file.FullName, isEncrypted.to_string()));
             return isEncrypted;
         }
 
@@ -190,12 +190,12 @@ namespace chocolatey.infrastructure.filesystem
         {
             if (Array.IndexOf(fileTypes, ".*") > -1 || Array.IndexOf(fileTypes, get_file_extension_from(fileName).to_lower()) > -1)
             {
-                this.Log().Debug(() => "File \"{0}\" is in the approved file types of \"{1}\".".FormatWith(fileName,
-                                                                                                           string.Join(";", fileTypes)));
+                this.Log().Debug(() => "File \"{0}\" is in the approved file types of \"{1}\".".format_with(fileName,
+                                                                                                            string.Join(";", fileTypes)));
                 return true;
             }
 
-            this.Log().Info(() => "File \"{0}\" is not in the approved file types of \"{1}\".".FormatWith(fileName, string.Join(";", fileTypes)));
+            this.Log().Info(() => "File \"{0}\" is not in the approved file types of \"{1}\".".format_with(fileName, string.Join(";", fileTypes)));
             return false;
         }
 
@@ -266,7 +266,7 @@ namespace chocolatey.infrastructure.filesystem
             }
             else
             {
-                this.Log().Debug(() => "Directory \"{0}\" already exists".FormatWith(get_full_path(directory)));
+                this.Log().Debug(() => "Directory \"{0}\" already exists".format_with(get_full_path(directory)));
             }
         }
 
@@ -317,7 +317,7 @@ namespace chocolatey.infrastructure.filesystem
         /// <returns>A directory information object for use after creating the directory</returns>
         public DirectoryInfo create_directory(string directory)
         {
-            this.Log().Debug(() => "Attempting to create directory \"{0}\".".FormatWith(get_full_path(directory)));
+            this.Log().Debug(() => "Attempting to create directory \"{0}\".".format_with(get_full_path(directory)));
             return Directory.CreateDirectory(directory);
         }
 
@@ -328,7 +328,7 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
         public void delete_directory(string directory, bool recursive)
         {
-            this.Log().Debug(() => "Attempting to delete directory \"{0}\".".FormatWith(get_full_path(directory)));
+            this.Log().Debug(() => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directory)));
             Directory.Delete(directory, recursive);
         }
 

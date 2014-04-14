@@ -1,3 +1,7 @@
+using log4net.Config;
+
+[assembly: XmlConfigurator(Watch = true)]
+
 namespace chocolatey.infrastructure.logging
 {
     using System;

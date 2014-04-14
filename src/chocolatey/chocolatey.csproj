@@ -58,12 +58,22 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
-    <Compile Include="infrastructure\ApplicationParameters.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="EnumerationExtensions.cs" />
+    <Compile Include="infrastructure.app\ApplicationParameters.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
+    <Compile Include="infrastructure.app\commands\CommandNameType.cs" />
     <Compile Include="infrastructure\commandline\Options.cs" />
-    <Compile Include="infrastructure\commands\CommandConstants.cs" />
     <Compile Include="infrastructure\commands\CommandExecutor.cs" />
-    <Compile Include="infrastructure\configuration\ConfigurationSettings.cs" />
+    <Compile Include="infrastructure.app\configuration\ConfigurationSettings.cs" />
+    <Compile Include="infrastructure\commands\ICommand.cs" />
+    <Compile Include="infrastructure\configuration\Config.cs" />
+    <Compile Include="infrastructure.app\configuration\IConfigurationSettings.cs" />
+    <Compile Include="infrastructure\configuration\ConfigurationOptions.cs" />
+    <Compile Include="infrastructure\filesystem\DotNetFileSystem.cs" />
     <Compile Include="infrastructure\filesystem\DotNetFileSystemService.cs" />
+    <Compile Include="infrastructure\filesystem\IFileSystem.cs" />
+    <Compile Include="infrastructure\information\VersionInformation.cs" />
     <Compile Include="infrastructure\licensing\LicenseValidation.cs" />
     <Compile Include="infrastructure\logging\ILog.cs" />
     <Compile Include="infrastructure\logging\Log.cs" />
@@ -73,7 +83,9 @@
     <Compile Include="infrastructure\platforms\Platform.cs" />
     <Compile Include="infrastructure\platforms\PlatformType.cs" />
     <Compile Include="infrastructure\registration\Bootstrap.cs" />
-    <Compile Include="infrastructure\runners\ChocolateyInstallRunner.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyInstallCommand.cs" />
+    <Compile Include="infrastructure.app\registration\ContainerBinding.cs" />
+    <Compile Include="infrastructure\registration\SimpleInjectorContainerResolutionBehavior.cs" />
     <Compile Include="infrastructure\tokens\TokenReplacer.cs" />
     <Compile Include="LogExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
@@ -86,7 +98,10 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="infrastructure.app\runners\" />
+    <Folder Include="infrastructure\runners\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

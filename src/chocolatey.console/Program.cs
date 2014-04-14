@@ -1,15 +1,19 @@
-﻿namespace chocolatey
+﻿namespace chocolatey.console
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
-    using infrastructure;
-    using infrastructure.configuration;
-    using infrastructure.licensing;
-    using infrastructure.logging;
-    using infrastructure.platforms;
-    using infrastructure.registration;
-    using infrastructure.runners;
+    using System.Text;
+    using chocolatey.infrastructure.app;
+    using chocolatey.infrastructure.app.commands;
+    using chocolatey.infrastructure.app.configuration;
+    using chocolatey.infrastructure.configuration;
+    using chocolatey.infrastructure.information;
+    using chocolatey.infrastructure.licensing;
+    using chocolatey.infrastructure.logging;
+    using chocolatey.infrastructure.platforms;
+    using chocolatey.infrastructure.registration;
     using log4net;
     using log4net.Core;
     using log4net.Repository;
@@ -19,57 +23,99 @@
     {
         private static void Main(string[] args)
         {
-            string outputDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), ApplicationParameters.Name, "logs");
-            if (!Directory.Exists(outputDirectory)) Directory.CreateDirectory(outputDirectory);
-
-            Log4NetAppender.configure(outputDirectory);
-            Bootstrap.initialize();
-            Bootstrap.startup();
-
             try
             {
-                "chocolatey".Log().Info(() => "Starting {0}".FormatWith(ApplicationParameters.Name));
-                string currentAssembly = Assembly.GetExecutingAssembly().Location;
-                string assemblyDirectory = Path.GetDirectoryName(currentAssembly);
+                string outputDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), ApplicationParameters.Name, "logs");
+                if (!Directory.Exists(outputDirectory)) Directory.CreateDirectory(outputDirectory);
+
+                Log4NetAppender.configure(outputDirectory);
+                Bootstrap.initialize();
+                Bootstrap.startup();
+
+                IConfigurationSettings config = new ConfigurationSettings();
+
+                config.ChocolateyVersion = VersionInformation.get_current_assembly_version();
+
+                ConfigurationOptions.parse_arguments_and_update_configuration(args, config, 
+                    (option_set) =>
+                    {
+                        option_set
+                            .Add("d|debug",
+                                 "Run in Debug Mode",
+                                 option => config.Debug = option != null)
+                            .Add("f|force",
+                                 "Force",
+                                 option => config.Force = option != null)
+                            .Add("noop",
+                                 "Noop - Don't actually do anything",
+                                 option => config.Noop = option != null)
+                            ;
+                    },
+                    (unparsedArgs) =>
+                        {
+                            if (!string.IsNullOrWhiteSpace(config.CommandName))
+                            {
+                                // save help for next menu
+                                config.HelpRequested = false;
+                            }
+                        },
+                    () =>
+                        {
+                            var commandsLog = new StringBuilder();
+                            foreach (var command in Enum.GetValues(typeof (CommandNameType)).Cast<CommandNameType>())
+                            {
+                                commandsLog.AppendFormat(" * {0}\n", command.GetDescriptionOrValue());
+                            }
+
+                            "chocolatey".Log().Info(@"Chocolatey v{0}
+Commands:
+{1}
+Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.ChocolateyVersion, commandsLog.ToString()));
+                                                                                  });
+
+                set_logging_level_debug_when_debug(config);
+                set_and_report_platform(config);
+
+                "chocolatey".Log().Info(() => "Starting {0}".format_with(ApplicationParameters.Name));
+                string currentAssemblyLocation = Assembly.GetExecutingAssembly().Location;
+                string assemblyDirectory = Path.GetDirectoryName(currentAssemblyLocation);
                 string licenseFile = Path.Combine(assemblyDirectory, "license.xml");
                 LicenseValidation.Validate(licenseFile);
 
-                var configSettings = new ConfigurationSettings();
-                set_logging_level_debug_when_debug(configSettings);
-                report_platform(configSettings);
 
-                var runner = new ChocolateyInstallRunner();
-                runner.run(args);
+                Config.InitializeWith(config);
+                var application = new ConsoleApplication();
+                application.run(args, config);
 
-#if DEBUG
-                Console.WriteLine("Press enter to continue...");
-                Console.ReadKey();
-#endif
-                Environment.Exit(0);
+                Environment.ExitCode = 0;
             }
             catch (Exception ex)
             {
-                "chocolatey".Log().Error(() => "{0} had an error on {1} (with user {2}):{3}{4}".FormatWith(
+                "chocolatey".Log().Error(() => "{0} had an error on {1} (with user {2}):{3}{4}".format_with(
                     ApplicationParameters.Name,
                     Environment.MachineName,
                     Environment.UserName,
                     Environment.NewLine,
                     ex.ToString()));
 
-#if DEBUG
-                Console.WriteLine("Press enter to continue...");
-                Console.ReadKey();
-#endif
-                Environment.Exit(1);
+                Environment.ExitCode = 1;
+            }
+            finally
+            {
+                pause_execution_if_debug();
+                Bootstrap.shutdown();
+                Environment.Exit(Environment.ExitCode);
             }
         }
 
-        private static void report_platform(ConfigurationSettings configSettings)
+        private static void set_and_report_platform(IConfigurationSettings config)
         {
-            "chocolatey".Log().Info(() => "{0} is running on {1}".FormatWith(ApplicationParameters.Name, Platform.get_platform()));
+            config.PlatformType = Platform.get_platform();
+            config.PlatformVersion = Platform.get_version();
+            "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.PlatformType, config.PlatformVersion.to_string()));
         }
 
-        private static void set_logging_level_debug_when_debug(ConfigurationSettings configSettings)
+        private static void set_logging_level_debug_when_debug(IConfigurationSettings configSettings)
         {
             if (configSettings.Debug)
             {
@@ -84,6 +130,14 @@
                     }
                 }
             }
+        }
+
+        private static void pause_execution_if_debug()
+        {
+#if DEBUG
+            Console.WriteLine("Press enter to continue...");
+            Console.ReadKey();
+#endif
         }
     }
 }

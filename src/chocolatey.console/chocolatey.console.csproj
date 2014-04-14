@@ -8,7 +8,7 @@
     <ProjectGuid>{E24E3386-244F-4404-9E6E-5B53818EA903}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>chocolatey</RootNamespace>
+    <RootNamespace>chocolatey.console</RootNamespace>
     <AssemblyName>choco</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
@@ -54,6 +54,10 @@
     <Compile Include="..\SolutionVersion.cs">
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
+    <Compile Include="ConsoleApplication.cs" />
+    <Compile Include="infrastructure\registration\ContainerBindingConsole.cs" />
+    <Compile Include="infrastructure\registration\SimpleInjectorContainer.cs" />
+    <Compile Include="infrastructure\registration\SimpleInjectorExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -67,6 +71,7 @@
       <Name>chocolatey</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project=".\targets\Microsoft.Application.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
