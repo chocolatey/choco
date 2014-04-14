@@ -68,7 +68,7 @@
                                 commandsLog.AppendFormat(" * {0}\n", command.GetDescriptionOrValue());
                             }
 
-                            "chocolatey".Log().Info(@"Chocolatey v{0}
+                            "chocolatey".Log().Info(@"
 Commands:
 {1}
 Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.ChocolateyVersion, commandsLog.ToString()));
