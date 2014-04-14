@@ -83,13 +83,6 @@
             }
 
             optionSet.WriteOptionDescriptions(Console.Error);
-
-#if DEBUG
-            Console.WriteLine("Press enter to continue...");
-            Console.ReadKey();
-#endif
-
-            Environment.Exit(-1);
         }
     }
 }

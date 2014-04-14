@@ -1,5 +1,6 @@
 ﻿namespace chocolatey.console
 {
+    using System;
     using System.Collections.Generic;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.commands;
@@ -41,6 +42,15 @@
                 () => runner.help_message(config));
             this.Log().Debug(() => "Configuration: {0}".format_with(config.ToString()));
 
+            if (config.HelpRequested)
+            {
+#if DEBUG
+                Console.WriteLine("Press enter to continue...");
+                Console.ReadKey();
+#endif
+                Environment.Exit(-1);
+            }
+            
             runner.run(command_args, config);
         }
     }

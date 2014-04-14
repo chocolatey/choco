@@ -74,6 +74,12 @@ Commands:
 Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.ChocolateyVersion, commandsLog.ToString()));
                                                                                   });
 
+                if (config.HelpRequested)
+                {
+                    pause_execution_if_debug();
+                    Environment.Exit(-1);
+                }
+
                 set_logging_level_debug_when_debug(config);
                 set_and_report_platform(config);
 
@@ -81,7 +87,6 @@ Please run chocolatey with `choco command -help` for specific help on each comma
                 string assemblyDirectory = Path.GetDirectoryName(currentAssemblyLocation);
                 string licenseFile = Path.Combine(assemblyDirectory, "license.xml");
                 LicenseValidation.Validate(licenseFile);
-
 
                 Config.InitializeWith(config);
                 var application = new ConsoleApplication();
