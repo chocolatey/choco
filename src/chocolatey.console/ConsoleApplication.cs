@@ -11,7 +11,6 @@
     {
         public void run(string[] args, IConfigurationSettings config)
         {
-            this.Log().Info(() => "{0} v{1}".format_with(ApplicationParameters.Name, config.ChocolateyVersion));
             this.Log().Debug(() => "Passed in arguments: {0}".format_with(string.Join(" ", args)));
 
             IList<string> command_args = new List<string>();

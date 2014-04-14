@@ -35,6 +35,7 @@
                 IConfigurationSettings config = new ConfigurationSettings();
 
                 config.ChocolateyVersion = VersionInformation.get_current_assembly_version();
+                "chocolatey".Log().Info(() => "{0} v{1}".format_with(ApplicationParameters.Name, config.ChocolateyVersion));
 
                 ConfigurationOptions.parse_arguments_and_update_configuration(args, config, 
                     (option_set) =>
@@ -76,7 +77,6 @@ Please run chocolatey with `choco command -help` for specific help on each comma
                 set_logging_level_debug_when_debug(config);
                 set_and_report_platform(config);
 
-                "chocolatey".Log().Info(() => "Starting {0}".format_with(ApplicationParameters.Name));
                 string currentAssemblyLocation = Assembly.GetExecutingAssembly().Location;
                 string assemblyDirectory = Path.GetDirectoryName(currentAssemblyLocation);
                 string licenseFile = Path.Combine(assemblyDirectory, "license.xml");
