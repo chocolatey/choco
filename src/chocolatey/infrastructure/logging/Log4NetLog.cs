@@ -4,12 +4,12 @@ namespace chocolatey.infrastructure.logging
     using log4net;
 
     /// <summary>
-    /// Log4net logger implementing special ILog class
+    ///     Log4net logger implementing special ILog class
     /// </summary>
     public class Log4NetLog : ILog, ILog<Log4NetLog>
     {
-        private global::log4net.ILog _logger;
-        
+        private log4net.ILog _logger;
+
         public void InitializeFor(string loggerName)
         {
             _logger = LogManager.GetLogger(loggerName);
@@ -27,7 +27,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Info(string message, params object[] formatting)
         {
-           if (_logger.IsInfoEnabled) _logger.InfoFormat(DecorateMessageWithAuditInformation(message), formatting);
+            if (_logger.IsInfoEnabled) _logger.InfoFormat(DecorateMessageWithAuditInformation(message), formatting);
         }
 
         public void Info(Func<string> message)
@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Warn(string message, params object[] formatting)
         {
-           if (_logger.IsWarnEnabled) _logger.WarnFormat(DecorateMessageWithAuditInformation(message), formatting);
+            if (_logger.IsWarnEnabled) _logger.WarnFormat(DecorateMessageWithAuditInformation(message), formatting);
         }
 
         public void Warn(Func<string> message)
@@ -54,7 +54,7 @@ namespace chocolatey.infrastructure.logging
         public void Error(Func<string> message)
         {
             // don't need to check for enabled at this level
-             _logger.Error(DecorateMessageWithAuditInformation(message.Invoke()));
+            _logger.Error(DecorateMessageWithAuditInformation(message.Invoke()));
         }
 
         public void Fatal(string message, params object[] formatting)
@@ -73,6 +73,5 @@ namespace chocolatey.infrastructure.logging
         {
             return message;
         }
-
     }
 }

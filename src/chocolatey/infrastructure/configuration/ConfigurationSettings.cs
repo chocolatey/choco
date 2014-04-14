@@ -1,6 +1,5 @@
 namespace chocolatey.infrastructure.configuration
 {
-
     public class ConfigurationSettings
     {
         public bool DisablePush { get; set; }

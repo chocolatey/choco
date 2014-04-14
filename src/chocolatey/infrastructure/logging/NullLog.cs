@@ -3,7 +3,7 @@ namespace chocolatey.infrastructure.logging
     using System;
 
     /// <summary>
-    /// The default logger until one is set.
+    ///     The default logger until one is set.
     /// </summary>
     public class NullLog : ILog, ILog<NullLog>
     {

@@ -1,42 +1,42 @@
-﻿using chocolatey.infrastructure.configuration;
-using chocolatey.infrastructure.platforms;
-using log4net;
-using log4net.Core;
-using log4net.Repository;
-
-namespace chocolatey
+﻿namespace chocolatey
 {
     using System;
     using System.IO;
     using System.Reflection;
     using infrastructure;
+    using infrastructure.configuration;
     using infrastructure.licensing;
     using infrastructure.logging;
+    using infrastructure.platforms;
     using infrastructure.registration;
     using infrastructure.runners;
+    using log4net;
+    using log4net.Core;
+    using log4net.Repository;
+    using log4net.Repository.Hierarchy;
 
     public class Program
     {
         private static void Main(string[] args)
         {
-            var output_directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), ApplicationParameters.name, "logs");
-            if (!Directory.Exists(output_directory)) Directory.CreateDirectory(output_directory);
+            string outputDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), ApplicationParameters.Name, "logs");
+            if (!Directory.Exists(outputDirectory)) Directory.CreateDirectory(outputDirectory);
 
-            Log4NetAppender.configure(output_directory);
+            Log4NetAppender.configure(outputDirectory);
             Bootstrap.initialize();
             Bootstrap.startup();
 
             try
             {
-                "chocolatey".Log().Info(() => "Starting {0}".FormatWith(ApplicationParameters.name));
-                var current_assembly = Assembly.GetExecutingAssembly().Location;
-                var assembly_dir = Path.GetDirectoryName(current_assembly);
-                var license_file = Path.Combine(assembly_dir, "license.xml");
-                LicenseValidation.Validate(license_file);
+                "chocolatey".Log().Info(() => "Starting {0}".FormatWith(ApplicationParameters.Name));
+                string currentAssembly = Assembly.GetExecutingAssembly().Location;
+                string assemblyDirectory = Path.GetDirectoryName(currentAssembly);
+                string licenseFile = Path.Combine(assemblyDirectory, "license.xml");
+                LicenseValidation.Validate(licenseFile);
 
-                ConfigurationSettings config_settings = new ConfigurationSettings();
-                set_logging_level_debug_when_debug(config_settings);
-                report_platform(config_settings);
+                var configSettings = new ConfigurationSettings();
+                set_logging_level_debug_when_debug(configSettings);
+                report_platform(configSettings);
 
                 var runner = new ChocolateyInstallRunner();
                 runner.run(args);
@@ -50,11 +50,11 @@ namespace chocolatey
             catch (Exception ex)
             {
                 "chocolatey".Log().Error(() => "{0} had an error on {1} (with user {2}):{3}{4}".FormatWith(
-                                      ApplicationParameters.name,
-                                      Environment.MachineName,
-                                      Environment.UserName,
-                                      Environment.NewLine,
-                                      ex.ToString()));
+                    ApplicationParameters.Name,
+                    Environment.MachineName,
+                    Environment.UserName,
+                    Environment.NewLine,
+                    ex.ToString()));
 
 #if DEBUG
                 Console.WriteLine("Press enter to continue...");
@@ -64,20 +64,20 @@ namespace chocolatey
             }
         }
 
-        private static void report_platform(ConfigurationSettings config_settings)
+        private static void report_platform(ConfigurationSettings configSettings)
         {
-            "chocolatey".Log().Info(() => "{0} is running on {1}".FormatWith(ApplicationParameters.name, Platform.get_platform()));
+            "chocolatey".Log().Info(() => "{0} is running on {1}".FormatWith(ApplicationParameters.Name, Platform.get_platform()));
         }
-        
-        private static void set_logging_level_debug_when_debug(ConfigurationSettings config_settings)
+
+        private static void set_logging_level_debug_when_debug(ConfigurationSettings configSettings)
         {
-            if (config_settings.Debug)
+            if (configSettings.Debug)
             {
-                ILoggerRepository log_repository = LogManager.GetRepository(Assembly.GetCallingAssembly());
-                log_repository.Threshold = Level.Debug;
-                foreach (log4net.Core.ILogger log in log_repository.GetCurrentLoggers())
+                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly());
+                logRepository.Threshold = Level.Debug;
+                foreach (ILogger log in logRepository.GetCurrentLoggers())
                 {
-                    var logger = log as log4net.Repository.Hierarchy.Logger;
+                    var logger = log as Logger;
                     if (logger != null)
                     {
                         logger.Level = Level.Debug;

@@ -1,45 +1,45 @@
-﻿using System.IO;
-using System.Reflection;
-
-namespace chocolatey
+﻿namespace chocolatey
 {
+    using System.IO;
+    using System.Reflection;
+
     public static class AssemblyExtensions
     {
         /// <summary>
-        /// Get the manifest resource string from the specified assembly.
+        ///     Get the manifest resource string from the specified assembly.
         /// </summary>
         /// <param name="assembly">The assembly.</param>
-        /// <param name="manifest_resource_stream_location">The manifest resource stream location.</param>
+        /// <param name="manifestResourceStreamLocation">The manifest resource stream location.</param>
         /// <returns></returns>
-        public static string get_manifest_string(this Assembly assembly, string manifest_resource_stream_location)
+        public static string get_manifest_string(this Assembly assembly, string manifestResourceStreamLocation)
         {
-            var manifest_file_text = "";
+            string manifestFileText = "";
 
-            using (var manifest_file_stream = assembly.GetManifestResourceStream(manifest_resource_stream_location))
+            using (Stream manifestFileStream = assembly.GetManifestResourceStream(manifestResourceStreamLocation))
             {
-                if (manifest_file_stream != null)
+                if (manifestFileStream != null)
                 {
-                    using (var stream_reader = new StreamReader(manifest_file_stream))
+                    using (var streamReader = new StreamReader(manifestFileStream))
                     {
-                        manifest_file_text = stream_reader.ReadToEnd();
-                        stream_reader.Close();
-                        manifest_file_stream.Close();
+                        manifestFileText = streamReader.ReadToEnd();
+                        streamReader.Close();
+                        manifestFileStream.Close();
                     }
                 }
             }
 
-            return manifest_file_text;
+            return manifestFileText;
         }
 
         /// <summary>
-        /// Get manifest resource stream from the specified assembly. Useful when grabbing binaries.
+        ///     Get manifest resource stream from the specified assembly. Useful when grabbing binaries.
         /// </summary>
         /// <param name="assembly">The assembly.</param>
-        /// <param name="manifest_resource_stream_location">The manifest resource stream location.</param>
+        /// <param name="manifestResourceStreamLocation">The manifest resource stream location.</param>
         /// <returns></returns>
-        public static Stream get_manifest_stream(this Assembly assembly, string manifest_resource_stream_location)
+        public static Stream get_manifest_stream(this Assembly assembly, string manifestResourceStreamLocation)
         {
-            return assembly.GetManifestResourceStream(manifest_resource_stream_location);
+            return assembly.GetManifestResourceStream(manifestResourceStreamLocation);
         }
     }
 }

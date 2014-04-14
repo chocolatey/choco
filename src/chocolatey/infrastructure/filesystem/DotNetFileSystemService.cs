@@ -1,87 +1,85 @@
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-
 namespace chocolatey.infrastructure.filesystem
 {
     using System;
     using System.Collections;
+    using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Runtime.InteropServices;
-    using logging;
+    using System.Text;
 
     /// <summary>
-    /// All file system access code comes through here
+    ///     All file system access code comes through here
     /// </summary>
     public sealed class DotNetFileSystemService
     {
         #region File
 
         /// <summary>
-        /// Determines if a file exists
+        ///     Determines if a file exists
         /// </summary>
-        /// <param name="file_path">Path to the file</param>
+        /// <param name="filePath">Path to the file</param>
         /// <returns>True if there is a file already existing, otherwise false</returns>
-        public bool file_exists(string file_path)
+        public bool file_exists(string filePath)
         {
-            return File.Exists(file_path);
+            return File.Exists(filePath);
         }
 
         /// <summary>
-        /// Creates a file
+        ///     Creates a file
         /// </summary>
-        /// <param name="file_path">Path to the file name</param>
+        /// <param name="filePath">Path to the file name</param>
         /// <returns>A file stream object for use after creating the file</returns>
-        public FileStream create_file(string file_path)
+        public FileStream create_file(string filePath)
         {
-            return new FileStream(file_path, FileMode.OpenOrCreate);
+            return new FileStream(filePath, FileMode.OpenOrCreate);
         }
 
         /// <summary>
-        /// Opens a file
+        ///     Opens a file
         /// </summary>
-        /// <param name="file_path">Path to the file name</param>
+        /// <param name="filePath">Path to the file name</param>
         /// <returns>A file stream object for use after accessing the file</returns>
-        public FileStream open_file_in_read_mode_from(string file_path)
+        public FileStream open_file_in_read_mode_from(string filePath)
         {
-            return File.OpenRead(file_path);
+            return File.OpenRead(filePath);
         }
 
         /// <summary>
-        /// Returns the contents of a file
+        ///     Returns the contents of a file
         /// </summary>
-        /// <param name="file_path">Path to the file name</param>
+        /// <param name="filePath">Path to the file name</param>
         /// <returns>A string of the file contents</returns>
-        public string read_file_text(string file_path)
+        public string read_file_text(string filePath)
         {
-            return File.ReadAllText(file_path, get_file_encoding(file_path));
+            return File.ReadAllText(filePath, get_file_encoding(filePath));
         }
 
-        public void write_file_text(string file_path, string file_text)
+        public void write_file_text(string filePath, string fileText)
         {
-            var encoding = file_exists(file_path) ? get_file_encoding(file_path) : Encoding.UTF8;
-            write_file_text(file_path, file_text, encoding);
+            Encoding encoding = file_exists(filePath) ? get_file_encoding(filePath) : Encoding.UTF8;
+            write_file_text(filePath, fileText, encoding);
         }
 
-        public void write_file_text(string file_path, string file_text, Encoding encoding)
+        public void write_file_text(string filePath, string fileText, Encoding encoding)
         {
-            File.WriteAllText(file_path, file_text, encoding);
+            File.WriteAllText(filePath, fileText, encoding);
         }
 
         /// <summary>
-        /// Takes a guess at the file encoding by looking to see if it has a BOM
+        ///     Takes a guess at the file encoding by looking to see if it has a BOM
         /// </summary>
-        /// <param name="file_path">Path to the file name</param>
+        /// <param name="filePath">Path to the file name</param>
         /// <returns>A best guess at the encoding of the file</returns>
         /// <remarks>http://www.west-wind.com/WebLog/posts/197245.aspx</remarks>
-        public static Encoding get_file_encoding(string file_path)
+        public static Encoding get_file_encoding(string filePath)
         {
             // *** Use Default of Encoding.Default (Ansi CodePage)
             Encoding enc = Encoding.Default;
 
             // *** Detect byte order mark if any - otherwise assume default
-            byte[] buffer = new byte[5];
-            FileStream file = new FileStream(file_path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            var buffer = new byte[5];
+            var file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             file.Read(buffer, 0, 5);
             file.Close();
 
@@ -98,28 +96,28 @@ namespace chocolatey.infrastructure.filesystem
         }
 
         /// <summary>
-        /// Copies a file from one directory to another
+        ///     Copies a file from one directory to another
         /// </summary>
-        /// <param name="source_file_name">Where is the file now?</param>
-        /// <param name="destination_file_name">Where would you like it to go?</param>
-        /// <param name="overwrite_the_existing_file">If there is an existing file already there, would you like to delete it?</param>
-        public void file_copy(string source_file_name, string destination_file_name, bool overwrite_the_existing_file)
+        /// <param name="sourceFileName">Where is the file now?</param>
+        /// <param name="destinationFileName">Where would you like it to go?</param>
+        /// <param name="overwriteTheExistingFile">If there is an existing file already there, would you like to delete it?</param>
+        public void file_copy(string sourceFileName, string destinationFileName, bool overwriteTheExistingFile)
         {
-            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".FormatWith(source_file_name, destination_file_name));
-            File.Copy(source_file_name, destination_file_name, overwrite_the_existing_file);
+            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".FormatWith(sourceFileName, destinationFileName));
+            File.Copy(sourceFileName, destinationFileName, overwriteTheExistingFile);
         }
 
         /// <summary>
-        /// Copies a file from one directory to another using PInvoke
+        ///     Copies a file from one directory to another using PInvoke
         /// </summary>
-        /// <param name="source_file_name">Where is the file now?</param>
-        /// <param name="destination_file_name">Where would you like it to go?</param>
-        /// <param name="overwrite_the_existing_file">If there is an existing file already there, would you like to delete it?</param>
-        public void file_copy_unsafe(string source_file_name, string destination_file_name, bool overwrite_the_existing_file)
+        /// <param name="sourceFileName">Where is the file now?</param>
+        /// <param name="destinationFileName">Where would you like it to go?</param>
+        /// <param name="overwriteTheExistingFile">If there is an existing file already there, would you like to delete it?</param>
+        public void file_copy_unsafe(string sourceFileName, string destinationFileName, bool overwriteTheExistingFile)
         {
-            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".FormatWith(source_file_name, destination_file_name));
+            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".FormatWith(sourceFileName, destinationFileName));
             //Private Declare Function apiCopyFile Lib "kernel32" Alias "CopyFileA" _
-            int success = CopyFileA(source_file_name, destination_file_name, overwrite_the_existing_file ? 0 : 1);
+            int success = CopyFileA(sourceFileName, destinationFileName, overwriteTheExistingFile ? 0 : 1);
 
             //File.Copy(source_file_name, destination_file_name, overwrite_the_existing_file);
         }
@@ -129,120 +127,119 @@ namespace chocolatey.infrastructure.filesystem
 
 
         /// <summary>
-        /// Determines the file information given a path to an existing file
+        ///     Determines the file information given a path to an existing file
         /// </summary>
-        /// <param name="file_path">Path to an existing file</param>
+        /// <param name="filePath">Path to an existing file</param>
         /// <returns>FileInfo object</returns>
-        public FileInfo get_file_info_from(string file_path)
+        public FileInfo get_file_info_from(string filePath)
         {
-            return new FileInfo(file_path);
+            return new FileInfo(filePath);
         }
 
         /// <summary>
-        /// Determines the FileVersion of the file passed in
+        ///     Determines the FileVersion of the file passed in
         /// </summary>
-        /// <param name="file_path">Relative or full path to a file</param>
+        /// <param name="filePath">Relative or full path to a file</param>
         /// <returns>A string representing the FileVersion of the passed in file</returns>
-        public string get_file_version_from(string file_path)
+        public string get_file_version_from(string filePath)
         {
-            return FileVersionInfo.GetVersionInfo(get_full_path(file_path)).FileVersion;
+            return FileVersionInfo.GetVersionInfo(get_full_path(filePath)).FileVersion;
         }
 
         /// <summary>
-        /// Determines if a file is a system file
+        ///     Determines if a file is a system file
         /// </summary>
         /// <param name="file">File to check</param>
         /// <returns>True if the file has the System attribute marked, otherwise false</returns>
         public bool is_system_file(FileInfo file)
         {
-            bool is_system_file = ((file.Attributes & FileAttributes.System) == FileAttributes.System);
-            if (!is_system_file)
+            bool isSystemFile = ((file.Attributes & FileAttributes.System) == FileAttributes.System);
+            if (!isSystemFile)
             {
                 //check the directory to be sure
                 DirectoryInfo directory_info = get_directory_info_from(file.DirectoryName);
-                is_system_file = ((directory_info.Attributes & FileAttributes.System) == FileAttributes.System);
-                this.Log().Debug(() => "Is directory \"{0}\" a system directory? {1}".FormatWith(file.DirectoryName,
-                                    is_system_file.to_string()));
+                isSystemFile = ((directory_info.Attributes & FileAttributes.System) == FileAttributes.System);
+                this.Log().Debug(() => "Is directory \"{0}\" a system directory? {1}".FormatWith(file.DirectoryName, isSystemFile.to_string()));
             }
             else
             {
-                this.Log().Debug(() => "File \"{0}\" is a system file.".FormatWith( file.FullName));
+                this.Log().Debug(() => "File \"{0}\" is a system file.".FormatWith(file.FullName));
             }
-            return is_system_file;
+            return isSystemFile;
         }
 
         /// <summary>
-        /// Determines if a file is encrypted or not
+        ///     Determines if a file is encrypted or not
         /// </summary>
         /// <param name="file">File to check</param>
         /// <returns>True if the file has the Encrypted attribute marked, otherwise false</returns>
         public bool is_encrypted_file(FileInfo file)
         {
-            bool is_encrypted = ((file.Attributes & FileAttributes.Encrypted) == FileAttributes.Encrypted);
-            this.Log().Debug(() => "Is file \"{0}\" an encrypted file? {1}".FormatWith(file.FullName, is_encrypted.to_string()));
-            return is_encrypted;
+            bool isEncrypted = ((file.Attributes & FileAttributes.Encrypted) == FileAttributes.Encrypted);
+            this.Log().Debug(() => "Is file \"{0}\" an encrypted file? {1}".FormatWith(file.FullName, isEncrypted.to_string()));
+            return isEncrypted;
         }
 
         /// <summary>
-        /// Determines if a file has the same extension as in the list of types
+        ///     Determines if a file has the same extension as in the list of types
         /// </summary>
-        /// <param name="file_name">File to check</param>
-        /// <param name="file_types">File types to check against, listed as file extensions</param>
+        /// <param name="fileName">File to check</param>
+        /// <param name="fileTypes">File types to check against, listed as file extensions</param>
         /// <returns>True if the file in question has a file type in the list</returns>
-        public bool file_in_file_types(string file_name, string[] file_types)
+        public bool file_in_file_types(string fileName, string[] fileTypes)
         {
-            if (Array.IndexOf(file_types, ".*") > -1 || Array.IndexOf(file_types, get_file_extension_from(file_name).to_lower()) > -1)
+            if (Array.IndexOf(fileTypes, ".*") > -1 || Array.IndexOf(fileTypes, get_file_extension_from(fileName).to_lower()) > -1)
             {
-                this.Log().Debug(() => "File \"{0}\" is in the approved file types of \"{1}\".".FormatWith(file_name,
-                                    string.Join(";", file_types)));
+                this.Log().Debug(() => "File \"{0}\" is in the approved file types of \"{1}\".".FormatWith(fileName,
+                                                                                                           string.Join(";", fileTypes)));
                 return true;
             }
 
-            this.Log().Info(()=>"File \"{0}\" is not in the approved file types of \"{1}\".".FormatWith(file_name,string.Join(";", file_types)));
+            this.Log().Info(() => "File \"{0}\" is not in the approved file types of \"{1}\".".FormatWith(fileName, string.Join(";", fileTypes)));
             return false;
         }
 
         /// <summary>
-        /// Determines the older of the file dates, Creation Date or Modified Date
+        ///     Determines the older of the file dates, Creation Date or Modified Date
         /// </summary>
-        /// <param name="file_path">File to analyze</param>
+        /// <param name="filePath">File to analyze</param>
         /// <returns>The oldest date on the file</returns>
-        public string get_file_date(string file_path)
+        public string get_file_date(string filePath)
         {
-            FileInfo file = get_file_info_from(file_path);
+            FileInfo file = get_file_info_from(filePath);
             return file.CreationTime < file.LastWriteTime
-                                  ? file.CreationTime.Date.ToString("yyyyMMdd")
-                                  : file.LastWriteTime.Date.ToString("yyyyMMdd");
+                       ? file.CreationTime.Date.ToString("yyyyMMdd")
+                       : file.LastWriteTime.Date.ToString("yyyyMMdd");
         }
 
         /// <summary>
-        /// Determines the file name from the filepath
+        ///     Determines the file name from the filepath
         /// </summary>
-        /// <param name="file_path">Full path to file including file name</param>
+        /// <param name="filePath">Full path to file including file name</param>
         /// <returns>Returns only the file name from the filepath</returns>
-        public string get_file_name_from(string file_path)
+        public string get_file_name_from(string filePath)
         {
-            return Path.GetFileName(file_path);
+            return Path.GetFileName(filePath);
         }
 
         /// <summary>
-        /// Determines the file name from the filepath without the extension
+        ///     Determines the file name from the filepath without the extension
         /// </summary>
-        /// <param name="file_path">Full path to file including file name</param>
+        /// <param name="filePath">Full path to file including file name</param>
         /// <returns>Returns only the file name minus extensions from the filepath</returns>
-        public string get_file_name_without_extension_from(string file_path)
+        public string get_file_name_without_extension_from(string filePath)
         {
-            return Path.GetFileNameWithoutExtension(file_path);
+            return Path.GetFileNameWithoutExtension(filePath);
         }
 
         /// <summary>
-        /// Determines the file extension for a given path to a file
+        ///     Determines the file extension for a given path to a file
         /// </summary>
-        /// <param name="file_path">The file to find the extension for</param>
+        /// <param name="filePath">The file to find the extension for</param>
         /// <returns>The extension of the file.</returns>
-        public string get_file_extension_from(string file_path)
+        public string get_file_extension_from(string filePath)
         {
-            return Path.GetExtension(file_path);
+            return Path.GetExtension(filePath);
         }
 
         #endregion
@@ -250,7 +247,7 @@ namespace chocolatey.infrastructure.filesystem
         #region Directory
 
         /// <summary>
-        /// Verifies a directory exists, if it doesn't, it creates a new directory at that location
+        ///     Verifies a directory exists, if it doesn't, it creates a new directory at that location
         /// </summary>
         /// <param name="directory">Directory to verify exists</param>
         public void verify_or_create_directory(string directory)
@@ -263,7 +260,7 @@ namespace chocolatey.infrastructure.filesystem
                 }
                 catch (SystemException e)
                 {
-                    this.Log().Error("Cannot create directory \"{0}\". Error was:{1}{2}",get_full_path(directory),Environment.NewLine, e);
+                    this.Log().Error("Cannot create directory \"{0}\". Error was:{1}{2}", get_full_path(directory), Environment.NewLine, e);
                     throw;
                 }
             }
@@ -274,17 +271,17 @@ namespace chocolatey.infrastructure.filesystem
         }
 
         /// <summary>
-        /// Determines the directory name for a given file path. Useful when working with relative files
+        ///     Determines the directory name for a given file path. Useful when working with relative files
         /// </summary>
-        /// <param name="file_path">File to get the directory name from</param>
+        /// <param name="filePath">File to get the directory name from</param>
         /// <returns>Returns only the path to the directory name</returns>
-        public string get_directory_name_from(string file_path)
+        public string get_directory_name_from(string filePath)
         {
-            return Path.GetDirectoryName(get_full_path(file_path));
+            return Path.GetDirectoryName(get_full_path(filePath));
         }
 
         /// <summary>
-        /// Returns a DirectoryInfo object from a string
+        ///     Returns a DirectoryInfo object from a string
         /// </summary>
         /// <param name="directory">Full path to the directory you want the directory information for</param>
         /// <returns>DirectoryInfo object</returns>
@@ -294,17 +291,17 @@ namespace chocolatey.infrastructure.filesystem
         }
 
         /// <summary>
-        /// Returns a DirectoryInfo object from a string to a filepath
+        ///     Returns a DirectoryInfo object from a string to a filepath
         /// </summary>
-        /// <param name="file_path">Full path to the file you want directory information for</param>
+        /// <param name="filePath">Full path to the file you want directory information for</param>
         /// <returns>DirectoryInfo object</returns>
-        public DirectoryInfo get_directory_info_from_file_path(string file_path)
+        public DirectoryInfo get_directory_info_from_file_path(string filePath)
         {
-            return new DirectoryInfo(file_path).Parent;
+            return new DirectoryInfo(filePath).Parent;
         }
 
         /// <summary>
-        /// Determines if a directory exists
+        ///     Determines if a directory exists
         /// </summary>
         /// <param name="directory">Path to the directory</param>
         /// <returns>True if there is a directory already existing, otherwise false</returns>
@@ -314,7 +311,7 @@ namespace chocolatey.infrastructure.filesystem
         }
 
         /// <summary>
-        /// Creates a directory
+        ///     Creates a directory
         /// </summary>
         /// <param name="directory">Path to the directory</param>
         /// <returns>A directory information object for use after creating the directory</returns>
@@ -325,7 +322,7 @@ namespace chocolatey.infrastructure.filesystem
         }
 
         /// <summary>
-        /// Deletes a directory
+        ///     Deletes a directory
         /// </summary>
         /// <param name="directory">Path to the directory</param>
         /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
@@ -336,7 +333,7 @@ namespace chocolatey.infrastructure.filesystem
         }
 
         /// <summary>
-        /// Gets a list of directories inside of an existing directory
+        ///     Gets a list of directories inside of an existing directory
         /// </summary>
         /// <param name="directory">Directory to look for subdirectories in</param>
         /// <returns>A list of subdirectories inside of the existing directory</returns>
@@ -346,7 +343,7 @@ namespace chocolatey.infrastructure.filesystem
         }
 
         /// <summary>
-        /// Gets a list of files inside of an existing directory
+        ///     Gets a list of files inside of an existing directory
         /// </summary>
         /// <param name="directory">Path to the directory</param>
         /// <returns>A list of files inside of an existing directory</returns>
@@ -356,7 +353,7 @@ namespace chocolatey.infrastructure.filesystem
         }
 
         /// <summary>
-        /// Gets a list of files inside of an existing directory
+        ///     Gets a list of files inside of an existing directory
         /// </summary>
         /// <param name="directory">Path to the directory</param>
         /// <param name="pattern">Pattern or extension</param>
@@ -368,7 +365,7 @@ namespace chocolatey.infrastructure.filesystem
         }
 
         /// <summary>
-        /// Gets a list of all files inside of an existing directory, includes files in subdirectories also
+        ///     Gets a list of all files inside of an existing directory, includes files in subdirectories also
         /// </summary>
         /// <param name="directory">Path to the directory</param>
         /// <param name="pattern">Pattern or extension</param>
@@ -376,7 +373,7 @@ namespace chocolatey.infrastructure.filesystem
         public string[] get_all_file_name_strings_recursively_in(string directory, string pattern)
         {
             // ArrayList will hold all file names
-            ArrayList returnList = new ArrayList();
+            var returnList = new ArrayList();
 
             // Create an array of filter string
             string[] MultipleFilters = pattern.Split('|');
@@ -389,14 +386,14 @@ namespace chocolatey.infrastructure.filesystem
             }
 
             // returns string array of relevant file names
-            string[] returnFiles = (string[])returnList.ToArray(typeof(string));
+            var returnFiles = (string[]) returnList.ToArray(typeof (string));
             return returnFiles.OrderBy(get_file_name_from).ToArray();
         }
 
         #endregion
 
         /// <summary>
-        /// Determines the full path to a given directory. Useful when working with relative directories
+        ///     Determines the full path to a given directory. Useful when working with relative directories
         /// </summary>
         /// <param name="path">Where to get the full path from</param>
         /// <returns>Returns the full path to the file or directory</returns>
@@ -406,20 +403,19 @@ namespace chocolatey.infrastructure.filesystem
         }
 
         /// <summary>
-        /// Combines a set of paths into one path
+        ///     Combines a set of paths into one path
         /// </summary>
         /// <param name="paths">Each item in order from left to right of the path</param>
         /// <returns></returns>
         public string combine_paths(params string[] paths)
         {
-            string combined_path = String.Empty;
+            string combinedPath = String.Empty;
             foreach (string path in paths)
             {
-                combined_path = Path.Combine(combined_path, path);
+                combinedPath = Path.Combine(combinedPath, path);
             }
 
-            return combined_path;
+            return combinedPath;
         }
-
     }
 }

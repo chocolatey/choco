@@ -1,11 +1,10 @@
-using System;
-using System.IO;
-
 namespace chocolatey.infrastructure.platforms
 {
+    using System;
+    using System.IO;
+
     public static class Platform
     {
-
         public static PlatformType get_platform()
         {
             switch (Environment.OSVersion.Platform)
@@ -28,6 +27,10 @@ namespace chocolatey.infrastructure.platforms
                     return PlatformType.Windows;
             }
         }
-    }
 
+        public static Version get_version()
+        {
+            return Environment.OSVersion.Version;
+        }
+    }
 }

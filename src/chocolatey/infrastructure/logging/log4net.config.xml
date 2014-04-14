@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0"?>
+
 <log4net>
   <appender name="ColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
     <mapping>
@@ -25,12 +26,12 @@
   </appender>
 
   <root>
-    <level value="INFO"/>
-    <appender-ref ref="ColoredConsoleAppender"/>
+    <level value="INFO" />
+    <appender-ref ref="ColoredConsoleAppender" />
   </root>
 
   <!--<logger name="chocolatey">-->
-    <!--<level value="INFO"/>
+  <!--<level value="INFO"/>
   </logger>-->
 
 </log4net>

@@ -1,43 +1,43 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-
 namespace chocolatey.infrastructure.commands
 {
+    using System;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Reflection;
+
     public class CommandExecutor
     {
-        public static int execute(string process, string arguments, bool wait_for_exit)
+        public static int execute(string process, string arguments, bool waitForExit)
         {
-            return execute(process, arguments, wait_for_exit, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            return execute(process, arguments, waitForExit, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
         }
 
-        public static int execute(string process, string arguments, bool wait_for_exit, string working_directory)
+        public static int execute(string process, string arguments, bool waitForExit, string workingDirectory)
         {
-            return execute(process, arguments, wait_for_exit, working_directory, update_process_path: true);
+            return execute(process, arguments, waitForExit, workingDirectory, updateProcessPath: true);
         }
 
-        public static int execute(string process, string arguments, bool wait_for_exit, string working_directory, bool update_process_path)
+        public static int execute(string process, string arguments, bool waitForExit, string workingDirectory, bool updateProcessPath)
         {
-            int exit_code = -1;
-            if (update_process_path)
+            int exitCode = -1;
+            if (updateProcessPath)
             {
                 process = Path.GetFullPath(process);
             }
 
-            ProcessStartInfo psi = new ProcessStartInfo(process, arguments)
-                                       {
-                                           UseShellExecute = false,
-                                           WorkingDirectory = working_directory,
-                                           RedirectStandardOutput = true,
-                                           RedirectStandardError = true,
-                                           CreateNoWindow = true
-                                       };
+            var psi = new ProcessStartInfo(process, arguments)
+                {
+                    UseShellExecute = false,
+                    WorkingDirectory = workingDirectory,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
 
-            StreamReader standard_output;
-            StreamReader error_output;
+            StreamReader standardOutput;
+            StreamReader errorOutput;
 
-            using (Process p = new Process())
+            using (var p = new Process())
             {
                 p.StartInfo = psi;
                 p.ErrorDataReceived += log_output;
@@ -46,15 +46,15 @@ namespace chocolatey.infrastructure.commands
                 p.Start();
                 p.BeginErrorReadLine();
                 p.BeginOutputReadLine();
-                
-                if (wait_for_exit)
+
+                if (waitForExit)
                 {
                     p.WaitForExit();
                 }
-                exit_code = p.ExitCode;
+                exitCode = p.ExitCode;
             }
-            
-            return exit_code;
+
+            return exitCode;
         }
 
         private static void log_output(object sender, DataReceivedEventArgs e)
