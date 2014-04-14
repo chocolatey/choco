@@ -71,9 +71,13 @@
         <exec
           program="cmd"
           workingdir="${directory::get-parent-directory(spec.file)}"
-          failonerror="false">
+          failonerror="false"
+          if="${platform::is-windows()}">
             <arg value="/c ${app.nuget} pack ${spec.file}" />
         </exec>
+        <exec program="mono"
+          workingdir="${directory::get-parent-directory(spec.file)}"
+          commandline="'${app.nuget}' pack '${spec.file}'" if="${platform::is-unix()}"/>
       </do>
     </foreach>
   </target>
