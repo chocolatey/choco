@@ -31,8 +31,8 @@ namespace chocolatey
                 "chocolatey".Log().Info(() => "Starting {0}".FormatWith(ApplicationParameters.name));
                 var current_assembly = Assembly.GetExecutingAssembly().Location;
                 var assembly_dir = Path.GetDirectoryName(current_assembly);
-                var licencse_file = Path.Combine(assembly_dir, "license.xml");
-                LicenseValidation.Validate(licencse_file);
+                var license_file = Path.Combine(assembly_dir, "license.xml");
+                LicenseValidation.Validate(license_file);
 
                 ConfigurationSettings config_settings = new ConfigurationSettings();
                 set_logging_level_debug_when_debug(config_settings);
