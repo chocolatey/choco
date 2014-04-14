@@ -4,7 +4,7 @@ build_output
 code_drop
 [Bb]in
 obj
-/packages
+src/packages
 
 
 *.suo
