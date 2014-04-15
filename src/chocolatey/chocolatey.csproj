@@ -60,6 +60,9 @@
     <Compile Include="infrastructure.app\ApplicationParameters.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
     <Compile Include="infrastructure.app\commands\CommandNameType.cs" />
+    <Compile Include="infrastructure.app\configuration\settings\ChocolateyConfiguration.cs" />
+    <Compile Include="infrastructure.app\configuration\settings\SourceConfigurationElement.cs" />
+    <Compile Include="infrastructure.app\configuration\settings\SourcesConfigurationCollection.cs" />
     <Compile Include="infrastructure\commandline\Options.cs" />
     <Compile Include="infrastructure\commands\CommandExecutor.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigurationSettings.cs" />
