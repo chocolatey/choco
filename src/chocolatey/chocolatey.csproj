@@ -59,6 +59,7 @@
     <Compile Include="EnumerationExtensions.cs" />
     <Compile Include="infrastructure.app\ApplicationParameters.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyUnpackSelfCommand.cs" />
     <Compile Include="infrastructure.app\commands\CommandNameType.cs" />
     <Compile Include="infrastructure.app\configuration\settings\ChocolateyConfiguration.cs" />
     <Compile Include="infrastructure.app\configuration\settings\SourceConfigurationElement.cs" />
@@ -98,9 +99,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="infrastructure\runners\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\chocolatey.resources\chocolatey.resources.csproj">
       <Project>{AF584111-FE32-448D-A1D0-63217AF8B43C}</Project>

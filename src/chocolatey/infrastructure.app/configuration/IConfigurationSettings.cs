@@ -33,10 +33,15 @@
         /// Space separated package names.
         /// </value>
         string PackageNames { get; set; }
-
         string Version { get; set; }
         bool LocalOnly { get; set; }
         string Filter { get; set; }
         bool Prerelease { get; set; }
+        bool ForceX86 { get; set; }
+        string InstallArguments { get; set; }
+        bool OverrideArguments { get; set; }
+        bool NotSilent { get; set; }
+        string PackageParameters { get; set; }
+        bool IgnoreDependencies { get; set; }
     }
 }

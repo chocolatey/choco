@@ -19,6 +19,8 @@
         [Description("sources - view and configure default sources")]
         sources,
         [Description("config - view and change configuration")]
-        config
+        config,
+        [Description("unpackself - have chocolatey set it self up")]
+        unpackself,
     }
 }

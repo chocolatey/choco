@@ -42,13 +42,13 @@
                     {
                         option_set
                             .Add("d|debug",
-                                 "Run in Debug Mode",
+                                 "Debug - Run in Debug Mode.",
                                  option => config.Debug = option != null)
                             .Add("f|force",
-                                 "Force",
+                                 "Force - force the behavior",
                                  option => config.Force = option != null)
                             .Add("noop",
-                                 "Noop - Don't actually do anything",
+                                 "NoOp - Don't actually do anything.",
                                  option => config.Noop = option != null)
                             ;
                     },

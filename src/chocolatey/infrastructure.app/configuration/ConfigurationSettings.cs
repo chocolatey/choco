@@ -41,5 +41,11 @@ namespace chocolatey.infrastructure.app.configuration
         public bool LocalOnly { get; set; }
         public string Filter { get; set; }
         public bool Prerelease { get; set; }
+        public bool ForceX86 { get; set; }
+        public string InstallArguments { get; set; }
+        public bool OverrideArguments { get; set; }
+        public bool NotSilent { get; set; }
+        public string PackageParameters { get; set; }
+        public bool IgnoreDependencies { get; set; }
     }
 }

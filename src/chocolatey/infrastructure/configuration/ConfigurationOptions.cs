@@ -31,7 +31,7 @@
             {
                 _optionSet
                     .Add("?|help|h",
-                         "Prints out the options.",
+                         "Prints out the help menu.",
                          option => configuration.HelpRequested = option != null);
             }
 
