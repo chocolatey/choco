@@ -1,0 +1,1 @@
+ShimGen has a pending license. It should not be used separate from chocolatey.

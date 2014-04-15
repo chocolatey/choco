@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7656D054
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey", "chocolatey\chocolatey.csproj", "{5563DC61-35FD-4FAB-B331-9AE1FDB23F80}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.resources", "chocolatey.resources\chocolatey.resources.csproj", "{AF584111-FE32-448D-A1D0-63217AF8B43C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,16 @@ Global
 		{5563DC61-35FD-4FAB-B331-9AE1FDB23F80}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{5563DC61-35FD-4FAB-B331-9AE1FDB23F80}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{5563DC61-35FD-4FAB-B331-9AE1FDB23F80}.Release|x86.ActiveCfg = Release|Any CPU
+		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
