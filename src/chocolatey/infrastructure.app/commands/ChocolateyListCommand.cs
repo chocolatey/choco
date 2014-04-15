@@ -32,7 +32,7 @@ List Command
 ");
         }
 
-        public void run(ICollection<string> args, IConfigurationSettings configuration)
+        public void run(IConfigurationSettings configuration)
         {
         }
     }

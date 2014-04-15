@@ -32,8 +32,7 @@
         /// <summary>
         /// Runs the specified arguments.
         /// </summary>
-        /// <param name="args">The arguments.</param>
         /// <param name="config">The configuration.</param>
-        void run(ICollection<string> args, IConfigurationSettings config);
+        void run(IConfigurationSettings config);
     }
 }

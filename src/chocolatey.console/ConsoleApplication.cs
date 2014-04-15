@@ -5,6 +5,7 @@
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
+    using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.configuration;
     using infrastructure.registration;
 
@@ -13,6 +14,8 @@
         public void run(string[] args, IConfigurationSettings config)
         {
             this.Log().Debug(() => "Passed in arguments: {0}".format_with(string.Join(" ", args)));
+
+            SimpleInjectorContainer.Initialize();
 
             IList<string> command_args = new List<string>();
             //shift the first arg off 
@@ -28,10 +31,9 @@
                 command_args.Add(arg);
             }
 
-            SimpleInjectorContainer.Initialize();
-
             // get the runner you need and go to town
-            var runner = new ChocolateyInstallCommand();
+            //load the runners up in the container with their key being the name from commandnametype
+            ICommand runner = new ChocolateyInstallCommand();
             //
 
             ConfigurationOptions.parse_arguments_and_update_configuration(
@@ -51,7 +53,7 @@
                 Environment.Exit(-1);
             }
             
-            runner.run(command_args, config);
+            runner.run(config);
         }
     }
 }
