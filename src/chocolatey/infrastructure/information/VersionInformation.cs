@@ -3,7 +3,7 @@
     using System.Diagnostics;
     using System.Reflection;
 
-    public class VersionInformation
+    public sealed class VersionInformation
     {
         public static string get_current_assembly_version()
         {

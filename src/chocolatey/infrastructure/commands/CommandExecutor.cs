@@ -5,7 +5,7 @@ namespace chocolatey.infrastructure.commands
     using System.IO;
     using System.Reflection;
 
-    public class CommandExecutor
+    public sealed class CommandExecutor
     {
         public static int execute(string process, string arguments, bool waitForExit)
         {

@@ -19,7 +19,7 @@
     using log4net.Repository;
     using log4net.Repository.Hierarchy;
 
-    public class Program
+    public sealed class Program
     {
         private static void Main(string[] args)
         {

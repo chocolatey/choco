@@ -5,7 +5,7 @@
     /// <summary>
     /// Configuration initialization
     /// </summary>
-    public class Config
+    public sealed class Config
     {
         private static IConfigurationSettings _configuration = new ConfigurationSettings();
 

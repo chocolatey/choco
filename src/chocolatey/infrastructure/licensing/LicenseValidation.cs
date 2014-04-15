@@ -2,7 +2,7 @@ namespace chocolatey.infrastructure.licensing
 {
     using Rhino.Licensing;
 
-    public class LicenseValidation
+    public sealed class LicenseValidation
     {
         //private const string publicKey = @""
 

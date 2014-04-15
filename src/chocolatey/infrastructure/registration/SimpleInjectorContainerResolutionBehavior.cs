@@ -11,7 +11,7 @@
     /// <remarks>
     /// Adapted from https://simpleinjector.codeplex.com/wikipage?title=T4MVC%20Integration
     /// </remarks>
-    public class SimpleInjectorContainerResolutionBehavior : IConstructorResolutionBehavior
+    public sealed class SimpleInjectorContainerResolutionBehavior : IConstructorResolutionBehavior
     {
         private readonly IConstructorResolutionBehavior _originalBehavior;
 

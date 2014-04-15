@@ -10,7 +10,7 @@ namespace chocolatey.infrastructure.logging
     /// <summary>
     ///     Log4net logger implementing special ILog class
     /// </summary>
-    public class Log4NetLog : ILog, ILog<Log4NetLog>
+    public sealed class Log4NetLog : ILog, ILog<Log4NetLog>
     {
         private log4net.ILog _logger;
 

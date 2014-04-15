@@ -9,7 +9,7 @@ namespace chocolatey.infrastructure.logging
     using log4net.Layout;
     using log4net.Repository.Hierarchy;
 
-    public class Log4NetAppender
+    public sealed class Log4NetAppender
     {
         private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof (Log4NetAppender));
 

@@ -5,7 +5,7 @@ namespace chocolatey.infrastructure.tokens
     using System.Text.RegularExpressions;
     using app.configuration;
 
-    public class TokenReplacer
+    public sealed class TokenReplacer
     {
         public static string replace_tokens(ConfigurationSettings configuration, string textToReplace)
         {

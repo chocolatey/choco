@@ -7,7 +7,7 @@
     ///     This is client project specific - contains items that are only available in the client project.
     ///     Look for the broader application container in the core project.
     /// </summary>
-    public class ContainerBindingConsole
+    public sealed class ContainerBindingConsole
     {
         /// <summary>
         /// Loads the module into the kernel.

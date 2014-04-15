@@ -8,7 +8,7 @@
     /// <summary>
     ///     The main inversion container registration for the application. Look for other container bindings in client projects.
     /// </summary>
-    public class ContainerBinding
+    public sealed class ContainerBinding
     {
         /// <summary>
         ///     Loads the module into the kernel.

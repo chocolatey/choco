@@ -5,7 +5,7 @@ namespace chocolatey.infrastructure.logging
     /// <summary>
     ///     The default logger until one is set.
     /// </summary>
-    public class NullLog : ILog, ILog<NullLog>
+    public sealed class NullLog : ILog, ILog<NullLog>
     {
         public void InitializeFor(string loggerName)
         {

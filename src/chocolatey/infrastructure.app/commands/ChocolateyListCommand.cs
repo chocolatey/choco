@@ -5,7 +5,7 @@
     using configuration;
     using infrastructure.commands;
 
-    public class ChocolateyListCommand : ICommand
+    public sealed class ChocolateyListCommand : ICommand
     {
         public void configure_argument_parser(OptionSet optionSet, IConfigurationSettings configuration)
         {

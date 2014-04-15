@@ -4,7 +4,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System.Text;
     using platforms;
 
-    public class ConfigurationSettings : IConfigurationSettings
+    public sealed class ConfigurationSettings : IConfigurationSettings
     {
         // overrides
         public override string ToString()

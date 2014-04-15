@@ -8,7 +8,7 @@
     using chocolatey.infrastructure.configuration;
     using infrastructure.registration;
 
-    public class ConsoleApplication
+    public sealed class ConsoleApplication
     {
         public void run(string[] args, IConfigurationSettings config)
         {

@@ -6,7 +6,7 @@
     /// <summary>
     ///     Implementation of IFileSystem for Dot Net
     /// </summary>
-    public class DotNetFileSystem : IFileSystem
+    public sealed class DotNetFileSystem : IFileSystem
     {
         /// <summary>
         ///     Gets the files.

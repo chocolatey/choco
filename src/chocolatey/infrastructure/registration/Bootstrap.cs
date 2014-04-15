@@ -9,7 +9,7 @@
     /// <summary>
     ///     Application bootstrapping - sets up logging and errors for the app domain
     /// </summary>
-    public class Bootstrap
+    public sealed class Bootstrap
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof (Bootstrap));
 
