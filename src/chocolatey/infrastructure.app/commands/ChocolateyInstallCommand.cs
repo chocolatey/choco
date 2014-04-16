@@ -1,13 +1,15 @@
 ﻿namespace chocolatey.infrastructure.app.commands
 {
     using System.Collections.Generic;
+    using attributes;
     using commandline;
     using configuration;
     using infrastructure.commands;
 
+    [CommandFor(CommandNameType.install)]
     public sealed class ChocolateyInstallCommand : ICommand
     {
-        public void configure_argument_parser(OptionSet optionSet, IConfigurationSettings configuration)
+        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("s=|source=",
@@ -40,12 +42,12 @@
                 ;
         }
 
-        public void handle_unparsed_arguments(IList<string> unparsedArguments, IConfigurationSettings configuration)
+        public void handle_unparsed_arguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.PackageNames = string.Join(" ", unparsedArguments);
         }
 
-        public void help_message(IConfigurationSettings configuration)
+        public void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(@"
 Install Command
@@ -61,7 +63,7 @@ NOTE: `all` is a special package keyword that will allow you to install all
 ");
         }
 
-        public void run(IConfigurationSettings configuration)
+        public void run(ChocolateyConfiguration configuration)
         {
             //start log
             //is this a packages.config? If so run that command (that will call back into here).

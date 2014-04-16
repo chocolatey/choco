@@ -4,7 +4,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System.Text;
     using platforms;
 
-    public sealed class ConfigurationSettings : IConfigurationSettings
+    public sealed class ChocolateyConfiguration
     {
         // overrides
         public override string ToString()
@@ -18,9 +18,6 @@ namespace chocolatey.infrastructure.app.configuration
 
             return properties.ToString();
         }
-
-        // configuration set variables
-        public bool DisablePush { get; set; }
 
         // application set variables
         public PlatformType PlatformType { get; set; }
@@ -36,7 +33,15 @@ namespace chocolatey.infrastructure.app.configuration
 
         // command level options
         public string Source { get; set; }
+
+        /// <summary>
+        ///   Gets or sets the package names. Space separated
+        /// </summary>
+        /// <value>
+        ///   Space separated package names.
+        /// </value>
         public string PackageNames { get; set; }
+
         public string Version { get; set; }
         public bool LocalOnly { get; set; }
         public string Filter { get; set; }
@@ -47,5 +52,10 @@ namespace chocolatey.infrastructure.app.configuration
         public bool NotSilent { get; set; }
         public string PackageParameters { get; set; }
         public bool IgnoreDependencies { get; set; }
+
+        // configuration set variables
+        public bool UseNugetForSources { get; set; }
+        public bool CheckSumFiles { get; set; }
+        public bool VirusCheckFiles { get; set; }
     }
 }

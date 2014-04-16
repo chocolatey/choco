@@ -19,7 +19,7 @@
         /// <param name="setOptions">The set options.</param>
         /// <param name="helpMessage">The help message.</param>
         public static void parse_arguments_and_update_configuration(ICollection<string> args,
-                                                                    IConfigurationSettings configuration,
+                                                                    ChocolateyConfiguration configuration,
                                                                     Action<OptionSet> setOptions,
                                                                     Action<IList<string>> afterParse,
                                                                     Action helpMessage)

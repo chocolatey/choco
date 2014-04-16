@@ -24,7 +24,7 @@
         /// <summary>
         ///   Initializes the container
         /// </summary>
-        public static void Initialize()
+        public static Container Initialize()
         {
             "SimpleInjectorContainer".Log().Debug("SimpleInjector is starting up");
 
@@ -38,6 +38,8 @@
             {
                 Container.Verify();
             }
+
+            return Container;
         }
 
         private static void InitializeContainer(Container container)

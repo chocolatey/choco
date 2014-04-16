@@ -7,7 +7,7 @@ namespace chocolatey.infrastructure.tokens
 
     public sealed class TokenReplacer
     {
-        public static string replace_tokens(ConfigurationSettings configuration, string textToReplace)
+        public static string replace_tokens(ChocolateyConfiguration configuration, string textToReplace)
         {
             if (string.IsNullOrEmpty(textToReplace)) return string.Empty;
 
@@ -31,7 +31,7 @@ namespace chocolatey.infrastructure.tokens
             return output;
         }
 
-        private static IDictionary<string, string> create_dictionary_from_configuration(ConfigurationSettings configuration)
+        private static IDictionary<string, string> create_dictionary_from_configuration(ChocolateyConfiguration configuration)
         {
             var propertyDictionary = new Dictionary<string, string>();
             foreach (PropertyInfo property in configuration.GetType().GetProperties())

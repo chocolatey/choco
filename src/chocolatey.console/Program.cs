@@ -2,18 +2,18 @@
 {
     using System;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
-    using System.Text;
     using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.commands;
+    using chocolatey.infrastructure.app.builders;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.configuration;
+    using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.information;
     using chocolatey.infrastructure.licensing;
     using chocolatey.infrastructure.logging;
-    using chocolatey.infrastructure.platforms;
     using chocolatey.infrastructure.registration;
+    using chocolatey.infrastructure.services;
+    using infrastructure.registration;
     using log4net;
     using log4net.Core;
     using log4net.Repository;
@@ -32,48 +32,15 @@
                 Bootstrap.initialize();
                 Bootstrap.startup();
 
-                IConfigurationSettings config = new ConfigurationSettings();
+                var container = SimpleInjectorContainer.Initialize();
+                var config = container.GetInstance<ChocolateyConfiguration>();
+                var fileSystem = container.GetInstance<IFileSystem>();
 
                 config.ChocolateyVersion = VersionInformation.get_current_assembly_version();
                 "chocolatey".Log().Info(() => "{0} v{1}".format_with(ApplicationParameters.Name, config.ChocolateyVersion));
 
-                ConfigurationOptions.parse_arguments_and_update_configuration(args, config, 
-                    (option_set) =>
-                    {
-                        option_set
-                            .Add("d|debug",
-                                 "Debug - Run in Debug Mode.",
-                                 option => config.Debug = option != null)
-                            .Add("f|force",
-                                 "Force - force the behavior",
-                                 option => config.Force = option != null)
-                            .Add("noop",
-                                 "NoOp - Don't actually do anything.",
-                                 option => config.Noop = option != null)
-                            ;
-                    },
-                    (unparsedArgs) =>
-                        {
-                            if (!string.IsNullOrWhiteSpace(config.CommandName))
-                            {
-                                // save help for next menu
-                                config.HelpRequested = false;
-                            }
-                        },
-                    () =>
-                        {
-                            var commandsLog = new StringBuilder();
-                            foreach (var command in Enum.GetValues(typeof (CommandNameType)).Cast<CommandNameType>())
-                            {
-                                commandsLog.AppendFormat(" * {0}\n", command.GetDescriptionOrValue());
-                            }
-
-                            "chocolatey".Log().Info(@"
-Commands:
-{1}
-Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.ChocolateyVersion, commandsLog.ToString()));
-                                                                                  });
-
+                ConfigurationBuilder.set_up_configuration(args, config, fileSystem, container.GetInstance<IXmlService>());
+                Config.InitializeWith(config);
                 if (config.HelpRequested)
                 {
                     pause_execution_if_debug();
@@ -81,16 +48,12 @@ Please run chocolatey with `choco command -help` for specific help on each comma
                 }
 
                 set_logging_level_debug_when_debug(config);
-                set_and_report_platform(config);
+                "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.PlatformType, config.PlatformVersion.to_string()));
 
-                string currentAssemblyLocation = Assembly.GetExecutingAssembly().Location;
-                string assemblyDirectory = Path.GetDirectoryName(currentAssemblyLocation);
-                string licenseFile = Path.Combine(assemblyDirectory, "license.xml");
-                LicenseValidation.Validate(licenseFile);
+                LicenseValidation.Validate(fileSystem);
 
-                Config.InitializeWith(config);
                 var application = new ConsoleApplication();
-                application.run(args, config);
+                application.run(args, config, container);
 
                 Environment.ExitCode = 0;
             }
@@ -113,14 +76,7 @@ Please run chocolatey with `choco command -help` for specific help on each comma
             }
         }
 
-        private static void set_and_report_platform(IConfigurationSettings config)
-        {
-            config.PlatformType = Platform.get_platform();
-            config.PlatformVersion = Platform.get_version();
-            "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.PlatformType, config.PlatformVersion.to_string()));
-        }
-
-        private static void set_logging_level_debug_when_debug(IConfigurationSettings configSettings)
+        private static void set_logging_level_debug_when_debug(ChocolateyConfiguration configSettings)
         {
             if (configSettings.Debug)
             {

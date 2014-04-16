@@ -7,15 +7,15 @@
 
     public sealed class ChocolateyUnpackSelfCommand : ICommand
     {
-        public void configure_argument_parser(OptionSet optionSet, IConfigurationSettings configuration)
+        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
         }
 
-        public void handle_unparsed_arguments(IList<string> unparsedArguments, IConfigurationSettings configuration)
+        public void handle_unparsed_arguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
         }
 
-        public void help_message(IConfigurationSettings configuration)
+        public void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(@"
 UnpackSelf Command
@@ -24,7 +24,7 @@ This command should only be used when installing chocolatey, not during normal o
 ");
         }
 
-        public void run(IConfigurationSettings configuration)
+        public void run(ChocolateyConfiguration configuration)
         {
             this.Log().Info("{0} is setting itself up for use".format_with(ApplicationParameters.Name));
             //unpack all of the resources over to programdata
