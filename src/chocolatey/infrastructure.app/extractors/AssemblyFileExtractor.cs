@@ -16,7 +16,7 @@
                 var fileText = assembly.get_manifest_string(manifestLocation);
                 if (string.IsNullOrWhiteSpace(fileText))
                 {
-                    string errorMessage = "Could not find a file in the manifest resource stream at '{0}'.".format_with(manifestLocation);
+                    string errorMessage = "Could not find a file in the manifest resource stream of '{0}' at '{1}'.".format_with(assembly.FullName,manifestLocation);
                     "chocolatey".Log().Error(() => errorMessage);
                     throw new FileNotFoundException(errorMessage);
                 }
