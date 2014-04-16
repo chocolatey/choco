@@ -6,12 +6,12 @@ namespace chocolatey
     using System.Reflection;
 
     /// <summary>
-    /// Extensions for enumerations
+    ///   Extensions for enumerations
     /// </summary>
     public static class EnumerationExtensions
     {
         /// <summary>
-        /// Gets the description [Description("")] or ToString() value of an enumeration.
+        ///   Gets the description [Description("")] or ToString() value of an enumeration.
         /// </summary>
         /// <param name="enumeration">The enumeration item.</param>
         public static string GetDescriptionOrValue(this Enum enumeration)

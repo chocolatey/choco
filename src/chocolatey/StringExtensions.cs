@@ -1,12 +1,12 @@
 namespace chocolatey
 {
     /// <summary>
-    ///     Extensions for strings
+    ///   Extensions for strings
     /// </summary>
     public static class StringExtensions
     {
         /// <summary>
-        ///     Formats string with the formatting passed in. This is a shortcut to string.Format().
+        ///   Formats string with the formatting passed in. This is a shortcut to string.Format().
         /// </summary>
         /// <param name="input">The input.</param>
         /// <param name="formatting">The formatting.</param>
@@ -17,7 +17,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        ///     Performs a trim only if the item is not null
+        ///   Performs a trim only if the item is not null
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>
@@ -32,7 +32,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        ///     Toes the lower safe.
+        ///   Performs ToLower() only if input is not null
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>
@@ -47,7 +47,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        ///     Gets a string representation of an Ooottt.
+        ///   Gets a string representation unless input is null.
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>

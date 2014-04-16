@@ -8,7 +8,7 @@ namespace chocolatey.infrastructure.logging
     using log4net;
 
     /// <summary>
-    ///     Log4net logger implementing special ILog class
+    ///   Log4net logger implementing special ILog class
     /// </summary>
     public sealed class Log4NetLog : ILog, ILog<Log4NetLog>
     {

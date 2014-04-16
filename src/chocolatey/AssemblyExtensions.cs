@@ -6,7 +6,7 @@
     public static class AssemblyExtensions
     {
         /// <summary>
-        ///     Get the manifest resource string from the specified assembly.
+        ///   Get the manifest resource string from the specified assembly.
         /// </summary>
         /// <param name="assembly">The assembly.</param>
         /// <param name="manifestResourceStreamLocation">The manifest resource stream location.</param>
@@ -32,7 +32,7 @@
         }
 
         /// <summary>
-        ///     Get manifest resource stream from the specified assembly. Useful when grabbing binaries.
+        ///   Get manifest resource stream from the specified assembly. Useful when grabbing binaries.
         /// </summary>
         /// <param name="assembly">The assembly.</param>
         /// <param name="manifestResourceStreamLocation">The manifest resource stream location.</param>

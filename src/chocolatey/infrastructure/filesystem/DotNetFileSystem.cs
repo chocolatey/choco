@@ -4,8 +4,9 @@
     using System.IO;
 
     /// <summary>
-    ///     Implementation of IFileSystem for Dot Net
+    ///   Implementation of IFileSystem for Dot Net
     /// </summary>
+    /// <remarks>Normally we avoid regions, however this has so many methods that we are making an exception.</remarks>
     public sealed class DotNetFileSystem : IFileSystem
     {
         /// <summary>

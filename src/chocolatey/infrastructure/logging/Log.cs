@@ -3,7 +3,7 @@
     using System;
 
     /// <summary>
-    ///     Logger type initialization
+    ///   Logger type initialization
     /// </summary>
     public static class Log
     {
@@ -11,7 +11,7 @@
         private static ILog _logger;
 
         /// <summary>
-        ///     Sets up logging to be with a certain type
+        ///   Sets up logging to be with a certain type
         /// </summary>
         /// <typeparam name="T">The type of ILog for the application to use</typeparam>
         public static void InitializeWith<T>() where T : ILog, new()
@@ -20,7 +20,7 @@
         }
 
         /// <summary>
-        ///     Sets up logging to be with a certain instance. The other method is preferred.
+        ///   Sets up logging to be with a certain instance. The other method is preferred.
         /// </summary>
         /// <param name="loggerType">Type of the logger.</param>
         /// <remarks>This is mostly geared towards testing</remarks>
@@ -31,8 +31,8 @@
         }
 
         /// <summary>
-        ///     Initializes a new instance of a logger for an object.
-        ///     This should be done only once per object name.
+        ///   Initializes a new instance of a logger for an object.
+        ///   This should be done only once per object name.
         /// </summary>
         /// <param name="objectName">Name of the object.</param>
         /// <returns>ILog instance for an object if log type has been intialized; otherwise null</returns>

@@ -7,14 +7,14 @@
     using ILog = log4net.ILog;
 
     /// <summary>
-    ///     Application bootstrapping - sets up logging and errors for the app domain
+    ///   Application bootstrapping - sets up logging and errors for the app domain
     /// </summary>
     public sealed class Bootstrap
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof (Bootstrap));
 
         /// <summary>
-        ///     Initializes this instance.
+        ///   Initializes this instance.
         /// </summary>
         public static void initialize()
         {
@@ -24,7 +24,7 @@
         }
 
         /// <summary>
-        ///     Startups this instance.
+        ///   Startups this instance.
         /// </summary>
         public static void startup()
         {
@@ -33,11 +33,11 @@
         }
 
         /// <summary>
-        ///     Handles unhandled exception for the application domain.
+        ///   Handles unhandled exception for the application domain.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">
-        ///     The <see cref="System.UnhandledExceptionEventArgs" /> instance containing the event data.
+        ///   The <see cref="System.UnhandledExceptionEventArgs" /> instance containing the event data.
         /// </param>
         private static void DomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
@@ -57,7 +57,7 @@
         }
 
         /// <summary>
-        ///     Shutdowns this instance.
+        ///   Shutdowns this instance.
         /// </summary>
         public static void shutdown()
         {

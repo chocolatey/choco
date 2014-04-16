@@ -12,7 +12,7 @@
         private static readonly OptionSet _optionSet = new OptionSet();
 
         /// <summary>
-        /// Parses arguments and updates the configuration
+        ///   Parses arguments and updates the configuration
         /// </summary>
         /// <param name="args">The arguments.</param>
         /// <param name="configuration">The configuration</param>
@@ -72,7 +72,7 @@
         }
 
         /// <summary>
-        /// Shows the help menu and prints the options
+        ///   Shows the help menu and prints the options
         /// </summary>
         /// <param name="optionSet">The option_set.</param>
         private static void show_help(OptionSet optionSet, Action helpMessage)

@@ -6,17 +6,16 @@
     using logging;
 
     /// <summary>
-    ///     The main inversion container registration for the application. Look for other container bindings in client projects.
+    ///   The main inversion container registration for the application. Look for other container bindings in client projects.
     /// </summary>
     public sealed class ContainerBinding
     {
         /// <summary>
-        ///     Loads the module into the kernel.
+        ///   Loads the module into the kernel.
         /// </summary>
         public void RegisterComponents(Container container)
         {
             var configuration = Config.GetConfigurationSettings();
-
             Log.InitializeWith<Log4NetLog>();
 
             container.Register(() => configuration, Lifestyle.Singleton);

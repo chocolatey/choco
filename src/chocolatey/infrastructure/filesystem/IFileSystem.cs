@@ -4,7 +4,7 @@
     using System.IO;
 
     /// <summary>
-    ///     File System Interface
+    ///   File System Interface
     /// </summary>
     public interface IFileSystem
     {

@@ -7,14 +7,14 @@
     using chocolatey.infrastructure.registration;
 
     /// <summary>
-    /// The inversion container
+    ///   The inversion container
     /// </summary>
     public static class SimpleInjectorContainer
     {
         private static readonly Lazy<Container> _container = new Lazy<Container>(() => new Container());
 
         /// <summary>
-        /// Gets the container.
+        ///   Gets the container.
         /// </summary>
         public static Container Container
         {
@@ -22,7 +22,7 @@
         }
 
         /// <summary>
-        ///  Initializes the container
+        ///   Initializes the container
         /// </summary>
         public static void Initialize()
         {

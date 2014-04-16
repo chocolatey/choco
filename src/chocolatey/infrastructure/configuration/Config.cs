@@ -3,14 +3,14 @@
     using app.configuration;
 
     /// <summary>
-    /// Configuration initialization
+    ///   Configuration initialization
     /// </summary>
     public sealed class Config
     {
         private static IConfigurationSettings _configuration = new ConfigurationSettings();
 
         /// <summary>
-        /// Initializes application configuration with a configuration instance.
+        ///   Initializes application configuration with a configuration instance.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         public static void InitializeWith(IConfigurationSettings configuration)
@@ -19,7 +19,7 @@
         }
 
         /// <summary>
-        /// Gets the configuration settings.
+        ///   Gets the configuration settings.
         /// </summary>
         /// <returns>An instance of <see cref="IConfigurationSettings"/> if one has been initialized; defaults to <see cref="ConfigurationSettings"/> if one has not been.</returns>
         public static IConfigurationSettings GetConfigurationSettings()
