@@ -72,7 +72,6 @@
     <Compile Include="infrastructure.app\configuration\IConfigurationSettings.cs" />
     <Compile Include="infrastructure\configuration\ConfigurationOptions.cs" />
     <Compile Include="infrastructure\filesystem\DotNetFileSystem.cs" />
-    <Compile Include="infrastructure\filesystem\DotNetFileSystemService.cs" />
     <Compile Include="infrastructure\filesystem\IFileSystem.cs" />
     <Compile Include="infrastructure\information\VersionInformation.cs" />
     <Compile Include="infrastructure\licensing\LicenseValidation.cs" />

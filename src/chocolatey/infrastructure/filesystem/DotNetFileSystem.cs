@@ -1,7 +1,11 @@
 ﻿namespace chocolatey.infrastructure.filesystem
 {
     using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
+    using System.Runtime.InteropServices;
+    using System.Text;
 
     /// <summary>
     ///   Implementation of IFileSystem for Dot Net
@@ -9,75 +13,9 @@
     /// <remarks>Normally we avoid regions, however this has so many methods that we are making an exception.</remarks>
     public sealed class DotNetFileSystem : IFileSystem
     {
-        /// <summary>
-        ///     Gets the files.
-        /// </summary>
-        /// <param name="path">The path to a specified directory.</param>
-        /// <param name="pattern">The search pattern.</param>
-        /// <param name="option">The option specifies whether the search operation should include all subdirectories or only the current directory.</param>
-        /// <returns>Returns the names of files (including their paths).</returns>
-        public string[] GetFiles(string path, string pattern, SearchOption option)
-        {
-            return Directory.GetFiles(path, pattern, option);
-        }
+        #region Path
 
-        /// <summary>
-        ///     Gets the full path.
-        /// </summary>
-        /// <param name="filePath">The file or directory for which to obtain absolute path information.</param>
-        /// <returns>The fully qualified location of path, such as "C:\MyFile.txt".</returns>
-        public string GetFullPath(string filePath)
-        {
-            return Path.GetFullPath(filePath);
-        }
-
-        /// <summary>
-        ///     Files the exists.
-        /// </summary>
-        /// <param name="filePath">The file to check.</param>
-        /// <returns>Boolean - true if the caller has the required permissions and path contains the name of an existing file; otherwise, false.</returns>
-        public bool FileExists(string filePath)
-        {
-            return File.Exists(filePath);
-        }
-
-        /// <summary>
-        ///     Gets the file name without extension.
-        /// </summary>
-        /// <param name="filePath">The file path.</param>
-        /// <returns>The string returned by GetFileName, minus the last period (.) and all characters following it.</returns>
-        public string GetFileNameWithoutExtension(string filePath)
-        {
-            return Path.GetFileNameWithoutExtension(filePath);
-        }
-
-        /// <summary>
-        ///     Gets the extension.
-        /// </summary>
-        /// <param name="filePath">The file path.</param>
-        /// <returns>he extension of the specified path (including the period "."), or Nothing, or String.Empty. If path is Nothing, GetExtension returns Nothing. If path does not have extension information, GetExtension returns String.Empty.</returns>
-        public string GetExtension(string filePath)
-        {
-            return Path.GetExtension(filePath);
-        }
-
-        /// <summary>
-        ///     Gets the name of the directory.
-        /// </summary>
-        /// <param name="filePath">The file path.</param>
-        /// <returns>Directory information for path, or Nothing if path denotes a root directory or is null. Returns String.Empty if path does not contain directory information.</returns>
-        public string GetDirectoryName(string filePath)
-        {
-            return Path.GetDirectoryName(filePath);
-        }
-
-        /// <summary>
-        ///     Combines strings into a path.
-        /// </summary>
-        /// <param name="leftItem">The first path to combine. </param>
-        /// <param name="rightItems">string array of all other paths to combine.</param>
-        /// <returns>The combined paths.</returns>
-        public string PathCombine(string leftItem, params string[] rightItems)
+        public string combine_paths(string leftItem, params string[] rightItems)
         {
             var combinedPath = leftItem;
             foreach (var rightItem in rightItems)
@@ -88,108 +26,243 @@
             return combinedPath;
         }
 
-        /// <summary>
-        ///     Moves a specified file to a new location, providing the option to specify a new file name.
-        /// </summary>
-        /// <param name="filePath">The name of the file to move. </param>
-        /// <param name="newFilePath">The new path for the file. </param>
-        public void FileMove(string filePath, string newFilePath)
+        public string get_full_path(string path)
+        {
+            return Path.GetFullPath(path);
+        }
+
+        #endregion
+
+        #region File
+
+        public IList<string> get_files(string directoryPath, string pattern = "*.*", SearchOption option = SearchOption.TopDirectoryOnly)
+        {
+            return Directory.GetFiles(directoryPath, pattern, option);
+        }
+
+        public bool file_exists(string filePath)
+        {
+            return File.Exists(filePath);
+        }
+
+        public string get_file_name(string filePath)
+        {
+            return Path.GetFileName(filePath);
+        }
+
+        public string get_file_name_without_extension(string filePath)
+        {
+            return Path.GetFileNameWithoutExtension(filePath);
+        }
+
+        public string get_file_extension(string filePath)
+        {
+            return Path.GetExtension(filePath);
+        }
+
+        public FileInfo get_file_info_for(string filePath)
+        {
+            return new FileInfo(filePath);
+        }
+
+        public DateTime get_file_modified_date(string filePath)
+        {
+            return new FileInfo(filePath).LastWriteTime;
+        }
+
+        public long get_file_size(string filePath)
+        {
+            return new FileInfo(filePath).Length;
+        }
+
+        public string get_file_version_for(string filePath)
+        {
+            return FileVersionInfo.GetVersionInfo(get_full_path(filePath)).FileVersion;
+        }
+
+        public bool is_system_file(FileInfo file)
+        {
+            bool isSystemFile = ((file.Attributes & FileAttributes.System) == FileAttributes.System);
+            if (!isSystemFile)
+            {
+                //check the directory to be sure
+                DirectoryInfo directoryInfo = get_directory_info_for(file.DirectoryName);
+                isSystemFile = ((directoryInfo.Attributes & FileAttributes.System) == FileAttributes.System);
+                this.Log().Debug(() => "Is directory \"{0}\" a system directory? {1}".format_with(file.DirectoryName, isSystemFile.to_string()));
+            }
+            else
+            {
+                this.Log().Debug(() => "File \"{0}\" is a system file.".format_with(file.FullName));
+            }
+
+            return isSystemFile;
+        }
+
+        public bool is_encrypted_file(FileInfo file)
+        {
+            bool isEncrypted = ((file.Attributes & FileAttributes.Encrypted) == FileAttributes.Encrypted);
+            this.Log().Debug(() => "Is file \"{0}\" an encrypted file? {1}".format_with(file.FullName, isEncrypted.to_string()));
+            return isEncrypted;
+        }
+
+        public string get_file_date(FileInfo file)
+        {
+            return file.CreationTime < file.LastWriteTime
+                       ? file.CreationTime.Date.ToString("yyyyMMdd")
+                       : file.LastWriteTime.Date.ToString("yyyyMMdd");
+        }
+
+        public void move_file(string filePath, string newFilePath)
         {
             File.Move(filePath, newFilePath);
         }
 
-        /// <summary>
-        ///     Copies an existing file to a new file. Overwriting a file of the same name is allowed.
-        /// </summary>
-        /// <param name="sourceFilePath">The source file path. Teh File to copy.</param>
-        /// <param name="destFilePath">The dest file path.</param>
-        /// <param name="overWriteExisting">true if the destination file can be overwritten; otherwise, false.</param>
-        public void FileCopy(string sourceFilePath, string destFilePath, bool overWriteExisting)
+        public void copy_file(string sourceFilePath, string destFilePath, bool overWriteExisting)
         {
+            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFilePath, destFilePath));
             File.Copy(sourceFilePath, destFilePath, overWriteExisting);
         }
 
-        /// <summary>
-        ///     Deletes the specified file.
-        /// </summary>
-        /// <param name="filePath">The name of the file to be deleted. Wildcard characters are not supported.</param>
-        public void FileDelete(string filePath)
+        public void copy_file_unsafe(string sourceFileName, string destinationFileName, bool overwriteTheExistingFile)
         {
-            if (FileExists(filePath))
+            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFileName, destinationFileName));
+            //Private Declare Function apiCopyFile Lib "kernel32" Alias "CopyFileA" _
+            int success = CopyFileA(sourceFileName, destinationFileName, overwriteTheExistingFile ? 0 : 1);
+        }
+
+        [DllImport("kernel32")]
+        private static extern int CopyFileA(string lpExistingFileName, string lpNewFileName, int bFailIfExists);
+
+        public void delete_file(string filePath)
+        {
+            if (file_exists(filePath))
             {
                 File.Delete(filePath);
             }
         }
 
-        /// <summary>
-        ///     Determines whether the given path refers to an existing directory on disk.
-        /// </summary>
-        /// <param name="path">The path to test.</param>
-        /// <returns>True if path refers to an existing directory; otherwise, false.</returns>
-        public bool DirectoryExists(string path)
+        public FileStream create_file(string filePath)
         {
-            return Directory.Exists(path);
+            return new FileStream(filePath, FileMode.OpenOrCreate);
         }
 
-        /// <summary>
-        ///     Creates all directories and subdirectories in the specified path.
-        /// </summary>
-        /// <param name="path">The directory path to create. </param>
-        public void CreateDirectory(string path)
+        public string read_file(string filePath)
         {
-            Directory.CreateDirectory(path);
+            return File.ReadAllText(filePath, get_file_encoding(filePath));
         }
 
-        /// <summary>
-        ///     Creates all directories and subdirectories in the specified path if they have not already been created.
-        /// </summary>
-        /// <param name="path">The directory path to create.</param>
-        public void CreateDirectoryIfNotExists(string path)
+        public FileStream open_file_readonly(string filePath)
         {
-            if (!DirectoryExists(path))
+            return File.OpenRead(filePath);
+        }
+
+        public void write_file(string filePath, string fileText)
+        {
+            write_file(filePath, fileText, file_exists(filePath) ? get_file_encoding(filePath) : Encoding.UTF8);
+        }
+
+        public void write_file(string filePath, string fileText, Encoding encoding)
+        {
+            using (FileStream fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
+            using (var streamWriter = new StreamWriter(fileStream, encoding))
             {
-                CreateDirectory(path);
+                streamWriter.Write(fileText);
+                streamWriter.Flush();
+                streamWriter.Close();
+                fileStream.Close();
             }
         }
 
-        /// <summary>
-        ///     Gets the size of the file.
-        /// </summary>
-        /// <param name="filePath">The file path.</param>
-        /// <returns>The size, in bytes, of the current file.</returns>
-        public long GetFileSize(string filePath)
+        #endregion
+
+        #region Directory
+
+        public IList<string> get_directories(string directoryPath)
         {
-            return new FileInfo(filePath).Length;
+            return Directory.GetDirectories(directoryPath);
         }
 
-        /// <summary>
-        ///     Gets the names of subdirectories (including their paths) in the specified directory.
-        /// </summary>
-        /// <param name="directory">The path for which an array of subdirectory names is returned. </param>
-        /// <returns>An array of the names of subdirectories in "directory".</returns>
-        public string[] GetDirectories(string directory)
+        public bool directory_exists(string directoryPath)
         {
-            return Directory.GetDirectories(directory);
+            return Directory.Exists(directoryPath);
         }
 
-        /// <summary>
-        ///     Returns the file name and extension of the specified path string.
-        /// </summary>
-        /// <param name="filePath">The file path.</param>
-        /// <returns>The characters after the last directory character in path. If the last character of path is a directory or volume separator character, this method returns String.Empty. If path is Nothing, this method returns Nothing.</returns>
-        public string GetFileName(string filePath)
+        public string get_directory_name(string filePath)
         {
-            return Path.GetFileName(filePath);
+            return Path.GetDirectoryName(filePath);
         }
 
-        /// <summary>
-        ///     Gets the file mod date.
-        /// </summary>
-        /// <param name="filePath">The file path.</param>
-        /// <returns>the modification date of the specified file.</returns>
-        public DateTime GetFileModDate(string filePath)
+        public DirectoryInfo get_directory_info_for(string directoryPath)
         {
-            return new FileInfo(filePath).LastWriteTime;
+            return new DirectoryInfo(directoryPath);
+        }
+
+        public DirectoryInfo get_directory_info_from_file_path(string filePath)
+        {
+            return new DirectoryInfo(filePath).Parent;
+        }
+
+        public void create_directory(string directoryPath)
+        {
+            this.Log().Debug(() => "Attempting to create directory \"{0}\".".format_with(get_full_path(directoryPath)));
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        public void create_directory_if_not_exists(string directoryPath)
+        {
+            if (!directory_exists(directoryPath))
+            {
+                try
+                {
+                    create_directory(directoryPath);
+                }
+                catch (SystemException e)
+                {
+                    this.Log().Error("Cannot create directory \"{0}\". Error was:{1}{2}", get_full_path(directoryPath), Environment.NewLine, e);
+                    throw;
+                }
+            }
+            else
+            {
+                this.Log().Debug(() => "Directory \"{0}\" already exists".format_with(get_full_path(directoryPath)));
+            }
+        }
+
+        public void delete_directory(string directoryPath, bool recursive)
+        {
+            this.Log().Debug(() => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directoryPath)));
+            Directory.Delete(directoryPath, recursive);
+        }
+
+        #endregion
+
+        /// <summary>
+        ///   Takes a guess at the file encoding by looking to see if it has a BOM
+        /// </summary>
+        /// <param name="filePath">Path to the file name</param>
+        /// <returns>A best guess at the encoding of the file</returns>
+        /// <remarks>http://www.west-wind.com/WebLog/posts/197245.aspx</remarks>
+        public static Encoding get_file_encoding(string filePath)
+        {
+            // *** Use Default of Encoding.Default (Ansi CodePage)
+            Encoding enc = Encoding.Default;
+
+            // *** Detect byte order mark if any - otherwise assume default
+            var buffer = new byte[5];
+            var file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            file.Read(buffer, 0, 5);
+            file.Close();
+
+            if (buffer[0] == 0xef && buffer[1] == 0xbb && buffer[2] == 0xbf)
+                enc = Encoding.UTF8;
+            else if (buffer[0] == 0xfe && buffer[1] == 0xff)
+                enc = Encoding.Unicode;
+            else if (buffer[0] == 0 && buffer[1] == 0 && buffer[2] == 0xfe && buffer[3] == 0xff)
+                enc = Encoding.UTF32;
+            else if (buffer[0] == 0x2b && buffer[1] == 0x2f && buffer[2] == 0x76)
+                enc = Encoding.UTF7;
+
+            return enc;
         }
     }
 }
