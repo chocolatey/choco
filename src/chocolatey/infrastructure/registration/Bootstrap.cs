@@ -19,7 +19,6 @@
         public static void initialize()
         {
             Log.InitializeWith<Log4NetLog>();
-            //initialization code 
             _logger.Debug("XmlConfiguration is now operational");
         }
 
@@ -29,7 +28,6 @@
         public static void startup()
         {
             AppDomain.CurrentDomain.UnhandledException += DomainUnhandledException;
-            _logger.DebugFormat("Performing bootstrapping operations for '{0}'.", ApplicationParameters.Name);
         }
 
         /// <summary>

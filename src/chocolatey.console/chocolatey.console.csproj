@@ -88,14 +88,11 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="ConsoleApplication.cs" />
-    <Compile Include="infrastructure\registration\ContainerBindingConsole.cs" />
     <Compile Include="infrastructure\registration\SimpleInjectorContainer.cs" />
-    <Compile Include="infrastructure\registration\SimpleInjectorExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="chocolatey.config" />
     <None Include="packages.config" />
     <None Include="targets\Microsoft.Application.targets" />
   </ItemGroup>

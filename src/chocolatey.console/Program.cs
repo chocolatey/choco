@@ -25,7 +25,8 @@
         {
             try
             {
-                string outputDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), ApplicationParameters.Name, "logs");
+                string outputDirectory = ApplicationParameters.LoggingLocation;
+                //no file system at this point
                 if (!Directory.Exists(outputDirectory)) Directory.CreateDirectory(outputDirectory);
 
                 Log4NetAppender.configure(outputDirectory);

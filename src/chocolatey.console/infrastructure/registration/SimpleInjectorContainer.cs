@@ -2,7 +2,6 @@
 {
     using System;
     using SimpleInjector;
-    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.registration;
     using chocolatey.infrastructure.registration;
 
@@ -26,18 +25,15 @@
         /// </summary>
         public static Container Initialize()
         {
-            "SimpleInjectorContainer".Log().Debug("SimpleInjector is starting up");
-
             Container.Options.AllowOverridingRegistrations = true;
             var originalConstructorResolutionBehavior = Container.Options.ConstructorResolutionBehavior;
             Container.Options.ConstructorResolutionBehavior = new SimpleInjectorContainerResolutionBehavior(originalConstructorResolutionBehavior);
 
             InitializeContainer(Container);
 
-            if (ApplicationParameters.IsDebug)
-            {
-                Container.Verify();
-            }
+#if DEBUG
+            Container.Verify();
+#endif
 
             return Container;
         }
@@ -46,8 +42,6 @@
         {
             var binding = new ContainerBinding();
             binding.RegisterComponents(container);
-            var bindingClient = new ContainerBindingConsole();
-            bindingClient.RegisterComponents(container);
         }
     }
 }

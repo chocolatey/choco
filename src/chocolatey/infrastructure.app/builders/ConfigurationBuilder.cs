@@ -25,7 +25,7 @@
         private static void set_file_configuration(ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService)
         {
             var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
-            AssemblyFileExtractor.extract_file_from_assembly(fileSystem, Assembly.GetExecutingAssembly(), @"chocolatey.console.chocolatey.config", globalConfigPath);
+            AssemblyFileExtractor.extract_file_from_assembly(fileSystem, Assembly.GetExecutingAssembly(),ApplicationParameters.ChocolateyConfigFileResource, globalConfigPath);
 
             var configFileSettings = xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
 

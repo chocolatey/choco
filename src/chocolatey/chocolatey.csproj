@@ -95,12 +95,14 @@
     <Compile Include="LogExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimpleInjectorExtensions.cs" />
     <Compile Include="StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="infrastructure\logging\log4net.config.xml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="infrastructure.app\configuration\chocolatey.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
