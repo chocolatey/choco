@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using commands;
     using configuration;
@@ -24,7 +25,7 @@
         private static void set_file_configuration(ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService)
         {
             var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
-            AssemblyFileExtractor.extract_file_from_assembly(fileSystem, @"chocolatey.console.chocolatey.config", globalConfigPath);
+            AssemblyFileExtractor.extract_file_from_assembly(fileSystem, Assembly.GetExecutingAssembly(), @"chocolatey.console.chocolatey.config", globalConfigPath);
 
             var configFileSettings = xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
 
