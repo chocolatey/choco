@@ -18,16 +18,6 @@
                 if (configToArgNames.ContainsKey(prop.Name))
                 {
                     var arg = configToArgNames[prop.Name];
-                    //if (prop.PropertyType == typeof(Boolean))
-                    //{
-                    //    propValues.Add(prop.Name, "{0}{1}".format_with(arg.ArgumentName,
-                    //        string.IsNullOrWhiteSpace(arg.ArgumentValue)
-                    //            ? string.Empty 
-                    //            : arg.ArgumentValue
-                    //        ));
-                    //}
-                    //else
-                    //{
                     var propType = prop.PropertyType;
                     var propValue = prop.GetValue(config, null).to_string().wrap_spaces_in_quotes();
                     if (propType == typeof (Boolean) && propValue.is_equal_to(bool.FalseString))
@@ -35,7 +25,7 @@
                         continue;
                     }
 
-                    if (string.IsNullOrWhiteSpace(arg.ArgumentValue) && propType != typeof(Boolean))
+                    if (string.IsNullOrWhiteSpace(arg.ArgumentValue) && propType != typeof (Boolean))
                     {
                         arg.ArgumentValue = propValue;
                     }
@@ -45,7 +35,6 @@
                             ? "{0}".format_with(quote_arg_value_if_required(arg))
                             : "{0}{1}".format_with(arg.ArgumentOption, quote_arg_value_if_required(arg))
                         );
-                    //}
                 }
             }
 
