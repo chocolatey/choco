@@ -27,8 +27,14 @@
 
                     if (string.IsNullOrWhiteSpace(arg.ArgumentValue) && propType != typeof (Boolean))
                     {
+                        if (string.IsNullOrWhiteSpace(propValue))
+                        {
+                            continue;
+                        }
+
                         arg.ArgumentValue = propValue;
                     }
+
                     propValues.Add(
                         prop.Name,
                         arg.UseValueOnly
