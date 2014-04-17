@@ -19,6 +19,8 @@ namespace chocolatey.infrastructure.app
         public static readonly string GlobalConfigFileLocation = _fileSystem.combine_paths(CommonAppDataChocolatey, "config", "chocolatey.config");
         public static readonly string LicenseFileLocation = _fileSystem.combine_paths(CommonAppDataChocolatey, "license", "chocolatey.license.xml");
 
+        public static readonly string PackagesLocation = _fileSystem.combine_paths(InstallLocation, "lib");
+
         public static class Tools
         {
             public static readonly string NugetExe = _fileSystem.combine_paths(InstallLocation, "nuget.exe");
