@@ -173,6 +173,16 @@
             }
         }
 
+        public void write_file(string filePath, Func<Stream> getStream)
+        {
+            using (Stream incomingStream = getStream())
+            using (Stream fileStream = System.IO.File.Create(filePath))
+            {
+                incomingStream.CopyTo(fileStream);
+                fileStream.Close();
+            }
+        }
+
         #endregion
 
         #region Directory

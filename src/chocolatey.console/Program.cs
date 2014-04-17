@@ -1,11 +1,13 @@
 ﻿namespace chocolatey.console
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.builders;
     using chocolatey.infrastructure.app.configuration;
+    using chocolatey.infrastructure.app.extractors;
     using chocolatey.infrastructure.configuration;
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.information;
@@ -18,6 +20,7 @@
     using log4net.Core;
     using log4net.Repository;
     using log4net.Repository.Hierarchy;
+    using resources;
 
     public sealed class Program
     {
@@ -52,6 +55,16 @@
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.PlatformType, config.PlatformVersion.to_string()));
 
                 LicenseValidation.Validate(fileSystem);
+
+                //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
+                IList<string> folders = new List<string>
+                    {
+                        "helpers",
+                        "functions",
+                        "redirects",
+                        "tools"
+                    };
+                AssemblyFileExtractor.extract_all_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders);
 
                 var application = new ConsoleApplication();
                 application.run(args, config, container);

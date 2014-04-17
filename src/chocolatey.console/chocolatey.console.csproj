@@ -97,6 +97,10 @@
     <None Include="targets\Microsoft.Application.targets" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\chocolatey.resources\chocolatey.resources.csproj">
+      <Project>{AF584111-FE32-448D-A1D0-63217AF8B43C}</Project>
+      <Name>chocolatey.resources</Name>
+    </ProjectReference>
     <ProjectReference Include="..\chocolatey\chocolatey.csproj">
       <Project>{5563DC61-35FD-4FAB-B331-9AE1FDB23F80}</Project>
       <Name>chocolatey</Name>

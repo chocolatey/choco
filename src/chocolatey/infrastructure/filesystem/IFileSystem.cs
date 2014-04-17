@@ -182,6 +182,13 @@
         /// <param name="encoding">The encoding</param>
         void write_file(string filePath, string fileText, Encoding encoding);
 
+        /// <summary>
+        /// Writes a stream to a specified file path.
+        /// </summary>
+        /// <param name="filePath">The file path.</param>
+        /// <param name="getStream">A defferred function of getting the stream</param>
+        void write_file(string filePath, Func<Stream> getStream);
+
         #endregion
 
         #region Directory
