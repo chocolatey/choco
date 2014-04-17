@@ -100,7 +100,10 @@ Usage: choco list filter [options/switches]
             }
             else
             {
-                CommandExecutor.execute(_nugetExePath, ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetListArguments), true);
+                var args = ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetListArguments);
+                int exitCode = CommandExecutor.execute(_nugetExePath, args, true);
+                Environment.ExitCode = exitCode;
+                this.Log().Debug(() => "Command '\"{0}\" {1}' exited with '{2}'".format_with(_nugetExePath, args, exitCode));
             }
         }
     }
