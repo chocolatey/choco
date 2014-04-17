@@ -232,10 +232,6 @@
                     throw;
                 }
             }
-            else
-            {
-                this.Log().Debug(() => "Directory \"{0}\" already exists".format_with(get_full_path(directoryPath)));
-            }
         }
 
         public void delete_directory(string directoryPath, bool recursive)
