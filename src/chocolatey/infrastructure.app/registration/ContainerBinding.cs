@@ -34,7 +34,7 @@
                     {
                         new ChocolateyInstallCommand(),
                         new ChocolateyListCommand(),
-                        new ChocolateyUnpackSelfCommand()
+                        new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>())
                     };
 
                 return list.AsReadOnly();
