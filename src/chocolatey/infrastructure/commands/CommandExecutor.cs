@@ -51,6 +51,7 @@ namespace chocolatey.infrastructure.commands
                 exitCode = p.ExitCode;
             }
 
+            "chocolatey".Log().Debug(() => "Command '\"{0}\" {1}' exited with '{2}'".format_with(process, arguments, exitCode));
             return exitCode;
         }
 

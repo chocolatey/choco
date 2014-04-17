@@ -13,22 +13,22 @@
     public sealed class ChocolateyListCommand : ICommand
     {
         private readonly string _nugetExePath = ApplicationParameters.Tools.NugetExe;
-        private readonly IDictionary<string, ExternalCommandArgument> _nugetListArguments = new Dictionary<string, ExternalCommandArgument>();
+        private readonly IDictionary<string, ExternalCommandArgument> _nugetArguments = new Dictionary<string, ExternalCommandArgument>();
 
         public ChocolateyListCommand()
         {
-            set_nuget_list_dictionary();
+            set_nuget_args_dictionary();
         }
 
-        private void set_nuget_list_dictionary()
+        private void set_nuget_args_dictionary()
         {
-            _nugetListArguments.Add("_list_", new ExternalCommandArgument {ArgumentOption = "list", Required = true});
-            _nugetListArguments.Add("Filter", new ExternalCommandArgument {ArgumentOption = "filter", UseValueOnly = true});
-            _nugetListArguments.Add("AllVersions", new ExternalCommandArgument {ArgumentOption = "-all"});
-            _nugetListArguments.Add("Prerelease", new ExternalCommandArgument {ArgumentOption = "-prerelease"});
-            _nugetListArguments.Add("Verbose", new ExternalCommandArgument {ArgumentOption = "-verbosity", ArgumentValue = " detailed"});
-            _nugetListArguments.Add("_non_interactive_", new ExternalCommandArgument {ArgumentOption = "-noninteractive", Required = true});
-            _nugetListArguments.Add("Source", new ExternalCommandArgument {ArgumentOption = "-source ", QuoteValue = true});
+            _nugetArguments.Add("_list_", new ExternalCommandArgument {ArgumentOption = "list", Required = true});
+            _nugetArguments.Add("Filter", new ExternalCommandArgument {ArgumentOption = "filter", UseValueOnly = true});
+            _nugetArguments.Add("AllVersions", new ExternalCommandArgument {ArgumentOption = "-all"});
+            _nugetArguments.Add("Prerelease", new ExternalCommandArgument {ArgumentOption = "-prerelease"});
+            _nugetArguments.Add("Verbose", new ExternalCommandArgument {ArgumentOption = "-verbosity", ArgumentValue = " detailed"});
+            _nugetArguments.Add("_non_interactive_", new ExternalCommandArgument {ArgumentOption = "-noninteractive", Required = true});
+            _nugetArguments.Add("Source", new ExternalCommandArgument {ArgumentOption = "-source ", QuoteValue = true});
         }
 
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
@@ -81,7 +81,7 @@ Usage: choco list filter [options/switches]
                     ApplicationParameters.Name,
                     Environment.NewLine,
                     _nugetExePath,
-                    ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetListArguments)
+                    ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetArguments)
                                     )
                     );
             }
@@ -100,10 +100,9 @@ Usage: choco list filter [options/switches]
             }
             else
             {
-                var args = ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetListArguments);
+                var args = ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetArguments);
                 int exitCode = CommandExecutor.execute(_nugetExePath, args, true);
                 Environment.ExitCode = exitCode;
-                this.Log().Debug(() => "Command '\"{0}\" {1}' exited with '{2}'".format_with(_nugetExePath, args, exitCode));
             }
         }
     }
