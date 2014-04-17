@@ -34,9 +34,6 @@ namespace chocolatey.infrastructure.commands
                     CreateNoWindow = true
                 };
 
-            StreamReader standardOutput;
-            StreamReader errorOutput;
-
             using (var p = new Process())
             {
                 p.StartInfo = psi;

@@ -71,6 +71,8 @@ NOTE: `all` is a special package keyword that will allow you to install all
             //start log
             //is this a packages.config? If so run that command (that will call back into here).
             //are we installing from an alternate source? If so run that command instead
+
+            this.Log().Info("Command not yet functional, stay tuned...");
         }
     }
 }
