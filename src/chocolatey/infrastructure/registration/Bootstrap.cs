@@ -59,7 +59,6 @@
         /// </summary>
         public static void shutdown()
         {
-            _logger.DebugFormat("Performing shutdown operations for '{0}'.", ApplicationParameters.Name);
         }
     }
 }
