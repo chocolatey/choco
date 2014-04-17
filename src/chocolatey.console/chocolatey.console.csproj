@@ -110,9 +110,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\docs\logo\chocolatey.ico">
+    <None Include="..\..\docs\logo\chocolatey.ico">
       <Link>Properties\chocolatey.ico</Link>
-    </Content>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project=".\targets\Microsoft.Application.targets" />

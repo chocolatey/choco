@@ -112,9 +112,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\docs\logo\chocolatey.ico">
+    <None Include="..\..\docs\logo\chocolatey.ico">
       <Link>Properties\chocolatey.ico</Link>
-    </Content>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\chocolatey.resources\chocolatey.resources.csproj">
