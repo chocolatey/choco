@@ -54,6 +54,9 @@
                             .Add("d|debug",
                                 "Debug - Run in Debug Mode.",
                                 option => config.Debug = option != null)
+                            .Add("v|verbose",
+                                "Verbose - See verbose messaging.",
+                                option => config.Verbose = option != null)
                             .Add("f|force",
                                 "Force - force the behavior",
                                 option => config.Force = option != null)

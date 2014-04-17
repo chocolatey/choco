@@ -27,6 +27,7 @@ namespace chocolatey.infrastructure.app.configuration
         // top level commands
         public string CommandName { get; set; }
         public bool Debug { get; set; }
+        public bool Verbose { get; set; }
         public bool Force { get; set; }
         public bool Noop { get; set; }
         public bool HelpRequested { get; set; }
