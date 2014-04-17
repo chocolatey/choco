@@ -49,13 +49,11 @@
 
         public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Info(@"
-Install Command
----------------
+            this.Log().Info(@"_ Install Command _
 
 Installs a package or a list of packages (sometimes passed as a packages.config).
 
-Usage: choco install pkg1|packages.config [pkg2 pkgN] [options/switches]
+Usage: choco install pkg|packages.config [pkg2 pkgN] [options/switches]
 
 NOTE: `all` is a special package keyword that will allow you to install all
  packages from a custom feed. Will not work with Chocolatey default feed.

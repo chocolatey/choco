@@ -41,7 +41,6 @@ namespace chocolatey.infrastructure.app.configuration
         ///   Space separated package names.
         /// </value>
         public string PackageNames { get; set; }
-
         public string Version { get; set; }
         public bool LocalOnly { get; set; }
         public string Filter { get; set; }
@@ -52,6 +51,9 @@ namespace chocolatey.infrastructure.app.configuration
         public bool NotSilent { get; set; }
         public string PackageParameters { get; set; }
         public bool IgnoreDependencies { get; set; }
+
+        //list
+        public bool AllVersions { get; set; }
 
         // configuration set variables
         public bool UseNugetForSources { get; set; }

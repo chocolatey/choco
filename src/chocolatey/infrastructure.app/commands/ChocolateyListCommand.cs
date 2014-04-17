@@ -14,11 +14,14 @@
         {
             optionSet
                 .Add("s=|source=",
-                     "Source",
+                     "Source - Source location for install. Can include special 'webpi'. Defaults to sources.",
                      option => configuration.Source = option)
                 .Add("lo|localonly",
-                     "Local Only",
+                     "LocalOnly - Only search in installed items",
                      option => configuration.LocalOnly = option != null)
+                .Add("a|all|allversions",
+                     "AllVersions - include results from all versions",
+                     option => configuration.AllVersions = option != null)
                 ;
         }
 
@@ -29,14 +32,23 @@
 
         public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Info(@"
-List Command
+            this.Log().Info(@"_ List/Search Command _
+
+Chocolatey will perform a search for a package local or remote.
+
+Usage: choco search filter [options/switches]
+Usage: choco list filter [options/switches]
 
 ");
         }
 
         public void run(ChocolateyConfiguration configuration)
         {
+            this.Log().Debug(() => "Searching for package information");
+
+            //todo:webpi
+
+            var nugetExePath = ApplicationParameters.Tools.NugetExe;
         }
     }
 }
