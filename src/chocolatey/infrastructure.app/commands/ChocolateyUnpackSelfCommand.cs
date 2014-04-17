@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Reflection;
+    using attributes;
     using commandline;
     using configuration;
     using extractors;
@@ -9,6 +10,7 @@
     using infrastructure.commands;
     using resources;
 
+    [CommandFor(CommandNameType.unpackself)]
     public sealed class ChocolateyUnpackSelfCommand : ICommand
     {
         private readonly IFileSystem _fileSystem;
