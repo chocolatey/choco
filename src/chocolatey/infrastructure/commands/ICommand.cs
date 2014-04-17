@@ -21,7 +21,7 @@
         /// </summary>
         /// <param name="unparsedArguments">The unparsed arguments.</param>
         /// <param name="configuration">The configuration.</param>
-        void handle_unparsed_arguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration);
+        void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration);
 
         /// <summary>
         ///   The specific help message for a particular command.

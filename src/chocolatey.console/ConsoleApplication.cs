@@ -58,7 +58,7 @@
                     commandArgs,
                     config,
                     (optionSet) => command.configure_argument_parser(optionSet, config),
-                    (unparsedArgs) => command.handle_unparsed_arguments(unparsedArgs, config),
+                    (unparsedArgs) => command.handle_additional_argument_parsing(unparsedArgs, config),
                     () => command.help_message(config));
 
                 this.Log().Debug(() => "Configuration: {0}".format_with(config.ToString()));
