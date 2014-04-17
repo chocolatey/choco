@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>..\..\docs\logo\chocolatey.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -108,7 +111,11 @@
     <EmbeddedResource Include="infrastructure.app\configuration\chocolatey.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="..\..\docs\logo\chocolatey.ico">
+      <Link>Properties\chocolatey.ico</Link>
+    </Content>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\chocolatey.resources\chocolatey.resources.csproj">
       <Project>{AF584111-FE32-448D-A1D0-63217AF8B43C}</Project>
