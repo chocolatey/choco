@@ -42,6 +42,10 @@ Usage: choco list filter [options/switches]
 ");
         }
 
+        public void noop(ChocolateyConfiguration configuration)
+        {
+        }
+
         public void run(ChocolateyConfiguration configuration)
         {
             this.Log().Debug(() => "Searching for package information");

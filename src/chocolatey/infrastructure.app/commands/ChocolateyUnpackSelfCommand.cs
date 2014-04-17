@@ -24,6 +24,10 @@ This command should only be used when installing chocolatey, not during normal o
 ");
         }
 
+        public void noop(ChocolateyConfiguration configuration)
+        {
+        }
+
         public void run(ChocolateyConfiguration configuration)
         {
             this.Log().Info("{0} is setting itself up for use".format_with(ApplicationParameters.Name));

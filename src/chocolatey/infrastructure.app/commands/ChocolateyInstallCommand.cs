@@ -61,6 +61,11 @@ NOTE: `all` is a special package keyword that will allow you to install all
 ");
         }
 
+        public void noop(ChocolateyConfiguration configuration)
+        {
+
+        }
+
         public void run(ChocolateyConfiguration configuration)
         {
             //start log

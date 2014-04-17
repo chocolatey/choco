@@ -30,7 +30,13 @@
         void help_message(ChocolateyConfiguration configuration);
 
         /// <summary>
-        ///   Runs the specified arguments.
+        /// Runs in no op mode, which means it doesn't actually make any changes.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        void noop(ChocolateyConfiguration configuration);
+
+        /// <summary>
+        ///   Runs the command.
         /// </summary>
         /// <param name="config">The configuration.</param>
         void run(ChocolateyConfiguration config);

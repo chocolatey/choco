@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using SimpleInjector;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.commands;
@@ -71,7 +72,17 @@
                     Environment.Exit(-1);
                 }
 
-                command.run(config);
+                if (config.Noop)
+                {
+                    this.Log().Info("_ {0}:{1} - Noop Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                    command.noop(config);
+                }
+                else
+                {
+                    this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                    command.run(config);
+                }
+                
             }
 
 
