@@ -1,7 +1,9 @@
 ﻿namespace chocolatey.infrastructure.app.commands
 {
+    using System;
     using System.Collections.Generic;
     using attributes;
+    using builders;
     using commandline;
     using configuration;
     using infrastructure.commands;
@@ -9,6 +11,33 @@
     [CommandFor(CommandNameType.install)]
     public sealed class ChocolateyInstallCommand : ICommand
     {
+        private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
+        private readonly string _nugetExePath = ApplicationParameters.Tools.NugetExe;
+        private readonly IDictionary<string, ExternalCommandArgument> _nugetArguments = new Dictionary<string, ExternalCommandArgument>();
+
+        public ChocolateyInstallCommand()
+        {
+            set_nuget_args_dictionary();
+        }
+
+        private void set_nuget_args_dictionary()
+        {
+            _nugetArguments.Add("_install_", new ExternalCommandArgument {ArgumentOption = "install", Required = true});
+            _nugetArguments.Add("_package_name_", new ExternalCommandArgument {ArgumentOption = PACKAGE_NAME_TOKEN, Required = true});
+            _nugetArguments.Add("Version", new ExternalCommandArgument {ArgumentOption = "-version ",});
+            _nugetArguments.Add("_output_directory_", new ExternalCommandArgument
+                {
+                    ArgumentOption = "-outputdirectory ",
+                    ArgumentValue = "{0}".format_with(ApplicationParameters.PackagesLocation),
+                    QuoteValue = true,
+                    Required = true
+                });
+            _nugetArguments.Add("Source", new ExternalCommandArgument {ArgumentOption = "-source ", QuoteValue = true});
+            _nugetArguments.Add("Prerelease", new ExternalCommandArgument {ArgumentOption = "-prerelease"});
+            _nugetArguments.Add("_non_interactive_", new ExternalCommandArgument {ArgumentOption = "-noninteractive", Required = true});
+            _nugetArguments.Add("_no_cache_", new ExternalCommandArgument {ArgumentOption = "-nocache", Required = true});
+        }
+
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
@@ -63,7 +92,13 @@ NOTE: `all` is a special package keyword that will allow you to install all
 
         public void noop(ChocolateyConfiguration configuration)
         {
-
+            this.Log().Info("{0} would have run the following to install packages:{1}'\"{2}\" {3}'".format_with(
+                ApplicationParameters.Name,
+                Environment.NewLine,
+                _nugetExePath,
+                ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetArguments)
+                                )
+                );
         }
 
         public void run(ChocolateyConfiguration configuration)
@@ -72,7 +107,35 @@ NOTE: `all` is a special package keyword that will allow you to install all
             //is this a packages.config? If so run that command (that will call back into here).
             //are we installing from an alternate source? If so run that command instead
 
-            this.Log().Info("Command not yet functional, stay tuned...");
+            var packagesInstalled = new Dictionary<string, int>();
+
+            var args = ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetArguments);
+
+            var packageSuccesses = 0;
+            var totalPackageCount = 0;
+            int exitCode = -1;
+            foreach (var packageToInstall in configuration.PackageNames.Split(' '))
+            {
+                var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
+                totalPackageCount += 1;
+                exitCode = CommandExecutor.execute(_nugetExePath, argsForPackage, true);
+                
+                //todo: will need to get into the command log and see what we have as installed dependencies
+                //overall, if one fails, the process should report as a failure.
+                if (Environment.ExitCode != 0)
+                {
+                    Environment.ExitCode = exitCode;
+                }
+                else
+                {
+                    packageSuccesses += 1;
+                }
+
+                packagesInstalled.Add(packageToInstall, exitCode);
+            }
+
+            this.Log().Info(() => "Install Summary: {0}/{1} packages installed. Please check logs for errors.".format_with(packageSuccesses, totalPackageCount));
+            this.Log().Warn("Command not yet fully functional, stay tuned...");
         }
     }
 }
