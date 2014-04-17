@@ -38,18 +38,26 @@
                 }
             }
 
-            foreach (var args in configToArgNames)
+            foreach (var arg in configToArgNames)
             {
-                if (propValues.ContainsKey(args.Key))
+                if (propValues.ContainsKey(arg.Key))
                 {
-                    arguments.AppendFormat("{0} ", propValues[args.Key]);
+                    arguments.AppendFormat("{0} ", propValues[arg.Key]);
                 }
                 else
                 {
-                    //we never set a value, so we are just using the name
-                    if (args.Value.Required)
+                    if (arg.Value.Required)
                     {
-                        arguments.AppendFormat("{0} ", args.Value.ArgumentOption.wrap_spaces_in_quotes());
+                        var argValue = quote_arg_value_if_required(arg.Value).wrap_spaces_in_quotes();
+
+                        if (arg.Value.UseValueOnly)
+                        {
+                            arguments.AppendFormat("{0} ", argValue);
+                        }
+                        else
+                        {
+                            arguments.AppendFormat("{0}{1} ", arg.Value.ArgumentOption, argValue);
+                        }
                     }
                 }
             }
