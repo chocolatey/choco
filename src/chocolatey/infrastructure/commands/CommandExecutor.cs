@@ -12,12 +12,37 @@ namespace chocolatey.infrastructure.commands
             return execute(process, arguments, waitForExit, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
         }
 
-        public static int execute(string process, string arguments, bool waitForExit, string workingDirectory)
+        public static int execute(
+            string process,
+            string arguments,
+            bool waitForExit,
+            Action<object, DataReceivedEventArgs> stdOutAction,
+            Action<object, DataReceivedEventArgs> stdErrAction
+            )
         {
-            return execute(process, arguments, waitForExit, workingDirectory, updateProcessPath: true);
+            return execute(process,
+                           arguments,
+                           waitForExit,
+                           Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                           stdOutAction,
+                           stdErrAction,
+                           updateProcessPath: true
+                );
         }
 
-        public static int execute(string process, string arguments, bool waitForExit, string workingDirectory, bool updateProcessPath)
+        public static int execute(string process, string arguments, bool waitForExit, string workingDirectory)
+        {
+            return execute(process, arguments, waitForExit, workingDirectory, null, null, updateProcessPath: true);
+        }
+
+        public static int execute(string process,
+                                  string arguments,
+                                  bool waitForExit,
+                                  string workingDirectory,
+                                  Action<object, DataReceivedEventArgs> stdOutAction,
+                                  Action<object, DataReceivedEventArgs> stdErrAction,
+                                  bool updateProcessPath
+            )
         {
             int exitCode = -1;
             if (updateProcessPath)
@@ -37,8 +62,23 @@ namespace chocolatey.infrastructure.commands
             using (var p = new Process())
             {
                 p.StartInfo = psi;
-                p.ErrorDataReceived += log_output;
-                p.OutputDataReceived += log_output;
+                if (stdOutAction == null)
+                {
+                    p.OutputDataReceived += log_output;
+                }
+                else
+                {
+                    p.OutputDataReceived += (s, e) => stdOutAction(s, e);
+                }
+                if (stdErrAction == null)
+                {
+                    p.ErrorDataReceived += log_error;
+                }
+                else
+                {
+                    p.ErrorDataReceived += (s, e) => stdErrAction(s, e);
+                }
+
                 p.EnableRaisingEvents = true;
                 p.Start();
                 p.BeginErrorReadLine();
@@ -57,7 +97,12 @@ namespace chocolatey.infrastructure.commands
 
         private static void log_output(object sender, DataReceivedEventArgs e)
         {
-            Console.WriteLine(e.Data);
+            "chocolatey".Log().Info(e.Data);
+        }
+
+        private static void log_error(object sender, DataReceivedEventArgs e)
+        {
+            "chocolatey".Log().Error(e.Data);
         }
     }
 }
