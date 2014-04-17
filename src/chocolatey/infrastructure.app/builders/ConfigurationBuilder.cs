@@ -25,7 +25,7 @@
         private static void set_file_configuration(ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService)
         {
             var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
-            AssemblyFileExtractor.extract_file_from_assembly(fileSystem, Assembly.GetExecutingAssembly(),ApplicationParameters.ChocolateyConfigFileResource, globalConfigPath);
+            AssemblyFileExtractor.extract_text_file_from_assembly(fileSystem, Assembly.GetExecutingAssembly(),ApplicationParameters.ChocolateyConfigFileResource, globalConfigPath);
 
             var configFileSettings = xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
 
@@ -45,40 +45,42 @@
 
         private static void set_global_options(IList<string> args, ChocolateyConfiguration config)
         {
-            ConfigurationOptions.parse_arguments_and_update_configuration(args, config,
-                                                                          (option_set) =>
-                                                                              {
-                                                                                  option_set
-                                                                                      .Add("d|debug",
-                                                                                           "Debug - Run in Debug Mode.",
-                                                                                           option => config.Debug = option != null)
-                                                                                      .Add("f|force",
-                                                                                           "Force - force the behavior",
-                                                                                           option => config.Force = option != null)
-                                                                                      .Add("noop",
-                                                                                           "NoOp - Don't actually do anything.",
-                                                                                           option => config.Noop = option != null)
-                                                                                      ;
-                                                                              },
-                                                                          (unparsedArgs) =>
-                                                                              {
-                                                                                  if (!string.IsNullOrWhiteSpace(config.CommandName))
-                                                                                  {
-                                                                                      // save help for next menu
-                                                                                      config.HelpRequested = false;
-                                                                                  }
-                                                                              },
-                                                                          () =>
-                                                                              {
-                                                                                  var commandsLog = new StringBuilder();
-                                                                                  foreach (var command in Enum.GetValues(typeof (CommandNameType)).Cast<CommandNameType>())
-                                                                                  {
-                                                                                      commandsLog.AppendFormat(" * {0}\n", command.GetDescriptionOrValue());
-                                                                                  }
+            ConfigurationOptions.parse_arguments_and_update_configuration(
+                args, 
+                config,
+                (option_set) =>
+                    {
+                        option_set
+                            .Add("d|debug",
+                                "Debug - Run in Debug Mode.",
+                                option => config.Debug = option != null)
+                            .Add("f|force",
+                                "Force - force the behavior",
+                                option => config.Force = option != null)
+                            .Add("noop",
+                                "NoOp - Don't actually do anything.",
+                                option => config.Noop = option != null)
+                            ;
+                    },
+                (unparsedArgs) =>
+                    {
+                        if (!string.IsNullOrWhiteSpace(config.CommandName))
+                        {
+                            // save help for next menu
+                            config.HelpRequested = false;
+                        }
+                    },
+                () =>
+                    {
+                        var commandsLog = new StringBuilder();
+                        foreach (var command in Enum.GetValues(typeof (CommandNameType)).Cast<CommandNameType>())
+                        {
+                            commandsLog.AppendFormat(" * {0}\n", command.GetDescriptionOrValue());
+                        }
 
-                                                                                  "chocolatey".Log().Info(@"
-Commands:
+                        "chocolatey".Log().Info(@"_ Commands _
 {1}
+
 Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.ChocolateyVersion, commandsLog.ToString()));
                                                                               });
         }

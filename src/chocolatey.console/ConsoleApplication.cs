@@ -2,8 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using SimpleInjector;
-    using chocolatey.infrastructure.app.commands;
+    using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.configuration;
@@ -30,19 +31,29 @@
 
             var commands = container.GetAllInstances<ICommand>();
 
-            //todo var command = commands.Select((c) => c.);
+            var command = commands.Where((c) =>
+                {
+                    var attributes = c.GetType().GetCustomAttributes(typeof (CommandForAttribute), false);
+                    foreach (CommandForAttribute attribute in attributes)
+                    {
+                        if (attribute.CommandName.to_string().to_lower() == config.CommandName.to_lower()) return true;
+                    }
 
-            // get the runner you need and go to town
-            //load the runners up in the container with their key being the name from commandnametype
-            ICommand runner = new ChocolateyInstallCommand();
-            //
+                    return false;
+                }).FirstOrDefault();
+
+            if (command == null)
+            {
+                throw new Exception("Could not find a command registered that meets '{0}'".format_with(config.CommandName));
+            }
 
             ConfigurationOptions.parse_arguments_and_update_configuration(
                 commandArgs,
                 config,
-                (optionSet) => runner.configure_argument_parser(optionSet, config),
-                (unparsedArgs) => runner.handle_unparsed_arguments(unparsedArgs, config),
-                () => runner.help_message(config));
+                (optionSet) => command.configure_argument_parser(optionSet, config),
+                (unparsedArgs) => command.handle_unparsed_arguments(unparsedArgs, config),
+                () => command.help_message(config));
+
             this.Log().Debug(() => "Configuration: {0}".format_with(config.ToString()));
 
             if (config.HelpRequested)
@@ -54,7 +65,7 @@
                 Environment.Exit(-1);
             }
 
-            runner.run(config);
+            command.run(config);
         }
     }
 }

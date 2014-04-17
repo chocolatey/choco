@@ -6,11 +6,11 @@
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class CommandForAttribute : Attribute
     {
-        private readonly CommandNameType _type;
-
-        public CommandForAttribute(CommandNameType type)
+        public CommandNameType CommandName { get; set; }
+        
+        public CommandForAttribute(CommandNameType commandName)
         {
-            _type = type;
+            this.CommandName = commandName;
         }
     }
 }

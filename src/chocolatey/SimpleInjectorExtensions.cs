@@ -1,4 +1,4 @@
-﻿namespace chocolatey.console.infrastructure.registration
+﻿namespace chocolatey
 {
     using System;
     using System.Collections.Generic;

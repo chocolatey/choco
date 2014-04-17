@@ -1,7 +1,10 @@
 ﻿namespace chocolatey.infrastructure.app.registration
 {
+    using System.Collections.Generic;
     using SimpleInjector;
+    using commands;
     using filesystem;
+    using infrastructure.commands;
     using infrastructure.configuration;
     using infrastructure.services;
     using logging;
@@ -24,10 +27,24 @@
             container.Register<IFileSystem, DotNetFileSystem>(Lifestyle.Singleton);
             container.Register<IXmlService, XmlService>(Lifestyle.Singleton);
 
+            //refactor - this could all be autowired
+            container.Register<IEnumerable<ICommand>>(() =>
+            {
+                var list = new List<ICommand>
+                    {
+                        new ChocolateyInstallCommand(),
+                        new ChocolateyListCommand(),
+                        new ChocolateyUnpackSelfCommand()
+                    };
+
+                return list.AsReadOnly();
+            }, Lifestyle.Singleton);
+
             //container.Register<IEventAggregator, EventAggregator>(Lifestyle.Singleton);
             //container.Register<IMessageSubscriptionManagerService, MessageSubscriptionManagerService>(Lifestyle.Singleton);
             //EventManager.InitializeWith(() => container.GetInstance<IMessageSubscriptionManagerService>());
             //container.Register<IDateTimeService, SystemDateTimeUtcService>(Lifestyle.Singleton);
         }
     }
+
 }
