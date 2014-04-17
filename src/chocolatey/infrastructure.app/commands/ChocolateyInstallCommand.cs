@@ -15,7 +15,7 @@
                 .Add("s=|source=",
                      "Source - The source to find the package(s) to install. Special sources include: ruby, webpi, cygwin, windowsfeatures, and python. Defaults to default feeds.",
                      option => configuration.Source = option)
-                .Add("v=|version=",
+                .Add("version=",
                      "Version - A specific version to install. Defaults to unspecified.",
                      option => configuration.Version = option)
                 .Add("pre|prerelease",
