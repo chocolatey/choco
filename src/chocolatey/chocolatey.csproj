@@ -60,6 +60,7 @@
     <Compile Include="infrastructure.app\ApplicationParameters.cs" />
     <Compile Include="infrastructure.app\builders\ExternalCommandArgsBuilder.cs" />
     <Compile Include="infrastructure.app\builders\ExternalCommandArgument.cs" />
+    <Compile Include="infrastructure.app\configuration\SpecialSourceTypes.cs" />
     <Compile Include="infrastructure.app\extractors\AssemblyFileExtractor.cs" />
     <Compile Include="infrastructure.app\builders\ConfigurationBuilder.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
