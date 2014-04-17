@@ -64,7 +64,7 @@
                         "redirects",
                         "tools"
                     };
-                AssemblyFileExtractor.extract_all_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders);
+                AssemblyFileExtractor.extract_all_chocolatey_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders);
 
                 var application = new ConsoleApplication();
                 application.run(args, config, container);

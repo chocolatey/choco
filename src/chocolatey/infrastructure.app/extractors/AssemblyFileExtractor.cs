@@ -55,17 +55,22 @@
             }
         }
 
-        public static void extract_all_to_relative_directory(IFileSystem fileSystem, Assembly assembly, string directoryPath, IList<string> relativeDirectories, bool overwriteExisting = false)
+        public static void extract_all_chocolatey_resources_to_relative_directory(IFileSystem fileSystem, Assembly assembly, string directoryPath, IList<string> relativeDirectories, bool overwriteExisting = false)
         {
+            var resourcesToInclude = "chocolatey.resources";
             var resourceString = new StringBuilder();
             foreach (var resourceName in assembly.GetManifestResourceNames())
             {
+                if (!resourceName.StartsWith(resourcesToInclude))
+                {
+                    continue;
+                }
                 resourceString.Clear();
                 resourceString.Append(resourceName);
 
                 //var fileExtensionLocation = resourceName.LastIndexOf('.');
                 //resourceString.Remove(fileExtensionLocation, resourceString.Length - fileExtensionLocation);
-                resourceString.Replace(assembly.GetName().Name + ".", "");
+                resourceString.Replace(resourcesToInclude + ".", "");
                 foreach (var directory in relativeDirectories)
                 {
                     resourceString.Replace("{0}".format_with(directory), "{0}{1}".format_with(directory, Path.DirectorySeparatorChar));

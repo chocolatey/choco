@@ -33,7 +33,7 @@
 
             var command = commands.Where((c) =>
                 {
-                    var attributes = c.GetType().GetCustomAttributes(typeof (CommandForAttribute), false);
+                    var attributes = c.GetType().GetCustomAttributes(typeof(CommandForAttribute), false);
                     foreach (CommandForAttribute attribute in attributes)
                     {
                         if (attribute.CommandName.to_string().to_lower() == config.CommandName.to_lower()) return true;
@@ -44,28 +44,37 @@
 
             if (command == null)
             {
-                throw new Exception("Could not find a command registered that meets '{0}'".format_with(config.CommandName));
+                if (!string.IsNullOrWhiteSpace(config.CommandName))
+                {
+                    throw new Exception("Could not find a command registered that meets '{0}'".format_with(config.CommandName));
+                }
+
+                Environment.ExitCode = 1;
             }
-
-            ConfigurationOptions.parse_arguments_and_update_configuration(
-                commandArgs,
-                config,
-                (optionSet) => command.configure_argument_parser(optionSet, config),
-                (unparsedArgs) => command.handle_unparsed_arguments(unparsedArgs, config),
-                () => command.help_message(config));
-
-            this.Log().Debug(() => "Configuration: {0}".format_with(config.ToString()));
-
-            if (config.HelpRequested)
+            else
             {
+                ConfigurationOptions.parse_arguments_and_update_configuration(
+                    commandArgs,
+                    config,
+                    (optionSet) => command.configure_argument_parser(optionSet, config),
+                    (unparsedArgs) => command.handle_unparsed_arguments(unparsedArgs, config),
+                    () => command.help_message(config));
+
+                this.Log().Debug(() => "Configuration: {0}".format_with(config.ToString()));
+
+                if (config.HelpRequested)
+                {
 #if DEBUG
-                Console.WriteLine("Press enter to continue...");
-                Console.ReadKey();
+                    Console.WriteLine("Press enter to continue...");
+                    Console.ReadKey();
 #endif
-                Environment.Exit(-1);
+                    Environment.Exit(-1);
+                }
+
+                command.run(config);
             }
 
-            command.run(config);
+
         }
     }
 }
