@@ -1,4 +1,4 @@
-﻿namespace chocolatey.tests.infrastructure.messaging
+﻿namespace chocolatey.tests.infrastructure.events
 {
     using System;
     using System.Collections.Generic;
@@ -8,39 +8,39 @@
     using chocolatey.infrastructure.services;
     using context;
 
-    public class MessageSubscriptionManagerSpecs
+    public class EventSubscriptionManagerSpecs
     {
-        public abstract class MessageSubscriptionManagerSpecsBase : TinySpec
+        public abstract class EventSubscriptionManagerSpecsBase : TinySpec
         {
-            protected FakeMessage Message;
+            protected FakeEvent Event;
 
-            public IMessageSubscriptionManagerService SubscriptionManager { get; private set; }
+            public IEventSubscriptionManagerService SubscriptionManager { get; private set; }
 
             public override void Context()
             {
-                Message = new FakeMessage("yo", 12);
-                SubscriptionManager = new MessageSubscriptionManagerService();
+                Event = new FakeEvent("yo", 12);
+                SubscriptionManager = new EventSubscriptionManagerService();
             }
         }
 
-        public class When_using_MessageSubscriptionManager_to_subscribe_to_a_message : MessageSubscriptionManagerSpecsBase
+        public class When_using_EventSubscriptionManager_to_subscribe_to_an_event : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
-            private FakeMessage _localFakeMessage;
+            private FakeEvent _localFakeEvent;
 
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeMessage>(x =>
+                SubscriptionManager.subscribe<FakeEvent>(x =>
                     {
                         _wasCalled = true;
-                        _localFakeMessage = x;
+                        _localFakeEvent = x;
                     }, null, null);
             }
 
             public override void Because()
             {
-                SubscriptionManager.publish(Message);
+                SubscriptionManager.publish(Event);
             }
 
             [Fact]
@@ -52,43 +52,43 @@
             [Fact]
             public void should_have_passed_the_message()
             {
-                _localFakeMessage.ShouldEqual(Message);
+                _localFakeEvent.ShouldEqual(Event);
             }
 
             [Fact]
             public void should_have_passed_the_name_correctly()
             {
-                _localFakeMessage.Name.ShouldEqual("yo");
+                _localFakeEvent.Name.ShouldEqual("yo");
             }
 
             [Fact]
             public void should_have_passed_the_digits_correctly()
             {
-                _localFakeMessage.Digits.ShouldEqual(12d);
+                _localFakeEvent.Digits.ShouldEqual(12d);
             }
         }
 
-        public class When_using_MessageSubscriptionManager_with_long_running_events : MessageSubscriptionManagerSpecsBase
+        public class When_using_EventSubscriptionManager_with_long_running_event_subscriber : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
-            private FakeMessage _localFakeMessage;
+            private FakeEvent _localFakeEvent;
 
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeMessage>(m =>
+                SubscriptionManager.subscribe<FakeEvent>(m =>
                     {
                         //stuff is happening
                         Thread.Sleep(2000);
                         _wasCalled = true;
-                        _localFakeMessage = m;
+                        _localFakeEvent = m;
                         Console.WriteLine("event complete");
                     }, null, null);
             }
 
             public override void Because()
             {
-                SubscriptionManager.publish(Message);
+                SubscriptionManager.publish(Event);
             }
 
             [Fact]
@@ -101,28 +101,28 @@
             [Fact]
             public void should_have_passed_the_message()
             {
-                _localFakeMessage.ShouldEqual(Message);
+                _localFakeEvent.ShouldEqual(Event);
             }
         }
 
-        public class When_using_MessageSubscriptionManager_to_subscribe_to_a_message_with_a_filter_that_the_message_satisfies : MessageSubscriptionManagerSpecsBase
+        public class When_using_EventSubscriptionManager_to_subscribe_to_an_event_with_a_filter_that_the_event_satisfies : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
-            private FakeMessage _localFakeMessage;
+            private FakeEvent _localFakeEvent;
 
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeMessage>(x =>
+                SubscriptionManager.subscribe<FakeEvent>(x =>
                     {
                         _wasCalled = true;
-                        _localFakeMessage = x;
+                        _localFakeEvent = x;
                     }, null, (message) => message.Digits > 3);
             }
 
             public override void Because()
             {
-                SubscriptionManager.publish(Message);
+                SubscriptionManager.publish(Event);
             }
 
             [Fact]
@@ -134,40 +134,40 @@
             [Fact]
             public void should_have_passed_the_message()
             {
-                _localFakeMessage.ShouldEqual(Message);
+                _localFakeEvent.ShouldEqual(Event);
             }
 
             [Fact]
             public void should_have_passed_the_name_correctly()
             {
-                _localFakeMessage.Name.ShouldEqual("yo");
+                _localFakeEvent.Name.ShouldEqual("yo");
             }
 
             [Fact]
             public void should_have_passed_the_digits_correctly()
             {
-                _localFakeMessage.Digits.ShouldEqual(12d);
+                _localFakeEvent.Digits.ShouldEqual(12d);
             }
         }
 
-        public class When_using_MessageSubscriptionManager_to_subscribe_to_a_message_with_a_filter_that_the_message_does_not_satisfy : MessageSubscriptionManagerSpecsBase
+        public class When_using_EventSubscriptionManager_to_subscribe_to_an_event_with_a_filter_that_the_event_does_not_satisfy : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
-            private FakeMessage _localFakeMessage;
+            private FakeEvent _localFakeEvent;
 
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeMessage>(x =>
+                SubscriptionManager.subscribe<FakeEvent>(x =>
                     {
                         _wasCalled = true;
-                        _localFakeMessage = x;
+                        _localFakeEvent = x;
                     }, null, (message) => message.Digits < 3);
             }
 
             public override void Because()
             {
-                SubscriptionManager.publish(Message);
+                SubscriptionManager.publish(Event);
             }
 
             [Fact]
@@ -179,11 +179,11 @@
             [Fact]
             public void should_not_have_passed_the_message()
             {
-                _localFakeMessage.ShouldNotEqual(Message);
+                _localFakeEvent.ShouldNotEqual(Event);
             }
         }
 
-        public class When_using_MessageSubscriptionManager_and_multiple_parties_subscribe_to_the_same_message : MessageSubscriptionManagerSpecsBase
+        public class When_using_EventSubscriptionManager_and_multiple_parties_subscribe_to_the_same_event : EventSubscriptionManagerSpecsBase
         {
             private IList<FakeSubscriber> _list;
 
@@ -200,11 +200,11 @@
 
             public override void Because()
             {
-                SubscriptionManager.publish(Message);
+                SubscriptionManager.publish(Event);
             }
         }
 
-        public class When_using_MessageSubscriptionManager_to_send_a_null_message : MessageSubscriptionManagerSpecsBase
+        public class When_using_EventSubscriptionManager_to_send_a_null_event_message : EventSubscriptionManagerSpecsBase
         {
             private bool _errored;
 
@@ -212,7 +212,7 @@
             {
                 try
                 {
-                    SubscriptionManager.publish<FakeMessage>(null);
+                    SubscriptionManager.publish<FakeEvent>(null);
                 }
                 catch (Exception)
                 {
@@ -223,7 +223,7 @@
             [Fact]
             public void should_throw_an_error()
             {
-                Assert.Throws<ArgumentNullException>(() => SubscriptionManager.publish<FakeMessage>(null));
+                Assert.Throws<ArgumentNullException>(() => SubscriptionManager.publish<FakeEvent>(null));
                 _errored.ShouldBeTrue();
             }
         }

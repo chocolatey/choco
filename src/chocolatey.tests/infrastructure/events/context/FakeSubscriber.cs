@@ -1,21 +1,21 @@
-﻿namespace chocolatey.tests.infrastructure.messaging.context
+﻿namespace chocolatey.tests.infrastructure.events.context
 {
     using System;
     using chocolatey.infrastructure.services;
 
     public class FakeSubscriber
     {
-        public FakeSubscriber(IMessageSubscriptionManagerService subscriptionManager)
+        public FakeSubscriber(IEventSubscriptionManagerService subscriptionManager)
         {
-            subscriptionManager.subscribe<FakeMessage>(x =>
+            subscriptionManager.subscribe<FakeEvent>(x =>
                 {
                     WasCalled = true;
-                    ReceivedMessage = x;
+                    ReceivedEvent = x;
                     CalledAt = DateTime.Now;
                 }, null, null);
         }
 
-        public FakeMessage ReceivedMessage { get; private set; }
+        public FakeEvent ReceivedEvent { get; private set; }
         public bool WasCalled { get; private set; }
         public DateTime CalledAt { get; private set; }
     }

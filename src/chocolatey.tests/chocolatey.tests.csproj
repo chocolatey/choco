@@ -50,9 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="infrastructure\messaging\context\FakeMessage.cs" />
-    <Compile Include="infrastructure\messaging\context\FakeSubscriber.cs" />
-    <Compile Include="infrastructure\messaging\MessageSubscriptionManagerSpecs.cs" />
+    <Compile Include="infrastructure\events\context\FakeEvent.cs" />
+    <Compile Include="infrastructure\events\context\FakeSubscriber.cs" />
+    <Compile Include="infrastructure\events\EventSubscriptionManagerSpecs.cs" />
     <Compile Include="MockLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TinySpec.cs" />

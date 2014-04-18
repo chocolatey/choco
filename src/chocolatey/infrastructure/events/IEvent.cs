@@ -1,9 +1,9 @@
-﻿namespace chocolatey.infrastructure.messaging
+﻿namespace chocolatey.infrastructure.events
 {
     /// <summary>
     ///   Interface for Message
     /// </summary>
-    public interface IMessage
+    public interface IEvent
     {
     }
 }

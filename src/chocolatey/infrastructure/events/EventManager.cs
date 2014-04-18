@@ -1,17 +1,17 @@
-﻿namespace chocolatey.infrastructure.messaging
+﻿namespace chocolatey.infrastructure.events
 {
     using System;
-    using services;
+    using chocolatey.infrastructure.services;
 
     public static class EventManager
     {
-        private static Func<IMessageSubscriptionManagerService> _messageSubscriptionManager;
+        private static Func<IEventSubscriptionManagerService> _messageSubscriptionManager;
 
         /// <summary>
         ///   Initializes the Message platform with the subscription manager
         /// </summary>
         /// <param name="messageSubscriptionManager">The message subscription manager.</param>
-        public static void initialize_with(Func<IMessageSubscriptionManagerService> messageSubscriptionManager)
+        public static void initialize_with(Func<IEventSubscriptionManagerService> messageSubscriptionManager)
         {
             _messageSubscriptionManager = messageSubscriptionManager;
         }
@@ -22,7 +22,7 @@
         /// <value>
         ///   The manager service.
         /// </value>
-        public static IMessageSubscriptionManagerService ManagerService
+        public static IEventSubscriptionManagerService ManagerService
         {
             get { return _messageSubscriptionManager(); }
         }
@@ -30,9 +30,9 @@
         /// <summary>
         ///   Publishes the specified message.
         /// </summary>
-        /// <typeparam name="TMessage">The type of the message.</typeparam>
+        /// <typeparam name="Event">The type of the event.</typeparam>
         /// <param name="message">The message.</param>
-        public static void publish<TMessage>(TMessage message) where TMessage : class, IMessage
+        public static void publish<Event>(Event message) where Event : class, IEvent
         {
             if (_messageSubscriptionManager != null)
             {
@@ -43,16 +43,16 @@
         /// <summary>
         ///   Subscribes to the specified message.
         /// </summary>
-        /// <typeparam name="TMessage">The type of the message.</typeparam>
-        /// <param name="handleMessage">The handle message.</param>
+        /// <typeparam name="Event">The type of the event.</typeparam>
+        /// <param name="handleEvent">The handle message.</param>
         /// <param name="handleError">The handle error.</param>
         /// <param name="filter">The filter.</param>
         /// <returns>The subscription so that a service could unsubscribe</returns>
-        public static IDisposable subscribe<TMessage>(Action<TMessage> handleMessage, Action<Exception> handleError, Func<TMessage, bool> filter) where TMessage : class, IMessage
+        public static IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IEvent
         {
             if (_messageSubscriptionManager != null)
             {
-                return _messageSubscriptionManager().subscribe(handleMessage, handleError, filter);
+                return _messageSubscriptionManager().subscribe(handleEvent, handleError, filter);
             }
 
             return null;

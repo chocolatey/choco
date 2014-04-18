@@ -5,10 +5,10 @@
     using System.Collections.Generic;
     using System.Reactive.Subjects;
     using Moq;
-    using chocolatey.infrastructure.messaging;
+    using chocolatey.infrastructure.events;
     using chocolatey.infrastructure.services;
 
-    public class MockEventSubscriptionManager : Mock<IMessageSubscriptionManagerService>, IMessageSubscriptionManagerService
+    public class MockEventSubscriptionManager : Mock<IEventSubscriptionManagerService>, IEventSubscriptionManagerService
     {
         private readonly Lazy<ConcurrentDictionary<Type, IList<object>>> _messages = new Lazy<ConcurrentDictionary<Type, IList<object>>>();
 
@@ -17,16 +17,16 @@
             get { return _messages.Value; }
         }
 
-        public void publish<TMessage>(TMessage message) where TMessage : class, IMessage
+        public void publish<Event>(Event eventMessage) where Event : class, IEvent
         {
-            var list = _messages.Value.GetOrAdd(typeof (TMessage), new List<object>());
-            list.Add(message);
-            Object.publish(message);
+            var list = _messages.Value.GetOrAdd(typeof (Event), new List<object>());
+            list.Add(eventMessage);
+            Object.publish(eventMessage);
         }
 
-        public IDisposable subscribe<TMessage>(Action<TMessage> handleMessage, Action<Exception> handleError, Func<TMessage, bool> filter) where TMessage : class, IMessage
+        public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IEvent
         {
-            return new Subject<TMessage>();
+            return new Subject<Event>();
         }
     }
 }

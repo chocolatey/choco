@@ -1,6 +1,5 @@
 namespace chocolatey.infrastructure.logging
 {
-    using System;
     using System.IO;
     using System.Reflection;
     using app;
@@ -39,7 +38,7 @@ namespace chocolatey.infrastructure.logging
 
             _logger.DebugFormat("Configured {0} from assembly {1}", resource, assembly.FullName);
         }
-        
+
         /// <summary>
         ///   Adds a file appender to all current loggers. Only runs one time.
         /// </summary>

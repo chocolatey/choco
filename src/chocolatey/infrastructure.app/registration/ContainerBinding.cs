@@ -3,12 +3,12 @@
     using System.Collections.Generic;
     using SimpleInjector;
     using commands;
+    using events;
     using filesystem;
     using infrastructure.commands;
     using infrastructure.configuration;
     using infrastructure.services;
     using logging;
-    using messaging;
     using services;
 
     /// <summary>
@@ -41,8 +41,8 @@
                     return list.AsReadOnly();
                 }, Lifestyle.Singleton);
 
-            container.Register<IMessageSubscriptionManagerService, MessageSubscriptionManagerService>(Lifestyle.Singleton);
-            EventManager.initialize_with(container.GetInstance<IMessageSubscriptionManagerService>);
+            container.Register<IEventSubscriptionManagerService, EventSubscriptionManagerService>(Lifestyle.Singleton);
+            EventManager.initialize_with(container.GetInstance<IEventSubscriptionManagerService>);
             
             container.Register<IDateTimeService, SystemDateTimeUtcService>(Lifestyle.Singleton);
         }
