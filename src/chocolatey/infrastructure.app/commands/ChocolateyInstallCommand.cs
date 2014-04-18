@@ -81,7 +81,7 @@
 
         public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Warn(ChocolateyLoggers.Important,"Install Command");
+            this.Log().Warn(ChocolateyLoggers.Important, "Install Command");
             this.Log().Info(@"
 Installs a package or a list of packages (sometimes passed as a packages.config).
 
@@ -106,11 +106,9 @@ NOTE: `all` is a special package keyword that will allow you to install all
 
         public void run(ChocolateyConfiguration configuration)
         {
-            //start log
-            //is this a packages.config? If so run that command (that will call back into here).
-            //are we installing from an alternate source? If so run that command instead
+            //todo:is this a packages.config? If so run that command (that will call back into here).
+            //todo:are we installing from an alternate source? If so run that command instead
 
-            var packageQueue = new Dictionary<string, string>();
             var packageInstallResults = new Dictionary<string, bool>();
             var args = ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetArguments);
 
@@ -119,7 +117,6 @@ NOTE: `all` is a special package keyword that will allow you to install all
             this.Log().Info(@"
 By installing you accept licenses for the packages.
 ");
-
 
             var packageFailures = 0;
             int exitCode = -1;
@@ -169,7 +166,12 @@ By installing you accept licenses for the packages.
                             packageInstallResults.Add(packageName, true);
                             this.Log().Info(" {0} has been installed.".format_with(packageName));
                         },
-                    (s, e) => this.Log().Error(() => "{0}".format_with(e.Data)));
+                    (s, e) =>
+                        {
+                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            this.Log().Error(() => "{0}".format_with(e.Data));
+                        }
+                    );
 
                 //todo: will need to get into the command log and see what we have as installed dependencies
                 //overall, if one fails, the process should report as a failure.
@@ -179,12 +181,13 @@ By installing you accept licenses for the packages.
                 }
             }
 
-            this.Log().Info(() => "{0} installed {1}/{2} packages. {3} packages failed.{4}See the log for details.".format_with(
+            this.Log().Info(() => @"{0}{1} installed {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
+                Environment.NewLine,
                 ApplicationParameters.Name,
                 packageInstallResults.Where((p) => p.Value).Count(),
                 packageInstallResults.Count,
-                packageFailures,
-                Environment.NewLine));
+                packageFailures));
+
             this.Log().Warn("Command not yet fully functional, stay tuned...");
         }
 
