@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Text.RegularExpressions;
     using attributes;
     using builders;
     using commandline;
@@ -107,35 +109,92 @@ NOTE: `all` is a special package keyword that will allow you to install all
             //is this a packages.config? If so run that command (that will call back into here).
             //are we installing from an alternate source? If so run that command instead
 
-            var packagesInstalled = new Dictionary<string, int>();
-
+            var packageQueue = new Dictionary<string, string>();
+            var packageInstallResults = new Dictionary<string, bool>();
             var args = ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetArguments);
 
-            var packageSuccesses = 0;
-            var totalPackageCount = 0;
+            this.Log().Info(@"Installing the following packages:
+{0}
+
+By installing you accept the licenses for these packages (and their dependencies).".format_with(configuration.PackageNames));
+
+
+            var packageFailures = 0;
             int exitCode = -1;
             foreach (var packageToInstall in configuration.PackageNames.Split(' '))
             {
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
-                totalPackageCount += 1;
-                exitCode = CommandExecutor.execute(_nugetExePath, argsForPackage, true);
-                
+                exitCode = CommandExecutor.execute(
+                    _nugetExePath, argsForPackage, true,
+                    (s, e) =>
+                        {
+                            var logMessage = e.Data;
+                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            this.Log().Debug(() => "[Nuget] {0}".format_with(logMessage));
+
+                            var packageName = get_value_from_output(logMessage,ApplicationParameters.OutputParser.Nuget.PackageName,ApplicationParameters.OutputParser.Nuget.PACKAGE_NAME_GROUP);
+                            var packageVersion = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageVersion, ApplicationParameters.OutputParser.Nuget.PACKAGE_VERSION_GROUP);
+
+                            if (ApplicationParameters.OutputParser.Nuget.ResolvingDependency.IsMatch(logMessage))
+                            {
+                                return;
+                            }
+                            if (ApplicationParameters.OutputParser.Nuget.NotInstalled.IsMatch(logMessage))
+                            {
+                                this.Log().Error("{0} not installed: {1}".format_with(packageName, logMessage));
+                                packageFailures += 1;
+                                packageInstallResults.Add(packageName, false);
+                                return;
+                            }
+
+                            if (!string.IsNullOrWhiteSpace(packageName))
+                            {
+                                this.Log().Info("{0} {1}".format_with(packageName, !string.IsNullOrWhiteSpace(packageVersion) ? "v" + packageVersion : string.Empty));
+                            }
+
+                            if (ApplicationParameters.OutputParser.Nuget.AlreadyInstalled.IsMatch(logMessage))
+                            {
+                                if (!configuration.Force)
+                                {
+                                    packageInstallResults.Add(packageName, false);
+                                    this.Log().Info(" Already installed.{0} If you want to reinstall the current version of an existing package, please use the -force command.".format_with(Environment.NewLine));
+                                    return;
+                                }
+                                //packageQueue.Add();
+                            }
+
+                            packageInstallResults.Add(packageName, true);
+                            this.Log().Info(" {0} has been installed.".format_with(packageName));
+                        },
+                    (s, e) => this.Log().Error(() => "{0}".format_with(e.Data)));
+
                 //todo: will need to get into the command log and see what we have as installed dependencies
                 //overall, if one fails, the process should report as a failure.
                 if (Environment.ExitCode != 0)
                 {
                     Environment.ExitCode = exitCode;
                 }
-                else
-                {
-                    packageSuccesses += 1;
-                }
-
-                packagesInstalled.Add(packageToInstall, exitCode);
             }
 
-            this.Log().Info(() => "Install Summary: {0}/{1} packages installed. Please check logs for errors.".format_with(packageSuccesses, totalPackageCount));
+            this.Log().Info(() => "{0} installed {1}/{2} packages. {3} packages failed.{4}See the log for details.".format_with(
+                ApplicationParameters.Name,
+                packageInstallResults.Where((p) => p.Value).Count(),
+                packageInstallResults.Count,
+                packageFailures,
+                Environment.NewLine));
             this.Log().Warn("Command not yet fully functional, stay tuned...");
+        }
+
+
+        private static string get_value_from_output(string output, Regex regex, string groupName)
+        {
+            var matchGroup = regex.Match(output).Groups[groupName];
+            if (matchGroup != null)
+            {
+                return matchGroup.Value;
+            }
+
+            return string.Empty;
         }
     }
 }

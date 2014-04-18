@@ -3,6 +3,7 @@ namespace chocolatey.infrastructure.app
     using System;
     using System.IO;
     using System.Reflection;
+    using System.Text.RegularExpressions;
     using filesystem;
 
     public static class ApplicationParameters
@@ -24,6 +25,20 @@ namespace chocolatey.infrastructure.app
         public static class Tools
         {
             public static readonly string NugetExe = _fileSystem.combine_paths(InstallLocation, "nuget.exe");
+        }
+
+        public static class OutputParser
+        {
+            public static class Nuget
+            {
+                public const string PACKAGE_NAME_GROUP = "PkgName";
+                public const string PACKAGE_VERSION_GROUP = "PkgVersion";
+                public static readonly Regex AlreadyInstalled = new Regex(@"already installed", RegexOptions.Compiled);
+                public static readonly Regex NotInstalled = new Regex(@"not installed", RegexOptions.Compiled);
+                public static readonly Regex ResolvingDependency = new Regex(@"Attempting to resolve dependency", RegexOptions.Compiled);
+                public static readonly Regex PackageName = new Regex(@"'(?<{0}>[.\S]+)\s?".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
+                public static readonly Regex PackageVersion = new Regex(@"(?<{0}>[\d\.]+[\-\w]*)[[)]?'".format_with(PACKAGE_VERSION_GROUP), RegexOptions.Compiled);
+            }
         }
 
         private static T TryGetConfig<T>(Func<T> func, T defaultValue)
