@@ -8,6 +8,7 @@
     using infrastructure.configuration;
     using infrastructure.services;
     using logging;
+    using messaging;
     using services;
 
     /// <summary>
@@ -40,10 +41,10 @@
                     return list.AsReadOnly();
                 }, Lifestyle.Singleton);
 
-            //container.Register<IEventAggregator, EventAggregator>(Lifestyle.Singleton);
-            //container.Register<IMessageSubscriptionManagerService, MessageSubscriptionManagerService>(Lifestyle.Singleton);
-            //EventManager.InitializeWith(() => container.GetInstance<IMessageSubscriptionManagerService>());
-            //container.Register<IDateTimeService, SystemDateTimeUtcService>(Lifestyle.Singleton);
+            container.Register<IMessageSubscriptionManagerService, MessageSubscriptionManagerService>(Lifestyle.Singleton);
+            EventManager.initialize_with(container.GetInstance<IMessageSubscriptionManagerService>);
+            
+            container.Register<IDateTimeService, SystemDateTimeUtcService>(Lifestyle.Singleton);
         }
     }
 }
