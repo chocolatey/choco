@@ -4,6 +4,7 @@ namespace chocolatey.infrastructure.commands
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
+    using platforms;
 
     public sealed class CommandExecutor
     {
@@ -48,6 +49,12 @@ namespace chocolatey.infrastructure.commands
             if (updateProcessPath)
             {
                 process = Path.GetFullPath(process);
+            }
+
+            if (Platform.get_platform() != PlatformType.Windows)
+            {
+                arguments = process + " " + arguments;
+                process = "mono";
             }
 
             var psi = new ProcessStartInfo(process, arguments)
