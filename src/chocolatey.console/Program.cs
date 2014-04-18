@@ -32,7 +32,7 @@
                 //no file system at this point
                 if (!Directory.Exists(outputDirectory)) Directory.CreateDirectory(outputDirectory);
 
-                Log4NetAppender.configure(outputDirectory);
+                Log4NetAppenderConfiguration.configure(outputDirectory);
                 Bootstrap.initialize();
                 Bootstrap.startup();
 
@@ -51,8 +51,8 @@
                     Environment.Exit(-1);
                 }
 
-                set_verbose_logger_when_verbose(config);
-                set_logging_level_debug_when_debug(config);
+                Log4NetAppenderConfiguration.set_verbose_logger_when_verbose(config.Verbose, ChocolateyLoggers.Verbose.to_string());
+                Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug);
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.PlatformType, config.PlatformVersion.to_string()));
 
                 LicenseValidation.Validate(fileSystem);
@@ -91,40 +91,7 @@
                 Environment.Exit(Environment.ExitCode);
             }
         }
-
-        private static void set_logging_level_debug_when_debug(ChocolateyConfiguration configSettings)
-        {
-            if (configSettings.Debug)
-            {
-                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly());
-                logRepository.Threshold = Level.Debug;
-                foreach (ILogger log in logRepository.GetCurrentLoggers())
-                {
-                    var logger = log as Logger;
-                    if (logger != null)
-                    {
-                        logger.Level = Level.Debug;
-                    }
-                }
-            }
-        }
         
-        private static void set_verbose_logger_when_verbose(ChocolateyConfiguration configSettings)
-        {
-            if (configSettings.Verbose)
-            {
-                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly());
-                foreach (ILogger log in logRepository.GetCurrentLoggers())
-                {
-                    var logger = log as Logger;
-                    if (logger != null && logger.Name.is_equal_to(ChocolateyLoggers.Verbose.to_string()))
-                    {
-                        logger.Level = Level.Info;
-                    }
-                }
-            }
-        }
-
         private static void pause_execution_if_debug()
         {
 #if DEBUG

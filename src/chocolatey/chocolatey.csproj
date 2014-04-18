@@ -89,7 +89,7 @@
     <Compile Include="infrastructure\licensing\LicenseValidation.cs" />
     <Compile Include="infrastructure\logging\ILog.cs" />
     <Compile Include="infrastructure\logging\Log.cs" />
-    <Compile Include="infrastructure\logging\Log4NetAppender.cs" />
+    <Compile Include="infrastructure\logging\Log4NetAppenderConfiguration.cs" />
     <Compile Include="infrastructure\logging\Log4NetLog.cs" />
     <Compile Include="infrastructure\logging\NullLog.cs" />
     <Compile Include="infrastructure\platforms\Platform.cs" />
