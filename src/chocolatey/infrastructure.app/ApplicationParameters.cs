@@ -1,7 +1,6 @@
 namespace chocolatey.infrastructure.app
 {
     using System;
-    using System.IO;
     using System.Reflection;
     using System.Text.RegularExpressions;
     using filesystem;

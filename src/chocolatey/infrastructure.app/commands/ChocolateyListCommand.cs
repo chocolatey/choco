@@ -7,6 +7,7 @@
     using commandline;
     using configuration;
     using infrastructure.commands;
+    using logging;
 
     [CommandFor(CommandNameType.list)]
     [CommandFor(CommandNameType.search)]
@@ -59,8 +60,8 @@
 
         public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Info(@"_ List/Search Command _
-
+            this.Log().Warn(ChocolateyLoggers.Important,"List/Search Command");
+            this.Log().Info(@"
 Chocolatey will perform a search for a package local or remote.
 
 Usage: choco search filter [options/switches]

@@ -21,59 +21,59 @@ namespace chocolatey.infrastructure.logging
 
         public void Debug(string message, params object[] formatting)
         {
-            if (_logger.IsDebugEnabled) _logger.DebugFormat(DecorateMessageWithAuditInformation(message), formatting);
+            if (_logger.IsDebugEnabled) _logger.DebugFormat(decorate_message_with_audit_information(message), formatting);
         }
 
         public void Debug(Func<string> message)
         {
-            if (_logger.IsDebugEnabled) _logger.Debug(DecorateMessageWithAuditInformation(message.Invoke()));
+            if (_logger.IsDebugEnabled) _logger.Debug(decorate_message_with_audit_information(message.Invoke()));
         }
 
         public void Info(string message, params object[] formatting)
         {
-            if (_logger.IsInfoEnabled) _logger.InfoFormat(DecorateMessageWithAuditInformation(message), formatting);
+            if (_logger.IsInfoEnabled) _logger.InfoFormat(decorate_message_with_audit_information(message), formatting);
         }
 
         public void Info(Func<string> message)
         {
-            if (_logger.IsInfoEnabled) _logger.Info(DecorateMessageWithAuditInformation(message.Invoke()));
+            if (_logger.IsInfoEnabled) _logger.Info(decorate_message_with_audit_information(message.Invoke()));
         }
 
         public void Warn(string message, params object[] formatting)
         {
-            if (_logger.IsWarnEnabled) _logger.WarnFormat(DecorateMessageWithAuditInformation(message), formatting);
+            if (_logger.IsWarnEnabled) _logger.WarnFormat(decorate_message_with_audit_information(message), formatting);
         }
 
         public void Warn(Func<string> message)
         {
-            if (_logger.IsWarnEnabled) _logger.Warn(DecorateMessageWithAuditInformation(message.Invoke()));
+            if (_logger.IsWarnEnabled) _logger.Warn(decorate_message_with_audit_information(message.Invoke()));
         }
 
         public void Error(string message, params object[] formatting)
         {
             // don't need to check for enabled at this level
-            _logger.ErrorFormat(DecorateMessageWithAuditInformation(message), formatting);
+            _logger.ErrorFormat(decorate_message_with_audit_information(message), formatting);
         }
 
         public void Error(Func<string> message)
         {
             // don't need to check for enabled at this level
-            _logger.Error(DecorateMessageWithAuditInformation(message.Invoke()));
+            _logger.Error(decorate_message_with_audit_information(message.Invoke()));
         }
 
         public void Fatal(string message, params object[] formatting)
         {
             // don't need to check for enabled at this level
-            _logger.FatalFormat(DecorateMessageWithAuditInformation(message), formatting);
+            _logger.FatalFormat(decorate_message_with_audit_information(message), formatting);
         }
 
         public void Fatal(Func<string> message)
         {
             // don't need to check for enabled at this level
-            _logger.Fatal(DecorateMessageWithAuditInformation(message.Invoke()));
+            _logger.Fatal(decorate_message_with_audit_information(message.Invoke()));
         }
 
-        public string DecorateMessageWithAuditInformation(string message)
+        public string decorate_message_with_audit_information(string message)
         {
             return message;
         }

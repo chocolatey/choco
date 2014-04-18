@@ -41,7 +41,7 @@
                 var fileSystem = container.GetInstance<IFileSystem>();
 
                 config.ChocolateyVersion = VersionInformation.get_current_assembly_version();
-                "chocolatey".Log().Info(() => "{0} v{1}".format_with(ApplicationParameters.Name, config.ChocolateyVersion));
+                "chocolatey".Log().Info(ChocolateyLoggers.Important,() => "{0} v{1}".format_with(ApplicationParameters.Name, config.ChocolateyVersion));
 
                 ConfigurationBuilder.set_up_configuration(args, config, fileSystem, container.GetInstance<IXmlService>());
                 Config.InitializeWith(config);
@@ -51,6 +51,7 @@
                     Environment.Exit(-1);
                 }
 
+                set_verbose_logger_when_verbose(config);
                 set_logging_level_debug_when_debug(config);
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.PlatformType, config.PlatformVersion.to_string()));
 
@@ -86,6 +87,7 @@
             {
                 pause_execution_if_debug();
                 Bootstrap.shutdown();
+
                 Environment.Exit(Environment.ExitCode);
             }
         }
@@ -102,6 +104,22 @@
                     if (logger != null)
                     {
                         logger.Level = Level.Debug;
+                    }
+                }
+            }
+        }
+        
+        private static void set_verbose_logger_when_verbose(ChocolateyConfiguration configSettings)
+        {
+            if (configSettings.Verbose)
+            {
+                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly());
+                foreach (ILogger log in logRepository.GetCurrentLoggers())
+                {
+                    var logger = log as Logger;
+                    if (logger != null && logger.Name.is_equal_to(ChocolateyLoggers.Verbose.to_string()))
+                    {
+                        logger.Level = Level.Info;
                     }
                 }
             }

@@ -58,6 +58,7 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="infrastructure\logging\ChocolateyLoggers.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="EnumerationExtensions.cs" />
     <Compile Include="infrastructure.app\ApplicationParameters.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="infrastructure.app\registration\ContainerBinding.cs" />
     <Compile Include="infrastructure\registration\SimpleInjectorContainerResolutionBehavior.cs" />
     <Compile Include="infrastructure\tokens\TokenReplacer.cs" />
+    <Compile Include="ILogExtensions.cs" />
     <Compile Include="LogExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

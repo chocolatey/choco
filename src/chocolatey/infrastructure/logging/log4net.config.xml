@@ -1,37 +1,119 @@
 ﻿<?xml version="1.0"?>
-
+<!-- For colors that can be used with ManagedColoredConsoleAppender, see
+     http://msdn.microsoft.com/en-us/library/system.consolecolor(v=vs.110).aspx 
+-->
 <log4net>
-  <appender name="ColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
+  <appender name="NormalLoggingColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
     <mapping>
-      <level value="ERROR" />
+      <level value="FATAL" />
       <foreColor value="White" />
       <backColor value="Red" />
     </mapping>
     <mapping>
-      <level value="WARN" />
+      <level value="ERROR" />
       <foreColor value="Red" />
-      <backColor value="Yellow" />
+      <backColor value="Black" />
+    </mapping>
+    <mapping>
+      <level value="WARN" />
+      <foreColor value="DarkYellow" />
+      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="INFO" />
-      <foreColor value="Green" />
+      <foreColor value="Gray" />
+      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="DEBUG" />
-      <foreColor value="Blue" />
+      <foreColor value="DarkBlue" />
+      <backColor value="Gray" />
     </mapping>
     <layout type="log4net.Layout.PatternLayout">
       <conversionPattern value="%message%newline" />
     </layout>
   </appender>
 
+  <appender name="ImportantLoggingColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
+    <mapping>
+      <level value="FATAL" />
+      <foreColor value="White" />
+      <backColor value="Red" />
+    </mapping>
+    <mapping>
+      <level value="ERROR" />
+      <foreColor value="Red" />
+      <backColor value="Black" />
+    </mapping>
+    <mapping>
+      <level value="WARN" />
+      <foreColor value="Yellow" />
+      <backColor value="Black" />
+    </mapping>
+    <mapping>
+      <level value="INFO" />
+      <foreColor value="Green" />
+      <backColor value="Black" />
+    </mapping>
+    <mapping>
+      <level value="DEBUG" />
+      <foreColor value="Blue" />
+      <backColor value="Gray" />
+    </mapping>
+    <layout type="log4net.Layout.PatternLayout">
+      <conversionPattern value="%message%newline" />
+    </layout>
+  </appender>
+
+  <appender name="VerboseLoggingColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
+    <mapping>
+      <level value="FATAL" />
+      <foreColor value="White" />
+      <backColor value="Red" />
+    </mapping>
+    <mapping>
+      <level value="ERROR" />
+      <foreColor value="Red" />
+      <backColor value="Black" />
+    </mapping>
+    <mapping>
+      <level value="WARN" />
+      <foreColor value="DarkYellow" />
+      <backColor value="Black" />
+    </mapping>
+    <mapping>
+      <level value="INFO" />
+      <foreColor value="DarkMagenta" />
+      <backColor value="Black" />
+    </mapping>
+    <mapping>
+      <level value="DEBUG" />
+      <foreColor value="DarkBlue" />
+      <backColor value="Gray" />
+    </mapping>
+    <layout type="log4net.Layout.PatternLayout">
+      <conversionPattern value="%message%newline" />
+    </layout>
+  </appender>
+  
   <root>
     <level value="INFO" />
-    <appender-ref ref="ColoredConsoleAppender" />
+    <!--<appender-ref ref="ColoredConsoleAppender" />-->
   </root>
 
-  <!--<logger name="chocolatey">-->
-  <!--<level value="INFO"/>
-  </logger>-->
+  <logger name="Important">
+    <level value="INFO" />
+    <appender-ref ref="ImportantLoggingColoredConsoleAppender" />
+  </logger>  
+  
+  <logger name="Verbose">
+    <level value="ERROR" />
+    <appender-ref ref="VerboseLoggingColoredConsoleAppender" />
+  </logger>
+
+  <logger name="chocolatey">
+    <level value="INFO"/>
+    <appender-ref ref="NormalLoggingColoredConsoleAppender" />
+  </logger>
 
 </log4net>

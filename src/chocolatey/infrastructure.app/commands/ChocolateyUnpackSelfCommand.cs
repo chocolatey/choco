@@ -8,6 +8,7 @@
     using extractors;
     using filesystem;
     using infrastructure.commands;
+    using logging;
     using resources;
 
     [CommandFor(CommandNameType.unpackself)]
@@ -30,9 +31,8 @@
 
         public void help_message(ChocolateyConfiguration configuration)
         {
+            this.Log().Warn(ChocolateyLoggers.Important, "UnpackSelf Command");
             this.Log().Info(@"
-UnpackSelf Command
-
 This command should only be used when installing Chocolatey, not during normal operation. This will unpack unconditionally overwriting files that may exist.
 ");
         }

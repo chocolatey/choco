@@ -11,6 +11,7 @@
     using filesystem;
     using infrastructure.configuration;
     using infrastructure.services;
+    using logging;
     using platforms;
 
     public class ConfigurationBuilder
@@ -81,8 +82,8 @@
                             commandsLog.AppendFormat(" * {0}\n", command.GetDescriptionOrValue());
                         }
 
-                        "chocolatey".Log().Info(@"_ Commands _
-{1}
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, "Commands");
+                        "chocolatey".Log().Info(@"{1}
 
 Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.ChocolateyVersion, commandsLog.ToString()));
                                                                               });

@@ -9,6 +9,7 @@
     using commandline;
     using configuration;
     using infrastructure.commands;
+    using logging;
 
     [CommandFor(CommandNameType.install)]
     public sealed class ChocolateyInstallCommand : ICommand
@@ -80,8 +81,8 @@
 
         public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Info(@"_ Install Command _
-
+            this.Log().Warn(ChocolateyLoggers.Important,"Install Command");
+            this.Log().Info(@"
 Installs a package or a list of packages (sometimes passed as a packages.config).
 
 Usage: choco install pkg|packages.config [pkg2 pkgN] [options/switches]
@@ -113,10 +114,11 @@ NOTE: `all` is a special package keyword that will allow you to install all
             var packageInstallResults = new Dictionary<string, bool>();
             var args = ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetArguments);
 
-            this.Log().Info(@"Installing the following packages:
-{0}
-
-By installing you accept the licenses for these packages (and their dependencies).".format_with(configuration.PackageNames));
+            this.Log().Info(@"Installing the following packages:");
+            this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(configuration.PackageNames));
+            this.Log().Info(@"
+By installing you accept licenses for the packages.
+");
 
 
             var packageFailures = 0;
@@ -132,7 +134,7 @@ By installing you accept the licenses for these packages (and their dependencies
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
                             this.Log().Debug(() => "[Nuget] {0}".format_with(logMessage));
 
-                            var packageName = get_value_from_output(logMessage,ApplicationParameters.OutputParser.Nuget.PackageName,ApplicationParameters.OutputParser.Nuget.PACKAGE_NAME_GROUP);
+                            var packageName = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageName, ApplicationParameters.OutputParser.Nuget.PACKAGE_NAME_GROUP);
                             var packageVersion = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageVersion, ApplicationParameters.OutputParser.Nuget.PACKAGE_VERSION_GROUP);
 
                             if (ApplicationParameters.OutputParser.Nuget.ResolvingDependency.IsMatch(logMessage))
@@ -147,17 +149,18 @@ By installing you accept the licenses for these packages (and their dependencies
                                 return;
                             }
 
-                            if (!string.IsNullOrWhiteSpace(packageName))
-                            {
-                                this.Log().Info("{0} {1}".format_with(packageName, !string.IsNullOrWhiteSpace(packageVersion) ? "v" + packageVersion : string.Empty));
-                            }
+                            if (string.IsNullOrWhiteSpace(packageName)) return;
+
+                            this.Log().Info(ChocolateyLoggers.Important, "{0} {1}".format_with(packageName, !string.IsNullOrWhiteSpace(packageVersion) ? "v" + packageVersion : string.Empty));
+
 
                             if (ApplicationParameters.OutputParser.Nuget.AlreadyInstalled.IsMatch(logMessage))
                             {
                                 if (!configuration.Force)
                                 {
                                     packageInstallResults.Add(packageName, false);
-                                    this.Log().Info(" Already installed.{0} If you want to reinstall the current version of an existing package, please use the -force command.".format_with(Environment.NewLine));
+                                    this.Log().Warn(" Already installed.");
+                                    this.Log().Warn(ChocolateyLoggers.Important, " Use -force if you want to reinstall.".format_with(Environment.NewLine));
                                     return;
                                 }
                                 //packageQueue.Add();
@@ -184,7 +187,6 @@ By installing you accept the licenses for these packages (and their dependencies
                 Environment.NewLine));
             this.Log().Warn("Command not yet fully functional, stay tuned...");
         }
-
 
         private static string get_value_from_output(string output, Regex regex, string groupName)
         {
