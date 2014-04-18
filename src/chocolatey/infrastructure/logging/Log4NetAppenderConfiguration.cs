@@ -1,5 +1,6 @@
 namespace chocolatey.infrastructure.logging
 {
+    using System;
     using System.IO;
     using System.Reflection;
     using app;
@@ -10,10 +11,11 @@ namespace chocolatey.infrastructure.logging
     using log4net.Layout;
     using log4net.Repository;
     using log4net.Repository.Hierarchy;
+    using platforms;
 
     public sealed class Log4NetAppenderConfiguration
     {
-        private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof (Log4NetAppenderConfiguration));
+        private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof(Log4NetAppenderConfiguration));
 
         private static bool _alreadyConfiguredFileAppender;
 
@@ -29,7 +31,32 @@ namespace chocolatey.infrastructure.logging
             XmlConfigurator.Configure(xmlConfigStream);
             set_file_appender(outputDirectory);
 
+            remove_background_color_from_non_windows();
+
             _logger.DebugFormat("Configured {0} from assembly {1}", ApplicationParameters.Log4NetConfigurationResource, assembly.FullName);
+        }
+
+        private static void remove_background_color_from_non_windows()
+        {
+            if (platforms.Platform.get_platform() == PlatformType.Windows) return;
+
+            ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly());
+            logRepository.Threshold = Level.Debug;
+            foreach (IAppender appender in logRepository.GetAppenders())
+            {
+                var consoleAppender = appender as ManagedColoredConsoleAppender;
+                if (consoleAppender != null)
+                {
+                    var mapping = new ManagedColoredConsoleAppender.LevelColors
+                        {
+                            ForeColor = ConsoleColor.Green,
+                            Level = Level.Info
+                        };
+                    mapping.ActivateOptions();
+
+                    consoleAppender.AddMapping(mapping);
+                }
+            }
         }
 
         /// <summary>
@@ -57,7 +84,7 @@ namespace chocolatey.infrastructure.logging
                         Layout = layout,
                         AppendToFile = true,
                         RollingStyle = RollingFileAppender.RollingMode.Size,
-                        MaxFileSize = 1024*1024,
+                        MaxFileSize = 1024 * 1024,
                         MaxSizeRollBackups = 10,
                         LockingModel = lockingModel,
                     };
@@ -67,7 +94,10 @@ namespace chocolatey.infrastructure.logging
                 foreach (ILogger log in logRepository.GetCurrentLoggers())
                 {
                     var logger = log as Logger;
-                    logger.AddAppender(app);
+                    if (logger != null)
+                    {
+                        logger.AddAppender(app);
+                    }
                 }
             }
         }
