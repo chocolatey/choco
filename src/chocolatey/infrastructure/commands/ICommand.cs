@@ -17,7 +17,7 @@
         void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration);
 
         /// <summary>
-        ///   Handle the arguments that were not parsed by the argument parser.
+        ///   Handle the arguments that were not parsed by the argument parser and/or do additional parsing work
         /// </summary>
         /// <param name="unparsedArguments">The unparsed arguments.</param>
         /// <param name="configuration">The configuration.</param>
@@ -30,7 +30,7 @@
         void help_message(ChocolateyConfiguration configuration);
 
         /// <summary>
-        /// Runs in no op mode, which means it doesn't actually make any changes.
+        ///   Runs in no op mode, which means it doesn't actually make any changes.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         void noop(ChocolateyConfiguration configuration);

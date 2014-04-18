@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey", "chocolatey\ch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.resources", "chocolatey.resources\chocolatey.resources.csproj", "{AF584111-FE32-448D-A1D0-63217AF8B43C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.tests.integration", "chocolatey.tests.integration\chocolatey.tests.integration.csproj", "{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,11 +65,22 @@ Global
 		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{AF584111-FE32-448D-A1D0-63217AF8B43C}.Release|x86.ActiveCfg = Release|Any CPU
+		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5C4C60F0-47B1-498E-ABF7-D315E1A94BC9} = {7656D054-387D-409C-A9FB-62A44599AA77}
+		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456} = {7656D054-387D-409C-A9FB-62A44599AA77}
 	EndGlobalSection
 EndGlobal

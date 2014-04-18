@@ -55,10 +55,10 @@ This command should only be used when installing Chocolatey, not during normal o
                 };
 
             AssemblyFileExtractor.extract_all_chocolatey_resources_to_relative_directory(
-                _fileSystem, 
-                Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)), 
+                _fileSystem,
+                Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)),
                 ApplicationParameters.InstallLocation,
-                folders, 
+                folders,
                 overwriteExisting: true);
         }
     }

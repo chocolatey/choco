@@ -7,10 +7,10 @@
     public sealed class CommandForAttribute : Attribute
     {
         public CommandNameType CommandName { get; set; }
-        
+
         public CommandForAttribute(CommandNameType commandName)
         {
-            this.CommandName = commandName;
+            CommandName = commandName;
         }
     }
 }

@@ -29,16 +29,16 @@
 
             //refactor - this could all be autowired
             container.Register<IEnumerable<ICommand>>(() =>
-            {
-                var list = new List<ICommand>
-                    {
-                        new ChocolateyInstallCommand(),
-                        new ChocolateyListCommand(),
-                        new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>())
-                    };
+                {
+                    var list = new List<ICommand>
+                        {
+                            new ChocolateyInstallCommand(),
+                            new ChocolateyListCommand(),
+                            new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>())
+                        };
 
-                return list.AsReadOnly();
-            }, Lifestyle.Singleton);
+                    return list.AsReadOnly();
+                }, Lifestyle.Singleton);
 
             //container.Register<IEventAggregator, EventAggregator>(Lifestyle.Singleton);
             //container.Register<IMessageSubscriptionManagerService, MessageSubscriptionManagerService>(Lifestyle.Singleton);
@@ -46,5 +46,4 @@
             //container.Register<IDateTimeService, SystemDateTimeUtcService>(Lifestyle.Singleton);
         }
     }
-
 }

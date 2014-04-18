@@ -3,7 +3,6 @@ namespace chocolatey.infrastructure.logging
     using System.IO;
     using System.Reflection;
     using app;
-    using app.configuration;
     using log4net;
     using log4net.Appender;
     using log4net.Config;
@@ -19,7 +18,7 @@ namespace chocolatey.infrastructure.logging
         private static bool _alreadyConfiguredFileAppender;
 
         /// <summary>
-        /// Pulls xmlconfiguration from embedded location and applies it. Then it configures a file appender to the specified output directory. 
+        ///   Pulls xmlconfiguration from embedded location and applies it. Then it configures a file appender to the specified output directory.
         /// </summary>
         /// <param name="outputDirectory">The output directory.</param>
         public static void configure(string outputDirectory)
@@ -34,7 +33,7 @@ namespace chocolatey.infrastructure.logging
         }
 
         /// <summary>
-        /// Adds a file appender to all current loggers. Only runs one time.
+        ///   Adds a file appender to all current loggers. Only runs one time.
         /// </summary>
         /// <param name="outputDirectory">The output directory.</param>
         private static void set_file_appender(string outputDirectory)
@@ -42,7 +41,7 @@ namespace chocolatey.infrastructure.logging
             if (!_alreadyConfiguredFileAppender)
             {
                 _alreadyConfiguredFileAppender = true;
-             
+
                 var layout = new PatternLayout
                     {
                         ConversionPattern = "%date [%-5level] - %message%newline"
@@ -74,9 +73,11 @@ namespace chocolatey.infrastructure.logging
         }
 
         /// <summary>
-        /// Sets all loggers to Debug level
+        ///   Sets all loggers to Debug level
         /// </summary>
-        /// <param name="enableDebug">if set to <c>true</c> [enable debug].</param>
+        /// <param name="enableDebug">
+        ///   if set to <c>true</c> [enable debug].
+        /// </param>
         public static void set_logging_level_debug_when_debug(bool enableDebug)
         {
             if (enableDebug)
@@ -95,11 +96,13 @@ namespace chocolatey.infrastructure.logging
         }
 
         /// <summary>
-        /// Sets a named verbose logger to Info Level when enableVerbose is true.
+        ///   Sets a named verbose logger to Info Level when enableVerbose is true.
         /// </summary>
-        /// <param name="enableVerbose">if set to <c>true</c> [enable verbose].</param>
+        /// <param name="enableVerbose">
+        ///   if set to <c>true</c> [enable verbose].
+        /// </param>
         /// <param name="verboseLoggerName">Name of the verbose logger.</param>
-        public static void set_verbose_logger_when_verbose(bool enableVerbose,string verboseLoggerName)
+        public static void set_verbose_logger_when_verbose(bool enableVerbose, string verboseLoggerName)
         {
             if (enableVerbose)
             {
@@ -114,6 +117,5 @@ namespace chocolatey.infrastructure.logging
                 }
             }
         }
-    
     }
 }

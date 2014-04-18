@@ -5,6 +5,5 @@
         Normal,
         Verbose,
         Important,
-
     }
 }

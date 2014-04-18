@@ -32,7 +32,7 @@
             }
             catch (Exception ex)
             {
-                this.Log().Error("Error deserializing response of type {0}", typeof (XmlType));
+                this.Log().Error("Error deserializing response of type {0}:{1}{2}", typeof (XmlType), Environment.NewLine, ex.ToString());
                 throw;
             }
         }

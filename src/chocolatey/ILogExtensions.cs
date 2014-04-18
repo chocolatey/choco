@@ -14,7 +14,7 @@
                     logger.Debug(message, formatting);
                     break;
                 default:
-                    logType.to_string().Log().Debug(message,formatting);
+                    logType.to_string().Log().Debug(message, formatting);
                     break;
             }
         }
@@ -30,8 +30,8 @@
                     logType.to_string().Log().Debug(message);
                     break;
             }
-        }  
-        
+        }
+
         public static void Info(this ILog logger, ChocolateyLoggers logType, string message, params object[] formatting)
         {
             switch (logType)
@@ -41,7 +41,7 @@
                     logger.Info(message, formatting);
                     break;
                 default:
-                    logType.to_string().Log().Info(message,formatting);
+                    logType.to_string().Log().Info(message, formatting);
                     break;
             }
         }
@@ -58,7 +58,7 @@
                     break;
             }
         }
-       
+
         public static void Warn(this ILog logger, ChocolateyLoggers logType, string message, params object[] formatting)
         {
             switch (logType)
@@ -84,7 +84,7 @@
                     logType.to_string().Log().Warn(message);
                     break;
             }
-        }       
+        }
 
         public static void Error(this ILog logger, ChocolateyLoggers logType, string message, params object[] formatting)
         {

@@ -60,7 +60,7 @@
 
         public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Warn(ChocolateyLoggers.Important,"List/Search Command");
+            this.Log().Warn(ChocolateyLoggers.Important, "List/Search Command");
             this.Log().Info(@"
 Chocolatey will perform a search for a package local or remote.
 

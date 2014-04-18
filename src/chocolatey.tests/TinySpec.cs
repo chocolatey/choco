@@ -1,4 +1,4 @@
-// ==============================================================================
+﻿// ==============================================================================
 // 
 // Fervent Coder Copyright © 2011 - Released under the Apache 2.0 License
 // 
@@ -15,6 +15,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 // ==============================================================================
+
 namespace chocolatey.tests
 {
     using System;
@@ -40,20 +41,26 @@ namespace chocolatey.tests
             AfterObservations();
         }
 
-        public virtual void AfterObservations() {}
+        public virtual void AfterObservations()
+        {
+        }
     }
 
-    public class ObservationAttribute : TestAttribute {}
-    public class FactAttribute : TestAttribute {}
-    
+    public class ObservationAttribute : TestAttribute
+    {
+    }
+
+    public class FactAttribute : TestAttribute
+    {
+    }
+
     public class ConcernForAttribute : Attribute
     {
         public string Name { get; set; }
-        
+
         public ConcernForAttribute(string name)
         {
             Name = name;
         }
     }
-    
 }

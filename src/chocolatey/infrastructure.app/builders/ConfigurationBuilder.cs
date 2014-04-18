@@ -26,7 +26,7 @@
         private static void set_file_configuration(ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService)
         {
             var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
-            AssemblyFileExtractor.extract_text_file_from_assembly(fileSystem, Assembly.GetExecutingAssembly(),ApplicationParameters.ChocolateyConfigFileResource, globalConfigPath);
+            AssemblyFileExtractor.extract_text_file_from_assembly(fileSystem, Assembly.GetExecutingAssembly(), ApplicationParameters.ChocolateyConfigFileResource, globalConfigPath);
 
             var configFileSettings = xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
 
@@ -47,23 +47,23 @@
         private static void set_global_options(IList<string> args, ChocolateyConfiguration config)
         {
             ConfigurationOptions.parse_arguments_and_update_configuration(
-                args, 
+                args,
                 config,
                 (option_set) =>
                     {
                         option_set
                             .Add("d|debug",
-                                "Debug - Run in Debug Mode.",
-                                option => config.Debug = option != null)
+                                 "Debug - Run in Debug Mode.",
+                                 option => config.Debug = option != null)
                             .Add("v|verbose",
-                                "Verbose - See verbose messaging.",
-                                option => config.Verbose = option != null)
+                                 "Verbose - See verbose messaging.",
+                                 option => config.Verbose = option != null)
                             .Add("f|force",
-                                "Force - force the behavior",
-                                option => config.Force = option != null)
+                                 "Force - force the behavior",
+                                 option => config.Force = option != null)
                             .Add("noop",
-                                "NoOp - Don't actually do anything.",
-                                option => config.Noop = option != null)
+                                 "NoOp - Don't actually do anything.",
+                                 option => config.Noop = option != null)
                             ;
                     },
                 (unparsedArgs) =>
@@ -86,7 +86,7 @@
                         "chocolatey".Log().Info(@"{1}
 
 Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.ChocolateyVersion, commandsLog.ToString()));
-                                                                              });
+                    });
         }
 
         private static void set_platform(ChocolateyConfiguration config)

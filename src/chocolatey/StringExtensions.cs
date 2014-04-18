@@ -2,7 +2,6 @@ namespace chocolatey
 {
     using System.Globalization;
     using System.Text.RegularExpressions;
-    using infrastructure.app.configuration;
 
     /// <summary>
     ///   Extensions for strings
@@ -68,7 +67,7 @@ namespace chocolatey
         private static readonly Regex _spacePattern = new Regex(@"\s", RegexOptions.Compiled);
 
         /// <summary>
-        /// If the item contains spaces, it wraps it in quotes
+        ///   If the item contains spaces, it wraps it in quotes
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>
@@ -88,7 +87,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Are the strings equal(ignoring case and culture)?
+        ///   Are the strings equal(ignoring case and culture)?
         /// </summary>
         /// <param name="input">The input.</param>
         /// <param name="other">The value to compare to</param>

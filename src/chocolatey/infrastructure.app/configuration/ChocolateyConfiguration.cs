@@ -42,6 +42,7 @@ namespace chocolatey.infrastructure.app.configuration
         ///   Space separated package names.
         /// </value>
         public string PackageNames { get; set; }
+
         public string Version { get; set; }
         public bool LocalOnly { get; set; }
         public string Filter { get; set; }

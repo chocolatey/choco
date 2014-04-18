@@ -49,6 +49,15 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Reactive.Core">
+      <HintPath>..\packages\Rx-Core.2.1.30214.0\lib\Net40\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces">
+      <HintPath>..\packages\Rx-Interfaces.2.1.30214.0\lib\Net40\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq">
+      <HintPath>..\packages\Rx-Linq.2.1.30214.0\lib\Net40\System.Reactive.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
@@ -58,6 +67,7 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="infrastructure\guards\Ensure.cs" />
     <Compile Include="infrastructure\logging\ChocolateyLoggers.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="EnumerationExtensions.cs" />
@@ -71,8 +81,12 @@
     <Compile Include="infrastructure.app\commands\ChocolateyUnpackSelfCommand.cs" />
     <Compile Include="infrastructure.app\attributes\CommandForAttribute.cs" />
     <Compile Include="infrastructure.app\commands\CommandNameType.cs" />
-    <Compile Include="infrastructure\services\IConfigFileSettingsService.cs" />
-    <Compile Include="infrastructure\services\IXmlService.cs" />
+    <Compile Include="infrastructure\messaging\EventManager.cs" />
+    <Compile Include="infrastructure\messaging\IMessage.cs" />
+    <Compile Include="infrastructure\results\IResult.cs" />
+    <Compile Include="infrastructure\results\Result.cs" />
+    <Compile Include="infrastructure\results\ResultMessage.cs" />
+    <Compile Include="infrastructure\results\ResultType.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileSettings.cs" />
     <Compile Include="infrastructure.app\services\ConfigFileSettingsService.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileSourceSetting.cs" />
@@ -98,6 +112,19 @@
     <Compile Include="infrastructure.app\commands\ChocolateyInstallCommand.cs" />
     <Compile Include="infrastructure.app\registration\ContainerBinding.cs" />
     <Compile Include="infrastructure\registration\SimpleInjectorContainerResolutionBehavior.cs" />
+    <Compile Include="infrastructure\services\IConfigFileSettingsService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="infrastructure\services\IDateTimeService.cs" />
+    <Compile Include="infrastructure\services\IMessageSubscriptionManagerService.cs" />
+    <Compile Include="infrastructure\services\IRegularExpressionService.cs" />
+    <Compile Include="infrastructure\services\IXmlService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="infrastructure\services\MessageSubscriptionManagerService.cs" />
+    <Compile Include="infrastructure\services\RegularExpressionService.cs" />
+    <Compile Include="infrastructure\services\SystemDateTimeService.cs" />
+    <Compile Include="infrastructure\services\SystemDateTimeUtcService.cs" />
     <Compile Include="infrastructure\tokens\TokenReplacer.cs" />
     <Compile Include="ILogExtensions.cs" />
     <Compile Include="LogExtensions.cs" />
@@ -123,6 +150,10 @@
       <Project>{AF584111-FE32-448D-A1D0-63217AF8B43C}</Project>
       <Name>chocolatey.resources</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="infrastructure.app\messages\" />
+    <Folder Include="infrastructure.app\results\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
