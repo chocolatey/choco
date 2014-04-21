@@ -1,6 +1,7 @@
 ﻿namespace chocolatey.infrastructure.app.commands
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
@@ -10,6 +11,7 @@
     using configuration;
     using infrastructure.commands;
     using logging;
+    using results;
 
     [CommandFor(CommandNameType.install)]
     public sealed class ChocolateyInstallCommand : ICommand
@@ -109,7 +111,8 @@ NOTE: `all` is a special package keyword that will allow you to install all
             //todo:is this a packages.config? If so run that command (that will call back into here).
             //todo:are we installing from an alternate source? If so run that command instead
 
-            var packageInstallResults = new Dictionary<string, bool>();
+            //todo: upgrade this to IPackage
+            var packageInstalls = new ConcurrentDictionary<string, PackageInstallResult>();
             var args = ExternalCommandArgsBuilder.build_arguments(configuration, _nugetArguments);
 
             this.Log().Info(@"Installing the following packages:");
@@ -118,12 +121,10 @@ NOTE: `all` is a special package keyword that will allow you to install all
 By installing you accept licenses for the packages.
 ");
 
-            var packageFailures = 0;
-            int exitCode = -1;
             foreach (var packageToInstall in configuration.PackageNames.Split(' '))
             {
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
-                exitCode = CommandExecutor.execute(
+                var exitCode = CommandExecutor.execute(
                     _nugetExePath, argsForPackage, true,
                     (s, e) =>
                         {
@@ -138,11 +139,16 @@ By installing you accept licenses for the packages.
                             {
                                 return;
                             }
+
+                              //todo: ignore dependencies
+                            var results = packageInstalls.GetOrAdd(packageName, new PackageInstallResult(packageName, packageVersion));
+
+                            
                             if (ApplicationParameters.OutputParser.Nuget.NotInstalled.IsMatch(logMessage))
                             {
                                 this.Log().Error("{0} not installed: {1}".format_with(packageName, logMessage));
-                                packageFailures += 1;
-                                packageInstallResults.Add(packageName, false);
+                                results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+
                                 return;
                             }
 
@@ -150,21 +156,15 @@ By installing you accept licenses for the packages.
 
                             this.Log().Info(ChocolateyLoggers.Important, "{0} {1}".format_with(packageName, !string.IsNullOrWhiteSpace(packageVersion) ? "v" + packageVersion : string.Empty));
 
-
-                            if (ApplicationParameters.OutputParser.Nuget.AlreadyInstalled.IsMatch(logMessage))
+                            if (ApplicationParameters.OutputParser.Nuget.AlreadyInstalled.IsMatch(logMessage) && !configuration.Force)
                             {
-                                if (!configuration.Force)
-                                {
-                                    packageInstallResults.Add(packageName, false);
-                                    this.Log().Warn(" Already installed.");
-                                    this.Log().Warn(ChocolateyLoggers.Important, " Use -force if you want to reinstall.".format_with(Environment.NewLine));
-                                    return;
-                                }
-                                //packageQueue.Add();
+                                results.Messages.Add(new ResultMessage(ResultType.Inconclusive, packageName));
+                                this.Log().Warn(" Already installed.");
+                                this.Log().Warn(ChocolateyLoggers.Important, " Use -force if you want to reinstall.".format_with(Environment.NewLine));
+                                return;
                             }
-
-                            packageInstallResults.Add(packageName, true);
-                            this.Log().Info(" {0} has been installed.".format_with(packageName));
+                            
+                            results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of install."));
                         },
                     (s, e) =>
                         {
@@ -173,22 +173,38 @@ By installing you accept licenses for the packages.
                         }
                     );
 
-                //todo: will need to get into the command log and see what we have as installed dependencies
-                //overall, if one fails, the process should report as a failure.
-                if (Environment.ExitCode != 0)
+                if (exitCode != 0)
                 {
                     Environment.ExitCode = exitCode;
                 }
+
+                foreach (var packageInstall in packageInstalls.Where(p => p.Value.Success && !p.Value.Inconclusive).or_empty_list_if_null())
+                {
+                    //todo:move forward with packages that are able to be installed
+
+                    //powershell
+
+
+                    //batch/shim redirection
+
+                    this.Log().Info(" {0} has been installed.".format_with(packageInstall.Value.Name));
+                }
             }
 
+            var installFailures = packageInstalls.Count(p => !p.Value.Success);
             this.Log().Info(() => @"{0}{1} installed {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
                 Environment.NewLine,
                 ApplicationParameters.Name,
-                packageInstallResults.Where((p) => p.Value).Count(),
-                packageInstallResults.Count,
-                packageFailures));
+                packageInstalls.Count(p => p.Value.Success && !p.Value.Inconclusive),
+                packageInstalls.Count,
+                installFailures));
 
             this.Log().Warn("Command not yet fully functional, stay tuned...");
+
+            if (installFailures != 0 && Environment.ExitCode == 0)
+            {
+                Environment.ExitCode = 1;
+            }
         }
 
         private static string get_value_from_output(string output, Regex regex, string groupName)
