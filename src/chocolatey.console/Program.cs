@@ -80,6 +80,10 @@
             }
             finally
             {
+                "chocolatey".Log().Debug(() => "Exiting with {0}".format_with(Environment.ExitCode));
+#if DEBUG
+                "chocolatey".Log().Info(() => "Exiting with {0}".format_with(Environment.ExitCode));
+#endif
                 pause_execution_if_debug();
                 Bootstrap.shutdown();
 
