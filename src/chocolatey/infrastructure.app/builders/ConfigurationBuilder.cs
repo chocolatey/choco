@@ -105,6 +105,8 @@ Please run chocolatey with `choco command -help` for specific help on each comma
             config.PlatformType = Platform.get_platform();
             config.PlatformVersion = Platform.get_version();
             config.ChocolateyVersion = VersionInformation.get_current_assembly_version();
+            config.Is64Bit = Environment.Is64BitOperatingSystem;
+            config.IsInteractive = Environment.UserInteractive;
         }
     }
 }
