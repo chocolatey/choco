@@ -1,7 +1,6 @@
 ﻿namespace chocolatey.infrastructure.app.commands
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
@@ -12,35 +11,17 @@
     using infrastructure.commands;
     using logging;
     using results;
+    using services;
 
     [CommandFor(CommandNameType.install)]
     public sealed class ChocolateyInstallCommand : ICommand
     {
-        private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
-        private readonly string _nugetExePath = ApplicationParameters.Tools.NugetExe;
-        private readonly IDictionary<string, ExternalCommandArgument> _nugetArguments = new Dictionary<string, ExternalCommandArgument>();
+        private readonly INugetService _nugetService;
 
-        public ChocolateyInstallCommand()
-        {
-            set_nuget_args_dictionary();
-        }
 
-        private void set_nuget_args_dictionary()
+        public ChocolateyInstallCommand(INugetService nugetService)
         {
-            _nugetArguments.Add("_install_", new ExternalCommandArgument {ArgumentOption = "install", Required = true});
-            _nugetArguments.Add("_package_name_", new ExternalCommandArgument {ArgumentOption = PACKAGE_NAME_TOKEN, Required = true});
-            _nugetArguments.Add("Version", new ExternalCommandArgument {ArgumentOption = "-version ",});
-            _nugetArguments.Add("_output_directory_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "-outputdirectory ",
-                    ArgumentValue = "{0}".format_with(ApplicationParameters.PackagesLocation),
-                    QuoteValue = true,
-                    Required = true
-                });
-            _nugetArguments.Add("Source", new ExternalCommandArgument {ArgumentOption = "-source ", QuoteValue = true});
-            _nugetArguments.Add("Prerelease", new ExternalCommandArgument {ArgumentOption = "-prerelease"});
-            _nugetArguments.Add("_non_interactive_", new ExternalCommandArgument {ArgumentOption = "-noninteractive", Required = true});
-            _nugetArguments.Add("_no_cache_", new ExternalCommandArgument {ArgumentOption = "-nocache", Required = true});
+            _nugetService = nugetService;
         }
 
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
@@ -97,13 +78,7 @@ NOTE: `all` is a special package keyword that will allow you to install all
 
         public void noop(ChocolateyConfiguration configuration)
         {
-            this.Log().Info("{0} would have run the following to install packages:{1}'\"{2}\" {3}'".format_with(
-                ApplicationParameters.Name,
-                Environment.NewLine,
-                _nugetExePath,
-                ExternalCommandArgsBuilder.build_arguments(configuration, _nugetArguments)
-                                )
-                );
+            _nugetService.install_noop(configuration);
         }
 
         public void run(ChocolateyConfiguration configuration)
@@ -111,85 +86,26 @@ NOTE: `all` is a special package keyword that will allow you to install all
             //todo:is this a packages.config? If so run that command (that will call back into here).
             //todo:are we installing from an alternate source? If so run that command instead
 
-            //todo: upgrade this to IPackage
-            var packageInstalls = new ConcurrentDictionary<string, PackageInstallResult>();
-            var args = ExternalCommandArgsBuilder.build_arguments(configuration, _nugetArguments);
-
             this.Log().Info(@"Installing the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(configuration.PackageNames));
             this.Log().Info(@"
 By installing you accept licenses for the packages.
 ");
 
-            foreach (var packageToInstall in configuration.PackageNames.Split(' '))
+            var packageInstalls = _nugetService.install_run(configuration);
+            
+            foreach (var packageInstall in packageInstalls.Where(p => p.Value.Success && !p.Value.Inconclusive).or_empty_list_if_null())
             {
-                var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
-                var exitCode = CommandExecutor.execute(
-                    _nugetExePath, argsForPackage, true,
-                    (s, e) =>
-                        {
-                            var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Debug(() => "[Nuget] {0}".format_with(logMessage));
+                //todo:move forward with packages that are able to be installed
 
-                            var packageName = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageName, ApplicationParameters.OutputParser.Nuget.PACKAGE_NAME_GROUP);
-                            var packageVersion = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageVersion, ApplicationParameters.OutputParser.Nuget.PACKAGE_VERSION_GROUP);
-
-                            if (ApplicationParameters.OutputParser.Nuget.ResolvingDependency.IsMatch(logMessage))
-                            {
-                                return;
-                            }
-
-                              //todo: ignore dependencies
-                            var results = packageInstalls.GetOrAdd(packageName, new PackageInstallResult(packageName, packageVersion));
-
-                            
-                            if (ApplicationParameters.OutputParser.Nuget.NotInstalled.IsMatch(logMessage))
-                            {
-                                this.Log().Error("{0} not installed: {1}".format_with(packageName, logMessage));
-                                results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-
-                                return;
-                            }
-
-                            if (string.IsNullOrWhiteSpace(packageName)) return;
-
-                            this.Log().Info(ChocolateyLoggers.Important, "{0} {1}".format_with(packageName, !string.IsNullOrWhiteSpace(packageVersion) ? "v" + packageVersion : string.Empty));
-
-                            if (ApplicationParameters.OutputParser.Nuget.AlreadyInstalled.IsMatch(logMessage) && !configuration.Force)
-                            {
-                                results.Messages.Add(new ResultMessage(ResultType.Inconclusive, packageName));
-                                this.Log().Warn(" Already installed.");
-                                this.Log().Warn(ChocolateyLoggers.Important, " Use -force if you want to reinstall.".format_with(Environment.NewLine));
-                                return;
-                            }
-                            
-                            results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of install."));
-                        },
-                    (s, e) =>
-                        {
-                            if (string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Error(() => "{0}".format_with(e.Data));
-                        }
-                    );
-
-                if (exitCode != 0)
-                {
-                    Environment.ExitCode = exitCode;
-                }
-
-                foreach (var packageInstall in packageInstalls.Where(p => p.Value.Success && !p.Value.Inconclusive).or_empty_list_if_null())
-                {
-                    //todo:move forward with packages that are able to be installed
-
-                    //powershell
+                //powershell
 
 
-                    //batch/shim redirection
+                //batch/shim redirection
 
-                    this.Log().Info(" {0} has been installed.".format_with(packageInstall.Value.Name));
-                }
+                this.Log().Info(" {0} has been installed.".format_with(packageInstall.Value.Name));
             }
+
 
             var installFailures = packageInstalls.Count(p => !p.Value.Success);
             this.Log().Info(() => @"{0}{1} installed {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
@@ -207,15 +123,6 @@ By installing you accept licenses for the packages.
             }
         }
 
-        private static string get_value_from_output(string output, Regex regex, string groupName)
-        {
-            var matchGroup = regex.Match(output).Groups[groupName];
-            if (matchGroup != null)
-            {
-                return matchGroup.Value;
-            }
-
-            return string.Empty;
-        }
+       
     }
 }

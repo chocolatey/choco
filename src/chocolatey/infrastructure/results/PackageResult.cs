@@ -5,7 +5,7 @@ namespace chocolatey.infrastructure.results
     /// <summary>
     ///   Outcome of package installation
     /// </summary>
-    public sealed class PackageInstallResult : Result
+    public sealed class PackageResult : Result
     {
         public bool Inconclusive
         {
@@ -15,7 +15,7 @@ namespace chocolatey.infrastructure.results
         public string Name { get; private set; }
         public string Version { get; private set; }
 
-        public PackageInstallResult(string name, string version)
+        public PackageResult(string name, string version)
         {
             Name = name;
             Version = version;

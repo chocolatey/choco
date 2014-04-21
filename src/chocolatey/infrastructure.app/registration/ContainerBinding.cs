@@ -7,6 +7,7 @@
     using filesystem;
     using infrastructure.commands;
     using infrastructure.configuration;
+    using infrastructure.services;
     using logging;
     using services;
 
@@ -29,14 +30,15 @@
             container.Register(() => configuration, Lifestyle.Singleton);
             container.Register<IFileSystem, DotNetFileSystem>(Lifestyle.Singleton);
             container.Register<IXmlService, XmlService>(Lifestyle.Singleton);
+            container.Register<INugetService, NugetService>(Lifestyle.Singleton);
 
             //refactor - this could all be autowired
             container.Register<IEnumerable<ICommand>>(() =>
                 {
                     var list = new List<ICommand>
                         {
-                            new ChocolateyInstallCommand(),
-                            new ChocolateyListCommand(),
+                            new ChocolateyInstallCommand(container.GetInstance<INugetService>()),
+                            new ChocolateyListCommand(container.GetInstance<INugetService>()),
                             new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>())
                         };
 

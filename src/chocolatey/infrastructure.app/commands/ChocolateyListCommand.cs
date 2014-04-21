@@ -1,35 +1,22 @@
 ﻿namespace chocolatey.infrastructure.app.commands
 {
-    using System;
     using System.Collections.Generic;
     using attributes;
-    using builders;
     using commandline;
     using configuration;
     using infrastructure.commands;
     using logging;
+    using services;
 
     [CommandFor(CommandNameType.list)]
     [CommandFor(CommandNameType.search)]
     public sealed class ChocolateyListCommand : ICommand
     {
-        private readonly string _nugetExePath = ApplicationParameters.Tools.NugetExe;
-        private readonly IDictionary<string, ExternalCommandArgument> _nugetArguments = new Dictionary<string, ExternalCommandArgument>();
+        private readonly INugetService _nugetService;
 
-        public ChocolateyListCommand()
+        public ChocolateyListCommand(INugetService nugetService)
         {
-            set_nuget_args_dictionary();
-        }
-
-        private void set_nuget_args_dictionary()
-        {
-            _nugetArguments.Add("_list_", new ExternalCommandArgument {ArgumentOption = "list", Required = true});
-            _nugetArguments.Add("Filter", new ExternalCommandArgument {ArgumentOption = "filter", UseValueOnly = true});
-            _nugetArguments.Add("AllVersions", new ExternalCommandArgument {ArgumentOption = "-all"});
-            _nugetArguments.Add("Prerelease", new ExternalCommandArgument {ArgumentOption = "-prerelease"});
-            _nugetArguments.Add("Verbose", new ExternalCommandArgument {ArgumentOption = "-verbosity", ArgumentValue = " detailed"});
-            _nugetArguments.Add("_non_interactive_", new ExternalCommandArgument {ArgumentOption = "-noninteractive", Required = true});
-            _nugetArguments.Add("Source", new ExternalCommandArgument {ArgumentOption = "-source ", QuoteValue = true});
+            _nugetService = nugetService;
         }
 
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
@@ -78,13 +65,7 @@ Usage: choco list filter [options/switches]
             }
             else
             {
-                this.Log().Info("{0} would have run the following to return a list of results:{1}'\"{2}\" {3}'".format_with(
-                    ApplicationParameters.Name,
-                    Environment.NewLine,
-                    _nugetExePath,
-                    ExternalCommandArgsBuilder.build_arguments(configuration, _nugetArguments)
-                                    )
-                    );
+                _nugetService.list_noop(configuration);
             }
         }
 
@@ -101,9 +82,7 @@ Usage: choco list filter [options/switches]
             }
             else
             {
-                var args = ExternalCommandArgsBuilder.build_arguments(configuration, _nugetArguments);
-                int exitCode = CommandExecutor.execute(_nugetExePath, args, true);
-                Environment.ExitCode = exitCode;
+                _nugetService.list_run(configuration, logResults:true);
             }
         }
     }
