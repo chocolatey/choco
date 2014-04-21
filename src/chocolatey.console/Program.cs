@@ -66,8 +66,6 @@
 
                 var application = new ConsoleApplication();
                 application.run(args, config, container);
-
-                Environment.ExitCode = 0;
             }
             catch (Exception ex)
             {
