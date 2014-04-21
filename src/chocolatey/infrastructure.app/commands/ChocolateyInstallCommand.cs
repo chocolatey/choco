@@ -3,14 +3,11 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using attributes;
-    using builders;
     using commandline;
     using configuration;
     using infrastructure.commands;
     using logging;
-    using results;
     using services;
 
     [CommandFor(CommandNameType.install)]
@@ -93,7 +90,7 @@ By installing you accept licenses for the packages.
 ");
 
             var packageInstalls = _nugetService.install_run(configuration);
-            
+
             foreach (var packageInstall in packageInstalls.Where(p => p.Value.Success && !p.Value.Inconclusive).or_empty_list_if_null())
             {
                 //todo:move forward with packages that are able to be installed
@@ -122,7 +119,5 @@ By installing you accept licenses for the packages.
                 Environment.ExitCode = 1;
             }
         }
-
-       
     }
 }
