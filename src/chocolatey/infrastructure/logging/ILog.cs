@@ -2,6 +2,8 @@ namespace chocolatey.infrastructure.logging
 {
     using System;
 
+    // ReSharper disable InconsistentNaming
+
     /// <summary>
     ///   Custom interface for logging messages
     /// </summary>
@@ -79,6 +81,8 @@ namespace chocolatey.infrastructure.logging
         void Fatal(Func<string> message);
     }
 
+    // ReSharper restore InconsistentNaming
+
     /// <summary>
     ///   Ensures a default constructor for the logger type
     /// </summary>
@@ -86,4 +90,5 @@ namespace chocolatey.infrastructure.logging
     public interface ILog<T> where T : new()
     {
     }
+
 }

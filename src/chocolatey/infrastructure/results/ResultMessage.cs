@@ -11,7 +11,7 @@ namespace chocolatey.infrastructure.results
         /// <value>
         ///   The type of the message.
         /// </value>
-        public ResultType MessageType { get; set; }
+        public ResultType MessageType { get; private set; }
 
         /// <summary>
         ///   Gets or sets the message.
@@ -19,6 +19,17 @@ namespace chocolatey.infrastructure.results
         /// <value>
         ///   The message.
         /// </value>
-        public string Message { get; set; }
+        public string Message { get; private set; }
+
+        /// <summary>
+        ///   Initializes a new instance of the <see cref="ResultMessage" /> class.
+        /// </summary>
+        /// <param name="messageType">Type of the message.</param>
+        /// <param name="message">The message.</param>
+        public ResultMessage(ResultType messageType, string message)
+        {
+            MessageType = messageType;
+            Message = message;
+        }
     }
 }

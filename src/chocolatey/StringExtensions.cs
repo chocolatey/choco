@@ -4,7 +4,7 @@ namespace chocolatey
     using System.Text.RegularExpressions;
 
     /// <summary>
-    ///   Extensions for strings
+    ///   Extensions for string
     /// </summary>
     public static class StringExtensions
     {

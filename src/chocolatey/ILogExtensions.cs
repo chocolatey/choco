@@ -3,6 +3,11 @@
     using System;
     using infrastructure.logging;
 
+    // ReSharper disable InconsistentNaming
+
+    /// <summary>
+    /// Extensions for ILog
+    /// </summary>
     public static class ILogExtensions
     {
         public static void Debug(this ILog logger, ChocolateyLoggers logType, string message, params object[] formatting)
@@ -140,4 +145,6 @@
             }
         }
     }
+
+    // ReSharper restore InconsistentNaming
 }

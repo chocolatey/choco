@@ -6,15 +6,15 @@ namespace chocolatey.infrastructure.licensing
 
     public sealed class LicenseValidation
     {
-        private const string publicKey = @"";
+        private const string PUBLIC_KEY = @"";
 
-        public static void Validate(IFileSystem fileSystem)
+        public static void validate(IFileSystem fileSystem)
         {
             string licenseFile = ApplicationParameters.LicenseFileLocation;
 
             if (fileSystem.file_exists(licenseFile))
             {
-                new LicenseValidator(publicKey, licenseFile).AssertValidLicense();
+                new LicenseValidator(PUBLIC_KEY, licenseFile).AssertValidLicense();
             }
             else
             {

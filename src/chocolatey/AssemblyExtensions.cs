@@ -3,6 +3,9 @@
     using System.IO;
     using System.Reflection;
 
+    /// <summary>
+    /// Extensions for Assembly
+    /// </summary>
     public static class AssemblyExtensions
     {
         /// <summary>

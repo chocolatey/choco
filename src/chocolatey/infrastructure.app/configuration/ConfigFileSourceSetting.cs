@@ -3,6 +3,9 @@
     using System;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// XML config file sources element
+    /// </summary>
     [Serializable]
     [XmlType("source")]
     public sealed class ConfigFileSourceSetting

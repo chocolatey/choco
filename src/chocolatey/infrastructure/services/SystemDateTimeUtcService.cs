@@ -7,7 +7,7 @@ namespace chocolatey.infrastructure.services
     /// </summary>
     public class SystemDateTimeUtcService : IDateTimeService
     {
-        public DateTime? GetCurrentDateTime()
+        public DateTime? get_current_date_time()
         {
             return DateTime.UtcNow;
         }

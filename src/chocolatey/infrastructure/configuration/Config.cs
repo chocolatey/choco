@@ -13,7 +13,7 @@
         ///   Initializes application configuration with a configuration instance.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        public static void InitializeWith(ChocolateyConfiguration configuration)
+        public static void initialize_with(ChocolateyConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -27,7 +27,7 @@
         ///     cref="ChocolateyConfiguration" />
         ///   if one has not been.
         /// </returns>
-        public static ChocolateyConfiguration GetConfigurationSettings()
+        public static ChocolateyConfiguration get_configuration_settings()
         {
             return _configuration;
         }

@@ -4,27 +4,24 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.builders;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.extractors;
-    using chocolatey.infrastructure.configuration;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.information;
-    using chocolatey.infrastructure.licensing;
-    using chocolatey.infrastructure.logging;
-    using chocolatey.infrastructure.registration;
-    using chocolatey.infrastructure.services;
+    using infrastructure.app;
+    using infrastructure.app.builders;
+    using infrastructure.app.configuration;
+    using infrastructure.app.extractors;
+    using infrastructure.app.runners;
+    using infrastructure.configuration;
+    using infrastructure.filesystem;
+    using infrastructure.licensing;
+    using infrastructure.logging;
     using infrastructure.registration;
-    using log4net;
-    using log4net.Core;
-    using log4net.Repository;
-    using log4net.Repository.Hierarchy;
+    using infrastructure.services;
     using resources;
 
     public sealed class Program
     {
+// ReSharper disable InconsistentNaming
         private static void Main(string[] args)
+// ReSharper restore InconsistentNaming
         {
             try
             {
@@ -36,15 +33,15 @@
                 Bootstrap.initialize();
                 Bootstrap.startup();
 
-                var container = SimpleInjectorContainer.Initialize();
+                var container = SimpleInjectorContainer.initialize();
                 var config = container.GetInstance<ChocolateyConfiguration>();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
-                config.ChocolateyVersion = VersionInformation.get_current_assembly_version();
-                "chocolatey".Log().Info(ChocolateyLoggers.Important,() => "{0} v{1}".format_with(ApplicationParameters.Name, config.ChocolateyVersion));
-
                 ConfigurationBuilder.set_up_configuration(args, config, fileSystem, container.GetInstance<IXmlService>());
-                Config.InitializeWith(config);
+                Config.initialize_with(config);
+
+                "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.ChocolateyVersion));
+
                 if (config.HelpRequested)
                 {
                     pause_execution_if_debug();
@@ -55,7 +52,7 @@
                 Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug);
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.PlatformType, config.PlatformVersion.to_string()));
 
-                LicenseValidation.Validate(fileSystem);
+                LicenseValidation.validate(fileSystem);
 
                 //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
                 IList<string> folders = new List<string>
@@ -65,7 +62,7 @@
                         "redirects",
                         "tools"
                     };
-                AssemblyFileExtractor.extract_all_chocolatey_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders);
+                AssemblyFileExtractor.extract_all_chocolatey_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders);
 
                 var application = new ConsoleApplication();
                 application.run(args, config, container);
@@ -91,7 +88,7 @@
                 Environment.Exit(Environment.ExitCode);
             }
         }
-        
+
         private static void pause_execution_if_debug()
         {
 #if DEBUG

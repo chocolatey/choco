@@ -6,6 +6,8 @@ namespace chocolatey.infrastructure.logging
 {
     using System;
     using log4net;
+    
+    // ReSharper disable InconsistentNaming
 
     /// <summary>
     ///   Log4net logger implementing special ILog class
@@ -78,4 +80,6 @@ namespace chocolatey.infrastructure.logging
             return message;
         }
     }
+
+    // ReSharper restore InconsistentNaming
 }

@@ -4,6 +4,9 @@
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
+    /// <summary>
+    /// XML configuration file
+    /// </summary>
     [Serializable]
     [XmlRoot("chocolatey")]
     public class ConfigFileSettings

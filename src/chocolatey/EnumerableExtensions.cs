@@ -16,7 +16,7 @@ namespace chocolatey
         /// <returns>
         ///   Source if not null; otherwise Enumerable.Empty&lt;<see cref="T" />&gt;
         /// </returns>
-        public static IEnumerable<T> OrEmptyListIfNull<T>(this IEnumerable<T> source)
+        public static IEnumerable<T> or_empty_list_if_null<T>(this IEnumerable<T> source)
         {
             return source ?? Enumerable.Empty<T>();
         }

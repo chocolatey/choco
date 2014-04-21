@@ -7,9 +7,10 @@
     using filesystem;
     using infrastructure.commands;
     using infrastructure.configuration;
-    using infrastructure.services;
     using logging;
     using services;
+
+    // ReSharper disable InconsistentNaming
 
     /// <summary>
     ///   The main inversion container registration for the application. Look for other container bindings in client projects.
@@ -20,8 +21,9 @@
         ///   Loads the module into the kernel.
         /// </summary>
         public void RegisterComponents(Container container)
+
         {
-            var configuration = Config.GetConfigurationSettings();
+            var configuration = Config.get_configuration_settings();
             Log.InitializeWith<Log4NetLog>();
 
             container.Register(() => configuration, Lifestyle.Singleton);
@@ -43,8 +45,10 @@
 
             container.Register<IEventSubscriptionManagerService, EventSubscriptionManagerService>(Lifestyle.Singleton);
             EventManager.initialize_with(container.GetInstance<IEventSubscriptionManagerService>);
-            
+
             container.Register<IDateTimeService, SystemDateTimeUtcService>(Lifestyle.Singleton);
         }
     }
+
+    // ReSharper restore InconsistentNaming
 }

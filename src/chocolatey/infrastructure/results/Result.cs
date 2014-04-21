@@ -9,7 +9,7 @@ namespace chocolatey.infrastructure.results
     /// </summary>
     public class Result : IResult
     {
-        private readonly Lazy<List<ResultMessage>> _messages = new Lazy<List<ResultMessage>>();
+        protected readonly Lazy<List<ResultMessage>> _messages = new Lazy<List<ResultMessage>>();
 
         public bool Success
         {

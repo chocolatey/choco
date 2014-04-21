@@ -5,6 +5,9 @@ namespace chocolatey.infrastructure.app
     using System.Text.RegularExpressions;
     using filesystem;
 
+    /// <summary>
+    /// Application constants and settings for the application
+    /// </summary>
     public static class ApplicationParameters
     {
         private static readonly IFileSystem _fileSystem = new DotNetFileSystem();
@@ -40,7 +43,7 @@ namespace chocolatey.infrastructure.app
             }
         }
 
-        private static T TryGetConfig<T>(Func<T> func, T defaultValue)
+        private static T try_get_config<T>(Func<T> func, T defaultValue)
         {
             try
             {

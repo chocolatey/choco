@@ -37,7 +37,9 @@
         /// <param name="e">
         ///   The <see cref="System.UnhandledExceptionEventArgs" /> instance containing the event data.
         /// </param>
+// ReSharper disable InconsistentNaming
         private static void DomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+// ReSharper restore InconsistentNaming
         {
             var ex = e.ExceptionObject as Exception;
             string exceptionMessage = string.Empty;

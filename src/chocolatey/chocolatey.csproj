@@ -68,10 +68,11 @@
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="infrastructure.app\messages\PreRunEvent.cs" />
+    <Compile Include="infrastructure.app\runners\ConsoleApplication.cs" />
     <Compile Include="infrastructure\guards\Ensure.cs" />
     <Compile Include="infrastructure\logging\ChocolateyLoggers.cs" />
     <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="EnumerationExtensions.cs" />
+    <Compile Include="EnumExtensions.cs" />
     <Compile Include="infrastructure.app\ApplicationParameters.cs" />
     <Compile Include="infrastructure.app\builders\ExternalCommandArgsBuilder.cs" />
     <Compile Include="infrastructure.app\builders\ExternalCommandArgument.cs" />
@@ -84,14 +85,14 @@
     <Compile Include="infrastructure.app\commands\CommandNameType.cs" />
     <Compile Include="infrastructure\events\EventManager.cs" />
     <Compile Include="infrastructure\events\IEvent.cs" />
+    <Compile Include="infrastructure\registration\SimpleInjectorContainer.cs" />
     <Compile Include="infrastructure\results\IResult.cs" />
     <Compile Include="infrastructure\results\Result.cs" />
     <Compile Include="infrastructure\results\ResultMessage.cs" />
     <Compile Include="infrastructure\results\ResultType.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileSettings.cs" />
-    <Compile Include="infrastructure.app\services\ConfigFileSettingsService.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileSourceSetting.cs" />
-    <Compile Include="infrastructure.app\services\XmlService.cs" />
+    <Compile Include="infrastructure\services\XmlService.cs" />
     <Compile Include="infrastructure\commandline\Options.cs" />
     <Compile Include="infrastructure\commands\CommandExecutor.cs" />
     <Compile Include="infrastructure.app\configuration\ChocolateyConfiguration.cs" />
@@ -113,9 +114,6 @@
     <Compile Include="infrastructure.app\commands\ChocolateyInstallCommand.cs" />
     <Compile Include="infrastructure.app\registration\ContainerBinding.cs" />
     <Compile Include="infrastructure\registration\SimpleInjectorContainerResolutionBehavior.cs" />
-    <Compile Include="infrastructure\services\IConfigFileSettingsService.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="infrastructure\services\IDateTimeService.cs" />
     <Compile Include="infrastructure\services\IEventSubscriptionManagerService.cs" />
     <Compile Include="infrastructure\services\IRegularExpressionService.cs" />
@@ -131,7 +129,6 @@
     <Compile Include="LogExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleInjectorExtensions.cs" />
     <Compile Include="StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -153,7 +150,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="infrastructure.app\results\" />
+    <Folder Include="infrastructure.app\services\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="infrastructure\logging\log4net.mono.config.xml" />

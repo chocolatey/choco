@@ -21,6 +21,8 @@ namespace chocolatey.tests
     using System;
     using NUnit.Framework;
 
+    // ReSharper disable InconsistentNaming
+
     [TestFixture]
     public abstract class TinySpec
     {
@@ -63,4 +65,7 @@ namespace chocolatey.tests
             Name = name;
         }
     }
+
+
+    // ReSharper restore InconsistentNaming
 }

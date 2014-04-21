@@ -82,7 +82,7 @@ Usage: choco list filter [options/switches]
                     ApplicationParameters.Name,
                     Environment.NewLine,
                     _nugetExePath,
-                    ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetArguments)
+                    ExternalCommandArgsBuilder.build_arguments(configuration, _nugetArguments)
                                     )
                     );
             }
@@ -101,7 +101,7 @@ Usage: choco list filter [options/switches]
             }
             else
             {
-                var args = ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetArguments);
+                var args = ExternalCommandArgsBuilder.build_arguments(configuration, _nugetArguments);
                 int exitCode = CommandExecutor.execute(_nugetExePath, args, true);
                 Environment.ExitCode = exitCode;
             }

@@ -4,7 +4,10 @@ namespace chocolatey.infrastructure.app.configuration
     using System.Text;
     using platforms;
 
-    public sealed class ChocolateyConfiguration
+    /// <summary>
+    /// The chocolatey configuration.
+    /// </summary>
+    public sealed partial class ChocolateyConfiguration
     {
         // overrides
         public override string ToString()

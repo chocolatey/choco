@@ -1,15 +1,17 @@
-﻿namespace chocolatey.console
+﻿namespace chocolatey.infrastructure.app.runners
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using SimpleInjector;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.configuration;
+    using attributes;
+    using configuration;
+    using infrastructure.commands;
+    using infrastructure.configuration;
 
+    /// <summary>
+    ///   Console application responsible for running chocolatey
+    /// </summary>
     public sealed class ConsoleApplication
     {
         public void run(string[] args, ChocolateyConfiguration config, Container container)
@@ -34,7 +36,7 @@
 
             var command = commands.Where((c) =>
                 {
-                    var attributes = c.GetType().GetCustomAttributes(typeof(CommandForAttribute), false);
+                    var attributes = c.GetType().GetCustomAttributes(typeof (CommandForAttribute), false);
                     foreach (CommandForAttribute attribute in attributes)
                     {
                         if (attribute.CommandName.to_string().to_lower() == config.CommandName.to_lower()) return true;
@@ -82,10 +84,7 @@
                     this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
                     command.run(config);
                 }
-                
             }
-
-
         }
     }
 }

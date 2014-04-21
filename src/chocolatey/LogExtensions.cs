@@ -4,6 +4,8 @@
     using System.Collections.Concurrent;
     using infrastructure.logging;
 
+    // ReSharper disable InconsistentNaming
+
     /// <summary>
     ///   Extensions to help make logging awesome
     /// </summary>
@@ -47,4 +49,6 @@
             return _dictionary.Value.GetOrAdd(objectName, infrastructure.logging.Log.GetLoggerFor(objectName));
         }
     }
+
+    // ReSharper restore InconsistentNaming
 }

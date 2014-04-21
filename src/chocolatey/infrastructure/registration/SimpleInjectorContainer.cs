@@ -1,9 +1,8 @@
-﻿namespace chocolatey.console.infrastructure.registration
+﻿namespace chocolatey.infrastructure.registration
 {
     using System;
     using SimpleInjector;
-    using chocolatey.infrastructure.app.registration;
-    using chocolatey.infrastructure.registration;
+    using app.registration;
 
     /// <summary>
     ///   The inversion container
@@ -23,13 +22,13 @@
         /// <summary>
         ///   Initializes the container
         /// </summary>
-        public static Container Initialize()
+        public static Container initialize()
         {
             Container.Options.AllowOverridingRegistrations = true;
             var originalConstructorResolutionBehavior = Container.Options.ConstructorResolutionBehavior;
             Container.Options.ConstructorResolutionBehavior = new SimpleInjectorContainerResolutionBehavior(originalConstructorResolutionBehavior);
 
-            InitializeContainer(Container);
+            initialize_container(Container);
 
 #if DEBUG
             Container.Verify();
@@ -38,7 +37,7 @@
             return Container;
         }
 
-        private static void InitializeContainer(Container container)
+        private static void initialize_container(Container container)
         {
             var binding = new ContainerBinding();
             binding.RegisterComponents(container);

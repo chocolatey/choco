@@ -16,9 +16,19 @@ namespace chocolatey.infrastructure.results
         Debug,
 
         /// <summary>
+        ///   Verbose messages that may help the recipient determine items leading up to errors
+        /// </summary>
+        Verbose,
+
+        /// <summary>
         ///   These are notes to pass along with the result
         /// </summary>
         Note,
+
+        /// <summary>
+        ///   There was no result.
+        /// </summary>
+        Inconclusive,
 
         /// <summary>
         ///   These are errors

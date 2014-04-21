@@ -5,9 +5,12 @@
     using System.Text;
     using configuration;
 
+    /// <summary>
+    /// Responsible for setting up arguments for an external command to be executed
+    /// </summary>
     public static class ExternalCommandArgsBuilder
     {
-        public static string BuildArguments(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> configToArgNames)
+        public static string build_arguments(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> configToArgNames)
         {
             var arguments = new StringBuilder();
             var props = config.GetType().GetProperties();

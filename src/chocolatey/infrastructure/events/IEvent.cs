@@ -1,7 +1,7 @@
 ﻿namespace chocolatey.infrastructure.events
 {
     /// <summary>
-    ///   Interface for Message
+    ///   Interface for Event messages
     /// </summary>
     public interface IEvent
     {

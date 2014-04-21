@@ -7,7 +7,7 @@
     using Should;
     using chocolatey.infrastructure.services;
     using context;
-
+    
     public class EventSubscriptionManagerSpecs
     {
         public abstract class EventSubscriptionManagerSpecsBase : TinySpec
@@ -23,7 +23,7 @@
             }
         }
 
-        public class When_using_EventSubscriptionManager_to_subscribe_to_an_event : EventSubscriptionManagerSpecsBase
+        public class when_using_eventSubscriptionManager_to_subscribe_to_an_event : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
             private FakeEvent _localFakeEvent;
@@ -68,7 +68,7 @@
             }
         }
 
-        public class When_using_EventSubscriptionManager_with_long_running_event_subscriber : EventSubscriptionManagerSpecsBase
+        public class when_using_eventSubscriptionManager_with_long_running_event_subscriber : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
             private FakeEvent _localFakeEvent;
@@ -105,7 +105,7 @@
             }
         }
 
-        public class When_using_EventSubscriptionManager_to_subscribe_to_an_event_with_a_filter_that_the_event_satisfies : EventSubscriptionManagerSpecsBase
+        public class when_using_eventSubscriptionManager_to_subscribe_to_an_event_with_a_filter_that_the_event_satisfies : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
             private FakeEvent _localFakeEvent;
@@ -150,7 +150,7 @@
             }
         }
 
-        public class When_using_EventSubscriptionManager_to_subscribe_to_an_event_with_a_filter_that_the_event_does_not_satisfy : EventSubscriptionManagerSpecsBase
+        public class when_using_eventSubscriptionManager_to_subscribe_to_an_event_with_a_filter_that_the_event_does_not_satisfy : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
             private FakeEvent _localFakeEvent;
@@ -183,7 +183,7 @@
             }
         }
 
-        public class When_using_EventSubscriptionManager_and_multiple_parties_subscribe_to_the_same_event : EventSubscriptionManagerSpecsBase
+        public class when_using_eventSubscriptionManager_and_multiple_parties_subscribe_to_the_same_event : EventSubscriptionManagerSpecsBase
         {
             private IList<FakeSubscriber> _list;
 
@@ -204,7 +204,7 @@
             }
         }
 
-        public class When_using_EventSubscriptionManager_to_send_a_null_event_message : EventSubscriptionManagerSpecsBase
+        public class when_using_eventSubscriptionManager_to_send_a_null_event_message : EventSubscriptionManagerSpecsBase
         {
             private bool _errored;
 

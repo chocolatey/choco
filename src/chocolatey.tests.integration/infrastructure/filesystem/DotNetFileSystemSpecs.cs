@@ -32,7 +32,7 @@
             }
         }
 
-        public class When_doing_file_system_path_operations_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_doing_file_system_path_operations_with_DotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
@@ -82,7 +82,7 @@
         }
 
         [Category("Integration")]
-        public class When_doing_file_system_operations_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_doing_file_system_operations_with_DotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Context()
             {
@@ -146,7 +146,7 @@
         }
 
         [Category("Integration")]
-        public class When_running_FileMove_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_running_FileMove_with_DotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
@@ -177,7 +177,7 @@
         }
 
         [Category("Integration")]
-        public class When_running_FileCopy_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_running_FileCopy_with_DotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
@@ -211,7 +211,7 @@
         }
 
         [Category("Integration")]
-        public class When_running_FileDelete_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_running_FileDelete_with_DotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
@@ -234,7 +234,7 @@
         }
 
         [Category("Integration")]
-        public class When_running_CreateDirectory_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_running_CreateDirectory_with_DotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
@@ -254,7 +254,7 @@
         }
 
         [Category("Integration")]
-        public class When_running_GetFileModDate_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_running_GetFileModDate_with_DotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {

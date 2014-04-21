@@ -1,3 +1,4 @@
+
 //
 // Options.cs
 //
@@ -146,6 +147,9 @@ namespace chocolatey.infrastructure.commandline
     using System.Security.Permissions;
     using System.Text;
     using System.Text.RegularExpressions;
+
+
+    // ReSharper disable InconsistentNaming
 
     public class OptionValueCollection : IList, IList<string> {
 
@@ -1100,5 +1104,8 @@ namespace chocolatey.infrastructure.commandline
 				return end;
 			return sep;
 		}
+
 	}
+
+    // ReSharper restore InconsistentNaming
 }

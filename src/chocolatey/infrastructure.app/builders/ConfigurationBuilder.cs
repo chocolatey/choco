@@ -9,18 +9,29 @@
     using configuration;
     using extractors;
     using filesystem;
+    using information;
     using infrastructure.configuration;
     using infrastructure.services;
     using logging;
     using platforms;
 
-    public class ConfigurationBuilder
+    /// <summary>
+    /// Responsible for gathering all configuration related information and producing the ChocolateyConfig
+    /// </summary>
+    public static class ConfigurationBuilder
     {
+        /// <summary>
+        /// Sets up the configuration based on arguments passed in, config file, and environment
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <param name="config">The configuration.</param>
+        /// <param name="fileSystem">The file system.</param>
+        /// <param name="xmlService">The XML service.</param>
         public static void set_up_configuration(IList<string> args, ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService)
         {
             set_file_configuration(config, fileSystem, xmlService);
             set_global_options(args, config);
-            set_platform(config);
+            set_environment_options(config);
         }
 
         private static void set_file_configuration(ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService)
@@ -79,7 +90,7 @@
                         var commandsLog = new StringBuilder();
                         foreach (var command in Enum.GetValues(typeof (CommandNameType)).Cast<CommandNameType>())
                         {
-                            commandsLog.AppendFormat(" * {0}\n", command.GetDescriptionOrValue());
+                            commandsLog.AppendFormat(" * {0}\n", command.get_description_or_value());
                         }
 
                         "chocolatey".Log().Warn(ChocolateyLoggers.Important, "Commands");
@@ -89,10 +100,11 @@ Please run chocolatey with `choco command -help` for specific help on each comma
                     });
         }
 
-        private static void set_platform(ChocolateyConfiguration config)
+        private static void set_environment_options(ChocolateyConfiguration config)
         {
             config.PlatformType = Platform.get_platform();
             config.PlatformVersion = Platform.get_version();
+            config.ChocolateyVersion = VersionInformation.get_current_assembly_version();
         }
     }
 }

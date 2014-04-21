@@ -6,6 +6,9 @@
     using System.Text;
     using filesystem;
 
+    /// <summary>
+    /// Extracts resources from an assembly.
+    /// </summary>
     public static class AssemblyFileExtractor
     {
         /// <summary>
@@ -57,7 +60,7 @@
 
         public static void extract_all_chocolatey_resources_to_relative_directory(IFileSystem fileSystem, Assembly assembly, string directoryPath, IList<string> relativeDirectories, bool overwriteExisting = false)
         {
-            var resourcesToInclude = "chocolatey.resources";
+            const string resourcesToInclude = "chocolatey.resources";
             var resourceString = new StringBuilder();
             foreach (var resourceName in assembly.GetManifestResourceNames())
             {

@@ -99,7 +99,7 @@ NOTE: `all` is a special package keyword that will allow you to install all
                 ApplicationParameters.Name,
                 Environment.NewLine,
                 _nugetExePath,
-                ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetArguments)
+                ExternalCommandArgsBuilder.build_arguments(configuration, _nugetArguments)
                                 )
                 );
         }
@@ -110,7 +110,7 @@ NOTE: `all` is a special package keyword that will allow you to install all
             //todo:are we installing from an alternate source? If so run that command instead
 
             var packageInstallResults = new Dictionary<string, bool>();
-            var args = ExternalCommandArgsBuilder.BuildArguments(configuration, _nugetArguments);
+            var args = ExternalCommandArgsBuilder.build_arguments(configuration, _nugetArguments);
 
             this.Log().Info(@"Installing the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(configuration.PackageNames));

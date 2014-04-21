@@ -6,15 +6,15 @@ namespace chocolatey
     using System.Reflection;
 
     /// <summary>
-    ///   Extensions for enumerations
+    ///   Extensions for Enum
     /// </summary>
-    public static class EnumerationExtensions
+    public static class EnumExtensions
     {
         /// <summary>
         ///   Gets the description [Description("")] or ToString() value of an enumeration.
         /// </summary>
         /// <param name="enumeration">The enumeration item.</param>
-        public static string GetDescriptionOrValue(this Enum enumeration)
+        public static string get_description_or_value(this Enum enumeration)
         {
             string description = enumeration.ToString();
 
@@ -34,7 +34,7 @@ namespace chocolatey
             return description;
         }
 
-        public static TEnum ParseEnumFromDescription<TEnum>(this string description)
+        public static TEnum parse_enum_from_description<TEnum>(this string description)
             where TEnum : struct
         {
             if (!typeof (TEnum).IsEnum)

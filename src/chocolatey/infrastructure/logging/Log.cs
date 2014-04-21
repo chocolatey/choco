@@ -2,6 +2,8 @@
 {
     using System;
 
+    // ReSharper disable InconsistentNaming
+
     /// <summary>
     ///   Logger type initialization
     /// </summary>
@@ -9,9 +11,6 @@
     {
         private static Type _logType = typeof (NullLog);
         private static ILog _logger;
-
-        //these methods come from outside library
-        // ReSharper disable InconsistentNaming
         
         /// <summary>
         ///   Sets up logging to be with a certain type
@@ -54,7 +53,7 @@
 
             return logger;
         }
-
-        // ReSharper restore InconsistentNaming
     }
+
+    // ReSharper restore InconsistentNaming
 }

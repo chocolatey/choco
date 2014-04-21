@@ -10,6 +10,6 @@
         /// <summary>
         ///   Gets the current date time.
         /// </summary>
-        DateTime? GetCurrentDateTime();
+        DateTime? get_current_date_time();
     }
 }

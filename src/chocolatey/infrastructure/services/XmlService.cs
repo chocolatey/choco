@@ -1,12 +1,14 @@
-﻿namespace chocolatey.infrastructure.app.services
+﻿namespace chocolatey.infrastructure.services
 {
     using System;
     using System.IO;
     using System.Xml;
     using System.Xml.Serialization;
     using filesystem;
-    using infrastructure.services;
 
+    /// <summary>
+    ///   XML interaction
+    /// </summary>
     public sealed class XmlService : IXmlService
     {
         private readonly IFileSystem _fileSystem;
