@@ -94,6 +94,7 @@
     <Compile Include="infrastructure\events\IEvent.cs" />
     <Compile Include="infrastructure\registration\SimpleInjectorContainer.cs" />
     <Compile Include="infrastructure\results\IResult.cs" />
+    <Compile Include="infrastructure\results\PackageInstallResult.cs" />
     <Compile Include="infrastructure\results\Result.cs" />
     <Compile Include="infrastructure\results\ResultMessage.cs" />
     <Compile Include="infrastructure\results\ResultType.cs" />
