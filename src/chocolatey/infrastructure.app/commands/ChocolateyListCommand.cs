@@ -82,7 +82,7 @@ Usage: choco list filter [options/switches]
             }
             else
             {
-                _nugetService.list_run(configuration, logResults:true);
+                _nugetService.list_run(configuration, logResults: true);
             }
         }
     }
