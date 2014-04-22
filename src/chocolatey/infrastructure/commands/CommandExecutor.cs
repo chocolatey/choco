@@ -57,6 +57,9 @@ namespace chocolatey.infrastructure.commands
                 process = "mono";
             }
 
+
+            "chocolatey".Log().Debug(() => "Calling command ['\"{0}\" {1}']".format_with(process, arguments));
+
             var psi = new ProcessStartInfo(process, arguments)
                 {
                     UseShellExecute = false,
@@ -98,7 +101,7 @@ namespace chocolatey.infrastructure.commands
                 exitCode = p.ExitCode;
             }
 
-            "chocolatey".Log().Debug(() => "Command '\"{0}\" {1}' exited with '{2}'".format_with(process, arguments, exitCode));
+            "chocolatey".Log().Debug(() => "Command ['\"{0}\" {1}'] exited with '{2}'".format_with(process, arguments, exitCode));
             return exitCode;
         }
 
