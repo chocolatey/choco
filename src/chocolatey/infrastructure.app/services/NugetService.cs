@@ -130,7 +130,7 @@
                 );
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration)
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
         {
             //todo: upgrade this to IPackage
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
@@ -180,6 +180,10 @@
                             }
 
                             results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of install."));
+                            if (continueAction != null)
+                            {
+                                continueAction.Invoke(results);
+                            }
                         },
                     (s, e) =>
                         {

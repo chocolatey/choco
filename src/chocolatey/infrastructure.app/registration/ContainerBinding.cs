@@ -31,14 +31,16 @@
             container.Register<IFileSystem, DotNetFileSystem>(Lifestyle.Singleton);
             container.Register<IXmlService, XmlService>(Lifestyle.Singleton);
             container.Register<INugetService, NugetService>(Lifestyle.Singleton);
+            container.Register<IPowershellService, PowershellService>(Lifestyle.Singleton);
+            container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);
 
             //refactor - this could all be autowired
             container.Register<IEnumerable<ICommand>>(() =>
                 {
                     var list = new List<ICommand>
                         {
-                            new ChocolateyInstallCommand(container.GetInstance<INugetService>()),
-                            new ChocolateyListCommand(container.GetInstance<INugetService>()),
+                            new ChocolateyInstallCommand(container.GetInstance<IChocolateyPackageService>()),
+                            new ChocolateyListCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>())
                         };
 

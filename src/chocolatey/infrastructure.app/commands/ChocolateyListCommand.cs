@@ -12,11 +12,11 @@
     [CommandFor(CommandNameType.search)]
     public sealed class ChocolateyListCommand : ICommand
     {
-        private readonly INugetService _nugetService;
+        private readonly IChocolateyPackageService _packageService;
 
-        public ChocolateyListCommand(INugetService nugetService)
+        public ChocolateyListCommand(IChocolateyPackageService packageService)
         {
-            _nugetService = nugetService;
+            _packageService = packageService;
         }
 
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
@@ -59,31 +59,12 @@ Usage: choco list filter [options/switches]
 
         public void noop(ChocolateyConfiguration configuration)
         {
-            if (configuration.Source.is_equal_to(SpecialSourceTypes.webpi.to_string()))
-            {
-                //todo: webpi
-            }
-            else
-            {
-                _nugetService.list_noop(configuration);
-            }
+            _packageService.list_noop(configuration);
         }
 
         public void run(ChocolateyConfiguration configuration)
         {
-            this.Log().Debug(() => "Searching for package information");
-
-            if (configuration.Source.is_equal_to(SpecialSourceTypes.webpi.to_string()))
-            {
-                //todo: webpi
-                //install webpi if not installed
-                //run the webpi command 
-                this.Log().Info("Command not yet functional, stay tuned...");
-            }
-            else
-            {
-                _nugetService.list_run(configuration, logResults: true);
-            }
+            _packageService.list_run(configuration, logResults: true);
         }
     }
 }

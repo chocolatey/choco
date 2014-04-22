@@ -1,8 +1,6 @@
 ﻿namespace chocolatey.infrastructure.app.commands
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using attributes;
     using commandline;
     using configuration;
@@ -13,12 +11,11 @@
     [CommandFor(CommandNameType.install)]
     public sealed class ChocolateyInstallCommand : ICommand
     {
-        private readonly INugetService _nugetService;
+        private readonly IChocolateyPackageService _packageService;
 
-
-        public ChocolateyInstallCommand(INugetService nugetService)
+        public ChocolateyInstallCommand(IChocolateyPackageService packageService)
         {
-            _nugetService = nugetService;
+            _packageService = packageService;
         }
 
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
@@ -75,49 +72,12 @@ NOTE: `all` is a special package keyword that will allow you to install all
 
         public void noop(ChocolateyConfiguration configuration)
         {
-            _nugetService.install_noop(configuration);
+            _packageService.install_noop(configuration);
         }
 
         public void run(ChocolateyConfiguration configuration)
         {
-            //todo:is this a packages.config? If so run that command (that will call back into here).
-            //todo:are we installing from an alternate source? If so run that command instead
-
-            this.Log().Info(@"Installing the following packages:");
-            this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(configuration.PackageNames));
-            this.Log().Info(@"
-By installing you accept licenses for the packages.
-");
-
-            var packageInstalls = _nugetService.install_run(configuration);
-
-            foreach (var packageInstall in packageInstalls.Where(p => p.Value.Success && !p.Value.Inconclusive).or_empty_list_if_null())
-            {
-                //todo:move forward with packages that are able to be installed
-
-                //powershell
-
-
-                //batch/shim redirection
-
-                this.Log().Info(" {0} has been installed.".format_with(packageInstall.Value.Name));
-            }
-
-
-            var installFailures = packageInstalls.Count(p => !p.Value.Success);
-            this.Log().Info(() => @"{0}{1} installed {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
-                Environment.NewLine,
-                ApplicationParameters.Name,
-                packageInstalls.Count(p => p.Value.Success && !p.Value.Inconclusive),
-                packageInstalls.Count,
-                installFailures));
-
-            this.Log().Warn("Command not yet fully functional, stay tuned...");
-
-            if (installFailures != 0 && Environment.ExitCode == 0)
-            {
-                Environment.ExitCode = 1;
-            }
+            _packageService.install_run(configuration);
         }
     }
 }
