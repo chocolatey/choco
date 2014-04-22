@@ -32,57 +32,8 @@
             }
         }
 
-        public class when_doing_file_system_path_operations_with_DotNetFileSystem : DotNetFileSystemSpecsBase
-        {
-            public override void Because()
-            {
-            }
-
-            [Fact]
-            public void GetFullPath_should_return_the_full_path_to_an_item()
-            {
-                FileSystem.get_full_path("test.txt").ShouldEqual(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test.txt"));
-            }
-
-            [Fact]
-            public void GetFileNameWithoutExtension_should_return_a_file_name_without_an_extension()
-            {
-                FileSystem.get_file_name_without_extension("test.txt").ShouldEqual("test");
-            }
-
-            [Fact]
-            public void GetFileNameWithoutExtension_should_return_a_file_name_without_an_extension_even_with_a_full_path()
-            {
-                FileSystem.get_file_name_without_extension("C:\\temp\\test.txt").ShouldEqual("test");
-            }
-
-            [Fact]
-            public void GetExtension_should_return_the_extension_of_the_filename()
-            {
-                FileSystem.get_file_extension("test.txt").ShouldEqual(".txt");
-            }
-
-            [Fact]
-            public void GetExtension_should_return_the_extension_of_the_filename_even_with_a_full_path()
-            {
-                FileSystem.get_file_extension("C:\\temp\\test.txt").ShouldEqual(".txt");
-            }
-
-            [Fact]
-            public void GetDirectoryName_should_return_the_directory_of_the_path_to_the_file()
-            {
-                FileSystem.get_directory_name("C:\\temp\\test.txt").ShouldEqual("C:\\temp");
-            }
-
-            [Fact]
-            public void Combine_should_combine_the_file_paths_of_all_the_included_items_together()
-            {
-                FileSystem.combine_paths("C:\\temp", "yo", "filename.txt").ShouldEqual("C:\\temp\\yo\\filename.txt");
-            }
-        }
-
         [Category("Integration")]
-        public class when_doing_file_system_operations_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_doing_file_system_operations_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Context()
             {
@@ -106,6 +57,32 @@
             public void GetFiles_should_return_string_array_of_files()
             {
                 FileSystem.get_files(ContextPath, "*lipsum*", SearchOption.AllDirectories).ShouldEqual(FileArray);
+            }
+
+            [Fact]
+            public void GetFiles_should_return_files_that_meet_the_pattern()
+            {
+                string filePath = FileSystem.combine_paths(ContextPath, "chocolateyInstall.ps1");
+
+                FileSystem.write_file(filePath,"yo");
+                var actual = FileSystem.get_files(ContextPath, "chocolateyInstall.ps1", SearchOption.AllDirectories);
+                FileSystem.delete_file(filePath);
+                
+                actual.ShouldNotBeEmpty();
+                actual.Count.ShouldEqual(1);
+            }   
+            
+            [Fact]
+            public void GetFiles_should_return_files_that_meet_the_pattern_regardless_of_case()
+            {
+                string filePath = FileSystem.combine_paths(ContextPath, "chocolateyInstall.ps1");
+
+                FileSystem.write_file(filePath,"yo");
+                var actual = FileSystem.get_files(ContextPath, "chocolateyinstall.ps1", SearchOption.AllDirectories);
+                FileSystem.delete_file(filePath);
+                
+                actual.ShouldNotBeEmpty();
+                actual.Count.ShouldEqual(1);
             }
 
             [Fact]
@@ -146,7 +123,7 @@
         }
 
         [Category("Integration")]
-        public class when_running_FileMove_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_running_fileMove_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
@@ -177,7 +154,7 @@
         }
 
         [Category("Integration")]
-        public class when_running_FileCopy_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_running_fileCopy_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
@@ -211,7 +188,7 @@
         }
 
         [Category("Integration")]
-        public class when_running_FileDelete_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_running_fileDelete_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
@@ -234,7 +211,7 @@
         }
 
         [Category("Integration")]
-        public class when_running_CreateDirectory_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_running_createDirectory_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
@@ -254,7 +231,7 @@
         }
 
         [Category("Integration")]
-        public class when_running_GetFileModDate_with_DotNetFileSystem : DotNetFileSystemSpecsBase
+        public class when_running_getFileModDate_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
