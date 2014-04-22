@@ -93,7 +93,7 @@ By installing you accept licenses for the packages.
             //}
 
             var installFailures = packageInstalls.Count(p => !p.Value.Success);
-            this.Log().Info(ChocolateyLoggers.Important,() => @"{0}{1} installed {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
+            this.Log().Warn(ChocolateyLoggers.Important, () => @"{0}{1} installed {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
                 Environment.NewLine,
                 ApplicationParameters.Name,
                 packageInstalls.Count(p => p.Value.Success && !p.Value.Inconclusive),
