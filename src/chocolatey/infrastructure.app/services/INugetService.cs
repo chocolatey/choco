@@ -25,12 +25,14 @@
         ///   Run install in noop mode
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        void install_noop(ChocolateyConfiguration configuration);
+        /// <param name="continueAction">The action to continue with for each noop test install.</param>
+        void install_noop(ChocolateyConfiguration configuration,Action<PackageResult> continueAction);
 
         /// <summary>
         ///   Installs packages from NuGet related feeds
         /// </summary>
         /// <param name="configuration">The configuration.</param>
+        /// <param name="continueAction">The action to continue with when install is successful.</param>
         /// <returns>results of installs</returns>
         ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration,Action<PackageResult> continueAction);
     }

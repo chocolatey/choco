@@ -14,11 +14,16 @@ namespace chocolatey.infrastructure.results
 
         public string Name { get; private set; }
         public string Version { get; private set; }
+        public string InstallTopLevelLocation { get; set; }
 
-        public PackageResult(string name, string version)
+        public PackageResult(string name, string version) : this(name,version,null)
+        {}
+
+        public PackageResult(string name, string version, string installTopLevelLocation)
         {
             Name = name;
             Version = version;
+            InstallTopLevelLocation = installTopLevelLocation;
         }
     }
 }

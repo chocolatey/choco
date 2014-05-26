@@ -31,6 +31,11 @@
             return Path.GetFullPath(path);
         }
 
+        public string get_temp_path()
+        {
+            return Path.GetTempPath();
+        }
+
         #endregion
 
         #region File

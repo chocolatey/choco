@@ -27,6 +27,11 @@
         /// <returns>The fully qualified location of path, such as "C:\MyFile.txt".</returns>
         string get_full_path(string path);
 
+        /// <summary>
+        /// Gets the path to the temporary folder for the current user.
+        /// </summary>
+        string get_temp_path();
+
         #endregion
 
         #region File

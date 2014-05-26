@@ -5,6 +5,7 @@
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
+    using app;
     using filesystem;
 
     public sealed class PowershellExecutor
@@ -17,15 +18,6 @@
             };
 
         private static string _powershell = string.Empty;
-
-        public static string wrap_command_with_module(string command, IFileSystem fileSystem)
-        {
-            //[System.Threading.Thread]::CurrentThread.CurrentCulture = ''; [System.Threading.Thread]::CurrentThread.CurrentUICulture = '';& location.ps1
-            //todo: get args
-            // $importChocolateyHelpers = "";
-            //Get-ChildItem "$nugetChocolateyPath\helpers" -Filter *.psm1 | ForEach-Object { $importChocolateyHelpers = "& import-module -name  `'$($_.FullName)`';$importChocolateyHelpers" };
-            return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; {0}".format_with(command);
-        }
 
         public static int execute(
             string command,

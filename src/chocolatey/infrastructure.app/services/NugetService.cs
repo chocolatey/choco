@@ -119,15 +119,30 @@
             return packageResults;
         }
 
-        public void install_noop(ChocolateyConfiguration configuration)
+        public void install_noop(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
         {
+            var args = ExternalCommandArgsBuilder.build_arguments(configuration, _nugetInstallArguments);
             this.Log().Info("{0} would have run the following to install packages:{1}'\"{2}\" {3}'".format_with(
                 ApplicationParameters.Name,
                 Environment.NewLine,
                 _nugetExePath,
-                ExternalCommandArgsBuilder.build_arguments(configuration, _nugetInstallArguments)
-                                )
-                );
+                args
+                ));
+
+            var tempInstallsLocation = _fileSystem.combine_paths(_fileSystem.get_temp_path(), ApplicationParameters.Name, "TempInstalls_" + DateTime.Now.ToString("yyyyMMdd_HHmmss_ffff"));
+            _fileSystem.create_directory_if_not_exists(tempInstallsLocation);
+
+            _nugetInstallArguments["_output_directory_"] = new ExternalCommandArgument
+               {
+                   ArgumentOption = "-outputdirectory ",
+                   ArgumentValue = "{0}".format_with(tempInstallsLocation),
+                   QuoteValue = true,
+                   Required = true
+               };
+
+            install_run(configuration, continueAction);
+
+            _fileSystem.delete_directory(tempInstallsLocation,recursive:true);
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)

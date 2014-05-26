@@ -49,7 +49,11 @@
 
         public void install_noop(ChocolateyConfiguration configuration)
         {
-            _nugetService.install_noop(configuration);
+            _nugetService.install_noop(configuration,
+                (pkg) =>
+                {
+                _powershellService.install_noop(pkg);
+                });
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration)
