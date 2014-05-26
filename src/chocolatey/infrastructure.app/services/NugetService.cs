@@ -43,13 +43,13 @@
         /// </summary>
         private void set_nuget_list_dictionary()
         {
-            _nugetListArguments.Add("_list_", new ExternalCommandArgument {ArgumentOption = "list", Required = true});
-            _nugetListArguments.Add("Filter", new ExternalCommandArgument {ArgumentOption = "filter", UseValueOnly = true});
-            _nugetListArguments.Add("AllVersions", new ExternalCommandArgument {ArgumentOption = "-all"});
-            _nugetListArguments.Add("Prerelease", new ExternalCommandArgument {ArgumentOption = "-prerelease"});
-            _nugetListArguments.Add("Verbose", new ExternalCommandArgument {ArgumentOption = "-verbosity", ArgumentValue = " detailed"});
-            _nugetListArguments.Add("_non_interactive_", new ExternalCommandArgument {ArgumentOption = "-noninteractive", Required = true});
-            _nugetListArguments.Add("Source", new ExternalCommandArgument {ArgumentOption = "-source ", QuoteValue = true});
+            _nugetListArguments.Add("_list_", new ExternalCommandArgument { ArgumentOption = "list", Required = true });
+            _nugetListArguments.Add("Filter", new ExternalCommandArgument { ArgumentOption = "filter", UseValueOnly = true });
+            _nugetListArguments.Add("AllVersions", new ExternalCommandArgument { ArgumentOption = "-all" });
+            _nugetListArguments.Add("Prerelease", new ExternalCommandArgument { ArgumentOption = "-prerelease" });
+            _nugetListArguments.Add("Verbose", new ExternalCommandArgument { ArgumentOption = "-verbosity", ArgumentValue = " detailed" });
+            _nugetListArguments.Add("_non_interactive_", new ExternalCommandArgument { ArgumentOption = "-noninteractive", Required = true });
+            _nugetListArguments.Add("Source", new ExternalCommandArgument { ArgumentOption = "-source ", QuoteValue = true });
         }
 
         /// <summary>
@@ -57,9 +57,9 @@
         /// </summary>
         private void set_nuget_install_dictionary()
         {
-            _nugetInstallArguments.Add("_install_", new ExternalCommandArgument {ArgumentOption = "install", Required = true});
-            _nugetInstallArguments.Add("_package_name_", new ExternalCommandArgument {ArgumentOption = PACKAGE_NAME_TOKEN, Required = true});
-            _nugetInstallArguments.Add("Version", new ExternalCommandArgument {ArgumentOption = "-version ",});
+            _nugetInstallArguments.Add("_install_", new ExternalCommandArgument { ArgumentOption = "install", Required = true });
+            _nugetInstallArguments.Add("_package_name_", new ExternalCommandArgument { ArgumentOption = PACKAGE_NAME_TOKEN, Required = true });
+            _nugetInstallArguments.Add("Version", new ExternalCommandArgument { ArgumentOption = "-version ", });
             _nugetInstallArguments.Add("_output_directory_", new ExternalCommandArgument
                 {
                     ArgumentOption = "-outputdirectory ",
@@ -67,10 +67,10 @@
                     QuoteValue = true,
                     Required = true
                 });
-            _nugetInstallArguments.Add("Source", new ExternalCommandArgument {ArgumentOption = "-source ", QuoteValue = true});
-            _nugetInstallArguments.Add("Prerelease", new ExternalCommandArgument {ArgumentOption = "-prerelease"});
-            _nugetInstallArguments.Add("_non_interactive_", new ExternalCommandArgument {ArgumentOption = "-noninteractive", Required = true});
-            _nugetInstallArguments.Add("_no_cache_", new ExternalCommandArgument {ArgumentOption = "-nocache", Required = true});
+            _nugetInstallArguments.Add("Source", new ExternalCommandArgument { ArgumentOption = "-source ", QuoteValue = true });
+            _nugetInstallArguments.Add("Prerelease", new ExternalCommandArgument { ArgumentOption = "-prerelease" });
+            _nugetInstallArguments.Add("_non_interactive_", new ExternalCommandArgument { ArgumentOption = "-noninteractive", Required = true });
+            _nugetInstallArguments.Add("_no_cache_", new ExternalCommandArgument { ArgumentOption = "-nocache", Required = true });
         }
 
         public void list_noop(ChocolateyConfiguration configuration)
@@ -93,28 +93,28 @@
             Environment.ExitCode = CommandExecutor.execute(
                 _nugetExePath, args, true,
                 (s, e) =>
+                {
+                    var logMessage = e.Data;
+                    if (string.IsNullOrWhiteSpace(logMessage)) return;
+                    if (logResults)
                     {
-                        var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        if (logResults)
-                        {
-                            this.Log().Info(e.Data);
-                        }
-                        else
-                        {
-                            this.Log().Debug(() => "[Nuget] {0}".format_with(logMessage));
-                        }
-                        var lineParts = logMessage.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-                        if (lineParts.Length > 1)
-                        {
-                            packageResults.GetOrAdd(lineParts[0], new PackageResult(lineParts[0], lineParts[1]));
-                        }
-                    },
+                        this.Log().Info(e.Data);
+                    }
+                    else
+                    {
+                        this.Log().Debug(() => "[Nuget] {0}".format_with(logMessage));
+                    }
+                    var lineParts = logMessage.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (lineParts.Length > 1)
+                    {
+                        packageResults.GetOrAdd(lineParts[0], new PackageResult(lineParts[0], lineParts[1]));
+                    }
+                },
                 (s, e) =>
-                    {
-                        if (string.IsNullOrWhiteSpace(e.Data)) return;
-                        this.Log().Error(() => "{0}".format_with(e.Data));
-                    });
+                {
+                    if (string.IsNullOrWhiteSpace(e.Data)) return;
+                    this.Log().Error(() => "{0}".format_with(e.Data));
+                });
 
             return packageResults;
         }
@@ -151,60 +151,59 @@
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
             var args = ExternalCommandArgsBuilder.build_arguments(configuration, _nugetInstallArguments);
 
-            foreach (var packageToInstall in configuration.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var packageToInstall in configuration.PackageNames.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
                 var exitCode = CommandExecutor.execute(
                     _nugetExePath, argsForPackage, true,
                     (s, e) =>
+                    {
+                        var logMessage = e.Data;
+                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        this.Log().Debug(() => "[Nuget] {0}".format_with(logMessage));
+
+                        var packageName = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageName, ApplicationParameters.OutputParser.Nuget.PACKAGE_NAME_GROUP);
+                        var packageVersion = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageVersion, ApplicationParameters.OutputParser.Nuget.PACKAGE_VERSION_GROUP);
+
+                        if (ApplicationParameters.OutputParser.Nuget.ResolvingDependency.IsMatch(logMessage))
                         {
-                            var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Debug(() => "[Nuget] {0}".format_with(logMessage));
-
-                            var packageName = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageName, ApplicationParameters.OutputParser.Nuget.PACKAGE_NAME_GROUP);
-                            var packageVersion = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageVersion, ApplicationParameters.OutputParser.Nuget.PACKAGE_VERSION_GROUP);
-
-                            if (ApplicationParameters.OutputParser.Nuget.ResolvingDependency.IsMatch(logMessage))
-                            {
-                                return;
-                            }
-
-                            //todo: ignore dependencies
-                            var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, packageVersion));
-
-
-                            if (ApplicationParameters.OutputParser.Nuget.NotInstalled.IsMatch(logMessage))
-                            {
-                                this.Log().Error("{0} not installed: {1}".format_with(packageName, logMessage));
-                                results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-
-                                return;
-                            }
-
-                            if (string.IsNullOrWhiteSpace(packageName)) return;
-
-                            this.Log().Info(ChocolateyLoggers.Important, "{0} {1}".format_with(packageName, !string.IsNullOrWhiteSpace(packageVersion) ? "v" + packageVersion : string.Empty));
-
-                            if (ApplicationParameters.OutputParser.Nuget.AlreadyInstalled.IsMatch(logMessage) && !configuration.Force)
-                            {
-                                results.Messages.Add(new ResultMessage(ResultType.Inconclusive, packageName));
-                                this.Log().Warn(" Already installed.");
-                                this.Log().Warn(ChocolateyLoggers.Important, " Use -force if you want to reinstall.".format_with(Environment.NewLine));
-                                return;
-                            }
-
-                            results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of install."));
-                            if (continueAction != null)
-                            {
-                                continueAction.Invoke(results);
-                            }
-                        },
-                    (s, e) =>
-                        {
-                            if (string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Error(() => "{0}".format_with(e.Data));
+                            return;
                         }
+
+                        //todo: ignore dependencies
+                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, packageVersion, _nugetInstallArguments["_output_directory_"].ArgumentValue));
+                        
+                        if (ApplicationParameters.OutputParser.Nuget.NotInstalled.IsMatch(logMessage))
+                        {
+                            this.Log().Error("{0} not installed: {1}".format_with(packageName, logMessage));
+                            results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+
+                            return;
+                        }
+
+                        if (string.IsNullOrWhiteSpace(packageName)) return;
+
+                        this.Log().Info(ChocolateyLoggers.Important, "{0} {1}".format_with(packageName, !string.IsNullOrWhiteSpace(packageVersion) ? "v" + packageVersion : string.Empty));
+
+                        if (ApplicationParameters.OutputParser.Nuget.AlreadyInstalled.IsMatch(logMessage) && !configuration.Force)
+                        {
+                            results.Messages.Add(new ResultMessage(ResultType.Inconclusive, packageName));
+                            this.Log().Warn(" Already installed.");
+                            this.Log().Warn(ChocolateyLoggers.Important, " Use -force if you want to reinstall.".format_with(Environment.NewLine));
+                            return;
+                        }
+
+                        results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of install."));
+                        if (continueAction != null)
+                        {
+                            continueAction.Invoke(results);
+                        }
+                    },
+                    (s, e) =>
+                    {
+                        if (string.IsNullOrWhiteSpace(e.Data)) return;
+                        this.Log().Error(() => "{0}".format_with(e.Data));
+                    }
                     );
 
                 if (exitCode != 0)
