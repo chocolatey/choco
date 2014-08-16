@@ -181,6 +181,11 @@
                             return;
                         }
 
+                        if (ApplicationParameters.OutputParser.Nuget.Installing.IsMatch(logMessage))
+                        {
+                            return;
+                        }
+
                         if (string.IsNullOrWhiteSpace(packageName)) return;
 
                         this.Log().Info(ChocolateyLoggers.Important, "{0} {1}".format_with(packageName, !string.IsNullOrWhiteSpace(packageVersion) ? "v" + packageVersion : string.Empty));

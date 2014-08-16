@@ -37,6 +37,7 @@ namespace chocolatey.infrastructure.app
                 public const string PACKAGE_VERSION_GROUP = "PkgVersion";
                 public static readonly Regex AlreadyInstalled = new Regex(@"already installed", RegexOptions.Compiled);
                 public static readonly Regex NotInstalled = new Regex(@"not installed", RegexOptions.Compiled);
+                public static readonly Regex Installing = new Regex(@"Installing", RegexOptions.Compiled);
                 public static readonly Regex ResolvingDependency = new Regex(@"Attempting to resolve dependency", RegexOptions.Compiled);
                 public static readonly Regex PackageName = new Regex(@"'(?<{0}>[.\S]+)\s?".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
                 public static readonly Regex PackageVersion = new Regex(@"(?<{0}>[\d\.]+[\-\w]*)[[)]?'".format_with(PACKAGE_VERSION_GROUP), RegexOptions.Compiled);
