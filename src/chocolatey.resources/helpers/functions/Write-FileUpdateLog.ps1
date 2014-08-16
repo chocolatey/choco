@@ -2,14 +2,15 @@ function Write-FileUpdateLog {
   param (
     [string] $logFilePath,
     [string] $locationToMonitor,
-    [scriptblock] $scriptToRun
+    [scriptblock] $scriptToRun,
+    [object[]] $argumentList
   )
   Write-Debug "Running 'Write-FileUpdateLog' with logFilePath:`'$logFilePath`'', locationToMonitor:$locationToMonitor, Operation: `'$scriptToRun`'";
 
   Write-Debug "Tracking current state of `'$locationToMonitor`'"
   $originalContents = Get-ChildItem -Recurse $locationToMonitor | Select-Object LastWriteTimeUTC,FullName,Length
 
-  & $scriptToRun
+  Invoke-Command -ScriptBlock $scriptToRun -ArgumentList $argumentList
 
   $newContents = Get-ChildItem -Recurse $locationToMonitor | Select-Object LastWriteTimeUTC,FullName,Length
 

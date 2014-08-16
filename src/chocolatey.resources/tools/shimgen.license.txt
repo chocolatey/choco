@@ -1,1 +1,29 @@
-ShimGen has a pending license. It should not be used separate from chocolatey.
+Shim Generator - shimgen.exe
+Copyright (C) 2013-Present RealDimensions Software, LLC ("RDS")
+===================================================================
+Grant of License
+===================================================================
+You may use Shim Generator ("shimgen.exe") only with the official chocolatey client.
+
+The use of shimgen.exe for any other reason is strictly prohibited.
+
+If you would like to use this software for any other reason, you must obtain a personal or commercial license to do so. To do that you must contact RDS at ferventcoder.com.
+
+This software is not free to distribute.  If you would like to distribute this software, you must receive written permission from the software owner.
+
+===================================================================
+End-User License Agreement
+===================================================================
+EULA - Shim Generator
+
+IMPORTANT- READ CAREFULLY: This RealDimensions Software ("RDS") End-User License Agreement ("EULA") is a legal agreement between you("End User") and RDS for all RDS products, controls, source code, demos, intermediate files, media, printed materials, and "online" or electronic documentation ("SOFTWARE PRODUCT(S)") contained with this distribution.
+
+RDS grants to you as an individual, a personal, nonexclusive license to install and use the SOFTWARE PRODUCT(S) for the sole purpose of use with the official chocolatey client. By installing, copying, or otherwise using the SOFTWARE PRODUCT(S), you agree to be bound by the terms of this EULA. If you do not agree to any part of the terms of this EULA, DO NOT INSTALL, USE, OR EVALUATE, ANY PART, FILE OR PORTION OF THE SOFTWARE PRODUCT(S).
+
+ALL SOFTWARE PRODUCT(S) are licensed not sold. If you are an individual, you must acquire an individual license for the SOFTWARE PRODUCT(S) from RDS or its authorized resellers. If you are an entity, you must acquire an individual license for each Developer End User and each Build Machine Running the SOFTWARE PRODUCT(S) within your organization from RDS or its authorized resellers. Both Virtual and Physical Build Machines running the SOFTWARE PRODUCT(S) must be counted in the SOFTWARE PRODUCT(S) licenses quantity of the organization.
+
+===================================================================
+Commercial / Personal Licensing
+===================================================================
+Shim Generator (shimgen.exe) is also offered under personal and commercial licenses.
+You can learn more about this option by contacting RDS at http://ferventcoder.com

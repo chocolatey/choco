@@ -27,6 +27,19 @@ This is the url to download the file from.
 .PARAMETER Url64bit
 OPTIONAL - If there is an x64 installer to download, please include it here. If not, delete this parameter
 
+.PARAMETER Checksum
+OPTIONAL (Right now) - This allows a checksum to be validated for files that are not local
+
+.PARAMETER Checksum64
+OPTIONAL (Right now) - This allows a checksum to be validated for files that are not local
+
+.PARAMETER ChecksumType
+OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to 'md5'
+
+.PARAMETER ChecksumType64
+OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to ChecksumType
+
+
 .EXAMPLE
 Install-ChocolateyPackage '__NAME__' 'EXE_OR_MSI' 'SILENT_ARGS' 'URL' '64BIT_URL_DELETE_IF_NO_64BIT'
 
@@ -59,7 +72,8 @@ param(
 
     $chocTempDir = Join-Path $env:TEMP "chocolatey"
     $tempDir = Join-Path $chocTempDir "$packageName"
-    if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir) | Out-Null}
+
+    if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
     $file = Join-Path $tempDir "$($packageName)Install.$fileType"
 
     Get-ChocolateyWebFile $packageName $file $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64

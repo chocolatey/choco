@@ -15,25 +15,18 @@ When your installation script has to know what architecture it is run on, this s
 param(
   $compare # You can optionally pass a value to compare the system architecture and receive $True or $False in stead of 32|64|nn
 )
-  Write-Debug "Running 'System-GetBits'"
+  Write-Debug "Running 'Get-ProcessorBits'"
 
-  #TODO: This is trivial at the moment, but Get-WmiObject Win32_Processor IS SLOW.
-  #      Can we cache this?
-
-  # Get the address width
-    $proc = Get-WmiObject Win32_Processor
-    $procCount = (Get-WmiObject Win32_ComputerSystem).NumberofProcessors
-    if ($procCount -eq '1') {
-        $bits = $proc.AddressWidth
-    } else {
-        $bits = $proc[0].AddressWidth
-    }
+  $bits = 64
+  if ([System.IntPtr]::Size -eq 4) {
+    $bits = 32
+  }
 
   # Return bool|int
   if ("$compare" -ne '' -and $compare -eq $bits) {
-    return $True
+    return $true
   } elseif ("$compare" -ne '') {
-    return $False
+    return $false
   } else {
     return $bits
   }

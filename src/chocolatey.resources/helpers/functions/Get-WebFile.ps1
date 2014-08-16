@@ -25,7 +25,7 @@ param(
   Write-Debug "Running 'Get-WebFile' for $fileName with url:`'$url`', userAgent: `'$userAgent`' ";
   #if ($url -eq '' return)
   $req = [System.Net.HttpWebRequest]::Create($url);
-  #to check if a proxy is required
+  # check if a proxy is required
   $webclient = new-object System.Net.WebClient
   if (!$webclient.Proxy.IsBypassed($url))
   {
@@ -42,12 +42,18 @@ param(
     $req.proxy = $proxy
   }
 
+  $req.Accept = "*/*"
+  $req.AllowAutoRedirect = $true
+  $req.MaximumAutomaticRedirections = 20
+  #$req.KeepAlive = $true
+
   #http://stackoverflow.com/questions/518181/too-many-automatic-redirections-were-attempted-error-message-when-using-a-httpw
   $req.CookieContainer = New-Object System.Net.CookieContainer
   if ($userAgent -ne $null) {
     Write-Debug "Setting the UserAgent to `'$userAgent`'"
     $req.UserAgent = $userAgent
   }
+
   $res = $req.GetResponse();
 
   if($fileName -and !(Split-Path $fileName)) {

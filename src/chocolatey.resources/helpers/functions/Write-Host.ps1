@@ -1,8 +1,8 @@
 ﻿function Write-Host {
 param(
   [Parameter(Position=0,Mandatory=$false,ValueFromPipeline=$true, ValueFromRemainingArguments=$true)][object] $Object,
-  [Parameter()][switch] $NoNewLine, 
-  [Parameter(Mandatory=$false)][ConsoleColor] $ForegroundColor, 
+  [Parameter()][switch] $NoNewLine,
+  [Parameter(Mandatory=$false)][ConsoleColor] $ForegroundColor,
   [Parameter(Mandatory=$false)][ConsoleColor] $BackgroundColor,
   [Parameter(Mandatory=$false)][Object] $Separator
 )
@@ -11,7 +11,11 @@ param(
   $chocoInstallLog = Join-Path $chocoPath 'chocolateyInstall.log'
   "$(get-date -format 'yyyyMMdd-HH:mm:ss') [CHOCO] $Object"| Out-File -FilePath $chocoInstallLog -Force -Append
 
-  $oc = Get-Command 'Write-Host' -Module 'Microsoft.PowerShell.Utility' 
+  $oc = Get-Command 'Write-Host' -Module 'Microsoft.PowerShell.Utility'
+  if($env:ChocolateyEnvironmentQuiet -eq 'true') {
+    $oc = {}
+  }
+
   #I owe this guy a drink - http://powershell.com/cs/blogs/tobias/archive/2011/08/03/clever-splatting-to-pass-optional-parameters.aspx
   & $oc @PSBoundParameters
 }

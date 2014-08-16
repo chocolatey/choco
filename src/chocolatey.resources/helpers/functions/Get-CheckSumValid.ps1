@@ -11,14 +11,17 @@ param(
 
   if ($checksumType -ne 'sha1') { $checksumType = 'md5'}
 
+  Update-SessionEnvironment
   # On first install, env:ChocolateyInstall might be null still - join-path has issues
-  $checksumExe =  Join-Path "$env:SystemDrive" 'chocolatey\chocolateyinstall\tools\checksum.exe'
+  $checksumExe =  Join-Path "$env:ALLUSERSPROFILE" 'chocolatey\chocolateyinstall\tools\checksum.exe'
   if ($env:ChocolateyInstall){
     $checksumExe = Join-Path "$env:ChocolateyInstall" 'chocolateyinstall\tools\checksum.exe'
   }
 
   Write-Debug "Calling command [`'$checksumExe`' -c$checksum `"$file`"] to retrieve checksum"
   $process = Start-Process "$checksumExe" -ArgumentList " -c=`"$checksum`" -t=`"$checksumType`" -f=`"$file`"" -Wait -WindowStyle Hidden -PassThru
+  # this is here for specific cases in Posh v3 where -Wait is not honored
+  try { if (!($process.HasExited)) { Wait-Process $process } } catch { }
 
   Write-Debug "`'$checksumExe`' exited with $($process.ExitCode)"
 

@@ -17,6 +17,12 @@ package should be installed. This is optional. If not
 specified, the most recent Visual Studio installation
 will be targetted.
 
+.PARAMETER Checksum
+OPTIONAL (Right now) - This allows a checksum to be validated for files that are not local
+
+.PARAMETER ChecksumType
+OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to 'md5'
+
 .EXAMPLE
 Install-ChocolateyVsixPackage "MyPackage" http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix
 

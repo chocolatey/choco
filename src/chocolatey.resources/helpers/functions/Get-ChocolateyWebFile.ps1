@@ -20,8 +20,17 @@ This is the url to download the file from.
 .PARAMETER Url64bit
 OPTIONAL - If there is an x64 installer to download, please include it here. If not, delete this parameter
 
-.PARAMETER CheckSum
+.PARAMETER Checksum
 OPTIONAL (Right now) - This allows a checksum to be validated for files that are not local
+
+.PARAMETER Checksum64
+OPTIONAL (Right now) - This allows a checksum to be validated for files that are not local
+
+.PARAMETER ChecksumType
+OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to 'md5'
+
+.PARAMETER ChecksumType64
+OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to ChecksumType
 
 .EXAMPLE
 Get-ChocolateyWebFile '__NAME__' 'C:\somepath\somename.exe' 'URL' '64BIT_URL_DELETE_IF_NO_64BIT'
@@ -46,6 +55,8 @@ param(
   Write-Debug "Running 'Get-ChocolateyWebFile' for $packageName with url:`'$url`', fileFullPath:`'$fileFullPath`', url64bit:`'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`'";
 
   $url32bit = $url;
+  $checksum32 = $checksum
+  $checksumType32 = $checksumType
   $bitWidth = 32
   if (Get-ProcessorBits 64) {
     $bitWidth = 64
@@ -70,13 +81,24 @@ param(
     Write-Debug "User specified -x86 so forcing 32 bit"
     $bitPackage = 32
     $url = $url32bit
+    $checksum =  $checksum32
+    $checksumType = $checksumType32
   }
 
-  #$downloader = new-object System.Net.WebClient
-  #$downloader.DownloadFile($url, $fileFullPath)
   $headers = @{}
   if ($url.StartsWith('http')) {
-    $headers = Get-WebHeaders $url
+    try {
+      $headers = Get-WebHeaders $url
+    } catch {
+      if ($host.Version -lt (new-object 'Version' 3,0)) {
+        Write-Debug "Converting Security Protocol to SSL3 only for Powershell v2"
+        # this should last for the entire duration
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Ssl3
+        $headers = Get-WebHeaders $url
+      } else {
+        Write-Host "Attempt to get headers for $url failed.`n  $($_.Exception.Message)"
+      }
+    }
 
     $needsDownload = $true
     if ($headers.Count -ne 0 -and $headers.ContainsKey("Content-Length")) {
@@ -113,7 +135,7 @@ param(
   if ($headers.Count -ne 0) {
     # validate length is what we expected
     Write-Debug "Checking that `'$fileFullPath`' is the size we expect it to be."
-    if ($fi.Length -ne $headers["Content-Length"])  { throw "Chocolatey expected a file at `'$fileFullPath`' to be of length `'$($headers["Content-Length"])`' but the length was `'$($fi.Length)`'." }
+    if ($headers.ContainsKey("Content-Length") -and ($fi.Length -ne $headers["Content-Length"]))  { throw "Chocolatey expected a file at `'$fileFullPath`' to be of length `'$($headers["Content-Length"])`' but the length was `'$($fi.Length)`'." }
 
     if ($headers.ContainsKey("X-Checksum-Sha1")) {
       $remoteChecksum = $headers["X-Checksum-Sha1"]
@@ -125,7 +147,8 @@ param(
   Write-Debug "Verifying package provided checksum of `'$checksum`' for `'$fileFullPath`'."
   Get-CheckSumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType
 
+  # Virus check is not able to be performed, must note that.
   # $url is already set properly to the used location.
-  Write-Debug "Verifying downloaded file is not known to contain viruses. FilePath: `'$fileFullPath`'."
-  Get-VirusCheckValid -location $url -file $fileFullPath
+  #Write-Debug "Verifying downloaded file is not known to contain viruses. FilePath: `'$fileFullPath`'."
+  #Get-VirusCheckValid -location $url -file $fileFullPath
 }

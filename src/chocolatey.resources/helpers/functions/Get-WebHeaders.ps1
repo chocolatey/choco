@@ -7,7 +7,8 @@ param(
   if ($url -eq '') { return }
 
   $request = [System.Net.HttpWebRequest]::Create($url);
-  #to check if a proxy is required
+  #$request.Method = "HEAD"
+  # check if a proxy is required
   $client = New-Object System.Net.WebClient
   if (!$client.Proxy.IsBypassed($url))
   {
@@ -18,11 +19,17 @@ param(
       $creds = $cred.GetNetworkCredential();
     }
     $proxyAddress = $client.Proxy.GetProxy($url).Authority
-    Write-host "Using this proxyserver: $proxyAddress"
+    Write-Host "Using this proxyserver: $proxyAddress"
     $proxy = New-Object System.Net.WebProxy($proxyAddress)
     $proxy.credentials = $creds
     $request.proxy = $proxy
   }
+
+  $request.Accept = '*/*'
+  $request.AllowAutoRedirect = $true
+  $request.MaximumAutomaticRedirections = 20
+  #$request.KeepAlive = $true
+  $request.Timeout = 20000
 
   #http://stackoverflow.com/questions/518181/too-many-automatic-redirections-were-attempted-error-message-when-using-a-httpw
   $request.CookieContainer = New-Object System.Net.CookieContainer
@@ -31,18 +38,39 @@ param(
     $request.UserAgent = $userAgent
   }
 
-  $response = $request.GetResponse();
-
-  $headers = @{}
-  Write-Debug "Web Headers Received:"
-  foreach ($key in $response.Headers) {
-    $value = $response.Headers[$key];
+  Write-Debug "Request Headers:"
+  foreach ($key in $request.Headers) {
+    $value = $request.Headers[$key];
     if ($value) {
-      $headers.Add("$key","$value")
       Write-Debug "  `'$key`':`'$value`'"
+    } else {
+      Write-Debug "  `'$key`'"
     }
   }
-  $response.Close();
+
+  $headers = @{}
+
+  try {
+    $response = $request.GetResponse();
+    Write-Debug "Response Headers:"
+    foreach ($key in $response.Headers) {
+      $value = $response.Headers[$key];
+      if ($value) {
+        $headers.Add("$key","$value")
+        Write-Debug "  `'$key`':`'$value`'"
+      }
+    }
+    $response.Close();
+  }
+  catch {
+    $request.ServicePoint.MaxIdleTime = 0
+    $request.Abort();
+    # ruthlessly remove $request to ensure it isn't reused
+    Remove-Variable request
+    Start-Sleep 1
+    [GC]::Collect()
+    throw
+  }
 
   $headers
 }

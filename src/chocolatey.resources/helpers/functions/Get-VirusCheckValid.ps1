@@ -5,6 +5,7 @@ param(
 )
   Write-Debug "Running 'Get-VirusCheckValid' with location:`'$location`', file: `'$file`'";
 
+  Write-Debug "Right now there is no virus checking built in."
   #if ($settings:virusCheck) {
 
   #}

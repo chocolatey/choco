@@ -31,5 +31,9 @@ Export-ModuleMember -Function `
 	Write-ChocolateyFailure,`
 	Write-Host,`Write-Debug,`Write-Error,`
 	Start-ChocolateyProcessAsAdmin,`
+	Test-ProcessAdminRights,`
 	Uninstall-ChocolateyPackage,`
-	Update-SessionEnvironment
+	Update-SessionEnvironment,`
+	Get-EnvironmentVariableNames,`
+	Get-EnvironmentVariable,`
+	Set-EnvironmentVariable

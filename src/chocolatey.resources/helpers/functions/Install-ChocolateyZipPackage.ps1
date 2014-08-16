@@ -19,6 +19,18 @@ OPTIONAL - If there is an x64 installer to download, please include it here. If 
 .PARAMETER UnzipLocation
 This is a location to unzip the contents to, most likely your script folder.
 
+.PARAMETER Checksum
+OPTIONAL (Right now) - This allows a checksum to be validated for files that are not local
+
+.PARAMETER Checksum64
+OPTIONAL (Right now) - This allows a checksum to be validated for files that are not local
+
+.PARAMETER ChecksumType
+OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to 'md5'
+
+.PARAMETER ChecksumType64
+OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to ChecksumType
+
 .EXAMPLE
 Install-ChocolateyZipPackage '__NAME__' 'URL' "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 
@@ -51,7 +63,7 @@ param(
 
     $chocTempDir = Join-Path $env:TEMP "chocolatey"
     $tempDir = Join-Path $chocTempDir "$packageName"
-    if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir)}
+    if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir) | Out-Null}
     $file = Join-Path $tempDir "$($packageName)Install.$fileType"
 
     Get-ChocolateyWebFile $packageName $file $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64
