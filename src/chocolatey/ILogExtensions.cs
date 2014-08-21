@@ -6,7 +6,7 @@
     // ReSharper disable InconsistentNaming
 
     /// <summary>
-    /// Extensions for ILog
+    ///   Extensions for ILog
     /// </summary>
     public static class ILogExtensions
     {
@@ -145,6 +145,7 @@
             }
         }
     }
+
 
     // ReSharper restore InconsistentNaming
 }
