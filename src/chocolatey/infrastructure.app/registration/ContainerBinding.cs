@@ -22,7 +22,6 @@
         ///   Loads the module into the kernel.
         /// </summary>
         public void RegisterComponents(Container container)
-
         {
             var configuration = Config.get_configuration_settings();
             Log.InitializeWith<Log4NetLog>();

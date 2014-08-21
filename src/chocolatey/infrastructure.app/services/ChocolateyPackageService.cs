@@ -52,7 +52,7 @@
             _nugetService.install_noop(configuration,
                 (pkg) =>
                 {
-                _powershellService.install_noop(pkg);
+                 _powershellService.install_noop(pkg);
                 });
         }
 
