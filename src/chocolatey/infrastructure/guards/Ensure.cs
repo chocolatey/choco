@@ -54,5 +54,13 @@
                 throw new ArgumentNullException("Ensure found that {0} ({1}) was null.".format_with(_name, typeof(EnsurableType).Name));
             }
         }
+
+        public void meets(Func<EnsurableType, bool> ensureFunction, Action<string, EnsurableType> exceptionAction)
+        {
+            if (!ensureFunction(_value))
+            {
+                exceptionAction.Invoke(_name,_value);
+            }
+        }
     }
 }
