@@ -3,29 +3,36 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using System.Text.RegularExpressions;
+    using NuGet;
     using builders;
     using configuration;
-    using filesystem;
+    using guards;
     using infrastructure.commands;
     using logging;
+    using nuget;
     using results;
+    using IFileSystem = filesystem.IFileSystem;
 
     public class NugetService : INugetService
     {
         private readonly IFileSystem _fileSystem;
+        private readonly ILogger _nugetLogger;
         private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
         private readonly string _nugetExePath = ApplicationParameters.Tools.NugetExe;
-        private readonly IDictionary<string, ExternalCommandArgument> _nugetListArguments = new Dictionary<string, ExternalCommandArgument>();
         private readonly IDictionary<string, ExternalCommandArgument> _nugetInstallArguments = new Dictionary<string, ExternalCommandArgument>();
 
         /// <summary>
         ///   Initializes a new instance of the <see cref="NugetService" /> class.
         /// </summary>
         /// <param name="fileSystem">The file system.</param>
-        public NugetService(IFileSystem fileSystem)
+        /// <param name="nugetLogger">The nuget logger</param>
+        public NugetService(IFileSystem fileSystem, ILogger nugetLogger)
         {
             _fileSystem = fileSystem;
+            _nugetLogger = nugetLogger;
             set_nuget_args_dictionaries();
         }
 
@@ -34,22 +41,7 @@
         /// </summary>
         private void set_nuget_args_dictionaries()
         {
-            set_nuget_list_dictionary();
             set_nuget_install_dictionary();
-        }
-
-        /// <summary>
-        ///   Sets the nuget list args dictionary
-        /// </summary>
-        private void set_nuget_list_dictionary()
-        {
-            _nugetListArguments.Add("_list_", new ExternalCommandArgument { ArgumentOption = "list", Required = true });
-            _nugetListArguments.Add("Filter", new ExternalCommandArgument { ArgumentOption = "filter", UseValueOnly = true });
-            _nugetListArguments.Add("AllVersions", new ExternalCommandArgument { ArgumentOption = "-all" });
-            _nugetListArguments.Add("Prerelease", new ExternalCommandArgument { ArgumentOption = "-prerelease" });
-            _nugetListArguments.Add("Verbose", new ExternalCommandArgument { ArgumentOption = "-verbosity", ArgumentValue = " detailed" });
-            _nugetListArguments.Add("_non_interactive_", new ExternalCommandArgument { ArgumentOption = "-noninteractive", Required = true });
-            _nugetListArguments.Add("Source", new ExternalCommandArgument { ArgumentOption = "-source ", QuoteValue = true });
         }
 
         /// <summary>
@@ -75,46 +67,33 @@
 
         public void list_noop(ChocolateyConfiguration configuration)
         {
-            this.Log().Info("{0} would have run the following to return a list of results:{1}'\"{2}\" {3}'".format_with(
+            this.Log().Info("{0} would have searched for '{1}' against the following source(s) :\"{2}\"".format_with(
                 ApplicationParameters.Name,
-                Environment.NewLine,
-                _nugetExePath,
-                ExternalCommandArgsBuilder.build_arguments(configuration, _nugetListArguments)
-                                )
-                );
+                configuration.Input,
+                configuration.Source
+                                ));
         }
 
         public ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration configuration, bool logResults = true)
         {
-            //todo: upgrade this to IPackage
             var packageResults = new ConcurrentDictionary<string, PackageResult>();
-            var args = ExternalCommandArgsBuilder.build_arguments(configuration, _nugetListArguments);
 
-            Environment.ExitCode = CommandExecutor.execute(
-                _nugetExePath, args, true,
-                (s, e) =>
+            foreach (var package in NugetList.GetPackages(configuration, _nugetLogger).or_empty_list_if_null())
+            {
+                if (logResults)
                 {
-                    var logMessage = e.Data;
-                    if (string.IsNullOrWhiteSpace(logMessage)) return;
-                    if (logResults)
+                    this.Log().Info("{0} {1}".format_with(package.Id, package.Version.to_string()));
+                    if (configuration.Verbose)
                     {
-                        this.Log().Info(e.Data);
+                        this.Log().Info(" {0}{1} Tags:{2}".format_with(package.Description, Environment.NewLine, package.Tags));
                     }
-                    else
-                    {
-                        this.Log().Debug(() => "[Nuget] {0}".format_with(logMessage));
-                    }
-                    var lineParts = logMessage.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (lineParts.Length > 1)
-                    {
-                        packageResults.GetOrAdd(lineParts[0], new PackageResult(lineParts[0], lineParts[1]));
-                    }
-                },
-                (s, e) =>
+                }
+                else
                 {
-                    if (string.IsNullOrWhiteSpace(e.Data)) return;
-                    this.Log().Error(() => "{0}".format_with(e.Data));
-                });
+                    this.Log().Debug(() => "[Nuget] {0} {1}".format_with(package.Id, package.Version.to_string()));
+                }
+                packageResults.GetOrAdd(package.Id, new PackageResult(package.Id, package.Version.to_string()));
+            }
 
             return packageResults;
         }
