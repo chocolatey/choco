@@ -76,7 +76,12 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="infrastructure.app\nuget\ChocolateyNugetLogger.cs" />
     <Compile Include="infrastructure.app\messages\PreRunEvent.cs" />
+    <Compile Include="infrastructure.app\nuget\DictionaryPropertyProvider.cs" />
+    <Compile Include="infrastructure.app\nuget\NugetCommon.cs" />
+    <Compile Include="infrastructure.app\nuget\NugetList.cs" />
+    <Compile Include="infrastructure.app\nuget\NugetPack.cs" />
     <Compile Include="infrastructure.app\runners\ConsoleApplication.cs" />
     <Compile Include="infrastructure.app\services\ChocolateyPackageService.cs" />
     <Compile Include="infrastructure.app\services\IChocolateyPackageService.cs" />
