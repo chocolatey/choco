@@ -187,10 +187,15 @@
                 fileStream.Close();
             }
         }
-
+        
         #endregion
 
         #region Directory
+
+        public string get_current_directory()
+        {
+            return Directory.GetCurrentDirectory();
+        }
 
         public IList<string> get_directories(string directoryPath)
         {

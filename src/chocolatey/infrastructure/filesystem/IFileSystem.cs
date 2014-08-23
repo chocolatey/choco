@@ -199,6 +199,12 @@
         #region Directory
 
         /// <summary>
+        /// Gets the current working directory of the application.
+        /// </summary>
+        /// <returns></returns>
+        string get_current_directory();
+
+        /// <summary>
         ///   Gets the names of subdirectories (including their paths) in the specified directory.
         /// </summary>
         /// <param name="directoryPath">The path for which an array of subdirectory names is returned. </param>
