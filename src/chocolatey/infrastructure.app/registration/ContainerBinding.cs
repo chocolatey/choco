@@ -45,6 +45,7 @@
                         {
                             new ChocolateyInstallCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyListCommand(container.GetInstance<IChocolateyPackageService>()),
+                            new ChocolateyPackCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>())
                         };
 

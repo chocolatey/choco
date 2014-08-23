@@ -22,6 +22,18 @@
         ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration configuration, bool logResults);
 
         /// <summary>
+        ///   Run pack in noop mode.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        void pack_noop(ChocolateyConfiguration configuration);
+
+        /// <summary>
+        ///   Packages up a nuspec into a compiled nupkg.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        void pack_run(ChocolateyConfiguration configuration);
+
+        /// <summary>
         ///   Run install in noop mode
         /// </summary>
         /// <param name="configuration">The configuration.</param>

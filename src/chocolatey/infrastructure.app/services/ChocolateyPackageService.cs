@@ -47,6 +47,16 @@
             }
         }
 
+        public void pack_noop(ChocolateyConfiguration configuration)
+        {
+            _nugetService.pack_noop(configuration);
+        }
+
+        public void pack_run(ChocolateyConfiguration configuration)
+        {
+            _nugetService.pack_run(configuration);
+        }
+
         public void install_noop(ChocolateyConfiguration configuration)
         {
             _nugetService.install_noop(configuration,

@@ -4,6 +4,9 @@
     using configuration;
     using results;
 
+    /// <summary>
+    /// The packaging service
+    /// </summary>
     public interface IChocolateyPackageService
     {
         /// <summary>
@@ -19,6 +22,18 @@
         /// <param name="logResults">Should results be logged?</param>
         /// <returns></returns>
         void list_run(ChocolateyConfiguration configuration, bool logResults);
+
+        /// <summary>
+        /// Run pack in noop mode
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        void pack_noop(ChocolateyConfiguration configuration);
+
+        /// <summary>
+        /// Compiles a package
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        void pack_run(ChocolateyConfiguration configuration);
 
         /// <summary>
         ///   Run install in noop mode

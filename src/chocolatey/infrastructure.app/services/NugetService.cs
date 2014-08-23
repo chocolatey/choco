@@ -98,6 +98,65 @@
             return packageResults;
         }
 
+        public void pack_noop(ChocolateyConfiguration configuration)
+        {
+            this.Log().Info("{0} would have searched for a nuspec file in \"{1}\" and attempted to compile it.".format_with(
+                ApplicationParameters.Name,
+                _fileSystem.get_current_directory()
+                  ));
+        }
+
+        public void pack_run(ChocolateyConfiguration configuration)
+        {
+
+            Func<IFileSystem, string> getLocalNuspecFiles = (fileSystem) =>
+                {
+                    var nuspecFiles = fileSystem.get_files(fileSystem.get_current_directory(), "*" + Constants.ManifestExtension).or_empty_list_if_null();
+                    Ensure.that(() => nuspecFiles).meets((files) => files.Count() == 1,
+                        (name, value) =>
+                        {
+                            throw new FileNotFoundException("No nuspec files (or more than 1) were found to build in '{0}'. Please specify the nuspec file or try in a different directory.".format_with(_fileSystem.get_current_directory()));
+                        });
+
+                    return nuspecFiles.FirstOrDefault();
+                };
+
+            string nuspecFilePath = !string.IsNullOrWhiteSpace(configuration.Input) ? configuration.Input : getLocalNuspecFiles.Invoke(_fileSystem);
+            Ensure.that(() => nuspecFilePath).meets((nuspec) => _fileSystem.get_file_extension(nuspec).is_equal_to(Constants.ManifestExtension), (name, value) =>
+                {
+                    throw new ArgumentException("File specified or found is not a nuspec file. '{0}'".format_with(value));
+                });
+
+            var nuspecDirectory = _fileSystem.get_full_path(_fileSystem.get_directory_name(nuspecFilePath));
+
+            IDictionary<string, string> properties = new Dictionary<string, string>();
+            // Set the version property if the flag is set
+            if (!string.IsNullOrWhiteSpace(configuration.Version))
+            {
+                properties["version"] = configuration.Version;
+            }
+
+            //// Initialize the property provider based on what was passed in using the properties flag
+            var propertyProvider = new DictionaryPropertyProvider(properties);
+
+            PackageBuilder builder = new PackageBuilder(nuspecFilePath, propertyProvider, includeEmptyDirectories: true);
+            if (!string.IsNullOrWhiteSpace(configuration.Version))
+            {
+                builder.Version = new SemanticVersion(configuration.Version);
+            }
+           //todo:START HERE determine if builder version has a value without being passed one
+            string outputFile = builder.Id + "." + builder.Version + Constants.PackageExtension;
+            string outputPath = _fileSystem.combine_paths(nuspecDirectory, outputFile);
+
+            IPackage package = NugetPack.BuildPackage(builder, _fileSystem, outputPath);
+            //if (package != null)
+            //{
+            //    AnalyzePackage(package);
+            //}
+        }
+
+
+
         public void install_noop(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
         {
             var args = ExternalCommandArgsBuilder.build_arguments(configuration, _nugetInstallArguments);
