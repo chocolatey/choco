@@ -1,6 +1,7 @@
 ﻿namespace chocolatey.infrastructure.app.registration
 {
     using System.Collections.Generic;
+    using NuGet;
     using SimpleInjector;
     using commands;
     using events;
@@ -9,7 +10,9 @@
     using infrastructure.configuration;
     using infrastructure.services;
     using logging;
+    using nuget;
     using services;
+    using IFileSystem = filesystem.IFileSystem;
 
     // ReSharper disable InconsistentNaming
 
@@ -29,6 +32,8 @@
             container.Register(() => configuration, Lifestyle.Singleton);
             container.Register<IFileSystem, DotNetFileSystem>(Lifestyle.Singleton);
             container.Register<IXmlService, XmlService>(Lifestyle.Singleton);
+            //nuget
+            container.Register<ILogger, ChocolateyNugetLogger>(Lifestyle.Singleton);
             container.Register<INugetService, NugetService>(Lifestyle.Singleton);
             container.Register<IPowershellService, PowershellService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);
