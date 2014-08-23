@@ -69,12 +69,30 @@
             }
             catch (Exception ex)
             {
-                "chocolatey".Log().Error(() => "{0} had an error on {1} (with user {2}):{3}{4}".format_with(
-                    ApplicationParameters.Name,
-                    Environment.MachineName,
-                    Environment.UserName,
-                    Environment.NewLine,
-                    ex.ToString()));
+                var debug = false;
+                // no access to the good stuff here, need to go a bit primitive in parsing args
+                foreach (var arg in args.or_empty_list_if_null())
+                {
+                    if (arg.Contains("debug") || arg.is_equal_to("-d") || arg.is_equal_to("/d"))
+                    {
+                        debug = true;
+                        break;
+                    }
+                }
+
+                if (debug)
+                {
+                    "chocolatey".Log().Error(() => "{0} had an error on {1} (with user {2}):{3}{4}".format_with(
+                                  ApplicationParameters.Name,
+                                  Environment.MachineName,
+                                  Environment.UserName,
+                                  Environment.NewLine,
+                                  ex.ToString()));
+                }
+                else
+                {
+                    "chocolatey".Log().Error(ChocolateyLoggers.Important,() => "{0}".format_with(ex.Message));
+                }
 
                 Environment.ExitCode = 1;
             }
