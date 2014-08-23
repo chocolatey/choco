@@ -36,7 +36,7 @@
 
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
-            configuration.Filter = string.Join(" ", unparsedArguments);
+            configuration.Input = string.Join(" ", unparsedArguments);
 
             if (configuration.LocalOnly)
             {

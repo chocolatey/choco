@@ -40,7 +40,23 @@ namespace chocolatey.infrastructure.app.configuration
 
         // command level options
         public string Source { get; set; }
+        public string Version { get; set; }
+        public string Input { get; set; }
 
+        // list
+        public bool AllVersions { get; set; }
+        public bool LocalOnly { get; set; }
+
+        // configuration set variables
+        public bool UseNugetForSources { get; set; }
+        public bool CheckSumFiles { get; set; }
+        public bool VirusCheckFiles { get; set; }
+
+        // push
+        public int TimeoutInSeconds { get; set; } //default to 300
+        //DisableBuffering?
+
+        // install/update
         /// <summary>
         ///   Gets or sets the package names. Space separated
         /// </summary>
@@ -48,10 +64,6 @@ namespace chocolatey.infrastructure.app.configuration
         ///   Space separated package names.
         /// </value>
         public string PackageNames { get; set; }
-
-        public string Version { get; set; }
-        public bool LocalOnly { get; set; }
-        public string Filter { get; set; }
         public bool Prerelease { get; set; }
         public bool ForceX86 { get; set; }
         public string InstallArguments { get; set; }
@@ -59,13 +71,8 @@ namespace chocolatey.infrastructure.app.configuration
         public bool NotSilent { get; set; }
         public string PackageParameters { get; set; }
         public bool IgnoreDependencies { get; set; }
-
-        //list
-        public bool AllVersions { get; set; }
-
-        // configuration set variables
-        public bool UseNugetForSources { get; set; }
-        public bool CheckSumFiles { get; set; }
-        public bool VirusCheckFiles { get; set; }
+        //todo: come up with a good name for this
+        public bool AllowMultipleVersions { get; set; }
+        
     }
 }
