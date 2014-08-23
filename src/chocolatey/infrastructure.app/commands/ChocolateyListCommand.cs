@@ -41,7 +41,7 @@
             if (configuration.LocalOnly)
             {
                 configuration.Source = ApplicationParameters.PackagesLocation;
-                configuration.Source = @"c:\chocolatey\lib"; //todo:temporary
+                configuration.Source = @"c:\programdata\chocolatey\lib"; //todo:temporary
             }
         }
 
