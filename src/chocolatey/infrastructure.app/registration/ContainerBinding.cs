@@ -33,7 +33,7 @@
             container.Register<IPowershellService, PowershellService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);
 
-            //refactor - this could all be autowired
+            //todo:refactor - this should be autowired
             container.Register<IEnumerable<ICommand>>(() =>
                 {
                     var list = new List<ICommand>

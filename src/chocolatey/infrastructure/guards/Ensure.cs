@@ -14,21 +14,21 @@
         private static MemberExpression get_name_on_right(this Expression e)
         {
             if (e is LambdaExpression)
-                return get_name_on_right(((LambdaExpression) e).Body);
+                return get_name_on_right(((LambdaExpression)e).Body);
 
             if (e is MemberExpression)
-                return (MemberExpression) e;
+                return (MemberExpression)e;
 
             if (e is MethodCallExpression)
             {
-                var callExpression = (MethodCallExpression) e;
+                var callExpression = (MethodCallExpression)e;
                 var member = callExpression.Arguments.Count > 0 ? callExpression.Arguments[0] : callExpression.Object;
                 return get_name_on_right(member);
             }
 
             if (e is UnaryExpression)
             {
-                var unaryExpression = (UnaryExpression) e;
+                var unaryExpression = (UnaryExpression)e;
                 return get_name_on_right(unaryExpression.Operand);
             }
 
@@ -51,7 +51,7 @@
         {
             if (_value == null)
             {
-                throw new ArgumentNullException("Ensure found that {0} ({1}) was null.".format_with(_name, typeof (EnsurableType).Name));
+                throw new ArgumentNullException("Ensure found that {0} ({1}) was null.".format_with(_name, typeof(EnsurableType).Name));
             }
         }
     }
