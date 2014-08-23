@@ -106,22 +106,22 @@
                 Environment.NewLine,
                 _nugetExePath,
                 args
-                ));
+                                ));
 
             var tempInstallsLocation = _fileSystem.combine_paths(_fileSystem.get_temp_path(), ApplicationParameters.Name, "TempInstalls_" + DateTime.Now.ToString("yyyyMMdd_HHmmss_ffff"));
             _fileSystem.create_directory_if_not_exists(tempInstallsLocation);
 
             _nugetInstallArguments["_output_directory_"] = new ExternalCommandArgument
-               {
-                   ArgumentOption = "-outputdirectory ",
-                   ArgumentValue = "{0}".format_with(tempInstallsLocation),
-                   QuoteValue = true,
-                   Required = true
-               };
+                {
+                    ArgumentOption = "-outputdirectory ",
+                    ArgumentValue = "{0}".format_with(tempInstallsLocation),
+                    QuoteValue = true,
+                    Required = true
+                };
 
             install_run(configuration, continueAction);
 
-            _fileSystem.delete_directory(tempInstallsLocation,recursive:true);
+            _fileSystem.delete_directory(tempInstallsLocation, recursive: true);
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
@@ -151,7 +151,7 @@
 
                         //todo: ignore dependencies
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, packageVersion, _nugetInstallArguments["_output_directory_"].ArgumentValue));
-                        
+
                         if (ApplicationParameters.OutputParser.Nuget.NotInstalled.IsMatch(logMessage))
                         {
                             this.Log().Error("{0} not installed: {1}".format_with(packageName, logMessage));
