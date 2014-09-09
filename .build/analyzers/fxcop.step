@@ -32,6 +32,7 @@
   <property name="file.fxcop_results" value="${project.name}-results.xml" />
   <property name="args.fxcop" value="/searchgac /o:&quot;${dirs.fxcop_results}${path.separator}${file.fxcop_results}&quot;" />
   <property name="args.fxcop" value="/searchgac /o:&quot;${dirs.fxcop_results}${path.separator}${file.fxcop_results}&quot; /p:&quot;${file.fxcop_project}&quot;" if="${file::exists(file.fxcop_project)}" />
+  <property name="run.fxcop" value="false" overwrite="false" />
   <property name="is.replaced" value="false" />
   <property name="fail.build.on.error" value="false" />
   <property name="file.uppercut.assembly" value="uppercut.tasks.dll" />
@@ -43,7 +44,7 @@
     <loadtasks assembly="${path.uppercut.assembly}" if="${file::exists(path.uppercut.assembly)}" />
   </target>
 
-  <target name="run_tasks">
+  <target name="run_tasks" if="${file::exists(app.fxcop) and run.fxcop}">
     <echo level="Warning" message="" />
     <echo level="Warning" message="====================" />
     <echo level="Warning" message="${project::get-name()}" />
@@ -64,7 +65,7 @@
   <target name="run_normal_tasks"
           depends="get_regular_dlls, analysis"
           description="Using FxCop Code Analysis to report on the complexity and maintainability of your project(s)."
-          if="${file::exists(app.fxcop)}" />
+          />
 
   <target name="get_regular_dlls">
     <echo message="Getting output dlls based on name in directory ${path::get-full-path(dirs.build.code)}." />
