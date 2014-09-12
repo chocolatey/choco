@@ -15,7 +15,7 @@
     </mapping>
     <mapping>
       <level value="WARN" />
-      <foreColor value="DarkYellow" />
+      <foreColor value="Yellow" />
     </mapping>
     <mapping>
       <level value="INFO" />
@@ -42,7 +42,7 @@
     </mapping>
     <mapping>
       <level value="WARN" />
-      <foreColor value="Yellow" />
+      <foreColor value="Magenta" />
     </mapping>
     <mapping>
       <level value="INFO" />
@@ -70,11 +70,11 @@
     </mapping>
     <mapping>
       <level value="WARN" />
-      <foreColor value="DarkYellow" />
+      <foreColor value="DarkMagenta" />
     </mapping>
     <mapping>
       <level value="INFO" />
-      <foreColor value="DarkMagenta" />
+      <foreColor value="DarkGreen" />
     </mapping>
     <mapping>
       <level value="DEBUG" />
