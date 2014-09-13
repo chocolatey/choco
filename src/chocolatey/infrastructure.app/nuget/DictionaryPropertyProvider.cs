@@ -3,6 +3,8 @@
     using System.Collections.Generic;
     using NuGet;
 
+    // ReSharper disable InconsistentNaming
+
     internal sealed class DictionaryPropertyProvider : IPropertyProvider
     {
         private readonly IDictionary<string, string> _properties;
@@ -22,4 +24,6 @@
             return null;
         }
     }
+    
+    // ReSharper restore InconsistentNaming
 }

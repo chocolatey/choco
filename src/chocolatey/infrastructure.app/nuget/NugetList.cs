@@ -11,7 +11,7 @@
     {
         public static IEnumerable<IPackage> GetPackages(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
-            var packageRepository = NugetCommon.GetRepository(configuration, nugetLogger);
+            var packageRepository = NugetCommon.GetRemoteRepository(configuration, nugetLogger);
             IQueryable<IPackage> results = packageRepository.Search(configuration.Input, configuration.Prerelease);
 
             if (configuration.AllVersions)

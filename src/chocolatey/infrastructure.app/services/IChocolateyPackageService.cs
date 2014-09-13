@@ -46,6 +46,19 @@
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <returns>results of installs</returns>
-        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration);
+        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration);   
+        
+        /// <summary>
+        ///   Run upgrade in noop mode
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        void upgrade_noop(ChocolateyConfiguration configuration);
+
+        /// <summary>
+        ///   Upgrades packages
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns>results of upgrades</returns>
+        ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration configuration);
     }
 }

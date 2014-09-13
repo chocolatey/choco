@@ -1,6 +1,7 @@
 namespace chocolatey.infrastructure.results
 {
     using System.Linq;
+    using NuGet;
 
     /// <summary>
     ///   Outcome of package installation
@@ -13,17 +14,20 @@ namespace chocolatey.infrastructure.results
         }
 
         public string Name { get; private set; }
-        public string Version { get; private set; }
-        public string InstallTopLevelLocation { get; set; }
+        public string Version  { get; private set; }
+        public IPackage Package { get; private set; }
+        public string InstallLocation { get; set; }
 
-        public PackageResult(string name, string version) : this(name,version,null)
-        {}
-
-        public PackageResult(string name, string version, string installTopLevelLocation)
+        public PackageResult(IPackage package, string installLocation) : this(package.Id.to_lower(),package.Version.to_string(),installLocation)
+        {
+            Package = package;
+        }  
+        
+        public PackageResult(string name, string version, string installLocation)
         {
             Name = name;
             Version = version;
-            InstallTopLevelLocation = installTopLevelLocation;
+            InstallLocation = installLocation;
         }
     }
 }

@@ -31,7 +31,7 @@
 
         public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Warn(ChocolateyLoggers.Important, "UnpackSelf Command");
+            this.Log().Info(ChocolateyLoggers.Important, "UnpackSelf Command");
             this.Log().Info(@"
 This command should only be used when installing Chocolatey, not during normal operation. This will unpack unconditionally overwriting files that may exist.
 ");

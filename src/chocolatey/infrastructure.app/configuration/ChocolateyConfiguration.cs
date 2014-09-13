@@ -9,6 +9,11 @@ namespace chocolatey.infrastructure.app.configuration
     /// </summary>
     public sealed partial class ChocolateyConfiguration
     {
+        public ChocolateyConfiguration()
+        {
+            RegularOuptut = true;
+        }
+
         // overrides
         public override string ToString()
         {
@@ -37,6 +42,7 @@ namespace chocolatey.infrastructure.app.configuration
         public bool Force { get; set; }
         public bool Noop { get; set; }
         public bool HelpRequested { get; set; }
+        public bool RegularOuptut { get; set; }
 
         // command level options
         public string Source { get; set; }
@@ -71,8 +77,8 @@ namespace chocolatey.infrastructure.app.configuration
         public bool NotSilent { get; set; }
         public string PackageParameters { get; set; }
         public bool IgnoreDependencies { get; set; }
-        //todo: come up with a good name for this
         public bool AllowMultipleVersions { get; set; }
-        
+        public bool ForceDependencies { get; set; }
+
     }
 }

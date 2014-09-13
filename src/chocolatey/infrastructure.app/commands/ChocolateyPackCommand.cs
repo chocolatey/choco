@@ -34,7 +34,7 @@
 
         public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Warn(ChocolateyLoggers.Important, "Pack Command");
+            this.Log().Info(ChocolateyLoggers.Important, "Pack Command");
             this.Log().Info(@"
 Chocolatey will attempt to package a nuspec into a compiled nupkg.
 

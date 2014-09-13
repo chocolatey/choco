@@ -21,16 +21,21 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyConfigFileResource = @"chocolatey.infrastructure.app.configuration.chocolatey.config";
         public static readonly string GlobalConfigFileLocation = _fileSystem.combine_paths(CommonAppDataChocolatey, "config", "chocolatey.config");
         public static readonly string LicenseFileLocation = _fileSystem.combine_paths(CommonAppDataChocolatey, "license", "chocolatey.license.xml");
+        public static readonly string PackageNamesSeparator = ";";
 
-        public static readonly string PackagesLocation = _fileSystem.combine_paths(InstallLocation, "lib");
+        public static string PackagesLocation = _fileSystem.combine_paths(InstallLocation, "lib");
+        public static string PackageFailuresLocation = _fileSystem.combine_paths(InstallLocation, "lib-bad");
+        public static string ShimsLocation = _fileSystem.combine_paths(InstallLocation, "bin");
 
         public static class Tools
         {
-            public static readonly string NugetExe = _fileSystem.combine_paths(InstallLocation, "nuget.exe");
+            //public static readonly string WebPiCmdExe = _fileSystem.combine_paths(InstallLocation, "nuget.exe");
+            public static readonly string ShimGenExe = _fileSystem.combine_paths(InstallLocation,"tools", "shimgen.exe");
         }
 
         public static class OutputParser
         {
+            //todo: This becomes the WebPI parsing stuff instead
             public static class Nuget
             {
                 public const string PACKAGE_NAME_GROUP = "PkgName";

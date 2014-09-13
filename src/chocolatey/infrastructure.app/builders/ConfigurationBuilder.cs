@@ -75,6 +75,9 @@
                             .Add("noop",
                                  "NoOp - Don't actually do anything.",
                                  option => config.Noop = option != null)
+                            .Add("limitoutput|limit-output",
+                                 "LimitOuptut - Limit the output to essential information",
+                                 option => config.RegularOuptut = option == null)
                             ;
                     },
                 (unparsedArgs) =>
@@ -93,7 +96,7 @@
                             commandsLog.AppendFormat(" * {0}\n", command.get_description_or_value());
                         }
 
-                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, "Commands");
+                        "chocolatey".Log().Info(ChocolateyLoggers.Important, "Commands");
                         "chocolatey".Log().Info(@"{1}
 
 Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.ChocolateyVersion, commandsLog.ToString()));

@@ -40,8 +40,11 @@
                 ConfigurationBuilder.set_up_configuration(args, config, fileSystem, container.GetInstance<IXmlService>());
                 Config.initialize_with(config);
 
-                "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.ChocolateyVersion));
-
+                if (config.RegularOuptut)
+                {
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.ChocolateyVersion));
+                }
+                
                 if (config.HelpRequested)
                 {
                     pause_execution_if_debug();

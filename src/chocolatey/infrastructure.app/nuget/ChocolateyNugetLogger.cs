@@ -9,8 +9,6 @@
         public FileConflictResolution ResolveFileConflict(string message)
         {
             return FileConflictResolution.OverwriteAll;
-            //this.Log().Info(ChocolateyLoggers.Important,message);
-            //this.Log().Info(ChocolateyLoggers.Important,"Skipping the above...");
         }
 
         public void Log(MessageLevel level, string message, params object[] args)

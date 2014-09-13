@@ -25,10 +25,10 @@
                 .Add("s=|source=",
                      "Source - Source location for install. Can include special 'webpi'. Defaults to sources.",
                      option => configuration.Source = option)
-                .Add("lo|localonly",
+                .Add("lo|localonly|local-only",
                      "LocalOnly - Only search in installed items",
                      option => configuration.LocalOnly = option != null)
-                .Add("a|all|allversions",
+                .Add("a|all|allversions|all-versions",
                      "AllVersions - include results from all versions",
                      option => configuration.AllVersions = option != null)
                 ;
@@ -41,13 +41,12 @@
             if (configuration.LocalOnly)
             {
                 configuration.Source = ApplicationParameters.PackagesLocation;
-                configuration.Source = @"c:\programdata\chocolatey\lib"; //todo:temporary
             }
         }
 
         public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Warn(ChocolateyLoggers.Important, "List/Search Command");
+            this.Log().Info(ChocolateyLoggers.Important, "List/Search Command");
             this.Log().Info(@"
 Chocolatey will perform a search for a package local or remote.
 

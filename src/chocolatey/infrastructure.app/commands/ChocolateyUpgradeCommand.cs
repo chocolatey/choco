@@ -8,12 +8,12 @@
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.install)]
-    public sealed class ChocolateyInstallCommand : ICommand
+    [CommandFor(CommandNameType.upgrade)]
+    public sealed class ChocolateyUpgradeCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;
 
-        public ChocolateyInstallCommand(IChocolateyPackageService packageService)
+        public ChocolateyUpgradeCommand(IChocolateyPackageService packageService)
         {
             _packageService = packageService;
         }
@@ -49,11 +49,8 @@
                      "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false.",
                      option => configuration.AllowMultipleVersions = option != null)
                 .Add("ignoredependencies|ignore-dependencies",
-                     "IgnoreDependencies - Ignore dependencies when installing package(s). Defaults to false.",
+                     "IgnoreDependencies - Ignore dependencies when upgrading package(s). Defaults to false.",
                      option => configuration.IgnoreDependencies = option != null)
-                .Add("forcedependencies|force-dependencies",
-                     "ForceDependencies - Force dependencies to be reinstalled when force installing package(s). Must be used in conjunction with --force. Defaults to false.",
-                     option => configuration.ForceDependencies = option != null)
                 ;
         }
 
@@ -64,26 +61,27 @@
 
         public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Info(ChocolateyLoggers.Important, "Install Command");
+            this.Log().Info(ChocolateyLoggers.Important, "Upgrade Command");
             this.Log().Info(@"
-Installs a package or a list of packages (sometimes passed as a packages.config).
+Upgrades a package or a list of packages (sometimes passed in as a packages.config).
 
-Usage: choco install pkg|packages.config [pkg2 pkgN] [options/switches]
+Usage: choco upgrade pkg|packages.config [pkg2 pkgN] [options/switches]
 
-NOTE: `all` is a special package keyword that will allow you to install all
- packages from a custom feed. Will not work with Chocolatey default feed.
+NOTE: `all` is a special package keyword that will allow you to upgrade all
+ currently installed packages.
 
+NOTE: If you do not have a package installed, upgrade will do nothing.
 ");
         }
 
         public void noop(ChocolateyConfiguration configuration)
         {
-            _packageService.install_noop(configuration);
+            _packageService.upgrade_noop(configuration);
         }
 
         public void run(ChocolateyConfiguration configuration)
         {
-            _packageService.install_run(configuration);
+            _packageService.upgrade_run(configuration);
         }
     }
 }

@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Linq;
+    using configuration;
     using filesystem;
     using infrastructure.commands;
     using logging;
@@ -19,14 +20,14 @@
 
         public void install_noop(PackageResult packageResult)
         {
-            var packageDirectory = _fileSystem.combine_paths(packageResult.InstallTopLevelLocation ?? ApplicationParameters.PackagesLocation, "{0}.{1}".format_with(packageResult.Name, packageResult.Version));
+            var packageDirectory = packageResult.InstallLocation;
             var installScript = _fileSystem.get_files(packageDirectory, "chocolateyInstall.ps1", SearchOption.AllDirectories);
             if (installScript.Count != 0)
             {
                 var chocoInstall = installScript.FirstOrDefault();
 
                 this.Log().Info("Would have run '{0}':".format_with(chocoInstall));
-                this.Log().Warn(ChocolateyLoggers.Important,_fileSystem.read_file(chocoInstall));
+                this.Log().Warn(_fileSystem.read_file(chocoInstall));
             }
         }
 
@@ -37,9 +38,9 @@
             return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; & import-module -name '{0}'; {1}".format_with(installerModule,command);
         }
 
-        public void install(PackageResult packageResult)
+        public void install(ChocolateyConfiguration configuration, PackageResult packageResult)
         {
-            var packageDirectory = _fileSystem.combine_paths(packageResult.InstallTopLevelLocation ?? ApplicationParameters.PackagesLocation, "{0}.{1}".format_with(packageResult.Name, packageResult.Version));
+            var packageDirectory = packageResult.InstallLocation;
 
             if (!_fileSystem.directory_exists(packageDirectory))
             {
@@ -55,20 +56,58 @@
                 this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".format_with(chocoInstall));
                 this.Log().Debug(_fileSystem.read_file(chocoInstall));
 
+                var failure = false;
+
+                var package = packageResult.Package;
+                Environment.SetEnvironmentVariable("chocolateyPackageName", package.Id);
+                Environment.SetEnvironmentVariable("chocolateyPackageVersion", package.Version.to_string());
+                Environment.SetEnvironmentVariable("chocolateyPackageFolder", ApplicationParameters.PackagesLocation);
+                Environment.SetEnvironmentVariable("installerArguments", configuration.InstallArguments);
+                Environment.SetEnvironmentVariable("chocolateyPackageParameters", configuration.PackageParameters);
+                 if (configuration.ForceX86)
+                { 
+                    Environment.SetEnvironmentVariable("chocolateyForceX86","true");
+                }
+                if (configuration.OverrideArguments)
+                {
+                    Environment.SetEnvironmentVariable("chocolateyInstallOverride","true");
+                }
+
+
+
+                if (configuration.Debug)
+                {
+                    Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug","true");
+                }
+                //todo:if (configuration.NoOutput)
+                //{
+                //    Environment.SetEnvironmentVariable("ChocolateyEnvironmentQuiet","true");
+                //}
+               
+                
+              //$env:chocolateyInstallArguments = ''
+              //$env:chocolateyInstallOverride = $null
+
+
                 PowershellExecutor.execute(
                     wrap_command_with_module(installScript.FirstOrDefault()),
                     _fileSystem,
                     (s, e) =>
                         {
-                            var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Info(e.Data);
+                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            this.Log().Info(() => " " + e.Data);
                         },
                     (s, e) =>
                         {
                             if (string.IsNullOrWhiteSpace(e.Data)) return;
-                            packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Error while running '{0}':{1}{2}".format_with(installScript.FirstOrDefault(), Environment.NewLine, e.Data)));
+                            failure = true;
+                            this.Log().Error(() => " " + e.Data);
                         });
+
+                if (failure)
+                {
+                    packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Error while running '{0}'.{1} See log for details.".format_with(installScript.FirstOrDefault(), Environment.NewLine)));
+                }
             }
 
             packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Ran '{0}'".format_with(installScript)));

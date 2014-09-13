@@ -57,6 +57,6 @@
             return physicalPackageFile.SourcePath;
         }
     }
-
+    
     // ReSharper restore InconsistentNaming
 }
