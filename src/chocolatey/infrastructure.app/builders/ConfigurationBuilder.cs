@@ -72,7 +72,7 @@
                             .Add("f|force",
                                  "Force - force the behavior",
                                  option => config.Force = option != null)
-                            .Add("noop",
+                            .Add("noop|whatif|what-if",
                                  "NoOp - Don't actually do anything.",
                                  option => config.Noop = option != null)
                             .Add("limitoutput|limit-output",
