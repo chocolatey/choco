@@ -48,9 +48,10 @@ namespace chocolatey.infrastructure.app.configuration
         public string Source { get; set; }
         public string Version { get; set; }
         public string Input { get; set; }
+        public bool AllVersions { get; set; }
+        public bool SkipPackageInstallProvider { get; set; }
 
         // list
-        public bool AllVersions { get; set; }
         public bool LocalOnly { get; set; }
 
         // configuration set variables

@@ -71,7 +71,7 @@
                     Console.WriteLine("Press enter to continue...");
                     Console.ReadKey();
 #endif
-                    Environment.Exit(-1);
+                    Environment.Exit(1);
                 }
 
                 if (config.Noop)

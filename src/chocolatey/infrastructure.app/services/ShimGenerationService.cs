@@ -79,7 +79,7 @@
                     (s, e) =>
                     {
                         if (string.IsNullOrWhiteSpace(e.Data)) return;
-                        this.Log().Error(() => " {0}".format_with(e.Data));
+                        this.Log().Error(() => " [ShimGen] {0}".format_with(e.Data));
                     }
                     );
 
