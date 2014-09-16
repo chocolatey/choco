@@ -51,6 +51,9 @@
                 .Add("ignoredependencies|ignore-dependencies",
                      "IgnoreDependencies - Ignore dependencies when upgrading package(s). Defaults to false.",
                      option => configuration.IgnoreDependencies = option != null)
+                .Add("skippowershell|skip-powershell",
+                     "Skip Powershell - Do not run chocolateyInstall.ps1. Defaults to false.",
+                     option => configuration.SkipPackageInstallProvider = option != null)
                 ;
         }
 

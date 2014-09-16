@@ -62,5 +62,20 @@
         /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
         /// <returns>results of installs</returns>
         ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction);
+        
+        /// <summary>
+        ///   Run uninstall in noop mode
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <param name="continueAction">The action to continue with for each noop test upgrade.</param>
+        void uninstall_noop(ChocolateyConfiguration configuration, Action<PackageResult> continueAction);
+
+        /// <summary>
+        ///   Uninstalls packages from NuGet related feeds
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
+        /// <returns>results of installs</returns>
+        ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction);
     }
 }

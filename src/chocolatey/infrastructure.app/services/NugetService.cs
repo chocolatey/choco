@@ -47,10 +47,7 @@
                 if (logResults)
                 {
                     this.Log().Info("{0} {1}".format_with(package.Id, package.Version.to_string()));
-                    if (configuration.Verbose)
-                    {
-                        this.Log().Info(" {0}{1} Tags:{2}".format_with(package.Description, Environment.NewLine, package.Tags));
-                    }
+                    if (configuration.Verbose) this.Log().Info(" {0}{1} Tags:{2}".format_with(package.Description, Environment.NewLine, package.Tags));
                 }
                 else
                 {
@@ -121,7 +118,7 @@
                 ApplicationParameters.Name,
                 Environment.NewLine,
                 configuration.PackageNames
-            ));
+                                ));
 
             var tempInstallsLocation = _fileSystem.combine_paths(_fileSystem.get_temp_path(), ApplicationParameters.Name, "TempInstalls_" + DateTime.Now.ToString("yyyyMMdd_HHmmss_ffff"));
             _fileSystem.create_directory_if_not_exists(tempInstallsLocation);
@@ -145,10 +142,8 @@
                     var pkg = e.Package;
                     var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
                     results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of install."));
-                    if (continueAction != null)
-                    {
-                        continueAction.Invoke(results);
-                    }
+                    
+                    if (continueAction != null) continueAction.Invoke(results);
                 });
 
             foreach (string packageName in configuration.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
@@ -210,41 +205,30 @@
         public void upgrade_noop(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
         {
             configuration.Force = false;
-            upgrade_run(configuration, continueAction, performUpgrade: false);
+            upgrade_run(configuration, continueAction, performAction: false);
         }
 
         public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
         {
-            return upgrade_run(configuration, continueAction, performUpgrade: true);
+            return upgrade_run(configuration, continueAction, performAction: true);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction, bool performUpgrade)
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction, bool performAction)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
 
             SemanticVersion version = configuration.Version != null ? new SemanticVersion(configuration.Version) : null;
             var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger, (e) =>
-            {
-                var pkg = e.Package;
-                var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of upgrade."));
-                if (continueAction != null)
                 {
-                    continueAction.Invoke(results);
-                }
-            });
+                    var pkg = e.Package;
+                    var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                    results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of upgrade."));
+                    
+                    if (continueAction != null) continueAction.Invoke(results);
+                });
 
-            if (configuration.PackageNames.is_equal_to("all"))
-            {
-                configuration.LocalOnly = true;
-                var sources = configuration.Source;
-                configuration.Source = ApplicationParameters.PackagesLocation;
-                var localPackages = list_run(configuration, logResults: false);
-                configuration.Source = sources;
-                configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator, localPackages.Select((p) => p.Key).or_empty_list_if_null());
-                configuration.IgnoreDependencies = true;
-            }
+            set_package_names_if_all_is_specified(configuration, () => { configuration.IgnoreDependencies = true; });
 
             foreach (string packageName in configuration.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
@@ -263,11 +247,8 @@
                         string logMessage = "{0} is not installed. Cannot upgrade a non-existent package.".format_with(packageName);
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                         results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                        
-                        if (configuration.RegularOuptut)
-                        {
-                            this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                        }
+
+                        if (configuration.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
 
@@ -278,10 +259,7 @@
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                         results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                        if (configuration.RegularOuptut)
-                        {
-                           this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                        }
+                        if (configuration.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
 
@@ -291,14 +269,10 @@
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
                         results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
 
-                        if (configuration.RegularOuptut)
-                        {
-                            this.Log().Info(ChocolateyLoggers.Important, logMessage);
-                        }
-
+                        if (configuration.RegularOuptut) this.Log().Info(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
-                    
+
                     if ((installedPackage.Version == availablePackage.Version))
                     {
                         string logMessage = "{0} v{1} is the latest version available based on your source(s).".format_with(installedPackage.Id, installedPackage.Version);
@@ -307,15 +281,11 @@
                         {
                             results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         }
-                        
-                        if (configuration.RegularOuptut)
-                        {
-                            this.Log().Info(logMessage);
-                        }
 
+                        if (configuration.RegularOuptut) this.Log().Info(logMessage);
                         if (!configuration.Force) continue;
                     }
-                    
+
                     if (availablePackage.Version > installedPackage.Version || configuration.Force)
                     {
                         if (availablePackage.Version > installedPackage.Version)
@@ -330,15 +300,15 @@
                                 this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, "false"));
                             }
                         }
-                        
-                        if (performUpgrade)
+
+                        if (performAction)
                         {
                             using (packageManager.SourceRepository.StartOperation(
                                 RepositoryOperationNames.Install,
                                 packageName,
                                 version == null ? null : version.ToString()))
                             {
-                                packageManager.UpdatePackage(availablePackage,updateDependencies: !configuration.IgnoreDependencies,allowPrereleaseVersions: configuration.Prerelease);
+                                packageManager.UpdatePackage(availablePackage, updateDependencies: !configuration.IgnoreDependencies, allowPrereleaseVersions: configuration.Prerelease);
                             }
                         }
                     }
@@ -346,6 +316,162 @@
             }
 
             return packageInstalls;
+        }
+
+        public void uninstall_noop(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
+        {
+           var results =  uninstall_run(configuration, continueAction, performAction: false);
+            foreach (var packageResult in results.or_empty_list_if_null())
+            {
+                var package = packageResult.Value.Package;
+                if (package != null) this.Log().Warn("Would have uninstalled {0} v{1}.".format_with(package.Id,package.Version.to_string()));
+            }
+        }
+
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
+        {
+            return uninstall_run(configuration, continueAction, performAction: true);
+        }
+
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction, bool performAction)
+        {
+            var packageUninstalls = new ConcurrentDictionary<string, PackageResult>();
+
+            SemanticVersion version = configuration.Version != null ? new SemanticVersion(configuration.Version) : null;
+            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger, null);
+
+            packageManager.PackageUninstalling += (s, e) =>
+               {
+                    var pkg = e.Package;
+                    var results = packageUninstalls.GetOrAdd(pkg.Id.to_lower() + "." + pkg.Version.to_string(), new PackageResult(pkg, e.InstallPath));
+                    results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of uninstall."));
+                    
+                    // is this the latest version or have you passed --sxs? This is the only way you get through to the continue action.
+                    var latestVersion = packageManager.LocalRepository.FindPackage(e.Package.Id);
+                    if (latestVersion.Version == pkg.Version || configuration.AllowMultipleVersions)
+                    {
+                        if (continueAction != null) continueAction.Invoke(results);
+                    }
+               };
+
+            set_package_names_if_all_is_specified(configuration, () =>
+                {
+                    // force remove the item, ignore the dependencies 
+                    // as those are going to be picked up anyway
+                    configuration.Force = true;
+                    configuration.ForceDependencies = false;
+                });
+
+            foreach (string packageName in configuration.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            {
+                if (packageName.to_lower().EndsWith(".config"))
+                {
+                    //todo: determine if .config file for packages .config
+                    //todo: determine if config file exists
+                }
+                else
+                {
+                    IList<IPackage> installedPackageVersions = new List<IPackage>();
+                    if (string.IsNullOrWhiteSpace(configuration.Version))
+                    {
+                        installedPackageVersions = packageManager.LocalRepository.FindPackagesById(packageName).OrderBy((p) => p.Version).ToList();
+                    }
+                    else
+                    {
+                        IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+                        if (installedPackage != null) installedPackageVersions.Add(installedPackage);
+                    }
+
+                    if (installedPackageVersions.Count == 0)
+                    {
+                        string logMessage = "{0} is not installed. Cannot uninstall a non-existent package.".format_with(packageName);
+                        var results = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                        results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+
+                        if (configuration.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                        continue;
+                    }
+
+                    var packageVersionsToRemove = installedPackageVersions.ToList();
+                    if (installedPackageVersions.Count != 1 && !configuration.AllVersions)
+                    {
+                        packageVersionsToRemove.Clear();
+                        this.Log().Info(ChocolateyLoggers.Important, "Which version of {0} would you like to uninstall?".format_with(packageName));
+
+                        int counter = 1;
+                        IDictionary<int, IPackage> choices = new Dictionary<int, IPackage>();
+                        foreach (var installedVersion in installedPackageVersions.or_empty_list_if_null())
+                        {
+                            choices.Add(counter, installedVersion);
+                            this.Log().Info("{0}) {1}".format_with(counter, installedVersion.Version.to_string()));
+
+                            counter++;
+                        }
+
+                        this.Log().Info("{0}) All versions".format_with(counter));
+                        var selection = Console.ReadLine();
+
+                        int selected = -1;
+                        if (!int.TryParse(selection, out selected) || selected <= 0 || selected > counter)
+                        {
+                            string logMessage = "{0} was not a valid selection.".format_with(selection);
+                            var results = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                            results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+
+                            if (configuration.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                            continue;
+                        }
+
+
+                        if (selection == counter.to_string())
+                        {
+                            packageVersionsToRemove = installedPackageVersions.ToList();
+                            if (configuration.RegularOuptut) this.Log().Info(() => "You selected to remove all versions of {0}".format_with(packageName));
+                        }
+                        else
+                        {
+                            packageVersionsToRemove.Add(choices[selected]);
+                            if (configuration.RegularOuptut) this.Log().Info(() => "You selected {0} v{1}".format_with(choices[selected].Id, choices[selected].Version.to_string()));
+                        }
+                    }
+
+
+                    foreach (var packageVersion in packageVersionsToRemove)
+                    {
+                        if (performAction)
+                        {
+                            using (packageManager.SourceRepository.StartOperation(
+                                RepositoryOperationNames.Install,
+                                packageName,
+                                version == null ? null : version.ToString()))
+                            {
+                                packageManager.UninstallPackage(packageVersion, forceRemove: configuration.Force, removeDependencies: configuration.ForceDependencies);
+                            }
+                        }
+                        else
+                        {
+                            packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, ApplicationParameters.PackagesLocation));
+                        }
+                    }
+                }
+            }
+
+            return packageUninstalls;
+        }
+
+        private void set_package_names_if_all_is_specified(ChocolateyConfiguration configuration, Action customAction)
+        {
+            if (configuration.PackageNames.is_equal_to("all"))
+            {
+                configuration.LocalOnly = true;
+                var sources = configuration.Source;
+                configuration.Source = ApplicationParameters.PackagesLocation;
+                var localPackages = list_run(configuration, logResults: false);
+                configuration.Source = sources;
+                configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator, localPackages.Select((p) => p.Key).or_empty_list_if_null());
+
+                if (customAction != null) customAction.Invoke();
+            }
         }
     }
 }

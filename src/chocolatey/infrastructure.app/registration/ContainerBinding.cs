@@ -37,6 +37,7 @@
             container.Register<INugetService, NugetService>(Lifestyle.Singleton);
             container.Register<IPowershellService, PowershellService>(Lifestyle.Singleton);
             container.Register<IShimGenerationService, ShimGenerationService>(Lifestyle.Singleton);
+            container.Register<IRegistryService,RegistryService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);
 
             //todo:refactor - this should be autowired
@@ -44,13 +45,13 @@
                 {
                     var list = new List<ICommand>
                         {
+                            new ChocolateyListCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyInstallCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyUpgradeCommand(container.GetInstance<IChocolateyPackageService>()),
-                            new ChocolateyListCommand(container.GetInstance<IChocolateyPackageService>()),
+                            new ChocolateyUninstallCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyPackCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>())
                         };
-
                     return list.AsReadOnly();
                 }, Lifestyle.Singleton);
 

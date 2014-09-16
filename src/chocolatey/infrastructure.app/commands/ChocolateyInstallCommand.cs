@@ -54,6 +54,9 @@
                 .Add("forcedependencies|force-dependencies",
                      "ForceDependencies - Force dependencies to be reinstalled when force installing package(s). Must be used in conjunction with --force. Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
+                .Add("skippowershell|skip-powershell",
+                     "Skip Powershell - Do not run chocolateyInstall.ps1. Defaults to false.",
+                     option => configuration.SkipPackageInstallProvider = option != null)
                 ;
         }
 

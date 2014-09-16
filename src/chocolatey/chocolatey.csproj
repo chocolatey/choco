@@ -77,6 +77,7 @@
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPackCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyUninstallCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommand.cs" />
     <Compile Include="infrastructure.app\domain\IInstaller.cs" />
     <Compile Include="infrastructure.app\domain\InnoSetupInstaller.cs" />
