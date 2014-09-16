@@ -78,6 +78,12 @@
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPackCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommand.cs" />
+    <Compile Include="infrastructure.app\domain\IInstaller.cs" />
+    <Compile Include="infrastructure.app\domain\InnoSetupInstaller.cs" />
+    <Compile Include="infrastructure.app\domain\InstallShieldInstaller.cs" />
+    <Compile Include="infrastructure.app\domain\InstallerType.cs" />
+    <Compile Include="infrastructure.app\domain\MsiInstaller.cs" />
+    <Compile Include="infrastructure.app\domain\NsisInstaller.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyLocalPackageRepository.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyNugetLogger.cs" />
     <Compile Include="infrastructure.app\messages\PreRunEvent.cs" />
