@@ -2,9 +2,11 @@
 {
     using System;
     using System.IO;
+    using System.Text;
     using System.Xml;
     using System.Xml.Serialization;
     using filesystem;
+    using log4net.Util;
 
     /// <summary>
     ///   XML interaction
@@ -35,6 +37,35 @@
             catch (Exception ex)
             {
                 this.Log().Error("Error deserializing response of type {0}:{1}{2}", typeof (XmlType), Environment.NewLine, ex.ToString());
+                throw;
+            }
+        }
+
+        public void serialize<XmlType>(XmlType xmlType, string xmlFilePath)
+        {
+            _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(xmlFilePath));
+            try
+            {
+                if (_fileSystem.file_exists(xmlFilePath))
+                {
+                    _fileSystem.delete_file(xmlFilePath);
+                }
+
+                var xmlSerializer = new XmlSerializer(typeof(XmlType));
+                var textWriter = new StreamWriter(xmlFilePath,append:false,encoding:Encoding.UTF8)
+                    {
+                        AutoFlush = true
+                    };
+
+                xmlSerializer.Serialize(textWriter, xmlType);
+                textWriter.Flush();
+
+                textWriter.Close();
+                textWriter.Dispose();
+            }
+            catch (Exception ex)
+            {
+                this.Log().Error("Error serializing type {0}:{1}{2}", typeof (XmlType), Environment.NewLine, configuration.Config.get_configuration_settings().Debug ? ex.ToString() : ex.Message);
                 throw;
             }
         }

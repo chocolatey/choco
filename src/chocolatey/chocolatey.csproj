@@ -84,6 +84,7 @@
     <Compile Include="infrastructure.app\domain\InstallerType.cs" />
     <Compile Include="infrastructure.app\domain\MsiInstaller.cs" />
     <Compile Include="infrastructure.app\domain\NsisInstaller.cs" />
+    <Compile Include="infrastructure.app\domain\RegistryApplicationKey.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyLocalPackageRepository.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyNugetLogger.cs" />
     <Compile Include="infrastructure.app\messages\PreRunEvent.cs" />
@@ -99,9 +100,12 @@
     <Compile Include="infrastructure.app\services\IChocolateyPackageService.cs" />
     <Compile Include="infrastructure.app\services\INugetService.cs" />
     <Compile Include="infrastructure.app\services\IPowershellService.cs" />
+    <Compile Include="infrastructure.app\services\IRegistryService.cs" />
     <Compile Include="infrastructure.app\services\IShimGenerationService.cs" />
     <Compile Include="infrastructure.app\services\NugetService.cs" />
     <Compile Include="infrastructure.app\services\PowershellService.cs" />
+    <Compile Include="infrastructure.app\domain\RegistryInstallSnapshot.cs" />
+    <Compile Include="infrastructure.app\services\RegistryService.cs" />
     <Compile Include="infrastructure.app\services\ShimGenerationService.cs" />
     <Compile Include="infrastructure.app\services\WebPiService.cs" />
     <Compile Include="infrastructure\commands\PowershellExecutor.cs" />
