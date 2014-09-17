@@ -84,6 +84,7 @@
     <Compile Include="infrastructure.app\domain\InnoSetupInstaller.cs" />
     <Compile Include="infrastructure.app\domain\InstallShieldInstaller.cs" />
     <Compile Include="infrastructure.app\domain\InstallerType.cs" />
+    <Compile Include="infrastructure.app\domain\InstallTokens.cs" />
     <Compile Include="infrastructure.app\domain\MsiInstaller.cs" />
     <Compile Include="infrastructure.app\domain\NsisInstaller.cs" />
     <Compile Include="infrastructure.app\domain\RegistryApplicationKey.cs" />
