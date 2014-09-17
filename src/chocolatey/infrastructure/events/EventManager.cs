@@ -1,7 +1,7 @@
 ﻿namespace chocolatey.infrastructure.events
 {
     using System;
-    using chocolatey.infrastructure.services;
+    using services;
 
     public static class EventManager
     {

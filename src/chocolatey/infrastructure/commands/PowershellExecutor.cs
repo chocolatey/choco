@@ -5,7 +5,6 @@
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
-    using app;
     using filesystem;
 
     public sealed class PowershellExecutor

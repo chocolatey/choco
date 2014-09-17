@@ -153,16 +153,20 @@
                     appKey.InstallerType = InstallerType.Custom;
                 }
 
-                //if (appKey.InstallerType == InstallerType.Unknown)
+                //if (appKey.InstallerType == InstallerType.Msi)
                 //{
-                //    Console.WriteLine("");
-                //    Console.WriteLine(appKey.to_string());
-                //    foreach (var name in key.GetValueNames())
-                //    {
-                //        var kind = key.GetValueKind(name);
-                //        var value = key.GetValue(name);
-                //        Console.WriteLine("key - {0}, name - {1}, kind - {2}, value - {3}".format_with(key.Name, name, kind, value.to_string()));
-                //    }
+                //Console.WriteLine("");
+                //if (!string.IsNullOrWhiteSpace(appKey.UninstallString))
+                //{
+                //    Console.WriteLine(appKey.UninstallString.to_string().Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+                //    key.UninstallString.to_string().Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries);
+                //}
+                //foreach (var name in key.GetValueNames())
+                //{
+                //    var kind = key.GetValueKind(name);
+                //    var value = key.GetValue(name);
+                //    Console.WriteLine("key - {0}, name - {1}, kind - {2}, value - {3}".format_with(key.Name, name, kind, value.to_string()));
+                //}
                 //}
 
                 snapshot.RegistryKeys.Add(appKey);
