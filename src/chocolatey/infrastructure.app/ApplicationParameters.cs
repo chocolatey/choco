@@ -6,7 +6,7 @@ namespace chocolatey.infrastructure.app
     using filesystem;
 
     /// <summary>
-    /// Application constants and settings for the application
+    ///   Application constants and settings for the application
     /// </summary>
     public static class ApplicationParameters
     {
@@ -31,7 +31,7 @@ namespace chocolatey.infrastructure.app
         public static class Tools
         {
             //public static readonly string WebPiCmdExe = _fileSystem.combine_paths(InstallLocation, "nuget.exe");
-            public static readonly string ShimGenExe = _fileSystem.combine_paths(InstallLocation,"tools", "shimgen.exe");
+            public static readonly string ShimGenExe = _fileSystem.combine_paths(InstallLocation, "tools", "shimgen.exe");
         }
 
         public static class OutputParser
