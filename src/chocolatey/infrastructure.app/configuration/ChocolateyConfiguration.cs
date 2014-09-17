@@ -53,6 +53,7 @@ namespace chocolatey.infrastructure.app.configuration
 
         // list
         public bool LocalOnly { get; set; }
+        public bool IncludeRegistryPrograms { get; set; }
 
         // configuration set variables
         public bool UseNugetForSources { get; set; }
