@@ -34,6 +34,12 @@ namespace chocolatey.infrastructure.app
             public static readonly string ShimGenExe = _fileSystem.combine_paths(InstallLocation, "tools", "shimgen.exe");
         }
 
+        public static class Messages
+        {
+            public static readonly string ContinueChocolateyAction = "Moving forward with chocolatey actions.";
+            public static readonly string NugetEventActionHeader = "Nuget called an event";
+        }
+
         public static class OutputParser
         {
             //todo: This becomes the WebPI parsing stuff instead
