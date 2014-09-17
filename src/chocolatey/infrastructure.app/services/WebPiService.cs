@@ -68,57 +68,57 @@
                 var exitCode = CommandExecutor.execute(
                     _webPiExePath, argsForPackage, true,
                     (s, e) =>
-                    {
-                        var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Debug(() => " [WebPI] {0}".format_with(logMessage));
-
-                        var packageName = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageName, ApplicationParameters.OutputParser.Nuget.PACKAGE_NAME_GROUP);
-                        var packageVersion = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageVersion, ApplicationParameters.OutputParser.Nuget.PACKAGE_VERSION_GROUP);
-
-                        if (ApplicationParameters.OutputParser.Nuget.ResolvingDependency.IsMatch(logMessage))
                         {
-                            return;
-                        }
+                            var logMessage = e.Data;
+                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            this.Log().Debug(() => " [WebPI] {0}".format_with(logMessage));
 
-                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, packageVersion, _webPiInstallArguments["_output_directory_"].ArgumentValue));
+                            var packageName = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageName, ApplicationParameters.OutputParser.Nuget.PACKAGE_NAME_GROUP);
+                            var packageVersion = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageVersion, ApplicationParameters.OutputParser.Nuget.PACKAGE_VERSION_GROUP);
 
-                        if (ApplicationParameters.OutputParser.Nuget.NotInstalled.IsMatch(logMessage))
-                        {
-                            this.Log().Error("{0} not installed: {1}".format_with(packageName, logMessage));
-                            results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            if (ApplicationParameters.OutputParser.Nuget.ResolvingDependency.IsMatch(logMessage))
+                            {
+                                return;
+                            }
 
-                            return;
-                        }
+                            var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, packageVersion, _webPiInstallArguments["_output_directory_"].ArgumentValue));
 
-                        if (ApplicationParameters.OutputParser.Nuget.Installing.IsMatch(logMessage))
-                        {
-                            return;
-                        }
+                            if (ApplicationParameters.OutputParser.Nuget.NotInstalled.IsMatch(logMessage))
+                            {
+                                this.Log().Error("{0} not installed: {1}".format_with(packageName, logMessage));
+                                results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                        if (string.IsNullOrWhiteSpace(packageName)) return;
+                                return;
+                            }
 
-                        this.Log().Info(ChocolateyLoggers.Important, "{0} {1}".format_with(packageName, !string.IsNullOrWhiteSpace(packageVersion) ? "v" + packageVersion : string.Empty));
+                            if (ApplicationParameters.OutputParser.Nuget.Installing.IsMatch(logMessage))
+                            {
+                                return;
+                            }
 
-                        if (ApplicationParameters.OutputParser.Nuget.AlreadyInstalled.IsMatch(logMessage) && !configuration.Force)
-                        {
-                            results.Messages.Add(new ResultMessage(ResultType.Inconclusive, packageName));
-                            this.Log().Warn(" Already installed.");
-                            this.Log().Warn(ChocolateyLoggers.Important, " Use -force if you want to reinstall.".format_with(Environment.NewLine));
-                            return;
-                        }
+                            if (string.IsNullOrWhiteSpace(packageName)) return;
 
-                        results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of install."));
-                        if (continueAction != null)
-                        {
-                            continueAction.Invoke(results);
-                        }
-                    },
+                            this.Log().Info(ChocolateyLoggers.Important, "{0} {1}".format_with(packageName, !string.IsNullOrWhiteSpace(packageVersion) ? "v" + packageVersion : string.Empty));
+
+                            if (ApplicationParameters.OutputParser.Nuget.AlreadyInstalled.IsMatch(logMessage) && !configuration.Force)
+                            {
+                                results.Messages.Add(new ResultMessage(ResultType.Inconclusive, packageName));
+                                this.Log().Warn(" Already installed.");
+                                this.Log().Warn(ChocolateyLoggers.Important, " Use -force if you want to reinstall.".format_with(Environment.NewLine));
+                                return;
+                            }
+
+                            results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+                            if (continueAction != null)
+                            {
+                                continueAction.Invoke(results);
+                            }
+                        },
                     (s, e) =>
-                    {
-                        if (string.IsNullOrWhiteSpace(e.Data)) return;
-                        this.Log().Error(() => "{0}".format_with(e.Data));
-                    }
+                        {
+                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            this.Log().Error(() => "{0}".format_with(e.Data));
+                        }
                     );
 
                 if (exitCode != 0)
