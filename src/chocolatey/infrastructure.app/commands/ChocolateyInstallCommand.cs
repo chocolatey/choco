@@ -59,6 +59,8 @@
                      "Skip Powershell - Do not run chocolateyInstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 ;
+
+            //todo: Checksum / ChecksumType defaults to md5 / package name can be a url / installertype
         }
 
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
