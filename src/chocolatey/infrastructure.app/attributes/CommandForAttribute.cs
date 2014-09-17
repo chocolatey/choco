@@ -1,7 +1,7 @@
 ﻿namespace chocolatey.infrastructure.app.attributes
 {
     using System;
-    using commands;
+    using domain;
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class CommandForAttribute : Attribute

@@ -3,8 +3,8 @@
     using System;
     using System.IO;
     using System.Linq;
-    using commands;
     using configuration;
+    using domain;
     using filesystem;
     using infrastructure.commands;
     using logging;

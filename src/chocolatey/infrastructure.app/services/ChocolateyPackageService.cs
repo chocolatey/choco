@@ -6,9 +6,10 @@
     using System.Linq;
     using System.Text;
     using System.Threading;
-    using commands;
     using configuration;
+    using domain;
     using filesystem;
+    using infrastructure.commands;
     using logging;
     using results;
 

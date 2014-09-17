@@ -4,6 +4,7 @@
     using attributes;
     using commandline;
     using configuration;
+    using domain;
     using infrastructure.commands;
     using logging;
     using services;

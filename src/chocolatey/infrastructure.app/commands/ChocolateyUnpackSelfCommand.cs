@@ -5,6 +5,7 @@
     using attributes;
     using commandline;
     using configuration;
+    using domain;
     using extractors;
     using filesystem;
     using infrastructure.commands;

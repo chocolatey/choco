@@ -10,7 +10,7 @@
     using domain;
     using filesystem;
     using infrastructure.services;
-    using RegistryKey = Microsoft.Win32.RegistryKey;
+    using Registry = domain.Registry;
 
     /// <summary>
     ///   Allows comparing registry
@@ -26,9 +26,9 @@
             _fileSystem = fileSystem;
         }
 
-        public RegistryInstallSnapshot get_installer_keys_snapshot()
+        public Registry get_installer_keys()
         {
-            var snapshot = new RegistryInstallSnapshot();
+            var snapshot = new Registry();
             var windowsIdentity = WindowsIdentity.GetCurrent();
             if (windowsIdentity != null) snapshot.User = windowsIdentity.User.to_string();
 
@@ -172,25 +172,25 @@
             key.Dispose();
         }
 
-        public RegistryInstallSnapshot get_snapshot_differences(RegistryInstallSnapshot before, RegistryInstallSnapshot after)
+        public Registry get_differences(Registry before, Registry after)
         {
             //var difference = after.RegistryKeys.Where(r => !before.RegistryKeys.Contains(r)).ToList();
-            return new RegistryInstallSnapshot(after.User,after.RegistryKeys.Except(before.RegistryKeys).ToList());
+            return new Registry(after.User, after.RegistryKeys.Except(before.RegistryKeys).ToList());
         }
 
-        public void save_to_file(RegistryInstallSnapshot snapshot,string filePath)
+        public void save_to_file(Registry snapshot, string filePath)
         {
             _xmlService.serialize(snapshot, filePath);
         }
 
-        public RegistryInstallSnapshot read_from_file(string filePath)
+        public Registry read_from_file(string filePath)
         {
             if (!_fileSystem.file_exists(filePath))
             {
                 return null;
             }
 
-            return _xmlService.deserialize<RegistryInstallSnapshot>(filePath);
+            return _xmlService.deserialize<Registry>(filePath);
         }
     }
 }

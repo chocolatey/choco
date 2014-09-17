@@ -1,4 +1,4 @@
-﻿namespace chocolatey.infrastructure.app.commands
+﻿namespace chocolatey.infrastructure.app.domain
 {
     using System.ComponentModel;
 
@@ -14,9 +14,7 @@
         [Description("sources - view and configure default sources")] sources,
         [Description("config - view and change configuration")] config,
         [Description("unpackself - have chocolatey set it self up")] unpackself,
-        [Description("pack - packages up a nuspec to a compiled nupkg")]
-        pack,
-        [Description("push - pushes a compiled nupkg")]
-        push,
+        [Description("pack - packages up a nuspec to a compiled nupkg")] pack,
+        [Description("push - pushes a compiled nupkg")] push,
     }
 }

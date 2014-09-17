@@ -5,8 +5,8 @@
     using System.Linq;
     using System.Reflection;
     using System.Text;
-    using commands;
     using configuration;
+    using domain;
     using extractors;
     using filesystem;
     using information;

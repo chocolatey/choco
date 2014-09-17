@@ -105,7 +105,7 @@
     <Compile Include="infrastructure.app\services\IShimGenerationService.cs" />
     <Compile Include="infrastructure.app\services\NugetService.cs" />
     <Compile Include="infrastructure.app\services\PowershellService.cs" />
-    <Compile Include="infrastructure.app\domain\RegistryInstallSnapshot.cs" />
+    <Compile Include="infrastructure.app\domain\Registry.cs" />
     <Compile Include="infrastructure.app\services\RegistryService.cs" />
     <Compile Include="infrastructure.app\services\ShimGenerationService.cs" />
     <Compile Include="infrastructure.app\services\WebPiService.cs" />
@@ -117,13 +117,13 @@
     <Compile Include="infrastructure.app\ApplicationParameters.cs" />
     <Compile Include="infrastructure.app\builders\ExternalCommandArgsBuilder.cs" />
     <Compile Include="infrastructure.app\builders\ExternalCommandArgument.cs" />
-    <Compile Include="infrastructure.app\configuration\SpecialSourceTypes.cs" />
+    <Compile Include="infrastructure.app\domain\SpecialSourceType.cs" />
     <Compile Include="infrastructure.app\extractors\AssemblyFileExtractor.cs" />
     <Compile Include="infrastructure.app\builders\ConfigurationBuilder.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUnpackSelfCommand.cs" />
     <Compile Include="infrastructure.app\attributes\CommandForAttribute.cs" />
-    <Compile Include="infrastructure.app\commands\CommandNameType.cs" />
+    <Compile Include="infrastructure.app\domain\CommandNameType.cs" />
     <Compile Include="infrastructure\events\EventManager.cs" />
     <Compile Include="infrastructure\events\IEvent.cs" />
     <Compile Include="infrastructure\registration\SimpleInjectorContainer.cs" />
