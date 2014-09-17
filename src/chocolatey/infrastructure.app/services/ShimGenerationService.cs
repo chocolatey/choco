@@ -93,7 +93,20 @@
                     this.Log().Debug(() => "  Created: {0}{1}  Targeting: {2}{1}  IsGui:{3}{1}".format_with(shimLocation, Environment.NewLine, file, isGui));
                 }
             }
+        }
 
+        public void uninstall(ChocolateyConfiguration configuration, PackageResult packageResult)
+        {
+            //gather all .exes in the folder 
+            var exeFiles = _fileSystem.get_files(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
+            foreach (string file in exeFiles)
+            {
+                if (_fileSystem.file_exists(file + ".ignore")) continue;
+
+                var shimLocation = _fileSystem.combine_paths(ApplicationParameters.ShimsLocation, _fileSystem.get_file_name(file));
+                this.Log().Debug(() => "Removing shim for {0} at '{1}".format_with(_fileSystem.get_file_name(file), shimLocation));
+                _fileSystem.delete_file(shimLocation);
+            }
         }
     }
 }
