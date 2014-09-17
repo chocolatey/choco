@@ -31,6 +31,11 @@ namespace chocolatey.infrastructure.results
         Inconclusive,
 
         /// <summary>
+        ///   These are warnings
+        /// </summary>
+        Warn,
+
+        /// <summary>
         ///   These are errors
         /// </summary>
         Error,
