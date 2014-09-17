@@ -143,7 +143,8 @@
         /// <param name="sourceFileName">Where is the file now?</param>
         /// <param name="destinationFileName">Where would you like it to go?</param>
         /// <param name="overwriteTheExistingFile">If there is an existing file already there, would you like to delete it?</param>
-        void copy_file_unsafe(string sourceFileName, string destinationFileName, bool overwriteTheExistingFile);
+        /// <returns>true if copy was successful, otherwise false</returns>
+        bool copy_file_unsafe(string sourceFileName, string destinationFileName, bool overwriteTheExistingFile);
 
         /// <summary>
         ///   Deletes the specified file.

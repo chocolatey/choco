@@ -90,7 +90,7 @@
                 properties["version"] = configuration.Version;
             }
 
-            //// Initialize the property provider based on what was passed in using the properties flag
+            // Initialize the property provider based on what was passed in using the properties flag
             var propertyProvider = new DictionaryPropertyProvider(properties);
 
             var builder = new PackageBuilder(nuspecFilePath, propertyProvider, includeEmptyDirectories: true);

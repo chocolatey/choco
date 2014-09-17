@@ -128,15 +128,29 @@
             File.Copy(sourceFilePath, destFilePath, overWriteExisting);
         }
 
-        public void copy_file_unsafe(string sourceFileName, string destinationFileName, bool overwriteTheExistingFile)
+        public bool copy_file_unsafe(string sourceFileName, string destinationFileName, bool overwriteTheExistingFile)
         {
             this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFileName, destinationFileName));
             //Private Declare Function apiCopyFile Lib "kernel32" Alias "CopyFileA" _
             int success = CopyFileA(sourceFileName, destinationFileName, overwriteTheExistingFile ? 0 : 1);
+            return success == 0;
         }
 
+        // ReSharper disable InconsistentNaming
+
+        // http://msdn.microsoft.com/en-us/library/windows/desktop/aa363851.aspx
+        // http://www.pinvoke.net/default.aspx/kernel32.copyfile
+        /*
+            BOOL WINAPI CopyFile(
+              _In_  LPCTSTR lpExistingFileName,
+              _In_  LPCTSTR lpNewFileName,
+              _In_  BOOL bFailIfExists
+            );
+         */
         [DllImport("kernel32")]
         private static extern int CopyFileA(string lpExistingFileName, string lpNewFileName, int bFailIfExists);
+
+        // ReSharper restore InconsistentNaming
 
         public void delete_file(string filePath)
         {
