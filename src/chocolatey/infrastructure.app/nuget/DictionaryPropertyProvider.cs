@@ -24,6 +24,6 @@
             return null;
         }
     }
-    
+
     // ReSharper restore InconsistentNaming
 }

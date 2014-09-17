@@ -33,6 +33,6 @@ namespace chocolatey.infrastructure.results
         /// <summary>
         ///   These are errors
         /// </summary>
-        Error
+        Error,
     }
 }

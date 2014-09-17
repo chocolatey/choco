@@ -4,7 +4,7 @@
     using System.Reflection;
 
     /// <summary>
-    /// Extensions for Assembly
+    ///   Extensions for Assembly
     /// </summary>
     public static class AssemblyExtensions
     {

@@ -9,27 +9,25 @@
     using infrastructure.commands;
     using logging;
     using results;
-    
+
     public interface IWebPiService
     {
-
     }
 
     public class WebPiService : IWebPiService
     {
-
         private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
         private readonly string _webPiExePath = "webpicmd"; //ApplicationParameters.Tools.NugetExe;
         private readonly IDictionary<string, ExternalCommandArgument> _webPiListArguments = new Dictionary<string, ExternalCommandArgument>();
         private readonly IDictionary<string, ExternalCommandArgument> _webPiInstallArguments = new Dictionary<string, ExternalCommandArgument>();
-        
+
         public WebPiService()
         {
             set_cmd_args_dictionaries();
         }
 
         /// <summary>
-        /// Set any command arguments dictionaries necessary for the service
+        ///   Set any command arguments dictionaries necessary for the service
         /// </summary>
         private void set_cmd_args_dictionaries()
         {
@@ -38,24 +36,24 @@
         }
 
         /// <summary>
-        /// Sets webpicmd install dictionary
+        ///   Sets webpicmd install dictionary
         /// </summary>
         private void set_webpi_install_dictionary()
         {
-            _webPiInstallArguments.Add("_install_", new ExternalCommandArgument { ArgumentOption = "install", Required = true });
-            _webPiInstallArguments.Add("_package_name_", new ExternalCommandArgument { ArgumentOption = PACKAGE_NAME_TOKEN, Required = true });
-            _webPiInstallArguments.Add("Version", new ExternalCommandArgument { ArgumentOption = "-version ", });
+            _webPiInstallArguments.Add("_install_", new ExternalCommandArgument {ArgumentOption = "install", Required = true});
+            _webPiInstallArguments.Add("_package_name_", new ExternalCommandArgument {ArgumentOption = PACKAGE_NAME_TOKEN, Required = true});
+            _webPiInstallArguments.Add("Version", new ExternalCommandArgument {ArgumentOption = "-version ",});
             _webPiInstallArguments.Add("_output_directory_", new ExternalCommandArgument
-            {
-                ArgumentOption = "-outputdirectory ",
-                ArgumentValue = "{0}".format_with(ApplicationParameters.PackagesLocation),
-                QuoteValue = true,
-                Required = true
-            });
-            _webPiInstallArguments.Add("Source", new ExternalCommandArgument { ArgumentOption = "-source ", QuoteValue = true });
-            _webPiInstallArguments.Add("Prerelease", new ExternalCommandArgument { ArgumentOption = "-prerelease" });
-            _webPiInstallArguments.Add("_non_interactive_", new ExternalCommandArgument { ArgumentOption = "-noninteractive", Required = true });
-            _webPiInstallArguments.Add("_no_cache_", new ExternalCommandArgument { ArgumentOption = "-nocache", Required = true });
+                {
+                    ArgumentOption = "-outputdirectory ",
+                    ArgumentValue = "{0}".format_with(ApplicationParameters.PackagesLocation),
+                    QuoteValue = true,
+                    Required = true
+                });
+            _webPiInstallArguments.Add("Source", new ExternalCommandArgument {ArgumentOption = "-source ", QuoteValue = true});
+            _webPiInstallArguments.Add("Prerelease", new ExternalCommandArgument {ArgumentOption = "-prerelease"});
+            _webPiInstallArguments.Add("_non_interactive_", new ExternalCommandArgument {ArgumentOption = "-noninteractive", Required = true});
+            _webPiInstallArguments.Add("_no_cache_", new ExternalCommandArgument {ArgumentOption = "-nocache", Required = true});
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
@@ -64,7 +62,7 @@
 
             var args = ExternalCommandArgsBuilder.build_arguments(configuration, _webPiInstallArguments);
 
-            foreach (var packageToInstall in configuration.PackageNames.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var packageToInstall in configuration.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
             {
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
                 var exitCode = CommandExecutor.execute(
@@ -127,7 +125,7 @@
                 {
                     Environment.ExitCode = exitCode;
                 }
-            } 
+            }
             return packageInstalls;
         }
 

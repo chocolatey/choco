@@ -1,12 +1,12 @@
 ﻿namespace chocolatey
 {
     /// <summary>
-    /// Extensions for Object
+    ///   Extensions for Object
     /// </summary>
     public static class ObjectExtensions
     {
         /// <summary>
-        /// A null safe variant of ToString().
+        ///   A null safe variant of ToString().
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns>String.Empty if input is null, otherwise input.ToString()</returns>

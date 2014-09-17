@@ -22,9 +22,19 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Returns a distinct set of elements using the comparer specified. This implementation will pick the last occurrence
-        /// of each element instead of picking the first. This method assumes that similar items occur in order.
-        /// </summary>        
+        ///   Joins the specified IEnumerables.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <returns></returns>
+        public static string join(this IEnumerable<string> source, string separator)
+        {
+            return string.Join(separator, source);
+        }
+
+        /// <summary>
+        ///   Returns a distinct set of elements using the comparer specified. This implementation will pick the last occurrence
+        ///   of each element instead of picking the first. This method assumes that similar items occur in order.
+        /// </summary>
         public static IEnumerable<T> distinct_last<T>(this IEnumerable<T> source, IEqualityComparer<T> equalityComparer, IComparer<T> comparer)
         {
             bool first = true;

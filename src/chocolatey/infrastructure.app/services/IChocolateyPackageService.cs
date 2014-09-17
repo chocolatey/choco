@@ -5,7 +5,7 @@
     using results;
 
     /// <summary>
-    /// The packaging service
+    ///   The packaging service
     /// </summary>
     public interface IChocolateyPackageService
     {
@@ -24,13 +24,13 @@
         void list_run(ChocolateyConfiguration configuration, bool logResults);
 
         /// <summary>
-        /// Run pack in noop mode
+        ///   Run pack in noop mode
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         void pack_noop(ChocolateyConfiguration configuration);
 
         /// <summary>
-        /// Compiles a package
+        ///   Compiles a package
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         void pack_run(ChocolateyConfiguration configuration);
@@ -46,8 +46,8 @@
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <returns>results of installs</returns>
-        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration);   
-        
+        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration);
+
         /// <summary>
         ///   Run upgrade in noop mode
         /// </summary>
@@ -59,8 +59,8 @@
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <returns>results of upgrades</returns>
-        ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration configuration);   
-        
+        ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration configuration);
+
         /// <summary>
         ///   Run uninstall in noop mode
         /// </summary>

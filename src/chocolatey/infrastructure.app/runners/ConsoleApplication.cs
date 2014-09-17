@@ -80,7 +80,7 @@
                     {
                         this.Log().Info("_ {0}:{1} - Noop Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
                     }
-                    
+
                     command.noop(config);
                 }
                 else

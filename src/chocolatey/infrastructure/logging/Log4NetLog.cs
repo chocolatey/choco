@@ -6,7 +6,7 @@ namespace chocolatey.infrastructure.logging
 {
     using System;
     using log4net;
-    
+
     // ReSharper disable InconsistentNaming
 
     /// <summary>

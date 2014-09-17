@@ -13,12 +13,12 @@
     using RegistryKey = Microsoft.Win32.RegistryKey;
 
     /// <summary>
-    /// Allows comparing registry
+    ///   Allows comparing registry
     /// </summary>
     public class RegistryService : IRegistryService
     {
-        private IXmlService _xmlService;
-        private IFileSystem _fileSystem;
+        private readonly IXmlService _xmlService;
+        private readonly IFileSystem _fileSystem;
 
         public RegistryService(IXmlService xmlService, IFileSystem fileSystem)
         {
@@ -66,13 +66,12 @@
         }
 
         /// <summary>
-        /// Evaluates registry keys and updates the snapshop with items
+        ///   Evaluates registry keys and updates the snapshop with items
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="snapshot">The snapshot.</param>
-        public void evaluate_keys(RegistryKey key, RegistryInstallSnapshot snapshot)
+        public void evaluate_keys(RegistryKey key, Registry snapshot)
         {
-
             foreach (var subKeyName in key.GetSubKeyNames())
             {
                 evaluate_keys(key.OpenSubKey(subKeyName), snapshot);
@@ -93,7 +92,6 @@
 
             if (!string.IsNullOrWhiteSpace(appKey.DisplayName))
             {
-
                 appKey.InstallLocation = key.GetValue("InstallLocation").to_string();
                 appKey.UninstallString = key.GetValue("UninstallString").to_string();
                 if (key.GetValue("QuietUninstallString") != null)

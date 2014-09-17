@@ -28,7 +28,7 @@
         string get_full_path(string path);
 
         /// <summary>
-        /// Gets the path to the temporary folder for the current user.
+        ///   Gets the path to the temporary folder for the current user.
         /// </summary>
         string get_temp_path();
 
@@ -199,7 +199,7 @@
         #region Directory
 
         /// <summary>
-        /// Gets the current working directory of the application.
+        ///   Gets the current working directory of the application.
         /// </summary>
         /// <returns></returns>
         string get_current_directory();
@@ -259,6 +259,5 @@
         void delete_directory(string directoryPath, bool recursive);
 
         #endregion
- 
     }
 }

@@ -34,5 +34,4 @@
     }
 
     // ReSharper restore InconsistentNaming
-
 }

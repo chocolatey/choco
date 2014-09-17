@@ -6,7 +6,7 @@
     public interface IShimGenerationService
     {
         /// <summary>
-        /// Installs shimgens for the package
+        ///   Installs shimgens for the package
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="packageResult">The package result.</param>

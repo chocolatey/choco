@@ -5,7 +5,7 @@
     using System.Xml.Serialization;
 
     /// <summary>
-    /// XML configuration file
+    ///   XML configuration file
     /// </summary>
     [Serializable]
     [XmlRoot("chocolatey")]

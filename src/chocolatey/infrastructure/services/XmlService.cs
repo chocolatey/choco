@@ -5,8 +5,8 @@
     using System.Text;
     using System.Xml;
     using System.Xml.Serialization;
+    using configuration;
     using filesystem;
-    using log4net.Util;
 
     /// <summary>
     ///   XML interaction
@@ -51,8 +51,8 @@
                     _fileSystem.delete_file(xmlFilePath);
                 }
 
-                var xmlSerializer = new XmlSerializer(typeof(XmlType));
-                var textWriter = new StreamWriter(xmlFilePath,append:false,encoding:Encoding.UTF8)
+                var xmlSerializer = new XmlSerializer(typeof (XmlType));
+                var textWriter = new StreamWriter(xmlFilePath, append: false, encoding: Encoding.UTF8)
                     {
                         AutoFlush = true
                     };
@@ -65,7 +65,7 @@
             }
             catch (Exception ex)
             {
-                this.Log().Error("Error serializing type {0}:{1}{2}", typeof (XmlType), Environment.NewLine, configuration.Config.get_configuration_settings().Debug ? ex.ToString() : ex.Message);
+                this.Log().Error("Error serializing type {0}:{1}{2}", typeof (XmlType), Environment.NewLine, Config.get_configuration_settings().Debug ? ex.ToString() : ex.Message);
                 throw;
             }
         }

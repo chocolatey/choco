@@ -6,7 +6,7 @@
     using configuration;
 
     /// <summary>
-    /// Responsible for setting up arguments for an external command to be executed
+    ///   Responsible for setting up arguments for an external command to be executed
     /// </summary>
     public static class ExternalCommandArgsBuilder
     {

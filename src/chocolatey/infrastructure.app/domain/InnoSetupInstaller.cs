@@ -3,7 +3,7 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// InnoSetup Installer Options
+    ///   InnoSetup Installer Options
     /// </summary>
     /// <remarks>
     ///   http://www.jrsoftware.org/ishelp/index.php?topic=setupcmdline

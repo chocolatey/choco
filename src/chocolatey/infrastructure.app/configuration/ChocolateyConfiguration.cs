@@ -5,7 +5,7 @@ namespace chocolatey.infrastructure.app.configuration
     using platforms;
 
     /// <summary>
-    /// The chocolatey configuration.
+    ///   The chocolatey configuration.
     /// </summary>
     public sealed partial class ChocolateyConfiguration
     {
@@ -71,6 +71,7 @@ namespace chocolatey.infrastructure.app.configuration
         ///   Space separated package names.
         /// </value>
         public string PackageNames { get; set; }
+
         public bool Prerelease { get; set; }
         public bool ForceX86 { get; set; }
         public string InstallArguments { get; set; }
@@ -80,6 +81,5 @@ namespace chocolatey.infrastructure.app.configuration
         public bool IgnoreDependencies { get; set; }
         public bool AllowMultipleVersions { get; set; }
         public bool ForceDependencies { get; set; }
-
     }
 }

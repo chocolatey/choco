@@ -3,12 +3,12 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// NSIS Installer Options
+    ///   NSIS Installer Options
     /// </summary>
     /// <remarks>
     ///   http://nsis.sourceforge.net/Docs/Chapter3.html#installerusage
-    /// It is impossible to look at registry and determine a NSIS installer
-    /// NSIS has no logging or language options. The command line usage is very little.
+    ///   It is impossible to look at registry and determine a NSIS installer
+    ///   NSIS has no logging or language options. The command line usage is very little.
     /// </remarks>
     public class NsisInstaller : IInstaller
     {

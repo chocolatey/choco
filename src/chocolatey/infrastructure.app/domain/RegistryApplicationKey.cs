@@ -11,12 +11,15 @@
         public RegistryView RegistryView { get; set; }
 
         public string KeyPath { get; set; }
+
         [XmlAttribute(AttributeName = "installerType")]
         public InstallerType InstallerType { get; set; }
 
         public string DefaultValue { get; set; }
+
         [XmlAttribute(AttributeName = "displayName")]
         public string DisplayName { get; set; }
+
         public string InstallLocation { get; set; }
         public string UninstallString { get; set; }
         public bool HasQuietUninstall { get; set; }
@@ -30,6 +33,7 @@
         // version stuff
         [XmlAttribute(AttributeName = "displayVersion")]
         public string DisplayVersion { get; set; }
+
         public string Version { get; set; } //uint
         public string VersionMajor { get; set; } //uint
         public string VersionMinor { get; set; } //uint

@@ -3,10 +3,10 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// InstallShield Installer Options
+    ///   InstallShield Installer Options
     /// </summary>
     /// <remarks>
-    /// http://helpnet.installshield.com/installshield18helplib/ihelpsetup_execmdline.htm
+    ///   http://helpnet.installshield.com/installshield18helplib/ihelpsetup_execmdline.htm
     /// </remarks>
     public class InstallShieldInstaller : IInstaller
     {

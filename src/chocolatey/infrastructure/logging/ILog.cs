@@ -90,5 +90,4 @@ namespace chocolatey.infrastructure.logging
     public interface ILog<T> where T : new()
     {
     }
-
 }

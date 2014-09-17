@@ -4,7 +4,7 @@
     {
         Unknown,
         Custom,
-        Msi, 
+        Msi,
         Nsis,
         InnoSetup,
         InstallShield,

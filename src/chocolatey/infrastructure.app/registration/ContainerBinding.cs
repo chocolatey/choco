@@ -37,7 +37,7 @@
             container.Register<INugetService, NugetService>(Lifestyle.Singleton);
             container.Register<IPowershellService, PowershellService>(Lifestyle.Singleton);
             container.Register<IShimGenerationService, ShimGenerationService>(Lifestyle.Singleton);
-            container.Register<IRegistryService,RegistryService>(Lifestyle.Singleton);
+            container.Register<IRegistryService, RegistryService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);
 
             //todo:refactor - this should be autowired

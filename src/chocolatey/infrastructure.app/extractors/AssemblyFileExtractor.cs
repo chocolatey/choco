@@ -7,7 +7,7 @@
     using filesystem;
 
     /// <summary>
-    /// Extracts resources from an assembly.
+    ///   Extracts resources from an assembly.
     /// </summary>
     public static class AssemblyFileExtractor
     {

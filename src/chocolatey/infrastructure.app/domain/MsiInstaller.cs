@@ -3,14 +3,13 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// Windows Installer (MsiExec) Options
+    ///   Windows Installer (MsiExec) Options
     /// </summary>
     /// <remarks>
-    /// http://msdn.microsoft.com/en-us/library/aa367988.aspx
-    /// http://msdn.microsoft.com/en-us/library/aa372024.aspx
-    /// http://support.microsoft.com/kb/227091
-    /// http://www.advancedinstaller.com/user-guide/msiexec.html
-    /// 
+    ///   http://msdn.microsoft.com/en-us/library/aa367988.aspx
+    ///   http://msdn.microsoft.com/en-us/library/aa372024.aspx
+    ///   http://support.microsoft.com/kb/227091
+    ///   http://www.advancedinstaller.com/user-guide/msiexec.html
     /// </remarks>
     public class MsiInstaller : IInstaller
     {

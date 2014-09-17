@@ -202,7 +202,6 @@
 
         public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration configuration)
         {
- 
             this.Log().Info(@"Uninstalling the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(configuration.PackageNames));
 

@@ -24,7 +24,7 @@
             var file = "chocolateyInstall.ps1";
             switch (command)
             {
-                    case CommandNameType.uninstall:
+                case CommandNameType.uninstall:
                     file = "chocolateyUninstall.ps1";
                     break;
             }
@@ -42,7 +42,22 @@
 
         public void install_noop(PackageResult packageResult)
         {
-            noop_action(packageResult,CommandNameType.install);
+            noop_action(packageResult, CommandNameType.install);
+        }
+
+        public bool install(ChocolateyConfiguration configuration, PackageResult packageResult)
+        {
+            return run_action(configuration, packageResult, CommandNameType.install);
+        }
+
+        public void uninstall_noop(PackageResult packageResult)
+        {
+            noop_action(packageResult, CommandNameType.uninstall);
+        }
+
+        public bool uninstall(ChocolateyConfiguration configuration, PackageResult packageResult)
+        {
+            return run_action(configuration, packageResult, CommandNameType.uninstall);
         }
 
         public string wrap_command_with_module(string command)
@@ -52,12 +67,10 @@
             return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; & import-module -name '{0}'; {1}".format_with(installerModule, command);
         }
 
-
         public bool run_action(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command)
         {
-
             var installerFound = false;
-            
+
             var file = "chocolateyInstall.ps1";
             switch (command)
             {
@@ -100,6 +113,13 @@
                 {
                     Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
                 }
+
+                //verify how not silent is passed
+                //if (configuration.NotSilent)
+                //{
+                //    Environment.SetEnvironmentVariable("installerArguments", "  ");
+                //    Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
+                //}
                 if (configuration.Debug)
                 {
                     Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
@@ -110,19 +130,19 @@
                 //}
 
                 var exitCode = PowershellExecutor.execute(
-                      wrap_command_with_module(installScript.FirstOrDefault()),
-                      _fileSystem,
-                      (s, e) =>
-                      {
-                          if (string.IsNullOrWhiteSpace(e.Data)) return;
-                          this.Log().Info(() => " " + e.Data);
-                      },
-                      (s, e) =>
-                      {
-                          if (string.IsNullOrWhiteSpace(e.Data)) return;
-                          failure = true;
-                          this.Log().Error(() => " " + e.Data);
-                      });
+                    wrap_command_with_module(installScript.FirstOrDefault()),
+                    _fileSystem,
+                    (s, e) =>
+                        {
+                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            this.Log().Info(() => " " + e.Data);
+                        },
+                    (s, e) =>
+                        {
+                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            failure = true;
+                            this.Log().Error(() => " " + e.Data);
+                        });
 
                 if (failure)
                 {
@@ -134,22 +154,6 @@
             packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Ran '{0}'".format_with(installScript)));
 
             return installerFound;
-
-        }
-
-        public bool install(ChocolateyConfiguration configuration, PackageResult packageResult)
-        {
-            return run_action(configuration, packageResult, CommandNameType.install);
-        }
-
-        public void uninstall_noop(PackageResult packageResult)
-        {
-            noop_action(packageResult, CommandNameType.uninstall);
-        }
-
-        public bool uninstall(ChocolateyConfiguration configuration, PackageResult packageResult)
-        {
-            return run_action(configuration, packageResult, CommandNameType.uninstall);
         }
     }
 }

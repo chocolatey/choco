@@ -11,7 +11,7 @@
     {
         private static Type _logType = typeof (NullLog);
         private static ILog _logger;
-        
+
         /// <summary>
         ///   Sets up logging to be with a certain type
         /// </summary>

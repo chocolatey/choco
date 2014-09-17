@@ -16,12 +16,12 @@
     using platforms;
 
     /// <summary>
-    /// Responsible for gathering all configuration related information and producing the ChocolateyConfig
+    ///   Responsible for gathering all configuration related information and producing the ChocolateyConfig
     /// </summary>
     public static class ConfigurationBuilder
     {
         /// <summary>
-        /// Sets up the configuration based on arguments passed in, config file, and environment
+        ///   Sets up the configuration based on arguments passed in, config file, and environment
         /// </summary>
         /// <param name="args">The arguments.</param>
         /// <param name="config">The configuration.</param>
