@@ -75,7 +75,7 @@
                             .Add("noop|whatif|what-if",
                                  "NoOp - Don't actually do anything.",
                                  option => config.Noop = option != null)
-                            .Add("limitoutput|limit-output",
+                            .Add("r|limitoutput|limit-output",
                                  "LimitOuptut - Limit the output to essential information",
                                  option => config.RegularOuptut = option == null)
                             ;
