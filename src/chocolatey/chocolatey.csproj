@@ -80,6 +80,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyUninstallCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommand.cs" />
     <Compile Include="infrastructure.app\domain\ChocolateyPackageInformation.cs" />
+    <Compile Include="infrastructure.app\domain\CustomInstaller.cs" />
     <Compile Include="infrastructure.app\domain\IInstaller.cs" />
     <Compile Include="infrastructure.app\domain\InnoSetupInstaller.cs" />
     <Compile Include="infrastructure.app\domain\InstallShieldInstaller.cs" />

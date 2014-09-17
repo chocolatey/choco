@@ -3,26 +3,20 @@
     using System;
     using System.Collections.Generic;
 
-    /// <summary>
-    ///   InnoSetup Installer Options
-    /// </summary>
-    /// <remarks>
-    ///   http://www.jrsoftware.org/ishelp/index.php?topic=setupcmdline
-    /// </remarks>
-    public class InnoSetupInstaller : IInstaller
+    public class CustomInstaller : IInstaller
     {
-        public InnoSetupInstaller()
+        public CustomInstaller()
         {
-            InstallExecutable = "\"{0}\" ".format_with(InstallTokens.INSTALLER_LOCATION);
-            SilentInstall = "/VERYSILENT";
-            NoReboot = "/NORESTART";
-            LogFile = "/LOG=\"{0}\\InnoSetup.Install.log\"".format_with(InstallTokens.PACKAGE_LOCATION);
-            CustomInstallLocation = "/DIR=\"{0}\"".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
-            Language = "/LANG={0}".format_with(InstallTokens.LANGUAGE);
-            OtherInstallOptions = "/SP- /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /NOICONS";
+            InstallExecutable = "\"{0}\"".format_with(InstallTokens.INSTALLER_LOCATION);
+            SilentInstall = "/S";
+            NoReboot = "";
+            LogFile = "";
+            CustomInstallLocation = "";
+            Language = "";
+            OtherInstallOptions = "";
             UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
-            SilentUninstall = "/VERYSILENT";
-            OtherUninstallOptions = "/SUPPRESSMSGBOXES";
+            SilentUninstall = "/S";
+            OtherUninstallOptions = "";
             ValidExitCodes = new List<int> {0};
         }
 
@@ -45,7 +39,7 @@
 
         public string build_uninstall_command_arguments()
         {
-            return "{0} {1} {2}".format_with(SilentUninstall, NoReboot, OtherUninstallOptions);
+            return "{0} {1}".format_with(SilentUninstall, OtherInstallOptions);
         }
     }
 }
