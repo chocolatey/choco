@@ -137,16 +137,18 @@
             //todo: handle all
 
             SemanticVersion version = configuration.Version != null ? new SemanticVersion(configuration.Version) : null;
-            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger, (e) =>
-                {
-                    var pkg = e.Package;
-                    var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                    results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of install."));
-                    
-                    if (continueAction != null) continueAction.Invoke(results);
-                });
+            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
+                installSuccessAction: (e) =>
+                    {
+                        var pkg = e.Package;
+                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-            foreach (string packageName in configuration.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+                        if (continueAction != null) continueAction.Invoke(results);
+                    },
+                uninstallSuccessAction: null);
+
+            foreach (string packageName in configuration.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {
@@ -219,18 +221,20 @@
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
 
             SemanticVersion version = configuration.Version != null ? new SemanticVersion(configuration.Version) : null;
-            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger, (e) =>
-                {
-                    var pkg = e.Package;
-                    var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                    results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of upgrade."));
-                    
-                    if (continueAction != null) continueAction.Invoke(results);
-                });
+            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
+                installSuccessAction: (e) =>
+                    {
+                        var pkg = e.Package;
+                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+
+                        if (continueAction != null) continueAction.Invoke(results);
+                    },
+                uninstallSuccessAction: null);
 
             set_package_names_if_all_is_specified(configuration, () => { configuration.IgnoreDependencies = true; });
 
-            foreach (string packageName in configuration.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in configuration.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {
@@ -277,7 +281,7 @@
                     {
                         string logMessage = "{0} v{1} is the latest version available based on your source(s).".format_with(installedPackage.Id, installedPackage.Version);
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
-                        if (results.Messages.Count((p) => p.Message == "Moving forward with chocolatey portion of upgrade.") == 0)
+                        if (results.Messages.Count((p) => p.Message == ApplicationParameters.Messages.ContinueChocolateyAction) == 0)
                         {
                             results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         }
@@ -320,11 +324,11 @@
 
         public void uninstall_noop(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
         {
-           var results =  uninstall_run(configuration, continueAction, performAction: false);
+            var results = uninstall_run(configuration, continueAction, performAction: false);
             foreach (var packageResult in results.or_empty_list_if_null())
             {
                 var package = packageResult.Value.Package;
-                if (package != null) this.Log().Warn("Would have uninstalled {0} v{1}.".format_with(package.Id,package.Version.to_string()));
+                if (package != null) this.Log().Warn("Would have uninstalled {0} v{1}.".format_with(package.Id, package.Version.to_string()));
             }
         }
 
@@ -338,21 +342,43 @@
             var packageUninstalls = new ConcurrentDictionary<string, PackageResult>();
 
             SemanticVersion version = configuration.Version != null ? new SemanticVersion(configuration.Version) : null;
-            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger, null);
+            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
+                                                               installSuccessAction: null,
+                                                               uninstallSuccessAction: (e) =>
+                                                                   {
+                                                                       var pkg = e.Package;
+                                                                       "chocolatey".Log().Info(ChocolateyLoggers.Important, " {0} has been successfully uninstalled.".format_with(pkg.Id));
+                                                                   });
 
             packageManager.PackageUninstalling += (s, e) =>
-               {
+                {
                     var pkg = e.Package;
+
+                    // this section fires twice sometimes, like for older packages in a sxs install... 
                     var results = packageUninstalls.GetOrAdd(pkg.Id.to_lower() + "." + pkg.Version.to_string(), new PackageResult(pkg, e.InstallPath));
-                    results.Messages.Add(new ResultMessage(ResultType.Debug, "Moving forward with chocolatey portion of uninstall."));
-                    
+                    string logMessage = "{0}{1} v{2}{3}".format_with(Environment.NewLine, pkg.Id, pkg.Version.to_string(), configuration.Force ? " (forced)" : string.Empty);
+                    if (results.Messages.Count((p) => p.Message == ApplicationParameters.Messages.NugetEventActionHeader) == 0)
+                    {
+                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.NugetEventActionHeader));
+                        "chocolatey".Log().Info(ChocolateyLoggers.Important, logMessage);
+                    }
+                    else
+                    {
+                        "chocolatey".Log().Debug(ChocolateyLoggers.Important, "Another time through!{0}{1}".format_with(Environment.NewLine, logMessage));
+                    }
+
                     // is this the latest version or have you passed --sxs? This is the only way you get through to the continue action.
                     var latestVersion = packageManager.LocalRepository.FindPackage(e.Package.Id);
                     if (latestVersion.Version == pkg.Version || configuration.AllowMultipleVersions)
                     {
+                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
                         if (continueAction != null) continueAction.Invoke(results);
                     }
-               };
+                    else
+                    {
+                        //todo:allow cleaning of pkgstore files      
+                    }
+                };
 
             set_package_names_if_all_is_specified(configuration, () =>
                 {
@@ -362,7 +388,7 @@
                     configuration.ForceDependencies = false;
                 });
 
-            foreach (string packageName in configuration.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in configuration.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {
@@ -403,12 +429,12 @@
                         foreach (var installedVersion in installedPackageVersions.or_empty_list_if_null())
                         {
                             choices.Add(counter, installedVersion);
-                            this.Log().Info("{0}) {1}".format_with(counter, installedVersion.Version.to_string()));
+                            this.Log().Info(" {0}) {1}".format_with(counter, installedVersion.Version.to_string()));
 
                             counter++;
                         }
 
-                        this.Log().Info("{0}) All versions".format_with(counter));
+                        this.Log().Info(" {0}) All versions".format_with(counter));
                         var selection = Console.ReadLine();
 
                         int selected = -1;

@@ -61,7 +61,7 @@
             return repository;
         }
 
-        public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<PackageOperationEventArgs> installSuccessAction)
+        public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction)
         {
             IFileSystem nugetPackagesFileSystem = GetNuGetFileSystem(configuration, nugetLogger);
             IPackagePathResolver pathResolver = GetPathResolver(configuration, nugetPackagesFileSystem);
@@ -78,11 +78,9 @@
             packageManager.PackageInstalled += (s, e) =>
                 {
                     var pkg = e.Package;
-                    "chocolatey".Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}".format_with(Environment.NewLine, pkg.Id, pkg.Version.to_string(),configuration.Force ? " (forced)":string.Empty));
-                    if (installSuccessAction != null)
-                    {
-                        installSuccessAction.Invoke(e);
-                    }
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}".format_with(Environment.NewLine, pkg.Id, pkg.Version.to_string(), configuration.Force ? " (forced)" : string.Empty));
+
+                    if (installSuccessAction != null) installSuccessAction.Invoke(e);
                 };
 
             packageManager.PackageUninstalled += (s, e) =>
@@ -99,6 +97,10 @@
                             packageManager.UninstallPackage(pkg, forceRemove: configuration.Force, removeDependencies: false);
                             chocoPathResolver.UseSideBySidePaths = configuration.AllowMultipleVersions;
                         }
+                    }
+                    else
+                    {
+                        if (uninstallSuccessAction != null) uninstallSuccessAction.Invoke(e);
                     }
                 };
 
