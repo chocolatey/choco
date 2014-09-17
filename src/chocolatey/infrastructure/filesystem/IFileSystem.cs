@@ -258,6 +258,15 @@
         /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
         void delete_directory(string directoryPath, bool recursive);
 
+        /// <summary>
+        ///   Deletes a directory if it exists
+        /// </summary>
+        /// <param name="directoryPath">The directory path.</param>
+        /// <param name="recursive">
+        ///   if set to <c>true</c> [recursive].
+        /// </param>
+        void delete_directory_if_exists(string directoryPath, bool recursive);
+
         #endregion
     }
 }

@@ -250,6 +250,14 @@
             Directory.Delete(directoryPath, recursive);
         }
 
+        public void delete_directory_if_exists(string directoryPath, bool recursive)
+        {
+            if (directory_exists(directoryPath))
+            {
+                delete_directory(directoryPath, recursive);
+            }
+        }
+
         #endregion
 
         /// <summary>
