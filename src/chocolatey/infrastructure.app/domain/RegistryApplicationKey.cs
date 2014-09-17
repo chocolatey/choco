@@ -61,7 +61,10 @@
             return !string.IsNullOrWhiteSpace(DisplayName)
                    && !string.IsNullOrWhiteSpace(UninstallString)
                    && InstallerType != InstallerType.HotfixOrSecurityUpdate
+                   && InstallerType != InstallerType.ServicePack
                    && string.IsNullOrWhiteSpace(ParentKeyName)
+                   && !NoRemove
+                   && !SystemComponent
                 ;
         }
 
