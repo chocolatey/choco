@@ -25,7 +25,7 @@
                 .Add("version=",
                      "Version - A specific version to install. Defaults to unspecified.",
                      option => configuration.Version = option)
-                .Add("allversions|all-versions",
+                .Add("a|allversions|all-versions",
                      "AllVersions - Uninstall all versions? Defaults to false.",
                      option => configuration.AllVersions = option != null)
                 .Add("ua=|uninstallargs=|uninstallarguments=|uninstall-arguments=",
@@ -40,10 +40,10 @@
                 .Add("params=|parameters=|pkgparameters=|packageparameters=|package-parameters=",
                      "PackageParameters - Parameters to pass to the package. Defaults to unspecified.",
                      option => configuration.PackageParameters = option)
-                .Add("forcedependencies|force-dependencies",
+                .Add("x|forcedependencies|force-dependencies",
                      "ForceDependencies - Force dependencies to be uninstalled when uninstalling package(s). Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
-                .Add("skippowershell|skip-powershell",
+                .Add("n|skippowershell|skip-powershell",
                      "Skip Powershell - Do not run chocolateyUninstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 ;

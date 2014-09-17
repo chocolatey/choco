@@ -26,9 +26,12 @@
                 .Add("s=|source=",
                      "Source - Source location for install. Can include special 'webpi'. Defaults to sources.",
                      option => configuration.Source = option)
-                .Add("lo|localonly|local-only",
+                .Add("l|lo|localonly|local-only",
                      "LocalOnly - Only search in installed items",
                      option => configuration.LocalOnly = option != null)
+                .Add("p|includeprograms|include-programs",
+                     "IncludePrograms - Used in conjuction with LocalOnly, filters out apps chocolatey has listed as packages and includes those in the list. Defaults to false.",
+                     option => configuration.IncludeRegistryPrograms = option != null)
                 .Add("a|all|allversions|all-versions",
                      "AllVersions - include results from all versions",
                      option => configuration.AllVersions = option != null)

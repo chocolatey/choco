@@ -46,16 +46,16 @@
                 .Add("params=|parameters=|pkgparameters=|packageparameters=|package-parameters=",
                      "PackageParameters - Parameters to pass to the package. Defaults to unspecified.",
                      option => configuration.PackageParameters = option)
-                .Add("sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
+                .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
                      "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false.",
                      option => configuration.AllowMultipleVersions = option != null)
-                .Add("ignoredependencies|ignore-dependencies",
+                .Add("i|ignoredependencies|ignore-dependencies",
                      "IgnoreDependencies - Ignore dependencies when installing package(s). Defaults to false.",
                      option => configuration.IgnoreDependencies = option != null)
-                .Add("forcedependencies|force-dependencies",
+                .Add("x|forcedependencies|force-dependencies",
                      "ForceDependencies - Force dependencies to be reinstalled when force installing package(s). Must be used in conjunction with --force. Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
-                .Add("skippowershell|skip-powershell",
+                .Add("n|skippowershell|skip-powershell",
                      "Skip Powershell - Do not run chocolateyInstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 ;
