@@ -1,5 +1,6 @@
 ﻿namespace chocolatey.infrastructure.app.commands
 {
+    using System;
     using System.Collections.Generic;
     using attributes;
     using commandline;
@@ -61,6 +62,11 @@
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments);
+
+            if (string.IsNullOrWhiteSpace(configuration.PackageNames))
+            {
+                throw new ApplicationException("Package name is required. Please pass at least one package name to upgrade.");
+            }
         }
 
         public void help_message(ChocolateyConfiguration configuration)
