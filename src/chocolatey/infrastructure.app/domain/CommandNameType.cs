@@ -16,5 +16,7 @@
         [Description("unpackself - have chocolatey set it self up")] unpackself,
         [Description("pack - packages up a nuspec to a compiled nupkg")] pack,
         [Description("push - pushes a compiled nupkg")] push,
+        [Description("new - generates files necessary for a chocolatey package")] @new,
+
     }
 }

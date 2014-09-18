@@ -1,8 +1,24 @@
 namespace chocolatey.infrastructure.app.configuration
 {
     using System;
+    using System.Collections.Generic;
     using System.Text;
     using platforms;
+
+    public sealed class NewCommandConfiguration
+    {
+        //todo: retrofit other command configs this way
+
+        public NewCommandConfiguration()
+        {
+            TemplateProperties = new Dictionary<string, string>();
+        }
+
+        public string Name { get; set; }
+        public bool AutomaticPackage { get; set; }
+        public IDictionary<string, string> TemplateProperties { get; private set; }
+    }
+
 
     /// <summary>
     ///   The chocolatey configuration.
@@ -12,6 +28,7 @@ namespace chocolatey.infrastructure.app.configuration
         public ChocolateyConfiguration()
         {
             RegularOuptut = true;
+            NewCommand = new NewCommandConfiguration();
         }
 
         // overrides
@@ -72,7 +89,6 @@ namespace chocolatey.infrastructure.app.configuration
         ///   Space separated package names.
         /// </value>
         public string PackageNames { get; set; }
-
         public bool Prerelease { get; set; }
         public bool ForceX86 { get; set; }
         public string InstallArguments { get; set; }
@@ -82,5 +98,8 @@ namespace chocolatey.infrastructure.app.configuration
         public bool IgnoreDependencies { get; set; }
         public bool AllowMultipleVersions { get; set; }
         public bool ForceDependencies { get; set; }
+
+        public NewCommandConfiguration NewCommand { get; private set; }
+
     }
 }
