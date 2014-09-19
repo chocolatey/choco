@@ -39,7 +39,7 @@
                     var attributes = c.GetType().GetCustomAttributes(typeof (CommandForAttribute), false);
                     foreach (CommandForAttribute attribute in attributes)
                     {
-                        if (attribute.CommandName.to_string().to_lower() == config.CommandName.to_lower()) return true;
+                        if (attribute.CommandName.to_string().is_equal_to(config.CommandName)) return true;
                     }
 
                     return false;
