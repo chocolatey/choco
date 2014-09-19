@@ -62,46 +62,46 @@
                 args,
                 config,
                 (option_set) =>
-                    {
-                        option_set
-                            .Add("d|debug",
-                                 "Debug - Run in Debug Mode.",
-                                 option => config.Debug = option != null)
-                            .Add("v|verbose",
-                                 "Verbose - See verbose messaging.",
-                                 option => config.Verbose = option != null)
-                            .Add("f|force",
-                                 "Force - force the behavior",
-                                 option => config.Force = option != null)
-                            .Add("noop|whatif|what-if",
-                                 "NoOp - Don't actually do anything.",
-                                 option => config.Noop = option != null)
-                            .Add("r|limitoutput|limit-output",
-                                 "LimitOuptut - Limit the output to essential information",
-                                 option => config.RegularOuptut = option == null)
-                            ;
-                    },
+                {
+                    option_set
+                        .Add("d|debug",
+                             "Debug - Run in Debug Mode.",
+                             option => config.Debug = option != null)
+                        .Add("v|verbose",
+                             "Verbose - See verbose messaging.",
+                             option => config.Verbose = option != null)
+                        .Add("f|force",
+                             "Force - force the behavior",
+                             option => config.Force = option != null)
+                        .Add("noop|whatif|what-if",
+                             "NoOp - Don't actually do anything.",
+                             option => config.Noop = option != null)
+                        .Add("r|limitoutput|limit-output",
+                             "LimitOuptut - Limit the output to essential information",
+                             option => config.RegularOuptut = option == null)
+                        ;
+                },
                 (unparsedArgs) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(config.CommandName))
                     {
-                        if (!string.IsNullOrWhiteSpace(config.CommandName))
-                        {
-                            // save help for next menu
-                            config.HelpRequested = false;
-                        }
-                    },
+                        // save help for next menu
+                        config.HelpRequested = false;
+                    }
+                },
                 () =>
+                {
+                    var commandsLog = new StringBuilder();
+                    foreach (var command in Enum.GetValues(typeof(CommandNameType)).Cast<CommandNameType>())
                     {
-                        var commandsLog = new StringBuilder();
-                        foreach (var command in Enum.GetValues(typeof (CommandNameType)).Cast<CommandNameType>())
-                        {
-                            commandsLog.AppendFormat(" * {0}\n", command.get_description_or_value());
-                        }
+                        commandsLog.AppendFormat(" * {0}\n", command.get_description_or_value());
+                    }
 
-                        "chocolatey".Log().Info(ChocolateyLoggers.Important, "Commands");
-                        "chocolatey".Log().Info(@"{1}
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, "Commands");
+                    "chocolatey".Log().Info(@"{1}
 
 Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.ChocolateyVersion, commandsLog.ToString()));
-                    });
+                });
         }
 
         private static void set_environment_options(ChocolateyConfiguration config)
