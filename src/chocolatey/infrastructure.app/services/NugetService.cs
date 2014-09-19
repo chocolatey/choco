@@ -75,7 +75,9 @@
                     var filesFound = fileSystem.get_files(fileSystem.get_current_directory(), "*" + extension).or_empty_list_if_null();
                     Ensure.that(() => filesFound)
                           .meets((files) => files.Count() == 1,
-                                 (name, value) => { throw new FileNotFoundException("No {0} files (or more than 1) were found to build in '{1}'. Please specify the {0} file or try in a different directory.".format_with(extension, _fileSystem.get_current_directory()));
+                                 (name, value) =>
+                                 {
+                                     throw new FileNotFoundException("No {0} files (or more than 1) were found to build in '{1}'. Please specify the {0} file or try in a different directory.".format_with(extension, _fileSystem.get_current_directory()));
                                  });
 
                     return filesFound.FirstOrDefault();
@@ -124,13 +126,13 @@
         public void push_noop(ChocolateyConfiguration config)
         {
             string nupkgFilePath = validate_and_return_package_file(config, Constants.PackageExtension);
-            this.Log().Info(()=> "Would have attempted to push '{0}' to source '{1}'.".format_with(_fileSystem.get_file_name(nupkgFilePath),config.Source));
+            this.Log().Info(() => "Would have attempted to push '{0}' to source '{1}'.".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Source));
         }
 
         public void push_run(ChocolateyConfiguration config)
         {
             string nupkgFilePath = validate_and_return_package_file(config, Constants.PackageExtension);
-            if (config.RegularOuptut) this.Log().Info(()=>"Attempting to push {0} to {1}".format_with(_fileSystem.get_file_name(nupkgFilePath),config.Source));
+            if (config.RegularOuptut) this.Log().Info(() => "Attempting to push {0} to {1}".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Source));
 
             NugetPush.push_package(config, nupkgFilePath);
         }
@@ -173,7 +175,7 @@
                                                                    },
                                                                uninstallSuccessAction: null);
 
-            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {
@@ -259,7 +261,7 @@
 
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
 
-            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {
@@ -413,7 +415,7 @@
                     config.ForceDependencies = false;
                 });
 
-            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {
