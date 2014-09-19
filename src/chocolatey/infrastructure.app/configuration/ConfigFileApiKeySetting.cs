@@ -10,10 +10,10 @@
     [XmlType("apiKeys")]
     public sealed class ConfigFileApiKeySetting
     {
+        [XmlAttribute(AttributeName = "source")]
+        public string Source { get; set; }
+
         [XmlAttribute(AttributeName = "key")]
         public string Key { get; set; }
-
-        [XmlAttribute(AttributeName = "value")]
-        public string Value { get; set; }
     }
 }

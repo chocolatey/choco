@@ -16,6 +16,6 @@
         [Description("pack - packages up a nuspec to a compiled nupkg")] pack,
         [Description("push - pushes a compiled nupkg")] push,
         [Description("new - generates files necessary for a chocolatey package")] @new,
-
+        [Description("setapikey - saves an apikey for a particular source")] setapikey,
     }
 }

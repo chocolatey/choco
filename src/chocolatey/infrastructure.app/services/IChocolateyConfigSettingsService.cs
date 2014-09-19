@@ -10,5 +10,6 @@
         void source_remove(ChocolateyConfiguration configuration);
         void source_disable(ChocolateyConfiguration configuration);
         void source_enable(ChocolateyConfiguration configuration);
+        void set_api_key(ChocolateyConfiguration configuration);
     }
 }

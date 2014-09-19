@@ -55,6 +55,7 @@
                             new ChocolateyPackCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyNewCommand(container.GetInstance<ITemplateService>()),
                             new ChocolateySourceCommand(container.GetInstance<IChocolateyConfigSettingsService>()),
+                            new ChocolateySetApiKeyCommand(container.GetInstance<IChocolateyConfigSettingsService>()),
                             new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>())
                         };
                     return list.AsReadOnly();

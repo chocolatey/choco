@@ -15,6 +15,7 @@ namespace chocolatey.infrastructure.app.configuration
             RegularOuptut = true;
             NewCommand = new NewCommandConfiguration();
             SourceCommand = new SourcesCommandConfiguration();
+            ApiKeyCommand = new ApiKeyCommandConfiguration();
         }
 
         // overrides
@@ -87,6 +88,7 @@ namespace chocolatey.infrastructure.app.configuration
 
         public NewCommandConfiguration NewCommand { get; private set; }
         public SourcesCommandConfiguration SourceCommand { get; private set; }
+        public ApiKeyCommandConfiguration ApiKeyCommand { get; private set; }
     }
 
     public sealed class NewCommandConfiguration
@@ -110,5 +112,11 @@ namespace chocolatey.infrastructure.app.configuration
         public string Command { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+    }
+
+    public sealed class ApiKeyCommandConfiguration
+    {
+        public string Source { get; set; }
+        public string Key { get; set; }
     }
 }

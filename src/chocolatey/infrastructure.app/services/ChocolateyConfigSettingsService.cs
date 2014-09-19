@@ -31,7 +31,7 @@
         
         public void source_add(ChocolateyConfiguration configuration)
         {
-            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id == configuration.SourceCommand.Name);
+            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
             if (source == null)
             {
                 _configFileSettings.Sources.Add(new ConfigFileSourceSetting()
@@ -50,7 +50,7 @@
 
         public void source_remove(ChocolateyConfiguration configuration)
         {
-            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id == configuration.SourceCommand.Name);
+            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
             if (source != null)
             {
                 _configFileSettings.Sources.Remove(source);
@@ -62,7 +62,7 @@
 
         public void source_disable(ChocolateyConfiguration configuration)
         {
-            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id == configuration.SourceCommand.Name);
+            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
             if (source != null && !source.Disabled)
             {
                 source.Disabled = true;
@@ -73,12 +73,38 @@
 
         public void source_enable(ChocolateyConfiguration configuration)
         {
-            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id == configuration.SourceCommand.Name);
+            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
             if (source != null && source.Disabled)
             {
                 source.Disabled = false;
                 _xmlService.serialize(_configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                 this.Log().Info(() => "Enabled {0}".format_with(source.Id));
+            }
+        }
+
+        public void set_api_key(ChocolateyConfiguration configuration)
+        {
+            var apiKey = _configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.ApiKeyCommand.Source));
+            if (apiKey == null)
+            {
+                _configFileSettings.ApiKeys.Add(new ConfigFileApiKeySetting()
+                    {
+                        Source = configuration.ApiKeyCommand.Source,
+                        Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key),
+                    });
+
+                _xmlService.serialize(_configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+
+                this.Log().Info(() => "Added ApiKey for {0}".format_with(configuration.ApiKeyCommand.Source));
+            }
+            else
+            {
+                if (!NugetEncryptionUtility.DecryptString(apiKey.Key).to_string().is_equal_to(configuration.ApiKeyCommand.Key))
+                {
+                    apiKey.Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key);
+                    _xmlService.serialize(_configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                    this.Log().Info(() => "Updated ApiKey for {0}".format_with(configuration.ApiKeyCommand.Source));
+                }
             }
         }
     }
