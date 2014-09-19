@@ -47,7 +47,8 @@
                 if (logResults)
                 {
                     this.Log().Info(configuration.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal,() =>"{0} {1}".format_with(package.Id, package.Version.to_string()));
-                    if (configuration.Verbose) this.Log().Info(()=>" {0}{1} Tags:{2}{1}".format_with(package.Description, Environment.NewLine, package.Tags));
+                    if (configuration.Verbose) this.Log().Info(()=>" {0}{1} Description: {2}{1} Tags: {3}{1} Number of Downloads: {4}{1}".format_with(package.Title, Environment.NewLine, package.Description,  package.Tags,package.DownloadCount <=0 ? "n/a":package.DownloadCount.to_string() ));
+                    // Maintainer(s):{3}{1} | package.Owners.join(", ") - null at the moment
                 }
                 else
                 {
