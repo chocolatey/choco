@@ -114,6 +114,8 @@
             string outputFile = builder.Id + "." + builder.Version + Constants.PackageExtension;
             string outputPath = _fileSystem.combine_paths(nuspecDirectory, outputFile);
 
+            this.Log().Info(() => "Attempting to build package from '{0}'.".format_with(_fileSystem.get_file_name(nuspecFilePath)));
+
             //IPackage package = 
             NugetPack.BuildPackage(builder, _fileSystem, outputPath);
             //todo: v1 analyze package
@@ -121,6 +123,8 @@
             //{
             //    AnalyzePackage(package);
             //}
+
+            this.Log().Info(ChocolateyLoggers.Important, () => "Successfully created package '{0}'".format_with(outputFile));
         }
 
         public void push_noop(ChocolateyConfiguration config)
