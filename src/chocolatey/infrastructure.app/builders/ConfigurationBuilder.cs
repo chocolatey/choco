@@ -51,6 +51,7 @@
                 }
                 config.Source = sources.Remove(sources.Length - 1, 1).ToString();
             }
+            //todo: what if usenugetforsources is set true?
             config.CheckSumFiles = configFileSettings.ChecksumFiles;
             config.VirusCheckFiles = configFileSettings.VirusCheckFiles;
         }
