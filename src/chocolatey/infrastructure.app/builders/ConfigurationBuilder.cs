@@ -40,18 +40,13 @@
             AssemblyFileExtractor.extract_text_file_from_assembly(fileSystem, Assembly.GetExecutingAssembly(), ApplicationParameters.ChocolateyConfigFileResource, globalConfigPath);
 
             var configFileSettings = xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
-
-            config.UseNugetForSources = configFileSettings.UseNugetForSources;
-            if (!config.UseNugetForSources)
+            var sources = new StringBuilder();
+            foreach (var source in configFileSettings.Sources)
             {
-                var sources = new StringBuilder();
-                foreach (var source in configFileSettings.Sources)
-                {
-                    sources.AppendFormat("{0};", source.Value);
-                }
-                config.Source = sources.Remove(sources.Length - 1, 1).ToString();
+                sources.AppendFormat("{0};", source.Value);
             }
-            //todo: what if usenugetforsources is set true?
+            config.Source = sources.Remove(sources.Length - 1, 1).ToString();
+
             config.CheckSumFiles = configFileSettings.ChecksumFiles;
             config.VirusCheckFiles = configFileSettings.VirusCheckFiles;
         }

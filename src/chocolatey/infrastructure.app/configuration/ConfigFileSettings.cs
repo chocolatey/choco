@@ -11,9 +11,6 @@
     [XmlRoot("chocolatey")]
     public class ConfigFileSettings
     {
-        [XmlElement(ElementName = "useNugetForSources")]
-        public bool UseNugetForSources { get; set; }
-
         [XmlElement(ElementName = "checksumFiles")]
         public bool ChecksumFiles { get; set; }
 
