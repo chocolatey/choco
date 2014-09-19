@@ -48,7 +48,7 @@
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
-            foreach (var unparsedArgument in unparsedArguments)
+            foreach (var unparsedArgument in unparsedArguments.or_empty_list_if_null())
             {
                 var property = unparsedArgument.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
                 if (property.Count() == 2)
