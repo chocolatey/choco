@@ -7,8 +7,7 @@
         [Description("list - lists remote or local packages")] list,
         [Description("search - searches remote or local packages")] search,
         [Description("install - installs packages from various sources")] install,
-        //[Description("update - updates package index")]
-        //update,
+        //[Description("update - updates package index")] update,
         [Description("upgrade - upgrades packages from various sources")] upgrade,
         [Description("uninstall - uninstalls a package")] uninstall,
         [Description("source - view and configure default sources")] source,
