@@ -52,7 +52,9 @@
                 }
             }
 
-            var repository = new AggregateRepository(repositories);
+            //todo well that didn't work on failing repos... grrr
+            var repository = new AggregateRepository(repositories) {IgnoreFailingRepositories = true}; 
+            //,ResolveDependenciesVertically = true};
             if (configuration.Debug)
             {
                 repository.Logger = nugetLogger;

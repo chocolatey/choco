@@ -79,8 +79,11 @@
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyNewCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPackCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateySourceCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUninstallCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommand.cs" />
+    <Compile Include="infrastructure.app\services\ChocolateySourceService.cs" />
+    <Compile Include="infrastructure.app\services\IChocolateySourceService.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileApiKeySetting.cs" />
     <Compile Include="infrastructure.app\nuget\NugetEncryptionUtility.cs" />
     <Compile Include="infrastructure.app\services\ITemplateService.cs" />
