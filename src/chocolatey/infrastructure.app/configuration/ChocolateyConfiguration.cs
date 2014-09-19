@@ -108,7 +108,6 @@ namespace chocolatey.infrastructure.app.configuration
     public sealed class SourcesCommandConfiguration
     {
         public string Name { get; set; }
-        public string Source { get; set; }
         public string Command { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
@@ -116,7 +115,6 @@ namespace chocolatey.infrastructure.app.configuration
 
     public sealed class ApiKeyCommandConfiguration
     {
-        public string Source { get; set; }
         public string Key { get; set; }
     }
 }

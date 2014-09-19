@@ -23,13 +23,15 @@
 
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
+            configuration.Source = string.Empty;
+
             optionSet
                 .Add("n=|name=",
                      "Name - the name of the source. Required with some actions. Defaults to empty.",
                      option => configuration.SourceCommand.Name = option)
                 .Add("s=|source=",
                      "Source - The source. Defaults to empty.",
-                     option => configuration.SourceCommand.Source = option) 
+                     option => configuration.Source = option) 
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
                      option => configuration.SourceCommand.Username = option) 

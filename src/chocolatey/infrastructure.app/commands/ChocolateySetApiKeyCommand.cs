@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using attributes;
     using commandline;
     using configuration;
@@ -24,10 +23,12 @@
 
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
+            configuration.Source = ApplicationParameters.DefaultChocolateyPushSource;
+
             optionSet
                 .Add("s=|source=",
                      "Source [REQUIRED] - The source the key applies to. Defaults to {0}".format_with(ApplicationParameters.DefaultChocolateyPushSource),
-                     option => configuration.ApiKeyCommand.Source = option)
+                     option => configuration.Source = option)
                 .Add("k=|key=|apikey=|api-key=",
                      "ApiKey [REQUIRED] - The api key for the source.",
                      option => configuration.ApiKeyCommand.Key = option)
@@ -37,12 +38,6 @@
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
-
-            if (string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Source))
-            {
-                this.Log().Debug(() => "Setting source to {0}".format_with(ApplicationParameters.DefaultChocolateyPushSource));
-                configuration.ApiKeyCommand.Source = ApplicationParameters.DefaultChocolateyPushSource;
-            }
 
             if (string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key))
             {
