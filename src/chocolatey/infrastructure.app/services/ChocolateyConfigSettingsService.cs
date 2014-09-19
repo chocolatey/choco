@@ -5,12 +5,12 @@
     using infrastructure.services;
     using nuget;
 
-    class ChocolateySourceService : IChocolateySourceService
+    class ChocolateyConfigSettingsService : IChocolateyConfigSettingsService
     {
         private readonly ConfigFileSettings _configFileSettings;
         private readonly IXmlService _xmlService;
 
-        public ChocolateySourceService(IXmlService xmlService)
+        public ChocolateyConfigSettingsService(IXmlService xmlService)
         {
             _xmlService = xmlService;
             _configFileSettings = _xmlService.deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation);
@@ -21,7 +21,7 @@
             //todo: something
         }
 
-        public void list(ChocolateyConfiguration configuration)
+        public void source_list(ChocolateyConfiguration configuration)
         {
             foreach (var source in _configFileSettings.Sources)
             {
@@ -29,7 +29,7 @@
             }
         }
         
-        public void add(ChocolateyConfiguration configuration)
+        public void source_add(ChocolateyConfiguration configuration)
         {
             var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id == configuration.SourceCommand.Name);
             if (source == null)
@@ -48,7 +48,7 @@
             }
         }
 
-        public void remove(ChocolateyConfiguration configuration)
+        public void source_remove(ChocolateyConfiguration configuration)
         {
             var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id == configuration.SourceCommand.Name);
             if (source != null)
@@ -60,7 +60,7 @@
             }
         }
 
-        public void disable(ChocolateyConfiguration configuration)
+        public void source_disable(ChocolateyConfiguration configuration)
         {
             var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id == configuration.SourceCommand.Name);
             if (source != null && !source.Disabled)
@@ -71,7 +71,7 @@
             }
         }
 
-        public void enable(ChocolateyConfiguration configuration)
+        public void source_enable(ChocolateyConfiguration configuration)
         {
             var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id == configuration.SourceCommand.Name);
             if (source != null && source.Disabled)

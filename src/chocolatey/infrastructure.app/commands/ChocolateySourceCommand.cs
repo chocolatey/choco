@@ -14,11 +14,11 @@
     [CommandFor(CommandNameType.source)]
     public sealed class ChocolateySourceCommand : ICommand
     {
-        private readonly IChocolateySourceService _sourceService;
+        private readonly IChocolateyConfigSettingsService _configSettingsService;
 
-        public ChocolateySourceCommand(IChocolateySourceService sourceService)
+        public ChocolateySourceCommand(IChocolateyConfigSettingsService configSettingsService)
         {
-            _sourceService = sourceService;
+            _configSettingsService = configSettingsService;
         }
 
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
@@ -85,7 +85,7 @@ Examples:
 
         public void noop(ChocolateyConfiguration configuration)
         {
-            _sourceService.noop(configuration);
+            _configSettingsService.noop(configuration);
         }
 
         public void run(ChocolateyConfiguration configuration)
@@ -93,19 +93,19 @@ Examples:
             switch (configuration.SourceCommand.Command)
             {
                 case "list":
-                    _sourceService.list(configuration);
+                    _configSettingsService.source_list(configuration);
                     break;
                 case "add":
-                    _sourceService.add(configuration);
+                    _configSettingsService.source_add(configuration);
                     break;
                 case "remove":
-                    _sourceService.remove(configuration);
+                    _configSettingsService.source_remove(configuration);
                     break;
                 case "disable":
-                    _sourceService.disable(configuration);
+                    _configSettingsService.source_disable(configuration);
                     break;
                 case "enable":
-                    _sourceService.enable(configuration);
+                    _configSettingsService.source_enable(configuration);
                     break;
             }
 

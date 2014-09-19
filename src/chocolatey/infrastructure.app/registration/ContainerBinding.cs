@@ -40,7 +40,7 @@
             container.Register<IShimGenerationService, ShimGenerationService>(Lifestyle.Singleton);
             container.Register<IRegistryService, RegistryService>(Lifestyle.Singleton);
             container.Register<ITemplateService, TemplateService>(Lifestyle.Singleton);
-            container.Register<IChocolateySourceService, ChocolateySourceService>(Lifestyle.Singleton);
+            container.Register<IChocolateyConfigSettingsService, ChocolateyConfigSettingsService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);
 
             //todo:refactor - this should be autowired
@@ -54,7 +54,7 @@
                             new ChocolateyUninstallCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyPackCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyNewCommand(container.GetInstance<ITemplateService>()),
-                            new ChocolateySourceCommand(container.GetInstance<IChocolateySourceService>()),
+                            new ChocolateySourceCommand(container.GetInstance<IChocolateyConfigSettingsService>()),
                             new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>())
                         };
                     return list.AsReadOnly();
