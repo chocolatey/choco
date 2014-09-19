@@ -4,22 +4,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System.Collections.Generic;
     using System.Text;
     using platforms;
-
-    public sealed class NewCommandConfiguration
-    {
-        //todo: retrofit other command configs this way
-
-        public NewCommandConfiguration()
-        {
-            TemplateProperties = new Dictionary<string, string>();
-        }
-
-        public string Name { get; set; }
-        public bool AutomaticPackage { get; set; }
-        public IDictionary<string, string> TemplateProperties { get; private set; }
-    }
-
-
+    
     /// <summary>
     ///   The chocolatey configuration.
     /// </summary>
@@ -29,6 +14,7 @@ namespace chocolatey.infrastructure.app.configuration
         {
             RegularOuptut = true;
             NewCommand = new NewCommandConfiguration();
+            SourceCommand = new SourcesCommandConfiguration();
         }
 
         // overrides
@@ -100,6 +86,29 @@ namespace chocolatey.infrastructure.app.configuration
         public bool ForceDependencies { get; set; }
 
         public NewCommandConfiguration NewCommand { get; private set; }
+        public SourcesCommandConfiguration SourceCommand { get; private set; }
+    }
 
+    public sealed class NewCommandConfiguration
+    {
+        //todo: retrofit other command configs this way
+
+        public NewCommandConfiguration()
+        {
+            TemplateProperties = new Dictionary<string, string>();
+        }
+
+        public string Name { get; set; }
+        public bool AutomaticPackage { get; set; }
+        public IDictionary<string, string> TemplateProperties { get; private set; }
+    }
+
+    public sealed class SourcesCommandConfiguration
+    {
+        public string Name { get; set; }
+        public string Source { get; set; }
+        public string Command { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
     }
 }
