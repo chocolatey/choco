@@ -270,9 +270,11 @@
 
                                 foreach (var key in pkgInfo.RegistrySnapshot.RegistryKeys.or_empty_list_if_null())
                                 {
+                                    this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString));
                                     // split on " /" and " -" for quite a bit more accuracy
                                     IList<string> uninstallArgs = key.UninstallString.to_string().Split(new[] {" /", " -"}, StringSplitOptions.RemoveEmptyEntries).ToList();
-                                    var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault();
+                                    var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault().Replace("\"","");
+                                    this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
                                     uninstallArgs.Remove(uninstallExe);
 
                                     if (!key.HasQuietUninstall)
@@ -300,8 +302,12 @@
                                                 break;
                                         }
 
+                                        this.Log().Debug(() => " Installer type is '{0}'".format_with(installer.GetType().Name));
+
                                         uninstallArgs.Add(installer.build_uninstall_command_arguments());
                                     }
+
+                                    this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs.join(" ")));
 
                                     var exitCode = CommandExecutor.execute(
                                         uninstallExe, uninstallArgs.join(" "), true,
