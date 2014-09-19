@@ -29,25 +29,25 @@
             _nugetLogger = nugetLogger;
         }
 
-        public void list_noop(ChocolateyConfiguration configuration)
+        public void list_noop(ChocolateyConfiguration config)
         {
             this.Log().Info("{0} would have searched for '{1}' against the following source(s) :\"{2}\"".format_with(
                 ApplicationParameters.Name,
-                configuration.Input,
-                configuration.Source
+                config.Input,
+                config.Source
                                 ));
         }
 
-        public ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration configuration, bool logResults = true)
+        public ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration config, bool logResults = true)
         {
             var packageResults = new ConcurrentDictionary<string, PackageResult>();
 
-            foreach (var package in NugetList.GetPackages(configuration, _nugetLogger).or_empty_list_if_null())
+            foreach (var package in NugetList.GetPackages(config, _nugetLogger).or_empty_list_if_null())
             {
                 if (logResults)
                 {
-                    this.Log().Info(configuration.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal,() =>"{0} {1}".format_with(package.Id, package.Version.to_string()));
-                    if (configuration.Verbose) this.Log().Info(()=>" {0}{1} Description: {2}{1} Tags: {3}{1} Number of Downloads: {4}{1}".format_with(package.Title, Environment.NewLine, package.Description,  package.Tags,package.DownloadCount <=0 ? "n/a":package.DownloadCount.to_string() ));
+                    this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0} {1}".format_with(package.Id, package.Version.to_string()));
+                    if (config.Verbose) this.Log().Info(() => " {0}{1} Description: {2}{1} Tags: {3}{1} Number of Downloads: {4}{1}".format_with(package.Title, Environment.NewLine, package.Description, package.Tags, package.DownloadCount <= 0 ? "n/a" : package.DownloadCount.to_string()));
                     // Maintainer(s):{3}{1} | package.Owners.join(", ") - null at the moment
                 }
                 else
@@ -60,7 +60,7 @@
             return packageResults;
         }
 
-        public void pack_noop(ChocolateyConfiguration configuration)
+        public void pack_noop(ChocolateyConfiguration config)
         {
             this.Log().Info("{0} would have searched for a nuspec file in \"{1}\" and attempted to compile it.".format_with(
                 ApplicationParameters.Name,
@@ -68,36 +68,45 @@
                                 ));
         }
 
-        public void pack_run(ChocolateyConfiguration configuration)
+        public string validate_and_return_package_file(ChocolateyConfiguration config, string extension)
         {
-            Func<IFileSystem, string> getLocalNuspecFiles = (fileSystem) =>
+            Func<IFileSystem, string> getLocalFiles = (fileSystem) =>
                 {
-                    var nuspecFiles = fileSystem.get_files(fileSystem.get_current_directory(), "*" + Constants.ManifestExtension).or_empty_list_if_null();
-                    Ensure.that(() => nuspecFiles).meets((files) => files.Count() == 1,
-                                                         (name, value) => { throw new FileNotFoundException("No nuspec files (or more than 1) were found to build in '{0}'. Please specify the nuspec file or try in a different directory.".format_with(_fileSystem.get_current_directory())); });
+                    var filesFound = fileSystem.get_files(fileSystem.get_current_directory(), "*" + extension).or_empty_list_if_null();
+                    Ensure.that(() => filesFound)
+                          .meets((files) => files.Count() == 1,
+                                 (name, value) => { throw new FileNotFoundException("No {0} files (or more than 1) were found to build in '{1}'. Please specify the {0} file or try in a different directory.".format_with(extension, _fileSystem.get_current_directory()));
+                                 });
 
-                    return nuspecFiles.FirstOrDefault();
+                    return filesFound.FirstOrDefault();
                 };
 
-            string nuspecFilePath = !string.IsNullOrWhiteSpace(configuration.Input) ? configuration.Input : getLocalNuspecFiles.Invoke(_fileSystem);
-            Ensure.that(() => nuspecFilePath).meets((nuspec) => _fileSystem.get_file_extension(nuspec).is_equal_to(Constants.ManifestExtension), (name, value) => { throw new ArgumentException("File specified or found is not a nuspec file. '{0}'".format_with(value)); });
+            string filePath = !string.IsNullOrWhiteSpace(config.Input) ? config.Input : getLocalFiles.Invoke(_fileSystem);
+            Ensure.that(() => filePath).meets((file) => _fileSystem.get_file_extension(file).is_equal_to(extension) && _fileSystem.file_exists(file),
+                                              (name, value) => { throw new ArgumentException("File specified is either not found or not a {0} file. '{1}'".format_with(extension, value)); });
 
+            return filePath;
+        }
+
+        public void pack_run(ChocolateyConfiguration config)
+        {
+            string nuspecFilePath = validate_and_return_package_file(config, Constants.ManifestExtension);
             var nuspecDirectory = _fileSystem.get_full_path(_fileSystem.get_directory_name(nuspecFilePath));
 
             IDictionary<string, string> properties = new Dictionary<string, string>();
             // Set the version property if the flag is set
-            if (!string.IsNullOrWhiteSpace(configuration.Version))
+            if (!string.IsNullOrWhiteSpace(config.Version))
             {
-                properties["version"] = configuration.Version;
+                properties["version"] = config.Version;
             }
 
             // Initialize the property provider based on what was passed in using the properties flag
             var propertyProvider = new DictionaryPropertyProvider(properties);
 
             var builder = new PackageBuilder(nuspecFilePath, propertyProvider, includeEmptyDirectories: true);
-            if (!string.IsNullOrWhiteSpace(configuration.Version))
+            if (!string.IsNullOrWhiteSpace(config.Version))
             {
-                builder.Version = new SemanticVersion(configuration.Version);
+                builder.Version = new SemanticVersion(config.Version);
             }
 
             string outputFile = builder.Id + "." + builder.Version + Constants.PackageExtension;
@@ -111,45 +120,45 @@
             //}
         }
 
-        public void install_noop(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
+        public void install_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
             //todo: noop should see if packages are already installed and adjust message, amiright?!
 
             this.Log().Info("{0} would have used NuGet to install packages (if they are not already installed):{1}{2}".format_with(
                 ApplicationParameters.Name,
                 Environment.NewLine,
-                configuration.PackageNames
+                config.PackageNames
                                 ));
 
             var tempInstallsLocation = _fileSystem.combine_paths(_fileSystem.get_temp_path(), ApplicationParameters.Name, "TempInstalls_" + DateTime.Now.ToString("yyyyMMdd_HHmmss_ffff"));
             _fileSystem.create_directory_if_not_exists(tempInstallsLocation);
             ApplicationParameters.PackagesLocation = tempInstallsLocation;
 
-            install_run(configuration, continueAction);
+            install_run(config, continueAction);
 
             _fileSystem.delete_directory(tempInstallsLocation, recursive: true);
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
 
             //todo: handle all
 
-            SemanticVersion version = configuration.Version != null ? new SemanticVersion(configuration.Version) : null;
-            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
-                installSuccessAction: (e) =>
-                    {
-                        var pkg = e.Package;
-                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+            SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
+            var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
+                                                               installSuccessAction: (e) =>
+                                                                   {
+                                                                       var pkg = e.Package;
+                                                                       var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                                                                       results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                        if (continueAction != null) continueAction.Invoke(results);
-                    },
-                uninstallSuccessAction: null);
+                                                                       if (continueAction != null) continueAction.Invoke(results);
+                                                                   },
+                                                               uninstallSuccessAction: null);
 
-            foreach (string packageName in configuration.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {
@@ -161,7 +170,7 @@
                     //todo: get smarter about realizing multiple versions have been installed before and allowing that
 
                     IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
-                    if (installedPackage != null && (version == null || version == installedPackage.Version) && !configuration.Force)
+                    if (installedPackage != null && (version == null || version == installedPackage.Version) && !config.Force)
                     {
                         string logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
@@ -170,16 +179,16 @@
                         continue;
                     }
 
-                    if (installedPackage != null && (version == null || version == installedPackage.Version) && configuration.Force)
+                    if (installedPackage != null && (version == null || version == installedPackage.Version) && config.Force)
                     {
                         this.Log().Debug(() => "{0} v{1} already installed. Forcing reinstall.".format_with(installedPackage.Id, installedPackage.Version));
                         version = installedPackage.Version;
                     }
 
-                    IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, configuration.Prerelease, allowUnlisted: false);
+                    IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                     if (availablePackage == null)
                     {
-                        var logMessage = "{0} not installed. The package was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, configuration.Version, configuration.Source);
+                        var logMessage = "{0} not installed. The package was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Source);
                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                         results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -188,7 +197,7 @@
 
                     if (installedPackage != null && (installedPackage.Version == availablePackage.Version))
                     {
-                        packageManager.UninstallPackage(installedPackage, forceRemove: configuration.Force, removeDependencies: configuration.ForceDependencies);
+                        packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
                     }
 
                     using (packageManager.SourceRepository.StartOperation(
@@ -196,7 +205,7 @@
                         packageName,
                         version == null ? null : version.ToString()))
                     {
-                        packageManager.InstallPackage(availablePackage, configuration.IgnoreDependencies, configuration.Prerelease);
+                        packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
                         //packageManager.InstallPackage(packageName, version, configuration.IgnoreDependencies, configuration.Prerelease);
                     }
                 }
@@ -205,37 +214,37 @@
             return packageInstalls;
         }
 
-        public void upgrade_noop(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
+        public void upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            configuration.Force = false;
-            upgrade_run(configuration, continueAction, performAction: false);
+            config.Force = false;
+            upgrade_run(config, continueAction, performAction: false);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            return upgrade_run(configuration, continueAction, performAction: true);
+            return upgrade_run(config, continueAction, performAction: true);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction, bool performAction)
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, bool performAction)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
 
-            SemanticVersion version = configuration.Version != null ? new SemanticVersion(configuration.Version) : null;
-            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
-                installSuccessAction: (e) =>
-                    {
-                        var pkg = e.Package;
-                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+            SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
+            var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
+                                                               installSuccessAction: (e) =>
+                                                                   {
+                                                                       var pkg = e.Package;
+                                                                       var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                                                                       results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                        if (continueAction != null) continueAction.Invoke(results);
-                    },
-                uninstallSuccessAction: null);
+                                                                       if (continueAction != null) continueAction.Invoke(results);
+                                                                   },
+                                                               uninstallSuccessAction: null);
 
-            set_package_names_if_all_is_specified(configuration, () => { configuration.IgnoreDependencies = true; });
+            set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
 
-            foreach (string packageName in configuration.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {
@@ -253,18 +262,18 @@
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                         results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                        if (configuration.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
 
-                    IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, configuration.Prerelease, allowUnlisted: false);
+                    IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                     if (availablePackage == null)
                     {
-                        string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, configuration.Version, configuration.Source);
+                        string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Source);
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                         results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                        if (configuration.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
 
@@ -274,7 +283,7 @@
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
                         results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
 
-                        if (configuration.RegularOuptut) this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOuptut) this.Log().Info(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
 
@@ -287,15 +296,15 @@
                             results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         }
 
-                        if (configuration.RegularOuptut) this.Log().Info(logMessage);
-                        if (!configuration.Force) continue;
+                        if (config.RegularOuptut) this.Log().Info(logMessage);
+                        if (!config.Force) continue;
                     }
 
-                    if (availablePackage.Version > installedPackage.Version || configuration.Force)
+                    if (availablePackage.Version > installedPackage.Version || config.Force)
                     {
                         if (availablePackage.Version > installedPackage.Version)
                         {
-                            if (configuration.RegularOuptut)
+                            if (config.RegularOuptut)
                             {
                                 this.Log().Warn("You have {0} v{1} installed. Version {2} is available based on your source(s)".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version));
                             }
@@ -313,7 +322,7 @@
                                 packageName,
                                 version == null ? null : version.ToString()))
                             {
-                                packageManager.UpdatePackage(availablePackage, updateDependencies: !configuration.IgnoreDependencies, allowPrereleaseVersions: configuration.Prerelease);
+                                packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
                             }
                         }
                     }
@@ -323,9 +332,9 @@
             return packageInstalls;
         }
 
-        public void uninstall_noop(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
+        public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            var results = uninstall_run(configuration, continueAction, performAction: false);
+            var results = uninstall_run(config, continueAction, performAction: false);
             foreach (var packageResult in results.or_empty_list_if_null())
             {
                 var package = packageResult.Value.Package;
@@ -333,17 +342,17 @@
             }
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            return uninstall_run(configuration, continueAction, performAction: true);
+            return uninstall_run(config, continueAction, performAction: true);
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction, bool performAction)
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, bool performAction)
         {
             var packageUninstalls = new ConcurrentDictionary<string, PackageResult>();
 
-            SemanticVersion version = configuration.Version != null ? new SemanticVersion(configuration.Version) : null;
-            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
+            SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
+            var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
                                                                installSuccessAction: null,
                                                                uninstallSuccessAction: (e) =>
                                                                    {
@@ -357,7 +366,7 @@
 
                     // this section fires twice sometimes, like for older packages in a sxs install... 
                     var results = packageUninstalls.GetOrAdd(pkg.Id.to_lower() + "." + pkg.Version.to_string(), new PackageResult(pkg, e.InstallPath));
-                    string logMessage = "{0}{1} v{2}{3}".format_with(Environment.NewLine, pkg.Id, pkg.Version.to_string(), configuration.Force ? " (forced)" : string.Empty);
+                    string logMessage = "{0}{1} v{2}{3}".format_with(Environment.NewLine, pkg.Id, pkg.Version.to_string(), config.Force ? " (forced)" : string.Empty);
                     if (results.Messages.Count((p) => p.Message == ApplicationParameters.Messages.NugetEventActionHeader) == 0)
                     {
                         results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.NugetEventActionHeader));
@@ -370,7 +379,7 @@
 
                     // is this the latest version or have you passed --sxs? This is the only way you get through to the continue action.
                     var latestVersion = packageManager.LocalRepository.FindPackage(e.Package.Id);
-                    if (latestVersion.Version == pkg.Version || configuration.AllowMultipleVersions)
+                    if (latestVersion.Version == pkg.Version || config.AllowMultipleVersions)
                     {
                         results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
                         if (continueAction != null) continueAction.Invoke(results);
@@ -381,15 +390,15 @@
                     }
                 };
 
-            set_package_names_if_all_is_specified(configuration, () =>
+            set_package_names_if_all_is_specified(config, () =>
                 {
                     // force remove the item, ignore the dependencies 
                     // as those are going to be picked up anyway
-                    configuration.Force = true;
-                    configuration.ForceDependencies = false;
+                    config.Force = true;
+                    config.ForceDependencies = false;
                 });
 
-            foreach (string packageName in configuration.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {
@@ -399,7 +408,7 @@
                 else
                 {
                     IList<IPackage> installedPackageVersions = new List<IPackage>();
-                    if (string.IsNullOrWhiteSpace(configuration.Version))
+                    if (string.IsNullOrWhiteSpace(config.Version))
                     {
                         installedPackageVersions = packageManager.LocalRepository.FindPackagesById(packageName).OrderBy((p) => p.Version).ToList();
                     }
@@ -415,12 +424,12 @@
                         var results = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                         results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                        if (configuration.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
 
                     var packageVersionsToRemove = installedPackageVersions.ToList();
-                    if (installedPackageVersions.Count != 1 && !configuration.AllVersions)
+                    if (installedPackageVersions.Count != 1 && !config.AllVersions)
                     {
                         packageVersionsToRemove.Clear();
                         this.Log().Info(ChocolateyLoggers.Important, "Which version of {0} would you like to uninstall?".format_with(packageName));
@@ -445,7 +454,7 @@
                             var results = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                            if (configuration.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                            if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                             continue;
                         }
 
@@ -453,12 +462,12 @@
                         if (selection == counter.to_string())
                         {
                             packageVersionsToRemove = installedPackageVersions.ToList();
-                            if (configuration.RegularOuptut) this.Log().Info(() => "You selected to remove all versions of {0}".format_with(packageName));
+                            if (config.RegularOuptut) this.Log().Info(() => "You selected to remove all versions of {0}".format_with(packageName));
                         }
                         else
                         {
                             packageVersionsToRemove.Add(choices[selected]);
-                            if (configuration.RegularOuptut) this.Log().Info(() => "You selected {0} v{1}".format_with(choices[selected].Id, choices[selected].Version.to_string()));
+                            if (config.RegularOuptut) this.Log().Info(() => "You selected {0} v{1}".format_with(choices[selected].Id, choices[selected].Version.to_string()));
                         }
                     }
 
@@ -472,7 +481,7 @@
                                 packageName,
                                 version == null ? null : version.ToString()))
                             {
-                                packageManager.UninstallPackage(packageVersion, forceRemove: configuration.Force, removeDependencies: configuration.ForceDependencies);
+                                packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
                             }
                         }
                         else
@@ -486,16 +495,16 @@
             return packageUninstalls;
         }
 
-        private void set_package_names_if_all_is_specified(ChocolateyConfiguration configuration, Action customAction)
+        private void set_package_names_if_all_is_specified(ChocolateyConfiguration config, Action customAction)
         {
-            if (configuration.PackageNames.is_equal_to("all"))
+            if (config.PackageNames.is_equal_to("all"))
             {
-                configuration.LocalOnly = true;
-                var sources = configuration.Source;
-                configuration.Source = ApplicationParameters.PackagesLocation;
-                var localPackages = list_run(configuration, logResults: false);
-                configuration.Source = sources;
-                configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator, localPackages.Select((p) => p.Key).or_empty_list_if_null());
+                config.LocalOnly = true;
+                var sources = config.Source;
+                config.Source = ApplicationParameters.PackagesLocation;
+                var localPackages = list_run(config, logResults: false);
+                config.Source = sources;
+                config.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator, localPackages.Select((p) => p.Key).or_empty_list_if_null());
 
                 if (customAction != null) customAction.Invoke();
             }

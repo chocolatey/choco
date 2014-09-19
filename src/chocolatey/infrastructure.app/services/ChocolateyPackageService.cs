@@ -32,23 +32,23 @@
             _packageInfoService = packageInfoService;
         }
 
-        public void list_noop(ChocolateyConfiguration configuration)
+        public void list_noop(ChocolateyConfiguration config)
         {
-            if (configuration.Source.is_equal_to(SpecialSourceType.webpi.to_string()))
+            if (config.Source.is_equal_to(SpecialSourceType.webpi.to_string()))
             {
                 //todo: webpi
             }
             else
             {
-                _nugetService.list_noop(configuration);
+                _nugetService.list_noop(config);
             }
         }
 
-        public void list_run(ChocolateyConfiguration configuration, bool logResults)
+        public void list_run(ChocolateyConfiguration config, bool logResults)
         {
             this.Log().Debug(() => "Searching for package information");
 
-            if (configuration.Source.is_equal_to(SpecialSourceType.webpi.to_string()))
+            if (config.Source.is_equal_to(SpecialSourceType.webpi.to_string()))
             {
                 //todo: webpi
                 //install webpi if not installed
@@ -57,20 +57,20 @@
             }
             else
             {
-                var list = _nugetService.list_run(configuration, logResults: true);
-                if (configuration.RegularOuptut)
+                var list = _nugetService.list_run(config, logResults: true);
+                if (config.RegularOuptut)
                 {
-                    this.Log().Warn(() => @"{0} packages {1}.".format_with(list.Count, configuration.LocalOnly ? "installed" : "found"));
+                    this.Log().Warn(() => @"{0} packages {1}.".format_with(list.Count, config.LocalOnly ? "installed" : "found"));
 
-                    if (configuration.LocalOnly && configuration.IncludeRegistryPrograms)
+                    if (config.LocalOnly && config.IncludeRegistryPrograms)
                     {
-                        report_registry_programs(configuration, list);
+                        report_registry_programs(config, list);
                     }
                 }
             }
         }
 
-        private void report_registry_programs(ChocolateyConfiguration configuration, ConcurrentDictionary<string, PackageResult> list)
+        private void report_registry_programs(ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> list)
         {
             var itemsToRemoveFromMachine = new List<string>();
             foreach (var packageResult in list)
@@ -96,40 +96,40 @@
                 foreach (var key in machineInstalled.or_empty_list_if_null())
                 {
                     this.Log().Info("{0}|{1}".format_with(key.DisplayName, key.DisplayVersion));
-                    if (configuration.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation, Environment.NewLine, key.UninstallString));
+                    if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation, Environment.NewLine, key.UninstallString));
                 }
                 this.Log().Warn(() => @"{0} applications not managed with Chocolatey.".format_with(machineInstalled.Count));
             }
         }
 
-        public void pack_noop(ChocolateyConfiguration configuration)
+        public void pack_noop(ChocolateyConfiguration config)
         {
-            _nugetService.pack_noop(configuration);
+            _nugetService.pack_noop(config);
         }
 
-        public void pack_run(ChocolateyConfiguration configuration)
+        public void pack_run(ChocolateyConfiguration config)
         {
-            _nugetService.pack_run(configuration);
+            _nugetService.pack_run(config);
         }
 
-        public void install_noop(ChocolateyConfiguration configuration)
+        public void push_noop(ChocolateyConfiguration config)
         {
-            _nugetService.install_noop(configuration, (pkg) => _powershellService.install_noop(pkg));
+            _nugetService.push_noop(config);
         }
 
-        public void handle_package_result(PackageResult packageResult, ChocolateyConfiguration configuration, CommandNameType commandName)
+        public void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
         {
             var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
-            if (configuration.AllowMultipleVersions)
+            if (config.AllowMultipleVersions)
             {
                 pkgInfo.IsSideBySide = true;
             }
 
-            if (!configuration.SkipPackageInstallProvider)
+            if (!config.SkipPackageInstallProvider)
             {
                 var before = _registryService.get_installer_keys();
 
-                var powerShellRan = _powershellService.install(configuration, packageResult);
+                var powerShellRan = _powershellService.install(config, packageResult);
                 if (powerShellRan)
                 {
                     //todo: prevent reboots
@@ -152,11 +152,11 @@
 
             if (packageResult.Success)
             {
-                _shimgenService.install(configuration, packageResult);
+                _shimgenService.install(config, packageResult);
             }
 
             _packageInfoService.save_package_information(pkgInfo);
-            ensure_bad_package_path_is_clean(configuration, packageResult);
+            ensure_bad_package_path_is_clean(config, packageResult);
 
             if (!packageResult.Success)
             {
@@ -169,17 +169,17 @@
             this.Log().Info(ChocolateyLoggers.Important, " {0} has been {1}ed successfully.".format_with(packageResult.Name, commandName.to_string()));
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration)
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
         {
             //todo:are we installing from an alternate source? If so run that command instead
 
             this.Log().Info(@"Installing the following packages:");
-            this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(configuration.PackageNames));
+            this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
             this.Log().Info(@"By installing you accept licenses for the packages.");
 
             var packageInstalls = _nugetService.install_run(
-                configuration,
-                (packageResult) => handle_package_result(packageResult, configuration, CommandNameType.install)
+                config,
+                (packageResult) => handle_package_result(packageResult, config, CommandNameType.install)
                 );
 
             var installFailures = packageInstalls.Count(p => !p.Value.Success);
@@ -198,22 +198,22 @@
             return packageInstalls;
         }
 
-        public void upgrade_noop(ChocolateyConfiguration configuration)
+        public void upgrade_noop(ChocolateyConfiguration config)
         {
-            _nugetService.upgrade_noop(configuration, (pkg) => _powershellService.install_noop(pkg));
+            _nugetService.upgrade_noop(config, (pkg) => _powershellService.install_noop(pkg));
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration configuration)
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config)
         {
             //todo:are we upgrading an alternate source? If so run that command instead
 
             this.Log().Info(@"Upgrading the following packages:");
-            this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(configuration.PackageNames));
+            this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
             this.Log().Info(@"By installing you accept licenses for the packages.");
 
             var packageUpgrades = _nugetService.upgrade_run(
-                configuration,
-                (packageResult) => handle_package_result(packageResult, configuration, CommandNameType.upgrade)
+                config,
+                (packageResult) => handle_package_result(packageResult, config, CommandNameType.upgrade)
                 );
 
             var upgradeFailures = packageUpgrades.Count(p => !p.Value.Success);
@@ -232,18 +232,18 @@
             return packageUpgrades;
         }
 
-        public void uninstall_noop(ChocolateyConfiguration configuration)
+        public void uninstall_noop(ChocolateyConfiguration config)
         {
-            _nugetService.uninstall_noop(configuration, (pkg) => { _powershellService.uninstall_noop(pkg); });
+            _nugetService.uninstall_noop(config, (pkg) => { _powershellService.uninstall_noop(pkg); });
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration configuration)
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config)
         {
             this.Log().Info(@"Uninstalling the following packages:");
-            this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(configuration.PackageNames));
+            this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
 
             var packageUninstalls = _nugetService.uninstall_run(
-                configuration,
+                config,
                 (packageResult) =>
                     {
                         if (!_fileSystem.directory_exists(packageResult.InstallLocation))
@@ -251,12 +251,12 @@
                             packageResult.InstallLocation += ".{0}".format_with(packageResult.Package.Version.to_string());
                         }
 
-                        _shimgenService.uninstall(configuration, packageResult);
+                        _shimgenService.uninstall(config, packageResult);
 
                         var powershellRan = false;
-                        if (!configuration.SkipPackageInstallProvider)
+                        if (!config.SkipPackageInstallProvider)
                         {
-                            powershellRan = _powershellService.uninstall(configuration, packageResult);
+                            powershellRan = _powershellService.uninstall(config, packageResult);
                         }
 
                         if (!powershellRan)
@@ -381,7 +381,7 @@
             _fileSystem.delete_directory(packageResult.InstallLocation, recursive: true);
         }
 
-        private void ensure_bad_package_path_is_clean(ChocolateyConfiguration configuration, PackageResult packageResult)
+        private void ensure_bad_package_path_is_clean(ChocolateyConfiguration config, PackageResult packageResult)
         {
             try
             {
@@ -393,7 +393,7 @@
             }
             catch (Exception ex)
             {
-                if (configuration.Debug)
+                if (config.Debug)
                 {
                     this.Log().Error(() => "Attempted to delete bad package install path if existing. Had an error:{0}{1}".format_with(Environment.NewLine, ex));
                 }
