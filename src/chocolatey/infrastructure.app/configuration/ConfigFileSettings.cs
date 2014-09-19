@@ -22,5 +22,8 @@
 
         [XmlArray("sources")]
         public HashSet<ConfigFileSourceSetting> Sources { get; set; }
+        
+        [XmlArray("apiKeys")]
+        public HashSet<ConfigFileSourceSetting> ApiKeys { get; set; }
     }
 }

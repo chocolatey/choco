@@ -18,5 +18,11 @@
 
         [XmlAttribute(AttributeName = "disabled")]
         public bool Disabled { get; set; }
+
+        [XmlAttribute(AttributeName = "user")]
+        public string UserName { get; set; }
+
+        [XmlAttribute(AttributeName = "password")]
+        public string Password { get; set; }
     }
 }
