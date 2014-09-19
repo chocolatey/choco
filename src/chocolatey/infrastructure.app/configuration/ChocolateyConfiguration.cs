@@ -16,6 +16,7 @@ namespace chocolatey.infrastructure.app.configuration
             NewCommand = new NewCommandConfiguration();
             SourceCommand = new SourcesCommandConfiguration();
             ApiKeyCommand = new ApiKeyCommandConfiguration();
+            PushCommand = new PushCommandConfiguration();
         }
 
         // overrides
@@ -64,10 +65,6 @@ namespace chocolatey.infrastructure.app.configuration
         public bool CheckSumFiles { get; set; }
         public bool VirusCheckFiles { get; set; }
 
-        // push
-        public int TimeoutInSeconds { get; set; } //default to 300
-        //DisableBuffering?
-
         // install/update
         /// <summary>
         ///   Gets or sets the package names. Space separated
@@ -89,6 +86,7 @@ namespace chocolatey.infrastructure.app.configuration
         public NewCommandConfiguration NewCommand { get; private set; }
         public SourcesCommandConfiguration SourceCommand { get; private set; }
         public ApiKeyCommandConfiguration ApiKeyCommand { get; private set; }
+        public PushCommandConfiguration PushCommand { get; private set; }
     }
 
     public sealed class NewCommandConfiguration
@@ -116,5 +114,12 @@ namespace chocolatey.infrastructure.app.configuration
     public sealed class ApiKeyCommandConfiguration
     {
         public string Key { get; set; }
+    }
+
+    public sealed class PushCommandConfiguration
+    {
+        public string Key { get; set; }
+        public int TimeoutInSeconds { get; set; }
+        //DisableBuffering?
     }
 }

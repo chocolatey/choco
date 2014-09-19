@@ -53,6 +53,7 @@
                             new ChocolateyUpgradeCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyUninstallCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyPackCommand(container.GetInstance<IChocolateyPackageService>()),
+                            new ChocolateyPushCommand(container.GetInstance<IChocolateyPackageService>(), container.GetInstance<IChocolateyConfigSettingsService>()),
                             new ChocolateyNewCommand(container.GetInstance<ITemplateService>()),
                             new ChocolateySourceCommand(container.GetInstance<IChocolateyConfigSettingsService>()),
                             new ChocolateySetApiKeyCommand(container.GetInstance<IChocolateyConfigSettingsService>()),

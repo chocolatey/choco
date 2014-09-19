@@ -112,12 +112,27 @@
             string outputFile = builder.Id + "." + builder.Version + Constants.PackageExtension;
             string outputPath = _fileSystem.combine_paths(nuspecDirectory, outputFile);
 
-            IPackage package = NugetPack.BuildPackage(builder, _fileSystem, outputPath);
+            //IPackage package = 
+            NugetPack.BuildPackage(builder, _fileSystem, outputPath);
             //todo: v1 analyze package
             //if (package != null)
             //{
             //    AnalyzePackage(package);
             //}
+        }
+
+        public void push_noop(ChocolateyConfiguration config)
+        {
+            string nupkgFilePath = validate_and_return_package_file(config, Constants.PackageExtension);
+            this.Log().Info(()=> "Would have attempted to push '{0}' to source '{1}'.".format_with(_fileSystem.get_file_name(nupkgFilePath),config.Source));
+        }
+
+        public void push_run(ChocolateyConfiguration config)
+        {
+            string nupkgFilePath = validate_and_return_package_file(config, Constants.PackageExtension);
+            if (config.RegularOuptut) this.Log().Info(()=>"Attempting to push {0} to {1}".format_with(_fileSystem.get_file_name(nupkgFilePath),config.Source));
+
+            NugetPush.push_package(config, nupkgFilePath);
         }
 
         public void install_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)

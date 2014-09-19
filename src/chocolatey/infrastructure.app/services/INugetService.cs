@@ -34,6 +34,18 @@
         void pack_run(ChocolateyConfiguration config);
 
         /// <summary>
+        /// Push_noops the specified configuration.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        void push_noop(ChocolateyConfiguration config);
+
+        /// <summary>
+        /// Push_runs the specified configuration.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        void push_run(ChocolateyConfiguration config);
+
+        /// <summary>
         ///   Run install in noop mode
         /// </summary>
         /// <param name="config">The configuration.</param>

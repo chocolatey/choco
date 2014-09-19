@@ -117,6 +117,16 @@
             _nugetService.push_noop(config);
         }
 
+        public void push_run(ChocolateyConfiguration config)
+        {
+            _nugetService.push_run(config);
+        }
+
+        public void install_noop(ChocolateyConfiguration config)
+        {
+            _nugetService.install_noop(config, (pkg) => _powershellService.install_noop(pkg));
+        }
+
         public void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
         {
             var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);

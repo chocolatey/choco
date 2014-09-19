@@ -41,7 +41,7 @@
             // Review: This exclusion should be done by the package builder because it knows which file would collide with the auto-generated
             // manifest file.
             var excludes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var wildCards = excludes.Concat(new[] {@"**\*" + Constants.ManifestExtension, @"**\*" + Constants.PackageExtension});
+            var wildCards = excludes.Concat(new[] { @"**\*" + Constants.ManifestExtension, @"**\*" + Constants.PackageExtension });
 
             PathResolver.FilterPackageFiles(packageFiles, ResolvePath, wildCards);
         }

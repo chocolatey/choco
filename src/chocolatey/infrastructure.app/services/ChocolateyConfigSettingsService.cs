@@ -82,6 +82,17 @@
             }
         }
 
+        public string get_api_key(ChocolateyConfiguration configuration)
+        {
+            var apiKey = _configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Source));
+            if (apiKey != null)
+            {
+                return NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();
+            }
+
+            return null;
+        }
+
         public void set_api_key(ChocolateyConfiguration configuration)
         {
             var apiKey = _configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Source));
