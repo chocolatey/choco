@@ -106,11 +106,13 @@
             // Initialize the property provider based on what was passed in using the properties flag
             var propertyProvider = new DictionaryPropertyProvider(properties);
 
-            //if (config.PlatformType != PlatformType.Windows)
-            //{
-            //}
+            var basePath = _fileSystem.get_current_directory();
+            if (config.PlatformType != PlatformType.Windows)
+            {
+                basePath = "./";
+            }
 
-            var builder = new PackageBuilder(nuspecFilePath,_fileSystem.get_current_directory(), propertyProvider, includeEmptyDirectories: true);
+            var builder = new PackageBuilder(nuspecFilePath,basePath, propertyProvider, includeEmptyDirectories: true);
             if (!string.IsNullOrWhiteSpace(config.Version))
             {
                 builder.Version = new SemanticVersion(config.Version);
