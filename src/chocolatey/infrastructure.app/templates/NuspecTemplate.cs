@@ -11,7 +11,7 @@
     <id>[[PackageNameLower]]</id>
     <title>[[PackageName]] (Install)</title>
     <version>[[PackageVersion]]</version>
-    <authors>__REPLACE__</authors>
+    <authors>__REPLACE_AUTHORS_OF_SOFTWARE__</authors>
     <owners>[[MaintainerName]]</owners>
     <summary>__REPLACE__</summary>
     <description>__REPLACE__ [[AutomaticPackageNotesNuspec]]
