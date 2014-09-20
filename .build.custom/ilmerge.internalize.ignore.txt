@@ -1,1 +1,2 @@
 chocolatey.*
+NuGet.Manifest
