@@ -10,6 +10,7 @@
     using guards;
     using logging;
     using nuget;
+    using platforms;
     using results;
     using IFileSystem = filesystem.IFileSystem;
 
@@ -105,7 +106,11 @@
             // Initialize the property provider based on what was passed in using the properties flag
             var propertyProvider = new DictionaryPropertyProvider(properties);
 
-            var builder = new PackageBuilder(nuspecFilePath, propertyProvider, includeEmptyDirectories: true);
+            //if (config.PlatformType != PlatformType.Windows)
+            //{
+            //}
+
+            var builder = new PackageBuilder(nuspecFilePath,_fileSystem.get_current_directory(), propertyProvider, includeEmptyDirectories: true);
             if (!string.IsNullOrWhiteSpace(config.Version))
             {
                 builder.Version = new SemanticVersion(config.Version);
