@@ -41,14 +41,21 @@
             IList<IPackageRepository> repositories = new List<IPackageRepository>();
             foreach (var source in sources.or_empty_list_if_null())
             {
-                var uri = new Uri(source);
-                if (uri.IsFile || uri.IsUnc)
+                try
                 {
-                    repositories.Add(new ChocolateyLocalPackageRepository(uri.LocalPath));
+                    var uri = new Uri(source);
+                    if (uri.IsFile || uri.IsUnc)
+                    {
+                        repositories.Add(new ChocolateyLocalPackageRepository(uri.LocalPath));
+                    }
+                    else
+                    {
+                        repositories.Add(new DataServicePackageRepository(uri));
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    repositories.Add(new DataServicePackageRepository(uri));
+                    repositories.Add(new ChocolateyLocalPackageRepository(source));
                 }
             }
 
