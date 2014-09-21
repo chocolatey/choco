@@ -6,6 +6,7 @@
     using System.IO;
     using System.Linq;
     using NuGet;
+    using commandline;
     using configuration;
     using guards;
     using logging;
@@ -457,48 +458,35 @@
                     }
 
                     var packageVersionsToRemove = installedPackageVersions.ToList();
-                    if (installedPackageVersions.Count != 1 && !config.AllVersions)
+                    if (!config.AllVersions)
                     {
-                        packageVersionsToRemove.Clear();
-                        this.Log().Info(ChocolateyLoggers.Important, "Which version of {0} would you like to uninstall?".format_with(packageName));
-
-                        int counter = 1;
-                        IDictionary<int, IPackage> choices = new Dictionary<int, IPackage>();
-                        foreach (var installedVersion in installedPackageVersions.or_empty_list_if_null())
+                        if (installedPackageVersions.Count != 1 && config.PromptForConfirmation)
                         {
-                            choices.Add(counter, installedVersion);
-                            this.Log().Info(" {0}) {1}".format_with(counter, installedVersion.Version.to_string()));
+                            packageVersionsToRemove.Clear();
 
-                            counter++;
-                        }
+                            IList<string> choices = new List<string>();
+                            foreach (var installedVersion in installedPackageVersions.or_empty_list_if_null())
+                            {
+                                choices.Add(installedVersion.Version.to_string());
+                            }
+                            string allVersions = "All versions";
+                            choices.Add(allVersions);
+                            var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), choices, allVersions, false);
 
-                        this.Log().Info(" {0}) All versions".format_with(counter));
-                        var selection = Console.ReadLine();
-
-                        int selected = -1;
-                        if (!int.TryParse(selection, out selected) || selected <= 0 || selected > counter)
-                        {
-                            string logMessage = "{0} was not a valid selection.".format_with(selection);
-                            var results = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                            results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-
-                            if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                            continue;
-                        }
-
-
-                        if (selection == counter.to_string())
-                        {
-                            packageVersionsToRemove = installedPackageVersions.ToList();
-                            if (config.RegularOuptut) this.Log().Info(() => "You selected to remove all versions of {0}".format_with(packageName));
-                        }
-                        else
-                        {
-                            packageVersionsToRemove.Add(choices[selected]);
-                            if (config.RegularOuptut) this.Log().Info(() => "You selected {0} v{1}".format_with(choices[selected].Id, choices[selected].Version.to_string()));
+                            if (string.IsNullOrWhiteSpace(selection)) continue;
+                            if (selection.is_equal_to(allVersions))
+                            {
+                                packageVersionsToRemove = installedPackageVersions.ToList();
+                                if (config.RegularOuptut) this.Log().Info(() => "You selected to remove all versions of {0}".format_with(packageName));
+                            }
+                            else
+                            {
+                                IPackage pkg = installedPackageVersions.FirstOrDefault((p) => p.Version.to_string().is_equal_to(selection));
+                                packageVersionsToRemove.Add(pkg);
+                                if (config.RegularOuptut) this.Log().Info(() => "You selected {0} v{1}".format_with(pkg.Id, pkg.Version.to_string()));
+                            }
                         }
                     }
-
 
                     foreach (var packageVersion in packageVersionsToRemove)
                     {
