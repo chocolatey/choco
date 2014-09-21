@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Linq;
+    using commandline;
     using configuration;
     using domain;
     using filesystem;
@@ -69,7 +70,7 @@
 
         public bool run_action(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command)
         {
-            var installerFound = false;
+            var installerRun = false;
 
             var file = "chocolateyInstall.ps1";
             switch (command)
@@ -84,18 +85,13 @@
             if (!_fileSystem.directory_exists(packageDirectory))
             {
                 packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Package install not found:'{0}'".format_with(packageDirectory)));
-                return installerFound;
+                return installerRun;
             }
 
-            var installScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories);
-            if (installScript.Count != 0)
+            var powershellScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories);
+            if (powershellScript.Count != 0)
             {
-                var chocoInstall = installScript.FirstOrDefault();
-
-                if (chocoInstall != null) installerFound = true;
-
-                this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".format_with(chocoInstall));
-                this.Log().Debug(_fileSystem.read_file(chocoInstall));
+                var chocoPowerShellScript = powershellScript.FirstOrDefault();
 
                 var failure = false;
 
@@ -129,31 +125,53 @@
                 //    Environment.SetEnvironmentVariable("ChocolateyEnvironmentQuiet","true");
                 //}
 
-                var exitCode = PowershellExecutor.execute(
-                    wrap_command_with_module(installScript.FirstOrDefault()),
-                    _fileSystem,
-                    (s, e) =>
-                        {
-                            if (string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Info(() => " " + e.Data);
-                        },
-                    (s, e) =>
-                        {
-                            if (string.IsNullOrWhiteSpace(e.Data)) return;
-                            failure = true;
-                            this.Log().Error(() => " " + e.Data);
-                        });
+                this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".format_with(chocoPowerShellScript));
+                string chocoPowerShellScriptContents = _fileSystem.read_file(chocoPowerShellScript);
+                this.Log().Debug(chocoPowerShellScriptContents);
 
-                if (failure)
+                bool shouldRun = !configuration.PromptForConfirmation;
+
+                if (!shouldRun)
                 {
-                    Environment.ExitCode = exitCode;
-                    packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Error while running '{0}'.{1} See log for details.".format_with(installScript.FirstOrDefault(), Environment.NewLine)));
+                    this.Log().Info(ChocolateyLoggers.Important,() => " Found '{0}':".format_with(_fileSystem.get_file_name(chocoPowerShellScript)));
+                    this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents));
+                    var selection = InteractivePrompt.prompt_for_confirmation(" Do you want to run the script?", new[] { "yes", "no", "skip" }, "yes", false);
+                    if (selection.is_equal_to("yes")) shouldRun = true;
+                    if (selection.is_equal_to("no"))
+                    {
+                        Environment.ExitCode = 1;
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, "User cancelled powershell portion of installation for '{0}'.{1} Use skip to install without run.".format_with(powershellScript.FirstOrDefault(), Environment.NewLine)));
+                    }
+                }
+
+                if (shouldRun)
+                { 
+                    installerRun = true;
+                    var exitCode = PowershellExecutor.execute(
+                                       wrap_command_with_module(chocoPowerShellScript),
+                                       _fileSystem,
+                                       (s, e) =>
+                                       {
+                                           if (string.IsNullOrWhiteSpace(e.Data)) return;
+                                           this.Log().Info(() => " " + e.Data);
+                                       },
+                                       (s, e) =>
+                                       {
+                                           if (string.IsNullOrWhiteSpace(e.Data)) return;
+                                           failure = true;
+                                           this.Log().Error(() => " " + e.Data);
+                                       });
+
+                    if (failure)
+                    {
+                        Environment.ExitCode = exitCode;
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Error while running '{0}'.{1} See log for details.".format_with(powershellScript.FirstOrDefault(), Environment.NewLine)));
+                    }
+                    packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Ran '{0}'".format_with(powershellScript)));
                 }
             }
 
-            packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Ran '{0}'".format_with(installScript)));
-
-            return installerFound;
+            return installerRun;
         }
     }
 }
