@@ -13,6 +13,7 @@ namespace chocolatey.infrastructure.app.configuration
         public ChocolateyConfiguration()
         {
             RegularOuptut = true;
+            PromptForConfirmation = true;
             NewCommand = new NewCommandConfiguration();
             SourceCommand = new SourcesCommandConfiguration();
             ApiKeyCommand = new ApiKeyCommandConfiguration();
@@ -48,6 +49,7 @@ namespace chocolatey.infrastructure.app.configuration
         public bool Noop { get; set; }
         public bool HelpRequested { get; set; }
         public bool RegularOuptut { get; set; }
+        public bool PromptForConfirmation { get; set; }
 
         // command level options
         public string Source { get; set; }
