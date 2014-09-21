@@ -66,7 +66,7 @@
                              "Verbose - See verbose messaging.",
                              option => config.Verbose = option != null)
                         .Add("y|yes|confirm",
-                             "Confirm all prompts - Chooses default answer - See verbose messaging.",
+                             "Confirm all prompts - Chooses default answer instead of prompting.",
                              option => config.PromptForConfirmation = option == null)
                         .Add("f|force",
                              "Force - force the behavior",
