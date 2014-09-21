@@ -129,6 +129,7 @@
     <Compile Include="infrastructure.app\templates\ChocolateyInstallTemplate.cs" />
     <Compile Include="infrastructure.app\templates\NuspecTemplate.cs" />
     <Compile Include="infrastructure.app\templates\TemplateValues.cs" />
+    <Compile Include="infrastructure\commandline\InteractivePrompt.cs" />
     <Compile Include="infrastructure\commands\PowershellExecutor.cs" />
     <Compile Include="infrastructure\guards\Ensure.cs" />
     <Compile Include="infrastructure\logging\ChocolateyLoggers.cs" />
