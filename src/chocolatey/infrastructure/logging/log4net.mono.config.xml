@@ -6,8 +6,7 @@
   <appender name="NormalLoggingColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
     <mapping>
       <level value="FATAL" />
-      <foreColor value="White" />
-      <backColor value="Red" />
+      <foreColor value="Red" />
     </mapping>
     <mapping>
       <level value="ERROR" />
@@ -24,7 +23,6 @@
     <mapping>
       <level value="DEBUG" />
       <foreColor value="DarkBlue" />
-      <backColor value="Gray" />
     </mapping>
     <layout type="log4net.Layout.PatternLayout">
       <conversionPattern value="%message%newline" />
@@ -34,7 +32,7 @@
   <appender name="ImportantLoggingColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
     <mapping>
       <level value="FATAL" />
-      <foreColor value="White" />
+      <foreColor value="Red" />
     </mapping>
     <mapping>
       <level value="ERROR" />
@@ -51,7 +49,6 @@
     <mapping>
       <level value="DEBUG" />
       <foreColor value="Blue" />
-      <backColor value="Gray" />
     </mapping>
     <layout type="log4net.Layout.PatternLayout">
       <conversionPattern value="%message%newline" />
@@ -61,8 +58,7 @@
   <appender name="VerboseLoggingColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
     <mapping>
       <level value="FATAL" />
-      <foreColor value="White" />
-      <backColor value="Red" />
+      <foreColor value="Red" />
     </mapping>
     <mapping>
       <level value="ERROR" />
@@ -79,7 +75,6 @@
     <mapping>
       <level value="DEBUG" />
       <foreColor value="DarkBlue" />
-      <backColor value="Gray" />
     </mapping>
     <layout type="log4net.Layout.PatternLayout">
       <conversionPattern value="%message%newline" />
