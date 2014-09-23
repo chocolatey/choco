@@ -63,7 +63,7 @@
         {
             configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments);
 
-            if (string.IsNullOrWhiteSpace(configuration.PackageNames))
+            if (string.IsNullOrWhiteSpace(configuration.PackageNames) && !configuration.HelpRequested)
             {
                 throw new ApplicationException("Package name is required. Please pass at least one package name to upgrade.");
             }
