@@ -1,5 +1,6 @@
 ﻿namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using configuration;
 
     public interface IChocolateyConfigSettingsService
@@ -10,7 +11,7 @@
         void source_remove(ChocolateyConfiguration configuration);
         void source_disable(ChocolateyConfiguration configuration);
         void source_enable(ChocolateyConfiguration configuration);
-        string get_api_key(ChocolateyConfiguration configuration);
+        string get_api_key(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction);
         void set_api_key(ChocolateyConfiguration configuration);
     }
 }

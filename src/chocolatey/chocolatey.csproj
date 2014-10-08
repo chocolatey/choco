@@ -80,7 +80,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyNewCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPackCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPushCommand.cs" />
-    <Compile Include="infrastructure.app\commands\ChocolateySetApiKeyCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyApiKeyCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateySourceCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUninstallCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommand.cs" />

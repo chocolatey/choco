@@ -1,5 +1,6 @@
 ﻿namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using System.Linq;
     using configuration;
     using infrastructure.services;
@@ -82,15 +83,36 @@
             }
         }
 
-        public string get_api_key(ChocolateyConfiguration configuration)
+        public string get_api_key(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction)
         {
-            var apiKey = _configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Source));
-            if (apiKey != null)
+            string apiKeyValue = null;
+
+            if (!string.IsNullOrWhiteSpace(configuration.Source))
             {
-                return NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();
+                var apiKey = _configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Source));
+                if (apiKey != null)
+                {
+                    apiKeyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();
+
+                    if (keyAction != null)
+                    {
+                        keyAction.Invoke(new ConfigFileApiKeySetting{Key=apiKeyValue,Source=apiKey.Source});
+                    }
+                }
+            }
+            else
+            {
+                foreach (var apiKey in _configFileSettings.ApiKeys.or_empty_list_if_null())
+                {
+                    var keyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();
+                    if (keyAction != null)
+                    {
+                        keyAction.Invoke(new ConfigFileApiKeySetting { Key = keyValue, Source = apiKey.Source });
+                    }
+                }
             }
 
-            return null;
+            return apiKeyValue;
         }
 
         public void set_api_key(ChocolateyConfiguration configuration)
