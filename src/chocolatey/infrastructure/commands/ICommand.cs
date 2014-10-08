@@ -23,6 +23,8 @@
         /// <param name="configuration">The configuration.</param>
         void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration);
 
+        void handle_validation(ChocolateyConfiguration configuration);
+
         /// <summary>
         ///   The specific help message for a particular command.
         /// </summary>

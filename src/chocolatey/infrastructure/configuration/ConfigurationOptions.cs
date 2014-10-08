@@ -12,16 +12,19 @@
         private static readonly OptionSet _optionSet = new OptionSet();
 
         /// <summary>
-        ///   Parses arguments and updates the configuration
+        /// Parses arguments and updates the configuration
         /// </summary>
         /// <param name="args">The arguments.</param>
         /// <param name="configuration">The configuration</param>
         /// <param name="setOptions">The set options.</param>
+        /// <param name="afterParse">Actions to take after parsing</param>
+        /// <param name="validateConfiguration">Validate the configuration</param>
         /// <param name="helpMessage">The help message.</param>
         public static void parse_arguments_and_update_configuration(ICollection<string> args,
                                                                     ChocolateyConfiguration configuration,
                                                                     Action<OptionSet> setOptions,
                                                                     Action<IList<string>> afterParse,
+                                                                    Action validateConfiguration,
                                                                     Action helpMessage)
         {
             IList<string> unparsedArguments = new List<string>();
@@ -68,7 +71,17 @@
                 afterParse(unparsedArguments);
             }
 
-            if (configuration.HelpRequested) show_help(_optionSet, helpMessage);
+            if (configuration.HelpRequested)
+            {
+                show_help(_optionSet, helpMessage);
+            }
+            else
+            {
+                if (validateConfiguration != null)
+                {
+                    validateConfiguration();
+                }
+            }
         }
 
         /// <summary>

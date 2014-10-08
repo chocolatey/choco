@@ -58,13 +58,16 @@
             {
                 configuration.SourceCommand.Command = "list";
             }
+        }
 
+        public void handle_validation(ChocolateyConfiguration configuration)
+        {
             if (configuration.SourceCommand.Command != "list" && string.IsNullOrWhiteSpace(configuration.SourceCommand.Name))
             {
                 throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.SourceCommand.Command));
             }
         }
-
+        
         public void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Sources Command");

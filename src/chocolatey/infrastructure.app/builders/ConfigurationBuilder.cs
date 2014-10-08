@@ -87,6 +87,7 @@
                         config.HelpRequested = false;
                     }
                 },
+                () => { },
                 () =>
                 {
                     var commandsLog = new StringBuilder();

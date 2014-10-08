@@ -30,6 +30,10 @@
         {
         }
 
+        public void handle_validation(ChocolateyConfiguration configuration)
+        {
+        }
+
         public void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "UnpackSelf Command");

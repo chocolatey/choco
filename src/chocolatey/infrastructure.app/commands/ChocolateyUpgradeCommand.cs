@@ -62,8 +62,11 @@
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments);
+        }
 
-            if (string.IsNullOrWhiteSpace(configuration.PackageNames) && !configuration.HelpRequested)
+        public void handle_validation(ChocolateyConfiguration configuration)
+        {
+            if (string.IsNullOrWhiteSpace(configuration.PackageNames))
             {
                 throw new ApplicationException("Package name is required. Please pass at least one package name to upgrade.");
             }

@@ -60,20 +60,25 @@
             if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
             {
                 // perform a lookup
-                configuration.PushCommand.Key = _configSettingsService.get_api_key(configuration);
-
-                if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key))
-                {
-                    throw new ApplicationException("An ApiKey was not found for '{0}'. You must either set an api key in the configuration or specify one with --api-key.".format_with(configuration.Source));
-                }
+                configuration.PushCommand.Key = _configSettingsService.get_api_key(configuration, null);
             }
+        }
+
+        public void handle_validation(ChocolateyConfiguration configuration)
+        {
+            if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key))
+            {
+                throw new ApplicationException("An ApiKey was not found for '{0}'. You must either set an api key in the configuration or specify one with --api-key.".format_with(configuration.Source));
+            }
+
+            var remoteSource = new Uri(configuration.Source);
 
             // security advisory
             if (!configuration.Force || configuration.Source.to_lower().Contains("chocolatey.org"))
             {
                 if (remoteSource.Scheme == "http" && remoteSource.Host != "localhost")
                 {
-                    string errorMessage = 
+                    string errorMessage =
 @"WARNING! The specified source '{0}' is not secure.
  Sending apikey over insecure channels leaves your data susceptible to hackers.
  Please update your source to a more secure source and try again.

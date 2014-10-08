@@ -61,7 +61,10 @@
                     configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, configuration.NewCommand.Name);
                 }
             }
+        }
 
+        public void handle_validation(ChocolateyConfiguration configuration)
+        {
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.Name))
             {
                 throw new ApplicationException("Name is required. Please pass in a name for the new package.");
