@@ -11,6 +11,7 @@
     ///   http://msdn.microsoft.com/en-us/library/aa372024.aspx
     ///   http://support.microsoft.com/kb/227091
     ///   http://www.advancedinstaller.com/user-guide/msiexec.html
+    ///   1603 search for return value 3 http://blogs.msdn.com/b/astebner/archive/2005/08/01/446328.aspx
     /// </remarks>
     public class MsiInstaller : IInstaller
     {
