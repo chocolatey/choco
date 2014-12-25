@@ -1,10 +1,25 @@
 namespace chocolatey.infrastructure.platforms
 {
     using System;
+    using System.ComponentModel;
     using System.IO;
+    using adapters;
+    using Environment = adapters.Environment;
 
     public static class Platform
     {
+        private static Lazy<IEnvironment> environment_initializer = new Lazy<IEnvironment>(() => new Environment());
+
+        public static void initialize_with(Lazy<IEnvironment> environment)
+        {
+            environment_initializer = environment;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        private static IEnvironment Environment {
+            get { return environment_initializer.Value; }
+        }
+
         public static PlatformType get_platform()
         {
             switch (Environment.OSVersion.Platform)

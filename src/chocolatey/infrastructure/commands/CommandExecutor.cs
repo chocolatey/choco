@@ -1,13 +1,32 @@
 namespace chocolatey.infrastructure.commands
 {
     using System;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
+    using adapters;
+    using filesystem;
     using platforms;
+    using Process = adapters.Process;
 
     public sealed class CommandExecutor
     {
+        private static Lazy<IFileSystem> file_system_initializer = new Lazy<IFileSystem>(() => new DotNetFileSystem());
+
+        private static IFileSystem file_system {
+            get { return file_system_initializer.Value; }
+        }
+
+        private static Func<IProcess> initialize_process = () => new Process(); 
+        
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IFileSystem> file_system, Func<IProcess> process_initializer)
+        {
+            file_system_initializer = file_system;
+            initialize_process = process_initializer;
+        }
+
         public static int execute(string process, string arguments, bool waitForExit)
         {
             return execute(process, arguments, waitForExit, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
@@ -24,7 +43,7 @@ namespace chocolatey.infrastructure.commands
             return execute(process,
                            arguments,
                            waitForExit,
-                           Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                           file_system.get_directory_name(Assembly.GetExecutingAssembly().Location),
                            stdOutAction,
                            stdErrAction,
                            updateProcessPath: true
@@ -48,7 +67,7 @@ namespace chocolatey.infrastructure.commands
             int exitCode = -1;
             if (updateProcessPath)
             {
-                process = Path.GetFullPath(process);
+                process = file_system.get_full_path(process);
             }
 
             if (Platform.get_platform() != PlatformType.Windows)
@@ -56,7 +75,6 @@ namespace chocolatey.infrastructure.commands
                 arguments = process + " " + arguments;
                 process = "mono";
             }
-
 
             "chocolatey".Log().Debug(() => "Calling command ['\"{0}\" {1}']".format_with(process, arguments));
 
@@ -69,7 +87,7 @@ namespace chocolatey.infrastructure.commands
                     CreateNoWindow = true
                 };
 
-            using (var p = new Process())
+            using (var p = initialize_process())
             {
                 p.StartInfo = psi;
                 if (stdOutAction == null)
@@ -97,8 +115,8 @@ namespace chocolatey.infrastructure.commands
                 if (waitForExit)
                 {
                     p.WaitForExit();
+                    exitCode = p.ExitCode;
                 }
-                exitCode = p.ExitCode;
             }
 
             "chocolatey".Log().Debug(() => "Command ['\"{0}\" {1}'] exited with '{2}'".format_with(process, arguments, exitCode));

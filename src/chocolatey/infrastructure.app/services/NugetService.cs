@@ -6,6 +6,7 @@
     using System.IO;
     using System.Linq;
     using NuGet;
+    using adapters;
     using commandline;
     using configuration;
     using guards;
@@ -13,12 +14,20 @@
     using nuget;
     using platforms;
     using results;
+    using DateTime = adapters.DateTime;
+    using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
 
     public class NugetService : INugetService
     {
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _nugetLogger;
+        private Lazy<IDateTime> datetime_initializer = new Lazy<IDateTime>(() => new DateTime());
+       
+        private IDateTime DateTime
+        {
+            get { return datetime_initializer.Value; }
+        }
 
         /// <summary>
         ///   Initializes a new instance of the <see cref="NugetService" /> class.

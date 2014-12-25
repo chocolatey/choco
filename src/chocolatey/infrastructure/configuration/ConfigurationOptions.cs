@@ -4,11 +4,25 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using adapters;
     using app.configuration;
     using commandline;
+    using Console = adapters.Console;
 
     public static class ConfigurationOptions
     {
+        private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
+
+        public static void initialize_with(Lazy<IConsole> console)
+        {
+            _console = console;
+        }
+
+        private static IConsole Console
+        {
+            get { return _console.Value; }
+        }
+
         private static readonly OptionSet _optionSet = new OptionSet();
 
         /// <summary>

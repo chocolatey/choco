@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />
     <Compile Include="infrastructure\filesystem\DotNetFileSystemSpecs.cs" />
     <Compile Include="MockEventSubscriptionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
