@@ -66,6 +66,14 @@ namespace chocolatey.tests
         }
     }
 
+    public class IntegrationAttribute : CategoryAttribute
+    {
+        public IntegrationAttribute() : base("Integration")
+        {
+        }
+
+    }
+
 
     // ReSharper restore InconsistentNaming
 }
