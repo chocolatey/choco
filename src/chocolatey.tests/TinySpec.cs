@@ -58,7 +58,7 @@ namespace chocolatey.tests
     {
     }
 
-    public class FactAttribute : TestAttribute
+    public class FactAttribute : ObservationAttribute
     {
     }
 
@@ -79,7 +79,6 @@ namespace chocolatey.tests
         }
 
     }
-
 
     // ReSharper restore InconsistentNaming
 }
