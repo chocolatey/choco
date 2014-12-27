@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Text.RegularExpressions;
     using adapters;
@@ -13,6 +14,7 @@
     {
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IConsole> console)
         {
             _console = console;

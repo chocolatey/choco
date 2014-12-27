@@ -1,5 +1,6 @@
 ﻿namespace chocolatey.infrastructure.configuration
 {
+    using System.ComponentModel;
     using app.configuration;
 
     /// <summary>
@@ -13,6 +14,7 @@
         ///   Initializes application configuration with a configuration instance.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(ChocolateyConfiguration configuration)
         {
             _configuration = configuration;

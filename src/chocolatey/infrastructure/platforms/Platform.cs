@@ -4,18 +4,26 @@ namespace chocolatey.infrastructure.platforms
     using System.ComponentModel;
     using System.IO;
     using adapters;
+    using filesystem;
     using Environment = adapters.Environment;
 
     public static class Platform
     {
         private static Lazy<IEnvironment> environment_initializer = new Lazy<IEnvironment>(() => new Environment());
-
-        public static void initialize_with(Lazy<IEnvironment> environment)
-        {
-            environment_initializer = environment;
-        }
+        private static Lazy<IFileSystem> file_system_initializer = new Lazy<IFileSystem>(() => new DotNetFileSystem());
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IEnvironment> environment,Lazy<IFileSystem> file_system)
+        {
+            environment_initializer = environment;
+            file_system_initializer = file_system;
+        }
+
+        private static IFileSystem file_system
+        {
+            get { return file_system_initializer.Value; }
+        }
+
         private static IEnvironment Environment {
             get { return environment_initializer.Value; }
         }

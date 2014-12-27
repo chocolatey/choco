@@ -1,16 +1,18 @@
 ﻿namespace chocolatey.infrastructure.events
 {
     using System;
+    using System.ComponentModel;
     using services;
 
     public static class EventManager
     {
-        private static Func<IEventSubscriptionManagerService> _messageSubscriptionManager;
+        private static Func<IEventSubscriptionManagerService> _messageSubscriptionManager = () => new EventSubscriptionManagerService();
 
         /// <summary>
         ///   Initializes the Message platform with the subscription manager
         /// </summary>
         /// <param name="messageSubscriptionManager">The message subscription manager.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Func<IEventSubscriptionManagerService> messageSubscriptionManager)
         {
             _messageSubscriptionManager = messageSubscriptionManager;
