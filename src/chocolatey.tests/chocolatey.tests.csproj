@@ -58,6 +58,7 @@
     <Compile Include="infrastructure\events\context\FakeSubscriber.cs" />
     <Compile Include="infrastructure\events\EventSubscriptionManagerSpecs.cs" />
     <Compile Include="infrastructure\filesystem\DotNetFileSystemSpecs.cs" />
+    <Compile Include="infrastructure\guards\EnsureSpecs.cs" />
     <Compile Include="infrastructure\information\VersionInformationSpecs.cs" />
     <Compile Include="MockLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

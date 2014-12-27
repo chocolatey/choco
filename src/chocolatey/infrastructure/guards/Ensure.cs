@@ -38,28 +38,31 @@
 
     public class Ensure<EnsurableType> where EnsurableType : class
     {
-        private readonly string _name;
-        private readonly EnsurableType _value;
+        public string Name { get; private set; }
+        public EnsurableType Value { get; private set; }
 
         public Ensure(string name, EnsurableType value)
         {
-            _name = name;
-            _value = value;
+            Name = name;
+            Value = value;
         }
 
         public void is_not_null()
         {
-            if (_value == null)
+            if (Value == null)
             {
-                throw new ArgumentNullException("Ensure found that {0} ({1}) was null.".format_with(_name, typeof (EnsurableType).Name));
+                throw new ArgumentNullException(Name, "Value for {0} cannot be null.".format_with(Name));
             }
         }
 
         public void meets(Func<EnsurableType, bool> ensureFunction, Action<string, EnsurableType> exceptionAction)
         {
-            if (!ensureFunction(_value))
+            Ensure.that(() => ensureFunction).is_not_null();
+            Ensure.that(() => exceptionAction).is_not_null();
+
+            if (!ensureFunction(Value))
             {
-                exceptionAction.Invoke(_name, _value);
+                exceptionAction.Invoke(Name, Value);
             }
         }
     }
