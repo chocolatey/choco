@@ -8,7 +8,7 @@ namespace chocolatey.infrastructure.app.configuration
     /// <summary>
     ///   The chocolatey configuration.
     /// </summary>
-    public sealed partial class ChocolateyConfiguration
+    public partial class ChocolateyConfiguration
     {
         public ChocolateyConfiguration()
         {
