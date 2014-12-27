@@ -59,11 +59,34 @@
 
                 errored.ShouldBeTrue();
                 console.Verify(c=> c.ReadLine(),Times.Never);
+            }      
+            
+            [Fact]
+            public void should_error_when_the_choicelist_is_empty()
+            {
+                choices = new List<string>();
+                bool errored = false;
+                string errorMessage = string.Empty;
+                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                try
+                {
+                    prompt();
+                }
+                catch (Exception ex)
+                {
+                    errored = true;
+                    errorMessage = ex.Message;
+                }
+
+                errored.ShouldBeTrue();
+                errorMessage.ShouldContain("No choices passed in.");
+                console.Verify(c=> c.ReadLine(),Times.Never);
             }
 
             [Fact]
             public void should_error_when_the_prompt_input_is_null()
             {
+                choices = new List<string>{"bob"};
                 prompt_value = null;
                 bool errored = false;
                 console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
@@ -83,21 +106,25 @@
             [Fact]
             public void should_error_when_the_default_choice_is_not_in_list()
             {
+                choices = new List<string> { "bob" };
                 default_choice = "maybe";
                 bool errored = false;
+                string errorMessage = string.Empty;
                 console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 string result = null;
                 try
                 {
                    result = prompt();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     errored = true;
+                    errorMessage = ex.Message;
                 }
 
                 result.ShouldNotEqual("maybe");
                 errored.ShouldBeTrue();
+                errorMessage.ShouldEqual("Default choice value must be one of the given choices.");
                 console.Verify(c => c.ReadLine(), Times.Never);
             }
         }
