@@ -20,15 +20,20 @@ namespace chocolatey.tests
 {
     using System;
     using NUnit.Framework;
+    using chocolatey.infrastructure.logging;
 
     // ReSharper disable InconsistentNaming
 
     [TestFixture]
     public abstract class TinySpec
     {
+        public MockLogger MockLogger { get; set; }
+
         [TestFixtureSetUp]
         public void Setup()
         {
+            MockLogger = new MockLogger();
+            Log.InitializeWith(MockLogger);
             Context();
             Because();
         }
@@ -41,6 +46,7 @@ namespace chocolatey.tests
         public void TearDown()
         {
             AfterObservations();
+            MockLogger = new MockLogger();
         }
 
         public virtual void AfterObservations()
