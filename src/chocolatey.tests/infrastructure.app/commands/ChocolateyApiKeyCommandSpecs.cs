@@ -116,7 +116,6 @@
                 command.handle_validation(configuration);
             }
 
-
         }
 
         public class when_noop_is_called : ChocolateyApiKeyCommandSpecsBase
