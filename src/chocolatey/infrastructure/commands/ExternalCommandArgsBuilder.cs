@@ -1,19 +1,24 @@
-﻿namespace chocolatey.infrastructure.app.builders
+﻿namespace chocolatey.infrastructure.commands
 {
     using System;
     using System.Collections.Generic;
     using System.Text;
-    using configuration;
 
     /// <summary>
     ///   Responsible for setting up arguments for an external command to be executed
     /// </summary>
     public static class ExternalCommandArgsBuilder
     {
-        public static string build_arguments(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> configToArgNames)
+        /// <summary>
+        /// Builds a string containing the arguments for calling an external command based on public property values in the specified properties object.
+        /// </summary>
+        /// <param name="properties">The properties object. Public properties are inspected for names and values based on exact matches in the configToArgNames dictionary.</param>
+        /// <param name="configToArgNames">Dictionary of external commands set in the exact order in which you want to get back arguments. Keys should match exactly (casing as well) with the property names of the properties object.</param>
+        /// <returns>A string containing the arguments merged from the configToArgNames dictionary and the properties object.</returns>
+        public static string build_arguments(object properties, IDictionary<string, ExternalCommandArgument> configToArgNames)
         {
             var arguments = new StringBuilder();
-            var props = config.GetType().GetProperties();
+            var props = properties.GetType().GetProperties();
             var propValues = new Dictionary<string, string>();
 
             foreach (var prop in props)
@@ -22,7 +27,7 @@
                 {
                     var arg = configToArgNames[prop.Name];
                     var propType = prop.PropertyType;
-                    var propValue = prop.GetValue(config, null).to_string().wrap_spaces_in_quotes();
+                    var propValue = prop.GetValue(properties, null).to_string().wrap_spaces_in_quotes();
                     if (propType == typeof (Boolean) && propValue.is_equal_to(bool.FalseString))
                     {
                         continue;
@@ -70,6 +75,7 @@
                     }
                 }
             }
+            if (arguments.Length == 0) return string.Empty;
 
             return arguments.Remove(arguments.Length - 1, 1).ToString();
         }

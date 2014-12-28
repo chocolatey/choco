@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="infrastructure\commands\ExternalCommandArgsBuilderSpecs.cs" />
     <Compile Include="infrastructure\commandline\InteractivePromptSpecs.cs" />
     <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />
     <Compile Include="infrastructure\commands\PowershellExecutorSpecs.cs" />

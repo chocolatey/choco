@@ -1,4 +1,4 @@
-﻿namespace chocolatey.infrastructure.app.builders
+﻿namespace chocolatey.infrastructure.commands
 {
     /// <summary>
     ///   Used with ExternalCommandArgsBuilder to build arguments to pass to an external command.
