@@ -6,21 +6,22 @@ namespace chocolatey.infrastructure.tokens
 
     public sealed class TokenReplacer
     {
-        public static string replace_tokens<TConfig>(TConfig configuration, string textToReplace, string tokenPrefix = "\\[\\[", string tokenSuffix = "\\]\\]")
+        public static string replace_tokens<TConfig>(TConfig configuration, string textToReplace, string tokenPrefix = "[[", string tokenSuffix = "]]")
         {
             if (string.IsNullOrEmpty(textToReplace)) return string.Empty;
 
             IDictionary<string, string> dictionary = create_dictionary_from_configuration(configuration);
-            var regex = new Regex("{0}(?<key>\\w+){1}".format_with(tokenPrefix,tokenSuffix));
+            var regex = new Regex("{0}(?<key>\\w+){1}".format_with(Regex.Escape(tokenPrefix),Regex.Escape(tokenSuffix)));
 
             string output = regex.Replace(textToReplace, m =>
                 {
                     string key = "";
 
-                    key = m.Groups["key"].Value.to_lower();
+                    var originalKey = m.Groups["key"].Value;
+                    key = originalKey.to_lower();
                     if (!dictionary.ContainsKey(key))
                     {
-                        return tokenPrefix + key + tokenSuffix;
+                        return tokenPrefix + originalKey + tokenSuffix;
                     }
 
                     string value = dictionary[key];
