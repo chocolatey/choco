@@ -3,12 +3,12 @@
     using events;
     using infrastructure.commands;
 
-    public class PreRunEvent<TCommand> : IEvent where TCommand : ICommand
+    public class PostRunEvent<TCommand> : IEvent where TCommand : ICommand
     {
         public TCommand Command { get; private set; }
         public object[] State { get; private set; }
 
-        public PreRunEvent(TCommand command, object[] state)
+        public PostRunEvent(TCommand command, object[] state)
         {
             Command = command;
             State = state;
