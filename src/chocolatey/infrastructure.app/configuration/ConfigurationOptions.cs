@@ -1,13 +1,12 @@
-﻿namespace chocolatey.infrastructure.configuration
+﻿namespace chocolatey.infrastructure.app.configuration
 {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
     using System.Text.RegularExpressions;
-    using adapters;
-    using app.configuration;
-    using commandline;
+    using chocolatey.infrastructure.adapters;
+    using chocolatey.infrastructure.commandline;
     using Console = adapters.Console;
 
     public static class ConfigurationOptions

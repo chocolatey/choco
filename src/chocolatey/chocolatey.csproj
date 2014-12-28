@@ -170,7 +170,7 @@
     <Compile Include="infrastructure.app\configuration\ChocolateyConfiguration.cs" />
     <Compile Include="infrastructure\commands\ICommand.cs" />
     <Compile Include="infrastructure\configuration\Config.cs" />
-    <Compile Include="infrastructure\configuration\ConfigurationOptions.cs" />
+    <Compile Include="infrastructure.app\configuration\ConfigurationOptions.cs" />
     <Compile Include="infrastructure\filesystem\DotNetFileSystem.cs" />
     <Compile Include="infrastructure\filesystem\IFileSystem.cs" />
     <Compile Include="infrastructure\information\VersionInformation.cs" />
