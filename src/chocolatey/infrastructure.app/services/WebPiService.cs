@@ -4,7 +4,6 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
-    using builders;
     using configuration;
     using infrastructure.commands;
     using logging;
@@ -14,6 +13,7 @@
     {
     }
 
+    //todo this is the old nuget.exe installer code that needs cleaned up for webpi
     public class WebPiService : IWebPiService
     {
         private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
