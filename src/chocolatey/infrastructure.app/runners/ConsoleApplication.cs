@@ -47,6 +47,7 @@
 
             if (command == null)
             {
+                //todo add a search among other location/extensions for the command
                 if (!string.IsNullOrWhiteSpace(config.CommandName))
                 {
                     throw new Exception("Could not find a command registered that meets '{0}'".format_with(config.CommandName));
