@@ -1,10 +1,10 @@
-﻿namespace chocolatey.infrastructure.app.extractors
+﻿namespace chocolatey.infrastructure.extractors
 {
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
     using System.Text;
-    using filesystem;
+    using chocolatey.infrastructure.filesystem;
 
     /// <summary>
     ///   Extracts resources from an assembly.
@@ -58,9 +58,8 @@
             }
         }
 
-        public static void extract_all_chocolatey_resources_to_relative_directory(IFileSystem fileSystem, Assembly assembly, string directoryPath, IList<string> relativeDirectories, bool overwriteExisting = false)
+        public static void extract_all_resources_to_relative_directory(IFileSystem fileSystem, Assembly assembly, string directoryPath, IList<string> relativeDirectories, string resourcesToInclude, bool overwriteExisting = false)
         {
-            const string resourcesToInclude = "chocolatey.resources";
             var resourceString = new StringBuilder();
             foreach (var resourceName in assembly.GetManifestResourceNames())
             {

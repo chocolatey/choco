@@ -148,7 +148,7 @@
     <Compile Include="infrastructure\commands\ExternalCommandArgsBuilder.cs" />
     <Compile Include="infrastructure\commands\ExternalCommandArgument.cs" />
     <Compile Include="infrastructure.app\domain\SpecialSourceType.cs" />
-    <Compile Include="infrastructure.app\extractors\AssemblyFileExtractor.cs" />
+    <Compile Include="infrastructure\extractors\AssemblyFileExtractor.cs" />
     <Compile Include="infrastructure.app\builders\ConfigurationBuilder.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUnpackSelfCommand.cs" />

@@ -7,9 +7,9 @@
     using infrastructure.app;
     using infrastructure.app.builders;
     using infrastructure.app.configuration;
-    using infrastructure.app.extractors;
     using infrastructure.app.runners;
     using infrastructure.configuration;
+    using infrastructure.extractors;
     using infrastructure.filesystem;
     using infrastructure.licensing;
     using infrastructure.logging;
@@ -65,7 +65,7 @@
                         "redirects",
                         "tools"
                     };
-                AssemblyFileExtractor.extract_all_chocolatey_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders);
+                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, "chocolatey.resources");
 
                 var application = new ConsoleApplication();
                 application.run(args, config, container);
