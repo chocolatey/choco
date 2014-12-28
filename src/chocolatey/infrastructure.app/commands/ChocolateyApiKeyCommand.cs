@@ -15,7 +15,6 @@
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
 
-
         public ChocolateyApiKeyCommand(IChocolateyConfigSettingsService configSettingsService)
         {
             _configSettingsService = configSettingsService;
@@ -30,7 +29,7 @@
                      "Source [REQUIRED] - The source location for the key",
                      option => configuration.Source = option)
                 .Add("k=|key=|apikey=|api-key=",
-                     "ApiKey [REQUIRED] - The api key for the source.",
+                     "ApiKey - The api key for the source.",
                      option => configuration.ApiKeyCommand.Key = option)
                 ;
         }

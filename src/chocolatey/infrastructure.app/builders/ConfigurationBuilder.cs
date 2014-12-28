@@ -10,7 +10,6 @@
     using extractors;
     using filesystem;
     using information;
-    using infrastructure.configuration;
     using infrastructure.services;
     using logging;
     using platforms;
