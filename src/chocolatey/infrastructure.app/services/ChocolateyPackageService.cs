@@ -208,6 +208,15 @@
                 packageInstalls.Count,
                 installFailures));
 
+            if (installFailures != 0)
+            {
+                this.Log().Error("Failures");
+                foreach (var failure in packageInstalls.Where(p => !p.Value.Success).or_empty_list_if_null())
+                {
+                    this.Log().Error(" - {0}".format_with(failure.Value.Name));
+                }
+            }
+
             if (installFailures != 0 && Environment.ExitCode == 0)
             {
                 Environment.ExitCode = 1;
@@ -241,6 +250,15 @@
                 packageUpgrades.Count(p => p.Value.Success && !p.Value.Inconclusive),
                 packageUpgrades.Count,
                 upgradeFailures));
+
+            if (upgradeFailures != 0)
+            {
+                this.Log().Error("Failures");
+                foreach (var failure in packageUpgrades.Where(p => !p.Value.Success).or_empty_list_if_null())
+                {
+                    this.Log().Error(" - {0}".format_with(failure.Value.Name));
+                }
+            }
 
             if (upgradeFailures != 0 && Environment.ExitCode == 0)
             {
@@ -371,6 +389,15 @@
                 packageUninstalls.Count(p => p.Value.Success && !p.Value.Inconclusive),
                 packageUninstalls.Count,
                 uninstallFailures));
+
+            if (uninstallFailures != 0)
+            {
+                this.Log().Error("Failures");
+                foreach (var failure in packageUninstalls.Where(p => !p.Value.Success).or_empty_list_if_null())
+                {
+                    this.Log().Error(" - {0}".format_with(failure.Value.Name));
+                }
+            }
 
             if (uninstallFailures != 0 && Environment.ExitCode == 0)
             {
