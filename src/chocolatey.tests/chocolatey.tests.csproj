@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="infrastructure.app\attributes\CommandForAttributeSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyApiKeyCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInstallCommandSpecs.cs" />
     <Compile Include="infrastructure\commands\ExternalCommandArgsBuilderSpecs.cs" />
