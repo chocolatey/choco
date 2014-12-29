@@ -84,5 +84,28 @@ namespace chocolatey
         {
             return string.Compare(input, other, ignoreCase: true, culture: CultureInfo.InvariantCulture) == 0;
         }
+
+        /// <summary>
+        /// Removes quotes or apostrophes surrounding a string
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <returns></returns>
+        public static string remove_surrounding_quotes(this string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+
+            if (input.StartsWith(" "))
+            {
+                input = input.trim_safe();
+            }
+
+            if ((input.StartsWith("\"") && input.EndsWith("\"")) 
+                || (input.StartsWith("'") && input.EndsWith("'")))
+            {
+                input = input.Remove(0, 1).Remove(input.Length - 2, 1);
+            }
+
+            return input;
+        }
     }
 }
