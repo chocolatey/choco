@@ -309,7 +309,7 @@
                                 this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString));
                                 // split on " /" and " -" for quite a bit more accuracy
                                 IList<string> uninstallArgs = key.UninstallString.to_string().Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                                var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault().Replace("\"", "");
+                                var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault().remove_surrounding_quotes();
                                 this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
                                 uninstallArgs.Remove(uninstallExe);
 
