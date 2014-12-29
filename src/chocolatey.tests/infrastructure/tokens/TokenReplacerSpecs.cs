@@ -70,6 +70,18 @@
             {
                 TokenReplacer.replace_tokens(configuration, "Hi! My name is [[DataBase]]").ShouldEqual("Hi! My name is [[DataBase]]");
             }
+            
+            [Fact]
+            public void if_given_an_empty_value_should_return_the_empty_value()
+            {
+                TokenReplacer.replace_tokens(configuration, "").ShouldEqual("");
+            }
+            
+            [Fact]
+            public void if_given_an_null_value_should_return_the_ll_value()
+            {
+                TokenReplacer.replace_tokens(configuration, null).ShouldEqual("");
+            }
         }
     }
 }
