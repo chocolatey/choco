@@ -1,10 +1,14 @@
 ﻿namespace chocolatey.tests.infrastructure.app.commands
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Moq;
     using Should;
+    using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
+    using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
 
@@ -20,6 +24,21 @@
             {
                 configuration.Source = "bob";
                 command = new ChocolateyApiKeyCommand(configSettingsService.Object);
+            }
+        }
+
+        public class when_implementing_command_for : ChocolateyApiKeyCommandSpecsBase
+        {
+            private List<string> results;
+            public override void Because()
+            {
+                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+            }
+
+            [Fact]
+            public void should_implement_apikey()
+            {
+                results.ShouldContain(CommandNameType.apikey.to_string());
             }
         }
 
@@ -126,7 +145,7 @@
             }
 
             [Fact]
-            public void should_call_service_noop_method()
+            public void should_call_service_noop()
             {
                 configSettingsService.Verify(c=> c.noop(configuration),Times.Once);
             }

@@ -2,10 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Moq;
     using Should;
+    using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
+    using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
 
@@ -24,9 +27,23 @@
             }
         }
 
+        public class when_implementing_command_for : ChocolateyInstallCommandSpecsBase
+        {
+            private List<string> results;
+            public override void Because()
+            {
+                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+            }
+
+            [Fact]
+            public void should_implement_install()
+            {
+                results.ShouldContain(CommandNameType.install.to_string());
+            }
+        }
+
         public class when_configurating_the_argument_parser : ChocolateyInstallCommandSpecsBase
         {
-            private string result;
             private OptionSet optionSet;
 
             public override void Context()
@@ -228,32 +245,24 @@
             }
 
             [Fact]
-            public void should_call_service_noop_method()
+            public void should_call_service_install_noop()
             {
                 packageService.Verify(c => c.install_noop(configuration), Times.Once);
             }
         }
 
-        public class when_run_is_called_without_key_set : ChocolateyInstallCommandSpecsBase
+        public class when_run_is_called : ChocolateyInstallCommandSpecsBase
         {
-            public override void Context()
-            {
-                base.Context();
-                configuration.Source = "bob";
-                configuration.ApiKeyCommand.Key = "";
-            }
-
             public override void Because()
             {
                 command.run(configuration);
             }
 
             [Fact]
-            public void should_call_install()
+            public void should_call_service_install_run()
             {
                 packageService.Verify(c => c.install_run(configuration), Times.Once);
             }
         }
-
     }
 }
