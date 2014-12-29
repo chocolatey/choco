@@ -207,6 +207,11 @@
                 }
             }
 
+            if (config.Source.to_string().EndsWith(Constants.PackageExtension))
+            {
+                config.Source = _fileSystem.get_directory_name(_fileSystem.get_full_path(config.Source));
+            }
+
             var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
                                                                 installSuccessAction: (e) =>
                                                                     {
