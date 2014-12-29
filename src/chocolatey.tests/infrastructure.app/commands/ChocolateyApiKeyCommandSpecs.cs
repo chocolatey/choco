@@ -46,27 +46,27 @@
             }
 
             [Fact]
-            public void should_add_short_version_of_source_to_the_option_set()
-            {
-                optionSet.Contains("s").ShouldBeTrue();
-            } 
-            
-            [Fact]
             public void should_add_source_to_the_option_set()
             {
                 optionSet.Contains("source").ShouldBeTrue();
-            } 
-            
+            }
+
             [Fact]
-            public void should_add_short_version_of_apikey_to_the_option_set()
+            public void should_add_short_version_of_source_to_the_option_set()
             {
-                optionSet.Contains("k").ShouldBeTrue();
-            } 
-            
+                optionSet.Contains("s").ShouldBeTrue();
+            }
+
             [Fact]
             public void should_add_apikey_to_the_option_set()
             {
                 optionSet.Contains("apikey").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_short_version_of_apikey_to_the_option_set()
+            {
+                optionSet.Contains("k").ShouldBeTrue();
             }
         }
 
