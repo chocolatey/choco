@@ -26,10 +26,7 @@ namespace chocolatey
         /// <returns></returns>
         public static string trim_safe(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return string.Empty;
-            }
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
             return input.Trim();
         }
@@ -41,10 +38,7 @@ namespace chocolatey
         /// <returns></returns>
         public static string to_lower(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return input;
-            }
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
             return input.ToLower();
         }
@@ -56,10 +50,7 @@ namespace chocolatey
         /// <returns></returns>
         public static string to_string(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return input;
-            }
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
             return input;
         }
@@ -73,10 +64,7 @@ namespace chocolatey
         /// <returns></returns>
         public static string wrap_spaces_in_quotes(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return input;
-            }
+            if (string.IsNullOrWhiteSpace(input)) return input;
 
             if (_spacePattern.IsMatch(input))
             {
