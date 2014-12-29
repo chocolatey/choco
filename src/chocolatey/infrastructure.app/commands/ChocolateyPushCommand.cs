@@ -24,12 +24,13 @@
 
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
-            configuration.Source = ApplicationParameters.DefaultChocolateyPushSource;
+            configuration.Source = null;
+            //configuration.Source = ApplicationParameters.DefaultChocolateyPushSource;
             configuration.PushCommand.TimeoutInSeconds = 300;
 
             optionSet
                  .Add("s=|source=",
-                     "Source - The source we are pushing the package to. Defaults to {0}".format_with(ApplicationParameters.DefaultChocolateyPushSource),
+                     "Source - The source we are pushing the package to. Use {0} to push to community feed.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource),
                      option => configuration.Source = option)
                  .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The api key for the source. If not specified (and not local file source), does a lookup. If one is not found, will fail.",
@@ -56,16 +57,23 @@
         {
             configuration.Input = string.Join(" ", unparsedArguments); // path to .nupkg - assume relative
 
-            var remoteSource = new Uri(configuration.Source);
-            if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
+            if (!string.IsNullOrWhiteSpace(configuration.Source))
             {
-                // perform a lookup
-                configuration.PushCommand.Key = _configSettingsService.get_api_key(configuration, null);
+                var remoteSource = new Uri(configuration.Source);
+                if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
+                {
+                    // perform a lookup
+                    configuration.PushCommand.Key = _configSettingsService.get_api_key(configuration, null);
+                }
             }
         }
 
         public void handle_validation(ChocolateyConfiguration configuration)
         {
+            if (!string.IsNullOrWhiteSpace(configuration.Source))
+            {
+                throw new ApplicationException("Source is required. Please pass a source to push to, such as --source={0}".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+            }
             if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key))
             {
                 throw new ApplicationException("An ApiKey was not found for '{0}'. You must either set an api key in the configuration or specify one with --api-key.".format_with(configuration.Source));
@@ -103,7 +111,7 @@ Usage: choco push [path to nupkg] [options/switches]
 
 Note: If there is more than one nupkg file in the folder, the command will require specifying the path to the file.
 
-".format_with(ApplicationParameters.DefaultChocolateyPushSource));
+".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
         }
 
         public void noop(ChocolateyConfiguration configuration)
