@@ -19,8 +19,8 @@
         {
             var arguments = new StringBuilder();
             var props = properties.GetType().GetProperties();
-            var propValues = new Dictionary<string, string>();
-
+            var propValues = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+           
             foreach (var prop in props)
             {
                 if (configToArgNames.ContainsKey(prop.Name))

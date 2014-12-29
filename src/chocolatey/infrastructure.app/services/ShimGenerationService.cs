@@ -15,7 +15,7 @@
         private const string PATH_TOKEN = "{{path}}";
         private const string OUTPUT_TOKEN = "{{output}}";
         private readonly string _shimGenExePath = ApplicationParameters.Tools.ShimGenExe;
-        private readonly IDictionary<string, ExternalCommandArgument> _shimGenArguments = new Dictionary<string, ExternalCommandArgument>();
+        private readonly IDictionary<string, ExternalCommandArgument> _shimGenArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
 
         public ShimGenerationService(IFileSystem fileSystem)

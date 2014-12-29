@@ -42,6 +42,14 @@
                 argsDictionary.Clear();
                 argsDictionary.Add("source", new ExternalCommandArgument { ArgumentOption = "-source " });
                 buildConfigs().ShouldEqual("");
+            } 
+            
+            [Fact]
+            public void should_add_a_parameter_that_does_not_match_the_case_of_the_property_name_when_dictionary_ignores_case()
+            {
+                IDictionary<string, ExternalCommandArgument> ignoreCaseDictionary = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
+                ignoreCaseDictionary.Add("source", new ExternalCommandArgument { ArgumentOption = "-source " });
+                ExternalCommandArgsBuilder.build_arguments(configuration, ignoreCaseDictionary).ShouldEqual("-source yo");
             }
 
             [Fact]
