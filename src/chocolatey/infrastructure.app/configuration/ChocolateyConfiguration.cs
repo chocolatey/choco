@@ -97,7 +97,7 @@ namespace chocolatey.infrastructure.app.configuration
 
         public NewCommandConfiguration()
         {
-            TemplateProperties = new Dictionary<string, string>();
+            TemplateProperties = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
         public string Name { get; set; }

@@ -25,8 +25,8 @@
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
-                .Add("a|auto",
-                     "Generate automatic package instead of normal. Defaults to false",
+                .Add("a|auto|automaticpackage",
+                     "AutomaticPackage - Generate automatic package instead of normal. Defaults to false",
                      option => configuration.NewCommand.AutomaticPackage = option != null)
                 .Add("name=",
                      "Name [Required]- the name of the package. Can be passed as first parameter without \"--name=\".",
@@ -48,17 +48,33 @@
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
+
+            if (string.IsNullOrWhiteSpace(configuration.NewCommand.Name))
+            {
+                configuration.NewCommand.Name = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
+                var property = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                if (property.Count() == 1)
+                {
+                    configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, configuration.NewCommand.Name);
+                }
+            }
+
             foreach (var unparsedArgument in unparsedArguments.or_empty_list_if_null())
             {
                 var property = unparsedArgument.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
                 if (property.Count() == 2)
                 {
-                    configuration.NewCommand.TemplateProperties.Add(property[0], property[1]);
-                }
-                else if (string.IsNullOrWhiteSpace(configuration.NewCommand.Name))
-                {
-                    configuration.NewCommand.Name = unparsedArguments.FirstOrDefault();
-                    configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, configuration.NewCommand.Name);
+                    var propName = property[0].trim_safe();
+                    var propValue = property[1].trim_safe().remove_surrounding_quotes();
+
+                    if (configuration.NewCommand.TemplateProperties.ContainsKey(propName))
+                    {
+                        this.Log().Warn(() => "A value for '{0}' has already been added with the value '{1}'. Ignoring {0}='{2}'.".format_with(propName, configuration.NewCommand.TemplateProperties[propName],propValue));
+                    }
+                    else
+                    {
+                        configuration.NewCommand.TemplateProperties.Add(propName, propValue);
+                    }
                 }
             }
         }
