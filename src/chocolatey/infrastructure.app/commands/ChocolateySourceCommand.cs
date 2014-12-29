@@ -31,10 +31,10 @@
                      option => configuration.SourceCommand.Name = option)
                 .Add("s=|source=",
                      "Source - The source. Defaults to empty.",
-                     option => configuration.Source = option) 
+                     option => configuration.Source = option)
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
-                     option => configuration.SourceCommand.Username = option) 
+                     option => configuration.SourceCommand.Username = option)
                 .Add("p=|password=",
                      "Password - the user's password to the source. Encrypted in file.",
                      option => configuration.SourceCommand.Password = option)
@@ -50,24 +50,22 @@
                 throw new ApplicationException("A single sources command must be listed. Please see the help menu for those commands");
             }
 
-            configuration.SourceCommand.Command = unparsedArguments.FirstOrDefault();
+            var command = SourceCommandType.unknown;
+            Enum.TryParse(unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault(), true, out command);
 
-            var command = configuration.SourceCommand.Command;
+            if (command == SourceCommandType.unknown) command = SourceCommandType.list;
 
-            if (command != "add" && command != "remove" && command != "disable" && command != "enable")
-            {
-                configuration.SourceCommand.Command = "list";
-            }
+            configuration.SourceCommand.Command = command;
         }
 
         public void handle_validation(ChocolateyConfiguration configuration)
         {
-            if (configuration.SourceCommand.Command != "list" && string.IsNullOrWhiteSpace(configuration.SourceCommand.Name))
+            if (configuration.SourceCommand.Command != SourceCommandType.list && string.IsNullOrWhiteSpace(configuration.SourceCommand.Name))
             {
-                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.SourceCommand.Command));
+                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.SourceCommand.Command.to_string()));
             }
         }
-        
+
         public void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Sources Command");
@@ -98,19 +96,19 @@ Examples:
         {
             switch (configuration.SourceCommand.Command)
             {
-                case "list":
+                case SourceCommandType.list:
                     _configSettingsService.source_list(configuration);
                     break;
-                case "add":
+                case SourceCommandType.add:
                     _configSettingsService.source_add(configuration);
                     break;
-                case "remove":
+                case SourceCommandType.remove:
                     _configSettingsService.source_remove(configuration);
                     break;
-                case "disable":
+                case SourceCommandType.disable:
                     _configSettingsService.source_disable(configuration);
                     break;
-                case "enable":
+                case SourceCommandType.enable:
                     _configSettingsService.source_enable(configuration);
                     break;
             }

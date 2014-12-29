@@ -3,6 +3,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System;
     using System.Collections.Generic;
     using System.Text;
+    using domain;
     using platforms;
     
     /// <summary>
@@ -108,7 +109,7 @@ namespace chocolatey.infrastructure.app.configuration
     public sealed class SourcesCommandConfiguration
     {
         public string Name { get; set; }
-        public string Command { get; set; }
+        public SourceCommandType Command { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
     }
