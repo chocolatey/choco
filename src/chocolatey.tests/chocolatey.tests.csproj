@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="infrastructure.app\commands\ChocolateyApiKeyCommandSpecs.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyInstallCommandSpecs.cs" />
     <Compile Include="infrastructure\commands\ExternalCommandArgsBuilderSpecs.cs" />
     <Compile Include="infrastructure\commandline\InteractivePromptSpecs.cs" />
     <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />
