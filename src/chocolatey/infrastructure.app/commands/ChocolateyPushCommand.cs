@@ -33,7 +33,7 @@
                      "Source - The source we are pushing the package to. Use {0} to push to community feed.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource),
                      option => configuration.Source = option)
                  .Add("k=|key=|apikey=|api-key=",
-                     "ApiKey - The api key for the source. If not specified (and not local file source), does a lookup. If one is not found, will fail.",
+                     "ApiKey - The api key for the source. If not specified (and not local file source), does a lookup. If not specified and one is not found for an https source, push will fail.",
                      option => configuration.PushCommand.Key = option)
                  .Add("t=|timeout=",
                      "Timeout (in seconds) - The time to allow a package push to occur before timing out. Defaults to 300 seconds (5 minutes).",
@@ -70,17 +70,18 @@
 
         public void handle_validation(ChocolateyConfiguration configuration)
         {
-            if (!string.IsNullOrWhiteSpace(configuration.Source))
+            if (string.IsNullOrWhiteSpace(configuration.Source))
             {
                 throw new ApplicationException("Source is required. Please pass a source to push to, such as --source={0}".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
             }
-            if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key))
+
+            var remoteSource = new Uri(configuration.Source);
+
+            if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
             {
                 throw new ApplicationException("An ApiKey was not found for '{0}'. You must either set an api key in the configuration or specify one with --api-key.".format_with(configuration.Source));
             }
-           
-            var remoteSource = new Uri(configuration.Source);
-
+            
             // security advisory
             if (!configuration.Force || configuration.Source.to_lower().Contains("chocolatey.org"))
             {
