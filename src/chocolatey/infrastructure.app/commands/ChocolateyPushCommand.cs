@@ -38,17 +38,17 @@
                  .Add("t=|timeout=",
                      "Timeout (in seconds) - The time to allow a package push to occur before timing out. Defaults to 300 seconds (5 minutes).",
                      option =>
+                     {
+                         int timeout = 0;
+                         int.TryParse(option, out timeout);
+                         if (timeout > 0)
                          {
-                             int timeout = 0;
-                             int.TryParse(option, out timeout);
-                             if (timeout > 0)
-                             {
-                                 configuration.PushCommand.TimeoutInSeconds = timeout;
-                             }
-                         })     
-                 //.Add("b|disablebuffering|disable-buffering",
-                 //    "DisableBuffering -  Disable buffering when pushing to an HTTP(S) server to decrease memory usage. Note that when this option is enabled, integrated windows authentication might not work.",
-                 //    option => configuration.PushCommand.DisableBuffering = option)
+                             configuration.PushCommand.TimeoutInSeconds = timeout;
+                         }
+                     })
+                //.Add("b|disablebuffering|disable-buffering",
+                //    "DisableBuffering -  Disable buffering when pushing to an HTTP(S) server to decrease memory usage. Note that when this option is enabled, integrated windows authentication might not work.",
+                //    option => configuration.PushCommand.DisableBuffering = option)
                 ;
             //todo: push command - allow disable buffering?
         }
@@ -78,7 +78,7 @@
             {
                 throw new ApplicationException("An ApiKey was not found for '{0}'. You must either set an api key in the configuration or specify one with --api-key.".format_with(configuration.Source));
             }
-
+           
             var remoteSource = new Uri(configuration.Source);
 
             // security advisory

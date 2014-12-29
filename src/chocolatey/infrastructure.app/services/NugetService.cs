@@ -23,7 +23,7 @@
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _nugetLogger;
         private Lazy<IDateTime> datetime_initializer = new Lazy<IDateTime>(() => new DateTime());
-       
+
         private IDateTime DateTime
         {
             get { return datetime_initializer.Value; }
@@ -122,7 +122,7 @@
                 basePath = "./";
             }
 
-            var builder = new PackageBuilder(nuspecFilePath,basePath, propertyProvider, includeEmptyDirectories: true);
+            var builder = new PackageBuilder(nuspecFilePath, basePath, propertyProvider, includeEmptyDirectories: true);
             if (!string.IsNullOrWhiteSpace(config.Version))
             {
                 builder.Version = new SemanticVersion(config.Version);
@@ -186,15 +186,15 @@
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
             var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
-                                                               installSuccessAction: (e) =>
-                                                                   {
-                                                                       var pkg = e.Package;
-                                                                       var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                                                                       results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+                                                                installSuccessAction: (e) =>
+                                                                    {
+                                                                        var pkg = e.Package;
+                                                                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                                                                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                                                                       if (continueAction != null) continueAction.Invoke(results);
-                                                                   },
-                                                               uninstallSuccessAction: null);
+                                                                        if (continueAction != null) continueAction.Invoke(results);
+                                                                    },
+                                                                uninstallSuccessAction: null);
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
