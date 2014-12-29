@@ -185,6 +185,28 @@
             //todo: handle all
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
+
+            IList<string> packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
+            if (packageNames.Count == 1)
+            {
+                var packageName = packageNames.FirstOrDefault();
+                if (packageName.EndsWith(Constants.PackageExtension) || packageName.EndsWith(Constants.ManifestExtension))
+                {
+                    this.Log().Debug("Updating source and package name to handle *.nupkg or *.nuspec file.");
+                    packageNames.Clear();
+                    packageNames.Add(_fileSystem.get_file_name_without_extension(packageName));
+                    config.Source = _fileSystem.get_directory_name(_fileSystem.get_full_path(packageName));
+
+                    if (packageName.EndsWith(Constants.ManifestExtension))
+                    {
+                        this.Log().Debug("Building nuspec file prior to install.");
+                        config.Input = packageName;
+                        // build package
+                        pack_run(config);
+                    }
+                }
+            }
+
             var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
                                                                 installSuccessAction: (e) =>
                                                                     {
@@ -196,7 +218,7 @@
                                                                     },
                                                                 uninstallSuccessAction: null);
 
-            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in packageNames.or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {
