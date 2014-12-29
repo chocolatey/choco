@@ -71,7 +71,7 @@
 
         public void handle_validation(ChocolateyConfiguration configuration)
         {
-            if (string.IsNullOrWhiteSpace(configuration.PackageNames) && !configuration.HelpRequested)
+            if (string.IsNullOrWhiteSpace(configuration.PackageNames))
             {
                 throw new ApplicationException("Package name is required. Please pass at least one package name to install.");
             }
