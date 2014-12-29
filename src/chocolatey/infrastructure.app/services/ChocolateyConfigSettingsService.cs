@@ -8,13 +8,18 @@
 
     class ChocolateyConfigSettingsService : IChocolateyConfigSettingsService
     {
-        private readonly ConfigFileSettings _configFileSettings;
+        private readonly Lazy<ConfigFileSettings> _configFileSettings;
         private readonly IXmlService _xmlService;
+
+        private ConfigFileSettings configFileSettings
+        {
+            get { return _configFileSettings.Value; }
+        }
 
         public ChocolateyConfigSettingsService(IXmlService xmlService)
         {
             _xmlService = xmlService;
-            _configFileSettings = _xmlService.deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation);
+            _configFileSettings = new Lazy<ConfigFileSettings>(()=> _xmlService.deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation));
         }
 
         public void noop(ChocolateyConfiguration configuration)
@@ -24,7 +29,7 @@
 
         public void source_list(ChocolateyConfiguration configuration)
         {
-            foreach (var source in _configFileSettings.Sources)
+            foreach (var source in configFileSettings.Sources)
             {
                 this.Log().Info(() => "{0}{1} - {2}".format_with(source.Id, source.Disabled ? " [Disabled]" : string.Empty, source.Value));
             }
@@ -32,10 +37,10 @@
         
         public void source_add(ChocolateyConfiguration configuration)
         {
-            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
+            var source = configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
             if (source == null)
             {
-                _configFileSettings.Sources.Add(new ConfigFileSourceSetting()
+                configFileSettings.Sources.Add(new ConfigFileSourceSetting()
                     {
                         Id = configuration.SourceCommand.Name,
                         Value = configuration.Source, 
@@ -51,10 +56,10 @@
 
         public void source_remove(ChocolateyConfiguration configuration)
         {
-            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
+            var source = configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
             if (source != null)
             {
-                _configFileSettings.Sources.Remove(source);
+                configFileSettings.Sources.Remove(source);
                 _xmlService.serialize(_configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
                 this.Log().Info(() => "Removed {0}".format_with(source.Id));
@@ -63,7 +68,7 @@
 
         public void source_disable(ChocolateyConfiguration configuration)
         {
-            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
+            var source = configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
             if (source != null && !source.Disabled)
             {
                 source.Disabled = true;
@@ -74,7 +79,7 @@
 
         public void source_enable(ChocolateyConfiguration configuration)
         {
-            var source = _configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
+            var source = configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
             if (source != null && source.Disabled)
             {
                 source.Disabled = false;
@@ -89,7 +94,7 @@
 
             if (!string.IsNullOrWhiteSpace(configuration.Source))
             {
-                var apiKey = _configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Source));
+                var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Source));
                 if (apiKey != null)
                 {
                     apiKeyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();
@@ -102,7 +107,7 @@
             }
             else
             {
-                foreach (var apiKey in _configFileSettings.ApiKeys.or_empty_list_if_null())
+                foreach (var apiKey in configFileSettings.ApiKeys.or_empty_list_if_null())
                 {
                     var keyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();
                     if (keyAction != null)
@@ -117,10 +122,10 @@
 
         public void set_api_key(ChocolateyConfiguration configuration)
         {
-            var apiKey = _configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Source));
+            var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Source));
             if (apiKey == null)
             {
-                _configFileSettings.ApiKeys.Add(new ConfigFileApiKeySetting()
+                configFileSettings.ApiKeys.Add(new ConfigFileApiKeySetting()
                     {
                         Source = configuration.Source,
                         Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key),
