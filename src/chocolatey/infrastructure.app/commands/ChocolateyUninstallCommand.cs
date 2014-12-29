@@ -24,7 +24,7 @@
         {
             optionSet
                 .Add("version=",
-                     "Version - A specific version to install. Defaults to unspecified.",
+                     "Version - A specific version to uninstall. Defaults to unspecified.",
                      option => configuration.Version = option)
                 .Add("a|allversions|all-versions",
                      "AllVersions - Uninstall all versions? Defaults to false.",
