@@ -79,9 +79,16 @@
                         .Add("v|verbose",
                              "Verbose - See verbose messaging.",
                              option => config.Verbose = option != null)
+                        .Add("acceptlicense|accept-license",
+                             "AcceptLicense - Accept license dialogs automatically.",
+                             option => config.AcceptLicense = option != null)
                         .Add("y|yes|confirm",
-                             "Confirm all prompts - Chooses default answer instead of prompting.",
-                             option => config.PromptForConfirmation = option == null)
+                             "Confirm all prompts - Chooses default answer instead of prompting. Implies --accept-license",
+                             option =>
+                             {
+                                 config.PromptForConfirmation = option == null;
+                                 config.AcceptLicense = option != null;
+                             })
                         .Add("f|force",
                              "Force - force the behavior",
                              option => config.Force = option != null)

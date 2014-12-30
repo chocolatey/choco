@@ -56,6 +56,7 @@ namespace chocolatey.infrastructure.app.configuration
         public bool HelpRequested { get; set; }
         public bool RegularOuptut { get; set; }
         public bool PromptForConfirmation { get; set; }
+        public bool AcceptLicense { get; set; }
 
         // command level options
         public string Source { get; set; }
