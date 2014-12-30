@@ -1,7 +1,7 @@
 namespace chocolatey.infrastructure.logging
 {
     using System.IO;
-    using System.Reflection;
+    using adapters;
     using app;
     using log4net;
     using log4net.Appender;
@@ -24,7 +24,7 @@ namespace chocolatey.infrastructure.logging
         /// <param name="outputDirectory">The output directory.</param>
         public static void configure(string outputDirectory)
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
+            var assembly = Assembly.GetExecutingAssembly();
             var resource = ApplicationParameters.Log4NetConfigurationResource;
             if (Platform.get_platform() != PlatformType.Windows)
             {
@@ -70,7 +70,7 @@ namespace chocolatey.infrastructure.logging
                     };
                 app.ActivateOptions();
 
-                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly());
+                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
                 foreach (ILogger log in logRepository.GetCurrentLoggers())
                 {
                     var logger = log as Logger;
@@ -92,7 +92,7 @@ namespace chocolatey.infrastructure.logging
         {
             if (enableDebug)
             {
-                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly());
+                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
                 logRepository.Threshold = Level.Debug;
                 foreach (ILogger log in logRepository.GetCurrentLoggers())
                 {
@@ -116,7 +116,7 @@ namespace chocolatey.infrastructure.logging
         {
             if (enableVerbose)
             {
-                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly());
+                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
                 foreach (ILogger log in logRepository.GetCurrentLoggers())
                 {
                     var logger = log as Logger;

@@ -1,7 +1,8 @@
 ﻿namespace chocolatey
 {
     using System.IO;
-    using System.Reflection;
+    using infrastructure.adapters;
+    using Assembly = System.Reflection.Assembly;
 
     /// <summary>
     ///   Extensions for Assembly
@@ -14,7 +15,7 @@
         /// <param name="assembly">The assembly.</param>
         /// <param name="manifestResourceStreamLocation">The manifest resource stream location.</param>
         /// <returns></returns>
-        public static string get_manifest_string(this Assembly assembly, string manifestResourceStreamLocation)
+        public static string get_manifest_string(this IAssembly assembly, string manifestResourceStreamLocation)
         {
             string manifestFileText = "";
 
@@ -40,7 +41,7 @@
         /// <param name="assembly">The assembly.</param>
         /// <param name="manifestResourceStreamLocation">The manifest resource stream location.</param>
         /// <returns></returns>
-        public static Stream get_manifest_stream(this Assembly assembly, string manifestResourceStreamLocation)
+        public static Stream get_manifest_stream(this IAssembly assembly, string manifestResourceStreamLocation)
         {
             return assembly.GetManifestResourceStream(manifestResourceStreamLocation);
         }

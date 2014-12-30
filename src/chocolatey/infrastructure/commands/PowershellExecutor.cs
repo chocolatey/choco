@@ -4,8 +4,9 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Reflection;
+    using adapters;
     using filesystem;
+    using Environment = System.Environment;
 
     public sealed class PowershellExecutor
     {

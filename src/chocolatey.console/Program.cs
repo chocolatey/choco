@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Reflection;
+    using infrastructure.adapters;
     using infrastructure.app;
     using infrastructure.app.builders;
     using infrastructure.app.configuration;
@@ -16,6 +16,8 @@
     using infrastructure.registration;
     using infrastructure.services;
     using resources;
+    using Console = System.Console;
+    using Environment = System.Environment;
 
     public sealed class Program
     {

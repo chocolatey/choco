@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using System.Text;
+    using adapters;
     using configuration;
     using domain;
     using extractors;
@@ -13,6 +13,7 @@
     using infrastructure.services;
     using logging;
     using platforms;
+    using Environment = System.Environment;
 
     /// <summary>
     ///   Responsible for gathering all configuration related information and producing the ChocolateyConfig

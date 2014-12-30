@@ -1,10 +1,11 @@
 ﻿namespace chocolatey.infrastructure.extractors
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Reflection;
     using System.Text;
-    using chocolatey.infrastructure.filesystem;
+    using adapters;
+    using filesystem;
 
     /// <summary>
     ///   Extracts resources from an assembly.
@@ -22,7 +23,7 @@
         ///   if set to <c>true</c> [overwrite existing].
         /// </param>
         /// <exception cref="System.IO.FileNotFoundException"></exception>
-        public static void extract_text_file_from_assembly(IFileSystem fileSystem, Assembly assembly, string manifestLocation, string filePath, bool overwriteExisting = false)
+        public static void extract_text_file_from_assembly(IFileSystem fileSystem, IAssembly assembly, string manifestLocation, string filePath, bool overwriteExisting = false)
         {
             if (overwriteExisting || !fileSystem.file_exists(filePath))
             {
@@ -49,7 +50,7 @@
         /// <param name="overwriteExisting">
         ///   if set to <c>true</c> [overwrite existing].
         /// </param>
-        public static void extract_binary_file_from_assembly(IFileSystem fileSystem, Assembly assembly, string manifestLocation, string filePath, bool overwriteExisting = false)
+        public static void extract_binary_file_from_assembly(IFileSystem fileSystem, IAssembly assembly, string manifestLocation, string filePath, bool overwriteExisting = false)
         {
             if (overwriteExisting || !fileSystem.file_exists(filePath))
             {
@@ -58,7 +59,7 @@
             }
         }
 
-        public static void extract_all_resources_to_relative_directory(IFileSystem fileSystem, Assembly assembly, string directoryPath, IList<string> relativeDirectories, string resourcesToInclude, bool overwriteExisting = false)
+        public static void extract_all_resources_to_relative_directory(IFileSystem fileSystem, IAssembly assembly, string directoryPath, IList<string> relativeDirectories, string resourcesToInclude, bool overwriteExisting = false)
         {
             var resourceString = new StringBuilder();
             foreach (var resourceName in assembly.GetManifestResourceNames())

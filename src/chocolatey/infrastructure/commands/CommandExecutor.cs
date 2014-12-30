@@ -4,10 +4,10 @@ namespace chocolatey.infrastructure.commands
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
-    using System.Reflection;
     using adapters;
     using filesystem;
     using platforms;
+    using Assembly = adapters.Assembly;
     using Process = adapters.Process;
 
     public sealed class CommandExecutor

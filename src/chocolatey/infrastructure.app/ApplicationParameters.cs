@@ -1,9 +1,10 @@
 namespace chocolatey.infrastructure.app
 {
     using System;
-    using System.Reflection;
     using System.Text.RegularExpressions;
+    using adapters;
     using filesystem;
+    using Environment = System.Environment;
 
     /// <summary>
     ///   Application constants and settings for the application

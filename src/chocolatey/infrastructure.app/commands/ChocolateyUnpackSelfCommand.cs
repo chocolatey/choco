@@ -1,7 +1,7 @@
 ﻿namespace chocolatey.infrastructure.app.commands
 {
     using System.Collections.Generic;
-    using System.Reflection;
+    using adapters;
     using attributes;
     using commandline;
     using configuration;
