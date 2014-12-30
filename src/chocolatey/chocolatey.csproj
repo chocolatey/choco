@@ -131,9 +131,11 @@
     <Compile Include="infrastructure.app\templates\ChocolateyInstallTemplate.cs" />
     <Compile Include="infrastructure.app\templates\NuspecTemplate.cs" />
     <Compile Include="infrastructure.app\templates\TemplateValues.cs" />
+    <Compile Include="infrastructure\adapters\Assembly.cs" />
     <Compile Include="infrastructure\adapters\Console.cs" />
     <Compile Include="infrastructure\adapters\DateTime.cs" />
     <Compile Include="infrastructure\adapters\Environment.cs" />
+    <Compile Include="infrastructure\adapters\IAssembly.cs" />
     <Compile Include="infrastructure\adapters\IConsole.cs" />
     <Compile Include="infrastructure\adapters\IDateTime.cs" />
     <Compile Include="infrastructure\adapters\IEnvironment.cs" />
