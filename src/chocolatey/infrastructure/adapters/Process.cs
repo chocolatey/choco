@@ -53,6 +53,11 @@
             _process.WaitForExit();
         }
 
+        public bool WaitForExit(int milliseconds)
+        {
+            return _process.WaitForExit(milliseconds);
+        }
+
         public void Dispose()
         {
             _process.Dispose();

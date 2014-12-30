@@ -65,6 +65,13 @@
         ///       indefinitely for the associated process to exit.
         /// </summary>
         void WaitForExit();
+
+        /// <summary>
+        /// Instructs the <see cref='System.Diagnostics.Process'/> component to wait the specified number of milliseconds for the associated process to exit.
+        /// </summary>
+        /// <param name="milliseconds">The milliseconds.</param>
+        /// <returns></returns>
+        bool WaitForExit(int milliseconds);
     }
 
     // ReSharper restore InconsistentNaming
