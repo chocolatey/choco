@@ -54,6 +54,15 @@
                 configFileSettings.CommandExecutionTimeoutSeconds = ApplicationParameters.DefaultWaitForExitInSeconds;
             }
             config.CommandExecutionTimeoutSeconds = configFileSettings.CommandExecutionTimeoutSeconds;
+
+            try
+            {
+                xmlService.serialize(configFileSettings, globalConfigPath);
+            }
+            catch (Exception ex)
+            {
+                "chocolatey".Log().Warn(() => "Error updating '{0}'. Please ensure you have permissions to do so.{1} {2}".format_with(globalConfigPath, Environment.NewLine, ex.Message));   
+            }
         }
 
         private static void set_global_options(IList<string> args, ChocolateyConfiguration config)
