@@ -40,7 +40,12 @@ namespace chocolatey.infrastructure.app.configuration
         public string ChocolateyVersion { get; set; }
         public bool Is64Bit { get; set; }
         public bool IsInteractive { get; set; }
-        //public bool 
+
+        // configuration set variables
+        public bool UseNugetForSources { get; set; }
+        public bool CheckSumFiles { get; set; }
+        public bool VirusCheckFiles { get; set; }
+        public int CommandExecutionTimeoutSeconds { get; set; }
 
         // top level commands
         public string CommandName { get; set; }
@@ -62,11 +67,6 @@ namespace chocolatey.infrastructure.app.configuration
         // list
         public bool LocalOnly { get; set; }
         public bool IncludeRegistryPrograms { get; set; }
-
-        // configuration set variables
-        public bool UseNugetForSources { get; set; }
-        public bool CheckSumFiles { get; set; }
-        public bool VirusCheckFiles { get; set; }
 
         // install/update
         /// <summary>

@@ -49,6 +49,11 @@
 
             config.CheckSumFiles = configFileSettings.ChecksumFiles;
             config.VirusCheckFiles = configFileSettings.VirusCheckFiles;
+            if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
+            {
+                configFileSettings.CommandExecutionTimeoutSeconds = ApplicationParameters.DefaultWaitForExitInSeconds;
+            }
+            config.CommandExecutionTimeoutSeconds = configFileSettings.CommandExecutionTimeoutSeconds;
         }
 
         private static void set_global_options(IList<string> args, ChocolateyConfiguration config)
@@ -77,6 +82,9 @@
                         .Add("r|limitoutput|limit-output",
                              "LimitOuptut - Limit the output to essential information",
                              option => config.RegularOuptut = option == null)
+                        .Add("execution-timeout=",
+                             "CommandExecutionTimeoutSeconds - Override the default execution timeout in the configuration of {0} seconds.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
+                             option => config.CommandExecutionTimeoutSeconds = int.Parse(option))
                         ;
                 },
                 (unparsedArgs) =>

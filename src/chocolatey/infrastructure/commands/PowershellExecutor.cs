@@ -5,6 +5,7 @@
     using System.Diagnostics;
     using System.IO;
     using adapters;
+    using app;
     using filesystem;
     using Environment = System.Environment;
 
@@ -22,6 +23,7 @@
         public static int execute(
             string command,
             IFileSystem fileSystem,
+            int waitForExitSeconds,
             Action<object, DataReceivedEventArgs> stdOutAction,
             Action<object, DataReceivedEventArgs> stdErrAction
             )
@@ -33,7 +35,7 @@
             return CommandExecutor.execute(
                 _powershell,
                 arguments,
-                waitForExit: true,
+                waitForExitSeconds,
                 workingDirectory: fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location),
                 stdOutAction: stdOutAction,
                 stdErrAction: stdErrAction,

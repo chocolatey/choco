@@ -17,6 +17,9 @@
         [XmlElement(ElementName = "virusCheckFiles")]
         public bool VirusCheckFiles { get; set; }
 
+        [XmlElement(ElementName = "commandExecutionTimeoutSeconds")]
+        public int CommandExecutionTimeoutSeconds { get; set; }
+
         [XmlArray("sources")]
         public HashSet<ConfigFileSourceSetting> Sources { get; set; }
         

@@ -150,6 +150,7 @@
                     var exitCode = PowershellExecutor.execute(
                                        wrap_command_with_module(chocoPowerShellScript),
                                        _fileSystem,
+                                       configuration.CommandExecutionTimeoutSeconds,
                                        (s, e) =>
                                        {
                                            if (string.IsNullOrWhiteSpace(e.Data)) return;

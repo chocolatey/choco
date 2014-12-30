@@ -4,6 +4,7 @@
     using Moq;
     using Should;
     using chocolatey.infrastructure.adapters;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
 
@@ -28,11 +29,12 @@
             {
                 base.Context();
                 process.Setup(p => p.ExitCode).Returns(0);
+                process.Setup(p => p.WaitForExit(It.IsAny<int>())).Returns(true);
             }
 
             public override void Because()
             {
-                result = CommandExecutor.execute("bob", "args", waitForExit: true);
+                result = CommandExecutor.execute("bob", "args", ApplicationParameters.DefaultWaitForExitInSeconds);
             }
 
             [Fact]
@@ -50,7 +52,7 @@
             [Fact]
             public void should_call_WaitForExit()
             {
-                process.Verify(p => p.WaitForExit(), Times.Once);
+                process.Verify(p => p.WaitForExit(It.IsAny<int>()), Times.Once);
             }
 
             [Fact]
@@ -66,9 +68,50 @@
             }
 
             [Fact]
+            public void should_call_ExitCode()
+            {
+                process.Verify(p => p.ExitCode, Times.Once);
+            }
+
+            [Fact]
             public void should_return_an_exit_code_of_zero_when_finished()
             {
                 result.ShouldEqual(0);
+            }
+        }
+        
+        public class when_CommandExecutor_has_a_long_running_process_that_takes_longer_than_wait_time : CommandExecutorSpecsBase
+        {
+            private int result;
+
+            public override void Context()
+            {
+                base.Context();
+                process.Setup(p => p.WaitForExit(It.IsAny<int>())).Returns(false);
+                process.Setup(p => p.ExitCode).Returns(0);
+            }
+
+            public override void Because()
+            {
+                result = CommandExecutor.execute("bob", "args", ApplicationParameters.DefaultWaitForExitInSeconds);
+            }
+
+            [Fact]
+            public void should_call_WaitForExit()
+            {
+                process.Verify(p => p.WaitForExit(It.IsAny<int>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_return_an_exit_code_of_negative_one_since_it_timed_out()
+            {
+                result.ShouldEqual(-1);
+            }
+
+            [Fact]
+            public void should_not_call_ExitCode()
+            {
+                process.Verify(p => p.ExitCode, Times.Never);
             }
         }
 
@@ -78,7 +121,7 @@
 
             public override void Because()
             {
-                result = CommandExecutor.execute("bob", "args", waitForExit: false);
+                result = CommandExecutor.execute("bob", "args",waitForExitInSeconds: 0);
             }
 
             [Fact]
@@ -90,7 +133,7 @@
             [Fact]
             public void should_not_call_WaitForExit()
             {
-                process.Verify(p => p.WaitForExit(), Times.Never);
+                process.Verify(p => p.WaitForExit(It.IsAny<int>()), Times.Never);
             }
         }
     }

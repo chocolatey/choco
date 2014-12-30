@@ -346,7 +346,7 @@
                                 this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs.join(" ")));
 
                                 var exitCode = CommandExecutor.execute(
-                                    uninstallExe, uninstallArgs.join(" "), true,
+                                    uninstallExe, uninstallArgs.join(" "), config.CommandExecutionTimeoutSeconds,
                                     (s, e) =>
                                     {
                                         if (string.IsNullOrWhiteSpace(e.Data)) return;

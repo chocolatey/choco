@@ -66,7 +66,7 @@
             {
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
                 var exitCode = CommandExecutor.execute(
-                    _webPiExePath, argsForPackage, true,
+                    _webPiExePath, argsForPackage, configuration.CommandExecutionTimeoutSeconds,
                     (s, e) =>
                         {
                             var logMessage = e.Data;

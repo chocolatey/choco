@@ -2,6 +2,7 @@
 {
     using System;
     using Should;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
 
@@ -27,7 +28,7 @@
 
             public override void Because()
             {
-                result = CommandExecutor.execute("cmd.exe", "/c bob123123", true, file_system.get_current_directory(), null, (s, e) => { errorOutput += e.Data; }, updateProcessPath: false);
+                result = CommandExecutor.execute("cmd.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, file_system.get_current_directory(), null, (s, e) => { errorOutput += e.Data; }, updateProcessPath: false);
             }
 
             [Fact]
@@ -58,7 +59,7 @@
             {
                 try
                 {
-                   CommandExecutor.execute("noprocess.exe", "/c bob123123", true, null, (s, e) => { errorOutput += e.Data; });
+                    CommandExecutor.execute("noprocess.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, null, (s, e) => { errorOutput += e.Data; });
 
                 }
                 catch (Exception e)

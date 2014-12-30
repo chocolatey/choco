@@ -32,6 +32,11 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
         public static readonly string UserAgent =  "Chocolatey Command Line";
 
+        /// <summary>
+        /// Default is 45 minutes
+        /// </summary>
+        public static int DefaultWaitForExitInSeconds = 2700;
+
         public static class Tools
         {
             //public static readonly string WebPiCmdExe = _fileSystem.combine_paths(InstallLocation, "nuget.exe");

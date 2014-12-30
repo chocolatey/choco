@@ -70,7 +70,7 @@
                 }
 
                 var exitCode = CommandExecutor.execute(
-                    _shimGenExePath, argsForPackage, true,
+                    _shimGenExePath, argsForPackage, configuration.CommandExecutionTimeoutSeconds,
                     (s, e) =>
                         {
                             if (string.IsNullOrWhiteSpace(e.Data)) return;

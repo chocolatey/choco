@@ -27,22 +27,22 @@ namespace chocolatey.infrastructure.commands
             initialize_process = process_initializer;
         }
 
-        public static int execute(string process, string arguments, bool waitForExit)
+        public static int execute(string process, string arguments, int waitForExitInSeconds)
         {
-            return execute(process, arguments, waitForExit, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            return execute(process, arguments, waitForExitInSeconds, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
         }
 
         public static int execute(
             string process,
             string arguments,
-            bool waitForExit,
+            int waitForExitInSeconds,
             Action<object, DataReceivedEventArgs> stdOutAction,
             Action<object, DataReceivedEventArgs> stdErrAction
             )
         {
             return execute(process,
                            arguments,
-                           waitForExit,
+                           waitForExitInSeconds,
                            file_system.get_directory_name(Assembly.GetExecutingAssembly().Location),
                            stdOutAction,
                            stdErrAction,
@@ -50,14 +50,14 @@ namespace chocolatey.infrastructure.commands
                 );
         }
 
-        public static int execute(string process, string arguments, bool waitForExit, string workingDirectory)
+        public static int execute(string process, string arguments, int waitForExitInSeconds, string workingDirectory)
         {
-            return execute(process, arguments, waitForExit, workingDirectory, null, null, updateProcessPath: true);
+            return execute(process, arguments, waitForExitInSeconds, workingDirectory, null, null, updateProcessPath: true);
         }
 
         public static int execute(string process,
                                   string arguments,
-                                  bool waitForExit,
+                                  int waitForExitInSeconds,
                                   string workingDirectory,
                                   Action<object, DataReceivedEventArgs> stdOutAction,
                                   Action<object, DataReceivedEventArgs> stdErrAction,
@@ -112,10 +112,13 @@ namespace chocolatey.infrastructure.commands
                 p.BeginErrorReadLine();
                 p.BeginOutputReadLine();
 
-                if (waitForExit)
+                if (waitForExitInSeconds > 0)
                 {
-                    p.WaitForExit();
-                    exitCode = p.ExitCode;
+                    var exited = p.WaitForExit((int)TimeSpan.FromSeconds(waitForExitInSeconds).TotalMilliseconds);
+                    if (exited)
+                    {
+                        exitCode = p.ExitCode;
+                    }
                 }
             }
 
