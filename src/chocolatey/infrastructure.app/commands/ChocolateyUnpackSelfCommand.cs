@@ -1,6 +1,8 @@
 ﻿namespace chocolatey.infrastructure.app.commands
 {
+    using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using adapters;
     using attributes;
     using commandline;
@@ -16,6 +18,18 @@
     public sealed class ChocolateyUnpackSelfCommand : ICommand
     {
         private readonly IFileSystem _fileSystem;
+        private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)));
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void initialize_with(Lazy<IAssembly> assembly_initializer)
+        {
+            _assemblyInitializer = assembly_initializer;
+        }
+
+        private IAssembly assembly
+        {
+            get { return _assemblyInitializer.Value; }
+        }
 
         public ChocolateyUnpackSelfCommand(IFileSystem fileSystem)
         {
@@ -61,10 +75,10 @@ This command should only be used when installing Chocolatey, not during normal o
 
             AssemblyFileExtractor.extract_all_resources_to_relative_directory(
                 _fileSystem,
-                Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)),
+                assembly,
                 ApplicationParameters.InstallLocation,
-                folders, 
-                "chocolatey.resources",
+                folders,
+                ApplicationParameters.ChocolateyFileResources,
                 overwriteExisting: true);
         }
     }

@@ -32,6 +32,12 @@
         /// </summary>
         string get_temp_path();
 
+        /// <summary>
+        /// Gets the path directory separator character
+        /// </summary>
+        /// <returns></returns>
+        char get_path_directory_separator_char();
+
         #endregion
 
         #region File

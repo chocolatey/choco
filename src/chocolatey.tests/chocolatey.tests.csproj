@@ -59,6 +59,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyPushCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateySourceCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUninstallCommandSpecs.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyUnpackSelfCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommandSpecs.cs" />
     <Compile Include="infrastructure\commands\ExternalCommandArgsBuilderSpecs.cs" />
     <Compile Include="infrastructure\commandline\InteractivePromptSpecs.cs" />

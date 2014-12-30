@@ -36,6 +36,11 @@
             return Path.GetTempPath();
         }
 
+        public char get_path_directory_separator_char()
+        {
+            return Path.DirectorySeparatorChar;
+        }
+
         #endregion
 
         #region File

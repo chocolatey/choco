@@ -76,10 +76,11 @@
                 resourceString.Replace(resourcesToInclude + ".", "");
                 foreach (var directory in relativeDirectories)
                 {
-                    resourceString.Replace("{0}".format_with(directory), "{0}{1}".format_with(directory, Path.DirectorySeparatorChar));
+                    resourceString.Replace("{0}".format_with(directory), "{0}{1}".format_with(directory, fileSystem.get_path_directory_separator_char()));
                 }
 
-                resourceString.Replace("{0}.".format_with(Path.DirectorySeparatorChar), "{0}".format_with(Path.DirectorySeparatorChar));
+                // replacing \. with \
+                resourceString.Replace("{0}.".format_with(fileSystem.get_path_directory_separator_char()), "{0}".format_with(fileSystem.get_path_directory_separator_char()));
 
                 var fileLocation = resourceString.ToString();
                 //var fileLocation = fileSystem.combine_paths("", resourceString.ToString().Split('.')) + resourceName.Substring(fileExtensionLocation);
