@@ -24,6 +24,7 @@
         <include name="**/*.*" />
       </fileset>
     </delete>
+    <delete dir="${dirs.drop}${path.separator}${folder.app.drop}${path.separator}infrastructure" />
     
     <echo level="Warning" message="Renaming ${dirs.drop}${path.separator}_PublishedApplications${path.separator}chocolatey.console to ${dirs.drop}${path.separator}${folder.app.drop}." />
     <move todir="${dirs.drop}${path.separator}${folder.app.drop}" overwrite="true">
@@ -34,5 +35,4 @@
     
     <delete dir="${dirs.drop}${path.separator}_PublishedApplications${path.separator}chocolatey.console" />
   </target>
-  
 </project>
