@@ -22,10 +22,10 @@
   <target name="go" depends="set_environment_variables, hold_license" />
  
   <target name="set_environment_variables">
-    <property name="dirs.merge.from" value="${dirs.drop}${path.separator}${folder.app.drop}" />
+    <property name="dirs.merge.from" value="${dirs.drop}${path.separator}${folder.app.drop}\console" />
     <property name="file.merge.name" value="choco.exe" />
     <property name="merge.target.type" value="exe" />
-    <setenv name="uc.dirs.merge.from" value="${dirs.drop}${path.separator}${folder.app.drop}"/>
+    <setenv name="uc.dirs.merge.from" value="${dirs.drop}${path.separator}${folder.app.drop}\console"/>
     <setenv name="uc.file.merge.name" value="choco.exe"/>
     <setenv name="uc.merge.target.type" value="exe"/>
   </target>

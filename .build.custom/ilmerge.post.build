@@ -18,7 +18,7 @@
   <property name="dirs.app.drop" value="${dirs.drop}\${folder.app.drop}" overwrite="false" />
   <property name="file.key.path" value="${dirs.current}${path.separator}${project.name}.snk" overwrite="false" />
 
-  <target name="go" depends="recover_license" />
+  <target name="go" depends="recover_license,merge_the_dll" />
  
   <target name="recover_license">
     <echo level="Warning" message="Copying back in license.xml after merging." />
@@ -29,6 +29,10 @@
     </copy>
        
     <delete dir="${dirs.drop}${path.separator}merge_holding" />
+  </target>
+    
+  <target name="merge_the_dll">
+    <nant buildfile="${dirs.build_scripts_custom}${path.separator}ilmergeDLL.build" inheritall="true" />
   </target>
  
 </project>

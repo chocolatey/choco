@@ -26,13 +26,24 @@
     </delete>
     <delete dir="${dirs.drop}${path.separator}${folder.app.drop}${path.separator}infrastructure" />
     
-    <echo level="Warning" message="Renaming ${dirs.drop}${path.separator}_PublishedApplications${path.separator}chocolatey.console to ${dirs.drop}${path.separator}${folder.app.drop}." />
-    <move todir="${dirs.drop}${path.separator}${folder.app.drop}" overwrite="true">
+    <property name="dirs.drop.console" value="${dirs.drop}${path.separator}${folder.app.drop}${path.separator}console" />
+    <echo level="Warning" message="Renaming ${dirs.drop}${path.separator}_PublishedApplications${path.separator}chocolatey.console to ${dirs.drop.console}." />
+    <mkdir dir="${dirs.drop.console}" />
+    <move todir="${dirs.drop.console}" overwrite="true">
       <fileset basedir="${dirs.drop}${path.separator}_PublishedApplications${path.separator}chocolatey.console">
         <include name="**/*.*" />
       </fileset>
     </move>
-    
     <delete dir="${dirs.drop}${path.separator}_PublishedApplications${path.separator}chocolatey.console" />
+    
+    <property name="dirs.drop.lib" value="${dirs.drop}${path.separator}${folder.app.drop}${path.separator}lib" />
+    <echo level="Warning" message="Renaming ${dirs.drop}${path.separator}_PublishedApplications${path.separator}chocolatey to ${dirs.drop.lib}." />
+    <mkdir dir="${dirs.drop.lib}" />
+    <move todir="${dirs.drop.lib}" overwrite="true">
+      <fileset basedir="${dirs.drop}${path.separator}_PublishedApplications${path.separator}chocolatey">
+        <include name="**/*.*" />
+      </fileset>
+    </move>
+    <delete dir="${dirs.drop}${path.separator}_PublishedApplications${path.separator}chocolatey" />
   </target>
 </project>
