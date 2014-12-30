@@ -1,13 +1,8 @@
 ﻿namespace chocolatey.infrastructure.app.runners
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using SimpleInjector;
-    using attributes;
     using configuration;
-    using infrastructure.commands;
-    using infrastructure.configuration;
 
     /// <summary>
     ///   Console application responsible for running chocolatey
@@ -32,65 +27,17 @@
                 commandArgs.Add(arg);
             }
 
-            var commands = container.GetAllInstances<ICommand>();
-
-            var command = commands.Where((c) =>
+            var runner = new GenericRunner();
+            runner.run(config, container, isConsole: true, parseArgs: command =>
                 {
-                    var attributes = c.GetType().GetCustomAttributes(typeof (CommandForAttribute), false);
-                    foreach (CommandForAttribute attribute in attributes)
-                    {
-                        if (attribute.CommandName.is_equal_to(config.CommandName)) return true;
-                    }
-
-                    return false;
-                }).FirstOrDefault();
-
-            if (command == null)
-            {
-                //todo add a search among other location/extensions for the command
-                if (!string.IsNullOrWhiteSpace(config.CommandName))
-                {
-                    throw new Exception("Could not find a command registered that meets '{0}'".format_with(config.CommandName));
-                }
-
-                Environment.ExitCode = 1;
-            }
-            else
-            {
-                ConfigurationOptions.parse_arguments_and_update_configuration(
-                    commandArgs,
-                    config,
-                    (optionSet) => command.configure_argument_parser(optionSet, config),
-                    (unparsedArgs) => command.handle_additional_argument_parsing(unparsedArgs, config),
-                    () => command.handle_validation(config),
-                    () => command.help_message(config));
-
-                this.Log().Debug(() => "Configuration: {0}".format_with(config.ToString()));
-
-                if (config.HelpRequested)
-                {
-#if DEBUG
-                    Console.WriteLine("Press enter to continue...");
-                    Console.ReadKey();
-#endif
-                    Environment.Exit(1);
-                }
-
-                if (config.Noop)
-                {
-                    if (config.RegularOuptut)
-                    {
-                        this.Log().Info("_ {0}:{1} - Noop Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
-                    }
-
-                    command.noop(config);
-                }
-                else
-                {
-                    this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
-                    command.run(config);
-                }
-            }
+                    ConfigurationOptions.parse_arguments_and_update_configuration(
+                        commandArgs,
+                        config,
+                        (optionSet) => command.configure_argument_parser(optionSet, config),
+                        (unparsedArgs) => command.handle_additional_argument_parsing(unparsedArgs, config),
+                        () => command.handle_validation(config),
+                        () => command.help_message(config));
+                });
         }
     }
 }

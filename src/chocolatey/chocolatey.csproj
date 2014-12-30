@@ -77,6 +77,7 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="GetChocolatey.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyNewCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPackCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPushCommand.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="infrastructure.app\domain\SourceCommandType.cs" />
     <Compile Include="infrastructure.app\messages\PostRunEvent.cs" />
     <Compile Include="infrastructure.app\nuget\NugetPush.cs" />
+    <Compile Include="infrastructure.app\runners\GenericRunner.cs" />
     <Compile Include="infrastructure.app\services\ChocolateyConfigSettingsService.cs" />
     <Compile Include="infrastructure.app\services\IChocolateyConfigSettingsService.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileApiKeySetting.cs" />
