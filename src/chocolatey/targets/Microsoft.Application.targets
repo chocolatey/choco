@@ -12,7 +12,8 @@ Copyright (C) 2005 Microsoft Corporation. All rights reserved.
 ***********************************************************************************************
 -->
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <UsingTask TaskName="Microsoft.WebApplication.Build.Tasks.CopyFilesToFolders"  AssemblyFile="Microsoft.WebApplication.Build.Tasks.dll" />
+  <!--UsingTask TaskName="Microsoft.WebApplication.Build.Tasks.CopyFilesToFolders"  AssemblyFile="Microsoft.WebApplication.Build.Tasks.dll" /-->
+  <!--UsingTask TaskName="Microsoft.Build.Tasks.Copy" AssemblyFile="Microsoft.Build.Tasks.dll" /-->
 
   <PropertyGroup>
     <IsDesktopBuild Condition="'$(IsDesktopBuild)'=='' And '$(TeamFoundationServerUrl)' != ''">False</IsDesktopBuild>
@@ -42,10 +43,9 @@ Copyright (C) 2005 Microsoft Corporation. All rights reserved.
   <!--App.config -->
   <!--***************************************************************-->
   <Target Name="CopyAndRenameAppConfig">
-    <Copy SourceFiles="@(AppConfigWithTargetPath)"
+    <Copy
+      SourceFiles="@(AppConfigWithTargetPath)"
       DestinationFiles="@(AppConfigWithTargetPath->'$(ExeProjectOutputDir)\$(AssemblyName).exe%(Extension)')"
-      Retries="$(CopyRetryCount)"
-      RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)" 
       Condition="Exists('%(RootDir)%(Directory)%(Filename)%(Extension)')"
       />
   </Target>
@@ -136,75 +136,54 @@ Copyright (C) 2005 Microsoft Corporation. All rights reserved.
     <!-- ##### APP.CONFIG RENAME ##### -->
     <CallTarget Targets="CopyAndRenameAppConfig" />
 
-    <!-- Copy build outputs to _PublishedApplications\app folder -->
-    <Copy SourceFiles="@(IntermediateAssembly)" DestinationFolder="$(ExeProjectOutputDir)\"
-          SkipUnchangedFiles="true"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"/>
+    <!-- build outputs to _PublishedApplications\app folder -->
+    <!--Retries="2" 
+        RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)" -->
+    <Copy SourceFiles="@(IntermediateAssembly)" 
+          DestinationFolder="$(ExeProjectOutputDir)\"
+          SkipUnchangedFiles="true"/>
     <Copy SourceFiles="@(AddModules)"
           DestinationFolder="$(ExeProjectOutputDir)\"
-          SkipUnchangedFiles="true"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"/>
+          SkipUnchangedFiles="true"/>
     <Copy SourceFiles="$(IntermediateOutputPath)$(_SGenDllName)"
           DestinationFolder="$(ExeProjectOutputDir)\%(Content.SubFolder)%(Content.RecursiveDir)"
           SkipUnchangedFiles="true"
-          Condition="'$(_SGenDllCreated)'=='true'"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"/>
+          Condition="'$(_SGenDllCreated)'=='true'"/>
     <Copy SourceFiles="$(IntermediateOutputPath)$(TargetName).pdb"
           DestinationFolder="$(ExeProjectOutputDir)\"
           SkipUnchangedFiles="true"
-          Condition="'$(_DebugSymbolsProduced)'=='true'"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"/>
+          Condition="'$(_DebugSymbolsProduced)'=='true'"/>
     <Copy SourceFiles="@(DocFileItem)"
           DestinationFolder="$(ExeProjectOutputDir)\"
           SkipUnchangedFiles="true"
-          Condition="'$(_DocumentationFileProduced)'=='true'"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"/>
+          Condition="'$(_DocumentationFileProduced)'=='true'"/>
     <Copy SourceFiles="@(IntermediateSatelliteAssembliesWithTargetPath)"
           DestinationFiles="@(IntermediateSatelliteAssembliesWithTargetPath->'$(ExeProjectOutputDir)\%(Culture)\$(TargetName).resources.dll')"
-          SkipUnchangedFiles="true"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"/>
+          SkipUnchangedFiles="true"/>
     <Copy SourceFiles="@(ReferenceComWrappersToCopyLocal); @(ResolvedIsolatedComModules); @(_DeploymentLooseManifestFile); @(NativeReferenceFile)"
           DestinationFolder="$(ExeProjectOutputDir)"
-          SkipUnchangedFiles="true"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"/>
+          SkipUnchangedFiles="true"/>
 
-    <!-- copy any referenced assemblies to _PublishedApplications\app folder -->
+    <!-- any referenced assemblies to _PublishedApplications\app folder -->
     <Copy SourceFiles="@(ReferenceCopyLocalPaths)"
           DestinationFiles="@(ReferenceCopyLocalPaths->'$(ExeProjectOutputDir)\%(DestinationSubDirectory)%(Filename)%(Extension)')"
-          SkipUnchangedFiles="true"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"/>
+          SkipUnchangedFiles="true"/>
 
     <!-- Copy content files recursively to _PublishedApplications\app\ folder -->
     <Copy SourceFiles="@(Content)" Condition="'%(Content.Link)' == ''"
           DestinationFolder="$(ExeProjectOutputDir)\%(Content.RelativeDir)"
-          SkipUnchangedFiles="true"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)" />
+          SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(Content)" Condition="!$(DisableLinkInCopyExeApplicaton) And '%(Content.Link)' != ''"
           DestinationFiles="$(ExeProjectOutputDir)\%(Content.Link)"
-          SkipUnchangedFiles="true"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"/>
+          SkipUnchangedFiles="true"/>
 
-    <!-- Copy items that have been marked to be copied to the bin folder -->
+    <!--  items that have been marked to be copied to the bin folder -->
     <Copy SourceFiles="@(_SourceItemsToCopyToOutputDirectory)"
           DestinationFolder="$(ExeProjectOutputDir)"
-          SkipUnchangedFiles="true"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"/>
+          SkipUnchangedFiles="true"/>
     <Copy SourceFiles="@(_SourceItemsToCopyToOutputDirectoryAlways)"
           DestinationFolder="$(ExeProjectOutputDir)"
-          SkipUnchangedFiles="false"
-          Retries="$(CopyRetryCount)"
-          RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"/>
+          SkipUnchangedFiles="false"/>
 
   </Target>
 
