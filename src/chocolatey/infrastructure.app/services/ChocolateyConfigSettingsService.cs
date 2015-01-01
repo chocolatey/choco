@@ -48,7 +48,7 @@
                         Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password),
                     });
 
-                _xmlService.serialize(_configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
                 this.Log().Info(() =>"Added {0} - {1}".format_with(configuration.SourceCommand.Name, configuration.Source));
             }
@@ -60,7 +60,7 @@
             if (source != null)
             {
                 configFileSettings.Sources.Remove(source);
-                _xmlService.serialize(_configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
                 this.Log().Info(() => "Removed {0}".format_with(source.Id));
             }
@@ -72,7 +72,7 @@
             if (source != null && !source.Disabled)
             {
                 source.Disabled = true;
-                _xmlService.serialize(_configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                 this.Log().Info(() => "Disabled {0}".format_with(source.Id));
             }
         }
@@ -83,7 +83,7 @@
             if (source != null && source.Disabled)
             {
                 source.Disabled = false;
-                _xmlService.serialize(_configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                 this.Log().Info(() => "Enabled {0}".format_with(source.Id));
             }
         }
@@ -131,7 +131,7 @@
                         Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key),
                     });
 
-                _xmlService.serialize(_configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
                 this.Log().Info(() => "Added ApiKey for {0}".format_with(configuration.Source));
             }
@@ -140,7 +140,7 @@
                 if (!NugetEncryptionUtility.DecryptString(apiKey.Key).to_string().is_equal_to(configuration.ApiKeyCommand.Key))
                 {
                     apiKey.Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key);
-                    _xmlService.serialize(_configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                    _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                     this.Log().Info(() => "Updated ApiKey for {0}".format_with(configuration.Source));
                 }
             }
