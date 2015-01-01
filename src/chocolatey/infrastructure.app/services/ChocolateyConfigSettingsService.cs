@@ -44,7 +44,7 @@
                     {
                         Id = configuration.SourceCommand.Name,
                         Value = configuration.Source, 
-                        UserName = configuration.SourceCommand.Name,
+                        UserName = configuration.SourceCommand.Username,
                         Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password),
                     });
 
