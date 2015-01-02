@@ -27,11 +27,11 @@
         {
             try
             {
-                string outputDirectory = ApplicationParameters.LoggingLocation;
+                string loggingLocation = ApplicationParameters.LoggingLocation;
                 //no file system at this point
-                if (!Directory.Exists(outputDirectory)) Directory.CreateDirectory(outputDirectory);
+                if (!Directory.Exists(loggingLocation)) Directory.CreateDirectory(loggingLocation);
 
-                Log4NetAppenderConfiguration.configure(outputDirectory);
+                Log4NetAppenderConfiguration.configure(loggingLocation);
                 Bootstrap.initialize();
                 Bootstrap.startup();
 
