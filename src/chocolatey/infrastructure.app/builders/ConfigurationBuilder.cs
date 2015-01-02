@@ -49,6 +49,7 @@
 
             config.CheckSumFiles = configFileSettings.ChecksumFiles;
             config.VirusCheckFiles = configFileSettings.VirusCheckFiles;
+            config.CacheLocation = configFileSettings.CacheLocation;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
             {
                 configFileSettings.CommandExecutionTimeoutSeconds = ApplicationParameters.DefaultWaitForExitInSeconds;
@@ -101,6 +102,9 @@
                         .Add("execution-timeout=",
                              "CommandExecutionTimeoutSeconds - Override the default execution timeout in the configuration of {0} seconds.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
                              option => config.CommandExecutionTimeoutSeconds = int.Parse(option))
+                        .Add("c=|cache=|cachelocation=|cache-location=",
+                             "CacheLocation - Location for download cache, defaults to %TEMP% or value in chocolatey.config file.",
+                             option => config.CacheLocation = option)
                         ;
                 },
                 (unparsedArgs) =>

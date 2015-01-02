@@ -45,6 +45,7 @@ namespace chocolatey.infrastructure.app.configuration
         public bool UseNugetForSources { get; set; }
         public bool CheckSumFiles { get; set; }
         public bool VirusCheckFiles { get; set; }
+        public string CacheLocation { get; set; }
         public int CommandExecutionTimeoutSeconds { get; set; }
 
         // top level commands
@@ -90,7 +91,7 @@ namespace chocolatey.infrastructure.app.configuration
         public NewCommandConfiguration NewCommand { get; private set; }
         public SourcesCommandConfiguration SourceCommand { get; private set; }
         public ApiKeyCommandConfiguration ApiKeyCommand { get; private set; }
-        public PushCommandConfiguration PushCommand { get; private set; }
+        public PushCommandConfiguration PushCommand { get; private set; } 
     }
 
     public sealed class NewCommandConfiguration
