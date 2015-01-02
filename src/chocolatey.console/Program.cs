@@ -87,10 +87,8 @@
 
                 if (debug)
                 {
-                    "chocolatey".Log().Error(() => "{0} had an error on {1} (with user {2}):{3}{4}".format_with(
+                    "chocolatey".Log().Error(() => "{0} had an error occur:{1}{2}".format_with(
                                   ApplicationParameters.Name,
-                                  Environment.MachineName,
-                                  Environment.UserName,
                                   Environment.NewLine,
                                   ex.ToString()));
                 }
