@@ -1,5 +1,6 @@
 namespace chocolatey
 {
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -19,6 +20,16 @@ namespace chocolatey
         public static IEnumerable<T> or_empty_list_if_null<T>(this IEnumerable<T> source)
         {
             return source ?? Enumerable.Empty<T>();
+        }
+
+        /// <summary>
+        ///  Safe for each, returns an empty Enumerable if the list to iterate is null.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <returns>Source if not null; otherwise new ArrayList</returns>
+        public static IEnumerable or_empty_list_if_null(this IEnumerable source)
+        {
+            return source ?? new ArrayList();
         }
 
         /// <summary>
