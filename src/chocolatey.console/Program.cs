@@ -44,7 +44,7 @@
 
                 if (config.RegularOuptut)
                 {
-                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.ChocolateyVersion));
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyVersion));
                 }
                 
                 if (config.HelpRequested)
