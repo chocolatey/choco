@@ -63,6 +63,7 @@
     <Compile Include="infrastructure\filesystem\DotNetFileSystemSpecs.cs" />
     <Compile Include="MockEventSubscriptionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TODO.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
