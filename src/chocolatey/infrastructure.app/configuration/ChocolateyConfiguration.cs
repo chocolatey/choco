@@ -49,7 +49,7 @@ namespace chocolatey.infrastructure.app.configuration
         public string CommandName { get; set; }
 
         // configuration set variables
-        public bool UseNugetForSources { get; set; }
+        
         public bool CheckSumFiles { get; set; }
         public bool VirusCheckFiles { get; set; }
         public string CacheLocation { get; set; }
