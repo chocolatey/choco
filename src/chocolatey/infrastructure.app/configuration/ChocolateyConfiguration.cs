@@ -1,7 +1,9 @@
 namespace chocolatey.infrastructure.app.configuration
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Text;
     using domain;
     using platforms;
@@ -15,7 +17,9 @@ namespace chocolatey.infrastructure.app.configuration
         {
             RegularOuptut = true;
             PromptForConfirmation = true;
+            Information = new InformationCommandConfiguration();
             NewCommand = new NewCommandConfiguration();
+            ListCommand = new ListCommandConfiguration();
             SourceCommand = new SourcesCommandConfiguration();
             ApiKeyCommand = new ApiKeyCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
@@ -34,12 +38,15 @@ namespace chocolatey.infrastructure.app.configuration
             return properties.ToString();
         }
 
-        // application set variables
-        public PlatformType PlatformType { get; set; }
-        public Version PlatformVersion { get; set; }
-        public string ChocolateyVersion { get; set; }
-        public bool Is64Bit { get; set; }
-        public bool IsInteractive { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the command.
+        /// This is the command that choco runs.
+        /// </summary>
+        /// <value>
+        /// The name of the command.
+        /// </value>
+        public string CommandName { get; set; }
 
         // configuration set variables
         public bool UseNugetForSources { get; set; }
@@ -48,8 +55,13 @@ namespace chocolatey.infrastructure.app.configuration
         public string CacheLocation { get; set; }
         public int CommandExecutionTimeoutSeconds { get; set; }
 
+        /// <summary>
+        /// One or more source locations set by configuration or by command line. Separated by semi-colon
+        /// </summary>
+        public string Sources { get; set; }
+
         // top level commands
-        public string CommandName { get; set; }
+        
         public bool Debug { get; set; }
         public bool Verbose { get; set; }
         public bool Force { get; set; }
@@ -59,16 +71,16 @@ namespace chocolatey.infrastructure.app.configuration
         public bool PromptForConfirmation { get; set; }
         public bool AcceptLicense { get; set; }
 
-        // command level options
-        public string Source { get; set; }
-        public string Version { get; set; }
+
+        /// <summary>
+        /// Usually related to unparsed arguments.
+        /// </summary>
         public string Input { get; set; }
+
+        // command level options
+        public string Version { get; set; }
         public bool AllVersions { get; set; }
         public bool SkipPackageInstallProvider { get; set; }
-
-        // list
-        public bool LocalOnly { get; set; }
-        public bool IncludeRegistryPrograms { get; set; }
 
         // install/update
         /// <summary>
@@ -88,17 +100,54 @@ namespace chocolatey.infrastructure.app.configuration
         public bool AllowMultipleVersions { get; set; }
         public bool ForceDependencies { get; set; }
 
+        /// <summary>
+        /// Configuration values provided by choco.
+        /// </summary>
+        public InformationCommandConfiguration Information { get; private set; }
+        /// <summary>
+        /// Configuration related specifically to List command
+        /// </summary>
+        public ListCommandConfiguration ListCommand { get; private set; }
+        /// <summary>
+        /// Configuration related specifically to New command
+        /// </summary>
         public NewCommandConfiguration NewCommand { get; private set; }
+        /// <summary>
+        /// Configuration related specifically to Source command
+        /// </summary>
         public SourcesCommandConfiguration SourceCommand { get; private set; }
+        /// <summary>
+        /// Configuration related specifically to ApiKey command
+        /// </summary>
         public ApiKeyCommandConfiguration ApiKeyCommand { get; private set; }
+        /// <summary>
+        /// Configuration related specifically to Push command
+        /// </summary>
         public PushCommandConfiguration PushCommand { get; private set; } 
     }
 
+    public sealed class InformationCommandConfiguration
+    {
+        // application set variables
+        public PlatformType PlatformType { get; set; }
+        public Version PlatformVersion { get; set; }
+        public string ChocolateyVersion { get; set; }
+        public bool Is64Bit { get; set; }
+        public bool IsInteractive { get; set; }
+    }
+
+    //todo: retrofit other command configs this way
+
+    public sealed class ListCommandConfiguration
+    {
+        // list
+        public bool LocalOnly { get; set; }
+        public bool IncludeRegistryPrograms { get; set; }
+    } 
+    
     public sealed class NewCommandConfiguration
     {
-        //todo: retrofit other command configs this way
-
-        public NewCommandConfiguration()
+       public NewCommandConfiguration()
         {
             TemplateProperties = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }

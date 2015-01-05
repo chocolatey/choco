@@ -22,7 +22,7 @@
 
             public override void Context()
             {
-                configuration.Source = "bob";
+                configuration.Sources = "bob";
                 command = new ChocolateyInstallCommand(packageService.Object);
             }
         }

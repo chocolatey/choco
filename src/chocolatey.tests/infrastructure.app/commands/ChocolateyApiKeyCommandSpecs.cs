@@ -22,7 +22,7 @@
 
             public override void Context()
             {
-                configuration.Source = "bob";
+                configuration.Sources = "bob";
                 command = new ChocolateyApiKeyCommand(configSettingsService.Object);
             }
         }
@@ -61,7 +61,7 @@
             [Fact]
             public void should_clear_previously_set_Source()
             {
-                configuration.Source.ShouldBeNull();
+                configuration.Sources.ShouldBeNull();
             }
 
             [Fact]
@@ -100,7 +100,7 @@
             public void should_throw_when_key_is_set_without_a_source()
             {
                 configuration.ApiKeyCommand.Key = "bob";
-                configuration.Source = "";
+                configuration.Sources = "";
                 var errorred = false;
                 Exception error = null;
 
@@ -123,7 +123,7 @@
             public void should_continue_when_source_is_set_but_no_key_set()
             {
                 configuration.ApiKeyCommand.Key = "";
-                configuration.Source = "bob";
+                configuration.Sources = "bob";
                 command.handle_validation(configuration);
             }
  
@@ -131,7 +131,7 @@
             public void should_continue_when_both_source_and_key_are_set()
             {
                 configuration.ApiKeyCommand.Key = "bob";
-                configuration.Source = "bob";
+                configuration.Sources = "bob";
                 command.handle_validation(configuration);
             }
 
@@ -156,7 +156,7 @@
             public override void Context()
             {
                 base.Context();
-                configuration.Source = "bob";
+                configuration.Sources = "bob";
                 configuration.ApiKeyCommand.Key = "";
             }
 
@@ -177,7 +177,7 @@
             public override void Context()
             {
                 base.Context();
-                configuration.Source = "bob";
+                configuration.Sources = "bob";
                 configuration.ApiKeyCommand.Key = "bob";
             }
 

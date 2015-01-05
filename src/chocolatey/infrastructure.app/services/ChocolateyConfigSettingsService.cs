@@ -43,14 +43,14 @@
                 configFileSettings.Sources.Add(new ConfigFileSourceSetting()
                     {
                         Id = configuration.SourceCommand.Name,
-                        Value = configuration.Source, 
+                        Value = configuration.Sources, 
                         UserName = configuration.SourceCommand.Username,
                         Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password),
                     });
 
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                this.Log().Info(() =>"Added {0} - {1}".format_with(configuration.SourceCommand.Name, configuration.Source));
+                this.Log().Info(() =>"Added {0} - {1}".format_with(configuration.SourceCommand.Name, configuration.Sources));
             }
         }
 
@@ -92,9 +92,9 @@
         {
             string apiKeyValue = null;
 
-            if (!string.IsNullOrWhiteSpace(configuration.Source))
+            if (!string.IsNullOrWhiteSpace(configuration.Sources))
             {
-                var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Source));
+                var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Sources));
                 if (apiKey != null)
                 {
                     apiKeyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();
@@ -122,18 +122,18 @@
 
         public void set_api_key(ChocolateyConfiguration configuration)
         {
-            var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Source));
+            var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Sources));
             if (apiKey == null)
             {
                 configFileSettings.ApiKeys.Add(new ConfigFileApiKeySetting()
                     {
-                        Source = configuration.Source,
+                        Source = configuration.Sources,
                         Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key),
                     });
 
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                this.Log().Info(() => "Added ApiKey for {0}".format_with(configuration.Source));
+                this.Log().Info(() => "Added ApiKey for {0}".format_with(configuration.Sources));
             }
             else
             {
@@ -141,7 +141,7 @@
                 {
                     apiKey.Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key);
                     _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                    this.Log().Info(() => "Updated ApiKey for {0}".format_with(configuration.Source));
+                    this.Log().Info(() => "Updated ApiKey for {0}".format_with(configuration.Sources));
                 }
             }
         }

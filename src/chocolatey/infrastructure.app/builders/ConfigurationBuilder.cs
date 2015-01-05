@@ -41,12 +41,15 @@
 
             var configFileSettings = xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
             var sources = new StringBuilder();
-            foreach (var source in configFileSettings.Sources)
+            foreach (var source in configFileSettings.Sources.or_empty_list_if_null())
             {
                 sources.AppendFormat("{0};", source.Value);
             }
-            config.Source = sources.Remove(sources.Length - 1, 1).ToString();
-
+            if (sources.Length != 0)
+            {
+                config.Sources = sources.Remove(sources.Length - 1, 1).ToString();
+            }
+            
             config.CheckSumFiles = configFileSettings.ChecksumFiles;
             config.VirusCheckFiles = configFileSettings.VirusCheckFiles;
             config.CacheLocation = configFileSettings.CacheLocation;
@@ -127,17 +130,17 @@
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, "Commands");
                     "chocolatey".Log().Info(@"{1}
 
-Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.ChocolateyVersion, commandsLog.ToString()));
+Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.Information.ChocolateyVersion, commandsLog.ToString()));
                 });
         }
 
         private static void set_environment_options(ChocolateyConfiguration config)
         {
-            config.PlatformType = Platform.get_platform();
-            config.PlatformVersion = Platform.get_version();
-            config.ChocolateyVersion = VersionInformation.get_current_assembly_version();
-            config.Is64Bit = Environment.Is64BitOperatingSystem;
-            config.IsInteractive = Environment.UserInteractive;
+            config.Information.PlatformType = Platform.get_platform();
+            config.Information.PlatformVersion = Platform.get_version();
+            config.Information.ChocolateyVersion = VersionInformation.get_current_assembly_version();
+            config.Information.Is64Bit = Environment.Is64BitOperatingSystem;
+            config.Information.IsInteractive = Environment.UserInteractive;
         }
     }
 }

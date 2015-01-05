@@ -36,7 +36,7 @@
 
         public static IPackageRepository GetRemoteRepository(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
-            IEnumerable<string> sources = configuration.Source.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+            IEnumerable<string> sources = configuration.Sources.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
 
             IList<IPackageRepository> repositories = new List<IPackageRepository>();
             foreach (var source in sources.or_empty_list_if_null())

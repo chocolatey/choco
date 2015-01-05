@@ -55,7 +55,8 @@
 
                 Log4NetAppenderConfiguration.set_verbose_logger_when_verbose(config.Verbose, ChocolateyLoggers.Verbose.to_string());
                 Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug);
-                "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.PlatformType, config.PlatformVersion.to_string()));
+                "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.Information.PlatformType, config.Information.PlatformVersion.to_string()));
+                //"chocolatey".Log().Debug(() => "Command Line: {0}".format_with(Environment.CommandLine));
 
                 LicenseValidation.validate(fileSystem);
 

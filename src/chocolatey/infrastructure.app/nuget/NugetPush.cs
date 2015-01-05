@@ -17,7 +17,7 @@
             }
             const bool disableBuffering = false;
 
-            var packageServer = new PackageServer(config.Source, ApplicationParameters.UserAgent);
+            var packageServer = new PackageServer(config.Sources, ApplicationParameters.UserAgent);
             packageServer.SendingRequest += (sender, e) => { if (config.Verbose) "chocolatey".Log().Info(ChocolateyLoggers.Verbose, "{0} {1}".format_with(e.Request.Method, e.Request.RequestUri)); };
 
             var package = new OptimizedZipPackage(nupkgFilePath);
@@ -43,7 +43,7 @@
             }
 
 
-            "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} was pushed successfully to {1}".format_with(package.GetFullName(), config.Source));
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} was pushed successfully to {1}".format_with(package.GetFullName(), config.Sources));
         }
     }
 }

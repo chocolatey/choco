@@ -23,7 +23,7 @@
 
             public override void Context()
             {
-                configuration.Source = "bob";
+                configuration.Sources = "bob";
                 command = new ChocolateyListCommand(packageService.Object);
             }
         }
@@ -124,7 +124,7 @@
                 base.Context();
                 unparsedArgs.Add("pkg1");
                 unparsedArgs.Add("pkg2");
-                configuration.Source = source;
+                configuration.Sources = source;
             }
 
             public override void Because()
@@ -142,17 +142,17 @@
             [Fact]
             public void should_leave_source_as_set()
             {
-                configuration.LocalOnly = false;
+                configuration.ListCommand.LocalOnly = false;
                 because();
-                configuration.Source.ShouldEqual(source);
+                configuration.Sources.ShouldEqual(source);
             }
             
             [Fact]
             public void should_set_source_to_local_location_when_localonly_is_true()
             {
-                configuration.LocalOnly = true;
+                configuration.ListCommand.LocalOnly = true;
                 because();
-                configuration.Source.ShouldEqual(ApplicationParameters.PackagesLocation);
+                configuration.Sources.ShouldEqual(ApplicationParameters.PackagesLocation);
             }
         }   
 

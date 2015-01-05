@@ -23,7 +23,7 @@
 
             public override void Context()
             {
-                configuration.Source = "https://localhost/somewhere/out/there";
+                configuration.Sources = "https://localhost/somewhere/out/there";
                 command = new ChocolateyPushCommand(packageService.Object, configSettingsService.Object);
             }
         }
@@ -62,7 +62,7 @@
             [Fact]
             public void should_clear_previously_set_Source()
             {
-                configuration.Source.ShouldBeNull();
+                configuration.Sources.ShouldBeNull();
             }
 
             [Fact]
@@ -135,7 +135,7 @@
                 reset();
                 configSettingsService.Setup(c => c.get_api_key(configuration, null)).Returns(apiKey);
                 configuration.PushCommand.Key = "";
-                configuration.Source = "";
+                configuration.Sources = "";
                 because();
 
                 configuration.PushCommand.Key.ShouldEqual("");
@@ -148,7 +148,7 @@
                 reset();
                 configSettingsService.Setup(c => c.get_api_key(configuration, null)).Returns("");
                 configuration.PushCommand.Key = "";
-                configuration.Source = "https://localhost/somewhere/out/there";
+                configuration.Sources = "https://localhost/somewhere/out/there";
                 because();
 
                 configuration.PushCommand.Key.ShouldEqual("");
@@ -160,7 +160,7 @@
                 reset();
                 configSettingsService.Setup(c => c.get_api_key(configuration, null)).Returns("");
                 configuration.PushCommand.Key = "bob";
-                configuration.Source = "https://localhost/somewhere/out/there";
+                configuration.Sources = "https://localhost/somewhere/out/there";
                 because();
 
                 configuration.PushCommand.Key.ShouldEqual("bob");
@@ -171,7 +171,7 @@
             public void should_not_try_to_determine_the_key_if_source_is_set_for_a_local_source()
             {
                 reset();
-                configuration.Source = "c:\\packages";
+                configuration.Sources = "c:\\packages";
                 configuration.PushCommand.Key = "";
                 because();
 
@@ -182,7 +182,7 @@
             public void should_not_try_to_determine_the_key_if_source_is_set_for_an_unc_source()
             {
                 reset();
-                configuration.Source = "\\\\someserver\\packages";
+                configuration.Sources = "\\\\someserver\\packages";
                 configuration.PushCommand.Key = "";
                 because();
 
@@ -202,7 +202,7 @@
             [Fact]
             public void should_throw_when_source_is_not_set()
             {
-                configuration.Source = "";
+                configuration.Sources = "";
                 var errorred = false;
                 Exception error = null;
 
@@ -225,7 +225,7 @@
             [Fact]
             public void should_throw_when_apiKey_has_not_been_set_or_determined_for_a_https_source()
             {
-                configuration.Source = "https://somewhere/out/there";
+                configuration.Sources = "https://somewhere/out/there";
                 configuration.PushCommand.Key = "";
                 var errorred = false;
                 Exception error = null;
@@ -249,7 +249,7 @@
             [Fact]
             public void should_continue_when_source_and_apikey_is_set_for_a_https_source()
             {
-                configuration.Source = "https://somewhere/out/there";
+                configuration.Sources = "https://somewhere/out/there";
                 configuration.PushCommand.Key = "bob";
                 because();
             }
@@ -257,7 +257,7 @@
             [Fact]
             public void should_continue_when_source_is_set_for_a_local_source()
             {
-                configuration.Source = "c:\\packages";
+                configuration.Sources = "c:\\packages";
                 configuration.PushCommand.Key = "";
                 because();
             }
@@ -265,7 +265,7 @@
             [Fact]
             public void should_continue_when_source_is_set_for_an_unc_source()
             {
-                configuration.Source = "\\\\someserver\\packages";
+                configuration.Sources = "\\\\someserver\\packages";
                 configuration.PushCommand.Key = "";
                 because();
             }
@@ -273,7 +273,7 @@
             [Fact]
             public void should_throw_when_source_is_http_and_not_secure()
             {
-                configuration.Source = "http://somewhere/out/there";
+                configuration.Sources = "http://somewhere/out/there";
                 configuration.PushCommand.Key = "bob";
                 configuration.Force = false;
                 var errorred = false;
@@ -292,13 +292,13 @@
                 errorred.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldContain("WARNING! The specified source '{0}' is not secure".format_with(configuration.Source));
+                error.Message.ShouldContain("WARNING! The specified source '{0}' is not secure".format_with(configuration.Sources));
             }
 
             [Fact]
             public void should_continue_when_source_is_http_and_not_secure_if_force_is_passed()
             {
-                configuration.Source = "http://somewhere/out/there";
+                configuration.Sources = "http://somewhere/out/there";
                 configuration.PushCommand.Key = "bob";
                 configuration.Force = true;
 

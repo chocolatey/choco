@@ -22,12 +22,12 @@
 
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
-            configuration.Source = null;
+            configuration.Sources = null;
 
             optionSet
                 .Add("s=|source=",
                      "Source [REQUIRED] - The source location for the key",
-                     option => configuration.Source = option)
+                     option => configuration.Sources = option)
                 .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The api key for the source.",
                      option => configuration.ApiKeyCommand.Key = option)
@@ -41,7 +41,7 @@
 
         public void handle_validation(ChocolateyConfiguration configuration)
         {
-            if (!string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key) && string.IsNullOrWhiteSpace(configuration.Source))
+            if (!string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key) && string.IsNullOrWhiteSpace(configuration.Sources))
             {
                 throw new ApplicationException("You must specify both 'source' and 'key' to set an api key.");
             }            

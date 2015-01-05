@@ -35,7 +35,7 @@
 
         public void list_noop(ChocolateyConfiguration config)
         {
-            if (config.Source.is_equal_to(SpecialSourceType.webpi.to_string()))
+            if (config.Sources.is_equal_to(SpecialSourceType.webpi.to_string()))
             {
                 //todo: webpi
             }
@@ -49,7 +49,7 @@
         {
             this.Log().Debug(() => "Searching for package information");
 
-            if (config.Source.is_equal_to(SpecialSourceType.webpi.to_string()))
+            if (config.Sources.is_equal_to(SpecialSourceType.webpi.to_string()))
             {
                 //todo: webpi
                 //install webpi if not installed
@@ -61,9 +61,9 @@
                 var list = _nugetService.list_run(config, logResults: true);
                 if (config.RegularOuptut)
                 {
-                    this.Log().Warn(() => @"{0} packages {1}.".format_with(list.Count, config.LocalOnly ? "installed" : "found"));
+                    this.Log().Warn(() => @"{0} packages {1}.".format_with(list.Count, config.ListCommand.LocalOnly ? "installed" : "found"));
 
-                    if (config.LocalOnly && config.IncludeRegistryPrograms)
+                    if (config.ListCommand.LocalOnly && config.ListCommand.IncludeRegistryPrograms)
                     {
                         report_registry_programs(config, list);
                     }
@@ -136,7 +136,7 @@
                 pkgInfo.IsSideBySide = true;
             }
 
-            if (config.PlatformType == PlatformType.Windows)
+            if (config.Information.PlatformType == PlatformType.Windows)
             {
                 if (!config.SkipPackageInstallProvider)
                 {

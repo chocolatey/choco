@@ -24,14 +24,14 @@
 
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
-            configuration.Source = null;
+            configuration.Sources = null;
             //configuration.Source = ApplicationParameters.DefaultChocolateyPushSource;
             configuration.PushCommand.TimeoutInSeconds = 300;
 
             optionSet
                  .Add("s=|source=",
                      "Source - The source we are pushing the package to. Use {0} to push to community feed.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource),
-                     option => configuration.Source = option)
+                     option => configuration.Sources = option)
                  .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The api key for the source. If not specified (and not local file source), does a lookup. If not specified and one is not found for an https source, push will fail.",
                      option => configuration.PushCommand.Key = option)
@@ -57,9 +57,9 @@
         {
             configuration.Input = string.Join(" ", unparsedArguments); // path to .nupkg - assume relative
 
-            if (!string.IsNullOrWhiteSpace(configuration.Source))
+            if (!string.IsNullOrWhiteSpace(configuration.Sources))
             {
-                var remoteSource = new Uri(configuration.Source);
+                var remoteSource = new Uri(configuration.Sources);
                 if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
                 {
                     // perform a lookup
@@ -70,20 +70,20 @@
 
         public void handle_validation(ChocolateyConfiguration configuration)
         {
-            if (string.IsNullOrWhiteSpace(configuration.Source))
+            if (string.IsNullOrWhiteSpace(configuration.Sources))
             {
                 throw new ApplicationException("Source is required. Please pass a source to push to, such as --source={0}".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
             }
 
-            var remoteSource = new Uri(configuration.Source);
+            var remoteSource = new Uri(configuration.Sources);
 
             if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
             {
-                throw new ApplicationException("An ApiKey was not found for '{0}'. You must either set an api key in the configuration or specify one with --api-key.".format_with(configuration.Source));
+                throw new ApplicationException("An ApiKey was not found for '{0}'. You must either set an api key in the configuration or specify one with --api-key.".format_with(configuration.Sources));
             }
             
             // security advisory
-            if (!configuration.Force || configuration.Source.to_lower().Contains("chocolatey.org"))
+            if (!configuration.Force || configuration.Sources.to_lower().Contains("chocolatey.org"))
             {
                 if (remoteSource.Scheme == "http" && remoteSource.Host != "localhost")
                 {
@@ -96,7 +96,7 @@
  accessing an internal feed. If you are however doing this against an internet
  feed, then the choco gods think you are crazy. ;-)
  
-NOTE: For chocolatey.org, you must update the source to be secure.".format_with(configuration.Source);
+NOTE: For chocolatey.org, you must update the source to be secure.".format_with(configuration.Sources);
                     throw new ApplicationException(errorMessage);
                 }
             }

@@ -52,6 +52,7 @@
 
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
+            configuration.Input = string.Join(" ", unparsedArguments);
             configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments);
         }
 

@@ -45,7 +45,7 @@
             this.Log().Info("{0} would have searched for '{1}' against the following source(s) :\"{2}\"".format_with(
                 ApplicationParameters.Name,
                 config.Input,
-                config.Source
+                config.Sources
                                 ));
         }
 
@@ -117,7 +117,7 @@
             var propertyProvider = new DictionaryPropertyProvider(properties);
 
             var basePath = _fileSystem.get_current_directory();
-            if (config.PlatformType != PlatformType.Windows)
+            if (config.Information.PlatformType != PlatformType.Windows)
             {
                 basePath = "./";
             }
@@ -147,13 +147,13 @@
         public void push_noop(ChocolateyConfiguration config)
         {
             string nupkgFilePath = validate_and_return_package_file(config, Constants.PackageExtension);
-            this.Log().Info(() => "Would have attempted to push '{0}' to source '{1}'.".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Source));
+            this.Log().Info(() => "Would have attempted to push '{0}' to source '{1}'.".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Sources));
         }
 
         public void push_run(ChocolateyConfiguration config)
         {
             string nupkgFilePath = validate_and_return_package_file(config, Constants.PackageExtension);
-            if (config.RegularOuptut) this.Log().Info(() => "Attempting to push {0} to {1}".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Source));
+            if (config.RegularOuptut) this.Log().Info(() => "Attempting to push {0} to {1}".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Sources));
 
             NugetPush.push_package(config, nupkgFilePath);
         }
@@ -195,7 +195,7 @@
                     this.Log().Debug("Updating source and package name to handle *.nupkg or *.nuspec file.");
                     packageNames.Clear();
                     packageNames.Add(_fileSystem.get_file_name_without_extension(packageName));
-                    config.Source = _fileSystem.get_directory_name(_fileSystem.get_full_path(packageName));
+                    config.Sources = _fileSystem.get_directory_name(_fileSystem.get_full_path(packageName));
 
                     if (packageName.EndsWith(Constants.ManifestExtension))
                     {
@@ -207,9 +207,9 @@
                 }
             }
 
-            if (config.Source.to_string().EndsWith(Constants.PackageExtension))
+            if (config.Sources.to_string().EndsWith(Constants.PackageExtension))
             {
-                config.Source = _fileSystem.get_directory_name(_fileSystem.get_full_path(config.Source));
+                config.Sources = _fileSystem.get_directory_name(_fileSystem.get_full_path(config.Sources));
             }
 
             var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
@@ -253,7 +253,7 @@
                     IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                     if (availablePackage == null)
                     {
-                        var logMessage = "{0} not installed. The package was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Source);
+                        var logMessage = "{0} not installed. The package was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                         results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -334,7 +334,7 @@
                     IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                     if (availablePackage == null)
                     {
-                        string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Source);
+                        string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                         results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
@@ -551,11 +551,11 @@
         {
             if (config.PackageNames.is_equal_to("all"))
             {
-                config.LocalOnly = true;
-                var sources = config.Source;
-                config.Source = ApplicationParameters.PackagesLocation;
+                config.ListCommand.LocalOnly = true;
+                var sources = config.Sources;
+                config.Sources = ApplicationParameters.PackagesLocation;
                 var localPackages = list_run(config, logResults: false);
-                config.Source = sources;
+                config.Sources = sources;
                 config.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator, localPackages.Select((p) => p.Key).or_empty_list_if_null());
 
                 if (customAction != null) customAction.Invoke();

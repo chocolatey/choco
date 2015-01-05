@@ -36,6 +36,7 @@ namespace chocolatey
         ///   Joins the specified IEnumerables.
         /// </summary>
         /// <param name="source">The source.</param>
+        /// <param name="separator">The value to put in between elements</param>
         /// <returns></returns>
         public static string join(this IEnumerable<string> source, string separator)
         {

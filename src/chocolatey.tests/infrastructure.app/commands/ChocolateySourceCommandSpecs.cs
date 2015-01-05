@@ -22,7 +22,7 @@
 
             public override void Context()
             {
-                configuration.Source = "https://localhost/somewhere/out/there";
+                configuration.Sources = "https://localhost/somewhere/out/there";
                 command = new ChocolateySourceCommand(configSettingsService.Object);
             }
         }
@@ -51,7 +51,7 @@
             {
                 base.Context();
                 optionSet = new OptionSet();
-                configuration.Source = "https://localhost/somewhere/out/there";
+                configuration.Sources = "https://localhost/somewhere/out/there";
             }
 
             public override void Because()
@@ -62,7 +62,7 @@
             [Fact]
             public void should_clear_previously_set_Source()
             {
-                configuration.Source.ShouldBeEmpty();
+                configuration.Sources.ShouldBeEmpty();
             }
 
             [Fact]

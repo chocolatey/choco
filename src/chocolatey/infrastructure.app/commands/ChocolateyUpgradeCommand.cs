@@ -25,7 +25,7 @@
             optionSet
                 .Add("s=|source=",
                      "Source - The source to find the package(s) to install. Special sources include: ruby, webpi, cygwin, windowsfeatures, and python. Defaults to default feeds.",
-                     option => configuration.Source = option)
+                     option => configuration.Sources = option)
                 .Add("version=",
                      "Version - A specific version to install. Defaults to unspecified.",
                      option => configuration.Version = option)
@@ -61,6 +61,7 @@
 
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
+            configuration.Input = string.Join(" ", unparsedArguments);
             configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments);
         }
 

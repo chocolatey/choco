@@ -50,7 +50,7 @@
                     QuoteValue = true,
                     Required = true
                 });
-            _webPiInstallArguments.Add("Source", new ExternalCommandArgument {ArgumentOption = "-source ", QuoteValue = true});
+            _webPiInstallArguments.Add("Sources", new ExternalCommandArgument {ArgumentOption = "-source ", QuoteValue = true});
             _webPiInstallArguments.Add("Prerelease", new ExternalCommandArgument {ArgumentOption = "-prerelease"});
             _webPiInstallArguments.Add("_non_interactive_", new ExternalCommandArgument {ArgumentOption = "-noninteractive", Required = true});
             _webPiInstallArguments.Add("_no_cache_", new ExternalCommandArgument {ArgumentOption = "-nocache", Required = true});
