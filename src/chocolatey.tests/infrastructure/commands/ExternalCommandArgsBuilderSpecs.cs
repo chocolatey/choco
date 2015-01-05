@@ -18,6 +18,7 @@
             {
                 configuration.Sources = "yo";
                 configuration.Verbose = true;
+                configuration.ApiKeyCommand.Key = "dude";
                 configuration.CommandName = "with a space";
             }
 
@@ -32,6 +33,14 @@
                 argsDictionary.Clear();
                 argsDictionary.Add("Sources", new ExternalCommandArgument {ArgumentOption = "-source "});
                 buildConfigs().ShouldEqual("-source " + configuration.Sources);
+            } 
+            
+            [Fact]
+            public void should_add_a_parameter_if_property_value_is_sub_property()
+            {
+                argsDictionary.Clear();
+                argsDictionary.Add("ApiKeyCommand.Key", new ExternalCommandArgument { ArgumentOption = "-apikey " });
+                buildConfigs().ShouldEqual("-apikey " + configuration.ApiKeyCommand.Key);
             }
 
             [Fact]

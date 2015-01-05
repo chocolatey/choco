@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Text;
 
     /// <summary>
@@ -18,39 +19,9 @@
         public static string build_arguments(object properties, IDictionary<string, ExternalCommandArgument> configToArgNames)
         {
             var arguments = new StringBuilder();
-            var props = properties.GetType().GetProperties();
             var propValues = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
-           
-            foreach (var prop in props)
-            {
-                if (configToArgNames.ContainsKey(prop.Name))
-                {
-                    var arg = configToArgNames[prop.Name];
-                    var propType = prop.PropertyType;
-                    var propValue = prop.GetValue(properties, null).to_string().wrap_spaces_in_quotes();
-                    if (propType == typeof (Boolean) && propValue.is_equal_to(bool.FalseString))
-                    {
-                        continue;
-                    }
 
-                    if (string.IsNullOrWhiteSpace(arg.ArgumentValue) && propType != typeof (Boolean))
-                    {
-                        if (string.IsNullOrWhiteSpace(propValue))
-                        {
-                            continue;
-                        }
-
-                        arg.ArgumentValue = propValue;
-                    }
-
-                    propValues.Add(
-                        prop.Name,
-                        arg.UseValueOnly
-                            ? "{0}".format_with(quote_arg_value_if_required(arg))
-                            : "{0}{1}".format_with(arg.ArgumentOption, quote_arg_value_if_required(arg))
-                        );
-                }
-            }
+            fill_args_dictionary(propValues, properties.GetType().GetProperties(), configToArgNames, properties, "");
 
             foreach (var arg in configToArgNames)
             {
@@ -80,9 +51,55 @@
             return arguments.Remove(arguments.Length - 1, 1).ToString();
         }
 
+        private static void fill_args_dictionary(Dictionary<string, string> propertyValues, IEnumerable<PropertyInfo> properties, IDictionary<string, ExternalCommandArgument> configToArgNames, object obj, string prepend)
+        {
+            foreach (var prop in properties.or_empty_list_if_null())
+            {
+                if (prop.PropertyType.is_built_in_system_type())
+                {
+                    var propName = "{0}{1}".format_with(
+                        string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
+                        prop.Name
+                        );
+
+                    if (configToArgNames.ContainsKey(propName))
+                    {
+                        var arg = configToArgNames[propName];
+                        var propType = prop.PropertyType;
+                        var propValue = prop.GetValue(obj, null).to_string().wrap_spaces_in_quotes();
+                        if (propType == typeof(Boolean) && propValue.is_equal_to(bool.FalseString))
+                        {
+                            continue;
+                        }
+
+                        if (string.IsNullOrWhiteSpace(arg.ArgumentValue) && propType != typeof(Boolean))
+                        {
+                            if (string.IsNullOrWhiteSpace(propValue))
+                            {
+                                continue;
+                            }
+
+                            arg.ArgumentValue = propValue;
+                        }
+
+                        propertyValues.Add(
+                            propName,
+                            arg.UseValueOnly
+                                ? "{0}".format_with(quote_arg_value_if_required(arg))
+                                : "{0}{1}".format_with(arg.ArgumentOption, quote_arg_value_if_required(arg))
+                            );
+                    }
+                }
+                else
+                {
+                    fill_args_dictionary(propertyValues, prop.PropertyType.GetProperties(), configToArgNames, prop.GetValue(obj, null), prop.Name);
+                }
+            }
+        }
+
         private static string quote_arg_value_if_required(ExternalCommandArgument argument)
         {
-            if (argument.QuoteValue && ! argument.ArgumentValue.StartsWith("\""))
+            if (argument.QuoteValue && !argument.ArgumentValue.StartsWith("\""))
             {
                 return "\"{0}\"".format_with(argument.ArgumentValue);
             }
