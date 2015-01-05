@@ -30,14 +30,44 @@ namespace chocolatey.infrastructure.app.configuration
         {
             var properties = new StringBuilder();
 
-            foreach (var propertyInfo in GetType().GetProperties())
-            {
-                properties.AppendFormat("{0}='{1}'|", propertyInfo.Name, propertyInfo.GetValue(this, null).to_string());
-            }
+            output_tostring(properties,GetType().GetProperties(),this,"");
 
             return properties.ToString();
         }
 
+        private void output_tostring(StringBuilder propertyValues, IEnumerable<PropertyInfo> properties,object obj,string prepend)
+        {
+            foreach (var propertyInfo in properties.or_empty_list_if_null())
+            {
+                var objectValue = propertyInfo.GetValue(obj, null);
+                if (propertyInfo.PropertyType.is_built_in_system_type())
+                {
+                    if (!string.IsNullOrWhiteSpace(objectValue.to_string()))
+                    {
+                        propertyValues.AppendFormat("{0}{1}='{2}'|",
+                        string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
+                        propertyInfo.Name,
+                        objectValue.to_string());
+                    }
+                }
+                else if (propertyInfo.PropertyType.is_collections_type())
+                {
+                    var list = objectValue as IDictionary<string, string>;
+                    foreach (var item in list.or_empty_list_if_null())
+                    {
+                        propertyValues.AppendFormat("{0}{1}.{2}='{3}'|",
+                       string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
+                       propertyInfo.Name,
+                       item.Key, 
+                       item.Value);
+                    }
+                }
+                else
+                {
+                    output_tostring(propertyValues, propertyInfo.PropertyType.GetProperties(), objectValue,propertyInfo.Name);
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the name of the command.
