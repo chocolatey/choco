@@ -20,6 +20,9 @@
         [XmlElement(ElementName = "cacheLocation")]
         public string CacheLocation { get; set; }
 
+        [XmlElement(ElementName = "containsLegacyPackageInstalls")]
+        public bool ContainsLegacyPackageInstalls { get; set; }
+
         [XmlElement(ElementName = "commandExecutionTimeoutSeconds")]
         public int CommandExecutionTimeoutSeconds { get; set; }
 

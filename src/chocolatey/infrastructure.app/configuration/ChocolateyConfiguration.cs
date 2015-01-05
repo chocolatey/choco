@@ -53,6 +53,7 @@ namespace chocolatey.infrastructure.app.configuration
         public bool CheckSumFiles { get; set; }
         public bool VirusCheckFiles { get; set; }
         public string CacheLocation { get; set; }
+        public bool ContainsLegacyPackageInstalls { get; set; }
         public int CommandExecutionTimeoutSeconds { get; set; }
 
         /// <summary>
