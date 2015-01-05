@@ -12,7 +12,8 @@
     {
         public void run(string[] args, ChocolateyConfiguration config, Container container)
         {
-            this.Log().Debug(() => "Passed in arguments: {0}".format_with(string.Join(" ", args)));
+            this.Log().Debug(() => "Command line: {0}".format_with(Environment.CommandLine)); 
+            this.Log().Debug(() => "Received arguments: {0}".format_with(string.Join(" ", args)));
 
             IList<string> commandArgs = new List<string>();
             //shift the first arg off 
