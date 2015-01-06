@@ -42,7 +42,7 @@
             }
         }
 
-        public class when_configurating_the_argument_parser : ChocolateyApiKeyCommandSpecsBase
+        public class when_configuring_the_argument_parser : ChocolateyApiKeyCommandSpecsBase
         {
             private string result;
             private OptionSet optionSet;
