@@ -1,6 +1,8 @@
 Contributors
 ============
 
+Submitting an Issue? See the "Submitting Issues" section in the [README](https://github.com/chocolatey/choco/blob/master/README.md#submitting-issues)
+
 The process for contributions is roughly as follows:
 
 ## Prerequisites
