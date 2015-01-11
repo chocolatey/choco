@@ -7,19 +7,19 @@ namespace chocolatey.infrastructure.commands
     using adapters;
     using filesystem;
     using platforms;
-    using Assembly = adapters.Assembly;
     using Process = adapters.Process;
 
     public sealed class CommandExecutor
     {
         private static Lazy<IFileSystem> file_system_initializer = new Lazy<IFileSystem>(() => new DotNetFileSystem());
 
-        private static IFileSystem file_system {
+        private static IFileSystem file_system
+        {
             get { return file_system_initializer.Value; }
         }
 
-        private static Func<IProcess> initialize_process = () => new Process(); 
-        
+        private static Func<IProcess> initialize_process = () => new Process();
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IFileSystem> file_system, Func<IProcess> process_initializer)
         {
@@ -114,7 +114,7 @@ namespace chocolatey.infrastructure.commands
 
                 if (waitForExitInSeconds > 0)
                 {
-                    var exited = p.WaitForExit((int)TimeSpan.FromSeconds(waitForExitInSeconds).TotalMilliseconds);
+                    var exited = p.WaitForExit((int) TimeSpan.FromSeconds(waitForExitInSeconds).TotalMilliseconds);
                     if (exited)
                     {
                         exitCode = p.ExitCode;

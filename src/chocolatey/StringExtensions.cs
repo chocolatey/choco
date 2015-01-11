@@ -86,7 +86,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Removes quotes or apostrophes surrounding a string
+        ///   Removes quotes or apostrophes surrounding a string
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>
@@ -99,7 +99,7 @@ namespace chocolatey
                 input = input.trim_safe();
             }
 
-            if ((input.StartsWith("\"") && input.EndsWith("\"")) 
+            if ((input.StartsWith("\"") && input.EndsWith("\""))
                 || (input.StartsWith("'") && input.EndsWith("'")))
             {
                 input = input.Remove(0, 1).Remove(input.Length - 2, 1);

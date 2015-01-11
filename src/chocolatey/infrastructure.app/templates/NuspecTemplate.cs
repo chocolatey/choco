@@ -1,9 +1,24 @@
-﻿namespace chocolatey.infrastructure.app.templates
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.infrastructure.app.templates
 {
     public class NuspecTemplate
     {
-        public static string Template = 
-@"<?xml version=""1.0"" encoding=""utf-8""?>
+        public static string Template =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
 <package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
   <metadata>
@@ -35,13 +50,12 @@
 ";
 
         public static string AutomaticPackageNotes =
-@"
+            @"
 
 
 **Please Note**: This is an automatically updated package. If you find it is 
 out of date by more than a day or two, please contact the maintainer(s) and
 let them know the package is no longer updating correctly.
 ";
-
     }
 }

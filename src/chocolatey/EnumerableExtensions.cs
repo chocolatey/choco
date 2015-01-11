@@ -23,7 +23,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        ///  Safe for each, returns an empty Enumerable if the list to iterate is null.
+        ///   Safe for each, returns an empty Enumerable if the list to iterate is null.
         /// </summary>
         /// <param name="source">The source.</param>
         /// <returns>Source if not null; otherwise new ArrayList</returns>

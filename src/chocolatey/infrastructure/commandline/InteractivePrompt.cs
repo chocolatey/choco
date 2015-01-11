@@ -1,4 +1,19 @@
-﻿namespace chocolatey.infrastructure.commandline
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.infrastructure.commandline
 {
     using System;
     using System.Collections.Generic;
@@ -30,20 +45,17 @@
             Ensure.that(() => prompt).is_not_null();
             Ensure.that(() => choices).is_not_null();
             Ensure
-              .that(() => choices)
-              .meets(
-                c => c.Count() > 0,
-                (name, value) => { throw new ApplicationException("No choices passed in. Please ensure you pass choices");
-            });
+                .that(() => choices)
+                .meets(
+                    c => c.Count() > 0,
+                    (name, value) => { throw new ApplicationException("No choices passed in. Please ensure you pass choices"); });
             if (defaultChoice != null)
             {
                 Ensure
-                  .that(()=> choices)
-                  .meets(
-                    c=> c.Contains(defaultChoice),
-                    (name, value) => {
-                        throw new ApplicationException("Default choice value must be one of the given choices.");
-                    });
+                    .that(() => choices)
+                    .meets(
+                        c => c.Contains(defaultChoice),
+                        (name, value) => { throw new ApplicationException("Default choice value must be one of the given choices."); });
             }
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, prompt);

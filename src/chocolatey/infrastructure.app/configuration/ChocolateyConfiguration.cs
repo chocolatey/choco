@@ -1,17 +1,16 @@
 namespace chocolatey.infrastructure.app.configuration
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Reflection;
     using System.Text;
     using domain;
     using platforms;
-    
+
     /// <summary>
     ///   The chocolatey configuration.
     /// </summary>
-    public partial class ChocolateyConfiguration
+    public class ChocolateyConfiguration
     {
         public ChocolateyConfiguration()
         {
@@ -30,12 +29,12 @@ namespace chocolatey.infrastructure.app.configuration
         {
             var properties = new StringBuilder();
 
-            output_tostring(properties,GetType().GetProperties(),this,"");
+            output_tostring(properties, GetType().GetProperties(), this, "");
 
             return properties.ToString();
         }
 
-        private void output_tostring(StringBuilder propertyValues, IEnumerable<PropertyInfo> properties,object obj,string prepend)
+        private void output_tostring(StringBuilder propertyValues, IEnumerable<PropertyInfo> properties, object obj, string prepend)
         {
             foreach (var propertyInfo in properties.or_empty_list_if_null())
             {
@@ -45,9 +44,9 @@ namespace chocolatey.infrastructure.app.configuration
                     if (!string.IsNullOrWhiteSpace(objectValue.to_string()))
                     {
                         propertyValues.AppendFormat("{0}{1}='{2}'|",
-                        string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
-                        propertyInfo.Name,
-                        objectValue.to_string());
+                                                    string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
+                                                    propertyInfo.Name,
+                                                    objectValue.to_string());
                     }
                 }
                 else if (propertyInfo.PropertyType.is_collections_type())
@@ -56,30 +55,30 @@ namespace chocolatey.infrastructure.app.configuration
                     foreach (var item in list.or_empty_list_if_null())
                     {
                         propertyValues.AppendFormat("{0}{1}.{2}='{3}'|",
-                       string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
-                       propertyInfo.Name,
-                       item.Key, 
-                       item.Value);
+                                                    string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
+                                                    propertyInfo.Name,
+                                                    item.Key,
+                                                    item.Value);
                     }
                 }
                 else
                 {
-                    output_tostring(propertyValues, propertyInfo.PropertyType.GetProperties(), objectValue,propertyInfo.Name);
+                    output_tostring(propertyValues, propertyInfo.PropertyType.GetProperties(), objectValue, propertyInfo.Name);
                 }
             }
         }
 
         /// <summary>
-        /// Gets or sets the name of the command.
-        /// This is the command that choco runs.
+        ///   Gets or sets the name of the command.
+        ///   This is the command that choco runs.
         /// </summary>
         /// <value>
-        /// The name of the command.
+        ///   The name of the command.
         /// </value>
         public string CommandName { get; set; }
 
         // configuration set variables
-        
+
         public bool CheckSumFiles { get; set; }
         public bool VirusCheckFiles { get; set; }
         public string CacheLocation { get; set; }
@@ -87,12 +86,12 @@ namespace chocolatey.infrastructure.app.configuration
         public int CommandExecutionTimeoutSeconds { get; set; }
 
         /// <summary>
-        /// One or more source locations set by configuration or by command line. Separated by semi-colon
+        ///   One or more source locations set by configuration or by command line. Separated by semi-colon
         /// </summary>
         public string Sources { get; set; }
 
         // top level commands
-        
+
         public bool Debug { get; set; }
         public bool Verbose { get; set; }
         public bool Force { get; set; }
@@ -104,7 +103,7 @@ namespace chocolatey.infrastructure.app.configuration
 
 
         /// <summary>
-        /// Usually related to unparsed arguments.
+        ///   Usually related to unparsed arguments.
         /// </summary>
         public string Input { get; set; }
 
@@ -121,6 +120,7 @@ namespace chocolatey.infrastructure.app.configuration
         ///   Space separated package names.
         /// </value>
         public string PackageNames { get; set; }
+
         public bool Prerelease { get; set; }
         public bool ForceX86 { get; set; }
         public string InstallArguments { get; set; }
@@ -132,29 +132,34 @@ namespace chocolatey.infrastructure.app.configuration
         public bool ForceDependencies { get; set; }
 
         /// <summary>
-        /// Configuration values provided by choco.
+        ///   Configuration values provided by choco.
         /// </summary>
         public InformationCommandConfiguration Information { get; private set; }
+
         /// <summary>
-        /// Configuration related specifically to List command
+        ///   Configuration related specifically to List command
         /// </summary>
         public ListCommandConfiguration ListCommand { get; private set; }
+
         /// <summary>
-        /// Configuration related specifically to New command
+        ///   Configuration related specifically to New command
         /// </summary>
         public NewCommandConfiguration NewCommand { get; private set; }
+
         /// <summary>
-        /// Configuration related specifically to Source command
+        ///   Configuration related specifically to Source command
         /// </summary>
         public SourcesCommandConfiguration SourceCommand { get; private set; }
+
         /// <summary>
-        /// Configuration related specifically to ApiKey command
+        ///   Configuration related specifically to ApiKey command
         /// </summary>
         public ApiKeyCommandConfiguration ApiKeyCommand { get; private set; }
+
         /// <summary>
-        /// Configuration related specifically to Push command
+        ///   Configuration related specifically to Push command
         /// </summary>
-        public PushCommandConfiguration PushCommand { get; private set; } 
+        public PushCommandConfiguration PushCommand { get; private set; }
     }
 
     public sealed class InformationCommandConfiguration
@@ -174,11 +179,11 @@ namespace chocolatey.infrastructure.app.configuration
         // list
         public bool LocalOnly { get; set; }
         public bool IncludeRegistryPrograms { get; set; }
-    } 
-    
+    }
+
     public sealed class NewCommandConfiguration
     {
-       public NewCommandConfiguration()
+        public NewCommandConfiguration()
         {
             TemplateProperties = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }

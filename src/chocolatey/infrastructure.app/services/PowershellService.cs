@@ -1,4 +1,19 @@
-﻿namespace chocolatey.infrastructure.app.services
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.infrastructure.app.services
 {
     using System;
     using System.IO;
@@ -109,11 +124,11 @@
                 {
                     Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
                 }
-                
+
                 if (!string.IsNullOrWhiteSpace(configuration.CacheLocation))
                 {
                     //refactor - this is possibly temporary until we get all things running Posh into here
-                    Environment.SetEnvironmentVariable("TEMP",configuration.CacheLocation);
+                    Environment.SetEnvironmentVariable("TEMP", configuration.CacheLocation);
                 }
 
                 //verify how not silent is passed
@@ -139,9 +154,9 @@
 
                 if (!shouldRun)
                 {
-                    this.Log().Info(ChocolateyLoggers.Important,() => " Found '{0}':".format_with(_fileSystem.get_file_name(chocoPowerShellScript)));
+                    this.Log().Info(ChocolateyLoggers.Important, () => " Found '{0}':".format_with(_fileSystem.get_file_name(chocoPowerShellScript)));
                     this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents));
-                    var selection = InteractivePrompt.prompt_for_confirmation(" Do you want to run the script?", new[] { "yes", "no", "skip" }, "yes",requireAnswer:true);
+                    var selection = InteractivePrompt.prompt_for_confirmation(" Do you want to run the script?", new[] {"yes", "no", "skip"}, "yes", requireAnswer: true);
                     if (selection.is_equal_to("yes")) shouldRun = true;
                     if (selection.is_equal_to("no"))
                     {
@@ -151,23 +166,23 @@
                 }
 
                 if (shouldRun)
-                { 
+                {
                     installerRun = true;
                     var exitCode = PowershellExecutor.execute(
-                                       wrap_command_with_module(chocoPowerShellScript),
-                                       _fileSystem,
-                                       configuration.CommandExecutionTimeoutSeconds,
-                                       (s, e) =>
-                                       {
-                                           if (string.IsNullOrWhiteSpace(e.Data)) return;
-                                           this.Log().Info(() => " " + e.Data);
-                                       },
-                                       (s, e) =>
-                                       {
-                                           if (string.IsNullOrWhiteSpace(e.Data)) return;
-                                           failure = true;
-                                           this.Log().Error(() => " " + e.Data);
-                                       });
+                        wrap_command_with_module(chocoPowerShellScript),
+                        _fileSystem,
+                        configuration.CommandExecutionTimeoutSeconds,
+                        (s, e) =>
+                            {
+                                if (string.IsNullOrWhiteSpace(e.Data)) return;
+                                this.Log().Info(() => " " + e.Data);
+                            },
+                        (s, e) =>
+                            {
+                                if (string.IsNullOrWhiteSpace(e.Data)) return;
+                                failure = true;
+                                this.Log().Error(() => " " + e.Data);
+                            });
 
                     if (failure)
                     {

@@ -1,4 +1,19 @@
-﻿namespace chocolatey.infrastructure.app.templates
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.infrastructure.app.templates
 {
     public class TemplateValues
     {
@@ -32,24 +47,25 @@
         }
 
 
-        public string PackageName { get; set; } 
-        public string PackageNameLower {
+        public string PackageName { get; set; }
+
+        public string PackageNameLower
+        {
             get { return PackageName.to_lower(); }
         }
 
-        public string PackageVersion { get; set; } 
-        public string MaintainerName { get; set; } 
+        public string PackageVersion { get; set; }
+        public string MaintainerName { get; set; }
         public string MaintainerRepo { get; set; }
         public string AutomaticPackageNotesInstaller { get; set; }
-        public string AutomaticPackageNotesNuspec { get; set; } 
-        public string InstallerType { get; set; } 
-        public string Url { get; set; } 
-        public string Url64 { get; set; } 
+        public string AutomaticPackageNotesNuspec { get; set; }
+        public string InstallerType { get; set; }
+        public string Url { get; set; }
+        public string Url64 { get; set; }
         public string SilentArgs { get; set; }
 
-        public readonly static string NamePropertyName = "PackageName";
-        public readonly static string VersionPropertyName = "PackageVersion";
-        public readonly static string MaintainerPropertyName = "MaintainerName";
-
+        public static readonly string NamePropertyName = "PackageName";
+        public static readonly string VersionPropertyName = "PackageVersion";
+        public static readonly string MaintainerPropertyName = "MaintainerName";
     }
 }

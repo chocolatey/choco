@@ -1,4 +1,19 @@
-﻿namespace chocolatey.infrastructure.commands
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.infrastructure.commands
 {
     using System;
     using System.Collections.Generic;
@@ -11,7 +26,7 @@
     public static class ExternalCommandArgsBuilder
     {
         /// <summary>
-        /// Builds a string containing the arguments for calling an external command based on public property values in the specified properties object.
+        ///   Builds a string containing the arguments for calling an external command based on public property values in the specified properties object.
         /// </summary>
         /// <param name="properties">The properties object. Public properties are inspected for names and values based on exact matches in the configToArgNames dictionary.</param>
         /// <param name="configToArgNames">Dictionary of external commands set in the exact order in which you want to get back arguments. Keys should match exactly (casing as well) with the property names of the properties object.</param>
@@ -67,12 +82,12 @@
                         var arg = configToArgNames[propName];
                         var propType = prop.PropertyType;
                         var propValue = prop.GetValue(obj, null).to_string().wrap_spaces_in_quotes();
-                        if (propType == typeof(Boolean) && propValue.is_equal_to(bool.FalseString))
+                        if (propType == typeof (Boolean) && propValue.is_equal_to(bool.FalseString))
                         {
                             continue;
                         }
 
-                        if (string.IsNullOrWhiteSpace(arg.ArgumentValue) && propType != typeof(Boolean))
+                        if (string.IsNullOrWhiteSpace(arg.ArgumentValue) && propType != typeof (Boolean))
                         {
                             if (string.IsNullOrWhiteSpace(propValue))
                             {

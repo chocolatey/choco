@@ -1,4 +1,19 @@
-﻿namespace chocolatey.infrastructure.app.commands
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.infrastructure.app.commands
 {
     using System;
     using System.Collections.Generic;
@@ -29,23 +44,23 @@
             configuration.PushCommand.TimeoutInSeconds = 300;
 
             optionSet
-                 .Add("s=|source=",
+                .Add("s=|source=",
                      "Source - The source we are pushing the package to. Use {0} to push to community feed.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource),
                      option => configuration.Sources = option)
-                 .Add("k=|key=|apikey=|api-key=",
+                .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The api key for the source. If not specified (and not local file source), does a lookup. If not specified and one is not found for an https source, push will fail.",
                      option => configuration.PushCommand.Key = option)
-                 .Add("t=|timeout=",
+                .Add("t=|timeout=",
                      "Timeout (in seconds) - The time to allow a package push to occur before timing out. Defaults to 300 seconds (5 minutes).",
                      option =>
-                     {
-                         int timeout = 0;
-                         int.TryParse(option, out timeout);
-                         if (timeout > 0)
                          {
-                             configuration.PushCommand.TimeoutInSeconds = timeout;
-                         }
-                     })
+                             int timeout = 0;
+                             int.TryParse(option, out timeout);
+                             if (timeout > 0)
+                             {
+                                 configuration.PushCommand.TimeoutInSeconds = timeout;
+                             }
+                         })
                 //.Add("b|disablebuffering|disable-buffering",
                 //    "DisableBuffering -  Disable buffering when pushing to an HTTP(S) server to decrease memory usage. Note that when this option is enabled, integrated windows authentication might not work.",
                 //    option => configuration.PushCommand.DisableBuffering = option)
@@ -81,14 +96,14 @@
             {
                 throw new ApplicationException("An ApiKey was not found for '{0}'. You must either set an api key in the configuration or specify one with --api-key.".format_with(configuration.Sources));
             }
-            
+
             // security advisory
             if (!configuration.Force || configuration.Sources.to_lower().Contains("chocolatey.org"))
             {
                 if (remoteSource.Scheme == "http" && remoteSource.Host != "localhost")
                 {
                     string errorMessage =
-@"WARNING! The specified source '{0}' is not secure.
+                        @"WARNING! The specified source '{0}' is not secure.
  Sending apikey over insecure channels leaves your data susceptible to hackers.
  Please update your source to a more secure source and try again.
  

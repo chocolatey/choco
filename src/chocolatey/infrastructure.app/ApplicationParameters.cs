@@ -14,7 +14,7 @@ namespace chocolatey.infrastructure.app
         private static readonly IFileSystem _fileSystem = new DotNetFileSystem();
         public static readonly string Name = "Chocolatey";
         //public static readonly string InstallLocation = Environment.GetEnvironmentVariable("ChocolateyInstall") ??  _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location);
-        public static readonly string InstallLocation =  _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location);
+        public static readonly string InstallLocation = _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location);
         public static readonly string CommonAppDataChocolatey = _fileSystem.combine_paths(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), Name);
         public static readonly string LoggingLocation = _fileSystem.combine_paths(InstallLocation, "logs");
         public static readonly string LoggingFile = @"chocolatey.log";
@@ -31,10 +31,10 @@ namespace chocolatey.infrastructure.app
         public static string ShimsLocation = _fileSystem.combine_paths(InstallLocation, "bin");
         public static string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
-        public static readonly string UserAgent =  "Chocolatey Command Line";
+        public static readonly string UserAgent = "Chocolatey Command Line";
 
         /// <summary>
-        /// Default is 45 minutes
+        ///   Default is 45 minutes
         /// </summary>
         public static int DefaultWaitForExitInSeconds = 2700;
 

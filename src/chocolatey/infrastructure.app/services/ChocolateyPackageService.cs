@@ -1,4 +1,19 @@
-﻿namespace chocolatey.infrastructure.app.services
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.infrastructure.app.services
 {
     using System;
     using System.Collections.Concurrent;
@@ -170,7 +185,7 @@
             }
             else
             {
-                this.Log().Info(ChocolateyLoggers.Important, ()=> " Skipping Powershell and shimgen portions of the install due to non-Windows.");
+                this.Log().Info(ChocolateyLoggers.Important, () => " Skipping Powershell and shimgen portions of the install due to non-Windows.");
             }
 
             _packageInfoService.save_package_information(pkgInfo);
@@ -281,106 +296,106 @@
             var packageUninstalls = _nugetService.uninstall_run(
                 config,
                 (packageResult) =>
-                {
-                    if (!_fileSystem.directory_exists(packageResult.InstallLocation))
                     {
-                        packageResult.InstallLocation += ".{0}".format_with(packageResult.Package.Version.to_string());
-                    }
-
-                    _shimgenService.uninstall(config, packageResult);
-
-                    var powershellRan = false;
-                    if (!config.SkipPackageInstallProvider)
-                    {
-                        powershellRan = _powershellService.uninstall(config, packageResult);
-                    }
-
-                    if (!powershellRan)
-                    {
-                        var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
-
-                        if (pkgInfo.RegistrySnapshot != null)
+                        if (!_fileSystem.directory_exists(packageResult.InstallLocation))
                         {
-                            //todo:refactor this crap
-                            this.Log().Info(" Running AutoUninstaller...");
+                            packageResult.InstallLocation += ".{0}".format_with(packageResult.Package.Version.to_string());
+                        }
 
-                            foreach (var key in pkgInfo.RegistrySnapshot.RegistryKeys.or_empty_list_if_null())
+                        _shimgenService.uninstall(config, packageResult);
+
+                        var powershellRan = false;
+                        if (!config.SkipPackageInstallProvider)
+                        {
+                            powershellRan = _powershellService.uninstall(config, packageResult);
+                        }
+
+                        if (!powershellRan)
+                        {
+                            var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
+
+                            if (pkgInfo.RegistrySnapshot != null)
                             {
-                                this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString));
-                                // split on " /" and " -" for quite a bit more accuracy
-                                IList<string> uninstallArgs = key.UninstallString.to_string().Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                                var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault().remove_surrounding_quotes();
-                                this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
-                                uninstallArgs.Remove(uninstallExe);
+                                //todo:refactor this crap
+                                this.Log().Info(" Running AutoUninstaller...");
 
-                                if (!key.HasQuietUninstall)
+                                foreach (var key in pkgInfo.RegistrySnapshot.RegistryKeys.or_empty_list_if_null())
                                 {
-                                    IInstaller installer = new CustomInstaller();
+                                    this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString));
+                                    // split on " /" and " -" for quite a bit more accuracy
+                                    IList<string> uninstallArgs = key.UninstallString.to_string().Split(new[] {" /", " -"}, StringSplitOptions.RemoveEmptyEntries).ToList();
+                                    var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault().remove_surrounding_quotes();
+                                    this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
+                                    uninstallArgs.Remove(uninstallExe);
 
-                                    //refactor this to elsewhere
-                                    switch (key.InstallerType)
+                                    if (!key.HasQuietUninstall)
                                     {
-                                        case InstallerType.Msi:
-                                            installer = new MsiInstaller();
-                                            break;
-                                        case InstallerType.InnoSetup:
-                                            installer = new InnoSetupInstaller();
-                                            break;
-                                        case InstallerType.Nsis:
-                                            installer = new NsisInstaller();
-                                            break;
-                                        case InstallerType.InstallShield:
-                                            installer = new CustomInstaller();
-                                            break;
-                                        default:
-                                            // skip
+                                        IInstaller installer = new CustomInstaller();
 
-                                            break;
+                                        //refactor this to elsewhere
+                                        switch (key.InstallerType)
+                                        {
+                                            case InstallerType.Msi:
+                                                installer = new MsiInstaller();
+                                                break;
+                                            case InstallerType.InnoSetup:
+                                                installer = new InnoSetupInstaller();
+                                                break;
+                                            case InstallerType.Nsis:
+                                                installer = new NsisInstaller();
+                                                break;
+                                            case InstallerType.InstallShield:
+                                                installer = new CustomInstaller();
+                                                break;
+                                            default:
+                                                // skip
+
+                                                break;
+                                        }
+
+                                        this.Log().Debug(() => " Installer type is '{0}'".format_with(installer.GetType().Name));
+
+                                        uninstallArgs.Add(installer.build_uninstall_command_arguments());
                                     }
 
-                                    this.Log().Debug(() => " Installer type is '{0}'".format_with(installer.GetType().Name));
+                                    this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs.join(" ")));
 
-                                    uninstallArgs.Add(installer.build_uninstall_command_arguments());
-                                }
+                                    var exitCode = CommandExecutor.execute(
+                                        uninstallExe, uninstallArgs.join(" "), config.CommandExecutionTimeoutSeconds,
+                                        (s, e) =>
+                                            {
+                                                if (string.IsNullOrWhiteSpace(e.Data)) return;
+                                                this.Log().Debug(() => " [AutoUninstaller] {0}".format_with(e.Data));
+                                            },
+                                        (s, e) =>
+                                            {
+                                                if (string.IsNullOrWhiteSpace(e.Data)) return;
+                                                this.Log().Error(() => " [AutoUninstaller] {0}".format_with(e.Data));
+                                            });
 
-                                this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs.join(" ")));
-
-                                var exitCode = CommandExecutor.execute(
-                                    uninstallExe, uninstallArgs.join(" "), config.CommandExecutionTimeoutSeconds,
-                                    (s, e) =>
+                                    if (exitCode != 0)
                                     {
-                                        if (string.IsNullOrWhiteSpace(e.Data)) return;
-                                        this.Log().Debug(() => " [AutoUninstaller] {0}".format_with(e.Data));
-                                    },
-                                    (s, e) =>
+                                        Environment.ExitCode = exitCode;
+                                        string logMessage = " Auto uninstaller failed. Please remove machine installation manually.";
+                                        this.Log().Error(() => logMessage);
+                                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                                    }
+                                    else
                                     {
-                                        if (string.IsNullOrWhiteSpace(e.Data)) return;
-                                        this.Log().Error(() => " [AutoUninstaller] {0}".format_with(e.Data));
-                                    });
-
-                                if (exitCode != 0)
-                                {
-                                    Environment.ExitCode = exitCode;
-                                    string logMessage = " Auto uninstaller failed. Please remove machine installation manually.";
-                                    this.Log().Error(() => logMessage);
-                                    packageResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                                }
-                                else
-                                {
-                                    this.Log().Info(() => " AutoUninstaller has successfully uninstalled {0} from your machine install".format_with(packageResult.Package.Id));
+                                        this.Log().Info(() => " AutoUninstaller has successfully uninstalled {0} from your machine install".format_with(packageResult.Package.Id));
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    if (packageResult.Success)
-                    {
-                        //todo: v2 clean up package information store for things no longer installed (call it compact?)
-                        _packageInfoService.remove_package_information(packageResult.Package);
-                    }
+                        if (packageResult.Success)
+                        {
+                            //todo: v2 clean up package information store for things no longer installed (call it compact?)
+                            _packageInfoService.remove_package_information(packageResult.Package);
+                        }
 
-                    //todo:prevent reboots
-                });
+                        //todo:prevent reboots
+                    });
 
             var uninstallFailures = packageUninstalls.Count(p => !p.Value.Success);
             this.Log().Warn(() => @"{0}{1} uninstalled {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(

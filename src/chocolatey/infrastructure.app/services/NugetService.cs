@@ -1,4 +1,19 @@
-﻿namespace chocolatey.infrastructure.app.services
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.infrastructure.app.services
 {
     using System;
     using System.Collections.Concurrent;
@@ -22,7 +37,7 @@
     {
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _nugetLogger;
-        private Lazy<IDateTime> datetime_initializer = new Lazy<IDateTime>(() => new DateTime());
+        private readonly Lazy<IDateTime> datetime_initializer = new Lazy<IDateTime>(() => new DateTime());
 
         private IDateTime DateTime
         {
@@ -86,10 +101,7 @@
                     var filesFound = fileSystem.get_files(fileSystem.get_current_directory(), "*" + extension).or_empty_list_if_null();
                     Ensure.that(() => filesFound)
                           .meets((files) => files.Count() == 1,
-                                 (name, value) =>
-                                 {
-                                     throw new FileNotFoundException("No {0} files (or more than 1) were found to build in '{1}'. Please specify the {0} file or try in a different directory.".format_with(extension, _fileSystem.get_current_directory()));
-                                 });
+                                 (name, value) => { throw new FileNotFoundException("No {0} files (or more than 1) were found to build in '{1}'. Please specify the {0} file or try in a different directory.".format_with(extension, _fileSystem.get_current_directory())); });
 
                     return filesFound.FirstOrDefault();
                 };
@@ -186,7 +198,7 @@
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
 
-            IList<string> packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
+            IList<string> packageNames = config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
             if (packageNames.Count == 1)
             {
                 var packageName = packageNames.FirstOrDefault();
@@ -213,15 +225,15 @@
             }
 
             var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
-                                                                installSuccessAction: (e) =>
-                                                                    {
-                                                                        var pkg = e.Package;
-                                                                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                                                                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+                                                               installSuccessAction: (e) =>
+                                                                   {
+                                                                       var pkg = e.Package;
+                                                                       var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                                                                       results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                                                                        if (continueAction != null) continueAction.Invoke(results);
-                                                                    },
-                                                                uninstallSuccessAction: null);
+                                                                       if (continueAction != null) continueAction.Invoke(results);
+                                                                   },
+                                                               uninstallSuccessAction: null);
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
@@ -309,7 +321,7 @@
 
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
 
-            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {
@@ -463,7 +475,7 @@
                     config.ForceDependencies = false;
                 });
 
-            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 if (packageName.to_lower().EndsWith(".config"))
                 {

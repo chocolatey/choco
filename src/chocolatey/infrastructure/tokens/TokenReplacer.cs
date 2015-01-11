@@ -11,7 +11,7 @@ namespace chocolatey.infrastructure.tokens
             if (string.IsNullOrEmpty(textToReplace)) return string.Empty;
 
             IDictionary<string, string> dictionary = create_dictionary_from_configuration(configuration);
-            var regex = new Regex("{0}(?<key>\\w+){1}".format_with(Regex.Escape(tokenPrefix),Regex.Escape(tokenSuffix)));
+            var regex = new Regex("{0}(?<key>\\w+){1}".format_with(Regex.Escape(tokenPrefix), Regex.Escape(tokenSuffix)));
 
             string output = regex.Replace(textToReplace, m =>
                 {
