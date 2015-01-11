@@ -1,4 +1,19 @@
-﻿namespace chocolatey.tests.infrastructure.app.commands
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.tests.infrastructure.app.commands
 {
     using System;
     using System.Collections.Generic;
@@ -33,7 +48,7 @@
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
@@ -75,8 +90,8 @@
             public void should_add_short_version_of_name_to_the_option_set()
             {
                 optionSet.Contains("n").ShouldBeTrue();
-            }   
-            
+            }
+
             [Fact]
             public void should_add_source_to_the_option_set()
             {
@@ -112,7 +127,6 @@
             {
                 optionSet.Contains("p").ShouldBeTrue();
             }
-
         }
 
         public class when_handling_additional_argument_parsing : ChocolateySourceCommandSpecsBase
@@ -174,8 +188,8 @@
                 because();
 
                 configuration.SourceCommand.Command.ShouldEqual(SourceCommandType.add);
-            }  
-            
+            }
+
             [Fact]
             public void should_accept_uppercase_add_as_the_subcommand()
             {
@@ -233,8 +247,8 @@
                 because();
 
                 configuration.SourceCommand.Command.ShouldEqual(SourceCommandType.list);
-            } 
-            
+            }
+
             [Fact]
             public void should_handle_passing_in_an_empty_string()
             {
@@ -254,7 +268,7 @@
             {
                 because = () => command.handle_validation(configuration);
             }
-            
+
             [Fact]
             public void should_throw_when_command_is_not_list_and_name_is_not_set()
             {
@@ -286,8 +300,8 @@
                 configuration.SourceCommand.Command = SourceCommandType.list;
                 configuration.SourceCommand.Name = "";
                 because();
-            }    
-            
+            }
+
             [Fact]
             public void should_continue_when_command_is_not_list_and_name_is_set()
             {
@@ -317,7 +331,7 @@
 
             public override void Because()
             {
-               because = () => command.run(configuration);
+                because = () => command.run(configuration);
             }
 
             [Fact]
@@ -326,16 +340,16 @@
                 configuration.SourceCommand.Command = SourceCommandType.list;
                 because();
                 configSettingsService.Verify(c => c.source_list(configuration), Times.Once);
-            }   
-            
+            }
+
             [Fact]
             public void should_call_service_source_add_when_command_is_add()
             {
                 configuration.SourceCommand.Command = SourceCommandType.add;
                 because();
                 configSettingsService.Verify(c => c.source_add(configuration), Times.Once);
-            } 
-            
+            }
+
             [Fact]
             public void should_call_service_source_remove_when_command_is_remove()
             {
@@ -343,7 +357,7 @@
                 because();
                 configSettingsService.Verify(c => c.source_remove(configuration), Times.Once);
             }
-            
+
             [Fact]
             public void should_call_service_source_disable_when_command_is_disable()
             {
@@ -351,7 +365,7 @@
                 because();
                 configSettingsService.Verify(c => c.source_disable(configuration), Times.Once);
             }
-            
+
             [Fact]
             public void should_call_service_source_enable_when_command_is_enable()
             {

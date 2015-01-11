@@ -1,4 +1,19 @@
-﻿namespace chocolatey.tests.infrastructure.app.commands
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.tests.infrastructure.app.commands
 {
     using System;
     using System.Collections.Generic;
@@ -30,9 +45,10 @@
         public class when_implementing_command_for : ChocolateyNewCommandSpecsBase
         {
             private List<string> results;
+
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
@@ -91,7 +107,7 @@
 
         public class when_handling_additional_argument_parsing : ChocolateyNewCommandSpecsBase
         {
-            private IList<string> unparsedArgs = new List<string>();
+            private readonly IList<string> unparsedArgs = new List<string>();
             private Action because;
 
             public override void Because()
@@ -126,8 +142,8 @@
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.ShouldEqual("bob");
                 templateProperty.Value.ShouldEqual("new");
-            } 
-            
+            }
+
             [Fact]
             public void should_set_template_properties_only_once()
             {
@@ -141,8 +157,8 @@
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.ShouldEqual("bob");
                 templateProperty.Value.ShouldEqual("one");
-            }    
-         
+            }
+
             [Fact]
             public void should_ignore_casing_differences_when_setting_template_properties()
             {
@@ -156,12 +172,12 @@
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.ShouldEqual("bob");
                 templateProperty.Value.ShouldEqual("one");
-            } 
-            
+            }
+
             [Fact]
             public void should_not_set_template_properties_when_args_are_not_separated_by_equals()
             {
-                reset(); 
+                reset();
                 configuration.NewCommand.Name = "bill";
                 configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, "bill");
                 unparsedArgs.Add("bob new");
@@ -172,8 +188,8 @@
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.ShouldEqual("PackageName");
                 templateProperty.Value.ShouldEqual("bill");
-            } 
-            
+            }
+
             [Fact]
             public void should_not_set_override_configuration_Name_when_unparsed_without_equals()
             {
@@ -183,23 +199,23 @@
                 unparsedArgs.Add("bob");
                 because();
 
-                var properties = configuration.NewCommand.TemplateProperties; 
+                var properties = configuration.NewCommand.TemplateProperties;
                 properties.Count.ShouldEqual(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.ShouldEqual("PackageName");
                 templateProperty.Value.ShouldEqual("bill");
             }
-            
+
             [Fact]
             public void should_not_set_override_configuration_Name_when_package_name_is_also_passed()
             {
                 reset();
-                configuration.NewCommand.Name = "bill"; 
+                configuration.NewCommand.Name = "bill";
                 configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, "bill");
-                unparsedArgs.Add(TemplateValues.NamePropertyName +"=bob");
+                unparsedArgs.Add(TemplateValues.NamePropertyName + "=bob");
                 because();
 
-                var properties = configuration.NewCommand.TemplateProperties; 
+                var properties = configuration.NewCommand.TemplateProperties;
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.ShouldEqual("PackageName");
                 templateProperty.Value.ShouldEqual("bill");
@@ -245,8 +261,8 @@
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.ShouldEqual("bob");
                 templateProperty.Value.ShouldEqual("new \"this");
-            } 
-            
+            }
+
             [Fact]
             public void should_set_template_properties_without_surrounding_apostrophes()
             {

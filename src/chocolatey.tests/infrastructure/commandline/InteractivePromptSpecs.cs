@@ -1,4 +1,19 @@
-﻿namespace chocolatey.tests.infrastructure.commandline
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.tests.infrastructure.commandline
 {
     using System;
     using System.Collections.Generic;
@@ -20,7 +35,7 @@
                 prompt_value = "hi";
 
                 InteractivePrompt.initialize_with(new Lazy<IConsole>(() => console.Object));
-          
+
                 choices.Add("yes");
                 choices.Add("no");
             }
@@ -33,7 +48,7 @@
 
         public class when_prompting_with_interactivePrompt : InteractivePromptSpecsBase
         {
-            private string default_choice = null;
+            private string default_choice;
             private Func<string> prompt;
 
             public override void Because()
@@ -58,9 +73,9 @@
                 }
 
                 errored.ShouldBeTrue();
-                console.Verify(c=> c.ReadLine(),Times.Never);
-            }      
-            
+                console.Verify(c => c.ReadLine(), Times.Never);
+            }
+
             [Fact]
             public void should_error_when_the_choicelist_is_empty()
             {
@@ -80,13 +95,13 @@
 
                 errored.ShouldBeTrue();
                 errorMessage.ShouldContain("No choices passed in.");
-                console.Verify(c=> c.ReadLine(),Times.Never);
+                console.Verify(c => c.ReadLine(), Times.Never);
             }
 
             [Fact]
             public void should_error_when_the_prompt_input_is_null()
             {
-                choices = new List<string>{"bob"};
+                choices = new List<string> {"bob"};
                 prompt_value = null;
                 bool errored = false;
                 console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
@@ -101,12 +116,12 @@
 
                 errored.ShouldBeTrue();
                 console.Verify(c => c.ReadLine(), Times.Never);
-            }  
-            
+            }
+
             [Fact]
             public void should_error_when_the_default_choice_is_not_in_list()
             {
-                choices = new List<string> { "bob" };
+                choices = new List<string> {"bob"};
                 default_choice = "maybe";
                 bool errored = false;
                 string errorMessage = string.Empty;
@@ -114,7 +129,7 @@
                 string result = null;
                 try
                 {
-                   result = prompt();
+                    result = prompt();
                 }
                 catch (Exception ex)
                 {
@@ -132,6 +147,7 @@
         public class when_prompting_with_interactivePrompt_without_default_and_answer_is_not_required : InteractivePromptSpecsBase
         {
             private Func<string> prompt;
+
             public override void Because()
             {
                 prompt = () => InteractivePrompt.prompt_for_confirmation(prompt_value, choices, null, requireAnswer: false);
@@ -165,16 +181,16 @@
                 console.Setup(c => c.ReadLine()).Returns("2");
                 var result = prompt();
                 result.ShouldEqual(choices[1]);
-            } 
-            
+            }
+
             [Fact]
             public void should_return_null_choice_when_3_is_given()
             {
                 console.Setup(c => c.ReadLine()).Returns("3");
                 var result = prompt();
                 result.ShouldBeNull();
-            }   
-  
+            }
+
             [Fact]
             public void should_return_null_choice_when_4_is_given()
             {
@@ -182,23 +198,23 @@
                 var result = prompt();
                 result.ShouldBeNull();
             }
-  
+
             [Fact]
             public void should_return_null_choice_when_0_is_given()
             {
                 console.Setup(c => c.ReadLine()).Returns("0");
                 var result = prompt();
                 result.ShouldBeNull();
-            } 
-            
+            }
+
             [Fact]
             public void should_return_null_choice_when_negative_1_is_given()
             {
                 console.Setup(c => c.ReadLine()).Returns("-1");
                 var result = prompt();
                 result.ShouldBeNull();
-            }           
- 
+            }
+
             [Fact]
             public void should_return_null_choice_when_alphabetical_characters_are_given()
             {
@@ -206,12 +222,12 @@
                 var result = prompt();
                 result.ShouldBeNull();
             }
-
         }
 
         public class when_prompting_with_interactivePrompt_without_default_and_answer_is_required : InteractivePromptSpecsBase
         {
             private Func<string> prompt;
+
             public override void Because()
             {
                 prompt = () => InteractivePrompt.prompt_for_confirmation(prompt_value, choices, null, requireAnswer: true);
@@ -227,7 +243,7 @@
             public void should_error_when_no_answer_given()
             {
                 bool errored = false;
-               
+
                 console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
@@ -238,7 +254,7 @@
                     errored = true;
                 }
                 errored.ShouldBeTrue();
-                console.Verify(c=>c.ReadLine(),Times.AtLeast(8));
+                console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
 
             [Fact]
@@ -273,12 +289,13 @@
                 }
                 errored.ShouldBeTrue();
                 console.Verify(c => c.ReadLine(), Times.AtLeast(8));
-            }   
+            }
         }
 
         public class when_prompting_with_interactivePrompt_with_default_and_answer_is_not_required : InteractivePromptSpecsBase
         {
             private Func<string> prompt;
+
             public override void Because()
             {
                 prompt = () => InteractivePrompt.prompt_for_confirmation(prompt_value, choices, choices[1], requireAnswer: false);
@@ -358,6 +375,7 @@
         public class when_prompting_with_interactivePrompt_with_default_and_answer_is_required : InteractivePromptSpecsBase
         {
             private Func<string> prompt;
+
             public override void Because()
             {
                 prompt = () => InteractivePrompt.prompt_for_confirmation(prompt_value, choices, choices[0], requireAnswer: true);

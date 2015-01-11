@@ -77,7 +77,6 @@ namespace chocolatey.tests
         public IntegrationAttribute() : base("Integration")
         {
         }
-
     }
 
     // ReSharper restore InconsistentNaming

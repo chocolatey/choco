@@ -1,12 +1,25 @@
-﻿namespace chocolatey.tests.infrastructure.guards
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.tests.infrastructure.guards
 {
     using System;
     using Moq;
-    using Moq.Protected;
     using Should;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.guards;
-    using chocolatey.infrastructure.logging;
 
     public class EnsureSpecs
     {
@@ -104,7 +117,7 @@
             [Fact]
             public void when_testing_a_class_against_is_not_null_should_pass()
             {
-                ChocolateyConfiguration test = new ChocolateyConfiguration();
+                var test = new ChocolateyConfiguration();
                 Ensure.that(() => test).is_not_null();
             }
 
@@ -137,11 +150,8 @@
                 try
                 {
                     Ensure.that(() => test).meets(
-                         null,
-                         (name, value) =>
-                         {
-                             throw new ApplicationException("this is what we throw.");
-                         });
+                        null,
+                        (name, value) => { throw new ApplicationException("this is what we throw."); });
                 }
                 catch (Exception ex)
                 {
@@ -209,10 +219,7 @@
                 {
                     Ensure.that(() => test).meets(
                         null,
-                         (name, value) =>
-                         {
-                             throw new ApplicationException("this is what we throw.");
-                         });
+                        (name, value) => { throw new ApplicationException("this is what we throw."); });
                 }
                 catch (Exception ex)
                 {
@@ -274,9 +281,9 @@
 
         public class when_testing_Ensure_meets_against_a_string_value_that_passes : EnsureSpecsBase
         {
-            private object exceptionType = null;
+            private object exceptionType;
             private string exceptionMessage = string.Empty;
-            private bool exceptionActionInvoked = false;
+            private bool exceptionActionInvoked;
 
             public override void Because()
             {
@@ -287,10 +294,10 @@
                     Ensure.that(() => test).meets(
                         s => s == s.ToLower(),
                         (name, value) =>
-                        {
-                            exceptionActionInvoked = true;
-                            throw new ApplicationException("this is what we throw.");
-                        });
+                            {
+                                exceptionActionInvoked = true;
+                                throw new ApplicationException("this is what we throw.");
+                            });
                 }
                 catch (Exception ex)
                 {
@@ -326,9 +333,9 @@
 
         public class when_testing_Ensure_meets_against_a_string_value_that_fails : EnsureSpecsBase
         {
-            private object exceptionType = null;
+            private object exceptionType;
             private string exceptionMessage = string.Empty;
-            private bool exceptionActionInvoked = false;
+            private bool exceptionActionInvoked;
 
             public override void Because()
             {
@@ -339,10 +346,10 @@
                     Ensure.that(() => test).meets(
                         s => s == s.ToLower(),
                         (name, value) =>
-                        {
-                            exceptionActionInvoked = true;
-                            throw new ApplicationException("this is what we throw.");
-                        });
+                            {
+                                exceptionActionInvoked = true;
+                                throw new ApplicationException("this is what we throw.");
+                            });
                 }
                 catch (Exception ex)
                 {
@@ -378,9 +385,9 @@
 
         public class when_testing_Ensure_meets_against_a_null_value_without_guarding_the_value : EnsureSpecsBase
         {
-            private object exceptionType = null;
+            private object exceptionType;
             private string exceptionMessage = string.Empty;
-            private bool exceptionActionInvoked = false;
+            private bool exceptionActionInvoked;
 
             public override void Because()
             {
@@ -391,10 +398,10 @@
                     Ensure.that(() => test).meets(
                         s => s == s.ToLower(),
                         (name, value) =>
-                        {
-                            exceptionActionInvoked = true;
-                            throw new ApplicationException("this is what we throw.");
-                        });
+                            {
+                                exceptionActionInvoked = true;
+                                throw new ApplicationException("this is what we throw.");
+                            });
                 }
                 catch (Exception ex)
                 {
@@ -414,7 +421,7 @@
             {
                 exceptionType.ShouldNotBeNull();
             }
-  
+
             [Fact]
             public void should_not_return_the_specified_exception_of_type_ApplicationException()
             {

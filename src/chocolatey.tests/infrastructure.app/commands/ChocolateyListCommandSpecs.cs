@@ -1,4 +1,19 @@
-﻿namespace chocolatey.tests.infrastructure.app.commands
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.tests.infrastructure.app.commands
 {
     using System;
     using System.Collections.Generic;
@@ -31,9 +46,10 @@
         public class when_implementing_command_for : ChocolateyListCommandSpecsBase
         {
             private List<string> results;
+
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
@@ -115,7 +131,7 @@
 
         public class when_handling_additional_argument_parsing : ChocolateyListCommandSpecsBase
         {
-            private IList<string> unparsedArgs = new List<string>();
+            private readonly IList<string> unparsedArgs = new List<string>();
             private string source = "https://somewhereoutthere";
             private Action because;
 
@@ -146,7 +162,7 @@
                 because();
                 configuration.Sources.ShouldEqual(source);
             }
-            
+
             [Fact]
             public void should_set_source_to_local_location_when_localonly_is_true()
             {
@@ -154,7 +170,7 @@
                 because();
                 configuration.Sources.ShouldEqual(ApplicationParameters.PackagesLocation);
             }
-        }   
+        }
 
         public class when_noop_is_called : ChocolateyListCommandSpecsBase
         {
@@ -180,7 +196,7 @@
             [Fact]
             public void should_call_service_list_run()
             {
-                packageService.Verify(c => c.list_run(configuration,true), Times.Once);
+                packageService.Verify(c => c.list_run(configuration, true), Times.Once);
             }
         }
     }

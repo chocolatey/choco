@@ -1,4 +1,19 @@
-﻿namespace chocolatey.tests.infrastructure.commands
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.tests.infrastructure.commands
 {
     using System;
     using Moq;
@@ -79,7 +94,7 @@
                 result.ShouldEqual(0);
             }
         }
-        
+
         public class when_CommandExecutor_has_a_long_running_process_that_takes_longer_than_wait_time : CommandExecutorSpecsBase
         {
             private int result;
@@ -121,7 +136,7 @@
 
             public override void Because()
             {
-                result = CommandExecutor.execute("bob", "args",waitForExitInSeconds: 0);
+                result = CommandExecutor.execute("bob", "args", waitForExitInSeconds: 0);
             }
 
             [Fact]

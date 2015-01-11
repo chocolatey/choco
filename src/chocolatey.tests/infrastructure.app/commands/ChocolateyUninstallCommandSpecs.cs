@@ -1,4 +1,19 @@
-﻿namespace chocolatey.tests.infrastructure.app.commands
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.tests.infrastructure.app.commands
 {
     using System;
     using System.Collections.Generic;
@@ -30,9 +45,10 @@
         public class when_implementing_command_for : ChocolateyUninstallCommandSpecsBase
         {
             private List<string> results;
+
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
@@ -54,7 +70,7 @@
 
             public override void Because()
             {
-                command.configure_argument_parser(optionSet,configuration);
+                command.configure_argument_parser(optionSet, configuration);
             }
 
             [Fact]
@@ -62,7 +78,7 @@
             {
                 optionSet.Contains("version").ShouldBeTrue();
             }
-            
+
             [Fact]
             public void should_add_allversions_to_the_option_set()
             {
@@ -73,8 +89,8 @@
             public void should_add_short_version_of_allversions_to_the_option_set()
             {
                 optionSet.Contains("a").ShouldBeTrue();
-            }   
-            
+            }
+
             [Fact]
             public void should_add_uninstallargs_to_the_option_set()
             {
@@ -85,8 +101,8 @@
             public void should_add_short_version_of_uninstallargs_to_the_option_set()
             {
                 optionSet.Contains("ua").ShouldBeTrue();
-            } 
-            
+            }
+
             [Fact]
             public void should_add_overrideargs_to_the_option_set()
             {
@@ -97,14 +113,14 @@
             public void should_add_short_version_of_overrideargs_to_the_option_set()
             {
                 optionSet.Contains("o").ShouldBeTrue();
-            } 
-            
+            }
+
             [Fact]
             public void should_add_notsilent_to_the_option_set()
             {
                 optionSet.Contains("notsilent").ShouldBeTrue();
-            } 
-            
+            }
+
             [Fact]
             public void should_add_packageparameters_to_the_option_set()
             {
@@ -115,7 +131,7 @@
             public void should_add_short_version_of_packageparameters_to_the_option_set()
             {
                 optionSet.Contains("params").ShouldBeTrue();
-            } 
+            }
 
             [Fact]
             public void should_add_forcedependencies_to_the_option_set()
@@ -144,7 +160,7 @@
 
         public class when_handling_additional_argument_parsing : ChocolateyUninstallCommandSpecsBase
         {
-            private IList<string> unparsedArgs = new List<string>();
+            private readonly IList<string> unparsedArgs = new List<string>();
 
             public override void Context()
             {
@@ -155,7 +171,7 @@
 
             public override void Because()
             {
-                command.handle_additional_argument_parsing(unparsedArgs,configuration);
+                command.handle_additional_argument_parsing(unparsedArgs, configuration);
             }
 
             [Fact]
@@ -166,7 +182,7 @@
         }
 
         public class when_handling_validation : ChocolateyUninstallCommandSpecsBase
-        { 
+        {
             public override void Because()
             {
             }
