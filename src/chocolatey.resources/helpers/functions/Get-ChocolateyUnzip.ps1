@@ -81,7 +81,7 @@ param(
     param($7zip, $destination, $fileFullPath, [ref]$exitCodeRef)
     $process = Start-Process $7zip -ArgumentList "x -o`"$destination`" -y `"$fileFullPath`"" -Wait -WindowStyle Hidden -PassThru
     # this is here for specific cases in Posh v3 where -Wait is not honored
-    try { if (!($process.HasExited)) { Wait-Process $process } } catch { }
+    try { if (!($process.HasExited)) { Wait-Process -Id $process.Id } } catch { }
 
     $exitCodeRef.Value = $process.ExitCode
   }

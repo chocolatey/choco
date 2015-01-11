@@ -17,7 +17,9 @@ Use the Update-SessionEnvironment command to refresh the current
 powershell session with all environment settings possibly performed by
 chocolatey package installs.
 
-#>
+#>
+  Write-Debug "Running 'Update-SessionEnvironment' - Updating the environment variables for the session."
+
   #ordering is important here, $user comes after so we can override $machine
   'Machine', 'User' |
     % {

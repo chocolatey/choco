@@ -7,9 +7,18 @@ param(
   if ($url -eq '') { return }
 
   $request = [System.Net.HttpWebRequest]::Create($url);
+  $defaultCreds = [System.Net.CredentialCache]::DefaultCredentials
+  if ($defaultCreds -ne $null) {
+    $request.Credentials = $defaultCreds
+  }
+
   #$request.Method = "HEAD"
   # check if a proxy is required
   $client = New-Object System.Net.WebClient
+  if ($defaultCreds -ne $null) {
+    $client.Credentials = $defaultCreds
+  }
+
   if (!$client.Proxy.IsBypassed($url))
   {
     $creds = [Net.CredentialCache]::DefaultCredentials

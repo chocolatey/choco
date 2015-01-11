@@ -1,7 +1,133 @@
-##[0.9.8.24](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.24&page=1&state=closed) (unreleased)
+##[0.9.8.31](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.31&page=1&state=closed) (January 7, 2015)
 
+BUG FIXES:
 
+ * Fix - Shim doesn't always shift off the first argument - [#655](https://github.com/chocolatey/chocolatey/issues/655) & [ShimGen #7](https://github.com/chocolatey/shimgen/issues/7)
+ * Fix - If executable isn't available, fallback to default icon - [#579](https://github.com/chocolatey/chocolatey/issues/579)
 
+##[0.9.8.30](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.30&page=1&state=closed) (January 6, 2015)
+
+FEATURES:
+
+ * Use icon of the executable with generated shim - [#579](https://github.com/chocolatey/chocolatey/issues/579) & [ShimGen #2](https://github.com/chocolatey/shimgen/issues/2)
+
+BUG FIXES:
+
+ * Fix - Shims don't correctly handle spaces in path to shim - [#654](https://github.com/chocolatey/chocolatey/issues/654) & [ShimGen #5](https://github.com/chocolatey/shimgen/issues/5)
+
+##[0.9.8.29](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.29&page=1&state=closed) (January 2, 2015)
+
+FEATURES:
+
+ * Use icon of the executable with generated shim - [#579](https://github.com/chocolatey/chocolatey/issues/579) & [ShimGen #2](https://github.com/chocolatey/shimgen/issues/2)
+ * Allow setting custom temp download location - [#307](https://github.com/chocolatey/chocolatey/issues/307)
+
+IMPROVEMENTS:
+
+ * Don't assume $env:TEMP or $env:UserProfile are set - [#647](https://github.com/chocolatey/chocolatey/issues/647)
+ * Remove Kickstarter message.
+
+##[0.9.8.28](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.28&page=1&state=closed) (November 4, 2014)
+
+BREAKING CHANGES:
+
+ * You may need to update your saved API key for chocolatey, due to [#599](https://github.com/chocolatey/chocolatey/issues/599) we have switched push to ensure https.
+
+BUG FIXES:
+
+ * Fix - Shim argument parsing needs fixed for quoting - [ShimGen #1](https://github.com/chocolatey/shimgen/issues/1)
+ * Fix - Forcing x86 does not use 32bit checksum - [#535](https://github.com/chocolatey/chocolatey/issues/535)
+ * Fix - Powershell v2 fails to download SSLv3 files - [#531](https://github.com/chocolatey/chocolatey/issues/531)
+ * Fix - Get-ChocolateyUnzip fails due to Wait-Process exception - [#571](https://github.com/chocolatey/chocolatey/issues/571)
+
+IMPROVEMENTS:
+
+ * Use default credentials for internet if available - [#577](https://github.com/chocolatey/chocolatey/issues/577)
+ * Add moderation message on push - [#600](https://github.com/chocolatey/chocolatey/issues/600)
+ * Restrict all calls to chocolatey.org to HTTPS - [#599](https://github.com/chocolatey/chocolatey/issues/599)
+ * Batch fallback should quote path for spaces - [#558](https://github.com/chocolatey/chocolatey/issues/558)
+
+##[0.9.8.27](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.27&page=1&state=closed) (July 13, 2014)
+
+BUG FIXES:
+
+ * Fix - Posh v3+ Ignores -Wait when run from cmd.exe - [#516](https://github.com/chocolatey/chocolatey/pull/516)
+
+##[0.9.8.26](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.26&page=1&state=closed) (July 12, 2014)
+
+BUG FIXES:
+
+ * Fix - Allow spaces in arguments to chocolatey again - Regenerate chocolatey included shims to take advantage of shimgen fixes - [#507](https://github.com/chocolatey/chocolatey/issues/507)
+ * Fix - Default path has changed, causing running without closing shell to have issues again - [#510](https://github.com/chocolatey/chocolatey/issues/510)
+ * Fix - Working directory of shimgen generated files points to path target executable is in (GUI apps only) - [#508](https://github.com/chocolatey/chocolatey/issues/508)
+ * Fix - cpack/cpush returns zero exit code even when error occurs - [#256](https://github.com/chocolatey/chocolatey/issues/256) & [#384](https://github.com/chocolatey/chocolatey/issues/384)
+ * Fix - Install error throws another error due to true instead of $true - [#514](https://github.com/chocolatey/chocolatey/pull/514)
+ * Fix - Posh v3+ Ignores -Wait when run from cmd.exe - [#516](https://github.com/chocolatey/chocolatey/pull/516)
+
+IMPROVEMENTS:
+
+ * Allow to pass shimgen specific parameters - [#509](https://github.com/chocolatey/chocolatey/issues/509)
+ * Issue warning if user is not running an elevated shell - [#519](https://github.com/chocolatey/chocolatey/issues/519)
+
+##[0.9.8.25](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.25&page=1&state=closed) (July 7, 2014)
+
+BUG FIXES:
+
+ * Fix - Shims that require admin may fail on UAC enforced machines (System.ComponentModel.Win32Exception: The requested operation requires elevation) - [#505](https://github.com/chocolatey/chocolatey/issues/505)
+ * Fix - Do not check content-length if there isn't a content-length returned from Get-WebHeaders - [#504](https://github.com/chocolatey/chocolatey/issues/504)
+
+##[0.9.8.24](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.24&page=1&state=closed) (July 3, 2014)
+
+BREAKING CHANGES:
+
+ * Enhancement - Default install to C:\ProgramData\chocolatey - [#452](https://github.com/chocolatey/chocolatey/issues/452) & [#494](https://github.com/chocolatey/chocolatey/issues/494)
+ * Don't allow $binroot to be set to c:\ - [#434](https://github.com/chocolatey/chocolatey/issues/434) - this is meant to be temporary while other pieces are fixed.
+
+FEATURES:
+
+ * Checksum downloaded files - [#427](https://github.com/chocolatey/chocolatey/issues/427)
+ * Replace Batch Redirector with Shims - [#372](https://github.com/chocolatey/chocolatey/issues/372)
+ * New Helper - Get-UACEnabled - [#451](https://github.com/chocolatey/chocolatey/issues/451)
+ * Enhancement - Install to Machine environment variable - [#453](https://github.com/chocolatey/chocolatey/issues/453)
+ * Enhancement - Install the .NET framework 4.0 requirement - [#255](https://github.com/chocolatey/chocolatey/issues/255)
+ * Update environment using command (RefreshEnv) - [#134](https://github.com/chocolatey/chocolatey/issues/134)
+ * `-quiet` parameter that silences almost all output / allow shutting off real write-host - [#416](https://github.com/chocolatey/chocolatey/pull/416) & [#411](https://github.com/chocolatey/chocolatey/issues/411)
+ * New Helpers - Test-ProcessAdminRights, Get-EnvironmentVariableNames, Get-EnvironmentVariable, Set-EnvironmentVariable - [#486](https://github.com/chocolatey/chocolatey/pull/486)
+
+BUG FIXES:
+
+ * Fix - Cannot bind argument to parameter 'Path' because it is an empty string - [#371](https://github.com/chocolatey/chocolatey/issues/371)
+ * Fix - clist -source webpi doesn't prompt for admin access - [#293](https://github.com/chocolatey/chocolatey/issues/293)
+ * Fix - Get-ChocolateyUnzip silently fails due to incorrect usage of System32 (File System Redirector Issues) - [#476](https://github.com/chocolatey/chocolatey/pull/476) & [#455](https://github.com/chocolatey/chocolatey/issues/455)
+ * Fix - 7za.exe is subject to UAC file virtualization - [#454](https://github.com/chocolatey/chocolatey/issues/454)
+ * Fix - "You cannot call a method on a null-valued expression" introduced somewhere. - [#430](https://github.com/chocolatey/chocolatey/issues/430)
+ * Fix - Get-BinRoot defaulted to "C:\" instead of "C:\tools" - [#421](https://github.com/chocolatey/chocolatey/pull/421)
+ * Fix - Get-ProcessorBits doesn't return the bitness of the OperatingSystem - [#396](https://github.com/chocolatey/chocolatey/pull/396)
+ * Fix - Fix Invoke for Install All from a Feed (DEPRECATED by #446 - in improvements below) - [#381](https://github.com/chocolatey/chocolatey/issues/381)
+ * Fix - Upgrade to 0.9.8.24 produces cannot find Update-SessionEnvironment when using cmd.exe - [#459](https://github.com/chocolatey/chocolatey/issues/459)
+ * Fix - Package depending on newer chocolatey version is installed using existing version of chocolatey - [#460](https://github.com/chocolatey/chocolatey/issues/460)
+ * Fix - Bash improvements - [#383](https://github.com/chocolatey/chocolatey/pull/383)
+ * Fix - Resolve issue with DISM "missing" or with the 32-bit DISM being called on a 64-bit system - [#393](https://github.com/chocolatey/chocolatey/pull/393)
+ * Fix - Do NOT throw if missing a chocolateyuninstall.ps1 - [#499](https://github.com/chocolatey/chocolatey/issues/499)
+
+IMPROVEMENTS:
+
+ * Do not download if file already cached - [#428](https://github.com/chocolatey/chocolatey/issues/428) & [#109](https://github.com/chocolatey/chocolatey/pull/109)
+ * If *.ignore file failes to create, do not fail the process - [#380](https://github.com/chocolatey/chocolatey/issues/380)
+ * Validate downloaded file is the right size - [#429](https://github.com/chocolatey/chocolatey/issues/429)
+ * Add perf to Chocolatey-List & allow to return as object - [#426](https://github.com/chocolatey/chocolatey/issues/426)
+ * Chocolatey-List LocalOnly performance improvements - [#425](https://github.com/chocolatey/chocolatey/pull/425)
+ * Chocolatey-Version Improvements - [#445](https://github.com/chocolatey/chocolatey/issues/445)
+ * Remove Invoke-Chocolatey Function to improve handling - [#446](https://github.com/chocolatey/chocolatey/issues/446)
+ * Don't create a window during Run-Nuget.ps1 - [#450](https://github.com/chocolatey/chocolatey/pull/450)
+ * Generate _env.cmd file instead of bat file for consistency - [#469](https://github.com/chocolatey/chocolatey/pull/469)
+ * Remove-BinFile removes shim.exes when installing a package - [#449](https://github.com/chocolatey/chocolatey/pull/449)
+ * Remove annoying "Reading environment variables from registry. Please wait..." - [#440](https://github.com/chocolatey/chocolatey/pull/440)
+ * Replace ascii cue to visual cue for "installing package" - [#376](https://github.com/chocolatey/chocolatey/pull/376)
+ * Clean up the verbosity of chocolatey - [#374](https://github.com/chocolatey/chocolatey/issues/374)
+ * Improve chocolatey setup as administrator - [#486](https://github.com/chocolatey/chocolatey/pull/486)
+ * Simplify Chocolatey-Update - [#493](https://github.com/chocolatey/chocolatey/issues/493)
+ * Update to Nuget.exe 2.8.2 - [#379](https://github.com/chocolatey/chocolatey/issues/379)
 
 ##[0.9.8.23](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.23&page=1&state=closed) (November 11, 2013)
 
@@ -9,6 +135,7 @@ BUG FIXES:
 
  * Fix - Chocolatey 0.9.8.22 incorrectly reports version as alpha1 [#368](https://github.com/chocolatey/chocolatey/issues/368)
  * Fix - Some chocolatey commands with no arguments error [#369](https://github.com/chocolatey/chocolatey/issues/369)
+
 
 ##[0.9.8.22](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.22&page=1&state=closed) (November 10, 2013)
 
@@ -23,7 +150,8 @@ FEATURES:
 
 BUG FIXES:
 
- * Fix - Chocolatey 0.9.8.21 errors when using spaces or quotes with chocolatey or with batch redirect files [#367](https://github.com/chocolatey/chocolatey/issues/367)
+ * Fix - Chocolatey 0.9.8.21 errors when using spaces or quotes with chocolatey or with batch redirect files. - [#367](https://github.com/chocolatey/chocolatey/issues/367)
+
 
 ##[0.9.8.21](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.21&page=1&state=closed) (November 7, 2013)
 

@@ -1,10 +1,10 @@
-function Get-CheckSumValid {
+function Get-ChecksumValid {
 param(
   [string] $file,
   [string] $checksum = '',
   [string] $checksumType = 'md5'
 )
-  Write-Debug "Running 'Get-CheckSumValid' with file:`'$file`', checksum: `'$checksum`', checksumType: `'$checksumType`'";
+  Write-Debug "Running 'Get-ChecksumValid' with file:`'$file`', checksum: `'$checksum`', checksumType: `'$checksumType`'";
   if ($checksum -eq '' -or $checksum -eq $null) { return }
 
   if(!([System.IO.File]::Exists($file))) { throw "Unable to checksum a file that doesn't exist - Could not find file `'$file`'" }
@@ -21,7 +21,7 @@ param(
   Write-Debug "Calling command [`'$checksumExe`' -c$checksum `"$file`"] to retrieve checksum"
   $process = Start-Process "$checksumExe" -ArgumentList " -c=`"$checksum`" -t=`"$checksumType`" -f=`"$file`"" -Wait -WindowStyle Hidden -PassThru
   # this is here for specific cases in Posh v3 where -Wait is not honored
-  try { if (!($process.HasExited)) { Wait-Process $process } } catch { }
+  try { if (!($process.HasExited)) { Wait-Process -Id $process.Id } } catch { }
 
   Write-Debug "`'$checksumExe`' exited with $($process.ExitCode)"
 

@@ -41,7 +41,12 @@ param(
   }
   $fileType = Split-Path $executable -leaf
   $fileType = $fileType.Replace(" ","_")
-  $elevated = "cmd /c 'assoc $extension=$fileType';cmd /c 'ftype $fileType=\`"$executable\`" \`"%1\`" \`"%*\`"'"
+  $elevated = @"
+    cmd /c "assoc $extension=$fileType"
+    cmd /c 'ftype $fileType="$executable" "%1" "%*"'
+    New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+    Set-ItemProperty -Path "HKCR:\$fileType" -Name "(Default)" -Value "$fileType file" -ErrorAction Stop
+"@
   Start-ChocolateyProcessAsAdmin $elevated
   Write-Host "`'$extension`' has been associated with `'$executable`'"
 }

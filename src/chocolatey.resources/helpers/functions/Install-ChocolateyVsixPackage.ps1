@@ -51,15 +51,33 @@ param(
 )
     Write-Debug "Running 'Install-ChocolateyVsixPackage' for $packageName with vsixUrl:`'$vsixUrl`', vsVersion: `'$vsVersion`', checksum: `'$checksum`', checksumType: `'$checksumType`' ";
     if($vsVersion -eq 0) {
-        $versions=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName -match "^[0-9\.]+$") } | ? {$_.property -contains "InstallDir"} | sort {[int]($_.PSChildName)} -descending)
+        if ([System.IntPtr]::Size -eq 4)
+        {
+            <# 32bits system case #>
+            $versions=(get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName -match "^[0-9\.]+$") } | ? {$_.property -contains "InstallDir"} | sort {[int]($_.PSChildName)} -descending)
+            
+        }
+        else
+        {
+            $versions=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName -match "^[0-9\.]+$") } | ? {$_.property -contains "InstallDir"} | sort {[int]($_.PSChildName)} -descending)
+        }
         if($versions -and $versions.Length){
             $version = $versions[0]
         }elseif($versions){
             $version = $versions
         }
+        
     }
     else {
-        $version=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName.EndsWith("$vsVersion.0")) } | ? {$_.property -contains "InstallDir"})
+        if ([System.IntPtr]::Size -eq 4)
+        {
+            <# 32bits system case #>
+            $versions=(get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName.EndsWith("$vsVersion.0")) } | ? {$_.property -contains "InstallDir"})
+        }
+        else
+        {
+            $version=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName.EndsWith("$vsVersion.0")) } | ? {$_.property -contains "InstallDir"})
+        }
     }
     if($version){
         $vnum=$version.PSPath.Substring($version.PSPath.LastIndexOf('\')+1)

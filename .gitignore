@@ -23,6 +23,7 @@ _ReSharper*
 *.log
 *.pidb
 *userprefs
+*.nupkg
  
 TestResult.xml
 submit.xml
