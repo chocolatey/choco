@@ -10,6 +10,20 @@
 	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LIMIT/@EntryValue">220</s:Int64>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LINES/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CSharpUsing/AddImportsToDeepestScope/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">Copyright 2011 - Present RealDimensions Software, LLC&#xD;
+&#xD;
+Licensed under the Apache License, Version 2.0 (the "License");&#xD;
+you may not use this file except in compliance with the License.&#xD;
+&#xD;
+You may obtain a copy of the License at&#xD;
+&#xD;
+	http://www.apache.org/licenses/LICENSE-2.0&#xD;
+&#xD;
+Unless required by applicable law or agreed to in writing, software&#xD;
+distributed under the License is distributed on an "AS IS" BASIS,&#xD;
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.&#xD;
+See the License for the specific language governing permissions and&#xD;
+limitations under the License.</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=Constants/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AA_BB" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=EnumMember/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb"&gt;&lt;ExtraRule Prefix="" Suffix="" Style="aaBb_AaBb" /&gt;&lt;/Policy&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=LocalConstants/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
