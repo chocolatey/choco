@@ -49,6 +49,7 @@
   <property name="version.nuget.prerelease" value="" overwrite="false" />
   <property name="version.use.build_date" value="false" overwrite="false" />
   <property name="assembly.description" value="${project.name} is a product of ${company.name} - All Rights Reserved." overwrite="false" />
+  <property name="assembly.copyright" value="Copyright © 2011 - Present, ${company.name}" overwrite="false" />
   <property name="assembly.clscompliant" value="false" overwrite="false" />
   <!-- partially trusted callers doesn't set correctly with assembly generator - Leave false for now-->
   <property name="allow.partially_trusted_callers" value="false" overwrite="false" />

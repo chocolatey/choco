@@ -28,6 +28,7 @@
   <property name="version.revision" value="0" overwrite="false" />
   <property name="version.hash" value="${version.revision}" overwrite="false" />
   <property name="assembly.description" value="${project.name} is a product of ${company.name}" overwrite="false" />
+  <property name="assembly.copyright" value="Copyright © ${datetime::get-year(datetime::now())} ${company.name} - Original author or authors" overwrite="false" />
   <property name="assembly.clscompliant" value="true" overwrite="false" />
   <property name="allow.partially_trusted_callers" value="true" overwrite="false" />
   <property name="sign.project_with_key" value="false" overwrite="false" />
@@ -118,7 +119,7 @@
         <attribute type="AssemblyProductAttribute" value="${project.name}" />
         <attribute type="AssemblyDescriptionAttribute" value="${assembly.description}" />
         <attribute type="AssemblyTrademarkAttribute" value="${project.name} - ${company.name}" />
-        <attribute type="AssemblyCopyrightAttribute" value="Copyright ©  ${datetime::get-year(datetime::now())} ${company.name}, - Original author or authors" />
+        <attribute type="AssemblyCopyrightAttribute" value="${assembly.copyright}" />
         <attribute type="AllowPartiallyTrustedCallers" if="${allow.partially_trusted_callers}" asis="true" />
         <attribute type="AssemblyKeyFileAttribute" value="${file.key.name.private}" if="${sign.project_with_key and not sign.key.use_relative_pathing}" />
         <attribute type="AssemblyKeyFileAttribute" value="${sign.key.relative_path_from_projects}${path.separator}${path::get-file-name(file.key.name.private)}" if="${sign.project_with_key and sign.key.use_relative_pathing}" />
