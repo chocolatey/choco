@@ -5,7 +5,7 @@ Submitting an Issue? See the "Submitting Issues" section in the [README](https:/
 
 The process for contributions is roughly as follows:
 
-## Prerequisites
+## Prerequisites
 
  * Ensure you have signed the Contributor License Agreement (CLA) - without this we are not able to take contributions that are not trivial.
 
@@ -18,7 +18,7 @@ The process for contributions is roughly as follows:
  * Once you get a nod from one of the Chocolatey team folks (https://github.com/chocolatey?tab=members), you can start on the feature.
  * Alternatively if a feature is on the issues list with the [community tag](https://github.com/chocolatey/choco/labels/Community), it is open for a patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
 
-### Set up your environment for work
+### Set up your environment for work
 
  * You create, or update, a fork of choco under your GitHub account.
  * From there you create a branch named specific to the feature.
@@ -30,7 +30,7 @@ The process for contributions is roughly as follows:
  * Test your changes and please help us out by updating and implementing some automated tests. I would suggest just spend some time looking over the tests in the source code. You can't go wrong emulating one of the existing tests and then changing it specific to the behavior you are testing.
  * Please do not update your branch from the master unless we ask you to. See the responding to feedback section below.
 
-### Prepare commits
+### Prepare commits
 
  This section serves to help you understand what makes a good commit.
 
@@ -79,9 +79,9 @@ Submitting PR:
  * Once the pull request is in, please do not delete the branch or close the pull request (unless something is wrong with it).
  * One of the members will evaluate it within a reasonable time period (which is to say usually within 2-4 weeks). Some things get evaluated faster or fast tracked. We are human and we have active lives outside of open source so don't fret if you haven't seen any activity on your pull request within a month or two. We don't have a Service Level Agreement (SLA) for pull requests. Just know that we will evaluate your pull request.
 
-### Respond to Feedback on Pull Request
+### Respond to Feedback on Pull Request
 
-We may have feedback for you to fix or change some things. We generally like to see that pushed against the same topic branch (it will automatically update the Pull Request). You can also fix/squash/rebase commits and push the same topic branch with `-force` (it's generally acceptable to do this on topic branches not in the main repository, it is generally unacceptable and should be avoided at all costs against the main repository).
+We may have feedback for you to fix or change some things. We generally like to see that pushed against the same topic branch (it will automatically update the Pull Request). You can also fix/squash/rebase commits and push the same topic branch with `--force` (it's generally acceptable to do this on topic branches not in the main repository, it is generally unacceptable and should be avoided at all costs against the main repository).
 
 If we have comments or questions when we do evaluate it and receive no response, it will probably lessen the chance of getting accepted. Eventually this means it will be closed if it is not accepted. Please know this doesn't mean we don't value your contribution, just that things go stale. If in the future you want to pick it back up, feel free to address our concerns/questions/feedback and reopen the issue/open a new PR (referencing old one).
 
