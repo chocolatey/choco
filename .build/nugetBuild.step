@@ -29,14 +29,23 @@
   <property name="dirs.nuget" value="${dirs.current}${path.separator}${folder.nuget}" overwrite="false" />
   <property name="dirs.drop.nuget" value="${dirs.drop}${path.separator}${folder.nuget}" overwrite="false" />
   <property name="folder.nuget.exists" value="${directory::exists(dirs.nuget)}" />
-  <property name="version.major" value="1" overwrite="false" />
-  <property name="version.minor" value="0" overwrite="false" />
-  <property name="version.build" value="0" overwrite="false" />
-  <property name="version.revision" value="0" overwrite="false" />
-  <property name="assembly.version.full" value="${version.major}.${version.minor}.${version.build}.${version.revision}" />
   <property name="app.nuget" value="..${path.separator}..${path.separator}${folder.references}${path.separator}NuGet${path.separator}NuGet.exe" overwrite="false" />
   <property name="app.nuget" value="${path::get-full-path(app.nuget)}" />
   <property name="app.nuget.exists" value="${file::exists(app.nuget)}" />
+  <property name="version.use_semanticversioning" value="false" overwrite="false" />
+  <property name="version.major" value="1" overwrite="false" />
+  <property name="version.minor" value="0" overwrite="false" />
+  <property name="version.patch" value="0" overwrite="false" />
+  <property name="version.build" value="0" overwrite="false" />
+  <property name="version.revision" value="0" overwrite="false" />
+  <property name="assembly.version.full" value="${version.major}.${version.minor}.${version.build}.${version.revision}" />
+  <property name="assembly.version.full" value="${version.major}.${version.minor}.${version.patch}.0"  if="${version.use_semanticversioning}" />
+  <property name="version.nuget.prerelease" value="" overwrite="false" />
+  <property name="version.use.build_date" value="false" overwrite="false" />
+  <property name="pkg.build.date" value="20100801" overwrite="false" />
+  <property name="file.nuget.version" value="${dirs.drop.nuget}${path.separator}version.xml" />
+  <property name="nuget.version" value="${version.major}.${version.minor}.${version.build}.${version.revision}" />
+  <property name="nuget.version" value="${version.major}.${version.minor}.${version.patch}"  if="${version.use_semanticversioning}" />
 
   <property name="is.replaced" value="false" />
   <property name="fail.build.on.error" value="false" />
@@ -55,9 +64,29 @@
   </target>
 
   <target name="run_normal_tasks"
-          depends="build_nugget,remove_nuget_files"
+          depends="update_build_date, update_version, build_nugget, remove_nuget_files"
           description="Building nuget." />
 
+
+  <target name="update_build_date">
+    <property name="pkg.current.date" value="${datetime::now()}" />
+    <property name="pkg.current.date.year" value="${datetime::get-year(pkg.current.date)}" />
+    <property name="pkg.current.date.month" value="${datetime::get-month(pkg.current.date)}" />
+    <property name="pkg.current.date.month" value="${'0' + pkg.current.date.month}" if="${string::get-length(pkg.current.date.month) == 1}" />
+    <property name="pkg.current.date.month" value="${'0' + pkg.current.date.month}" if="${string::get-length(pkg.current.date.month) == 1}" />
+    <property name="pkg.current.date.day" value="${datetime::get-day(pkg.current.date)}" />
+    <property name="pkg.current.date.day" value="${'0' + pkg.current.date.day}" if="${string::get-length(pkg.current.date.day) == 1}" />
+    <property name="pkg.build.date" value="${'' + pkg.current.date.year + pkg.current.date.month + pkg.current.date.day}" />
+  </target>
+  
+  <target name="update_version">
+    <property name="nuget.version" value="${nuget.version + '-' + version.nuget.prerelease}" if="${version.nuget.prerelease != ''}" />
+    <property name="nuget.version" value="${nuget.version + '.' + pkg.build.date}" if="${version.use.build_date and version.use_semanticversioning and version.nuget.prerelease == ''}" />
+    <property name="nuget.version" value="${nuget.version + '-' + pkg.build.date}" if="${version.use.build_date and version.nuget.prerelease != ''}" />
+    <!-- version.use.build_date -->
+    <echo level="Warning" message="Using ${nuget.version} as the version for the nuget package(s)." />
+  </target>
+          
   <target name="build_nugget">
     <echo level="Warning" message="Finding and building all nuggets in ${dirs.drop.nuget}."/>
     <foreach item="File" property="spec.file">
@@ -73,11 +102,11 @@
           workingdir="${directory::get-parent-directory(spec.file)}"
           failonerror="false"
           if="${platform::is-windows()}">
-            <arg value="/c ${app.nuget} pack ${spec.file}" />
+            <arg value="/c ${app.nuget} pack '${spec.file}' -Version ${nuget.version}" />
         </exec>
         <exec program="mono"
           workingdir="${directory::get-parent-directory(spec.file)}"
-          commandline="'${app.nuget}' pack '${spec.file}'" if="${platform::is-unix()}"/>
+          commandline="'${app.nuget}' pack '${spec.file}' -Version ${nuget.version}" if="${platform::is-unix()}"/>
       </do>
     </foreach>
   </target>
