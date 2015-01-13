@@ -42,6 +42,26 @@ namespace chocolatey.tests
 
         public abstract void Because();
 
+        [SetUp]
+        public void EachSpecSetup()
+        {
+            BeforeEachSpec();
+        }
+
+        public virtual void BeforeEachSpec()
+        {
+        }
+
+        [TearDown]
+        public void EachSpecTearDown()
+        {
+            AfterEachSpec();
+        }
+
+        public virtual void AfterEachSpec()
+        {
+        }
+
         [TestFixtureTearDown]
         public void TearDown()
         {
@@ -62,6 +82,11 @@ namespace chocolatey.tests
     {
     }
 
+    public class ExplicitAttribute : NUnit.Framework.ExplicitAttribute
+    {
+    }
+
+
     public class ConcernForAttribute : Attribute
     {
         public string Name { get; set; }
@@ -74,7 +99,8 @@ namespace chocolatey.tests
 
     public class IntegrationAttribute : CategoryAttribute
     {
-        public IntegrationAttribute() : base("Integration")
+        public IntegrationAttribute()
+            : base("Integration")
         {
         }
     }
