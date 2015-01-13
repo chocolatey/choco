@@ -34,6 +34,34 @@ namespace chocolatey.infrastructure.adapters
         /// </exception>
         /// <filterpriority>1</filterpriority>
         OperatingSystem OSVersion { get; }
+
+        /// <summary>
+        ///   Gets a value indicating whether this is running on a 64bit operating system.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if the OS is a 64bit operating system; otherwise, <c>false</c>.
+        /// </value>
+        bool Is64BitOperatingSystem { get; }
+
+        /// <summary>
+        ///   Gets a value indicating whether the current process is running in user interactive mode.
+        /// </summary>
+        /// <returns>
+        ///   true if the current process is running in user interactive mode; otherwise, false.
+        /// </returns>
+        /// <filterpriority>1</filterpriority>
+        bool UserInteractive { get; }
+
+        /// <summary>
+        ///   Gets the newline string defined for this environment.
+        /// </summary>
+        /// <returns>
+        ///   A string containing "\r\n" for non-Unix platforms,
+        ///   or
+        ///   a string containing "\n" for Unix platforms.
+        /// </returns>
+        /// <filterpriority>1</filterpriority>
+        string NewLine { get; }
     }
 
     // ReSharper restore InconsistentNaming

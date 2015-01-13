@@ -23,5 +23,20 @@ namespace chocolatey.infrastructure.adapters
         {
             get { return System.Environment.OSVersion; }
         }
+
+        public bool Is64BitOperatingSystem
+        {
+            get { return System.Environment.Is64BitOperatingSystem; }
+        }
+
+        public bool UserInteractive
+        {
+            get { return System.Environment.UserInteractive; }
+        }
+
+        public string NewLine
+        {
+            get { return System.Environment.NewLine; }
+        }
     }
 }
