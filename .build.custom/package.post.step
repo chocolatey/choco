@@ -45,5 +45,7 @@
       </fileset>
     </move>
     <delete dir="${dirs.drop}${path.separator}_PublishedApplications${path.separator}chocolatey" />
+    
+    <delete dir="${dirs.drop}${path.separator}_PublishedApplications" />
   </target>
 </project>
