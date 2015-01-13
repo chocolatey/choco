@@ -17,6 +17,7 @@ namespace chocolatey.infrastructure.app.builders
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Text;
     using adapters;
@@ -28,13 +29,26 @@ namespace chocolatey.infrastructure.app.builders
     using infrastructure.services;
     using logging;
     using platforms;
-    using Environment = System.Environment;
+    using Environment = adapters.Environment;
 
     /// <summary>
     ///   Responsible for gathering all configuration related information and producing the ChocolateyConfig
     /// </summary>
     public static class ConfigurationBuilder
     {
+        private static Lazy<IEnvironment> environment_initializer = new Lazy<IEnvironment>(() => new Environment());
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IEnvironment> environment)
+        {
+            environment_initializer = environment;
+        }
+
+        private static IEnvironment Environment
+        {
+            get { return environment_initializer.Value; }
+        }
+
         /// <summary>
         ///   Sets up the configuration based on arguments passed in, config file, and environment
         /// </summary>
