@@ -85,6 +85,7 @@
   <property name="app.opencover.tester" value="${app.nunit.console}" overwrite="false" if="${test.framework=='nunit'}" />
   <property name="app.opencover.tester" value="${app.xunit.console}" overwrite="false" if="${test.framework=='xunit'}" />
   <property name="app.opencover.tester" value="${path::get-full-path(folder.program_files)}${path.separator}Gallio${path.separator}bin${path.separator}Gallio.Host.exe" overwrite="false" if="${test.framework=='gallio'}" />
+  <property name="app.opencover.filters" value="+[${project.name}*]* -[${project.name}*test*]* -[${project.name}]*adapters.* -[${project.name}]*infrastructure.app.configuration.*Setting* -[${project.name}]*app.configuration.*Configuration -[${project.name}]*app.domain.* -[${project.name}]*app.messages.* -[${project.name}]*.registration.* -[${project.name}]*app.templates.* -[${project.name}]*commandline.Option* -[${project.name}]*licensing.* -[${project.name}]*infrastructure.results.*" />
   <property name="app.ndepend" value="${path::get-full-path(folder.program_files)}${path.separator}NDepend${path.separator}NDepend.Console.exe" overwrite="false" />
   <property name="app.metric" value="${path::get-full-path(folder.program_files)}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" overwrite="false" />
   <property name="app.moma" value="..${path.separator}..${path.separator}${folder.references}${path.separator}MoMA${path.separator}MoMA.exe" overwrite="false" />
