@@ -179,7 +179,23 @@ namespace chocolatey.infrastructure.app.services
                         (s, e) =>
                             {
                                 if (string.IsNullOrWhiteSpace(e.Data)) return;
-                                this.Log().Info(() => " " + e.Data);
+                                //inspect for different streams
+                                if (e.Data.StartsWith("DEBUG:"))
+                                {
+                                    this.Log().Debug(() => " " + e.Data);
+                                }
+                                else if (e.Data.StartsWith("WARNING:"))
+                                {
+                                    this.Log().Warn(() => " " + e.Data);
+                                }
+                                else if (e.Data.StartsWith("VERBOSE:"))
+                                {
+                                    this.Log().Info(ChocolateyLoggers.Verbose,() => " " + e.Data);
+                                }
+                                else
+                                {
+                                    this.Log().Info(() => " " + e.Data);
+                                }
                             },
                         (s, e) =>
                             {
