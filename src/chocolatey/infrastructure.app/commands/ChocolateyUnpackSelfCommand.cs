@@ -94,7 +94,7 @@ This command should only be used when installing Chocolatey, not during normal o
                 ApplicationParameters.InstallLocation,
                 folders,
                 ApplicationParameters.ChocolateyFileResources,
-                overwriteExisting: true);
+                overwriteExisting: configuration.Force);
         }
     }
 }

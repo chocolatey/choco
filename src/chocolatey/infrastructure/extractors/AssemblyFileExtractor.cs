@@ -100,7 +100,7 @@ namespace chocolatey.infrastructure.extractors
                 //var fileLocation = fileSystem.combine_paths("", resourceString.ToString().Split('.')) + resourceName.Substring(fileExtensionLocation);
 
                 var filePath = fileSystem.combine_paths(directoryPath, fileLocation);
-                extract_binary_file_from_assembly(fileSystem, assembly, resourceName, filePath);
+                extract_binary_file_from_assembly(fileSystem, assembly, resourceName, filePath, overwriteExisting);
             }
         }
     }
