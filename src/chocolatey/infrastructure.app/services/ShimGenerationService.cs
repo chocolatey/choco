@@ -27,6 +27,7 @@ namespace chocolatey.infrastructure.app.services
     {
         private readonly IFileSystem _fileSystem;
         private const string PATH_TOKEN = "{{path}}";
+        private const string ICON_PATH_TOKEN = "{{icon_path}}";
         private const string OUTPUT_TOKEN = "{{output}}";
         private readonly string _shimGenExePath = ApplicationParameters.Tools.ShimGenExe;
         private readonly IDictionary<string, ExternalCommandArgument> _shimGenArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
@@ -59,6 +60,14 @@ namespace chocolatey.infrastructure.app.services
                     Required = true
                 });
 
+            _shimGenArguments.Add("_icon_path_", new ExternalCommandArgument
+                {
+                    ArgumentOption = " --iconpath=",
+                    ArgumentValue = ICON_PATH_TOKEN,
+                    QuoteValue = true,
+                    Required = true
+                });
+
             //_shimGenArguments.Add("_gui_", new ExternalCommandArgument { ArgumentOption = "--gui", Required = false });
         }
 
@@ -77,7 +86,7 @@ namespace chocolatey.infrastructure.app.services
 
                 var args = ExternalCommandArgsBuilder.build_arguments(configuration, _shimGenArguments);
                 var shimLocation = _fileSystem.combine_paths(ApplicationParameters.ShimsLocation, _fileSystem.get_file_name(file));
-                var argsForPackage = args.Replace(PATH_TOKEN, file.Replace(ApplicationParameters.InstallLocation, "..\\")).Replace(OUTPUT_TOKEN, shimLocation);
+                var argsForPackage = args.Replace(PATH_TOKEN, file.Replace(ApplicationParameters.InstallLocation, "..\\")).Replace(OUTPUT_TOKEN, shimLocation).Replace(ICON_PATH_TOKEN, file);
                 if (isGui)
                 {
                     argsForPackage += " --gui";
