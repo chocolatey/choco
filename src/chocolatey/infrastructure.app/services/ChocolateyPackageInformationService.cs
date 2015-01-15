@@ -15,6 +15,7 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System.IO;
     using System.Text;
     using NuGet;
     using domain;
@@ -60,6 +61,9 @@ namespace chocolatey.infrastructure.app.services
 
         public void save_package_information(ChocolateyPackageInformation packageInformation)
         {
+            _fileSystem.create_directory_if_not_exists(ApplicationParameters.ChocolateyPackageInfoStoreLocation);
+            _fileSystem.ensure_file_attribute_set(ApplicationParameters.ChocolateyPackageInfoStoreLocation, FileAttributes.Hidden);
+
             var pkgStorePath = _fileSystem.combine_paths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".format_with(packageInformation.Package.Id, packageInformation.Package.Version.to_string()));
             _fileSystem.create_directory_if_not_exists(pkgStorePath);
 
