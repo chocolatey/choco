@@ -67,7 +67,6 @@
           depends="update_build_date, update_version, build_nugget, remove_nuget_files"
           description="Building nuget." />
 
-
   <target name="update_build_date">
     <property name="pkg.current.date" value="${datetime::now()}" />
     <property name="pkg.current.date.year" value="${datetime::get-year(pkg.current.date)}" />
@@ -96,17 +95,17 @@
         </items>
       </in>
       <do>
-        <echo level="Warning" message="executing '${app.nuget} pack ${spec.file}'" />
+        <echo level="Warning" message="executing '${app.nuget} pack ${spec.file} -Version ${nuget.version}'" />
         <exec
           program="cmd"
           workingdir="${directory::get-parent-directory(spec.file)}"
           failonerror="false"
           if="${platform::is-windows()}">
-            <arg value="/c ${app.nuget} pack '${spec.file}' -Version ${nuget.version}" />
+            <arg value='/c ${app.nuget} pack "${spec.file}" -Version ${nuget.version}' />
         </exec>
         <exec program="mono"
           workingdir="${directory::get-parent-directory(spec.file)}"
-          commandline="'${app.nuget}' pack '${spec.file}' -Version ${nuget.version}" if="${platform::is-unix()}"/>
+          commandline='"${app.nuget}" pack "${spec.file}" -Version ${nuget.version}' if="${platform::is-unix()}"/>
       </do>
     </foreach>
   </target>

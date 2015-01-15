@@ -99,7 +99,7 @@
   
   <target name="copy_notices_to_doc_folder">
     <echo level="Warning" message="Packaging readme file to ${dirs.drop.nuget}${path.separator}docs."/>
-    <copy file="${dirs.current}README.markdown" tofile="${dirs.drop.nuget}${path.separator}docs${path.separator}README" failonerror="false" />
+    <copy file="${dirs.current}${path.separator}README.md" tofile="${dirs.drop.nuget}${path.separator}docs${path.separator}README" failonerror="false" />
     
     <echo level="Warning" message="Packaging other legal stuff to ${dirs.drop.nuget}${path.separator}docs."/>
     <copy todir="${dirs.drop.nuget}${path.separator}docs" failonerror="false">
