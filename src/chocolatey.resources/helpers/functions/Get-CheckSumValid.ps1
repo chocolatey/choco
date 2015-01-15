@@ -26,11 +26,11 @@ param(
   if ($checksumType -ne 'sha1') { $checksumType = 'md5'}
 
   Update-SessionEnvironment
-  # On first install, env:ChocolateyInstall might be null still - join-path has issues
-  $checksumExe =  Join-Path "$env:ALLUSERSPROFILE" 'chocolatey\tools\checksum.exe'
-  if ($env:ChocolateyInstall){
-    $checksumExe = Join-Path "$env:ChocolateyInstall" 'tools\checksum.exe'
-  }
+  $thisScriptDirectory = (Split-Path -parent $MyInvocation.MyCommand.Definition)
+  $checksumExe = Join-Path "$thisScriptDirectory" '..\tools\checksum.exe'
+  #if ($env:ChocolateyInstall){
+  #  $checksumExe = Join-Path "$env:ChocolateyInstall" 'tools\checksum.exe'
+  #}
   Write-Debug "checksum is set at `'$checksumExe`'"
 
   Write-Debug "Calling command [`'$checksumExe`' -c$checksum `"$file`"] to retrieve checksum"
