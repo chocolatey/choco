@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 function Get-ChecksumValid {
 param(
   [string] $file,
@@ -21,17 +22,17 @@ param(
   Write-Debug "Running 'Get-ChecksumValid' with file:`'$file`', checksum: `'$checksum`', checksumType: `'$checksumType`'";
   if ($checksum -eq '' -or $checksum -eq $null) { return }
 
-  if(!([System.IO.File]::Exists($file))) { throw "Unable to checksum a file that doesn't exist - Could not find file `'$file`'" }
+  if (!([System.IO.File]::Exists($file))) { throw "Unable to checksum a file that doesn't exist - Could not find file `'$file`'" }
 
   if ($checksumType -ne 'sha1') { $checksumType = 'md5'}
 
-  Update-SessionEnvironment
-  $thisScriptDirectory = (Split-Path -parent $MyInvocation.MyCommand.Definition)
-  $checksumExe = Join-Path "$thisScriptDirectory" '..\tools\checksum.exe'
-  #if ($env:ChocolateyInstall){
-  #  $checksumExe = Join-Path "$env:ChocolateyInstall" 'tools\checksum.exe'
-  #}
-  Write-Debug "checksum is set at `'$checksumExe`'"
+  
+  $checksumExe = Join-Path "$helpersPath" '..\tools\checksum.exe'
+  if (!([System.IO.File]::Exists($checksumExe))) {
+	Update-SessionEnvironment
+	$checksumExe = Join-Path "$env:ChocolateyInstall" 'tools\checksum.exe'
+  }
+  Write-Debug "checksum.exe found at `'$checksumExe`'"
 
   Write-Debug "Calling command [`'$checksumExe`' -c$checksum `"$file`"] to retrieve checksum"
   $process = Start-Process "$checksumExe" -ArgumentList " -c=`"$checksum`" -t=`"$checksumType`" -f=`"$file`"" -Wait -WindowStyle Hidden -PassThru

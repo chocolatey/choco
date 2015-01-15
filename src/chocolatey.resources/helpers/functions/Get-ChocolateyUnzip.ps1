@@ -72,14 +72,12 @@ param(
   Write-Host "Extracting $fileFullPath to $destination..."
   if (![System.IO.Directory]::Exists($destination)) {[System.IO.Directory]::CreateDirectory($destination)}
 
-  Update-SessionEnvironment
-  # On first install, env:ChocolateyInstall might be null still - join-path has issues
-  $thisScriptDirectory = (Split-Path -parent $MyInvocation.MyCommand.Definition)
-  $7zip = Join-Path "$thisScriptDirectory" '..\tools\7za.exe'
-  #if ($env:ChocolateyInstall){
-  #  $7zip = Join-Path "$env:ChocolateyInstall" 'tools\7za.exe'
-  #}
-  Write-Debug "7zip is set at `'$7zip`'"
+  $7zip = Join-Path "$helpersPath" '..\tools\7za.exe'
+  if (!([System.IO.File]::Exists($7zip))) {
+	Update-SessionEnvironment
+	$7zip = Join-Path "$env:ChocolateyInstall" 'tools\7za.exe'
+  }
+  Write-Debug "7zip found at `'$7zip`'"
 
   # 32-bit 7za.exe would not find C:\Windows\System32\config\systemprofile\AppData\Local\Temp,
   # because it gets translated to C:\Windows\SysWOW64\... by the WOW redirection layer.
