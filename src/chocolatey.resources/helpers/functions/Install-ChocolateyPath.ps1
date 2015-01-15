@@ -52,3 +52,5 @@ param(
     $env:Path = $envPSPath + $statementTerminator + $pathToInstall
   }
 }
+
+# [System.Text.RegularExpressions.Regex]::Match($Path,[System.Text.RegularExpressions.Regex]::Escape('locationtoMatch') + '(?>;)?', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
