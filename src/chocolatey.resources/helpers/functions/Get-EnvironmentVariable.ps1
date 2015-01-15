@@ -15,3 +15,6 @@
 function Get-EnvironmentVariable([string] $Name, [System.EnvironmentVariableTarget] $Scope) {
     [Environment]::GetEnvironmentVariable($Name, $Scope)
 }
+
+# Some enhancements to think about here.
+# $machinePath = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Session Manager\Environment\").GetValue("PATH", "", [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames).ToString();
