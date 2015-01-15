@@ -13,5 +13,6 @@
 # limitations under the License.
 
 function Set-EnvironmentVariable([string] $Name, [string] $Value, [System.EnvironmentVariableTarget] $Scope) {
+	Write-Debug "Calling Set-EnvironmentVariable with `$Name = '$Name', `$Value = '$Value', `$Scope = '$Scope'"
     [Environment]::SetEnvironmentVariable($Name, $Value, $Scope)
 }
