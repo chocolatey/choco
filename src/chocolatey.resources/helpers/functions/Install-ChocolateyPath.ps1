@@ -21,6 +21,7 @@ param(
   $originalPathToInstall = $pathToInstall
 
   #get the PATH variable
+  Update-SessionEnvironment
   $envPath = $env:PATH
   if (!$envPath.ToLower().Contains($pathToInstall.ToLower()))
   {
