@@ -43,7 +43,6 @@ Export-ModuleMember -Function `
 	Install-ChocolateyVsixPackage,`
 	Write-ChocolateySuccess,`
 	Write-ChocolateyFailure,`
-	Write-Host,`Write-Debug,`Write-Error,`
 	Start-ChocolateyProcessAsAdmin,`
 	Test-ProcessAdminRights,`
 	Uninstall-ChocolateyPackage,`
