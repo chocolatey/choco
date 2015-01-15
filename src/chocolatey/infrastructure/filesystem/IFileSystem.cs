@@ -290,5 +290,12 @@ namespace chocolatey.infrastructure.filesystem
         void delete_directory_if_exists(string directoryPath, bool recursive);
 
         #endregion
+
+        /// <summary>
+        ///   Ensure file attributes are set on a specified path.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="attributes">The attributes.</param>
+        void ensure_file_attribute_set(string path, FileAttributes attributes);
     }
 }

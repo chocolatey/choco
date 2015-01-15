@@ -295,6 +295,26 @@ namespace chocolatey.infrastructure.filesystem
 
         #endregion
 
+        public void ensure_file_attribute_set(string path, FileAttributes attributes)
+        {
+            if (directory_exists(path))
+            {
+                var directoryInfo = get_directory_info_for(path);
+                if ((directoryInfo.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                {
+                    directoryInfo.Attributes |= FileAttributes.Hidden;
+                }
+            }
+            if (file_exists(path))
+            {
+                var fileInfo = get_file_info_for(path);
+                if ((fileInfo.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                {
+                    fileInfo.Attributes |= FileAttributes.Hidden;
+                }
+            }
+        }
+
         /// <summary>
         ///   Takes a guess at the file encoding by looking to see if it has a BOM
         /// </summary>
