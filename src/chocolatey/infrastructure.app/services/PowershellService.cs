@@ -141,6 +141,10 @@ namespace chocolatey.infrastructure.app.services
                 {
                     Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
                 }
+                if (configuration.Verbose)
+                {
+                    Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
+                }
                 //todo:if (configuration.NoOutput)
                 //{
                 //    Environment.SetEnvironmentVariable("ChocolateyEnvironmentQuiet","true");

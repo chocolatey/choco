@@ -15,8 +15,9 @@
 $helpersPath = (Split-Path -parent $MyInvocation.MyCommand.Definition);
 
 $DebugPreference = "SilentlyContinue"
-if ($env:ChocolateyEnvironmentDebug -eq 'true') {$DebugPreference = "Continue";}
-
+if ($env:ChocolateyEnvironmentDebug -eq 'true') { $DebugPreference = "Continue"; }
+$VerbosePreference = "SilentlyContinue"
+if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $VerbosePreference = "Continue"; $verbosity = $true }
 
 # grab functions from files
 Resolve-Path $helpersPath\functions\*.ps1 |
