@@ -74,10 +74,11 @@ param(
 
   Update-SessionEnvironment
   # On first install, env:ChocolateyInstall might be null still - join-path has issues
-  $7zip = Join-Path "$env:ALLUSERSPROFILE" 'chocolatey\chocolateyinstall\tools\7za.exe'
+  $7zip = Join-Path "$env:ALLUSERSPROFILE" 'chocolatey\tools\7za.exe'
   if ($env:ChocolateyInstall){
-    $7zip = Join-Path "$env:ChocolateyInstall" 'chocolateyinstall\tools\7za.exe'
+    $7zip = Join-Path "$env:ChocolateyInstall" 'tools\7za.exe'
   }
+  Write-Debug "7zip is set at `'$7zip`'"
 
   # 32-bit 7za.exe would not find C:\Windows\System32\config\systemprofile\AppData\Local\Temp,
   # because it gets translated to C:\Windows\SysWOW64\... by the WOW redirection layer.

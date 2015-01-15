@@ -27,10 +27,11 @@ param(
 
   Update-SessionEnvironment
   # On first install, env:ChocolateyInstall might be null still - join-path has issues
-  $checksumExe =  Join-Path "$env:ALLUSERSPROFILE" 'chocolatey\chocolateyinstall\tools\checksum.exe'
+  $checksumExe =  Join-Path "$env:ALLUSERSPROFILE" 'chocolatey\tools\checksum.exe'
   if ($env:ChocolateyInstall){
-    $checksumExe = Join-Path "$env:ChocolateyInstall" 'chocolateyinstall\tools\checksum.exe'
+    $checksumExe = Join-Path "$env:ChocolateyInstall" 'tools\checksum.exe'
   }
+  Write-Debug "checksum is set at `'$checksumExe`'"
 
   Write-Debug "Calling command [`'$checksumExe`' -c$checksum `"$file`"] to retrieve checksum"
   $process = Start-Process "$checksumExe" -ArgumentList " -c=`"$checksum`" -t=`"$checksumType`" -f=`"$file`"" -Wait -WindowStyle Hidden -PassThru
