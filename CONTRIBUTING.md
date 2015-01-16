@@ -3,6 +3,8 @@ Contributors
 
 Submitting an Issue? See the "Submitting Issues" section in the [README](https://github.com/chocolatey/choco/blob/master/README.md#submitting-issues)
 
+**NOTE**: Do not submit issues for missing `SolutionVersion.cs`. Please see **Compiling / Building Source** below.
+
 The process for contributions is roughly as follows:
 
 ## Prerequisites
@@ -18,7 +20,7 @@ The process for contributions is roughly as follows:
  * Once you get a nod from one of the [Chocolatey Team](https://github.com/chocolatey?tab=members), you can start on the feature.
  * Alternatively, if a feature is on the issues list with the [community tag](https://github.com/chocolatey/choco/labels/Community), it is open for a patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
 
-### Set up your environment
+### Set Up Your Environment
 
  * You create, or update, a fork of chocolatey/choco under your GitHub account.
  * From there you create a branch named specific to the feature.
@@ -30,7 +32,54 @@ The process for contributions is roughly as follows:
  * Test your changes and please help us out by updating and implementing some automated tests. It is recommended that all contributors spend some time looking over the tests in the source code. You can't go wrong emulating one of the existing tests and then changing it specific to the behavior you are testing.
  * Please do not update your branch from the master unless we ask you to. See the responding to feedback section below.
 
-### Prepare commits
+### Compiling/ Building Source
+
+There is a `build.bat`/`build.sh` file that creates a necessary generated file named `SolutionVersion.cs`. It must be run at least once before Visual Studio will build.
+
+#### Windows
+
+Prerequisites:
+
+ * .NET Framework 4+
+ * Visual Studio is helpful for working on source.
+ * ReSharper is immensely helpful (and there is a `.sln.DotSettings` file to help with code conventions).
+
+Build Process:
+
+ * Run `build.bat`.
+
+Running the build on Windows should produce an artifact that is tested and ready to be used.
+
+#### Other Platforms
+
+On other operating systems, you will need to install and configure Mono first prior to building.
+
+```
+$ mono -V
+Mono JIT compiler version 3.8.0 ((no/45d0ba1 Tue Aug 26 20:33:43 EDT 2014)
+Copyright (C) 2002-2014 Novell, Inc, Xamarin Inc and Contributors. www.mono-project.com
+```
+
+Prerequisites:
+
+ * Install and configure Mono 3.8.0 (no guarantees that newer versions will work appropriately).
+ * Add the following to your `~/.profile` (or other relevant dot source file)
+ * Xamarin Studio is helpful for working on source.
+
+```sh
+# mono
+# http://www.michaelruck.de/2010/03/solving-pkg-config-and-mono-35-profile.html
+# http://cloudgen.wordpress.com/2013/03/06/configure-nant-to-run-under-mono-3-06-beta-for-mac-osx/
+export PKG_CONFIG_PATH=/opt/local/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig
+```
+
+Build Process:
+
+ * Run `./build.sh`.
+
+Running the build on Mono produces an artifact similar to Windows but may have more rough edges. You may get a failure or two in the build script that can be safely ignored.
+
+### Prepare Commits
 
 This section serves to help you understand what makes a good commit.
 
@@ -101,7 +150,7 @@ The only reasons a pull request should be closed and resubmitted are as follows:
   * When the pull request is targeting the wrong branch (this doesn't happen as often).
   * When there are updates made to the original by someone other than the original contributor. Then the old branch is closed with a note on the newer branch this supersedes #github_number.
 
-## Other general information
+## Other General Information
 
 The helpers/utility functions that are available to the packages are what we consider the API. If you are working in the API, please note that you will need to maintain backwards compatibility. If you plan to rename a function or make it more generic, you must provide an alias in the [chocolateyInstaller.psm1](https://github.com/chocolatey/chocolatey/blob/master/src/helpers/chocolateyInstaller.psm1) as part of what gets exported. You should not remove or reorder parameters, only add optional parameters to the end. They should be named and not positional (we are moving away from positional parameters as much as possible).
 
