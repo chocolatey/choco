@@ -5,8 +5,6 @@ Chocolatey (like yum or apt-get, but for Windows)
 ## License / Credits
 Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICENSE) and [NOTICE](https://github.com/chocolatey/choco/blob/master/NOTICE) files.
 
-Credits - see [docs/legal/CREDITS](https://github.com/chocolatey/choco/blob/master/docs/legal/CREDITS) (just LEGAL/Credits in the zip folder)
-
 ## Documentation
 Please see the [wiki](https://github.com/chocolatey/chocolatey/wiki)
 
@@ -80,3 +78,7 @@ Build Process:
  * Run `./build.sh`.
 
 Running the build on Mono produces an artifact similar to Windows but may have more rough edges. You may get a failure or two in the build script that can be safely ignored.
+
+## Credits
+
+Chocolatey is brought to you by quite a few people and frameworks. See [CREDITS](https://github.com/chocolatey/choco/blob/master/docs/legal/CREDITS.md) (just LEGAL/Credits.md in the zip folder)
