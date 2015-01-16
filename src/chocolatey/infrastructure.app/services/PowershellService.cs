@@ -151,7 +151,7 @@ namespace chocolatey.infrastructure.app.services
                 //}
 
                 this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".format_with(chocoPowerShellScript));
-                string chocoPowerShellScriptContents = _fileSystem.read_file(chocoPowerShellScript);
+                string chocoPowerShellScriptContents = _fileSystem.read_file(chocoPowerShellScript).escape_curly_braces();
                 this.Log().Debug(chocoPowerShellScriptContents);
 
                 bool shouldRun = !configuration.PromptForConfirmation;

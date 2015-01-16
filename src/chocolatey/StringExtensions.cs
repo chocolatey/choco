@@ -122,5 +122,12 @@ namespace chocolatey
 
             return input;
         }
+
+        public static string escape_curly_braces(this string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+
+            return input.Replace("{", "{{").Replace("}", "}}");
+        }
     }
 }
