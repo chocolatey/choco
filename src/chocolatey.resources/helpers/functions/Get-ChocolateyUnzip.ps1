@@ -60,13 +60,13 @@ param(
   Write-Debug "Running 'Get-ChocolateyUnzip' with fileFullPath:`'$fileFullPath`'', destination: `'$destination`', specificFolder: `'$specificFolder``, packageName: `'$packageName`'";
 
   if ($packageName) {
-    $packagelibPath=$env:chocolateyPackageFolder
+    $packagelibPath = Join-Path $env:ChocolateyPackageFolder $env:ChocolateyPackageName
     if (!(Test-Path -path $packagelibPath)) {
       New-Item $packagelibPath -type directory
     }
 
     $zipFilename=split-path $zipfileFullPath -Leaf
-    $zipExtractLogFullPath=join-path $packagelibPath $zipFilename`.txt
+    $zipExtractLogFullPath= Join-Path $packagelibPath $zipFilename`.txt
   }
 
   Write-Host "Extracting $fileFullPath to $destination..."
