@@ -26,11 +26,11 @@ Observe the following help for submitting an issue:
 
 ## Contributing
 
-If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [Contributing](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md).
+If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md).
 
 ## Committers
 
-Committers, you should be very familiar with [Committers](https://github.com/chocolatey/choco/blob/master/COMMITTERS.md).
+Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey/choco/blob/master/COMMITTERS.md).
 
 ### Compiling / Building Source
 
