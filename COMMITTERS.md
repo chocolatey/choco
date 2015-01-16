@@ -20,9 +20,9 @@ In all cases politeness goes a long way. Please thank folks for contributions - 
  * A contributor sends a pull request (usually against master).
  * A committer typically reviews it within a week or less to determine the feasibility of the changes.
 
-#### Inital PR Review
+#### Initial PR Review
 
- * Has the user signed the CLA?
+ * Has the user signed the Contributor License Agreement (CLA)?
  * Did the user create a branch with these changes? If it is on their master, please ask them to review the [contributing document](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md).
  * Did the user reformat files and they should not have? Was is just white-space? You can try adding [?w=1](https://github.com/blog/967-github-secrets) to the URL on GitHub.
  * Are there tests? We really want any new contributions to contain tests so unless the committer believes this code really needs to be in the code base and is willing to write the tests, then we need to ask the contributor to make a good faith effort in adding test cases. Ask them to review the [contributing document](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) and provide tests. **Note:** Some commits may be refactoring which wouldn't necessarily add additional test sets.
@@ -30,7 +30,7 @@ In all cases politeness goes a long way. Please thank folks for contributions - 
  * Was this code warranted? Did the contributor follow the process of gaining approval for big change sets? If not please have them review the [contributing document](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) and ask that they follow up with a case for putting the code into the code base on the mailing list.
 
 #### Review the Code
-  * Does the code meet the naming conventions and formatting?
+  * Does the code meet the naming conventions and formatting (need link)?
   * Is the code sound? Does it read well? Can you understand what it is doing without having to execute it? Principal of no clever hacks (need link).
   * Does the code do what the purpose of the pull request is for?
 
