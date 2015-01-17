@@ -310,6 +310,7 @@ namespace chocolatey.infrastructure.app.services
                             powershellRan = _powershellService.uninstall(config, packageResult);
                         }
 
+                        //todo run autouninstaller every time - to do this you must determine if the install path still exists.
                         if (!powershellRan)
                         {
                             var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
