@@ -73,7 +73,7 @@ Creating Chocolatey folders if they do not already exist.
   #create the base structure if it doesn't exist
   Create-DirectoryIfNotExists $chocolateyExePath
   Create-DirectoryIfNotExists $chocolateyLibPath
-  Upgrade-OldChocolateyInstall $defaultChocolateyPathOld $chocolateyPath
+
   Install-ChocolateyFiles $chocolateyPath
 
   $chocolateyExePathVariable = $chocolateyExePath.ToLower().Replace($chocolateyPath.ToLower(), "%DIR%..\").Replace("\\","\")
@@ -84,6 +84,7 @@ Creating Chocolatey folders if they do not already exist.
   $realModule = Join-Path $chocolateyPath "helpers\chocolateyInstaller.psm1"
   Import-Module "$realModule" -Force
 
+    Upgrade-OldChocolateyInstall $defaultChocolateyPathOld $chocolateyPath
 @"
 Chocolatey (choco.exe) is now ready.
 You can call choco from anywhere, command line or powershell by typing choco.
@@ -126,15 +127,9 @@ param(
   if (Test-Path $chocolateyPathOld) {
     Write-Warning "Attempting to upgrade `'$chocolateyPathOld`' to `'$chocolateyPath`'."
     Write-Warning "Copying the contents of `'$chocolateyPathOld`' to `'$chocolateyPath`'. `n This step may fail if you have anything in this folder running or locked."
-    Write-Host 'If it fails, just manually copy the rest of the items out and then delete the folder.'
-    Copy-Item "$($chocolateyPathOld)\*" "$chocolateyPath" -force -recurse
-    try {
-      Write-Host "Attempting to remove `'$chocolateyPathOld`'. This may fail if something in the folder is being used or locked."
-      Remove-Item "$($chocolateyPathOld)" -force -recurse
-    }
-    catch {
-      Write-Warning "Was not able to remove `'$chocolateyPathOld`'. You will need to manually remove it."
-    }
+    Write-Warning "It is fine to see errors below when upgrading from an version of Chocolatey less than 0.9.9."
+    Write-Warning "!!!! You will need to close and reopen your shell for the path updates to finish taking place!!!!"
+    Write-Output 'If it fails, just manually copy the rest of the items out and then delete the folder.'
 
     $chocolateyExePathOld = Join-Path $chocolateyPathOld 'bin'
     'Machine', 'User' |
@@ -142,9 +137,18 @@ param(
       $path = Get-EnvironmentVariable -Name 'PATH' -Scope $_
       $updatedPath = [System.Text.RegularExpressions.Regex]::Replace($path,[System.Text.RegularExpressions.Regex]::Escape($chocolateyExePathOld) + '(?>;)?', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
       if ($updatedPath -ne $path) {
-        Write-Host "Updating `'$_`' PATH to reflect removal of $chocolateyPathOld"
+        Write-Output "Updating `'$_`' PATH to reflect removal of $chocolateyPathOld"
         Set-EnvironmentVariable -Name 'Path' -Value $updatedPath -Scope $_
       }
+    }
+
+    Copy-Item "$($chocolateyPathOld)\*" "$chocolateyPath" -force -recurse
+    try {
+      Write-Output "Attempting to remove `'$chocolateyPathOld`'. This may fail if something in the folder is being used or locked."
+      Remove-Item "$($chocolateyPathOld)" -force -recurse
+    }
+    catch {
+      Write-Warning "Was not able to remove `'$chocolateyPathOld`'. You will need to manually remove it."
     }
   }
 }
