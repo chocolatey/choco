@@ -101,4 +101,8 @@
     <appender-ref ref="NormalLoggingColoredConsoleAppender" />
   </logger>
 
+  <logger name="logfile">
+    <level value="INFO"/>
+  </logger>
+
 </log4net>

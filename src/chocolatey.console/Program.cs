@@ -59,6 +59,7 @@ namespace chocolatey.console
 
                 if (config.RegularOuptut)
                 {
+                    "logfile".Log().Info(() => "".PadRight(60, '='));
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyVersion));
                 }
 
