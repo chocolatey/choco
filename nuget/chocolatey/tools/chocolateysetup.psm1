@@ -83,6 +83,7 @@ Creating Chocolatey folders if they do not already exist.
   Create-DirectoryIfNotExists $chocolateyLibPath
 
   Install-ChocolateyFiles $chocolateyPath
+  Ensure-ChocolateyLibFiles $chocolateyLibPath
 
   Install-ChocolateyBinFiles $chocolateyPath $chocolateyExePath
 
@@ -189,6 +190,27 @@ param(
   Copy-Item $chocInstallFolder\* $chocolateyPath -recurse -force
 }
 
+function Ensure-ChocolateyLibFiles {
+param(
+  [string]$chocolateyLibPath
+)
+  $chocoPkgDirectory = Join-Path $chocolateyLibPath 'chocolatey'
+
+  if ( -not (Test-Path("$chocoPkgDirectory\chocolatey.nupkg")) ) {
+    Write-Output "Ensuring '$chocoPkgDirectory' exists."
+    Create-DirectoryIfNotExists $chocoPkgDirectory
+
+    $chocoPkg = Get-ChildItem "$thisScriptFolder/../../" | ?{$_.name -match "^chocolatey.*nupkg"} | Sort name -Descending | Select -First 1
+    if ($chocoPkg -ne '') { $chocoPkg = $chocoPkg.FullName }
+    "$tempDir\chocolatey.zip", "$chocoPkg" | % {
+      if ($_ -ne $null -and $_ -ne '') {
+        if (Test-Path $_) {
+          Copy-Item $_ "$chocoPkgDirectory\chocolatey.nupkg" -force
+        }
+      }
+    }
+  }
+}
 
 function Install-ChocolateyBinFiles {
 param(
