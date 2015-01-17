@@ -68,7 +68,7 @@ A shim file for the command line goes to `'$chocolateyExePath`' and points to an
 
 Creating Chocolatey folders if they do not already exist.
 
-"@ | Write-Host
+"@ | Write-Output
 
   #create the base structure if it doesn't exist
   Create-DirectoryIfNotExists $chocolateyExePath
@@ -91,7 +91,7 @@ You can call choco from anywhere, command line or powershell by typing choco.
 Run choco /? for a list of functions.
 You may need to shut down and restart powershell and/or consoles
  first prior to using choco.
-"@ | write-host
+"@ | write-Output
 }
 
 function Set-ChocolateyInstallFolder {
@@ -106,7 +106,7 @@ param(
     Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue $null -variableType $environmentTarget
   }
 
-  Write-Host "Creating $chocInstallVariableName as an Environment variable (targeting `'$environmentTarget`') and setting it to `'$folder`'"
+  Write-Output "Creating $chocInstallVariableName as an Environment variable (targeting `'$environmentTarget`') and setting it to `'$folder`'"
   Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue "$folder" -variableType $environmentTarget
 }
 
@@ -227,7 +227,7 @@ param(
     $files = get-childitem $chocolateyExePath -include *.bat -recurse
     if ($files -ne $null -and $files.Count -gt 0) {
       foreach ($file in $files) {
-        Write-Host "Processing $($file.Name) to make it portable"
+        Write-Output "Processing $($file.Name) to make it portable"
         $fileStream = [System.IO.File]::Open("$file", 'Open', 'Read', 'ReadWrite')
         $reader = New-Object System.IO.StreamReader($fileStream)
         $fileText = $reader.ReadToEnd()
