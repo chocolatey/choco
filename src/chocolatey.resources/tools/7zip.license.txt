@@ -1,14 +1,15 @@
-      7-Zip Command line version
-      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      7-Zip Extra
+      ~~~~~~~~~~~
       License for use and distribution
       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      7-Zip Copyright (C) 1999-2010 Igor Pavlov.
+      Copyright (C) 1999-2015 Igor Pavlov.
 
-      7za.exe is distributed under the GNU LGPL license
+      7-Zip Extra files are under the GNU LGPL license.
 
+      
       Notes: 
-        You can use 7-Zip on any computer, including a computer in a commercial 
+        You can use 7-Zip Extra on any computer, including a computer in a commercial 
         organization. You don't need to register or pay for 7-Zip.
 
 

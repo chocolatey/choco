@@ -60,7 +60,7 @@ param(
   Write-Debug "Running 'Get-ChocolateyUnzip' with fileFullPath:`'$fileFullPath`'', destination: `'$destination`', specificFolder: `'$specificFolder``, packageName: `'$packageName`'";
 
   if ($packageName) {
-    $packagelibPath = Join-Path $env:ChocolateyPackageFolder $env:ChocolateyPackageName
+    $packagelibPath = Join-Path $env:ChocolateyPackageFolder $packageName
     if (!(Test-Path -path $packagelibPath)) {
       New-Item $packagelibPath -type directory
     }
@@ -77,6 +77,7 @@ param(
 	Update-SessionEnvironment
 	$7zip = Join-Path "$env:ChocolateyInstall" 'tools\7za.exe'
   }
+  $7zip = [System.IO.Path]::GetFullPath($7zip)
   Write-Debug "7zip found at `'$7zip`'"
 
   # 32-bit 7za.exe would not find C:\Windows\System32\config\systemprofile\AppData\Local\Temp,
@@ -93,7 +94,9 @@ param(
   $exitCode = -1
   $unzipOps = {
     param($7zip, $destination, $fileFullPath, [ref]$exitCodeRef)
-    $process = Start-Process $7zip -ArgumentList "x -o`"$destination`" -y `"$fileFullPath`"" -Wait -WindowStyle Hidden -PassThru
+    Write-Debug "Calling '$7zip x -aoa -o`"$destination`" -y `"$fileFullPath`"'"
+    $process = Start-Process $7zip -ArgumentList "x -aoa -o`"$destination`" -y `"$fileFullPath`"" -Wait -WindowStyle Hidden -PassThru
+    #$process = Start-Process $7zip -ArgumentList "x -aoa -o`"$destination`" -y `"$fileFullPath`"" -Wait -NoNewWindow -PassThru
     # this is here for specific cases in Posh v3 where -Wait is not honored
     try { if (!($process.HasExited)) { Wait-Process -Id $process.Id } } catch { }
 
