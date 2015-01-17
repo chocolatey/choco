@@ -41,9 +41,13 @@ param(
     $chocolateyPath = Join-Path "$programData" 'chocolatey'
   }
 
-  #if we have an already environment variable path, use it.
+  # variable to allow insecure directory:
+  $allowInsecureRootInstall = $false
+  if ($env:ChocolateyAllowInsecureRootDirectory -eq 'true') { $allowInsecureRootInstall = $true }
+
+  # if we have an already environment variable path, use it.
   $alreadyInitializedNugetPath = Get-ChocolateyInstallFolder
-  if ($alreadyInitializedNugetPath -and $alreadyInitializedNugetPath -ne $chocolateyPath -and $alreadyInitializedNugetPath -ne $defaultChocolateyPathOld){
+  if ($alreadyInitializedNugetPath -and $alreadyInitializedNugetPath -ne $chocolateyPath -and ($allowInsecureRootInstall -or $alreadyInitializedNugetPath -ne $defaultChocolateyPathOld)){
     $chocolateyPath = $alreadyInitializedNugetPath
   }
   else {
@@ -89,8 +93,11 @@ Creating Chocolatey folders if they do not already exist.
   $realModule = Join-Path $chocolateyPath "helpers\chocolateyInstaller.psm1"
   Import-Module "$realModule" -Force
 
+  if (-not $allowInsecureRootInstall) {
     Upgrade-OldChocolateyInstall $defaultChocolateyPathOld $chocolateyPath
     Install-ChocolateyBinFiles $chocolateyPath $chocolateyExePath
+  }
+
 @"
 Chocolatey (choco.exe) is now ready.
 You can call choco from anywhere, command line or powershell by typing choco.
