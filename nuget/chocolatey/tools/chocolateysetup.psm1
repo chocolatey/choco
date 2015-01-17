@@ -63,12 +63,16 @@ param(
   $yourPkgPath = [System.IO.Path]::Combine($chocolateyLibPath,"yourPackageName")
 @"
 We are setting up the Chocolatey package repository.
-The packages themselves go to `'$chocolateyLibPath`' (i.e. $yourPkgPath).
-A shim file for the command line goes to `'$chocolateyExePath`' and points to an executable in `'$yourPkgPath`'.
+The packages themselves go to `'$chocolateyLibPath`'
+  (i.e. $yourPkgPath).
+A shim file for the command line goes to `'$chocolateyExePath`'
+  and points to an executable in `'$yourPkgPath`'.
 
 Creating Chocolatey folders if they do not already exist.
 
 "@ | Write-Output
+
+  Write-Warning "You can safely ignore errors related to missing log files when `n  upgrading from a version of Chocolatey less than 0.9.9. `n  'Batch file could not be found' is also safe to ignore. `n  'The system cannot find the file specified' - also safe."
 
   #create the base structure if it doesn't exist
   Create-DirectoryIfNotExists $chocolateyExePath
@@ -76,8 +80,9 @@ Creating Chocolatey folders if they do not already exist.
 
   Install-ChocolateyFiles $chocolateyPath
 
-  $chocolateyExePathVariable = $chocolateyExePath.ToLower().Replace($chocolateyPath.ToLower(), "%DIR%..\").Replace("\\","\")
   Install-ChocolateyBinFiles $chocolateyPath $chocolateyExePath
+
+  $chocolateyExePathVariable = $chocolateyExePath.ToLower().Replace($chocolateyPath.ToLower(), "%DIR%..\").Replace("\\","\")
   Initialize-ChocolateyPath $chocolateyExePath $chocolateyExePathVariable
   Process-ChocolateyBinFiles $chocolateyExePath $chocolateyExePathVariable
   Install-DotNet4IfMissing
@@ -106,7 +111,8 @@ param(
     Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue $null -variableType $environmentTarget
   }
 
-  Write-Output "Creating $chocInstallVariableName as an Environment variable (targeting `'$environmentTarget`') and setting it to `'$folder`'"
+  Write-Output "Creating $chocInstallVariableName as an environment variable (targeting `'$environmentTarget`') `n  Setting $chocInstallVariableName to `'$folder`'"
+  Write-Warning "It's very likely you will need to close and reopen your shell `n  before you can use choco."
   Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue "$folder" -variableType $environmentTarget
 }
 
@@ -125,11 +131,10 @@ param(
 )
 
   if (Test-Path $chocolateyPathOld) {
-    Write-Warning "Attempting to upgrade `'$chocolateyPathOld`' to `'$chocolateyPath`'."
+    Write-Output "Attempting to upgrade `'$chocolateyPathOld`' to `'$chocolateyPath`'."
     Write-Warning "Copying the contents of `'$chocolateyPathOld`' to `'$chocolateyPath`'. `n This step may fail if you have anything in this folder running or locked."
-    Write-Warning "It is fine to see errors below when upgrading from an version of Chocolatey less than 0.9.9."
-    Write-Warning "!!!! You will need to close and reopen your shell for the path updates to finish taking place!!!!"
     Write-Output 'If it fails, just manually copy the rest of the items out and then delete the folder.'
+    Write-Warning "!!!! ATTN: YOU WILL NEED TO CLOSE AND REOPEN YOUR SHELL !!!!"
 
     $chocolateyExePathOld = Join-Path $chocolateyPathOld 'bin'
     'Machine', 'User' |
@@ -137,7 +142,7 @@ param(
       $path = Get-EnvironmentVariable -Name 'PATH' -Scope $_
       $updatedPath = [System.Text.RegularExpressions.Regex]::Replace($path,[System.Text.RegularExpressions.Regex]::Escape($chocolateyExePathOld) + '(?>;)?', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
       if ($updatedPath -ne $path) {
-        Write-Output "Updating `'$_`' PATH to reflect removal of $chocolateyPathOld"
+        Write-Output "Updating `'$_`' PATH to reflect removal of '$chocolateyPathOld'."
         Set-EnvironmentVariable -Name 'Path' -Value $updatedPath -Scope $_
       }
     }
@@ -245,9 +250,9 @@ param(
 }
 
 function Install-DotNet4IfMissing {
-  if([IntPtr]::Size -eq 8) {$fx="framework64"} else {$fx="framework"}
+  if ([IntPtr]::Size -eq 8) {$fx="framework64"} else {$fx="framework"}
 
-  if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
+  if (!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
     $NetFx4ClientUrl = 'http://download.microsoft.com/download/5/6/2/562A10F9-C9F4-4313-A044-9C94E0A8FAC8/dotNetFx40_Client_x86_x64.exe'
     $NetFx4FullUrl = 'http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe'
     Install-ChocolateyPackage "NetFx4.0" 'exe' -silentArgs "/q /norestart /repair /log `'$tempDir\NetFx4Install.log`'" -url "$NetFx4ClientUrl" -url64bit "$NetFx4ClientUrl" -validExitCodes @(0, 3010)
