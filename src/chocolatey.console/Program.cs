@@ -133,6 +133,7 @@ namespace chocolatey.console
 
         private static void remove_old_chocolatey_exe(IFileSystem fileSystem)
         {
+            fileSystem.delete_file(Assembly.GetExecutingAssembly().Location + ".old");
             fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
         }
 

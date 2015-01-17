@@ -175,6 +175,7 @@ namespace chocolatey.infrastructure.filesystem
 
         public void delete_file(string filePath)
         {
+            this.Log().Debug(() => "Attempting to delete file \"{0}\".".format_with(filePath));
             if (file_exists(filePath))
             {
                 File.Delete(filePath);
