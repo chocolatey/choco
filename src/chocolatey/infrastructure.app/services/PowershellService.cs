@@ -111,6 +111,11 @@ namespace chocolatey.infrastructure.app.services
                 var failure = false;
 
                 var package = packageResult.Package;
+                Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION", configuration.Information.ChocolateyVersion);
+                Environment.SetEnvironmentVariable("OS_TYPE", configuration.Information.PlatformType.get_description_or_value());
+                Environment.SetEnvironmentVariable("OS_VERSION", configuration.Information.PlatformVersion.to_string());
+                // experimental until we know if this value returns correctly based on the OS and not the current process.
+                Environment.SetEnvironmentVariable("OS_IS64BIT", configuration.Information.Is64Bit ? "true":"false");
                 Environment.SetEnvironmentVariable("chocolateyPackageName", package.Id);
                 Environment.SetEnvironmentVariable("chocolateyPackageVersion", package.Version.to_string());
                 Environment.SetEnvironmentVariable("chocolateyPackageFolder", ApplicationParameters.PackagesLocation);
