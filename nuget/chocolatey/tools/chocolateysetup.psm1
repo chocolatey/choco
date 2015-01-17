@@ -90,6 +90,7 @@ Creating Chocolatey folders if they do not already exist.
   Import-Module "$realModule" -Force
 
     Upgrade-OldChocolateyInstall $defaultChocolateyPathOld $chocolateyPath
+    Install-ChocolateyBinFiles $chocolateyPath $chocolateyExePath
 @"
 Chocolatey (choco.exe) is now ready.
 You can call choco from anywhere, command line or powershell by typing choco.
@@ -147,7 +148,8 @@ param(
       }
     }
 
-    Copy-Item "$($chocolateyPathOld)\*" "$chocolateyPath" -force -recurse
+    Copy-Item "$chocolateyPathOld\bin\*" "$chocolateyPath\bin" -force -recurse
+    Copy-Item "$chocolateyPathOld\lib\*" "$chocolateyPath\lib" -force -recurse
     try {
       Write-Output "Attempting to remove `'$chocolateyPathOld`'. This may fail if something in the folder is being used or locked."
       Remove-Item "$($chocolateyPathOld)" -force -recurse
@@ -162,12 +164,12 @@ function Install-ChocolateyFiles {
 param(
   [string]$chocolateyPath
 )
-  "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" |
-    % {
-        if(test-path $_) {
-          Remove-Item $_ -recurse -force
-        }
-      }
+
+  "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" | % {
+    if (Test-Path $_) {
+      Remove-Item $_ -exclude *.log -recurse -force
+    }
+  }
 
   # rename the currently running process / it will be locked if it exists
   $chocoExe = Join-Path $chocolateyPath 'choco.exe'
