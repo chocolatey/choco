@@ -153,15 +153,19 @@ function Install-ChocolateyFiles {
 param(
   [string]$chocolateyPath
 )
-
-  #todo: In place update of choco.exe
-
   "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" |
     % {
         if(test-path $_) {
           Remove-Item $_ -recurse -force
         }
       }
+
+  # rename the currently running process / it will be locked if it exists
+  $chocoExe = Join-Path $chocolateyPath 'choco.exe'
+  if (Test-Path ($chocoExe)) {
+    Write-Debug "Renaming '$chocoExe' to '$chocoExe.old'"
+    Move-Item $chocoExe "$chocoExe.old" -force
+  }
 
   $chocInstallFolder = Join-Path $thisScriptFolder "chocolateyInstall"
   Copy-Item $chocInstallFolder\* $chocolateyPath -recurse -force

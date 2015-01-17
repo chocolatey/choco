@@ -63,6 +63,8 @@ namespace chocolatey.console
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyVersion));
                 }
 
+                remove_old_chocolatey_exe(fileSystem);
+
                 if (config.HelpRequested)
                 {
                     pause_execution_if_debug();
@@ -127,6 +129,11 @@ namespace chocolatey.console
 
                 Environment.Exit(Environment.ExitCode);
             }
+        }
+
+        private static void remove_old_chocolatey_exe(IFileSystem fileSystem)
+        {
+            fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
         }
 
         private static void pause_execution_if_debug()
