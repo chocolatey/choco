@@ -2,6 +2,8 @@ Chocolatey (like yum or apt-get, but for Windows)
 =======
 ![Chocolatey Logo](https://github.com/chocolatey/chocolatey/raw/master/docs/logo/chocolateyicon.gif "Chocolatey")
 
+[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/jfxywa3xuwowt20w?svg=true)](https://ci.appveyor.com/project/ferventcoder/choco)
+
 ## License / Credits
 Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICENSE) and [NOTICE](https://github.com/chocolatey/choco/blob/master/NOTICE) files.
 

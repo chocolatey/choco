@@ -1,0 +1,16 @@
+version: 1.0.0.{build}
+clone_depth: 10
+build_script:
+- build.bat
+artifacts:
+- path: build_output\build_artifacts\compile\msbuild-net-4.0-results.xml
+  name: Compile.xml
+- path: code_drop\build_artifacts\ilmerge\ilmerge.log
+  name: ILMerge.log
+- path: build_output\build_artifacts\nunit\nunit-results.xml
+  name: NUnitResults.xml
+- path: build_output\build_artifacts\nunit\index.html
+  name: NUnitResults.html
+- path: build_output\build_artifacts\opencover\chocolatey.opencover.xml
+- path: build_output\build_artifacts\opencover\Html\index.htm
+  name: OpenCoverResults.htm
