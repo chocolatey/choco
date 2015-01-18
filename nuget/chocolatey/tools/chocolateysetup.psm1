@@ -227,10 +227,17 @@ param(
     $binFilePathRename = $binFilePath + '.old'
     $batchFilePath = $binFilePath.Replace(".exe",".bat")
     $bashFilePath = $binFilePath.Replace(".exe","")
-    if (Test-Path ($batchFilePath)) {Remove-Item $batchFilePath -force}
-    if (Test-Path ($bashFilePath)) {Remove-Item $bashFilePath -force}
-    if (Test-Path ($binFilePathRename)) {Remove-Item $binFilePathRename -force}
-    if (Test-Path ($binFilePath)) {Move-Item -path $binFilePath -destination $binFilePathRename -force}
+    if (Test-Path ($batchFilePath)) { Remove-Item $batchFilePath -force }
+    if (Test-Path ($bashFilePath)) { Remove-Item $bashFilePath -force }
+    if (Test-Path ($binFilePathRename)) {
+      try {
+        Remove-Item $binFilePathRename -force
+      }
+      catch {
+        Write-Warning "Was not able to remove `'$binFilePathRename`'. This may cause errors."
+      }
+    }
+    if (Test-Path ($binFilePath)) { Move-Item -path $binFilePath -destination $binFilePathRename -force }
 
     Copy-Item -path $exeFilePath -destination $binFilePath -force
     $commandShortcut = [System.IO.Path]::GetFileNameWithoutExtension("$exeFilePath")
