@@ -27,7 +27,7 @@ artifacts:
   name: ILMerge.log
 - path: code_drop\build_artifacts\ilmerge\ilmergedll.log
   name: ILMergeDLL.log
-- path: C:\codelocal\chocolatey2\code_drop\nuget\chocolatey.*.nupkg
+#- path: C:\codelocal\chocolatey2\code_drop\nuget\chocolatey.*.nupkg
 notifications:
 - provider: Email
   to:
