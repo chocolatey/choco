@@ -1,5 +1,5 @@
 version: 1.0.0.{build}
-clone_depth: 10
+clone_depth: 5
 init:
 - git config --global user.email "chocolatey@realdimensions.net"
 - git config --global user.name "Chocolatey yo"
