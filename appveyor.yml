@@ -32,7 +32,7 @@ notifications:
 - provider: Email
   to:
   - chocolatey-build-status@googlegroups.com
-  subject: Chocolatey Build Failure
+  subject: AppVeyor - choco Build Notification
   on_build_success: false
   on_build_failure: true
   on_build_status_changed: true
