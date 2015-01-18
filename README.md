@@ -12,6 +12,7 @@ You can just call me choco.
  * [Community Feed aka Chocolatey.org](https://chocolatey.org) (if this is down, try the backup at http://chocolatey.apphb.com )
  * [Mailing List/Forum](http://groups.google.com/group/chocolatey)
  * [Twitter](https://twitter.com/chocolateynuget)
+ * [Build Status Email List](http://groups.google.com/group/chocolatey-build-status)
 
 ## License / Credits
 Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICENSE) and [NOTICE](https://github.com/chocolatey/choco/blob/master/NOTICE) files.
