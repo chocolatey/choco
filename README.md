@@ -6,7 +6,9 @@ Chocolatey (like yum or apt-get, but for Windows)
 Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICENSE) and [NOTICE](https://github.com/chocolatey/choco/blob/master/NOTICE) files.
 
 ## Documentation
-Please see the [wiki](https://github.com/chocolatey/chocolatey/wiki)
+Please see the [wiki](https://github.com/chocolatey/chocolatey/wiki) (WILL NEED TO UPDATE TO A NEW LOCAL WIKI with all the fun changes)
+
+Give `choco.exe /?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
 
 ## Requirements
 * .NET Framework 4.0

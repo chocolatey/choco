@@ -5,6 +5,8 @@ We like to see folks contributing to Chocolatey. If you are a committer, we'd li
 
 In all cases politeness goes a long way. Please thank folks for contributions - they are going out of their way to help make the code base better, or adding something they may personally feel is necessary for the code base.
 
+Please be VERY familiar with [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) and follow the process as well.
+
 ## Terminology
 
 **contributor** - A person who makes a change to the code base and submits a change set in the form of a pull request.
@@ -23,7 +25,7 @@ In all cases politeness goes a long way. Please thank folks for contributions - 
 #### Initial PR Review
 
  * Has the user signed the Contributor License Agreement (CLA)?
- * Did the user create a branch with these changes? If it is on their master, please ask them to review the [contributing document](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md).
+ * Did the user create a branch with these changes? If it is on their master, please ask them to review [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md).
  * Did the user reformat files and they should not have? Was is just white-space? You can try adding [?w=1](https://github.com/blog/967-github-secrets) to the URL on GitHub.
  * Are there tests? We really want any new contributions to contain tests so unless the committer believes this code really needs to be in the code base and is willing to write the tests, then we need to ask the contributor to make a good faith effort in adding test cases. Ask them to review the [contributing document](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) and provide tests. **Note:** Some commits may be refactoring which wouldn't necessarily add additional test sets.
  * Is the code documented properly? Does this additional set of changes require changes to the [wiki](https://github.com/chocolatey/chocolatey/wiki)?

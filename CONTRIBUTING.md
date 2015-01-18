@@ -1,15 +1,16 @@
 Contributors
 ============
 
-Submitting an Issue? See the "Submitting Issues" section in the [README](https://github.com/chocolatey/choco/blob/master/README.md#submitting-issues)
+Submitting an Issue? See the [Submitting Issues](https://github.com/chocolatey/choco#submitting-issues) section in the [README](https://github.com/chocolatey/choco/blob/master/README.md#submitting-issues).
 
-**NOTE**: Do not submit issues for missing `SolutionVersion.cs`. Please see **Compiling / Building Source** in the README.md.
+**NOTE**: Do not submit issues for missing `SolutionVersion.cs`. Please see [Compiling / Building Source](https://github.com/chocolatey/choco#compiling--building-source).
 
 The process for contributions is roughly as follows:
 
 ## Prerequisites
 
- * Ensure you have signed the Contributor License Agreement (CLA) - without this we are not able to take contributions that are not trivial. (need link)
+ * Ensure you have signed the Contributor License Agreement (CLA) - without this we are not able to take contributions that are not trivial. (PATIENCE folks, this will go up soon)
+   * If you are curious why we would require a CLA, we agree with Julien Ponge - take a look at his [post](https://julien.ponge.org/blog/in-defense-of-contributor-license-agreements/).
 
 ## Contributing Process
 
@@ -105,7 +106,7 @@ The only reasons a pull request should be closed and resubmitted are as follows:
 
 ## Other General Information
 
-The helpers/utility functions that are available to the packages are what we consider the API. If you are working in the API, please note that you will need to maintain backwards compatibility. If you plan to rename a function or make it more generic, you must provide an alias in the [chocolateyInstaller.psm1](https://github.com/chocolatey/chocolatey/blob/master/src/helpers/chocolateyInstaller.psm1) as part of what gets exported. You should not remove or reorder parameters, only add optional parameters to the end. They should be named and not positional (we are moving away from positional parameters as much as possible).
+The helpers/utility functions that are available to the packages are what we consider the API. If you are working in the API, please note that you will need to maintain backwards compatibility. If you plan to rename a function or make it more generic, you must provide an alias in the [chocolateyInstaller.psm1](https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/chocolateyInstaller.psm1) as part of what gets exported. You should not remove or reorder parameters, only add optional parameters to the end. They should be named and not positional (we are moving away from positional parameters as much as possible).
 
 If you reformat code or hit core functionality without an approval from a person on the Chocolatey Team, it's likely that no matter how awesome it looks afterwards, it will probably not get accepted. Reformatting code makes it harder for us to evaluate exactly what was changed.
 
