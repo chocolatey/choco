@@ -25,8 +25,8 @@ namespace chocolatey.infrastructure.app.configuration
     [XmlType("feature")]
     public sealed class ConfigFileFeatureSetting
     {
-        [XmlAttribute(AttributeName = "id")]
-        public string Id { get; set; }
+        [XmlAttribute(AttributeName = "name")]
+        public string Name { get; set; }
 
         [XmlAttribute(AttributeName = "enabled")]
         public bool Enabled { get; set; }

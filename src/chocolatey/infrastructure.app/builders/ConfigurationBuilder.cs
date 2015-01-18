@@ -89,6 +89,11 @@ namespace chocolatey.infrastructure.app.builders
             }
             config.CommandExecutionTimeoutSeconds = configFileSettings.CommandExecutionTimeoutSeconds;
 
+            //refactor - as features grows, it will need it's own section.
+            config.Features.AutoUninstaller = false;
+            var feature = configFileSettings.Features.FirstOrDefault(f => f.Name.is_equal_to(ApplicationParameters.Features.AutoUnintaller));
+            if (feature != null && feature.Enabled) config.Features.AutoUninstaller = true;
+
             try
             {
                 xmlService.serialize(configFileSettings, globalConfigPath);

@@ -59,6 +59,11 @@ namespace chocolatey.infrastructure.app
             public static readonly string ShimGenExe = _fileSystem.combine_paths(InstallLocation, "tools", "shimgen.exe");
         }
 
+        public static class Features
+        {
+            public static readonly string AutoUnintaller = "autouninstaller";
+        }
+
         public static class Messages
         {
             public static readonly string ContinueChocolateyAction = "Moving forward with chocolatey actions.";

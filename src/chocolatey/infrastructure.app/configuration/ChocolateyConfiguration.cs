@@ -32,6 +32,7 @@ namespace chocolatey.infrastructure.app.configuration
             RegularOuptut = true;
             PromptForConfirmation = true;
             Information = new InformationCommandConfiguration();
+            Features = new FeaturesConfiguration();
             NewCommand = new NewCommandConfiguration();
             ListCommand = new ListCommandConfiguration();
             SourceCommand = new SourcesCommandConfiguration();
@@ -152,6 +153,11 @@ namespace chocolatey.infrastructure.app.configuration
         public InformationCommandConfiguration Information { get; private set; }
 
         /// <summary>
+        ///   Configuration related to features and whether they are enabled.
+        /// </summary>
+        public FeaturesConfiguration Features { get; private set; }
+
+        /// <summary>
         ///   Configuration related specifically to List command
         /// </summary>
         public ListCommandConfiguration ListCommand { get; private set; }
@@ -175,6 +181,7 @@ namespace chocolatey.infrastructure.app.configuration
         ///   Configuration related specifically to Push command
         /// </summary>
         public PushCommandConfiguration PushCommand { get; private set; }
+
     }
 
     public sealed class InformationCommandConfiguration
@@ -185,6 +192,11 @@ namespace chocolatey.infrastructure.app.configuration
         public string ChocolateyVersion { get; set; }
         public bool Is64Bit { get; set; }
         public bool IsInteractive { get; set; }
+    }
+
+    public sealed class FeaturesConfiguration
+    {
+        public bool AutoUninstaller { get; set; }
     }
 
     //todo: retrofit other command configs this way
