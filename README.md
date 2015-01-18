@@ -1,10 +1,17 @@
-Chocolatey (like yum or apt-get, but for Windows)
-=======
+# Chocolatey - like yum or apt-get, but for Windows
+You can just call me choco.
+
 ![Chocolatey Logo](https://github.com/chocolatey/chocolatey/raw/master/docs/logo/chocolateyicon.gif "Chocolatey")
 
 [![](http://img.shields.io/chocolatey/dt/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/chocolatey/v/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/gittip/Chocolatey.svg)](https://www.gittip.com/Chocolatey/)
 
 [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/jfxywa3xuwowt20w?svg=true)](https://ci.appveyor.com/project/ferventcoder/choco)
+
+## Information
+
+ * [Community Feed aka Chocolatey.org](https://chocolatey.org) (if this is down, try the backup at http://chocolatey.apphb.com )
+ * [Mailing List/Forum](http://groups.google.com/group/chocolatey)
+ * [Twitter](https://twitter.com/chocolateynuget)
 
 ## License / Credits
 Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICENSE) and [NOTICE](https://github.com/chocolatey/choco/blob/master/NOTICE) files.
