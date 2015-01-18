@@ -1,16 +1,29 @@
 version: 1.0.0.{build}
 clone_depth: 10
+init:
+- git config user.email "chocolatey@realdimensions.net"
+- git config user.name "Chocolatey yo"
 build_script:
 - build.bat
+test:
+  categories:
+    except:
+    - ignore
+    - Ignore
+    - NotWorking
+    - notworking
 artifacts:
 - path: build_output\build_artifacts\compile\msbuild-net-4.0-results.xml
   name: Compile.xml
 - path: code_drop\build_artifacts\ilmerge\ilmerge.log
   name: ILMerge.log
-- path: build_output\build_artifacts\nunit\nunit-results.xml
-  name: NUnitResults.xml
+- path: code_drop\build_artifacts\ilmerge\ilmergedll.log
+  name: ILMergeDLL.log
 - path: build_output\build_artifacts\nunit\index.html
   name: NUnitResults.html
-- path: build_output\build_artifacts\opencover\chocolatey.opencover.xml
 - path: build_output\build_artifacts\opencover\Html\index.htm
   name: OpenCoverResults.htm
+- path: build_output\_BuildInfo.xml
+  name: BuildInfo.xml
+- path: build_output\build.log
+  name: DetailedBuildLog.log
