@@ -112,7 +112,7 @@ namespace chocolatey.infrastructure.app.services
                 foreach (var key in machineInstalled.or_empty_list_if_null())
                 {
                     this.Log().Info("{0}|{1}".format_with(key.DisplayName, key.DisplayVersion));
-                    if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation, Environment.NewLine, key.UninstallString));
+                    if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation.escape_curly_braces(), Environment.NewLine, key.UninstallString.escape_curly_braces()));
                 }
                 this.Log().Warn(() => @"{0} applications not managed with Chocolatey.".format_with(machineInstalled.Count));
             }
