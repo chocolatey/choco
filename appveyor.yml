@@ -15,10 +15,6 @@ test:
 artifacts:
 - path: build_output\build_artifacts\compile\msbuild-net-4.0-results.xml
   name: Compile.xml
-- path: code_drop\build_artifacts\ilmerge\ilmerge.log
-  name: ILMerge.log
-- path: code_drop\build_artifacts\ilmerge\ilmergedll.log
-  name: ILMergeDLL.log
 - path: build_output\build_artifacts\nunit\index.html
   name: NUnitResults.html
 - path: build_output\build_artifacts\opencover\Html\index.htm
@@ -27,3 +23,8 @@ artifacts:
   name: BuildInfo.xml
 - path: build_output\build.log
   name: DetailedBuildLog.log
+- path: code_drop\build_artifacts\ilmerge\ilmerge.log
+  name: ILMerge.log
+- path: code_drop\build_artifacts\ilmerge\ilmergedll.log
+  name: ILMergeDLL.log
+- path: C:\codelocal\chocolatey2\code_drop\nuget\chocolatey.*.nupkg
