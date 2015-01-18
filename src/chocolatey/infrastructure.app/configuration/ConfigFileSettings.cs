@@ -42,7 +42,10 @@ namespace chocolatey.infrastructure.app.configuration
         public int CommandExecutionTimeoutSeconds { get; set; }
 
         [XmlArray("sources")]
-        public HashSet<ConfigFileSourceSetting> Sources { get; set; }
+        public HashSet<ConfigFileSourceSetting> Sources { get; set; }  
+        
+        [XmlArray("features")]
+        public HashSet<ConfigFileFeatureSetting> Features { get; set; }
 
         [XmlArray("apiKeys")]
         public HashSet<ConfigFileApiKeySetting> ApiKeys { get; set; }

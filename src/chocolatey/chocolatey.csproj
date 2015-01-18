@@ -86,6 +86,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateySourceCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUninstallCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommand.cs" />
+    <Compile Include="infrastructure.app\configuration\ConfigFileFeatureSetting.cs" />
     <Compile Include="infrastructure.app\domain\SourceCommandType.cs" />
     <Compile Include="infrastructure.app\messages\PostRunEvent.cs" />
     <Compile Include="infrastructure.app\nuget\NugetPush.cs" />
@@ -214,7 +215,9 @@
     <EmbeddedResource Include="infrastructure\logging\log4net.config.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="infrastructure.app\configuration\chocolatey.config" />
+    <EmbeddedResource Include="infrastructure.app\configuration\chocolatey.config">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="targets\Microsoft.Application.targets" />
   </ItemGroup>
