@@ -97,12 +97,48 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Install Command");
             this.Log().Info(@"
-Installs a package or a list of packages (sometimes passed as a packages.config).
+Installs a package or a list of packages (sometimes specified as a 
+ packages.config).
 
 Usage: choco install pkg|packages.config [pkg2 pkgN] [options/switches]
 
-NOTE: `all` is a special package keyword that will allow you to install all
- packages from a custom feed. Will not work with Chocolatey default feed.
+NOTE: `all` is a special package keyword that will allow you to install 
+ all packages from a custom feed. Will not work with Chocolatey default 
+ feed. THIS IS NOT YET REIMPLEMENTED.
+
+Examples:
+
+ choco install sysinternals
+ choco install notepadplusplus googlechrome atom 7zip 
+ choco install notepadplusplus --force --force-dependencies
+ choco install notepadplusplus googlechrome atom 7zip -dvfy
+ choco install git --params=""/GitAndUnixToolsOnPath /NoAutoCrlf"" -y
+ choco install nodejs.install --version 0.10.35
+
+Choco can also install directly from a nuspec/nupkg file. This aids in 
+ testing packages.
+
+ choco install path/to/nuspec
+ choco install path/to/nupkg
+
+Install multiple versions of a package using -m (AllowMultiple versions)
+
+Example:
+ 
+ choco install ruby --version 1.8.7.37402 -my
+ choco install ruby --version 1.9.3.55100 -my
+ choco install ruby --version 2.0.0.59800 -my
+ choco install ruby --version 2.1.5 -my
+
+NOTE: All of these will add to PATH variable. We'll be adding a special 
+ option to not allow PATH changes. Until then you will need to manually 
+ go modify Path to just one Ruby and then use something like uru or pik
+ to switch between versions.
+
+NOTE: Ruby 1.8.7 reached EOL (end of life) on 7/31/2014 and 1.9.3 will 
+ reach EOL on 2/23/2015. They are provided for example only and not 
+ recommended to be installed as they could pose security threats once 
+ they are past EOL.
 
 ");
         }

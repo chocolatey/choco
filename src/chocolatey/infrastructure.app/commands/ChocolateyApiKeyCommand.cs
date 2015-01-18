@@ -66,13 +66,14 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "ApiKey Command");
             this.Log().Info(@"
-This lists api keys that are set or sets an api key for a particular source so it doesn't need to be specified every time.
+This lists api keys that are set or sets an api key for a particular   
+ source so it doesn't need to be specified every time.
 
 Anything that doesn't contain source and key will list api keys.
 
 Usage: choco apikey [options/switches]
 
-Example:
+Examples:
 
  choco apikey
  choco apikey -s""https://somewhere/out/there""

@@ -67,7 +67,12 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "UnpackSelf Command");
             this.Log().Info(@"
-This command should only be used when installing Chocolatey, not during normal operation. This will unpack unconditionally overwriting files that may exist.
+This will unpack files needed by choco. It will overwrite existing 
+ files only if --force is specified.
+
+NOTE: This command should only be used when installing Chocolatey, not 
+ during normal operation. 
+
 ");
         }
 
@@ -78,7 +83,7 @@ This command should only be used when installing Chocolatey, not during normal o
 
         public void run(ChocolateyConfiguration configuration)
         {
-            this.Log().Info("{0} is setting itself up for use".format_with(ApplicationParameters.Name));
+            this.Log().Info("{0} is unpacking required files for use. Overwriting? {1}".format_with(ApplicationParameters.Name, configuration.Force));
             //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
             IList<string> folders = new List<string>
                 {

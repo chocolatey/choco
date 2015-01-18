@@ -76,6 +76,14 @@ Chocolatey will perform a search for a package local or remote.
 Usage: choco search filter [options/switches]
 Usage: choco list filter [options/switches]
 
+Examples:
+
+ choco list --local-only
+ choco list -lp
+ choco list -lap
+ choco search git
+ choco search git -s ""https://somewhere/out/there""
+
 ");
         }
 
