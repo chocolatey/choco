@@ -59,6 +59,13 @@ namespace chocolatey.infrastructure.app.commands
 Chocolatey will attempt to package a nuspec into a compiled nupkg.
 
 Usage: choco pack [path to nuspec] [options/switches]
+
+Examples:
+ 
+ choco pack
+ choco pack --version 1.2.3
+ choco pack path/to/nuspec
+
 ");
         }
 

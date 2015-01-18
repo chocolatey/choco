@@ -119,6 +119,12 @@ Possible properties to pass:
  Url64
  SilentArgs
 
+Examples:
+
+ choco new bob
+ choco new bob -a --version 1.2.0 maintainername=""This guy""
+ choco new bob SilentArgs=""/S"" Url=""https://somewhere/out/there.msi""
+
 ");
         }
 

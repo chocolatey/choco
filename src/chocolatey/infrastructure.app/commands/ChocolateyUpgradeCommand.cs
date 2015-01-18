@@ -92,14 +92,23 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Upgrade Command");
             this.Log().Info(@"
-Upgrades a package or a list of packages (sometimes passed in as a packages.config).
+Upgrades a package or a list of packages.
 
-Usage: choco upgrade pkg|packages.config [pkg2 pkgN] [options/switches]
+Usage: choco upgrade pkg [pkg2 pkgN] [options/switches]
 
-NOTE: `all` is a special package keyword that will allow you to upgrade all
- currently installed packages.
+NOTE: `all` is a special package keyword that will allow you to upgrade 
+ all currently installed packages.
 
-NOTE: If you do not have a package installed, upgrade will do nothing.
+NOTE: If you do not have a package installed, upgrade will error.
+
+Examples:
+
+ choco upgrade chocolatey
+ choco upgrade notepadplusplus googlechrome atom 7zip 
+ choco upgrade notepadplusplus googlechrome atom 7zip -dvfy
+ choco upgrade git --params=""/GitAndUnixToolsOnPath /NoAutoCrlf"" -y
+ choco upgrade nodejs.install --version 0.10.35
+
 ");
         }
 

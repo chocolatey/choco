@@ -84,12 +84,20 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Uninstall Command");
             this.Log().Info(@"
-Uninstalls a package or a list of packages (sometimes passed as a packages.config).
+Uninstalls a package or a list of packages.
 
-Usage: choco uninstall pkg|packages.config [pkg2 pkgN] [options/switches]
+Usage: choco uninstall pkg [pkg2 pkgN] [options/switches]
 
-NOTE: `all` is a special package keyword that will allow you to uninstall all
- packages.
+NOTE: `all` is a special package keyword that will allow you to 
+ uninstall all packages.
+
+Examples:
+
+ choco uninstall git
+ choco uninstall notepadplusplus googlechrome atom 7zip 
+ choco uninstall notepadplusplus googlechrome atom 7zip -dv
+ choco uninstall ruby --version 1.8.7.37402
+ choco uninstall nodejs.install --all-versions
 
 ");
         }
