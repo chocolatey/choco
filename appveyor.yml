@@ -3,6 +3,8 @@ clone_depth: 5
 init:
 - git config --global user.email "chocolatey@realdimensions.net"
 - git config --global user.name "Chocolatey yo"
+nuget:
+  disable_publish_on_pr: true
 build_script:
 - build.bat
 test:
