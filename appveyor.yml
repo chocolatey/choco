@@ -1,8 +1,8 @@
 version: 1.0.0.{build}
 clone_depth: 10
 init:
-- git config user.email "chocolatey@realdimensions.net"
-- git config user.name "Chocolatey yo"
+- git config --global user.email "chocolatey@realdimensions.net"
+- git config --global user.name "Chocolatey yo"
 build_script:
 - build.bat
 test:
