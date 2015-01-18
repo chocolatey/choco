@@ -38,6 +38,7 @@ namespace chocolatey.infrastructure.app.configuration
             SourceCommand = new SourcesCommandConfiguration();
             ApiKeyCommand = new ApiKeyCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
+            PinCommand = new PinCommandConfiguration();
         }
 
         // overrides
@@ -179,6 +180,10 @@ namespace chocolatey.infrastructure.app.configuration
         /// </summary>
         public PushCommandConfiguration PushCommand { get; private set; }
 
+        /// <summary>
+        /// Configuration related specifically to Pin command
+        /// </summary>
+        public PinCommandConfiguration PinCommand { get; private set; }
     }
 
     public sealed class InformationCommandConfiguration
@@ -225,6 +230,12 @@ namespace chocolatey.infrastructure.app.configuration
         public SourceCommandType Command { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+    }
+
+    public sealed class PinCommandConfiguration
+    {
+        public string Name { get; set; }
+        public PinCommandType Command { get; set; }
     }
 
     public sealed class ApiKeyCommandConfiguration

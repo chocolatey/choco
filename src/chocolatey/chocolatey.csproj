@@ -87,6 +87,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyUninstallCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommand.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileFeatureSetting.cs" />
+    <Compile Include="infrastructure.app\domain\PinCommandType.cs" />
     <Compile Include="infrastructure.app\domain\SourceCommandType.cs" />
     <Compile Include="infrastructure.app\messages\PostRunEvent.cs" />
     <Compile Include="infrastructure.app\nuget\NugetPush.cs" />
