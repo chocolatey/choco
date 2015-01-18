@@ -37,6 +37,7 @@ namespace chocolatey.infrastructure.app.services
     {
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _nugetLogger;
+        private readonly IChocolateyPackageInformationService _packageInfoService;
         private readonly Lazy<IDateTime> datetime_initializer = new Lazy<IDateTime>(() => new DateTime());
 
         private IDateTime DateTime
@@ -49,10 +50,12 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="fileSystem">The file system.</param>
         /// <param name="nugetLogger">The nuget logger</param>
-        public NugetService(IFileSystem fileSystem, ILogger nugetLogger)
+        /// <param name="packageInfoService">Package information service</param>
+        public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService)
         {
             _fileSystem = fileSystem;
             _nugetLogger = nugetLogger;
+            _packageInfoService = packageInfoService;
         }
 
         public void list_noop(ChocolateyConfiguration config)
@@ -345,6 +348,7 @@ spam/junk folder.");
                     //todo: get smarter about realizing multiple versions have been installed before and allowing that
 
                     IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+
                     if (installedPackage == null)
                     {
                         string logMessage = "{0} is not installed. Cannot upgrade a non-existent package.".format_with(packageName);
@@ -352,6 +356,16 @@ spam/junk folder.");
                         results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
                         if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                        continue;
+                    }
+
+                    var pkgInfo = _packageInfoService.get_package_information(installedPackage);
+                    if (pkgInfo != null && pkgInfo.IsPinned)
+                    {
+                        string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
+                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                        results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                        if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
 
