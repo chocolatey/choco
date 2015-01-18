@@ -2,6 +2,8 @@ Chocolatey (like yum or apt-get, but for Windows)
 =======
 ![Chocolatey Logo](https://github.com/chocolatey/chocolatey/raw/master/docs/logo/chocolateyicon.gif "Chocolatey")
 
+[![](http://img.shields.io/chocolatey/dt/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/chocolatey/v/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/gittip/Chocolatey.svg)](https://www.gittip.com/Chocolatey/)
+
 [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/jfxywa3xuwowt20w?svg=true)](https://ci.appveyor.com/project/ferventcoder/choco)
 
 ## License / Credits
