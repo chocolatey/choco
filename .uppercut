@@ -71,7 +71,7 @@
   <!-- These are run two folders down from the top level folder, so figure out the relative path from there and add "..\..\" -->
   <!-- In example, if from the top level directory, you have an item that is in lib\NCover\NCover.Console.exe you should add it here as ..\..\lib\NCover\NCover.Console.exe  -->
   <!-- To not use the tool, change to a location that doesn't exist -->
-  <property name="app.nunit.console" value="..${path.separator}..${path.separator}src${path.separator}packages${path.separator}NUnit.2.5.10.11092${path.separator}tools${path.separator}nunit-console.exe" overwrite="false" if="${platform::is-windows()}" />
+  <property name="app.nunit.console" value="..${path.separator}..${path.separator}src${path.separator}packages${path.separator}NUnit.Runners.2.6.4${path.separator}tools${path.separator}nunit-console.exe" overwrite="false" if="${platform::is-windows()}" />
   <property name="app.nunit.console" value="nunit-console" overwrite="false" if="${platform::is-unix()}"/>
   <property name="app.xunit.console" value="..${path.separator}..${path.separator}${folder.references}${path.separator}xUnit${path.separator}xunit.console.clr4.exe" overwrite="false" />
   <property name="app.storevil.console" value="..${path.separator}..${path.separator}${folder.references}${path.separator}StorEvil${path.separator}StorEvil.exe" overwrite="false" />
