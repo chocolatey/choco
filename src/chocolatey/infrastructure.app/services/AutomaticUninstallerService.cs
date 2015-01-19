@@ -65,9 +65,11 @@ namespace chocolatey.infrastructure.app.services
 
                 // split on " /" and " -" for quite a bit more accuracy
                 IList<string> uninstallArgs = key.UninstallString.to_string().Split(new[] {" /", " -"}, StringSplitOptions.RemoveEmptyEntries).ToList();
-                var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault().remove_surrounding_quotes();
-                this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
+                var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault();
                 uninstallArgs.Remove(uninstallExe);
+                uninstallExe = uninstallExe.remove_surrounding_quotes();
+                this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
+
 
                 if (!key.HasQuietUninstall)
                 {
