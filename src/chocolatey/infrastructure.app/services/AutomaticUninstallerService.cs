@@ -20,22 +20,25 @@ namespace chocolatey.infrastructure.app.services
     using System.Linq;
     using configuration;
     using domain;
+    using filesystem;
     using infrastructure.commands;
     using results;
 
     public class AutomaticUninstallerService : IAutomaticUninstallerService
     {
         private readonly IChocolateyPackageInformationService _packageInfoService;
+        private readonly IFileSystem _fileSystem;
+        private readonly IRegistryService _registryService;
 
-        public AutomaticUninstallerService(IChocolateyPackageInformationService packageInfoService)
+        public AutomaticUninstallerService(IChocolateyPackageInformationService packageInfoService, IFileSystem fileSystem, IRegistryService registryService)
         {
             _packageInfoService = packageInfoService;
+            _fileSystem = fileSystem;
+            _registryService = registryService;
         }
 
         public void run(PackageResult packageResult, ChocolateyConfiguration config)
         {
-            //todo run autouninstaller every time - to do this you must determine if the install path still exists.
-
             if (!config.Features.AutoUninstaller)
             {
                 this.Log().Info(() => "Skipping auto uninstaller due to feature not being enabled.");
@@ -51,6 +54,15 @@ namespace chocolatey.infrastructure.app.services
             foreach (var key in pkgInfo.RegistrySnapshot.RegistryKeys.or_empty_list_if_null())
             {
                 this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString));
+
+                if (!_fileSystem.directory_exists(key.InstallLocation) || !_registryService.value_exists(key.KeyPath,"InstallLocation"))
+                {
+                    this.Log().Info(()=> "Skipping auto uninstall. The application appears to have been uninstalled already by other means.");
+                    this.Log().Debug(() => "Searched for install path '{0}' - found? {1}".format_with(key.InstallLocation.escape_curly_braces(), _fileSystem.directory_exists(key.InstallLocation)));
+                    this.Log().Debug(() => "Searched for registry key '{0}' value 'InstallLocation' - found? {1}".format_with(key.KeyPath.escape_curly_braces(), _registryService.value_exists(key.KeyPath, "InstallLocation")));
+                    continue;
+                }
+
                 // split on " /" and " -" for quite a bit more accuracy
                 IList<string> uninstallArgs = key.UninstallString.to_string().Split(new[] {" /", " -"}, StringSplitOptions.RemoveEmptyEntries).ToList();
                 var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault().remove_surrounding_quotes();
