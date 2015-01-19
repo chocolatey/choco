@@ -94,9 +94,6 @@ namespace chocolatey.infrastructure.app.configuration
         public string CommandName { get; set; }
 
         // configuration set variables
-
-        public bool CheckSumFiles { get; set; }
-        public bool VirusCheckFiles { get; set; }
         public string CacheLocation { get; set; }
         public bool ContainsLegacyPackageInstalls { get; set; }
         public int CommandExecutionTimeoutSeconds { get; set; }
@@ -197,6 +194,8 @@ namespace chocolatey.infrastructure.app.configuration
     public sealed class FeaturesConfiguration
     {
         public bool AutoUninstaller { get; set; }
+        public bool CheckSumFiles { get; set; }
+        public bool VirusCheckFiles { get; set; }
     }
 
     //todo: retrofit other command configs this way

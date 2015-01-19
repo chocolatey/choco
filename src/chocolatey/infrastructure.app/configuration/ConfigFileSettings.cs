@@ -26,12 +26,6 @@ namespace chocolatey.infrastructure.app.configuration
     [XmlRoot("chocolatey")]
     public class ConfigFileSettings
     {
-        [XmlElement(ElementName = "checksumFiles")]
-        public bool ChecksumFiles { get; set; }
-
-        [XmlElement(ElementName = "virusCheckFiles")]
-        public bool VirusCheckFiles { get; set; }
-
         [XmlElement(ElementName = "cacheLocation")]
         public string CacheLocation { get; set; }
 
