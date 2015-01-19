@@ -26,6 +26,7 @@ namespace chocolatey.infrastructure.app.services
     public class ShimGenerationService : IShimGenerationService
     {
         private readonly IFileSystem _fileSystem;
+        private readonly ICommandExecutor _commandExecutor;
         private const string PATH_TOKEN = "{{path}}";
         private const string ICON_PATH_TOKEN = "{{icon_path}}";
         private const string OUTPUT_TOKEN = "{{output}}";
@@ -33,9 +34,10 @@ namespace chocolatey.infrastructure.app.services
         private readonly IDictionary<string, ExternalCommandArgument> _shimGenArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
 
-        public ShimGenerationService(IFileSystem fileSystem)
+        public ShimGenerationService(IFileSystem fileSystem,ICommandExecutor commandExecutor)
         {
             _fileSystem = fileSystem;
+            _commandExecutor = commandExecutor;
             set_shimgen_args_dictionary();
         }
 
@@ -92,7 +94,7 @@ namespace chocolatey.infrastructure.app.services
                     argsForPackage += " --gui";
                 }
 
-                var exitCode = CommandExecutor.execute(
+                var exitCode = _commandExecutor.execute(
                     _shimGenExePath, argsForPackage, configuration.CommandExecutionTimeoutSeconds,
                     (s, e) =>
                         {

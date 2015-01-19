@@ -66,7 +66,6 @@ namespace chocolatey.tests
         public void TearDown()
         {
             AfterObservations();
-            MockLogger = new MockLogger();
         }
 
         public virtual void AfterObservations()

@@ -148,6 +148,7 @@
     <Compile Include="infrastructure\adapters\IProcess.cs" />
     <Compile Include="infrastructure\adapters\Process.cs" />
     <Compile Include="infrastructure\commandline\InteractivePrompt.cs" />
+    <Compile Include="infrastructure\commands\ICommandExecutor.cs" />
     <Compile Include="infrastructure\commands\PowershellExecutor.cs" />
     <Compile Include="infrastructure\guards\Ensure.cs" />
     <Compile Include="infrastructure\logging\ChocolateyLoggers.cs" />

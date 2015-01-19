@@ -31,13 +31,15 @@ namespace chocolatey.infrastructure.app.services
     //todo this is the old nuget.exe installer code that needs cleaned up for webpi
     public class WebPiService : IWebPiService
     {
+        private readonly ICommandExecutor _commandExecutor;
         private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
         private readonly string _webPiExePath = "webpicmd"; //ApplicationParameters.Tools.NugetExe;
         private readonly IDictionary<string, ExternalCommandArgument> _webPiListArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
         private readonly IDictionary<string, ExternalCommandArgument> _webPiInstallArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
-        public WebPiService()
+        public WebPiService(ICommandExecutor commandExecutor)
         {
+            _commandExecutor = commandExecutor;
             set_cmd_args_dictionaries();
         }
 
@@ -80,7 +82,7 @@ namespace chocolatey.infrastructure.app.services
             foreach (var packageToInstall in configuration.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
             {
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
-                var exitCode = CommandExecutor.execute(
+                var exitCode = _commandExecutor.execute(
                     _webPiExePath, argsForPackage, configuration.CommandExecutionTimeoutSeconds,
                     (s, e) =>
                         {

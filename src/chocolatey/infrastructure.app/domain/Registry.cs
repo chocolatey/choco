@@ -43,7 +43,14 @@ namespace chocolatey.infrastructure.app.domain
         public Registry(string user, IEnumerable<RegistryApplicationKey> keys)
         {
             User = user;
-            RegistryKeys = keys.ToList();
+            if (keys != null)
+            {
+                RegistryKeys = keys.ToList();
+            }
+            else
+            {
+                RegistryKeys = new List<RegistryApplicationKey>();
+            }
         }
 
         [XmlElement(ElementName = "user")]

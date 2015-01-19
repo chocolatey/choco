@@ -29,37 +29,50 @@ namespace chocolatey.infrastructure.app.services
         private readonly IChocolateyPackageInformationService _packageInfoService;
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
+        private readonly ICommandExecutor _commandExecutor;
 
-        public AutomaticUninstallerService(IChocolateyPackageInformationService packageInfoService, IFileSystem fileSystem, IRegistryService registryService)
+        public AutomaticUninstallerService(IChocolateyPackageInformationService packageInfoService, IFileSystem fileSystem, IRegistryService registryService, ICommandExecutor commandExecutor)
         {
             _packageInfoService = packageInfoService;
             _fileSystem = fileSystem;
             _registryService = registryService;
+            _commandExecutor = commandExecutor;
         }
 
         public void run(PackageResult packageResult, ChocolateyConfiguration config)
         {
             if (!config.Features.AutoUninstaller)
             {
-                this.Log().Info(() => "Skipping auto uninstaller due to feature not being enabled.");
+                this.Log().Info(" Skipping auto uninstaller - AutoUninstaller feature is not enabled.");
                 return;
             }
 
             var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
 
-            if (pkgInfo.RegistrySnapshot == null) return;
+            if (pkgInfo.RegistrySnapshot == null)
+            {
+                this.Log().Info(" Skipping auto uninstaller - No registry snapshot.");
+                return;
+            }
 
-            this.Log().Info(" Running AutoUninstaller...");
+            var registryKeys = pkgInfo.RegistrySnapshot.RegistryKeys;
+            if (registryKeys == null || registryKeys.Count == 0)
+            {
+                this.Log().Info(" Skipping auto uninstaller - No registry keys in snapshot.");
+                return;
+            }
 
-            foreach (var key in pkgInfo.RegistrySnapshot.RegistryKeys.or_empty_list_if_null())
+            this.Log().Info(" Running auto uninstaller...");
+
+            foreach (var key in registryKeys.or_empty_list_if_null())
             {
                 this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString));
 
-                if (!_fileSystem.directory_exists(key.InstallLocation) || !_registryService.value_exists(key.KeyPath,"InstallLocation"))
+                if (!_fileSystem.directory_exists(key.InstallLocation) || !_registryService.value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation))
                 {
-                    this.Log().Info(()=> "Skipping auto uninstall. The application appears to have been uninstalled already by other means.");
-                    this.Log().Debug(() => "Searched for install path '{0}' - found? {1}".format_with(key.InstallLocation.escape_curly_braces(), _fileSystem.directory_exists(key.InstallLocation)));
-                    this.Log().Debug(() => "Searched for registry key '{0}' value 'InstallLocation' - found? {1}".format_with(key.KeyPath.escape_curly_braces(), _registryService.value_exists(key.KeyPath, "InstallLocation")));
+                    this.Log().Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means.");
+                    this.Log().Debug(() => " Searched for install path '{0}' - found? {1}".format_with(key.InstallLocation.escape_curly_braces(), _fileSystem.directory_exists(key.InstallLocation)));
+                    this.Log().Debug(() => " Searched for registry key '{0}' value '{1}' - found? {2}".format_with(key.KeyPath.escape_curly_braces(), ApplicationParameters.RegistryValueInstallLocation, _registryService.value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation)));
                     continue;
                 }
 
@@ -70,12 +83,11 @@ namespace chocolatey.infrastructure.app.services
                 uninstallExe = uninstallExe.remove_surrounding_quotes();
                 this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
 
-
+                //todo: ultimately we should merge keys with logging
                 if (!key.HasQuietUninstall)
                 {
                     IInstaller installer = new CustomInstaller();
 
-                    //refactor this to elsewhere
                     switch (key.InstallerType)
                     {
                         case InstallerType.Msi:
@@ -102,16 +114,18 @@ namespace chocolatey.infrastructure.app.services
 
                 this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs.@join(" ")));
 
-                var exitCode = CommandExecutor.execute(
-                    uninstallExe, uninstallArgs.@join(" "), config.CommandExecutionTimeoutSeconds,
+                var exitCode = _commandExecutor.execute(
+                    uninstallExe, 
+                    uninstallArgs.@join(" "), 
+                    config.CommandExecutionTimeoutSeconds,
                     (s, e) =>
                         {
-                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
                             this.Log().Debug(() => " [AutoUninstaller] {0}".format_with(e.Data));
                         },
                     (s, e) =>
                         {
-                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
                             this.Log().Error(() => " [AutoUninstaller] {0}".format_with(e.Data));
                         });
 
@@ -124,7 +138,7 @@ namespace chocolatey.infrastructure.app.services
                 }
                 else
                 {
-                    this.Log().Info(() => " AutoUninstaller has successfully uninstalled {0} from your machine.".format_with(packageResult.Package.Id));
+                    this.Log().Info(() => " Auto uninstaller has successfully uninstalled {0} from your machine.".format_with(packageResult.Package.Id));
                 }
             }
         }

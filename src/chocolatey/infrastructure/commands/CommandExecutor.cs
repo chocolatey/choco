@@ -24,8 +24,13 @@ namespace chocolatey.infrastructure.commands
     using platforms;
     using Process = adapters.Process;
 
-    public sealed class CommandExecutor
+    public sealed class CommandExecutor : ICommandExecutor
     {
+        public CommandExecutor(IFileSystem fileSystem)
+        {
+            file_system_initializer = new Lazy<IFileSystem>(() => fileSystem);
+        }
+
         private static Lazy<IFileSystem> file_system_initializer = new Lazy<IFileSystem>(() => new DotNetFileSystem());
 
         private static IFileSystem file_system
@@ -42,12 +47,12 @@ namespace chocolatey.infrastructure.commands
             initialize_process = process_initializer;
         }
 
-        public static int execute(string process, string arguments, int waitForExitInSeconds)
+        public int execute(string process, string arguments, int waitForExitInSeconds)
         {
             return execute(process, arguments, waitForExitInSeconds, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
         }
 
-        public static int execute(
+        public int execute(
             string process,
             string arguments,
             int waitForExitInSeconds,
@@ -65,7 +70,7 @@ namespace chocolatey.infrastructure.commands
                 );
         }
 
-        public static int execute(string process, string arguments, int waitForExitInSeconds, string workingDirectory)
+        public int execute(string process, string arguments, int waitForExitInSeconds, string workingDirectory)
         {
             return execute(process, arguments, waitForExitInSeconds, workingDirectory, null, null, updateProcessPath: true);
         }
@@ -143,12 +148,12 @@ namespace chocolatey.infrastructure.commands
 
         private static void log_output(object sender, DataReceivedEventArgs e)
         {
-            "chocolatey".Log().Info(e.Data);
+            if (e != null) "chocolatey".Log().Info(e.Data);
         }
 
         private static void log_error(object sender, DataReceivedEventArgs e)
         {
-            "chocolatey".Log().Error(e.Data);
+            if (e != null) "chocolatey".Log().Error(e.Data);
         }
     }
 }
