@@ -27,12 +27,12 @@ namespace chocolatey.tests.infrastructure.commands
     {
         public abstract class CommandExecutorSpecsBase : TinySpec
         {
-            protected Mock<IFileSystem> file_system = new Mock<IFileSystem>();
+            protected Mock<IFileSystem> fileSystem = new Mock<IFileSystem>();
             protected Mock<IProcess> process = new Mock<IProcess>();
 
             public override void Context()
             {
-                CommandExecutor.initialize_with(new Lazy<IFileSystem>(() => file_system.Object), () => process.Object);
+                CommandExecutor.initialize_with(new Lazy<IFileSystem>(() => fileSystem.Object), () => process.Object);
             }
         }
 
