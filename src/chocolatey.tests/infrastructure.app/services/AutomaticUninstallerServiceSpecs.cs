@@ -32,6 +32,8 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.results;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
+    //todo: come back and fix the logging tests - determine why it gets cycled out during test suite runs.
+
     public class AutomaticUninstallerServiceSpecs
     {
         public abstract class AutomaticUninstallerServiceSpecsBase : TinySpec
