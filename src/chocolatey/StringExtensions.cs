@@ -31,6 +31,8 @@ namespace chocolatey
         /// <returns>A formatted string.</returns>
         public static string format_with(this string input, params object[] formatting)
         {
+           if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+
             return string.Format(input, formatting);
         }
 
