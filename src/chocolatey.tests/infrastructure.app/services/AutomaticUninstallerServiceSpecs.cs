@@ -268,14 +268,100 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }    
         
-        public class when_AutomaticUninstallerService_is_run : AutomaticUninstallerServiceSpecsBase
+        public class when_AutomaticUninstallerService_defines_uninstall_switches : AutomaticUninstallerServiceSpecsBase
         {
             private Action because;
+            private readonly string registryUninstallArgs = "bob";
 
             public override void Because()
             {
                 because = () => service.run(packageResult, config);
             }
+
+            public void reset()
+            {
+                Context();
+            }
+
+            private void test_installertype(IInstaller installer,bool useInstallerDefaultArgs)
+            {
+                reset();
+                registryKeys.Add(new RegistryApplicationKey
+                {
+                    InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                    UninstallString =  "{0} {1}".format_with(originalUninstallString,registryUninstallArgs),
+                    HasQuietUninstall = false,
+                    KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                    InstallerType = installer.InstallerType,
+                });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                
+                because();
+
+                var uninstallArgs = useInstallerDefaultArgs ? installer.build_uninstall_command_arguments().trim_safe() : registryUninstallArgs.trim_safe();
+
+                commandExecutor.Verify(c => c.execute(expectedUninstallString, uninstallArgs, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>()), Times.Never);
+            }
+
+            [Fact]
+            public void should_use_CustomInstaller_uninstall_args_when_installtype_is_unknown_and_has_quiet_uninstall_is_false()
+            {
+                test_installertype(new CustomInstaller(), useInstallerDefaultArgs: true);
+            }  
+            
+            [Fact]
+            public void should_use_registry_uninstall_args_when_installtype_is_unknown_and_has_quiet_uninstall_is_true()
+            {
+                test_installertype(new CustomInstaller(), useInstallerDefaultArgs: false);
+            }  
+            
+            [Fact]
+            public void should_use_MsiInstaller_uninstall_args_when_installtype_is_msi_and_has_quiet_uninstall_is_false()
+            {
+                test_installertype(new MsiInstaller(), useInstallerDefaultArgs: true);
+            }  
+            
+            [Fact]
+            public void should_use_registry_uninstall_args_when_installtype_is_msi_and_has_quiet_uninstall_is_true()
+            {
+                test_installertype(new MsiInstaller(), useInstallerDefaultArgs: false);
+            } 
+             
+            [Fact]
+            public void should_use_InnoSetupInstaller_uninstall_args_when_installtype_is_innosetup_and_has_quiet_uninstall_is_false()
+            {
+                test_installertype(new InnoSetupInstaller(), useInstallerDefaultArgs: true);
+            }  
+            
+            [Fact]
+            public void should_use_registry_uninstall_args_when_installtype_is_innosetup_and_has_quiet_uninstall_is_true()
+            {
+                test_installertype(new InnoSetupInstaller(), useInstallerDefaultArgs: false);
+            }   
+            
+            [Fact]
+            public void should_use_InstallShieldInstaller_uninstall_args_when_installtype_is_installshield_and_has_quiet_uninstall_is_false()
+            {
+                test_installertype(new InstallShieldInstaller(), useInstallerDefaultArgs: true);
+            }  
+            
+            [Fact]
+            public void should_use_registry_uninstall_args_when_installtype_is_installshield_and_has_quiet_uninstall_is_true()
+            {
+                test_installertype(new InstallShieldInstaller(), useInstallerDefaultArgs: false);
+            }  
+            
+            [Fact]
+            public void should_use_NsisInstaller_uninstall_args_when_installtype_is_nsis_and_has_quiet_uninstall_is_false()
+            {
+                test_installertype(new NsisInstaller(), useInstallerDefaultArgs: true);
+            }  
+            
+            [Fact]
+            public void should_use_registry_uninstall_args_when_installtype_is_nsis_and_has_quiet_uninstall_is_true()
+            {
+                test_installertype(new NsisInstaller(), useInstallerDefaultArgs: false);
+            }  
         }
     }
 }
