@@ -32,6 +32,10 @@ namespace chocolatey.tests
 
     public class MockLogger : Mock<ILog>, ILog, ILog<MockLogger>
     {
+        public MockLogger()
+        {
+        }
+
         private readonly Lazy<ConcurrentDictionary<string, IList<string>>> _messages = new Lazy<ConcurrentDictionary<string, IList<string>>>();
 
         public ConcurrentDictionary<string, IList<string>> Messages
@@ -57,61 +61,61 @@ namespace chocolatey.tests
         public void Debug(string message, params object[] formatting)
         {
             LogMessage(LogLevel.Debug, message.format_with(formatting));
-            Object.Debug(message, formatting);
+            Object.Debug(message.format_with(formatting));
         }
 
         public void Debug(Func<string> message)
         {
             LogMessage(LogLevel.Debug, message());
-            Object.Debug(message);
+            Object.Debug(message());
         }
 
         public void Info(string message, params object[] formatting)
         {
             LogMessage(LogLevel.Info, message.format_with(formatting));
-            Object.Info(message, formatting);
+            Object.Info(message.format_with(formatting));
         }
 
         public void Info(Func<string> message)
         {
             LogMessage(LogLevel.Info, message());
-            Object.Info(message);
+            Object.Info(message());
         }
 
         public void Warn(string message, params object[] formatting)
         {
             LogMessage(LogLevel.Warn, message.format_with(formatting));
-            Object.Warn(message, formatting);
+            Object.Warn(message.format_with(formatting));
         }
 
         public void Warn(Func<string> message)
         {
             LogMessage(LogLevel.Warn, message());
-            Object.Warn(message);
+            Object.Warn(message());
         }
 
         public void Error(string message, params object[] formatting)
         {
             LogMessage(LogLevel.Error, message.format_with(formatting));
-            Object.Error(message, formatting);
+            Object.Error(message.format_with(formatting));
         }
 
         public void Error(Func<string> message)
         {
             LogMessage(LogLevel.Error, message());
-            Object.Error(message);
+            Object.Error(message());
         }
 
         public void Fatal(string message, params object[] formatting)
         {
             LogMessage(LogLevel.Fatal, message.format_with(formatting));
-            Object.Fatal(message, formatting);
+            Object.Fatal(message.format_with(formatting));
         }
 
         public void Fatal(Func<string> message)
         {
             LogMessage(LogLevel.Fatal, message());
-            Object.Fatal(message);
+            Object.Fatal(message());
         }
     }
 }

@@ -27,13 +27,18 @@ namespace chocolatey.tests
     [TestFixture]
     public abstract class TinySpec
     {
-        public MockLogger MockLogger { get; set; }
+        private MockLogger _mockLogger;
+
+        public MockLogger MockLogger
+        {
+            get { return _mockLogger; }
+        }
 
         [TestFixtureSetUp]
         public void Setup()
         {
-            MockLogger = new MockLogger();
-            Log.InitializeWith(MockLogger);
+            _mockLogger = new MockLogger();
+            Log.InitializeWith(_mockLogger);
             Context();
             Because();
         }
@@ -65,7 +70,10 @@ namespace chocolatey.tests
         [TestFixtureTearDown]
         public void TearDown()
         {
+
             AfterObservations();
+            _mockLogger = null;
+            Log.InitializeWith(new NullLog());
         }
 
         public virtual void AfterObservations()
