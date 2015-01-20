@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.app.domain
             // http://msdn.microsoft.com/en-us/library/aa372064.aspx
             CustomInstallLocation = "TARGETDIR=\"{0}\"".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
             // http://msdn.microsoft.com/en-us/library/aa370856.aspx
-            Language = "ProductLanguage={LANGUAGE}".format_with(InstallTokens.LANGUAGE);
+            Language = "ProductLanguage={0}".format_with(InstallTokens.LANGUAGE);
             // http://msdn.microsoft.com/en-us/library/aa367559.aspx
             OtherInstallOptions = "ALLUSERS=1 DISABLEDESKTOPSHORTCUT=1 ADDDESKTOPICON=0 ADDSTARTMENU=0";
             UninstallExecutable = "msiexec.exe";
@@ -48,6 +48,11 @@ namespace chocolatey.infrastructure.app.domain
             SilentUninstall = "/qn";
             OtherUninstallOptions = "";
             ValidExitCodes = new List<int> {0, 3010};
+        }
+
+        public InstallerType InstallerType
+        {
+            get { return InstallerType.Msi; }
         }
 
         public string InstallExecutable { get; private set; }
