@@ -104,6 +104,25 @@ namespace chocolatey.tests
         }
     }
 
+    public class NotWorkingAttribute : CategoryAttribute
+    {
+        public string Reason { get; set; }
+
+        public NotWorkingAttribute(string reason)
+            : base("NotWorking")
+        {
+            Reason = reason;
+        }
+    }   
+    
+    public class PendingAttribute : IgnoreAttribute
+    {
+        public PendingAttribute(string reason)
+            : base("Pending test - {0}".format_with(reason))
+        {
+        }
+    }
+
     public class IntegrationAttribute : CategoryAttribute
     {
         public IntegrationAttribute()
