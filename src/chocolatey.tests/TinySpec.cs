@@ -24,21 +24,35 @@ namespace chocolatey.tests
 
     // ReSharper disable InconsistentNaming
 
+    [SetUpFixture]
+    public class NUnitSetup
+    {
+        public static MockLogger MockLogger { get; set; }
+
+        [SetUp]
+        public void BeforeEverything()
+        {
+            MockLogger = new MockLogger();
+            Log.InitializeWith(MockLogger);
+        }
+
+        [TearDown]
+        public void AfterEverything() { }
+    }
+
     [TestFixture]
     public abstract class TinySpec
     {
-        private MockLogger _mockLogger;
-
         public MockLogger MockLogger
         {
-            get { return _mockLogger; }
+            get { return NUnitSetup.MockLogger; }
         }
 
         [TestFixtureSetUp]
         public void Setup()
         {
-            _mockLogger = new MockLogger();
-            Log.InitializeWith(_mockLogger);
+            if (MockLogger != null) MockLogger.reset();
+            //Log.InitializeWith(MockLogger);
             Context();
             Because();
         }
@@ -70,10 +84,7 @@ namespace chocolatey.tests
         [TestFixtureTearDown]
         public void TearDown()
         {
-
             AfterObservations();
-            _mockLogger = null;
-            Log.InitializeWith(new NullLog());
         }
 
         public virtual void AfterObservations()
