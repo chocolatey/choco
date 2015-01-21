@@ -1,5 +1,7 @@
 language: csharp
 install:
   - sudo apt-get install mono-devel mono-gmcs nunit-console
+before_script:
+  - chmod +x build.sh
 script:
-  - sudo ./build.sh
+  - ./build.sh
