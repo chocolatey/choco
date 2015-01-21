@@ -47,6 +47,7 @@ namespace chocolatey.infrastructure.app
         public static string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
         public static readonly string UserAgent = "Chocolatey Command Line";
+        public static readonly string RegistryValueInstallLocation = "InstallLocation";
 
         /// <summary>
         ///   Default is 45 minutes
@@ -57,6 +58,13 @@ namespace chocolatey.infrastructure.app
         {
             //public static readonly string WebPiCmdExe = _fileSystem.combine_paths(InstallLocation, "nuget.exe");
             public static readonly string ShimGenExe = _fileSystem.combine_paths(InstallLocation, "tools", "shimgen.exe");
+        }
+
+        public static class Features
+        {
+            public static readonly string CheckSumFiles = "checksumFiles";
+            public static readonly string VirusCheckFiles = "virusCheckFiles";
+            public static readonly string AutoUninstaller = "autoUninstaller";
         }
 
         public static class Messages

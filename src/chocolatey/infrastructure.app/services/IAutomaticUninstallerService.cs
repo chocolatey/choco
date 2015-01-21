@@ -15,14 +15,19 @@
 
 namespace chocolatey.infrastructure.app.services
 {
-    using domain;
+    using configuration;
+    using results;
 
-    public interface IRegistryService
+    /// <summary>
+    /// The automagic uninstaller service
+    /// </summary>
+    public interface IAutomaticUninstallerService
     {
-        Registry get_installer_keys();
-        Registry get_differences(Registry before, Registry after);
-        void save_to_file(Registry snapshot, string filePath);
-        Registry read_from_file(string filePath);
-        bool value_exists(string keyPath, string value);
+        /// <summary>
+        /// Runs to remove a application from the registry.
+        /// </summary>
+        /// <param name="packageResult">The package result.</param>
+        /// <param name="config">The configuration.</param>
+        void run(PackageResult packageResult, ChocolateyConfiguration config);
     }
 }

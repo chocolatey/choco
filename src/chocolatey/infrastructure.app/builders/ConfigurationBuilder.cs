@@ -79,8 +79,6 @@ namespace chocolatey.infrastructure.app.builders
                 config.Sources = sources.Remove(sources.Length - 1, 1).ToString();
             }
 
-            config.CheckSumFiles = configFileSettings.ChecksumFiles;
-            config.VirusCheckFiles = configFileSettings.VirusCheckFiles;
             config.CacheLocation = configFileSettings.CacheLocation;
             config.ContainsLegacyPackageInstalls = configFileSettings.ContainsLegacyPackageInstalls;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
@@ -89,14 +87,32 @@ namespace chocolatey.infrastructure.app.builders
             }
             config.CommandExecutionTimeoutSeconds = configFileSettings.CommandExecutionTimeoutSeconds;
 
+            set_feature_flags(config, configFileSettings);
+
             try
             {
+                // save so all updated configuration items get set to existing config
                 xmlService.serialize(configFileSettings, globalConfigPath);
             }
             catch (Exception ex)
             {
                 "chocolatey".Log().Warn(() => "Error updating '{0}'. Please ensure you have permissions to do so.{1} {2}".format_with(globalConfigPath, Environment.NewLine, ex.Message));
             }
+        }
+
+        private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
+        {
+            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, config, configFileSettings);
+            config.Features.VirusCheckFiles = set_feature_flag(ApplicationParameters.Features.VirusCheckFiles, config, configFileSettings);
+            config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, config, configFileSettings);
+        }
+
+        private static bool set_feature_flag(string featureName, ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
+        {
+            var feature = configFileSettings.Features.FirstOrDefault(f => f.Name.is_equal_to(featureName));
+            if (feature != null && feature.Enabled) return true;
+
+            return false;
         }
 
         private static void set_global_options(IList<string> args, ChocolateyConfiguration config)

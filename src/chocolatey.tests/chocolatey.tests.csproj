@@ -32,11 +32,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
+    </Reference>
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.2.1402.2112\lib\net40\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.5.10.11092, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.2.5.10.11092\lib\nunit.framework.dll</HintPath>
+    <Reference Include="NuGet.Core, Version=2.8.50506.491, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\NuGet.Core.2.8.2\lib\net40-Client\NuGet.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Should, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Should.1.1.12.0\lib\Should.dll</HintPath>
@@ -62,6 +69,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyUnpackSelfCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommandSpecs.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigurationOptionsSpec.cs" />
+    <Compile Include="infrastructure.app\services\AutomaticUninstallerServiceSpecs.cs" />
     <Compile Include="infrastructure\commands\ExternalCommandArgsBuilderSpecs.cs" />
     <Compile Include="infrastructure\commandline\InteractivePromptSpecs.cs" />
     <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />

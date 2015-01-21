@@ -25,8 +25,13 @@ namespace chocolatey.tests.integration.infrastructure.commands
     {
         public abstract class CommandExecutorSpecsBase : TinySpec
         {
+            protected readonly IFileSystem fileSystem = new DotNetFileSystem();
+            protected CommandExecutor commandExecutor;
+
             public override void Context()
             {
+                commandExecutor = new CommandExecutor(fileSystem);
+          
             }
         }
 
@@ -34,7 +39,6 @@ namespace chocolatey.tests.integration.infrastructure.commands
         {
             private int result;
             private string errorOutput;
-            private readonly IFileSystem file_system = new DotNetFileSystem();
 
             public override void Context()
             {
@@ -43,7 +47,7 @@ namespace chocolatey.tests.integration.infrastructure.commands
 
             public override void Because()
             {
-                result = CommandExecutor.execute("cmd.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, file_system.get_current_directory(), null, (s, e) => { errorOutput += e.Data; }, updateProcessPath: false);
+                result = CommandExecutor.execute("cmd.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, fileSystem.get_current_directory(), null, (s, e) => { errorOutput += e.Data; }, updateProcessPath: false);
             }
 
             [Fact]
@@ -74,7 +78,7 @@ namespace chocolatey.tests.integration.infrastructure.commands
             {
                 try
                 {
-                    CommandExecutor.execute("noprocess.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, null, (s, e) => { errorOutput += e.Data; });
+                    commandExecutor.execute("noprocess.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, null, (s, e) => { errorOutput += e.Data; });
                 }
                 catch (Exception e)
                 {

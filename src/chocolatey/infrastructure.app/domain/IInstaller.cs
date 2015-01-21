@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.domain
 
     public interface IInstaller
     {
+        InstallerType InstallerType { get; }
         string InstallExecutable { get; }
         string SilentInstall { get; }
         string NoReboot { get; }

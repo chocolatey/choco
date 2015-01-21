@@ -41,6 +41,11 @@ namespace chocolatey.infrastructure.app.domain
             ValidExitCodes = new List<int> {0};
         }
 
+        public InstallerType InstallerType
+        {
+            get { return InstallerType.InstallShield; }
+        }
+
         public string InstallExecutable { get; private set; }
         public string SilentInstall { get; private set; }
         public string NoReboot { get; private set; }

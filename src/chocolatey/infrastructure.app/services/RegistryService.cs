@@ -202,6 +202,11 @@ namespace chocolatey.infrastructure.app.services
             _xmlService.serialize(snapshot, filePath);
         }
 
+        public bool value_exists(string keyPath, string value)
+        {
+            return Microsoft.Win32.Registry.GetValue(keyPath, value, null) != null;
+        }
+
         public Registry read_from_file(string filePath)
         {
             if (!_fileSystem.file_exists(filePath))

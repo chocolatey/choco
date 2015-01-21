@@ -27,12 +27,14 @@ namespace chocolatey.tests.infrastructure.commands
     {
         public abstract class CommandExecutorSpecsBase : TinySpec
         {
-            protected Mock<IFileSystem> file_system = new Mock<IFileSystem>();
+            protected Mock<IFileSystem> fileSystem = new Mock<IFileSystem>();
             protected Mock<IProcess> process = new Mock<IProcess>();
+            protected CommandExecutor commandExecutor;
 
             public override void Context()
             {
-                CommandExecutor.initialize_with(new Lazy<IFileSystem>(() => file_system.Object), () => process.Object);
+                commandExecutor = new CommandExecutor(fileSystem.Object);
+                CommandExecutor.initialize_with(new Lazy<IFileSystem>(() => fileSystem.Object), () => process.Object);
             }
         }
 
@@ -49,7 +51,7 @@ namespace chocolatey.tests.infrastructure.commands
 
             public override void Because()
             {
-                result = CommandExecutor.execute("bob", "args", ApplicationParameters.DefaultWaitForExitInSeconds);
+                result = commandExecutor.execute("bob", "args", ApplicationParameters.DefaultWaitForExitInSeconds);
             }
 
             [Fact]
@@ -108,7 +110,7 @@ namespace chocolatey.tests.infrastructure.commands
 
             public override void Because()
             {
-                result = CommandExecutor.execute("bob", "args", ApplicationParameters.DefaultWaitForExitInSeconds);
+                result = commandExecutor.execute("bob", "args", ApplicationParameters.DefaultWaitForExitInSeconds);
             }
 
             [Fact]
@@ -136,7 +138,7 @@ namespace chocolatey.tests.infrastructure.commands
 
             public override void Because()
             {
-                result = CommandExecutor.execute("bob", "args", waitForExitInSeconds: 0);
+                result = commandExecutor.execute("bob", "args", waitForExitInSeconds: 0);
             }
 
             [Fact]

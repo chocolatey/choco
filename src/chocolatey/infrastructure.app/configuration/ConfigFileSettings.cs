@@ -26,12 +26,6 @@ namespace chocolatey.infrastructure.app.configuration
     [XmlRoot("chocolatey")]
     public class ConfigFileSettings
     {
-        [XmlElement(ElementName = "checksumFiles")]
-        public bool ChecksumFiles { get; set; }
-
-        [XmlElement(ElementName = "virusCheckFiles")]
-        public bool VirusCheckFiles { get; set; }
-
         [XmlElement(ElementName = "cacheLocation")]
         public string CacheLocation { get; set; }
 
@@ -42,7 +36,10 @@ namespace chocolatey.infrastructure.app.configuration
         public int CommandExecutionTimeoutSeconds { get; set; }
 
         [XmlArray("sources")]
-        public HashSet<ConfigFileSourceSetting> Sources { get; set; }
+        public HashSet<ConfigFileSourceSetting> Sources { get; set; }  
+        
+        [XmlArray("features")]
+        public HashSet<ConfigFileFeatureSetting> Features { get; set; }
 
         [XmlArray("apiKeys")]
         public HashSet<ConfigFileApiKeySetting> ApiKeys { get; set; }

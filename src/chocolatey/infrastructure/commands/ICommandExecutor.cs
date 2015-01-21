@@ -13,16 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.app.services
+namespace chocolatey.infrastructure.commands
 {
-    using domain;
+    using System;
+    using System.Diagnostics;
 
-    public interface IRegistryService
+    public interface ICommandExecutor
     {
-        Registry get_installer_keys();
-        Registry get_differences(Registry before, Registry after);
-        void save_to_file(Registry snapshot, string filePath);
-        Registry read_from_file(string filePath);
-        bool value_exists(string keyPath, string value);
+        int execute(string process, string arguments, int waitForExitInSeconds);
+        int execute(string process, string arguments, int waitForExitInSeconds, string workingDirectory);
+
+        int execute(
+            string process,
+            string arguments,
+            int waitForExitInSeconds,
+            Action<object, DataReceivedEventArgs> stdOutAction,
+            Action<object, DataReceivedEventArgs> stdErrAction
+            );
     }
 }

@@ -13,16 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.app.services
+namespace chocolatey.infrastructure.app.configuration
 {
-    using domain;
+    using System;
+    using System.Xml.Serialization;
 
-    public interface IRegistryService
+    /// <summary>
+    ///   XML config file features element
+    /// </summary>
+    [Serializable]
+    [XmlType("feature")]
+    public sealed class ConfigFileFeatureSetting
     {
-        Registry get_installer_keys();
-        Registry get_differences(Registry before, Registry after);
-        void save_to_file(Registry snapshot, string filePath);
-        Registry read_from_file(string filePath);
-        bool value_exists(string keyPath, string value);
+        [XmlAttribute(AttributeName = "name")]
+        public string Name { get; set; }
+
+        [XmlAttribute(AttributeName = "enabled")]
+        public bool Enabled { get; set; }
     }
 }
