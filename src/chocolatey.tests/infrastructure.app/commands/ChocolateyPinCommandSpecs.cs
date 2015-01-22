@@ -29,6 +29,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
+    using chocolatey.infrastructure.logging;
     using chocolatey.infrastructure.results;
 
     public class ChocolateyPinCommandSpecs
@@ -40,13 +41,26 @@ namespace chocolatey.tests.infrastructure.app.commands
             protected Mock<ILogger> nugetLogger = new Mock<ILogger>();
             protected Mock<INugetService> nugetService = new Mock<INugetService>();
             protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected Mock<IPackage> package = new Mock<IPackage>();
+            protected Mock<IPackage> pinnedPackage = new Mock<IPackage>();
 
             public override void Context()
             {
+               // MockLogger = new MockLogger();
+               // Log.InitializeWith(MockLogger);
                 configuration.Sources = "https://localhost/somewhere/out/there";
                 command = new ChocolateyPinCommand(packageInfoService.Object, nugetLogger.Object, nugetService.Object);
+
+                package = new Mock<IPackage>();
+                package.Setup(p => p.Id).Returns("regular");
+                package.Setup(p => p.Version).Returns(new SemanticVersion("1.2.0"));
+                packageInfoService.Setup(s => s.get_package_information(package.Object)).Returns(new ChocolateyPackageInformation(package.Object) { IsPinned = false });
+                pinnedPackage = new Mock<IPackage>();
+                pinnedPackage.Setup(p => p.Id).Returns("pinned");
+                pinnedPackage.Setup(p => p.Version).Returns(new SemanticVersion("1.1.0"));
+                packageInfoService.Setup(s => s.get_package_information(pinnedPackage.Object)).Returns(new ChocolateyPackageInformation(pinnedPackage.Object) { IsPinned = true });
             }
-            
+
             public void reset()
             {
                 packageInfoService.ResetCalls();
@@ -60,7 +74,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
@@ -315,11 +329,54 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
+        public class when_list_is_called : ChocolateyPinCommandSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                configuration.Sources = ApplicationParameters.PackagesLocation;
+                configuration.ListCommand.LocalOnly = true;
+                configuration.AllVersions = true;
+                var packageResults = new ConcurrentDictionary<string, PackageResult>(); 
+                packageResults.GetOrAdd("regular", new PackageResult(package.Object, null));
+                packageResults.GetOrAdd("pinned", new PackageResult(pinnedPackage.Object, null));
+                nugetService.Setup(n => n.list_run(It.IsAny<ChocolateyConfiguration>(), false)).Returns(packageResults);
+                configuration.PinCommand.Command = PinCommandType.list;
+            }
+
+            public override void Because()
+            {
+                command.run(configuration);
+            }
+
+            [Fact]
+            public void should_list_pinned_packages()
+            {
+                MockLogger.Verify(l => l.Info("pinned|1.1.0"), Times.Once);
+            }
+
+            [Fact]
+            public void should_not_list_unpinned_packages()
+            {
+                MockLogger.Verify(l => l.Info("regular|1.2.0"), Times.Never);
+            }
+
+            [Fact]
+            public void should_log_a_message()
+            {
+                MockLogger.Verify(l => l.Info(It.IsAny<string>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_log_one_message()
+            {
+                MockLogger.Messages.Count.ShouldEqual(1);
+            }
+        }
+
         public class when_run_is_called : ChocolateyPinCommandSpecsBase
         {
             //private Action because;
-            private Mock<IPackage> package = new Mock<IPackage>();
-            private Mock<IPackage> pinnedPackage = new Mock<IPackage>();
             private readonly Mock<IPackageManager> packageManager = new Mock<IPackageManager>();
             private readonly Mock<IPackageRepository> localRepository = new Mock<IPackageRepository>();
 
@@ -333,15 +390,8 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public new void reset()
             {
+                Context();
                 base.reset();
-                package = new Mock<IPackage>();
-                package.Setup(p => p.Id).Returns("regular");
-                package.Setup(p => p.Version).Returns(new SemanticVersion("1.2.0"));
-                packageInfoService.Setup(s => s.get_package_information(package.Object)).Returns(new ChocolateyPackageInformation(package.Object) {IsPinned = false});
-                pinnedPackage = new Mock<IPackage>();
-                pinnedPackage.Setup(p => p.Id).Returns("pinned");
-                pinnedPackage.Setup(p => p.Version).Returns(new SemanticVersion("1.1.0"));
-                packageInfoService.Setup(s => s.get_package_information(pinnedPackage.Object)).Returns(new ChocolateyPackageInformation(pinnedPackage.Object) {IsPinned = true});
             }
 
             public override void AfterEachSpec()
@@ -352,7 +402,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-               // because = () => command.run(configuration);
+                // because = () => command.run(configuration);
             }
 
             [Fact]
@@ -364,71 +414,38 @@ namespace chocolatey.tests.infrastructure.app.commands
 
                 nugetService.Verify(n => n.list_run(It.IsAny<ChocolateyConfiguration>(), false), Times.Once);
             }
+            
+            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object.")]
+            [Fact]
+            public void should_set_pin_when_command_is_add()
+            {
+                reset();
 
-            //[Fact]
-            //public void should_list_pinned_packages_when_command_is_list()
-            //{
-            //    reset();
-            //    var packageResults = new ConcurrentDictionary<string, PackageResult>();
-            //    packageResults.GetOrAdd("pinned", new PackageResult(pinnedPackage.Object, null));
-            //    nugetService.Setup(n => n.list_run(It.IsAny<ChocolateyConfiguration>(), false)).Returns(packageResults);
-            //    configuration.PinCommand.Command = PinCommandType.list;
+                configuration.PinCommand.Name = "regular";
+                packageManager.Setup(pm => pm.LocalRepository).Returns(localRepository.Object);
+                SemanticVersion semanticVersion = null;
+                //nuget woes
+                localRepository.Setup(r => r.FindPackage(configuration.PinCommand.Name, semanticVersion)).Returns(package.Object);
+                configuration.PinCommand.Command = PinCommandType.add;
 
-            //    command.run(configuration);
+                command.set_pin(packageManager.Object, configuration);
 
-            //    var messages = MockLogger.MessagesFor(LogLevel.Info);
-            //    messages.ShouldNotBeEmpty();
-            //    messages.Count.ShouldEqual(1);
-            //    messages[0].ShouldEqual("pinned|1.1.0");
-                
-            //}
+                packageInfoService.Verify(s => s.save_package_information(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
+            }
 
-            //[Fact]
-            //public void should_not_list_unpinned_packages()
-            //{
-            //    reset();
-            //    var packageResults = new ConcurrentDictionary<string, PackageResult>();
-            //    packageResults.GetOrAdd("regular", new PackageResult(package.Object, null));
-            //    packageResults.GetOrAdd("pinned", new PackageResult(pinnedPackage.Object, null));
-            //    nugetService.Setup(n => n.list_run(It.IsAny<ChocolateyConfiguration>(), false)).Returns(packageResults);
-            //    configuration.PinCommand.Command = PinCommandType.list;
+            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object.")]
+            [Fact]
+            public void should_remove_pin_when_command_is_remove()
+            {
+                reset();
+                configuration.PinCommand.Name = "pinned";
+                packageManager.Setup(pm => pm.LocalRepository).Returns(localRepository.Object);
+                configuration.PinCommand.Command = PinCommandType.remove;
 
-            //    command.run(configuration);
+                command.set_pin(packageManager.Object, configuration);
 
-            //    var messages = MockLogger.MessagesFor(LogLevel.Info);
-            //    messages.ShouldNotBeEmpty();
-            //    messages.Count.ShouldEqual(1);
-            //    messages[0].ShouldEqual("pinned|1.1.0");
-            //}
-
-            //[Fact]
-            //public void should_set_pin_when_command_is_add()
-            //{
-            //    reset();
-                
-            //    configuration.PinCommand.Name = "regular";
-            //    packageManager.Setup(pm => pm.LocalRepository).Returns(localRepository.Object);
-            //    SemanticVersion semanticVersion = null;
-            //    //localRepository.Setup(r => r.FindPackage(configuration.PinCommand.Name, semanticVersion)).Returns(package.Object);
-            //    configuration.PinCommand.Command = PinCommandType.add;
-                
-            //    command.set_pin(packageManager.Object, configuration);
-
-            //    packageInfoService.Verify(s => s.save_package_information(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
-            //}
-
-            //[Fact]
-            //public void should_remove_pin_when_command_is_remove()
-            //{
-            //    reset();
-            //    configuration.PinCommand.Name = "pinned";
-            //    packageManager.Setup(pm => pm.LocalRepository).Returns(localRepository.Object);
-            //    configuration.PinCommand.Command = PinCommandType.remove;
-
-            //    command.set_pin(packageManager.Object, configuration);
-
-            //    packageInfoService.Verify(s => s.save_package_information(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
-            //}
+                packageInfoService.Verify(s => s.save_package_information(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
+            }
         }
     }
 }
