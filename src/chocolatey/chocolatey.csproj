@@ -81,12 +81,14 @@
     <Compile Include="GetChocolatey.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyNewCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPackCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyPinCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPushCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyApiKeyCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateySourceCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUninstallCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommand.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileFeatureSetting.cs" />
+    <Compile Include="infrastructure.app\domain\PinCommandType.cs" />
     <Compile Include="infrastructure.app\domain\SourceCommandType.cs" />
     <Compile Include="infrastructure.app\messages\PostRunEvent.cs" />
     <Compile Include="infrastructure.app\nuget\NugetPush.cs" />
@@ -215,7 +217,9 @@
     <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="infrastructure\logging\log4net.config.xml" />
+    <EmbeddedResource Include="infrastructure\logging\log4net.config.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="infrastructure.app\configuration\chocolatey.config">

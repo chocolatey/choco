@@ -67,6 +67,7 @@ namespace chocolatey.infrastructure.app.registration
                         {
                             new ChocolateyListCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyInstallCommand(container.GetInstance<IChocolateyPackageService>()),
+                            new ChocolateyPinCommand(container.GetInstance<IChocolateyPackageInformationService>(),container.GetInstance<ILogger>(),container.GetInstance<INugetService>()),
                             new ChocolateyUpgradeCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyUninstallCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyPackCommand(container.GetInstance<IChocolateyPackageService>()),

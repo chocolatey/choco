@@ -32,8 +32,6 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.results;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
-    //todo: come back and fix the logging tests - determine why it gets cycled out during test suite runs.
-
     public class AutomaticUninstallerServiceSpecs
     {
         public abstract class AutomaticUninstallerServiceSpecsBase : TinySpec
@@ -95,12 +93,11 @@ namespace chocolatey.tests.infrastructure.app.services
                 service.run(packageResult, config);
             }
 
-            //[Fact]
-            //public void should_log_why_it_skips_auto_uninstaller()
-            //{
-            //    // will pass by itself, but won't pass as part of the test suite.
-            //    MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - AutoUninstaller feature is not enabled."), Times.Once);
-            //}
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - AutoUninstaller feature is not enabled."), Times.Once);
+            }
 
             [Fact]
             public void should_not_get_package_information()
@@ -128,11 +125,11 @@ namespace chocolatey.tests.infrastructure.app.services
                 service.run(packageResult, config);
             }
 
-            //[Fact]
-            //public void should_log_why_it_skips_auto_uninstaller()
-            //{
-            //    MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - No registry snapshot."), Times.Once);
-            //}
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - No registry snapshot."), Times.Once);
+            }
 
             [Fact]
             public void should_not_call_command_executor()
@@ -154,11 +151,11 @@ namespace chocolatey.tests.infrastructure.app.services
                 service.run(packageResult, config);
             }
 
-            //[Fact]
-            //public void should_log_why_it_skips_auto_uninstaller()
-            //{
-            //    MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - No registry keys in snapshot."), Times.Once);
-            //}
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - No registry keys in snapshot."), Times.Once);
+            }
 
             [Fact]
             public void should_not_call_command_executor()
@@ -181,11 +178,11 @@ namespace chocolatey.tests.infrastructure.app.services
                 service.run(packageResult, config);
             }
 
-            //[Fact]
-            //public void should_log_why_it_skips_auto_uninstaller()
-            //{
-            //    MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
-            //}
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
+            }
 
             [Fact]
             public void should_not_call_command_executor()
@@ -208,11 +205,11 @@ namespace chocolatey.tests.infrastructure.app.services
                 service.run(packageResult, config);
             }
 
-            //[Fact]
-            //public void should_log_why_it_skips_auto_uninstaller()
-            //{
-            //    MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
-            //}
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
+            }
 
             [Fact]
             public void should_not_call_command_executor()
@@ -237,11 +234,11 @@ namespace chocolatey.tests.infrastructure.app.services
                 service.run(packageResult, config);
             }
 
-            //[Fact]
-            //public void should_log_why_it_skips_auto_uninstaller()
-            //{
-            //    MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
-            //}
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
+            }
 
             [Fact]
             public void should_not_call_command_executor()
