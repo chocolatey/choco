@@ -132,7 +132,7 @@ Examples:
                 var pkgInfo = _packageInfoService.get_package_information(pkg.Value.Package);
                 if (pkgInfo != null && pkgInfo.IsPinned)
                 {
-                    this.Log().Info(()=> "{0}|{1}".format_with(pkgInfo.Package.Id,pkgInfo.Package.Version));
+                    this.Log().Info(() => "{0}|{1}".format_with(pkgInfo.Package.Id,pkgInfo.Package.Version));
                 }
             }
         }

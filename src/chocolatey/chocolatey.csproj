@@ -217,7 +217,9 @@
     <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="infrastructure\logging\log4net.config.xml" />
+    <EmbeddedResource Include="infrastructure\logging\log4net.config.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="infrastructure.app\configuration\chocolatey.config">
