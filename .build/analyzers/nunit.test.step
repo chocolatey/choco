@@ -11,7 +11,7 @@
   <include buildfile="..${path.separator}csharp.functions" />
   <property name="file.current.no_extension" value="nunit.test" />
   <property name="dirs.current" value="${directory::get-current-directory()}" />
-  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />  
+  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
   <property name="folder.build_scripts" value="build" overwrite="false" />
   <property name="folder.build_scripts_custom" value="build.custom" overwrite="false" />
   <property name="dirs.build_scripts_custom" value="${dirs.current}${path.separator}${folder.build_scripts_custom}${path.separator}analyzers" />
@@ -37,17 +37,20 @@
   <property name="app.nunit.console" value="${path::get-full-path(dirs.lib)}${path.separator}NUnit${path.separator}nunit-console.exe" overwrite="false" if="${platform::is-windows()}" />
   <property name="app.nunit.console" value="${path::get-full-path(dirs.lib)}${path.separator}NUnit${path.separator}nunit-console-x86.exe" overwrite="false" if="${platform::is-windows() and uppercut::is-os64bit() and msbuild.platform=='x86'}" />
   <property name="app.nunit.console" value="nunit-console" overwrite="false" if="${platform::is-unix()}"/>
+
   <property name="dlls.test" value="" />
   <property name="tests.ran" value="false" />
-  
+  <property name="run.tests" value="true" />
+
+
   <property name="is.replaced" value="false" />
   <property name="fail.build.on.error" value="true" />
- 
-  <target name="go" depends="run_tasks" if="${file::exists(app.nunit.console)}" />
+
+  <target name="go" depends="run_tasks" if="${run.tests}" />
 
   <target name="run_all_tests" depends="prepare, set_nunit_failure_mode, get_test_dlls_all, run_tests, generate_report" description="Like go but runs all tests" />
-  
-  <target name="run_tasks" if="${file::exists(app.nunit.console)}" >
+
+  <target name="run_tasks" if="${run.tests}" >
     <echo level="Warning" message="" />
     <echo level="Warning" message="====================" />
     <echo level="Warning" message="${project::get-name()}" />
@@ -97,7 +100,7 @@
 
     <property name="args.test_runner" value="${dlls.test} ${test.args} ${test.args.exclude}" />
   </target>
-  
+
   <target name="get_test_dlls_all">
     <echo level="Warning" message="Getting all test dlls (including integration tests) based on name in directory ${path::get-full-path(dirs.build.code)}." />
     <property name="dll.names" value="" />
@@ -120,14 +123,14 @@
 
     <property name="args.test_runner" value="${dlls.test} ${test.args}" />
   </target>
-  
+
   <target name="run_tests" depends="prepare" description="Running Unit Tests">
-  
+
     <if test="${dlls.test !=''}">
       <property name="tests.ran" value="true" />
       <echo level="Warning" message="Running tests using NUnit and putting results in ${dirs.test_results}. Test Arguments: '${args.test_runner}'."/>
-      <exec 
-          program="${app.nunit.console}" 
+      <exec
+          program="${app.nunit.console}"
           workingdir="${dirs.build.code}"
           failonerror="true">
         <arg value="${args.test_runner}" />
@@ -136,7 +139,7 @@
     <if test="${dlls.test ==''}">
       <echo level="Warning" message="No test dlls to run against" />
     </if>
-   
+
   </target>
 
   <target name="generate_report">
@@ -148,7 +151,7 @@
       </nunit2report>
     </if>
   </target>
-  
+
   <target name="open_results">
     <echo level="Warning" message="Opening results - ${path::get-full-path(dirs.test_results) + path.separator + file.test_results + '.html'}" />
     <results display="${path::get-full-path(dirs.test_results) + path.separator + file.test_results + '.html'}" />
