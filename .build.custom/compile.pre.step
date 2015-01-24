@@ -16,7 +16,7 @@
 
   <target name="copy_nuget_core">
     <echo level="Warning" message="Copying NuGet.Core prior to compiling. This helps resolve issues with Mono 3.12.0." />
-    <copy todir="${dirs.build.code}">
+    <copy todir="${dirs.build.code}" flatten="true">
       <fileset basedir="${dirs.current}${path.separator}${path_to_solution}">
         <include name="packages/**/NuGet.*.dll" />
       </fileset>
