@@ -5,38 +5,17 @@
   <property name="build.config.settings" value="__NONE__" overwrite="false" />
   <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
   <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
-  <property name="file.current.no_extension" value="updateAssemblies" />
-  <property name="dirs.current" value="${directory::get-current-directory()}" />
-  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />  
-  <property name="folder.build_scripts" value="build" overwrite="false" />
-  <property name="folder.build_scripts_custom" value="build.custom" overwrite="false" />
-  <property name="dirs.build_scripts_custom" value="${dirs.current}${folder.build_scripts_custom}" />
-  <property name="folder.code_drop" value="code_drop" overwrite="false" />
-  <property name="dirs.drop" value="${dirs.current}${path.separator}${folder.code_drop}" overwrite="false" />
-  <property name="folder.app.drop" value="${project.name}" overwrite="false" />
-  <property name="project.name" value="__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__" overwrite="false" />
-  <property name="file.uppercut.assembly" value="uppercut.tasks.dll" />
-  <property name="path.uppercut.assembly" value="${dirs.current.file}${path.separator}${file.uppercut.assembly}" />
+  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <include buildfile="${dirs.current.file}${path.separator}default.build.settings" />
+  <property name="build.step.name" value="${project::get-name()}" />
+  <property name="build.step.path" value="${project::get-buildfile-path()}" />
+  <!-- build step customizations below this -->
+
   <property name="dirs.assemblies" value="${dirs.current}${path.separator}assemblies" overwrite="false" />
-  <property name="is.replaced" value="false" />
-  <property name="fail.build.on.error" value="true" />
-  <property name="app.ruby" value="C:\Ruby\bin\ruby.exe" overwrite="false" />
-  <property name="app.powershell" value="%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe" overwrite="false" />
 
   <target name="go" depends="load_uppercut_assemblies, run_tasks" />
 
-  <target name="run_tasks">
-    <echo level="Warning" message="" />
-    <echo level="Warning" message="====================" />
-    <echo level="Warning" message="${project::get-name()}" />
-    <echo level="Warning" message="====================" />
-    <call target="prepare" if="${target::exists('prepare')}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="pre" failonerror="${fail.build.on.error}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="replace" failonerror="${fail.build.on.error}" />
-    <call target="run_normal_tasks" if="${not is.replaced}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="post" failonerror="${fail.build.on.error}" />
-  </target>
-
+  <!-- run_normal_tasks is called from run_tasks unless replace extension exists-->
   <target name="run_normal_tasks"
           depends="error_check, update_assemblies"
           description="Moving assemblies to make available for Externals." />
@@ -54,9 +33,4 @@
       </fileset>
     </copy>
   </target>
-
-  <target name="load_uppercut_assemblies">
-    <loadtasks assembly="${path.uppercut.assembly}" if="${file::exists(path.uppercut.assembly)}" />
-  </target>
-    
 </project>

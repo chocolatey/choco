@@ -5,67 +5,26 @@
   <property name="build.config.settings" value="__NONE__" overwrite="false" />
   <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
   <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
-  <property name="file.current.no_extension" value="nugetBuild" />
-  <property name="dirs.current" value="${directory::get-current-directory()}" />
   <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
-  <property name="folder.build_scripts" value="build" overwrite="false" />
-  <property name="folder.build_scripts_custom" value="build.custom" overwrite="false" />
-  <property name="dirs.build_scripts_custom" value="${dirs.current}${path.separator}${folder.build_scripts_custom}" />
-  <property name="folder.code_build" value="build_output" overwrite="false" />
-  <property name="dirs.build" value="${dirs.current}${path.separator}${folder.code_build}" />
-  <property name="folder.code_drop" value="code_drop" overwrite="false" />
-  <property name="dirs.drop" value="${dirs.current}${path.separator}${folder.code_drop}" overwrite="false" />
-  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
-  <property name="folder.build_artifacts" value="build_artifacts" overwrite="false" />
-  <property name="folder.app.drop" value="${project.name}" overwrite="false" />
-  <property name="folder.database" value="__DATABASE_FOLDER_NAME__" overwrite="false" />
-  <property name="folder.reports" value="${project.name}.Reports" overwrite="false" />
-  <property name="folder.file_server" value="file.server" overwrite="false" />
-  <property name="folder.environment_files" value="environment.files" overwrite="false" />
-  <property name="folder.deployment" value="deployment" overwrite="false" />
-  <property name="folder.settings" value="settings" overwrite="false" />
-  <property name="folder.documentation" value="docs" overwrite="false" />
-  <property name="folder.nuget" value="nuget" overwrite="false" />
-  <property name="dirs.nuget" value="${dirs.current}${path.separator}${folder.nuget}" overwrite="false" />
-  <property name="dirs.drop.nuget" value="${dirs.drop}${path.separator}${folder.nuget}" overwrite="false" />
-  <property name="folder.nuget.exists" value="${directory::exists(dirs.nuget)}" />
-  <property name="app.nuget" value="..${path.separator}..${path.separator}${folder.references}${path.separator}NuGet${path.separator}NuGet.exe" overwrite="false" />
-  <property name="app.nuget" value="${path::get-full-path(app.nuget)}" />
-  <property name="app.nuget.exists" value="${file::exists(app.nuget)}" />
-  <property name="version.use_semanticversioning" value="false" overwrite="false" />
-  <property name="version.major" value="1" overwrite="false" />
-  <property name="version.minor" value="0" overwrite="false" />
-  <property name="version.patch" value="0" overwrite="false" />
-  <property name="version.build" value="0" overwrite="false" />
-  <property name="version.revision" value="0" overwrite="false" />
-  <property name="assembly.version.full" value="${version.major}.${version.minor}.${version.build}.${version.revision}" />
-  <property name="assembly.version.full" value="${version.major}.${version.minor}.${version.patch}.0"  if="${version.use_semanticversioning}" />
-  <property name="version.nuget.prerelease" value="" overwrite="false" />
-  <property name="version.use.build_date" value="false" overwrite="false" />
+  <include buildfile="${dirs.current.file}${path.separator}default.build.settings" />
+  <property name="build.step.name" value="${project::get-name()}" />
+  <property name="build.step.path" value="${project::get-buildfile-path()}" />
+  <!-- build step customizations below this -->
+
   <property name="pkg.build.date" value="20100801" overwrite="false" />
   <property name="file.nuget.version" value="${dirs.drop.nuget}${path.separator}version.xml" />
   <property name="nuget.version" value="${version.major}.${version.minor}.${version.build}.${version.revision}" />
   <property name="nuget.version" value="${version.major}.${version.minor}.${version.patch}"  if="${version.use_semanticversioning}" />
 
-  <property name="is.replaced" value="false" />
   <property name="fail.build.on.error" value="false" />
 
-  <target name="go" depends="run_tasks" if="${folder.nuget.exists and app.nuget.exists}" />
+  <target name="go" depends="run_tasks" />
 
-  <target name="run_tasks" if="${folder.nuget.exists}">
-    <echo level="Warning" message="" />
-    <echo level="Warning" message="====================" />
-    <echo level="Warning" message="${project::get-name()}" />
-    <echo level="Warning" message="====================" />
-    <customExtension extends="${project::get-buildfile-path()}" type="pre" failonerror="${fail.build.on.error}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="replace" failonerror="${fail.build.on.error}" />
-    <call target="run_normal_tasks" if="${not is.replaced}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="post" failonerror="${fail.build.on.error}" />
-  </target>
-
+  <!-- run_normal_tasks is called from run_tasks unless replace extension exists-->
   <target name="run_normal_tasks"
           depends="update_build_date, update_version, build_nugget, remove_nuget_files"
-          description="Building nuget." />
+          description="Building nuget."
+          if="${run.nuget}" />
 
   <target name="update_build_date">
     <property name="pkg.current.date" value="${datetime::now()}" />
@@ -77,7 +36,7 @@
     <property name="pkg.current.date.day" value="${'0' + pkg.current.date.day}" if="${string::get-length(pkg.current.date.day) == 1}" />
     <property name="pkg.build.date" value="${'' + pkg.current.date.year + pkg.current.date.month + pkg.current.date.day}" />
   </target>
-  
+
   <target name="update_version">
     <property name="nuget.version" value="${nuget.version + '-' + version.nuget.prerelease}" if="${version.nuget.prerelease != ''}" />
     <property name="nuget.version" value="${nuget.version + '.' + pkg.build.date}" if="${version.use.build_date and version.use_semanticversioning and version.nuget.prerelease == ''}" />
@@ -85,7 +44,7 @@
     <!-- version.use.build_date -->
     <echo level="Warning" message="Using ${nuget.version} as the version for the nuget package(s)." />
   </target>
-          
+
   <target name="build_nugget">
     <echo level="Warning" message="Finding and building all nuggets in ${dirs.drop.nuget}."/>
     <foreach item="File" property="spec.file">
@@ -105,7 +64,8 @@
         </exec>
         <exec program="mono"
           workingdir="${directory::get-parent-directory(spec.file)}"
-          commandline='"${app.nuget}" pack "${spec.file}" -Version ${nuget.version}' if="${platform::is-unix()}"/>
+          commandline='"${app.nuget}" pack "${spec.file}" -Version ${nuget.version}'
+          if="${platform::is-unix()}" />
       </do>
     </foreach>
   </target>

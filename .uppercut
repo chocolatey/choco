@@ -2,102 +2,47 @@
 <project name="BuildSettings">
   <!-- Project UppercuT - http://projectuppercut.org -->
   <!-- Learn how to edit this file at http://uppercut.pbwiki.com -->
+  <!-- In the build folder there is a default.build.settings. You can override defaults by adding those here and changing the values -->
 
   <!-- Required Items -->
   <property name="project.name" value="chocolatey" overwrite="false" />
-  <property name="path_to_solution" value="src" overwrite="false" />
-  <property name="repository.path" value="private" overwrite="false" />
+  <property name="repository.path" value="https://github.com/chocolatey/choco" overwrite="false" />
   <property name="company.name" value="RealDimensions Software, LLC" overwrite="false" />
 
-  <!-- folders -->
-  <property name="folder.database" value="${project.name}.Database" overwrite="false" />
-  <property name="folder.reports" value="${project.name}.Reports" overwrite="false" />
-  <property name="folder.deployment" value="deployment" overwrite="false" />
-  <property name="folder.documentation" value="docs" overwrite="false" />
-  <property name="folder.references" value="lib" overwrite="false" />
+  <!-- Folder Overrides -->
   <property name="folder.build_scripts" value=".build" overwrite="false" />
   <property name="folder.build_scripts_custom" value=".build.custom" overwrite="false" />
-  <property name="folder.code_build" value="build_output" overwrite="false" />
-  <property name="folder.code_drop" value="code_drop" overwrite="false" />
-  <property name="folder.app.drop" value="${project.name}" overwrite="false" />
-  <property name="folder.environment_files" value="environment.files" overwrite="false" />
-  <property name="folder.file_server" value="file.server" overwrite="false" />
-  <property name="folder.program_files" value="${environment::get-folder-path('ProgramFiles')}" />
-
-  <!-- FRAMEWORKS -->
-  <!-- microsoft.framework: vb6, net-1.0, net-1.1, net-2.0, net-3.5, net-4.0, netcf-1.0, netcf-2.0, silverlight-2.0, mono-1.0, mono-2.0, mono-3.5, mono-4.0, moonlight-2.0 (Enter multiple ones with a "," to take advantage of multitargeting) -->
-  <property name="microsoft.framework" value="net-4.0" overwrite="false" />
-  <!-- language.short: vb,cs -->
-  <property name="language.short" value="cs" overwrite="false" />
-  <!-- test.framework: none, mbunit2, nunit, xunit, gallio - with gallio it must be installed in program files on every computer. Alternatively you can add 26MB to your repo and put it there. Little much for my tastes. -->
-  <property name="test.framework" value="nunit" overwrite="false" />
-  <!-- source_control_type: svn, vss, tfs, vault, git, hg -->
-  <property name="source_control_type" value="git" overwrite="false" />
-  <!-- cover.framework: none, ncover, opencover -->
-  <property name="cover.framework" value="opencover" overwrite="false" />
-
-  <!-- Environment specific variables -->
-  <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
 
   <!-- ASSEMBLY VARIABLES -->
   <property name="version.use_semanticversioning" value="true" overwrite="false" />
   <property name="version.major" value="0" overwrite="false" />
   <property name="version.minor" value="0" overwrite="false" />
   <property name="version.patch" value="1" overwrite="false" />
-  <property name="version.gem.suffix" value="" overwrite="false" />
-  <property name="use.gem.build_date" value="false" overwrite="false" />
-  <property name="version.nuget.prerelease" value="" overwrite="false" />
-  <property name="version.use.build_date" value="false" overwrite="false" />
+  <property name="version.nuget.prerelease" value="alpha" overwrite="false" />
+  <property name="version.use.build_date" value="true" overwrite="false" />
   <property name="assembly.description" value="${project.name} is a product of ${company.name} - All Rights Reserved." overwrite="false" />
-  <property name="assembly.copyright" value="Copyright © 2011 - Present, ${company.name}" overwrite="false" />
-  <property name="assembly.clscompliant" value="false" overwrite="false" />
-  <!-- partially trusted callers doesn't set correctly with assembly generator - Leave false for now-->
-  <property name="allow.partially_trusted_callers" value="false" overwrite="false" />
+  <property name="assembly.copyright" value="Copyright © 2011 - Present, ${company.name} - All Rights Reserved." overwrite="false" />
   <property name="sign.project_with_key" value="true" overwrite="false" />
-  <!-- To use relative pathing your projects all need to be at the same level. -->
-  <property name="sign.key.use_relative_pathing" value="true" overwrite="false" />
-  <property name="sign.key.relative_path_from_projects" value="..${path.separator}..${path.separator}" overwrite="false" />
-  <property name="obfuscate" value="false" overwrite="false" />
 
-  <!-- COMPILE VARIABLES -->
-  <property name="msbuild.configuration" value="Release" overwrite="false" />
-  <property name="msbuild.platform" value="Any CPU" overwrite="false" />
-  <!-- Mixed Platforms is the default 4.0 build platform -->
-  <!--property name="msbuild.platform" value="Mixed Platforms" overwrite="false" /-->
-  <!-- This setting allows you to use your own output path by setting to false - this does not work in conjuction with multitargeting -->
-  <property name="msbuild.override_output_path" value="true" overwrite="false" />
+  <!-- Build Features Overrides -->
+  <property name="test.framework" value="nunit" overwrite="false" />
+  <property name="cover.framework" value="opencover" overwrite="false" />
 
-  <!-- EXTERNAL TOOLS -->
-  <!-- These are run two folders down from the top level folder, so figure out the relative path from there and add "..\..\" -->
-  <!-- In example, if from the top level directory, you have an item that is in lib\NCover\NCover.Console.exe you should add it here as ..\..\lib\NCover\NCover.Console.exe  -->
-  <!-- To not use the tool, change to a location that doesn't exist -->
-  <property name="run.tests" value="true" overwrite="false" />
-  <property name="app.nunit.console" value="..${path.separator}..${path.separator}src${path.separator}packages${path.separator}NUnit.Runners.2.6.4${path.separator}tools${path.separator}nunit-console.exe" overwrite="false" if="${platform::is-windows()}" />
-  <property name="app.nunit.console" value="nunit-console" overwrite="false" if="${platform::is-unix()}"/>
-  <property name="app.xunit.console" value="..${path.separator}..${path.separator}${folder.references}${path.separator}xUnit${path.separator}xunit.console.clr4.exe" overwrite="false" />
-  <property name="app.storevil.console" value="..${path.separator}..${path.separator}${folder.references}${path.separator}StorEvil${path.separator}StorEvil.exe" overwrite="false" />
-  <property name="app.ncover" value="..${path.separator}..${path.separator}${folder.references}${path.separator}NCover${path.separator}NCover.Console.exe" overwrite="false" />
-  <property name="app.ncover_explorer" value="..${path.separator}..${path.separator}${folder.references}${path.separator}NCover${path.separator}NCoverExplorer.Console.exe" overwrite="false" />
-  <property name="app.ncover.tester" value="..${path.separator}..${path.separator}${folder.references}${path.separator}MbUnit2${path.separator}MbUnit.Cons.exe" overwrite="false" if="${test.framework=='mbunit2'}" />
-  <property name="app.ncover.tester" value="${app.nunit.console}" overwrite="false" if="${test.framework=='nunit'}" />
-  <property name="app.ncover.tester" value="${app.xunit.console}" overwrite="false" if="${test.framework=='xunit'}" />
-  <property name="app.ncover.tester" value="${path::get-full-path(folder.program_files)}${path.separator}Gallio${path.separator}bin${path.separator}Gallio.Host.exe" overwrite="false" if="${test.framework=='gallio'}" />
-  <property name="app.opencover" value="..${path.separator}..${path.separator}${folder.references}${path.separator}OpenCover${path.separator}OpenCover.Console.exe" overwrite="false" />
-  <property name="app.opencover.tester" value="${app.nunit.console}" overwrite="false" if="${test.framework=='nunit'}" />
-  <property name="app.opencover.tester" value="${app.xunit.console}" overwrite="false" if="${test.framework=='xunit'}" />
-  <property name="app.opencover.tester" value="${path::get-full-path(folder.program_files)}${path.separator}Gallio${path.separator}bin${path.separator}Gallio.Host.exe" overwrite="false" if="${test.framework=='gallio'}" />
-  <property name="app.opencover.filters" value="+[${project.name}*]* -[${project.name}*test*]* -[${project.name}]*adapters.* -[${project.name}]*infrastructure.app.configuration.*Setting* -[${project.name}]*app.configuration.*Configuration -[${project.name}]*app.domain.* -[${project.name}]*app.messages.* -[${project.name}]*.registration.* -[${project.name}]*app.templates.* -[${project.name}]*commandline.Option* -[${project.name}]*licensing.* -[${project.name}]*infrastructure.results.*" />
-  <property name="app.ndepend" value="${path::get-full-path(folder.program_files)}${path.separator}NDepend${path.separator}NDepend.Console.exe" overwrite="false" />
-  <property name="app.metric" value="${path::get-full-path(folder.program_files)}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" overwrite="false" />
-  <property name="app.moma" value="..${path.separator}..${path.separator}${folder.references}${path.separator}MoMA${path.separator}MoMA.exe" overwrite="false" />
-  <property name="app.nitriq" value="Nitriq.Console.exe" overwrite="false" />
-  <property name="app.xbuild" value="${path::get-full-path(folder.program_files)}${path.separator}Mono-2.8${path.separator}bin${path.separator}xbuild.bat" overwrite="false" if="${platform::is-windows()}"/>
-  <property name="app.xbuild" value="xbuild" overwrite="false" if="${platform::is-unix()}" />
-  <property name="app.eazfuscator" value="..${path.separator}${folder.references}${path.separator}Eazfuscator.NET${path.separator}Eazfuscator.NET.exe" overwrite="false" />
-  <property name="app.nuget" value="..${path.separator}${folder.references}${path.separator}NuGet${path.separator}NuGet.exe" overwrite="false" />
-  <property name="app.ruby" value="C:${path.separator}Ruby${path.separator}bin${path.separator}ruby.exe" overwrite="false" if="${platform::is-windows()}" />
-  <property name="app.ruby" value="ruby" overwrite="false" if="${platform::is-unix()}" />
-  <property name="app.powershell" value="%WINDIR%${path.separator}System32${path.separator}WindowsPowerShell${path.separator}v1.0${path.separator}powershell.exe" overwrite="false" />
-
+  <property name="run.environmentbuilder" value="false" overwrite="false" />
+  <property name="run.deploymentbuilder" value="false" overwrite="false" />
+  <property name="run.gems" value="false" overwrite="false" />
+  <property name="run.metrics" value="false" overwrite="false" />
+  <property name="run.nitriq" value="false" overwrite="false" />
+  <property name="run.moma" value="false" overwrite="false" />
+  <property name="run.fxcop" value="false" overwrite="false" />
+  <property name="run.obfuscator" value="false" overwrite="false" />
   <property name="run.ilmerge" value="true" overwrite="false" />
+
+  <!-- EXTERNAL TOOL OVERRIDES -->
+  <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
+  <property name="dirs.current" value="${directory::get-current-directory()}" />
+
+  <property name="app.test.console" value="${dirs.current}${path.separator}src${path.separator}packages${path.separator}NUnit.Runners.2.6.4${path.separator}tools${path.separator}nunit-console.exe" overwrite="false" />
+  <property name="codecoverage.filters" value="+[${project.name}*]* -[${project.name}*test*]* -[${project.name}]*adapters.* -[${project.name}]*infrastructure.app.configuration.*Setting* -[${project.name}]*app.configuration.*Configuration -[${project.name}]*app.domain.* -[${project.name}]*app.messages.* -[${project.name}]*.registration.* -[${project.name}]*app.templates.* -[${project.name}]*commandline.Option* -[${project.name}]*licensing.* -[${project.name}]*infrastructure.results.*" />
+
 </project>

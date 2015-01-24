@@ -4,38 +4,33 @@
   <property name="build.config.settings" value="__NONE__" overwrite="false" />
   <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
   <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
-  <property name="file.current.no_extension" value="ilmerge" />
-  <property name="dirs.current" value="${directory::get-current-directory()}" />  
-  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />  
+  <property name="dirs.current" value="${directory::get-current-directory()}" />
+  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
   <property name="folder.build_scripts" value="build" overwrite="false" />
-  <property name="folder.build_scripts_custom" value="build.custom" overwrite="false" />
-  <property name="dirs.build_scripts_custom" value="${dirs.current}${path.separator}${folder.build_scripts_custom}" />
-  <property name="folder.code_drop" value="code_drop" overwrite="false" />
-  <property name="dirs.drop" value="${dirs.current}${path.separator}${folder.code_drop}" overwrite="false" />
-  <property name="folder.app.drop" value="${project.name}" overwrite="false" />
-  <property name="dirs.lib" value="${dirs.current}${path.separator}lib" overwrite="false" />
+  <include buildfile="${dirs.current}${path.separator}${folder.build_scripts}${path.separator}default.build.settings" />
+  <property name="build.step.name" value="${project::get-name()}" />
+  <property name="build.step.path" value="${project::get-buildfile-path()}" />
+  <!-- build step customizations below this -->
+
   <property name="dirs.ilmerge.folder" value="${dirs.lib}${path.separator}ILMerge" />
   <property name="app.ilmerge" value="${dirs.ilmerge.folder}${path.separator}ILMerge.exe" overwrite="false" />
   <property name="dirs.merge.log" value="${dirs.drop}${path.separator}build_artifacts${path.separator}ilmerge" />
   <property name="log.merge" value="ilmerge.log" />
-  <property name="app.ruby" value="C:\Ruby\bin\ruby.exe" overwrite="false" />
-  <property name="app.powershell" value="%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe" overwrite="false" />
 
   <property name="dirs.merge.from" value="${dirs.drop}${path.separator}${folder.app.drop}" overwrite="false" />
   <property name="dirs.merge.to" value="${dirs.drop}${path.separator}merge" overwrite="false" />
-  
+
   <property name="file.internalize.ignore" value="ilmerge.internalize.ignore.txt" />
   <property name="path.file.internalize.ignore" value="${dirs.build_scripts_custom}${path.separator}${file.internalize.ignore}" />
   <property name="file.merge.name" value="__REPLACE__" overwrite="false" />
   <!-- exe winexe dll -->
   <property name="merge.target.type" value="__REPLACE__" overwrite="false" />
-  <property name="path.file.key" value="${dirs.current}${path.separator}${project.name}.snk" overwrite="false" />
-  <property name="args.ilmerge" value="/internalize /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.file.key} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " />
-  <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.file.key} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
+  <property name="args.ilmerge" value="/internalize /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " />
+  <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
 
-  <target name="go" depends="run_tasks" />
+  <target name="go" depends="run_normal_tasks" />
 
-  <target name="run_tasks"
+  <target name="run_normal_tasks"
           depends="set_environment_variables, error_check, get_regular_dlls, run_ilmerge, copy_configs, remove_unneeded_assemblies, copy_from_merge, delete_merge_folder"
           description="Running ILMerge with UppercuT default.build." />
 
@@ -44,10 +39,10 @@
     <property name="dirs.merge.to" value="${environment::get-variable('uc.dirs.merge.to')}" if="${environment::variable-exists('uc.dirs.merge.to')}" />
     <property name="file.merge.name" value="${environment::get-variable('uc.file.merge.name')}" if="${environment::variable-exists('uc.file.merge.name')}" />
     <property name="merge.target.type" value="${environment::get-variable('uc.merge.target.type')}" if="${environment::variable-exists('uc.merge.target.type')}" />
-    <property name="args.ilmerge" value="/internalize /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.file.key} /log:${dirs.merge.log}${path.separator}${log.merge} /ndebug /allowDup ${file.merge.name} " />
-    <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.file.key} /log:${dirs.merge.log}${path.separator}${log.merge} /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
+    <property name="args.ilmerge" value="/internalize /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /ndebug /allowDup ${file.merge.name} " />
+    <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
   </target>
-  
+
   <target name="error_check">
     <fail message="You must pass in the file.merge.name and the merge.target.type through the command line calling this build. Please do that and retry the build. You can also set up an ilmerge.pre.build and set these environment variables: uc.dirs.merge.from, uc.dirs.merge.to, uc.file.merge.name, and uc.merge.target.type"
       if="${file.merge.name=='__REPLACE__' or merge.target.type=='__REPLACE__'}" />
@@ -118,5 +113,5 @@
     <delete dir="${dirs.merge.to}" failonerror="false"  />
   </target>
 
-  
+
 </project>

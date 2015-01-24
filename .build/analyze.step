@@ -5,41 +5,28 @@
   <property name="build.config.settings" value="__NONE__" overwrite="false" />
   <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
   <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
-  <property name="file.current.no_extension" value="analyze" />
-  <property name="dirs.current" value="${directory::get-current-directory()}" />
   <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
-  <property name="folder.build_scripts" value="build" overwrite="false" />
-  <property name="folder.build_scripts_custom" value="build.custom" overwrite="false" />
-  <property name="dirs.build_scripts_custom" value="${dirs.current}${path.separator}${folder.build_scripts_custom}" />
-  <property name="is.replaced" value="false" />
-  <property name="fail.build.on.error" value="true" />
+  <include buildfile="${dirs.current.file}${path.separator}default.build.settings" />
+  <property name="build.step.name" value="${project::get-name()}" />
+  <property name="build.step.path" value="${project::get-buildfile-path()}" />
+  <!-- build step customizations below this -->
 
   <target name="go" depends="run_tasks" />
 
-  <target name="run_tasks">
-    <echo level="Warning" message="" />
-    <echo level="Warning" message="====================" />
-    <echo level="Warning" message="${project::get-name()}" />
-    <echo level="Warning" message="====================" />
-    <call target="prepare" if="${target::exists('prepare')}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="pre" failonerror="${fail.build.on.error}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="replace" failonerror="${fail.build.on.error}" />
-    <call target="run_normal_tasks" if="${not is.replaced}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="post" failonerror="${fail.build.on.error}" />
-  </target>
-
+  <!-- run_normal_tasks is called from run_tasks unless replace extension exists-->
   <target name="run_normal_tasks"
           depends="run_analyzers"
-          description="Analyzing project for quality indicators." />
+          description="Analyzing project for quality indicators."
+          if="${run.analyzers}" />
 
   <target name="run_analyzers">
-    <nant buildfile="${dirs.current.file}${path.separator}analyzers${path.separator}test.step" inheritall="true" />
-    <nant buildfile="${dirs.current.file}${path.separator}analyzers${path.separator}cover.step" inheritall="true" failonerror="false" />
-    <nant buildfile="${dirs.current.file}${path.separator}analyzers${path.separator}ndepend.step" inheritall="true" failonerror="false" />
-    <nant buildfile="${dirs.current.file}${path.separator}analyzers${path.separator}nitriq.step" inheritall="true" failonerror="false" />
-    <nant buildfile="${dirs.current.file}${path.separator}analyzers${path.separator}metrics.step" inheritall="true" failonerror="false" />
-    <nant buildfile="${dirs.current.file}${path.separator}analyzers${path.separator}fxcop.step" inheritall="true" failonerror="false" />
-    <nant buildfile="${dirs.current.file}${path.separator}analyzers${path.separator}moma.step" inheritall="true" failonerror="false" />
+    <nant buildfile="${dirs.build_scripts}${path.separator}analyzers${path.separator}test.step" inheritall="true" if="${run.tests}" />
+    <nant buildfile="${dirs.build_scripts}${path.separator}analyzers${path.separator}cover.step" inheritall="true" failonerror="false" if="${run.codecoverage}" />
+    <nant buildfile="${dirs.build_scripts}${path.separator}analyzers${path.separator}ndepend.step" inheritall="true" failonerror="false" if="${run.ndepend}" />
+    <nant buildfile="${dirs.build_scripts}${path.separator}analyzers${path.separator}nitriq.step" inheritall="true" failonerror="false" if="${run.nitriq}" />
+    <nant buildfile="${dirs.build_scripts}${path.separator}analyzers${path.separator}metrics.step" inheritall="true" failonerror="false" if="${run.metrics}" />
+    <nant buildfile="${dirs.build_scripts}${path.separator}analyzers${path.separator}fxcop.step" inheritall="true" failonerror="false" if="${run.fxcop}" />
+    <nant buildfile="${dirs.build_scripts}${path.separator}analyzers${path.separator}moma.step" inheritall="true" failonerror="false" if="${run.moma}" />
   </target>
 
 </project>

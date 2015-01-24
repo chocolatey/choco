@@ -5,32 +5,16 @@
   <property name="build.config.settings" value="__NONE__" overwrite="false" />
   <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
   <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
-  <property name="file.current.no_extension" value="compile" />
-  <property name="dirs.current" value="${directory::get-current-directory()}" />
-  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />  
-  <property name="folder.build_scripts" value="build" overwrite="false" />
-  <property name="folder.build_scripts_custom" value="build.custom" overwrite="false" />
-  <property name="dirs.build_scripts_custom" value="${dirs.current}${path.separator}${folder.build_scripts_custom}" />
-  <property name="folder.code_build" value="build_output" overwrite="false" />
-  <property name="dirs.build" value="${dirs.current}${path.separator}${folder.code_build}" />
+  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <include buildfile="${dirs.current.file}${path.separator}default.build.settings" />
+  <property name="build.step.name" value="${project::get-name()}" />
+  <property name="build.step.path" value="${project::get-buildfile-path()}" />
+  <!-- build step customizations below this -->
+
   <property name="dirs.build.windows.mono" value="${string::replace(dirs.build,'\','/')}" />
-  <property name="folder.documentation" value="docs" overwrite="false" />
-  <property name="dirs.docs" value="${dirs.current}${path.separator}${folder.documentation}" />
-  <property name="folder.database" value="__DATABASE_FOLDER_NAME__" overwrite="false" />
-  <property name="dirs.db" value="${dirs.current}${path.separator}${folder.database}" />
-  <property name="project.name" value="__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__" overwrite="false" />
-  <property name="folder.app.drop" value="${project.name}" overwrite="false" />
-  <property name="folder.references" value="lib" overwrite="false" />
-  <property name="dirs.lib" value="${dirs.current}${path.separator}${folder.references}" overwrite="false" />
-  <property name="folder.build_artifacts" value="build_artifacts" overwrite="false" />
-  <property name="dirs.build_artifacts" value="${path::get-full-path(dirs.build)}${path.separator}${folder.build_artifacts}" />
   <property name="dirs.build_results" value="${dirs.build_artifacts}${path.separator}compile" overwrite="false" />
-  <property name="msbuild.logger" value="ThoughtWorks.CruiseControl.MSBuild.XmlLogger,&quot;${dirs.lib}${path.separator}NAnt${path.separator}ThoughtWorks.CruiseControl.MSBuild.dll&quot;" />
-  <property name="path_to_solution" value="." overwrite="false" />
-  <property name="microsoft.framework" value="net-3.5" overwrite="false" />
-  <property name="msbuild.configuration" value="Release" overwrite="false" />
-  <property name="msbuild.platform" value="Any CPU" overwrite="false" />
-  <property name="msbuild.override_output_path" value="true" overwrite="false" />
+  <property name="msbuild.logger" value="ThoughtWorks.CruiseControl.MSBuild.XmlLogger,&quot;${dirs.tools}${path.separator}NAnt${path.separator}ThoughtWorks.CruiseControl.MSBuild.dll&quot;" />
+
   <property name="msbuild.outputpath" value="${dirs.build}${path.separator}${folder.app.drop}" overwrite="false" />
   <property name="msbuild.outputpath.windows.mono" value="${string::replace(msbuild.outputpath,'\','/')}" />
   <property name="solution.path" value="${dirs.current}${path.separator}${path_to_solution}${path.separator}${project.name}.sln" />
@@ -39,48 +23,19 @@
   <property name="solution.path" value="${dirs.current}${path.separator}${path_to_solution}${path.separator}${project.name}.vbp" if="${microsoft.framework =='vb6'}" />
   <property name="nant.settings.currentframework" value="mono-4.0" if="${platform::is-unix()}" />
   <property name="nant.settings.currentframework" value="net-3.5" if="${microsoft.framework !='vb6' and platform::is-windows()}" />
-  <property name="app.xbuild" value="C:\Program Files (x86)\Mono-2.8\bin\xbuild.bat" overwrite="false" if="${platform::is-windows() and file::exists('C:\Program Files (x86)\Mono-2.8\bin\xbuild.bat')}" />
-  <property name="app.xbuild" value="C:\Program Files\Mono-2.8\bin\xbuild.bat" overwrite="false" if="${platform::is-windows() and file::exists('C:\Program Files\Mono-2.8\bin\xbuild.bat')}" />
-  <property name="app.xbuild" value="xbuild" overwrite="false" if="${platform::is-unix()}" />
   <property name="framework.multitargeting" value="false" />
   <property name="framework.multitargeting.delimiter" value="," />
-  <property name="is.replaced" value="false" />
-  <property name="fail.build.on.error" value="true" />
-  <property name="app.ruby" value="C:\Ruby\bin\ruby.exe" overwrite="false" />
-  <property name="app.powershell" value="%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe" overwrite="false" />
-  <property name="app.nuget" value="..${path.separator}..${path.separator}${folder.references}${path.separator}NuGet${path.separator}NuGet.exe" overwrite="false" />
-  <property name="app.nuget" value="${path::get-full-path(app.nuget)}" />
-
   <target name="go" depends="load_uppercut_assemblies, run_tasks" />
-  
-  <property name="file.uppercut.assembly" value="uppercut.tasks.dll" />
-    <property name="path.uppercut.assembly" value="${dirs.current.file}${path.separator}${file.uppercut.assembly}" />
-  <target name="load_uppercut_assemblies">
-    <loadtasks assembly="${path.uppercut.assembly}" if="${file::exists(path.uppercut.assembly)}" />
-  </target>
 
-  <target name="run_tasks">
-    <echo level="Warning" message="" />
-    <echo level="Warning" message="====================" />
-    <echo level="Warning" message="${project::get-name()}" />
-    <echo level="Warning" message="====================" />
-    <call target="prepare" if="${target::exists('prepare')}" />
-    <call target="check_for_multitargeting" if="${target::exists('check_for_multitargeting')}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="pre" failonerror="${fail.build.on.error}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="replace" failonerror="${fail.build.on.error}" />
-    <call target="run_normal_tasks" if="${not is.replaced}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="post" failonerror="${fail.build.on.error}" />
-    <call target="set_file_attributes_to_normal" />
-  </target>
-  
   <target name="prepare">
     <echo message="Removing and adding ${dirs.build_results}."/>
     <delete dir="${dirs.build_results}" failonerror="false" />
     <mkdir dir="${dirs.build_results}" />
   </target>
 
+  <!-- run_normal_tasks is called from run_tasks unless replace extension exists-->
   <target name="run_normal_tasks"
-          depends="error_check, set_vars, restore_packages, build_code, copy_documentation, copy_db"
+          depends="error_check, set_vars, restore_packages, build_code, copy_documentation, copy_db, set_file_attributes_to_normal"
           description="Compiling project." />
 
   <target name="error_check">
@@ -100,20 +55,24 @@
       <property name="framework.multitargeting.delimiter" value=";" />
     </if>
   </target>
-  
+
   <target name="set_vars">
     <echo level="Warning" message="Setting compile variables" />
     <setenv name="EnableNuGetPackageRestore" value="true"/>
   </target>
-  
+
   <target name="restore_packages" if="${file::exists(app.nuget)}">
     <echo level="Warning" message="Finding and restoring all packages (${app.nuget} restore '${solution.path}')" />
     <exec program="${app.nuget}"
           workingdir="${dirs.build}"
-          commandline='restore "${solution.path}"' if="${platform::is-windows()}" />
+          commandline='restore "${solution.path}"'
+          failonerror="false"
+          if="${platform::is-windows()}" />
     <exec program="mono"
           workingdir="${dirs.build}"
-          commandline="'${app.nuget}' restore '${solution.path}'" if="${platform::is-unix()}" />
+          commandline="'${app.nuget}' restore '${solution.path}'"
+          failonerror="false"
+          if="${platform::is-unix()}" />
   </target>
 
   <target name="build_code" depends="" description="Building Library">
@@ -136,7 +95,7 @@
       <call target="build_dotNet_code_framework" />
     </if>
   </target>
-  
+
   <target name="build_dotNet_code_framework">
     <echo level="Warning" message="Building on ${framework::get-version(microsoft.framework.specific)}" />
     <property name="nant.settings.currentframework" value="${string::trim(microsoft.framework.specific)}" />
@@ -181,12 +140,12 @@
               <!--property name="Logger" value="${msbuild.logger};&quot;${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml&quot;" /-->
               <arg line="/l:${msbuild.logger};&quot;${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml&quot;" />
             </msbuild>
-            <solution 
-              configuration="${msbuild.configuration}" 
-              solutionfile="${solution.path}" 
-              outputdir="${msbuild.outputpath}" 
-              platform="${msbuild.platform}" 
-              if="${microsoft.framework.specific == 'net-1.0' or microsoft.framework.specific == 'net-1.1'}" 
+            <solution
+              configuration="${msbuild.configuration}"
+              solutionfile="${solution.path}"
+              outputdir="${msbuild.outputpath}"
+              platform="${msbuild.platform}"
+              if="${microsoft.framework.specific == 'net-1.0' or microsoft.framework.specific == 'net-1.1'}"
             />
           </if>
         </if>
@@ -212,12 +171,12 @@
               <!--property name="Logger" value="${msbuild.logger};&quot;${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml&quot;" /-->
               <arg line="/l:${msbuild.logger};&quot;${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml&quot;" />
             </msbuild>
-            <solution 
-              configuration="${msbuild.configuration}" 
-              solutionfile="${solution.path}" 
-              outputdir="${msbuild.outputpath}" 
-              platform="${msbuild.platform}" 
-              if="${microsoft.framework.specific == 'net-1.0' or microsoft.framework.specific == 'net-1.1'}" 
+            <solution
+              configuration="${msbuild.configuration}"
+              solutionfile="${solution.path}"
+              outputdir="${msbuild.outputpath}"
+              platform="${msbuild.platform}"
+              if="${microsoft.framework.specific == 'net-1.0' or microsoft.framework.specific == 'net-1.1'}"
             />
           </if>
         </if>
@@ -246,11 +205,11 @@
               <!--property name="Logger" value="${msbuild.logger};&quot;${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml&quot;" /-->
               <arg line="/l:${msbuild.logger};&quot;${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml&quot;" />
             </msbuild>
-            <solution 
-              configuration="${msbuild.configuration}" 
-              solutionfile="${solution.path}" 
-              platform="${msbuild.platform}" 
-              if="${microsoft.framework.specific == 'net-1.0' or microsoft.framework.specific == 'net-1.1'}" 
+            <solution
+              configuration="${msbuild.configuration}"
+              solutionfile="${solution.path}"
+              platform="${msbuild.platform}"
+              if="${microsoft.framework.specific == 'net-1.0' or microsoft.framework.specific == 'net-1.1'}"
             />
           </if>
         </if>
@@ -275,11 +234,11 @@
               <!--property name="Logger" value="${msbuild.logger};&quot;${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml&quot;" /-->
               <arg line="/l:${msbuild.logger};&quot;${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml&quot;" />
             </msbuild>
-            <solution 
-              configuration="${msbuild.configuration}" 
-              solutionfile="${solution.path}" 
-              platform="${msbuild.platform}" 
-              if="${microsoft.framework.specific == 'net-1.0' or microsoft.framework.specific == 'net-1.1'}" 
+            <solution
+              configuration="${msbuild.configuration}"
+              solutionfile="${solution.path}"
+              platform="${msbuild.platform}"
+              if="${microsoft.framework.specific == 'net-1.0' or microsoft.framework.specific == 'net-1.1'}"
             />
           </if>
         </if>
@@ -291,8 +250,8 @@
     <vb6 project="${solution.path}" outdir="${dirs.build}${path.separator}${folder.app.drop}" />
   </target>
 
-  <target name="copy_documentation">
-    <echo level="Warning" message="Building documentation files to ${dirs.build}${path.separator}${folder.documentation}."/>
+  <target name="copy_documentation" if="${directory::exists(dirs.docs)}">
+    <echo level="Warning" message="Copying documentation files to ${dirs.build}${path.separator}${folder.documentation}."/>
     <copy todir="${dirs.build}${path.separator}${folder.documentation}" failonerror="false" >
       <fileset basedir="${dirs.docs}">
         <include name="**/*.*" />
@@ -300,8 +259,8 @@
     </copy>
   </target>
 
-  <target name="copy_db">
-    <echo level="Warning" message="Building database files to ${dirs.build}${path.separator}${folder.database}."/>
+  <target name="copy_db" if="${directory::exists(dirs.db)}">
+    <echo level="Warning" message="Copying database files to ${dirs.build}${path.separator}${folder.database}."/>
     <copy todir="${dirs.build}${path.separator}${folder.database}" failonerror="false">
       <fileset basedir="${dirs.db}">
         <exclude name="**/*.csproj" />
@@ -321,6 +280,6 @@
         <include name="**/*" />
       </fileset>
     </attrib>
-  </target>  
-  
+  </target>
+
 </project>

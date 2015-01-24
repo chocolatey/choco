@@ -14,9 +14,8 @@
     </imports>
     <code>
       <![CDATA[
-      
         [TaskName("results")]
-        public class ResultsProcessTask : Task 
+        public class ResultsProcessTask : Task
         {
             private string _display;
 
@@ -29,10 +28,10 @@
 
             protected override void ExecuteTask()
             {
-            	if (platformIsWindows())
-                	ExecuteProcess(CombinePaths(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),"Internet Explorer","iexplore.exe"), Display);
+                if (platformIsWindows())
+                    ExecuteProcess(CombinePaths(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),"Internet Explorer","iexplore.exe"), Display);
                 else
-                	ExecuteProcess(Display);
+                    ExecuteProcess(Display);
             }
 
             protected string CombinePaths(params string[] paths)
@@ -49,14 +48,14 @@
 
             protected void ExecuteProcess(string file)
             {
-            	ProcessStartInfo psi = new ProcessStartInfo(file, "");
-            	using (Process p = new Process())
+                ProcessStartInfo psi = new ProcessStartInfo(file, "");
+                using (Process p = new Process())
                 {
                     p.StartInfo = psi;
                     p.Start();
                 }
             }
-			
+
             protected void ExecuteProcess(string process, string arguments)
             {
                 ProcessStartInfo psi = new ProcessStartInfo(Path.GetFullPath(process), arguments);
@@ -71,14 +70,13 @@
                 }
 
             }
-            
+
             protected bool platformIsWindows()
-			{
-				PlatformID platform = Environment.OSVersion.Platform;
-				return !(platform.Equals(PlatformID.Unix) || platform.Equals(PlatformID.MacOSX));
-			}
+            {
+                PlatformID platform = Environment.OSVersion.Platform;
+                return !(platform.Equals(PlatformID.Unix) || platform.Equals(PlatformID.MacOSX));
+            }
         }
-       
       ]]>
     </code>
   </script>

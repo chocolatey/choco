@@ -5,31 +5,17 @@
   <property name="build.config.settings" value="__NONE__" overwrite="false" />
   <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
   <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
-  <property name="file.current.no_extension" value="svn" />
-  <property name="dirs.current" value="${directory::get-current-directory()}" />
-  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />  
-  <property name="folder.build_scripts" value="build" overwrite="false" />
-  <property name="folder.build_scripts_custom" value="build.custom${path.separator}" overwrite="false" />
-  <property name="dirs.build_scripts_custom" value="${dirs.current}${path.separator}${folder.build_scripts_custom}${path.separator}versioners" />
-  <property name="repository.path" value="__REPOSITORY_PATH__" overwrite="false" />
-  <property name="version.revision" value="0" overwrite="false" />
-  <property name="is.replaced" value="false" />
+  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <include buildfile="${dirs.current.file}${path.separator}..${path.separator}default.build.settings" />
+  <property name="build.step.name" value="${project::get-name()}" />
+  <property name="build.step.path" value="${project::get-buildfile-path()}" />
+  <!-- build step customizations below this -->
+
   <property name="fail.build.on.error" value="false" />
 
   <target name="go" depends="run_tasks" />
 
-  <target name="run_tasks">
-    <echo level="Warning" message="" />
-    <echo level="Warning" message="====================" />
-    <echo level="Warning" message="${project::get-name()}" />
-    <echo level="Warning" message="====================" />
-    <call target="prepare" if="${target::exists('prepare')}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="pre" failonerror="${fail.build.on.error}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="replace" failonerror="${fail.build.on.error}" />
-    <call target="run_normal_tasks" if="${not is.replaced}" />
-    <customExtension extends="${project::get-buildfile-path()}" type="post" failonerror="${fail.build.on.error}" />
-  </target>
-
+  <!-- run_normal_tasks is called from run_tasks unless replace extension exists -->
   <target name="run_normal_tasks"
           depends="get_revision, get_externally_provided_revision, set_version_environment_variable"
           description="Generating Assembly File." />
