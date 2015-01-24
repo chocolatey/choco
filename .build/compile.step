@@ -112,6 +112,8 @@
           workingdir="${dirs.build}"
           commandline="${solution.path} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.0'}" />
       <echo level="Warning" message="Building..." />
+      <echo level="Warning" message="Working directory ${dirs.build}" />
+      <echo level="Warning" message="Running ${app.xbuild} ${solution.path} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:minimal /toolsversion:${framework::get-version(microsoft.framework.specific)} /property:Platform='${msbuild.platform}' /property:TargetFrameworkVersion=v${framework::get-version(microsoft.framework.specific)} /l:${msbuild.logger};'${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml'" />
       <exec program="${app.xbuild}"
           basedir="/usr/bin"
           workingdir="${dirs.build}"
