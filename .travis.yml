@@ -8,3 +8,9 @@ script:
 notifications:
   email:
     - chocolatey-build-status@googlegroups.com
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/bd7909ec077be3f8873e
+    on_success: change  
+    on_failure: always  
+    on_start: false     
