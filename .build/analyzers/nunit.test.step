@@ -97,14 +97,14 @@
       <exec
           program="${app.test.console}"
           workingdir="${dirs.build.code}"
-          failonerror="true"
+          failonerror="${fail.build.on.error}"
           if="${platform::is-windows()}"
           >
         <arg value="${args.test_runner}" />
       </exec>
       <exec program="mono"
           workingdir="${dirs.build.code}"
-          failonerror="true"
+          failonerror="false"
           if="${platform::is-unix()}"
           >
           <arg value='"${app.test.console}"' />

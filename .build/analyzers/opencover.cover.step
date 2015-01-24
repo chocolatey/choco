@@ -87,7 +87,7 @@
     <echo level="Warning" message="Running ${app.codecoverage} -target:'${app.test.console}' -targetdir:'${dirs.build.code}' -targetargs:'${dll.names}' -filter:'${codecoverage.filters}' -output:'${dirs.codecoverage_results}${path.separator}${file.codecoverage_results}' -log:All -skipautoprops" />
     <exec program="${app.codecoverage}"
           workingdir="${dirs.build.code}"
-          failonerror="false"
+          failonerror="${fail.build.on.error}"
           if="${platform::is-windows()}"
           >
       <arg value='-target:"${app.test.console}"' />
@@ -100,7 +100,7 @@
     </exec>
     <exec program="mono"
           workingdir="${dirs.build.code}"
-          failonerror="false"
+          failonerror="${fail.build.on.error}"
           if="${platform::is-unix()}"
           >
       <arg value='"${app.codecoverage}"' />

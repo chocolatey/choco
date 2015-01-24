@@ -73,12 +73,14 @@
 
     <exec program="${app.fxcop}"
         workingdir="${dirs.build.code}"
+        failonerror="${fail.build.on.error}"
         if="${platform::is-windows()}"
         >
         <arg value="${args.fxcop}" />
     </exec>
     <exec program="mono"
         workingdir="${dirs.build.code}"
+        failonerror="${fail.build.on.error}"
         if="${platform::is-unix()}"
         >
         <arg value='"${app.fxcop}"' />

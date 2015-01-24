@@ -58,11 +58,13 @@
     <exec
       program="${path::get-full-path(app.obfuscator)}"
       workingdir="${dirs.build.code}"
+      failonerror="${fail.build.on.error}"
       commandline="${args.obfuscator}"
       if="${platform::is-windows()}" />
     <exec
       program="mono"
       workingdir="${dirs.build.code}"
+      failonerror="${fail.build.on.error}"
       if="${platform::is-unix()}"
       >
       <arg value='"${path::get-full-path(app.obfuscator)}"' />

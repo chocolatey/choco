@@ -77,11 +77,13 @@
     <echo level="Warning" message="Running this: ${app.ilmerge} ${args.ilmerge}"/>
     <exec program="${app.ilmerge}"
           workingdir="${dirs.merge.from}"
+          failonerror="${fail.build.on.error}"
           commandline="${args.ilmerge}"
           if="${platform::is-windows()}" />
     <exec
       program="mono"
       workingdir="${dirs.build}"
+      failonerror="${fail.build.on.error}"
       if="${platform::is-unix()}"
       >
       <arg value='"${app.ilmerge}"' />

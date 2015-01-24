@@ -69,13 +69,15 @@
 
     <exec program="${app.metrics}"
       workingdir="${dirs.build.code}"
-        if="${platform::is-windows()}"
+      failonerror="${fail.build.on.error}"
+      if="${platform::is-windows()}"
       >
       <arg line="${args.metrics}" />
     </exec>
     <exec program="mono"
       workingdir="${dirs.build.code}"
-        if="${platform::is-unix()}"
+      failonerror="${fail.build.on.error}"
+      if="${platform::is-unix()}"
       >
       <arg line='"${app.metrics}"' />
       <arg line="${args.metrics}" />

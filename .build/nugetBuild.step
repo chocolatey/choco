@@ -58,13 +58,14 @@
         <exec
           program="cmd"
           workingdir="${directory::get-parent-directory(spec.file)}"
-          failonerror="false"
+          failonerror="${fail.build.on.error}"
           if="${platform::is-windows()}">
             <arg value='/c ${app.nuget} pack "${spec.file}" -Version ${nuget.version}' />
         </exec>
         <exec
           program="mono"
           workingdir="${directory::get-parent-directory(spec.file)}"
+          failonerror="${fail.build.on.error}"
           if="${platform::is-unix()}"
           >
           <arg value='"${app.nuget}"' />
