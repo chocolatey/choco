@@ -63,7 +63,10 @@
     <exec
       program="mono"
       workingdir="${dirs.build.code}"
-      commandline="'${path::get-full-path(app.obfuscator)}' ${args.obfuscator}"
-      if="${platform::is-unix()}" />
+      if="${platform::is-unix()}"
+      >
+      <arg value='"${path::get-full-path(app.obfuscator)}"' />
+      <arg value='${args.obfuscator}' />
+    </exec>
   </target>
 </project>

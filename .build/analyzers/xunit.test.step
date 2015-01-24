@@ -74,7 +74,7 @@
             failonerror="true"
             if="${platform::is-unix()}"
             >
-            <arg value="'${app.test.console}'" />
+            <arg value='"${app.test.console}"' />
             <arg value="${args.test_runner}" />
           </exec>
         </if>

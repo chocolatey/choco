@@ -79,10 +79,14 @@
           workingdir="${dirs.merge.from}"
           commandline="${args.ilmerge}"
           if="${platform::is-windows()}" />
-    <exec program="mono"
-          workingdir="${dirs.merge.from}"
-          commandline="'${app.ilmerge}' ${args.ilmerge}"
-          if="${platform::is-unix()}"/>
+    <exec
+      program="mono"
+      workingdir="${dirs.build}"
+      if="${platform::is-unix()}"
+      >
+      <arg value='"${app.ilmerge}"' />
+      <arg value='${args.ilmerge}' />
+    </exec>
   </target>
 
   <target name="copy_configs">

@@ -77,7 +77,7 @@
       workingdir="${dirs.build.code}"
         if="${platform::is-unix()}"
       >
-      <arg line="'${app.metrics}'" />
+      <arg line='"${app.metrics}"' />
       <arg line="${args.metrics}" />
     </exec>s
   </target>

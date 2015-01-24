@@ -68,11 +68,15 @@
           commandline='restore "${solution.path}"'
           failonerror="false"
           if="${platform::is-windows()}" />
-    <exec program="mono"
-          workingdir="${dirs.build}"
-          commandline="'${app.nuget}' restore '${solution.path}'"
-          failonerror="false"
-          if="${platform::is-unix()}" />
+    <exec
+      program="mono"
+      workingdir="${dirs.build}"
+      failonerror="false"
+      if="${platform::is-unix()}"
+      >
+      <arg value='"${app.nuget}"' />
+      <arg value='restore "${solution.path}"' />
+    </exec>
   </target>
 
   <target name="build_code" depends="" description="Building Library">

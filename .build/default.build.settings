@@ -26,7 +26,7 @@
   <property name="folder.code_build" value="build_output" overwrite="false" />
   <property name="dirs.code_build" value="${dirs.current}${path.separator}${folder.code_build}" overwrite="false" />
   <property name="dirs.build" value="${dirs.current}${path.separator}${folder.code_build}" overwrite="false" />
-  <property name="dirs.build.code" value="${dirs.build}${path.separator}${folder.app.drop}" overwrite="false" />
+  <property name="dirs.build.code" value="${path::get-full-path(dirs.build)}${path.separator}${folder.app.drop}" overwrite="false" />
 
   <property name="folder.code_drop" value="code_drop" overwrite="false" />
   <property name="dirs.code_drop" value="${dirs.current}${path.separator}${folder.code_drop}" overwrite="false" />

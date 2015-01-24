@@ -81,7 +81,7 @@
         workingdir="${dirs.build.code}"
         if="${platform::is-unix()}"
         >
-        <arg value="'${app.fxcop}'" />
+        <arg value='"${app.fxcop}"' />
         <arg value="${args.fxcop}" />
     </exec>
   </target>

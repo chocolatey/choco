@@ -71,7 +71,9 @@
   <target name="opencover" if="${file::exists(app.codecoverage) and file::exists(app.test.console) and dlls.test != ''}">
     <echo level="Warning" message="Attempting to run OpenCover. Creating file at ${file.codecoverage_results} and logging at ${file.opencover_log}." />
 
-    <exec program="regsvr32.exe" verbose="true">
+    <exec program="regsvr32.exe"
+      verbose="true"
+      if="${platform::is-windows()}">
       <arg value="/s" />
       <arg value="/n" />
       <arg value="/i:user" />
@@ -101,7 +103,7 @@
           failonerror="false"
           if="${platform::is-unix()}"
           >
-      <arg value="'${app.codecoverage}'" />
+      <arg value='"${app.codecoverage}"' />
       <arg value='-target:"${app.test.console}"' />
       <arg value='-targetdir:"${dirs.build.code}"' />
       <arg value='-targetargs:"${dll.names}"' />
@@ -128,7 +130,7 @@
           failonerror="false"
           if="${platform::is-unix()}"
           >
-      <arg value="'${app.codecoverage.explorer}'" />
+      <arg value='"${app.codecoverage.explorer}"' />
       <arg value='${dirs.codecoverage_results}${path.separator}${file.codecoverage_results}' />
       <arg value="${dir.html.code_coverage_results}" />
       <arg value="HtmlSummary" />
