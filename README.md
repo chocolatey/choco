@@ -78,28 +78,65 @@ Running the build on Windows should produce an artifact that is tested and ready
 
 #### Other Platforms
 
-On other operating systems, you will need to install and configure Mono first prior to building.
+##### Prerequisites:
+
+ * Install and configure Mono 3.12.0 (3.8.0 should also work).
+  * [Debian based](http://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives)
+
+```sh
+# add the key
+
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+# add the package repository
+echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
+# Ubuntu 12.10/12.04 - add this deb as well
+echo "deb http://download.mono-project.com/repo/debian wheezy-libtiff-compat main" | sudo tee -a /etc/apt/sources.list.d/mono-xamarin.list
+
+# update package indexes
+sudo apt-get update
+# install
+sudo apt-get mono-devel -y
+```
+
+  * [RPM Based](http://www.mono-project.com/docs/getting-started/install/linux/#centos-fedora-and-derivatives)
+
+```sh
+### NOT FULLY TESTED AND WORKING ###
+# add the EPEL
+sudo yum install epel-release -y
+# Add the key
+sudo rpm --import "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF"
+
+# Add the package repository
+sudo yum-config-manager --add-repo http://download.mono-project.com/repo/centos/
+
+# update your system
+sudo yum update -y
+
+# Install mono-devel
+sudo yum install mono-devel -y
+
 
 ```
-$ mono -V
-Mono JIT compiler version 3.8.0 ((no/45d0ba1 Tue Aug 26 20:33:43 EDT 2014)
-Copyright (C) 2002-2014 Novell, Inc, Xamarin Inc and Contributors. www.mono-project.com
-```
 
-Prerequisites:
-
- * Install and configure Mono 3.8.0 (no guarantees that newer versions will work appropriately).
  * Xamarin Studio is helpful for working on source.
- * Add the following to your `~/.profile` (or other relevant dot source file):
+ * Consider adding the following to your `~/.profile` (or other relevant dot source file):
 
 ```sh
 # mono
 # http://www.michaelruck.de/2010/03/solving-pkg-config-and-mono-35-profile.html
 # http://cloudgen.wordpress.com/2013/03/06/configure-nant-to-run-under-mono-3-06-beta-for-mac-osx/
-export PKG_CONFIG_PATH=/opt/local/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig
+export PKG_CONFIG_PATH=/opt/local/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig:$PKG_CONFIG_PATH
 ```
 
-Build Process:
+ * Set your permissions correctly:
+
+```sh
+chmod +x build.sh
+chmod +x zip.sh
+```
+
+##### Build Process:
 
  * Run `./build.sh`.
 
