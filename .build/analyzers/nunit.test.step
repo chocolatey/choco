@@ -47,13 +47,17 @@
     <foreach item="File" property="dll.filename">
       <in>
         <items>
-          <exclude name="${dirs.build.code}${path.separator}lib${path.separator}**" />
-          <exclude name="${dirs.build.code}${path.separator}_PublishedApplications${path.separator}**" />
-          <exclude name="${dirs.build.code}${path.separator}**${path.separator}*Database*dll" />
-          <exclude name="${dirs.build.code}${path.separator}**${path.separator}*.Integration*dll" />
-          <exclude name="${dirs.build.code}${path.separator}**${path.separator}TestFu.dll" />
-          <include name="${dirs.build.code}${path.separator}**${path.separator}*Test*dll" />
-          <include name="${dirs.build.code}${path.separator}**${path.separator}*Spec*dll" />
+          <exclude name="${dirs.build.code}/lib/**" />
+          <exclude name="${dirs.build.code}/_PublishedApplications/**" />
+          <exclude name="${dirs.build.code}/**/*Database*dll" />
+          <exclude name="${dirs.build.code}/**/*database*dll" />
+          <exclude name="${dirs.build.code}/**/*.Integration*dll" />
+          <exclude name="${dirs.build.code}/**/*.integration*dll" />
+          <exclude name="${dirs.build.code}/**/TestFu.dll" />
+          <include name="${dirs.build.code}/**/*Test*dll" />
+          <include name="${dirs.build.code}/**/*test*dll" />
+          <include name="${dirs.build.code}/**/*Spec*dll" />
+          <include name="${dirs.build.code}/**/*spec*dll" />
         </items>
       </in>
       <do>
@@ -73,10 +77,12 @@
     <foreach item="File" property="dll.filename">
       <in>
         <items>
-          <exclude name="${dirs.build.code}${path.separator}lib${path.separator}**" />
-          <exclude name="${dirs.build.code}${path.separator}**${path.separator}TestFu.dll" />
-          <include name="${dirs.build.code}${path.separator}**${path.separator}*Test*dll" />
-          <include name="${dirs.build.code}${path.separator}**${path.separator}*Spec*dll" />
+          <exclude name="${dirs.build.code}/lib/**" />
+          <exclude name="${dirs.build.code}/**/TestFu.dll" />
+          <include name="${dirs.build.code}/**/*Test*dll" />
+          <include name="${dirs.build.code}/**/*test*dll" />
+          <include name="${dirs.build.code}/**/*Spec*dll" />
+          <include name="${dirs.build.code}/**/*spec*dll" />
         </items>
       </in>
       <do>

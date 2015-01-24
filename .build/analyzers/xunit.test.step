@@ -45,12 +45,16 @@
       <in>
         <items>
           <exclude name="${dirs.build.code}${path.separator}lib${path.separator}**" />
-          <exclude name="${dirs.build.code}${path.separator}**${path.separator}*Database*dll" if="${not tests.run_all}" />
-          <exclude name="${dirs.build.code}${path.separator}**${path.separator}*.Integration*dll" if="${not tests.run_all}" />
-          <exclude name="${dirs.build.code}${path.separator}**${path.separator}TestFu.dll" />
-          <exclude name="${dirs.build.code}${path.separator}**${path.separator}Microsoft.*.dll" />
-          <include name="${dirs.build.code}${path.separator}**${path.separator}*Test*dll" />
-          <include name="${dirs.build.code}${path.separator}**${path.separator}*Spec*dll" />
+          <exclude name="${dirs.build.code}/**/*Database*dll" if="${not tests.run_all}" />
+          <exclude name="${dirs.build.code}/**/*database*dll" if="${not tests.run_all}" />
+          <exclude name="${dirs.build.code}/**/*.Integration*dll" if="${not tests.run_all}" />
+          <exclude name="${dirs.build.code}/**/*.integration*dll" if="${not tests.run_all}" />
+          <exclude name="${dirs.build.code}/**/TestFu.dll" />
+          <exclude name="${dirs.build.code}/**/Microsoft.*.dll" />
+          <include name="${dirs.build.code}/**/*Test*dll" />
+          <include name="${dirs.build.code}/**/*test*dll" />
+          <include name="${dirs.build.code}/**/*Spec*dll" />
+          <include name="${dirs.build.code}/**/*spec*dll" />
         </items>
       </in>
       <do>
