@@ -155,6 +155,7 @@
 
   <!-- EXTERNAL TOOLS -->
   <property name="app.test.console" value="${dirs.tools}${path.separator}NUnit${path.separator}nunit-console.exe" overwrite="false" if="${test.framework == 'nunit'}" />
+  <property name="app.test.console.x86" value="${dirs.tools}${path.separator}NUnit${path.separator}nunit-console-x86.exe" overwrite="false" if="${test.framework == 'nunit'}" />
   <property name="app.test.console" value="${dirs.tools}${path.separator}xUnit${path.separator}xunit.console.clr4.exe" overwrite="false" if="${test.framework == 'xunit'}" />
   <property name="app.test.console" value="${dirs.tools}${path.separator}MbUnit2${path.separator}MbUnit.Cons.exe" overwrite="false" if="${test.framework == 'mbunit2'}" />
   <property name="app.test.console" value="${dirs.program_files}${path.separator}Gallio${path.separator}bin${path.separator}Gallio.Host.exe" overwrite="false" if="${test.framework == 'gallio'}" />
