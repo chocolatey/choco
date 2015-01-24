@@ -15,7 +15,6 @@
   <property name="dirs.ilmerge.folder" value="${dirs.lib}${path.separator}ILMerge" />
   <property name="dirs.merge.log" value="${dirs.drop}${path.separator}build_artifacts${path.separator}ilmerge" />
   <property name="log.merge" value="ilmergeDLL.log" />
-
   <!-- overwrite this property -->
   <property name="dirs.merge.from" value="${dirs.drop}${path.separator}${folder.app.drop}${path.separator}lib" />
   <property name="dirs.merge.to" value="${dirs.drop}${path.separator}merge" overwrite="false" />
