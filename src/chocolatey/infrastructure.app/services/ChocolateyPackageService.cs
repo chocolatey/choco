@@ -23,6 +23,7 @@ namespace chocolatey.infrastructure.app.services
     using configuration;
     using domain;
     using filesystem;
+    using infrastructure.services;
     using logging;
     using platforms;
     using results;
@@ -36,8 +37,9 @@ namespace chocolatey.infrastructure.app.services
         private readonly IRegistryService _registryService;
         private readonly IChocolateyPackageInformationService _packageInfoService;
         private readonly IAutomaticUninstallerService _autoUninstallerService;
+        private readonly IXmlService _xmlService;
 
-        public ChocolateyPackageService(INugetService nugetService, IPowershellService powershellService, IShimGenerationService shimgenService, IFileSystem fileSystem, IRegistryService registryService, IChocolateyPackageInformationService packageInfoService, IAutomaticUninstallerService autoUninstallerService)
+        public ChocolateyPackageService(INugetService nugetService, IPowershellService powershellService, IShimGenerationService shimgenService, IFileSystem fileSystem, IRegistryService registryService, IChocolateyPackageInformationService packageInfoService, IAutomaticUninstallerService autoUninstallerService, IXmlService xmlService)
         {
             _nugetService = nugetService;
             _powershellService = powershellService;
@@ -46,6 +48,7 @@ namespace chocolatey.infrastructure.app.services
             _registryService = registryService;
             _packageInfoService = packageInfoService;
             _autoUninstallerService = autoUninstallerService;
+            _xmlService = xmlService;
         }
 
         public void list_noop(ChocolateyConfiguration config)
@@ -216,13 +219,11 @@ namespace chocolatey.infrastructure.app.services
 
 
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
-            var originalConfig = config.deep_copy();
 
-            //each package can specify its own configuration values    
             foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, packageInstalls).or_empty_list_if_null())
             {
                 var results = _nugetService.install_run(
-                    config,
+                    packageConfig,
                     (packageResult) => handle_package_result(packageResult, packageConfig, CommandNameType.install)
                     );
                 foreach (var result in results)
@@ -263,11 +264,8 @@ namespace chocolatey.infrastructure.app.services
             {
                 config.PackageNames = config.PackageNames.Replace(packageConfigFile, string.Empty);
 
-                foreach (var package in get_packages_from_config(packageConfigFile, packageInstalls).or_empty_list_if_null())
+                foreach (var packageConfig in get_packages_from_config(packageConfigFile, config, packageInstalls).or_empty_list_if_null())
                 {
-                    var packageConfig = config.deep_copy();
-                    packageConfig.PackageNames = package;
-
                     yield return packageConfig;
                 }
             }
@@ -275,9 +273,9 @@ namespace chocolatey.infrastructure.app.services
             yield return config;
         }
 
-        private IEnumerable<string> get_packages_from_config(string packageConfigFile, ConcurrentDictionary<string, PackageResult> packageInstalls)
+        private IEnumerable<ChocolateyConfiguration> get_packages_from_config(string packageConfigFile, ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls)
         {
-            IList<string> packages = new List<string>();
+            IList<ChocolateyConfiguration> packageConfigs = new List<ChocolateyConfiguration>();
 
             if (!_fileSystem.file_exists(_fileSystem.get_full_path(packageConfigFile)))
             {
@@ -286,10 +284,29 @@ namespace chocolatey.infrastructure.app.services
                 var results = packageInstalls.GetOrAdd(packageConfigFile, new PackageResult(packageConfigFile, null, null));
                 results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                return packages;
+                return packageConfigs;
             }
 
-            return packages;
+            var settings = _xmlService.deserialize<PackagesConfigFileSettings>(_fileSystem.get_full_path(packageConfigFile));
+            foreach (var pkgSettings in settings.Packages.or_empty_list_if_null())
+            {
+                if (!pkgSettings.Disabled)
+                {
+                    var packageConfig = config.deep_copy();
+                    packageConfig.PackageNames = pkgSettings.Id;
+                    packageConfig.Sources = string.IsNullOrWhiteSpace(pkgSettings.Source) ? packageConfig.Sources : pkgSettings.Source;
+                    packageConfig.Version = pkgSettings.Version;
+                    packageConfig.InstallArguments = string.IsNullOrWhiteSpace(pkgSettings.InstallArguments) ? packageConfig.InstallArguments : pkgSettings.InstallArguments;
+                    packageConfig.PackageParameters = string.IsNullOrWhiteSpace(pkgSettings.PackageParameters) ? packageConfig.PackageParameters : pkgSettings.PackageParameters;
+                    if (pkgSettings.ForceX86) packageConfig.ForceX86 = true;
+                    if (pkgSettings.AllowMultipleVersions) packageConfig.AllowMultipleVersions = true;
+                    if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
+             
+                    packageConfigs.Add(packageConfig);
+                }
+            }
+
+            return packageConfigs;
         }
 
         public void upgrade_noop(ChocolateyConfiguration config)
