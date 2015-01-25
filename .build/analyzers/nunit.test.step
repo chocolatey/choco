@@ -110,7 +110,7 @@
       </exec>
       <exec program="mono"
           workingdir="${dirs.build.code}"
-          failonerror="false"
+          failonerror="${fail.build.on.error}"
           if="${platform::is-unix()}"
           >
           <arg value='"${app.test.console}"' />
