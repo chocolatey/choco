@@ -14,9 +14,9 @@ Chocolatey is brought to you by the work and inspiration of the community, the w
 
 This is the core package which allows Chocolatey to be embedded in your application.
 </description>
-    <releaseNotes>https://github.com/chocolatey/chocolatey/blob/master/CHANGELOG.md</releaseNotes>
+    <releaseNotes>https://github.com/chocolatey/choco/blob/master/CHANGELOG.md</releaseNotes>
     <projectUrl>https://github.com/chocolatey/choco</projectUrl>
-    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>RealDimensions Software, LLC - 2011 - Present</copyright>
     <tags>apt-get yum machine repository chocolatey</tags>

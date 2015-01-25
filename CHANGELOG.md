@@ -1,3 +1,15 @@
+##[0.9.9](https://github.com/chocolatey/choco/issues?q=is%3Aissue+milestone%3A0.9.9+is%3Aclosed) (unreleased)
+
+BREAKING CHANGES:
+
+ * Everything. Brand new executable. Time to learn choco again. Please call choco.exe -h to get started.
+
+##[0.9.8.32](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.32&page=1&state=closed) (January 22, 2015)
+
+BUG FIXES:
+
+ * Fix - Chocolatey-Install should return non-zero exit code if chocolateyInstall.ps1 fails - [#568](https://github.com/chocolatey/chocolatey/issues/568) & [#658](https://github.com/chocolatey/chocolatey/pull/658)
+
 ##[0.9.8.31](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.31&page=1&state=closed) (January 7, 2015)
 
 BUG FIXES:
