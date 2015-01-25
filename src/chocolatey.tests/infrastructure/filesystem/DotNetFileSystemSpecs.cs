@@ -19,6 +19,7 @@ namespace chocolatey.tests.infrastructure.filesystem
     using System.IO;
     using Should;
     using chocolatey.infrastructure.filesystem;
+    using chocolatey.infrastructure.platforms;
 
     public class DotNetFileSystemSpecs
     {
@@ -77,7 +78,10 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void Combine_should_combine_the_file_paths_of_all_the_included_items_together()
             {
-                FileSystem.combine_paths("C:\\temp", "yo", "filename.txt").ShouldEqual("C:\\temp\\yo\\filename.txt");
+                FileSystem.combine_paths("C:\\temp", "yo", "filename.txt").ShouldEqual(
+                    Platform.get_platform() == PlatformType.Windows ? 
+                        "C:\\temp\\yo\\filename.txt" 
+                        : "C:\\temp/yo/filename.txt");
             }
         }
     }

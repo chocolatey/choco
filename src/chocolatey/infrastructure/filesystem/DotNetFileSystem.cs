@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.filesystem
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Text;
+    using platforms;
 
     /// <summary>
     ///   Implementation of IFileSystem for Dot Net
@@ -82,7 +83,9 @@ namespace chocolatey.infrastructure.filesystem
 
         public string get_file_extension(string filePath)
         {
-            return Path.GetExtension(filePath);
+            if (Platform.get_platform() == PlatformType.Windows) return Path.GetExtension(filePath);
+
+            return Path.GetExtension(filePath.Replace('\\', '/'));
         }
 
         public FileInfo get_file_info_for(string filePath)
@@ -245,7 +248,9 @@ namespace chocolatey.infrastructure.filesystem
 
         public string get_directory_name(string filePath)
         {
-            return Path.GetDirectoryName(filePath);
+            if (Platform.get_platform() == PlatformType.Windows) return Path.GetDirectoryName(filePath);
+
+            return Path.GetDirectoryName(filePath.Replace('\\', '/'));
         }
 
         public DirectoryInfo get_directory_info_for(string directoryPath)
