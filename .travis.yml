@@ -4,13 +4,13 @@ install:
 before_script:
   - chmod +x build.sh
 script:
-  - ./build.sh
+  - ./build.sh -v
 notifications:
   email:
     - chocolatey-build-status@googlegroups.com
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/bd7909ec077be3f8873e
-    on_success: change  
-    on_failure: always  
-    on_start: false     
+    on_success: change
+    on_failure: always
+    on_start: false
