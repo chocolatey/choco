@@ -18,9 +18,13 @@ namespace chocolatey.infrastructure.app.runners
     using System;
     using System.Linq;
     using SimpleInjector;
+    using adapters;
     using attributes;
     using configuration;
     using infrastructure.commands;
+    using logging;
+    using Console = System.Console;
+    using Environment = System.Environment;
 
     public sealed class GenericRunner
     {
@@ -60,6 +64,28 @@ namespace chocolatey.infrastructure.app.runners
                     Console.ReadKey();
 #endif
                     Environment.Exit(1);
+                }
+
+                var token = Assembly.GetExecutingAssembly().get_public_key_token();
+                if (string.IsNullOrWhiteSpace(token) || token != ApplicationParameters.OfficialChocolateyPublicKey)
+                {
+                    if (!config.AllowUnofficialBuild)
+                    {
+                        throw new Exception(@"
+Custom unofficial builds are not allowed by default.
+ To override this behavior, explicitly set --allow-unofficial.
+ See the help menu (choco -h) for options.");
+                    }
+                    else
+                    {
+                        this.Log().Warn(ChocolateyLoggers.Important, @"
+choco.exe is not an official build (bypassed with --allow-unofficial).
+ If you are seeing this message and it is not expected, your system may 
+ now be in a bad state. Only official builds are to be trusted.
+"
+                         );
+
+                    }
                 }
 
                 if (config.Noop)
