@@ -140,7 +140,11 @@ namespace chocolatey.infrastructure.app.services
 
         public void install_noop(ChocolateyConfiguration config)
         {
-            _nugetService.install_noop(config, (pkg) => _powershellService.install_noop(pkg));
+            // each package can specify its own configuration values    
+            foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, new ConcurrentDictionary<string, PackageResult>()).or_empty_list_if_null())
+            {
+                _nugetService.install_noop(packageConfig, (pkg) => _powershellService.install_noop(pkg));
+            }
         }
 
         public void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
@@ -210,10 +214,22 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
             this.Log().Info(@"By installing you accept licenses for the packages.");
 
-            var packageInstalls = _nugetService.install_run(
-                config,
-                (packageResult) => handle_package_result(packageResult, config, CommandNameType.install)
-                );
+
+            var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
+            var originalConfig = config.deep_copy();
+
+            //each package can specify its own configuration values    
+            foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, packageInstalls).or_empty_list_if_null())
+            {
+                var results = _nugetService.install_run(
+                    config,
+                    (packageResult) => handle_package_result(packageResult, packageConfig, CommandNameType.install)
+                    );
+                foreach (var result in results)
+                {
+                    packageInstalls.GetOrAdd(result.Key, result.Value);
+                }
+            }
 
             var installFailures = packageInstalls.Count(p => !p.Value.Success);
             this.Log().Warn(() => @"{0}{1} installed {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
@@ -238,6 +254,18 @@ namespace chocolatey.infrastructure.app.services
             }
 
             return packageInstalls;
+        }
+
+        private IEnumerable<ChocolateyConfiguration> set_config_from_package_names_and_packages_config(ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls)
+        {
+            // if there are any .config files, split those off of the config. Then return the config without those package names.
+            foreach (var packageConfigFile in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.Contains(".config")).ToList())
+            {
+                config.PackageNames = config.PackageNames.Replace(packageConfigFile, string.Empty);
+
+            }
+
+            yield return config;
         }
 
         public void upgrade_noop(ChocolateyConfiguration config)
