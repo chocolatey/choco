@@ -31,7 +31,9 @@
   <target name="run_normal_tasks"
           depends="get_test_dlls, opencover, report_generator"
           description="Using OpenCover to Analyze project for test quality indicators."
-           if="${run.codecoverage and cover.framework == 'opencover' and file::exists(app.codecoverage)}" />
+           if="${run.codecoverage and cover.framework == 'opencover' and file::exists(app.codecoverage)}">
+    <echo level="Warning" message="OpenCover/ReportGenerator doesn't work on Mono." if="${platform::is-unix()}" />
+  </target>
 
   <target name="prepare">
     <echo level="Warning" message="Removing and adding ${dirs.codecoverage_results}."/>
@@ -39,7 +41,7 @@
     <mkdir dir="${dirs.codecoverage_results}" />
   </target>
 
-  <target name="get_test_dlls">
+  <target name="get_test_dlls" if="${platform::is-windows()}">
     <echo level="Warning" message="Getting test dlls based on name in directory ${path::get-full-path(dirs.build.code)}." />
     <property name="dll.names" value="" />
     <foreach item="File" property="dll.filename">
@@ -71,7 +73,8 @@
     <property name="args.test_runner" value="${dlls.test} ${test.args}" />
   </target>
 
-  <target name="opencover" if="${file::exists(app.codecoverage) and file::exists(app.test.console) and dlls.test != ''}">
+  <!-- tofix: OpenCover does not work with in Mono -->
+  <target name="opencover" if="${platform::is-windows() and file::exists(app.codecoverage) and file::exists(app.test.console) and dlls.test != ''}">
     <echo level="Warning" message="Attempting to run OpenCover. Creating file at ${file.codecoverage_results} and logging at ${file.opencover_log}." />
 
     <exec program="regsvr32.exe"
@@ -117,7 +120,8 @@
     </exec>
   </target>
 
-  <target name="report_generator" depends="opencover" if="${file::exists(app.codecoverage.explorer)}">
+  <!-- tofix: ReportGenerator does not work with in Mono -->
+  <target name="report_generator" depends="opencover" if="${platform::is-windows() and file::exists(app.codecoverage.explorer)}">
     <echo level="Warning" message="Attempting to run ReportGenerator. Creating HTML results file at ${file.html.code_coverage_results} and XML results file at ${file.xml.code_coverage_results}." />
     <exec program="${app.codecoverage.explorer}"
           workingdir="${dirs.build.code}"
