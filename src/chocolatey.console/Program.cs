@@ -60,7 +60,11 @@ namespace chocolatey.console
                 if (config.RegularOuptut)
                 {
                     "logfile".Log().Info(() => "".PadRight(60, '='));
+#if DEBUG
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1} (DEBUG BUILD)".format_with(ApplicationParameters.Name, config.Information.ChocolateyVersion));
+#else
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyVersion));
+#endif
                 }
 
                 remove_old_chocolatey_exe(fileSystem);
