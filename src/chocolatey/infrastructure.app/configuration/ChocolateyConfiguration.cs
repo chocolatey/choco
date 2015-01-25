@@ -39,6 +39,9 @@ namespace chocolatey.infrastructure.app.configuration
             ApiKeyCommand = new ApiKeyCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
             PinCommand = new PinCommandConfiguration();
+#if DEBUG
+            AllowUnofficialBuild = true;
+#endif
         }
 
         // overrides
@@ -114,6 +117,7 @@ namespace chocolatey.infrastructure.app.configuration
         public bool RegularOuptut { get; set; }
         public bool PromptForConfirmation { get; set; }
         public bool AcceptLicense { get; set; }
+        public bool AllowUnofficialBuild { get; set; }
 
 
         /// <summary>
