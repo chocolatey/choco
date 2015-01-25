@@ -263,9 +263,33 @@ namespace chocolatey.infrastructure.app.services
             {
                 config.PackageNames = config.PackageNames.Replace(packageConfigFile, string.Empty);
 
+                foreach (var package in get_packages_from_config(packageConfigFile, packageInstalls).or_empty_list_if_null())
+                {
+                    var packageConfig = config.deep_copy();
+                    packageConfig.PackageNames = package;
+
+                    yield return packageConfig;
+                }
             }
 
             yield return config;
+        }
+
+        private IEnumerable<string> get_packages_from_config(string packageConfigFile, ConcurrentDictionary<string, PackageResult> packageInstalls)
+        {
+            IList<string> packages = new List<string>();
+
+            if (!_fileSystem.file_exists(_fileSystem.get_full_path(packageConfigFile)))
+            {
+                var logMessage = "Could not find '{0}' in the location specified.".format_with(packageConfigFile);
+                this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                var results = packageInstalls.GetOrAdd(packageConfigFile, new PackageResult(packageConfigFile, null, null));
+                results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+
+                return packages;
+            }
+
+            return packages;
         }
 
         public void upgrade_noop(ChocolateyConfiguration config)
