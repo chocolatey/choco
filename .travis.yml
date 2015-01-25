@@ -1,7 +1,7 @@
 language: csharp
-solution: src/chocolatey.sln
 install:
-  - sudo apt-get install mono-devel mono-gmcs nunit-console
+  - sudo apt-get install mono-devel mono-gmcs
+  - nuget restore src/chocolatey.sln
 before_script:
   - chmod +x build.sh
 script:
