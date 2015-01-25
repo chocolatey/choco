@@ -40,6 +40,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string GlobalConfigFileLocation = _fileSystem.combine_paths(InstallLocation, "config", "chocolatey.config");
         public static readonly string LicenseFileLocation = _fileSystem.combine_paths(InstallLocation, "license", "chocolatey.license.xml");
         public static readonly string PackageNamesSeparator = ";";
+        public static readonly string OfficialChocolateyPublicKey = "79d02ea9cad655eb";
 
         public static string PackagesLocation = _fileSystem.combine_paths(InstallLocation, "lib");
         public static string PackageFailuresLocation = _fileSystem.combine_paths(InstallLocation, "lib-bad");
