@@ -78,7 +78,9 @@ namespace chocolatey.infrastructure.filesystem
 
         public string get_file_name_without_extension(string filePath)
         {
-            return Path.GetFileNameWithoutExtension(filePath);
+            if (Platform.get_platform() == PlatformType.Windows) return Path.GetFileNameWithoutExtension(filePath);
+
+            return Path.GetFileNameWithoutExtension(filePath.Replace('\\', '/'));
         }
 
         public string get_file_extension(string filePath)

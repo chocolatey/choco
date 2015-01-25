@@ -72,7 +72,10 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void GetDirectoryName_should_return_the_directory_of_the_path_to_the_file()
             {
-                FileSystem.get_directory_name("C:\\temp\\test.txt").ShouldEqual("C:\\temp");
+                FileSystem.get_directory_name("C:\\temp\\test.txt").ShouldEqual(
+                    Platform.get_platform() == PlatformType.Windows ? 
+                        "C:\\temp" 
+                        : "C:/temp");
             }
 
             [Fact]
