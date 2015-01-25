@@ -188,6 +188,7 @@ Please run chocolatey with `choco command -help` for specific help on each comma
             config.Information.PlatformType = Platform.get_platform();
             config.Information.PlatformVersion = Platform.get_version();
             config.Information.ChocolateyVersion = VersionInformation.get_current_assembly_version();
+            config.Information.FullName = Assembly.GetExecutingAssembly().FullName;
             config.Information.Is64Bit = Environment.Is64BitOperatingSystem;
             config.Information.IsInteractive = Environment.UserInteractive;
         }

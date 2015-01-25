@@ -196,6 +196,7 @@ namespace chocolatey.infrastructure.app.configuration
         public PlatformType PlatformType { get; set; }
         public Version PlatformVersion { get; set; }
         public string ChocolateyVersion { get; set; }
+        public string FullName { get; set; }
         public bool Is64Bit { get; set; }
         public bool IsInteractive { get; set; }
     }
