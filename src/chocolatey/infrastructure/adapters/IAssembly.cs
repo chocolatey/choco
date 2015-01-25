@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.adapters
     using System;
     using System.ComponentModel;
     using System.IO;
+    using System.Reflection;
 
     // ReSharper disable InconsistentNaming
 
@@ -63,6 +64,8 @@ namespace chocolatey.infrastructure.adapters
         ///   An array of type String containing the names of all the resources.
         /// </returns>
         string[] GetManifestResourceNames();
+
+        AssemblyName GetName();
 
         /// <summary>
         ///   Loads the specified manifest resource from this assembly.

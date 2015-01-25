@@ -16,6 +16,7 @@
 namespace chocolatey
 {
     using System.IO;
+    using System.Linq;
     using infrastructure.adapters;
 
     /// <summary>
@@ -58,6 +59,23 @@ namespace chocolatey
         public static Stream get_manifest_stream(this IAssembly assembly, string manifestResourceStreamLocation)
         {
             return assembly.GetManifestResourceStream(manifestResourceStreamLocation);
+        }
+
+        /// <summary>
+        ///   Gets the public key token of an assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly.</param>
+        /// <returns></returns>
+        /// <remarks>Borrowed heavily from http://dhvik.blogspot.com/2009/05/assemblynamegetpublickeytoken-tostring.html </remarks>
+        public static string get_public_key_token(this IAssembly assembly)
+        {
+            if (assembly == null) return string.Empty;
+
+            byte[] publicKeyToken = assembly.GetName().GetPublicKeyToken();
+
+            if (publicKeyToken == null || publicKeyToken.Length == 0) return string.Empty;
+
+            return publicKeyToken.Select(x => x.ToString("x2")).Aggregate((x, y) => x + y);
         }
     }
 }

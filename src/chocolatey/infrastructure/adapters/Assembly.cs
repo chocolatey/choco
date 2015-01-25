@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.adapters
     using System;
     using System.ComponentModel;
     using System.IO;
+    using System.Reflection;
 
     // ReSharper disable InconsistentNaming
 
@@ -65,6 +66,10 @@ namespace chocolatey.infrastructure.adapters
         {
             return new Assembly(System.Reflection.Assembly.GetAssembly(type));
             //return System.Reflection.Assembly.GetAssembly(type);
+        }
+        public AssemblyName GetName()
+        {
+            return _assembly.GetName();
         }
 
         public static IAssembly GetExecutingAssembly()
