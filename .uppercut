@@ -45,6 +45,9 @@
   <property name="app.test.console" value="${dirs.current}${path.separator}src${path.separator}packages${path.separator}NUnit.Runners.2.6.4${path.separator}tools${path.separator}nunit-console.exe" overwrite="false" />
   <property name="app.test.console.x86" value="${dirs.current}${path.separator}src${path.separator}packages${path.separator}NUnit.Runners.2.6.4${path.separator}tools${path.separator}nunit-console-x86.exe" overwrite="false" />
   <property name="codecoverage.filters" value="+[${project.name}*]* -[${project.name}*test*]* -[${project.name}]*adapters.* -[${project.name}]*infrastructure.app.configuration.*Setting* -[${project.name}]*app.configuration.*Configuration -[${project.name}]*app.domain.* -[${project.name}]*app.messages.* -[${project.name}]*.registration.* -[${project.name}]*app.templates.* -[${project.name}]*commandline.Option* -[${project.name}]*licensing.* -[${project.name}]*infrastructure.results.*" />
+  <property name="app.strongname" value="C:${path.separator}Program Files${path.separator}Microsoft SDKs${path.separator}Windows${path.separator}v7.0A${path.separator}Bin${path.separator}sn.exe" />
+  <property name="app.strongname" value="C:${path.separator}Program Files (x86)${path.separator}Microsoft SDKs${path.separator}Windows${path.separator}v7.0A${path.separator}Bin${path.separator}sn.exe" if="${not file::exists(app.strongname)}" />
+
   <property name="path.key.name.private" value="${environment::get-variable('CHOCOLATEY_OFFICIAL_KEY')}" if="${environment::variable-exists('CHOCOLATEY_OFFICIAL_KEY')}" />
 
 </project>
