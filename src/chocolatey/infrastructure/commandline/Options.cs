@@ -900,11 +900,12 @@ namespace chocolatey.infrastructure.commandline
 			option.Invoke (c);
 		}
 
-		private const int OptionWidth = 29;
+		private const int OptionWidth = 5;
 
 		public void WriteOptionDescriptions (TextWriter o)
 		{
 			foreach (Option p in this) {
+                o.WriteLine();
 				int written = 0;
 				if (!WriteOptionPrototype (o, p, ref written))
 					continue;
@@ -935,11 +936,11 @@ namespace chocolatey.infrastructure.commandline
 				return false;
 
 			if (names [i].Length == 1) {
-				Write (o, ref written, "  -");
+				Write (o, ref written, " -");
 				Write (o, ref written, names [0]);
 			}
 			else {
-				Write (o, ref written, "      --");
+				Write (o, ref written, "     --");
 				Write (o, ref written, names [0]);
 			}
 
