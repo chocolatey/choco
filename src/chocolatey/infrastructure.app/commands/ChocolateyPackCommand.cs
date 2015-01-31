@@ -56,17 +56,24 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Pack Command");
             this.Log().Info(@"
-Chocolatey will attempt to package a nuspec into a compiled nupkg.
+Chocolatey will attempt to package a nuspec into a compiled nupkg. Some
+ may prefer to use `cpack` as a shortcut for `choco pack`.
+");
 
-Usage: choco pack [path to nuspec] [options/switches]
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
+            "chocolatey".Log().Info(@"
+    choco pack [path to nuspec] [options/switches]
+");
 
-Examples:
-
- choco pack
- choco pack --version 1.2.3
- choco pack path/to/nuspec
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
+            "chocolatey".Log().Info(@"
+    choco pack
+    choco pack --version 1.2.3
+    choco pack path/to/nuspec
 
 ");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
         public void noop(ChocolateyConfiguration configuration)

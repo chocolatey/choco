@@ -86,20 +86,25 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Sources Command");
             this.Log().Info(@"
 Chocolatey will allow you to interact with sources.
-
-Usage: choco source [list]|add|remove|disable|enable [options/switches]
-
-Examples:
-
- choco source
- choco source list
- choco source add -n=bob -s""https://somewhere/out/there/api/v2/""
- choco source add -n=bob -s""https://somewhere/out/there/api/v2/"" -u=bob -p=12345
- choco source disable -n=bob
- choco source enable -n=bob
- choco source remove -n=bob
-
 ");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
+            "chocolatey".Log().Info(@"
+    choco source [list]|add|remove|disable|enable [options/switches]
+");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
+            "chocolatey".Log().Info(@"
+    choco source
+    choco source list
+    choco source add -n=bob -s""https://somewhere/out/there/api/v2/""
+    choco source add -n=bob -s""https://somewhere/out/there/api/v2/"" -u=bob -p=12345
+    choco source disable -n=bob
+    choco source enable -n=bob
+    choco source remove -n=bob
+");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
         public void noop(ChocolateyConfiguration configuration)

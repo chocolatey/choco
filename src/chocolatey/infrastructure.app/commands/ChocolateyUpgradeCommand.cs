@@ -92,23 +92,36 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Upgrade Command");
             this.Log().Info(@"
-Upgrades a package or a list of packages.
+Upgrades a package or a list of packages. Some may prefer to use `cup` 
+ as a shortcut for `choco upgrade`.
+");
 
-Usage: choco upgrade pkg [pkg2 pkgN] [options/switches]
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
+            "chocolatey".Log().Info(@"
+    choco upgrade pkg [pkg2 pkgN] [options/switches]
 
 NOTE: `all` is a special package keyword that will allow you to upgrade 
  all currently installed packages.
 
 NOTE: If you do not have a package installed, upgrade will error.
+");
 
-Examples:
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
+            "chocolatey".Log().Info(@"
+    choco upgrade chocolatey
+    choco upgrade notepadplusplus googlechrome atom 7zip 
+    choco upgrade notepadplusplus googlechrome atom 7zip -dvfy
+    choco upgrade git --params=""/GitAndUnixToolsOnPath /NoAutoCrlf"" -y
+    choco upgrade nodejs.install --version 0.10.35
+");
 
- choco upgrade chocolatey
- choco upgrade notepadplusplus googlechrome atom 7zip 
- choco upgrade notepadplusplus googlechrome atom 7zip -dvfy
- choco upgrade git --params=""/GitAndUnixToolsOnPath /NoAutoCrlf"" -y
- choco upgrade nodejs.install --version 0.10.35
-
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
+            "chocolatey".Log().Info(@"
+NOTE: Options and switches apply to all items passed, so if you are 
+ installing multiple packages, and you use `--version=1.0.0`, it is 
+ going to look for and try to install version 1.0.0 of every package 
+ passed. So please split out multiple package calls when wanting to 
+ pass specific options.
 ");
         }
 

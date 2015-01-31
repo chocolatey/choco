@@ -87,18 +87,24 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Pin Command");
             this.Log().Info(@"
 Pin a package to suppress upgrades.
+");
 
-Usage: choco pin [list]|add|remove [options/switches]
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
+            "chocolatey".Log().Info(@"
+    choco pin [list]|add|remove [options/switches]
+");
 
-Examples:
-
- choco pin   
- choco pin list  
- choco pin add -n=git
- choco pin add -n=git --version 1.2.3
- choco pin remove --name git
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
+            "chocolatey".Log().Info(@"
+    choco pin   
+    choco pin list  
+    choco pin add -n=git
+    choco pin add -n=git --version 1.2.3
+    choco pin remove --name git
 
 ");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
         public void noop(ChocolateyConfiguration configuration)

@@ -72,20 +72,27 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "List/Search Command");
             this.Log().Info(@"
-Chocolatey will perform a search for a package local or remote.
+Chocolatey will perform a search for a package local or remote. Some 
+ may prefer to use `clist` as a shortcut for `choco list`.
+");
 
-Usage: choco search filter [options/switches]
-Usage: choco list filter [options/switches]
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
+            "chocolatey".Log().Info(@"
+    choco search filter [options/switches]
+    choco list filter [options/switches]
+");
 
-Examples:
-
- choco list --local-only
- choco list -lp
- choco list -lap
- choco search git
- choco search git -s ""https://somewhere/out/there""
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
+            "chocolatey".Log().Info(@"
+    choco list --local-only
+    choco list -lp
+    choco list -lap
+    choco search git
+    choco search git -s ""https://somewhere/out/there""
 
 ");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
         public void noop(ChocolateyConfiguration configuration)

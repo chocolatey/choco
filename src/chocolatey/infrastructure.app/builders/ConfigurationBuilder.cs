@@ -176,10 +176,42 @@ namespace chocolatey.infrastructure.app.builders
                             commandsLog.AppendFormat(" * {0}\n", command.get_description_or_value());
                         }
 
+                        "chocolatey".Log().Info(@"This is a listing of all of the different things you can pass to choco.
+");
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, "Commands");
-                        "chocolatey".Log().Info(@"{1}
+                        "chocolatey".Log().Info(@"
+{1}
 
-Please run chocolatey with `choco command -help` for specific help on each command.".format_with(config.Information.ChocolateyVersion, commandsLog.ToString()));
+Please run chocolatey with `choco command -help` for specific help on 
+ each command.
+".format_with(config.Information.ChocolateyVersion, commandsLog.ToString()));
+                        "chocolatey".Log().Info(ChocolateyLoggers.Important, @"How To Pass Options / Switches");
+                        "chocolatey".Log().Info(@"
+You can pass options and switches in the following ways:
+
+ * `-` - except for normal switches (not 1 character) when using option
+   blending, see below.
+ * `--` - except for one character switches
+ * `/`
+ * ""Option Blending / Blended Options"": One character switches can be 
+   blended. e.g. `-d` (debug), `-f` (force), `-v` (verbose), and `-y` 
+   (confirm yes) can be blended as `-dfvy`, but you must use `--` for 
+   all other normal options/switches e.g. `--version` instead of 
+   `-version`. If you don't do this, you may have unintended results.
+ * ""Use Equals"": You can also include or not include an equals sign 
+   `=` between options and values. And quote the values.
+ * Options and switches apply to all items passed, so if you are 
+   installing multiple packages, and you use `--version=1.0.0`, it is 
+   going to look for and try to install version 1.0.0 of every package 
+   passed. So please split out multiple package calls when wanting to 
+   pass specific options.
+ * When you need to quote things, such as when using spaces in option 
+   values, please use single quote marks ('). In cmd.exe, you can also 
+   use double double quotes (i.e. """"yo""""). This is due to the hand 
+   off to PowerShell - seems to strip off the outer set of quotes. 
+   TODO: TEST THIS, MAY NOT BE RELEVANT NOW.
+");
+                        "chocolatey".Log().Info(ChocolateyLoggers.Important, "Default Options and Switches");
                     });
         }
 

@@ -84,21 +84,34 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Uninstall Command");
             this.Log().Info(@"
-Uninstalls a package or a list of packages.
+Uninstalls a package or a list of packages. Some may prefer to use 
+ `cuninst` as a shortcut for `choco uninstall`.
+");
 
-Usage: choco uninstall pkg [pkg2 pkgN] [options/switches]
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
+            "chocolatey".Log().Info(@"
+    choco uninstall pkg [pkg2 pkgN] [options/switches]
 
 NOTE: `all` is a special package keyword that will allow you to 
  uninstall all packages.
+");
 
-Examples:
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
+            "chocolatey".Log().Info(@"
+    choco uninstall git
+    choco uninstall notepadplusplus googlechrome atom 7zip 
+    choco uninstall notepadplusplus googlechrome atom 7zip -dv
+    choco uninstall ruby --version 1.8.7.37402
+    choco uninstall nodejs.install --all-versions
+");
 
- choco uninstall git
- choco uninstall notepadplusplus googlechrome atom 7zip 
- choco uninstall notepadplusplus googlechrome atom 7zip -dv
- choco uninstall ruby --version 1.8.7.37402
- choco uninstall nodejs.install --all-versions
-
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
+            "chocolatey".Log().Info(@"
+NOTE: Options and switches apply to all items passed, so if you are 
+ installing multiple packages, and you use `--version=1.0.0`, it is 
+ going to look for and try to install version 1.0.0 of every package 
+ passed. So please split out multiple package calls when wanting to 
+ pass specific options.
 ");
         }
 

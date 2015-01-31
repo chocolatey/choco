@@ -122,21 +122,28 @@ NOTE: For chocolatey.org, you must update the source to be secure.".format_with(
             this.Log().Info(ChocolateyLoggers.Important, "Push Command");
             this.Log().Info(@"
 Chocolatey will attempt to push a compiled nupkg to a package feed. 
- That feed can be a local folder, a file share, the community feed 
- '{0}' or a custom/private feed.
+ Some may prefer to use `cpush` as a shortcut for `choco push`.
 
-Usage: choco push [path to nupkg] [options/switches]
+A feed can be a local folder, a file share, the community feed 
+ '{0}' or a custom/private feed.
+".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
+            "chocolatey".Log().Info(@"
+    choco push [path to nupkg] [options/switches]
 
 NOTE: If there is more than one nupkg file in the folder, the command 
  will require specifying the path to the file.
+");
 
-Examples:
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
+            "chocolatey".Log().Info(@"
+    choco push --source ""https://chocolatey.org/""
+    choco push --source ""https://chocolatey.org/"" -t 500
+    choco push --source ""https://chocolatey.org/"" -k=""123-123123-123""
+");
 
- choco push --source ""https://chocolatey.org/""
- choco push --source ""https://chocolatey.org/"" -t 500
- choco push --source ""https://chocolatey.org/"" -k=""123-123123-123""
-
-".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
         public void noop(ChocolateyConfiguration configuration)

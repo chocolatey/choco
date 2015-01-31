@@ -70,16 +70,22 @@ This lists api keys that are set or sets an api key for a particular
  source so it doesn't need to be specified every time.
 
 Anything that doesn't contain source and key will list api keys.
-
-Usage: choco apikey [options/switches]
-
-Examples:
-
- choco apikey
- choco apikey -s""https://somewhere/out/there""
- choco apikey -s""https://somewhere/out/there/"" -k=""value""
- choco apikey -s""https://chocolatey.org/"" -k=""123-123123-123""
 ");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
+            "chocolatey".Log().Info(@"
+    choco apikey [options/switches]
+");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
+            "chocolatey".Log().Info(@"
+    choco apikey
+    choco apikey -s""https://somewhere/out/there""
+    choco apikey -s""https://somewhere/out/there/"" -k=""value""
+    choco apikey -s""https://chocolatey.org/"" -k=""123-123123-123""
+");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
         public void noop(ChocolateyConfiguration configuration)

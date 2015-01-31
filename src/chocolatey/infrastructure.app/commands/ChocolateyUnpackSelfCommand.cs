@@ -74,6 +74,8 @@ NOTE: This command should only be used when installing Chocolatey, not
  during normal operation. 
 
 ");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
         public void noop(ChocolateyConfiguration configuration)
