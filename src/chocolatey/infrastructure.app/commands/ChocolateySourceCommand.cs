@@ -51,7 +51,7 @@ namespace chocolatey.infrastructure.app.commands
                      "User - used with authenticated feeds. Defaults to empty.",
                      option => configuration.SourceCommand.Username = option)
                 .Add("p=|password=",
-                     "Password - the user's password to the source. Encrypted in file.",
+                     "Password - the user's password to the source. Encrypted in chocolatey.config file.",
                      option => configuration.SourceCommand.Password = option)
                 ;
         }
