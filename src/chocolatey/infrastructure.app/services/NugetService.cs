@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -148,7 +148,7 @@ namespace chocolatey.infrastructure.app.services
 
             this.Log().Info(() => "Attempting to build package from '{0}'.".format_with(_fileSystem.get_file_name(nuspecFilePath)));
 
-            //IPackage package = 
+            //IPackage package =
             NugetPack.BuildPackage(builder, _fileSystem, outputPath);
             //todo: v1 analyze package
             //if (package != null)
@@ -467,7 +467,7 @@ spam/junk folder.");
                 {
                     var pkg = e.Package;
 
-                    // this section fires twice sometimes, like for older packages in a sxs install... 
+                    // this section fires twice sometimes, like for older packages in a sxs install...
                     var results = packageUninstalls.GetOrAdd(pkg.Id.to_lower() + "." + pkg.Version.to_string(), new PackageResult(pkg, e.InstallPath));
                     string logMessage = "{0}{1} v{2}{3}".format_with(Environment.NewLine, pkg.Id, pkg.Version.to_string(), config.Force ? " (forced)" : string.Empty);
                     if (results.Messages.Count((p) => p.Message == ApplicationParameters.Messages.NugetEventActionHeader) == 0)
@@ -489,13 +489,13 @@ spam/junk folder.");
                     }
                     else
                     {
-                        //todo:allow cleaning of pkgstore files      
+                        //todo:allow cleaning of pkgstore files
                     }
                 };
 
             set_package_names_if_all_is_specified(config, () =>
                 {
-                    // force remove the item, ignore the dependencies 
+                    // force remove the item, ignore the dependencies
                     // as those are going to be picked up anyway
                     config.Force = true;
                     config.ForceDependencies = false;
@@ -545,7 +545,7 @@ spam/junk folder.");
                             }
                             string allVersions = "All versions";
                             choices.Add(allVersions);
-                            var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), choices, allVersions, false);
+                            var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), choices, allVersions, true);
 
                             if (string.IsNullOrWhiteSpace(selection)) continue;
                             if (selection.is_equal_to(allVersions))

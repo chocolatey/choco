@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,15 +42,16 @@ namespace chocolatey.infrastructure.app.commands
                      "Source - Source location for install. Can include special 'webpi'. Defaults to sources.",
                      option => configuration.Sources = option)
                 .Add("l|lo|localonly|local-only",
-                     "LocalOnly - Only search in installed items",
+                     "LocalOnly - Only search against local machine items.",
                      option => configuration.ListCommand.LocalOnly = option != null)
                 .Add("p|includeprograms|include-programs",
                      "IncludePrograms - Used in conjuction with LocalOnly, filters out apps chocolatey has listed as packages and includes those in the list. Defaults to false.",
                      option => configuration.ListCommand.IncludeRegistryPrograms = option != null)
                 .Add("a|all|allversions|all-versions",
-                     "AllVersions - include results from all versions",
+                     "AllVersions - include results from all versions.",
                      option => configuration.AllVersions = option != null)
                 ;
+            //todo exact name
         }
 
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)

@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,13 +91,13 @@ Usage: choco source [list]|add|remove|disable|enable [options/switches]
 
 Examples:
 
- choco source   
- choco source list  
+ choco source
+ choco source list
  choco source add -n=bob -s""https://somewhere/out/there/api/v2/""
  choco source add -n=bob -s""https://somewhere/out/there/api/v2/"" -u=bob -p=12345
  choco source disable -n=bob
  choco source enable -n=bob
- choco source remove -n=bob 
+ choco source remove -n=bob
 
 ");
         }
