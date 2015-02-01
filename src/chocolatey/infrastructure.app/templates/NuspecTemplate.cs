@@ -44,7 +44,7 @@ namespace chocolatey.infrastructure.app.templates
     <releaseNotes></releaseNotes>
   </metadata>
   <files>
-    <file src=""tools/**"" target=""tools"" />
+    <file src=""tools\**"" target=""tools"" />
   </files>
 </package>
 ";

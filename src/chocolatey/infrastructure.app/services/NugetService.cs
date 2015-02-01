@@ -134,6 +134,8 @@ namespace chocolatey.infrastructure.app.services
             var basePath = _fileSystem.get_current_directory();
             if (config.Information.PlatformType != PlatformType.Windows)
             {
+                //bug with nuspec and tools/** folder location on Windows.
+                //bug? this needs to be checked
                 basePath = "./";
             }
 
