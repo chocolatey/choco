@@ -26,17 +26,18 @@ Or, you can find us in IRC at #chocolatey.
  * [Twitter](https://twitter.com/chocolateynuget)
  * [Build Status Email List](http://groups.google.com/group/chocolatey-build-status)
 
-## License / Credits
-Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICENSE) and [NOTICE](https://github.com/chocolatey/choco/blob/master/NOTICE) files.
 
-## Documentation
-Please see the [wiki](https://github.com/chocolatey/chocolatey/wiki) (WILL NEED TO UPDATE TO A NEW LOCAL WIKI with all the fun changes)
+### Documentation
+Please see the [wiki](https://github.com/chocolatey/choco/wiki)
 
 Give `choco.exe /?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
 
-## Requirements
+### Requirements
 * .NET Framework 4.0
 * PowerShell 2.0+
+
+### License / Credits
+Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICENSE) and [NOTICE](https://github.com/chocolatey/choco/blob/master/NOTICE) files.
 
 ## Submitting Issues
 
