@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-//
+// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-//
+// 
 // You may obtain a copy of the License at
-//
+// 
 // 	http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -172,7 +172,7 @@ namespace chocolatey.infrastructure.app.services
 
             NugetPush.push_package(config, nupkgFilePath);
 
-            if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important,() => @"
+            if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
 Your package may be subject to moderation. A moderator will review the
 package prior to acceptance. You should have received an email. If you
@@ -337,7 +337,7 @@ spam/junk folder.");
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
 
             foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
-            {  
+            {
                 //todo: get smarter about realizing multiple versions have been installed before and allowing that
 
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
@@ -422,7 +422,7 @@ spam/junk folder.");
                         }
                     }
                 }
-        }
+            }
 
             return packageInstalls;
         }
