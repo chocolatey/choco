@@ -503,81 +503,73 @@ spam/junk folder.");
 
             foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                if (packageName.to_lower().EndsWith(".config"))
+                IList<IPackage> installedPackageVersions = new List<IPackage>();
+                if (string.IsNullOrWhiteSpace(config.Version))
                 {
-                    //todo: determine if .config file for packages .config
-                    //todo: determine if config file exists
+                    installedPackageVersions = packageManager.LocalRepository.FindPackagesById(packageName).OrderBy((p) => p.Version).ToList();
                 }
                 else
                 {
-                    IList<IPackage> installedPackageVersions = new List<IPackage>();
-                    if (string.IsNullOrWhiteSpace(config.Version))
-                    {
-                        installedPackageVersions = packageManager.LocalRepository.FindPackagesById(packageName).OrderBy((p) => p.Version).ToList();
-                    }
-                    else
-                    {
-                        IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
-                        if (installedPackage != null) installedPackageVersions.Add(installedPackage);
-                    }
+                    IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+                    if (installedPackage != null) installedPackageVersions.Add(installedPackage);
+                }
 
-                    if (installedPackageVersions.Count == 0)
-                    {
-                        string logMessage = "{0} is not installed. Cannot uninstall a non-existent package.".format_with(packageName);
-                        var results = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                        results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                if (installedPackageVersions.Count == 0)
+                {
+                    string logMessage = "{0} is not installed. Cannot uninstall a non-existent package.".format_with(packageName);
+                    var results = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                    results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                        if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                        continue;
-                    }
+                    if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    continue;
+                }
 
-                    var packageVersionsToRemove = installedPackageVersions.ToList();
-                    if (!config.AllVersions)
+                var packageVersionsToRemove = installedPackageVersions.ToList();
+                if (!config.AllVersions)
+                {
+                    if (installedPackageVersions.Count != 1 && config.PromptForConfirmation)
                     {
-                        if (installedPackageVersions.Count != 1 && config.PromptForConfirmation)
+                        packageVersionsToRemove.Clear();
+
+                        IList<string> choices = new List<string>();
+                        foreach (var installedVersion in installedPackageVersions.or_empty_list_if_null())
                         {
-                            packageVersionsToRemove.Clear();
-
-                            IList<string> choices = new List<string>();
-                            foreach (var installedVersion in installedPackageVersions.or_empty_list_if_null())
-                            {
-                                choices.Add(installedVersion.Version.to_string());
-                            }
-                            string allVersions = "All versions";
-                            choices.Add(allVersions);
-                            var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), choices, allVersions, true);
-
-                            if (string.IsNullOrWhiteSpace(selection)) continue;
-                            if (selection.is_equal_to(allVersions))
-                            {
-                                packageVersionsToRemove = installedPackageVersions.ToList();
-                                if (config.RegularOuptut) this.Log().Info(() => "You selected to remove all versions of {0}".format_with(packageName));
-                            }
-                            else
-                            {
-                                IPackage pkg = installedPackageVersions.FirstOrDefault((p) => p.Version.to_string().is_equal_to(selection));
-                                packageVersionsToRemove.Add(pkg);
-                                if (config.RegularOuptut) this.Log().Info(() => "You selected {0} v{1}".format_with(pkg.Id, pkg.Version.to_string()));
-                            }
+                            choices.Add(installedVersion.Version.to_string());
                         }
-                    }
+                        string allVersions = "All versions";
+                        choices.Add(allVersions);
+                        var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), choices, allVersions, true);
 
-                    foreach (var packageVersion in packageVersionsToRemove)
-                    {
-                        if (performAction)
+                        if (string.IsNullOrWhiteSpace(selection)) continue;
+                        if (selection.is_equal_to(allVersions))
                         {
-                            using (packageManager.SourceRepository.StartOperation(
-                                RepositoryOperationNames.Install,
-                                packageName,
-                                version == null ? null : version.ToString()))
-                            {
-                                packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
-                            }
+                            packageVersionsToRemove = installedPackageVersions.ToList();
+                            if (config.RegularOuptut) this.Log().Info(() => "You selected to remove all versions of {0}".format_with(packageName));
                         }
                         else
                         {
-                            packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, ApplicationParameters.PackagesLocation));
+                            IPackage pkg = installedPackageVersions.FirstOrDefault((p) => p.Version.to_string().is_equal_to(selection));
+                            packageVersionsToRemove.Add(pkg);
+                            if (config.RegularOuptut) this.Log().Info(() => "You selected {0} v{1}".format_with(pkg.Id, pkg.Version.to_string()));
                         }
+                    }
+                }
+
+                foreach (var packageVersion in packageVersionsToRemove)
+                {
+                    if (performAction)
+                    {
+                        using (packageManager.SourceRepository.StartOperation(
+                            RepositoryOperationNames.Install,
+                            packageName,
+                            version == null ? null : version.ToString()))
+                        {
+                            packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
+                        }
+                    }
+                    else
+                    {
+                        packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, ApplicationParameters.PackagesLocation));
                     }
                 }
             }
