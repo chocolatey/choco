@@ -10,33 +10,32 @@
     <description>
 Chocolatey is a package manager for Windows (like apt-get but for Windows). It was designed to be a decentralized framework for quickly installing applications and tools that you need. It is built on the NuGet infrastructure currently using PowerShell as its focus for delivering packages from the distros to your door, err computer.
 
-Chocolatey is brought to you by the work and inspiration of the community, the work and thankless nights of the Chocolatey Team (https://github.com/orgs/chocolatey/members), and Rob heading up the direction.
+Chocolatey is brought to you by the work and inspiration of the community, the work and thankless nights of the [Chocolatey Team](https://github.com/orgs/chocolatey/members), with Rob heading up the direction.
 
-You can host your own sources and add them to chocolatey, you can extend chocolatey's capabilities, and folks, it's only going to get better.
+You can host your own sources and add them to Chocolatey, you can extend Chocolatey's capabilities, and folks, it's only going to get better.
 
 ### Commands
-There are quite a few commands you can call - you should check out the command reference at: https://github.com/chocolatey/chocolatey/wiki/CommandsReference
+There are quite a few commands you can call - you should check out the [command reference](https://github.com/chocolatey/choco/wiki/CommandsReference). Here are the most common:
 
  * Search - choco search something
  * List - choco list -lo
  * Install - choco install baretail
- * Update - choco update baretail
+ * Pin - choco pin windirstat
+ * Upgrade - choco upgrade baretail
  * Uninstall - choco uninstall baretail
+
+ Alternative installation sources (TEMPORARILY DISABLED IN 0.9.9):
  * Install ruby gem - choco install compass -source ruby
  * Install python egg - choco install sphynx -source python
  * Install windows feature - choco install IIS -source windowsfeatures
  * Install webpi feature - choco install IIS7.5Express -source webpi
 
-More advanced commands and switches listed on the command reference, including how you can force a package to install the x86 version of a package.
+For more advanced commands and switches, use `choco -?` or `choco command -h`. You can also look at the [command reference](https://github.com/chocolatey/choco/wiki/CommandsReference), including how you can force a package to install the x86 version of a package.
 
 ### Create Packages?
-We have some great guidance on how to do that. Where? I'll give you a hint, it rhymes with sticky! https://github.com/chocolatey/chocolatey/wiki/CreatePackages
+We have some great guidance on how to do that. Where? I'll give you a hint, it rhymes with sticky! [Wiki!](https://github.com/chocolatey/choco/wiki/CreatePackages)
 
-In that mess there is a link to the Helper Reference - https://github.com/chocolatey/chocolatey/wiki/HelpersReference
-
-### Chocolatey gods?
-Humor related to playing off of tiki gods. We like humor. Don't take life so seriously, you will never get out alive.
-
+In that mess there is a link to the [Helper Reference](https://github.com/chocolatey/choco/wiki/HelpersReference).
 </description>
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/master/CHANGELOG.md
