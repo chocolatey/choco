@@ -527,21 +527,29 @@ spam/junk folder.");
                 var packageVersionsToRemove = installedPackageVersions.ToList();
                 if (!config.AllVersions)
                 {
-                    if (installedPackageVersions.Count != 1 && config.PromptForConfirmation)
+                    if (config.PromptForConfirmation)
                     {
                         packageVersionsToRemove.Clear();
 
                         IList<string> choices = new List<string>();
+                        const string abortChoice = "None";
+                        choices.Add(abortChoice);
                         foreach (var installedVersion in installedPackageVersions.or_empty_list_if_null())
                         {
                             choices.Add(installedVersion.Version.to_string());
                         }
-                        string allVersions = "All versions";
-                        choices.Add(allVersions);
-                        var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), choices, allVersions, true);
+
+                        const string allVersionsChoice = "All versions";
+                        if (installedPackageVersions.Count != 1)
+                        {
+                            choices.Add(allVersionsChoice);
+                        }
+
+                        var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), choices, abortChoice, true);
 
                         if (string.IsNullOrWhiteSpace(selection)) continue;
-                        if (selection.is_equal_to(allVersions))
+                        if (selection.is_equal_to(abortChoice)) continue;
+                        if (selection.is_equal_to(allVersionsChoice))
                         {
                             packageVersionsToRemove = installedPackageVersions.ToList();
                             if (config.RegularOuptut) this.Log().Info(() => "You selected to remove all versions of {0}".format_with(packageName));
