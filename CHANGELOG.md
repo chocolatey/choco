@@ -38,6 +38,7 @@ We'll try to capture everything here that you should know about. Please call `ch
    4. `update` is now `upgrade`. `update` has been removed for now but will be reincarnated later for a different purpose. **Hint**: It rhymes with smackage pindexes.
    5. `sources` is now `source`.
  * packages.config has a slightly different structure now. See [Packages.config](https://github.com/chocolatey/choco/wiki/CommandsInstall#packagesconfig) and [#10](https://github.com/chocolatey/choco/issues/10)
+ * PowerShell - Ensure all errors are terminating errors - see [#48](https://github.com/chocolatey/choco/issues/48)
 
 ### FEATURES
 
