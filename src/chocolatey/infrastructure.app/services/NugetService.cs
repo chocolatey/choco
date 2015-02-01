@@ -353,7 +353,7 @@ spam/junk folder.");
                     if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
-
+                
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 if (pkgInfo != null && pkgInfo.IsPinned)
                 {
@@ -416,7 +416,7 @@ spam/junk folder.");
                     if (performAction)
                     {
                         using (packageManager.SourceRepository.StartOperation(
-                            RepositoryOperationNames.Install,
+                            RepositoryOperationNames.Update,
                             packageName,
                             version == null ? null : version.ToString()))
                         {
