@@ -85,6 +85,17 @@ Anything that doesn't contain source and key will list api keys.
     choco apikey -s""https://chocolatey.org/"" -k=""123-123123-123""
 ");
 
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Connecting to Chocolatey.org");
+            "chocolatey".Log().Info(() => @"
+In order to save your API key for {0}, 
+ log in (or register, confirm and then log in) to
+ {0}, go to {0}account, 
+ copy the API Key, and then use it in the following command:
+
+    choco apikey -k <your key here> -s {0}
+
+".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 

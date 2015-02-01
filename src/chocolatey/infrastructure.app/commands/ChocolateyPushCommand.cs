@@ -147,8 +147,8 @@ NOTE: If there is more than one nupkg file in the folder, the command
 To use this command, you must have your API key saved for the community
  feed (chocolatey.org) or the source you want to push to. Or you can 
  explicitly pass the apikey to the command. In order to save your API 
- key for {0}, log into (or register, confirm and 
- then log in) {0}, go to {0}account, 
+ key for {0}, log in (or register, confirm and 
+ then log in) to {0}, go to {0}account, 
  copy the API Key and use it in the following command:
 
     choco apikey -k <your key here> -s {0}
