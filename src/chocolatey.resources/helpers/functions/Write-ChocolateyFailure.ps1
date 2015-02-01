@@ -19,8 +19,5 @@ param(
 )
   Write-Warning "Write-ChocolateyFailure is deprecated. If you are the package maintainer, please use 'throw `$_.Exception' instead."
     
-  $errorMessage = "$packageName did not finish successfully. Boo to the chocolatey gods!
-  $failureMessage"
   $error | %{ $_.Exception | fl * | Out-String }
-  #throw $errorMessage
 }
