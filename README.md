@@ -106,7 +106,7 @@ echo "deb http://download.mono-project.com/repo/debian wheezy-libtiff-compat mai
 # update package indexes
 sudo apt-get update
 # install
-sudo apt-get mono-devel -y
+sudo apt-get install mono-devel -y
 ```
 
   * [RPM Based](http://www.mono-project.com/docs/getting-started/install/linux/#centos-fedora-and-derivatives)
