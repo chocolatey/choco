@@ -75,10 +75,8 @@ Install-ChocolateyVsixPackage ""$packageName"" ""$url""
   # END PORTABLE EXAMPLE
 
   # everything below is all part of error handling
-  #Write-ChocolateySuccess ""$packageName""
 #} catch {
-  #Write-ChocolateyFailure ""$packageName"" ""$($_.Exception.Message)""
-  #throw
+  #throw $_
 #}
 ";
 
