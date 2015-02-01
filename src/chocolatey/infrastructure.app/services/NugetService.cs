@@ -337,100 +337,92 @@ spam/junk folder.");
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
 
             foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
-            {
-                if (packageName.to_lower().EndsWith(".config"))
+            {  
+                //todo: get smarter about realizing multiple versions have been installed before and allowing that
+
+                IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+
+                if (installedPackage == null)
                 {
-                    //todo: determine if .config file for packages .config
-                    //todo: determine if config file exists
+                    string logMessage = "{0} is not installed. Cannot upgrade a non-existent package.".format_with(packageName);
+                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                    results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+
+                    if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    continue;
                 }
-                else
+
+                var pkgInfo = _packageInfoService.get_package_information(installedPackage);
+                if (pkgInfo != null && pkgInfo.IsPinned)
                 {
-                    //todo: get smarter about realizing multiple versions have been installed before and allowing that
+                    string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
+                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                    results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                    if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                    continue;
+                }
 
-                    IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+                IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+                if (availablePackage == null)
+                {
+                    string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
+                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
+                    results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                    if (installedPackage == null)
+                    if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    continue;
+                }
+
+                if ((installedPackage.Version > availablePackage.Version))
+                {
+                    string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
+                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
+                    results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+
+                    if (config.RegularOuptut) this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                    continue;
+                }
+
+                if ((installedPackage.Version == availablePackage.Version))
+                {
+                    string logMessage = "{0} v{1} is the latest version available based on your source(s).".format_with(installedPackage.Id, installedPackage.Version);
+                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
+                    if (results.Messages.Count((p) => p.Message == ApplicationParameters.Messages.ContinueChocolateyAction) == 0)
                     {
-                        string logMessage = "{0} is not installed. Cannot upgrade a non-existent package.".format_with(packageName);
-                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                        results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-
-                        if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                        continue;
-                    }
-
-                    var pkgInfo = _packageInfoService.get_package_information(installedPackage);
-                    if (pkgInfo != null && pkgInfo.IsPinned)
-                    {
-                        string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
-                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                        results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                        if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
-                        continue;
-                    }
-
-                    IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
-                    if (availablePackage == null)
-                    {
-                        string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
-                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
-                        results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-
-                        if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                        continue;
-                    }
-
-                    if ((installedPackage.Version > availablePackage.Version))
-                    {
-                        string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
-                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
                         results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-
-                        if (config.RegularOuptut) this.Log().Info(ChocolateyLoggers.Important, logMessage);
-                        continue;
                     }
 
-                    if ((installedPackage.Version == availablePackage.Version))
-                    {
-                        string logMessage = "{0} v{1} is the latest version available based on your source(s).".format_with(installedPackage.Id, installedPackage.Version);
-                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
-                        if (results.Messages.Count((p) => p.Message == ApplicationParameters.Messages.ContinueChocolateyAction) == 0)
-                        {
-                            results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                        }
+                    if (config.RegularOuptut) this.Log().Info(logMessage);
+                    if (!config.Force) continue;
+                }
 
-                        if (config.RegularOuptut) this.Log().Info(logMessage);
-                        if (!config.Force) continue;
+                if (availablePackage.Version > installedPackage.Version || config.Force)
+                {
+                    if (availablePackage.Version > installedPackage.Version)
+                    {
+                        if (config.RegularOuptut)
+                        {
+                            this.Log().Warn("You have {0} v{1} installed. Version {2} is available based on your source(s)".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version));
+                        }
+                        else
+                        {
+                            //last one is whether this package is pinned or not
+                            this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, "false"));
+                        }
                     }
 
-                    if (availablePackage.Version > installedPackage.Version || config.Force)
+                    if (performAction)
                     {
-                        if (availablePackage.Version > installedPackage.Version)
+                        using (packageManager.SourceRepository.StartOperation(
+                            RepositoryOperationNames.Install,
+                            packageName,
+                            version == null ? null : version.ToString()))
                         {
-                            if (config.RegularOuptut)
-                            {
-                                this.Log().Warn("You have {0} v{1} installed. Version {2} is available based on your source(s)".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version));
-                            }
-                            else
-                            {
-                                //last one is whether this package is pinned or not
-                                this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, "false"));
-                            }
-                        }
-
-                        if (performAction)
-                        {
-                            using (packageManager.SourceRepository.StartOperation(
-                                RepositoryOperationNames.Install,
-                                packageName,
-                                version == null ? null : version.ToString()))
-                            {
-                                packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
-                            }
+                            packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
                         }
                     }
                 }
-            }
+        }
 
             return packageInstalls;
         }
