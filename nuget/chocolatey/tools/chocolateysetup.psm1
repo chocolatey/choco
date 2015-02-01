@@ -3,6 +3,7 @@ $chocInstallVariableName = "ChocolateyInstall"
 $sysDrive = $env:SystemDrive
 $tempDir = $env:TEMP
 $defaultChocolateyPathOld = "$sysDrive\Chocolatey"
+$ErrorActionPreference = 'Stop'
 
 function Initialize-Chocolatey {
 <#
@@ -237,9 +238,22 @@ param(
         Write-Warning "Was not able to remove `'$binFilePathRename`'. This may cause errors."
       }
     }
-    if (Test-Path ($binFilePath)) { Move-Item -path $binFilePath -destination $binFilePathRename -force }
+    if (Test-Path ($binFilePath)) {
+     try {
+        Move-Item -path $binFilePath -destination $binFilePathRename -force
+      }
+      catch {
+        Write-Warning "Was not able to rename `'$binFilePath`' to `'$binFilePathRename`'."
+      }
+    }
 
-    Copy-Item -path $exeFilePath -destination $binFilePath -force
+    try {
+      Copy-Item -path $exeFilePath -destination $binFilePath -force
+    }
+    catch {
+      Write-Warning "Was not able to replace `'$binFilePath`' with `'$exeFilePath`'. You may need to do this manually."
+    }
+
     $commandShortcut = [System.IO.Path]::GetFileNameWithoutExtension("$exeFilePath")
     Write-Debug "Added command $commandShortcut"
   }
