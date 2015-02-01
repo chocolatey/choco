@@ -111,6 +111,9 @@ Probably a lot of bug fixes that may not make it here, but here are the ones we 
  * Fix - Chocolatey behaves strangely after ctrl+c - see [chocolatey #608](https://github.com/chocolatey/chocolatey/issues/608)
  * Fix - Uninstall doesn't respect version setting - see [chocolatey #612](https://github.com/chocolatey/chocolatey/issues/612)
  * Fix - No update after download error - see [chocolatey #637](https://github.com/chocolatey/chocolatey/issues/637)
+ * Fix - cup ends silently on error - see [chocolatey #312](https://github.com/chocolatey/chocolatey/issues/312)
+ * Fix - cpack silently fails when dependency .NET 4.0+ is not met - see [chocolatey #270](https://github.com/chocolatey/chocolatey/issues/270)
+ * Fix - Regression in cver all in 0.9.8.27 - see [chocolatey #530](https://github.com/chocolatey/chocolatey/issues/530)
 
 ### IMPROVEMENTS
 
@@ -127,8 +130,11 @@ Probably a lot of bug fixes that may not make it here, but here are the ones we 
  * Add parameters in packages.config files - see [chocolatey #472](https://github.com/chocolatey/chocolatey/issues/472), [Packages.config](https://github.com/chocolatey/choco/wiki/CommandsInstall#packagesconfig) and [#10](https://github.com/chocolatey/choco/issues/10)
  * Choco pack should support `-version` - see [chocolatey #526](https://github.com/chocolatey/chocolatey/issues/526)
  * Enhancements to Start-ChocolateyProcessAsAdmin - see [chocolatey #564](https://github.com/chocolatey/chocolatey/pull/564)
- * Install-ChocolateyFileAssociation - add label to new file types - see [#564](https://github.com/chocolatey/chocolatey/pull/564)
- * Dat help menu tho. I mean srsly guise - see [#641](https://github.com/chocolatey/chocolatey/issues/641)
+ * Install-ChocolateyFileAssociation - add label to new file types - see [chocolatey #564](https://github.com/chocolatey/chocolatey/pull/564)
+ * Clean up the verobsity of Chocolatey - see [chocolatey #374](https://github.com/chocolatey/chocolatey/issues/374)
+ * Compact choco upgrade --noop option - see [chocolatey #414](https://github.com/chocolatey/chocolatey/issues/414)
+ * Remove references to the chocolatey gods - see [chocolatey #669](https://github.com/chocolatey/chocolatey/issues/669)
+ * Dat help menu tho. I mean srsly guise - see [chocolatey #641](https://github.com/chocolatey/chocolatey/issues/641)
 
     </releaseNotes>
     <projectUrl>https://github.com/chocolatey/choco</projectUrl>
