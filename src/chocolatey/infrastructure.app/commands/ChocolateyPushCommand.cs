@@ -45,7 +45,7 @@ namespace chocolatey.infrastructure.app.commands
 
             optionSet
                 .Add("s=|source=",
-                     "Source - The source we are pushing the package to. Use {0} to push to community feed.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource),
+                     "Source (REQUIRED) - The source we are pushing the package to. Use {0} to push to community feed.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource),
                      option => configuration.Sources = option)
                 .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The api key for the source. If not specified (and not local file source), does a lookup. If not specified and one is not found for an https source, push will fail.",
@@ -142,6 +142,25 @@ NOTE: If there is more than one nupkg file in the folder, the command
     choco push --source ""https://chocolatey.org/"" -t 500
     choco push --source ""https://chocolatey.org/"" -k=""123-123123-123""
 ");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Troubleshooting");
+            "chocolatey".Log().Info(()=> @"
+To use this command, you must have your API key saved for the community
+ feed (chocolatey.org) or the source you want to push to. Or you can 
+ explicitly pass the apikey to the command. In order to save your API 
+ key for {0}, log into (or register, confirm and 
+ then log in) {0}, go to {0}account, 
+ copy the API Key and use it in the following command:
+
+    choco apikey -k <your key here> -s {0}
+
+A common error is `Failed to process request. 'The specified API key 
+ does not provide the authority to push packages.' The remote server 
+ returned an error: (403) Forbidden..` This means the package already 
+ exists with a different user (API key). The package could be unlisted. 
+ You can verify by going to {0}packages/packageName. 
+ Please contact the administrators of {0} if you see this 
+ and you don't see a good reason for it.
+".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
