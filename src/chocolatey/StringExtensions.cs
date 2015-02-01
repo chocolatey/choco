@@ -15,8 +15,11 @@
 
 namespace chocolatey
 {
+    using System;
     using System.Globalization;
     using System.Text.RegularExpressions;
+    using infrastructure.app;
+    using infrastructure.logging;
 
     /// <summary>
     ///   Extensions for string
@@ -31,9 +34,17 @@ namespace chocolatey
         /// <returns>A formatted string.</returns>
         public static string format_with(this string input, params object[] formatting)
         {
-           if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
-            return string.Format(input, formatting);
+            try
+            {
+                return string.Format(input, formatting);
+            }
+            catch (Exception ex)
+            {
+                "chocolatey".Log().Error(ChocolateyLoggers.Important, "{0} had an error formatting string:{1} {2}", ApplicationParameters.Name, Environment.NewLine, ex.Message);
+                return input;
+            }
         }
 
         /// <summary>
