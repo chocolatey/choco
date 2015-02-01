@@ -592,7 +592,10 @@ spam/junk folder.");
                 config.ListCommand.LocalOnly = true;
                 var sources = config.Sources;
                 config.Sources = ApplicationParameters.PackagesLocation;
+                var pre = config.Prerelease;
+                config.Prerelease = true;
                 var localPackages = list_run(config, logResults: false);
+                config.Prerelease = pre;
                 config.Sources = sources;
                 config.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator, localPackages.Select((p) => p.Key).or_empty_list_if_null());
 

@@ -72,6 +72,7 @@ namespace chocolatey.infrastructure.app.commands
             configuration.Sources = ApplicationParameters.PackagesLocation;
             configuration.ListCommand.LocalOnly = true;
             configuration.AllVersions = true;
+            configuration.Prerelease = true;
         }
 
         public void handle_validation(ChocolateyConfiguration configuration)

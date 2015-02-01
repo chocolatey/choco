@@ -44,6 +44,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("l|lo|localonly|local-only",
                      "LocalOnly - Only search against local machine items.",
                      option => configuration.ListCommand.LocalOnly = option != null)
+                .Add("pre|prerelease",
+                     "Prerelease - Include Prereleases? Defaults to false.",
+                     option => configuration.Prerelease = option != null)
                 .Add("p|includeprograms|include-programs",
                      "IncludePrograms - Used in conjuction with LocalOnly, filters out apps chocolatey has listed as packages and includes those in the list. Defaults to false.",
                      option => configuration.ListCommand.IncludeRegistryPrograms = option != null)
@@ -61,6 +64,7 @@ namespace chocolatey.infrastructure.app.commands
             if (configuration.ListCommand.LocalOnly)
             {
                 configuration.Sources = ApplicationParameters.PackagesLocation;
+                configuration.Prerelease = true;
             }
         }
 

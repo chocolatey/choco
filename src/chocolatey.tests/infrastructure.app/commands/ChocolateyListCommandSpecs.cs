@@ -105,6 +105,18 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
+            public void should_add_prerelease_to_the_option_set()
+            {
+                optionSet.Contains("prerelease").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_short_version_of_prerelease_to_the_option_set()
+            {
+                optionSet.Contains("pre").ShouldBeTrue();
+            }
+
+            [Fact]
             public void should_add_includeprograms_to_the_option_set()
             {
                 optionSet.Contains("includeprograms").ShouldBeTrue();
