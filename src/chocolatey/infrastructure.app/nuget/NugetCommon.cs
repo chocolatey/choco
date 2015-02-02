@@ -99,6 +99,8 @@ namespace chocolatey.infrastructure.app.nuget
                 packageManager.Logger = nugetLogger;
             }
 
+            //NOTE DO NOT EVER use this method - packageManager.PackageInstalling += (s, e) =>
+                
             packageManager.PackageInstalled += (s, e) =>
                 {
                     var pkg = e.Package;
@@ -107,6 +109,8 @@ namespace chocolatey.infrastructure.app.nuget
                     if (installSuccessAction != null) installSuccessAction.Invoke(e);
                 };
 
+            // NOTE DO NOT EVER use this method, or endless loop - packageManager.PackageUninstalling += (s, e) =>
+                
             packageManager.PackageUninstalled += (s, e) =>
                 {
                     IPackage pkg = packageManager.LocalRepository.FindPackage(e.Package.Id, e.Package.Version);
