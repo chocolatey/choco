@@ -36,7 +36,14 @@ namespace chocolatey.infrastructure.filesystem
             var combinedPath = leftItem;
             foreach (var rightItem in rightItems)
             {
-                combinedPath = Path.Combine(combinedPath, rightItem);
+                if (rightItem.StartsWith(Path.DirectorySeparatorChar.to_string()) || rightItem.StartsWith(Path.AltDirectorySeparatorChar.to_string()))
+                {
+                    combinedPath = Path.Combine(combinedPath, rightItem.Substring(1));
+                }
+                else
+                {
+                    combinedPath = Path.Combine(combinedPath, rightItem);
+                }
             }
 
             return combinedPath;
