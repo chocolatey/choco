@@ -34,16 +34,17 @@ namespace chocolatey.infrastructure.filesystem
 
         public string combine_paths(string leftItem, params string[] rightItems)
         {
-            var combinedPath = leftItem;
+            var combinedPath = Platform.get_platform() == PlatformType.Windows ? leftItem : leftItem.Replace('\\', '/');
             foreach (var rightItem in rightItems)
             {
-                if (rightItem.StartsWith(Path.DirectorySeparatorChar.to_string()) || rightItem.StartsWith(Path.AltDirectorySeparatorChar.to_string()))
+                var rightSide = Platform.get_platform() == PlatformType.Windows ? rightItem : rightItem.Replace('\\', '/');
+                if (rightSide.StartsWith(Path.DirectorySeparatorChar.to_string()) || rightSide.StartsWith(Path.AltDirectorySeparatorChar.to_string()))
                 {
-                    combinedPath = Path.Combine(combinedPath, rightItem.Substring(1));
+                    combinedPath = Path.Combine(combinedPath, rightSide.Substring(1));
                 }
                 else
                 {
-                    combinedPath = Path.Combine(combinedPath, rightItem);
+                    combinedPath = Path.Combine(combinedPath, rightSide);
                 }
             }
 

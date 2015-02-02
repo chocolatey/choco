@@ -84,7 +84,7 @@ namespace chocolatey.tests.infrastructure.filesystem
                 FileSystem.combine_paths("C:\\temp", "yo", "filename.txt").ShouldEqual(
                     Platform.get_platform() == PlatformType.Windows ? 
                         "C:\\temp\\yo\\filename.txt" 
-                        : "C:\\temp/yo/filename.txt");
+                        : "C:/temp/yo/filename.txt");
             }
 
             [Fact]
@@ -93,7 +93,7 @@ namespace chocolatey.tests.infrastructure.filesystem
                 FileSystem.combine_paths("C:\\temp", "yo\\timmy", "filename.txt").ShouldEqual(
                     Platform.get_platform() == PlatformType.Windows ? 
                         "C:\\temp\\yo\\timmy\\filename.txt" 
-                        : "C:\\temp/yo/timmy/filename.txt");
+                        : "C:/temp/yo/timmy/filename.txt");
             }
 
             [Fact]
@@ -102,7 +102,7 @@ namespace chocolatey.tests.infrastructure.filesystem
                 FileSystem.combine_paths("C:\\temp", "\\yo", "filename.txt").ShouldEqual(
                     Platform.get_platform() == PlatformType.Windows ? 
                         "C:\\temp\\yo\\filename.txt" 
-                        : "C:\\temp/yo/filename.txt");
+                        : "C:/temp/yo/filename.txt");
             }
             
             [Fact]
@@ -111,7 +111,7 @@ namespace chocolatey.tests.infrastructure.filesystem
                 FileSystem.combine_paths("C:\\temp", "/yo", "filename.txt").ShouldEqual(
                     Platform.get_platform() == PlatformType.Windows ? 
                         "C:\\temp\\yo\\filename.txt" 
-                        : "C:\\temp/yo/filename.txt");
+                        : "C:/temp/yo/filename.txt");
             }
         }
     }
