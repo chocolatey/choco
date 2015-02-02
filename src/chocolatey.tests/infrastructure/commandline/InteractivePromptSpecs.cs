@@ -173,6 +173,14 @@ namespace chocolatey.tests.infrastructure.commandline
                 console.Setup(c => c.ReadLine()).Returns("1");
                 var result = prompt();
                 result.ShouldEqual(choices[0]);
+            } 
+            
+            [Fact]
+            public void should_return_first_choice_when_value_of_choice_is_given()
+            {
+                console.Setup(c => c.ReadLine()).Returns("yes");
+                var result = prompt();
+                result.ShouldEqual(choices[0]);
             }
 
             [Fact]

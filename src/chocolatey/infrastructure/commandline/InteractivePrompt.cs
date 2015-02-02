@@ -39,7 +39,7 @@ namespace chocolatey.infrastructure.commandline
             get { return _console.Value; }
         }
 
-        public static TChoice prompt_for_confirmation<TChoice>(string prompt, IEnumerable<TChoice> choices, TChoice defaultChoice, bool requireAnswer, int repeat = 10) where TChoice : class
+        public static string prompt_for_confirmation(string prompt, IEnumerable<string> choices, string defaultChoice, bool requireAnswer, int repeat = 10)
         {
             if (repeat < 0) throw new ApplicationException("Too many bad attempts. Stopping before application crash.");
             Ensure.that(() => prompt).is_not_null();
@@ -61,7 +61,7 @@ namespace chocolatey.infrastructure.commandline
             "chocolatey".Log().Info(ChocolateyLoggers.Important, prompt);
 
             int counter = 1;
-            IDictionary<int, TChoice> choiceDictionary = new Dictionary<int, TChoice>();
+            IDictionary<int, string> choiceDictionary = new Dictionary<int, string>();
             foreach (var choice in choices.or_empty_list_if_null())
             {
                 choiceDictionary.Add(counter, choice);
@@ -77,15 +77,31 @@ namespace chocolatey.infrastructure.commandline
             }
 
             int selected = -1;
+
             if (!int.TryParse(selection, out selected) || selected <= 0 || selected > (counter - 1))
             {
-                "chocolatey".Log().Error(ChocolateyLoggers.Important, "Your choice of '{0}' is not a valid selection.".format_with(selection));
-                if (requireAnswer)
+                // check to see if value was passed
+                var selectionFound = false;
+                foreach (var pair in choiceDictionary)
                 {
-                    "chocolatey".Log().Warn(ChocolateyLoggers.Important, "You must select an answer");
-                    return prompt_for_confirmation(prompt, choices, defaultChoice, requireAnswer, repeat - 1);
+                    if (pair.Value.is_equal_to(selection))
+                    {
+                        selected = pair.Key;
+                        selectionFound = true;   
+                        break;
+                    }
                 }
-                return null;
+
+                if (!selectionFound)
+                {
+                    "chocolatey".Log().Error(ChocolateyLoggers.Important, "Your choice of '{0}' is not a valid selection.".format_with(selection));
+                    if (requireAnswer)
+                    {
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, "You must select an answer");
+                        return prompt_for_confirmation(prompt, choices, defaultChoice, requireAnswer, repeat - 1);
+                    }
+                    return null;
+                }
             }
 
             return choiceDictionary[selected];
