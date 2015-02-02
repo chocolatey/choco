@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.app.services
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using commandline;
     using configuration;
     using domain;
     using filesystem;
@@ -195,7 +196,7 @@ namespace chocolatey.infrastructure.app.services
             if (!packageResult.Success)
             {
                 this.Log().Error(ChocolateyLoggers.Important, "{0} {1} not successful.".format_with(packageResult.Name, commandName.to_string()));
-                handle_unsuccessful_install(packageResult);
+                handle_unsuccessful_install(config, packageResult);
 
                 return;
             }
@@ -297,29 +298,29 @@ namespace chocolatey.infrastructure.app.services
             var packageUninstalls = _nugetService.uninstall_run(
                 config,
                 (packageResult) =>
+                {
+                    if (!_fileSystem.directory_exists(packageResult.InstallLocation))
                     {
-                        if (!_fileSystem.directory_exists(packageResult.InstallLocation))
-                        {
-                            packageResult.InstallLocation += ".{0}".format_with(packageResult.Package.Version.to_string());
-                        }
+                        packageResult.InstallLocation += ".{0}".format_with(packageResult.Package.Version.to_string());
+                    }
 
-                        _shimgenService.uninstall(config, packageResult);
+                    _shimgenService.uninstall(config, packageResult);
 
-                        if (!config.SkipPackageInstallProvider)
-                        {
-                             _powershellService.uninstall(config, packageResult);
-                        }
+                    if (!config.SkipPackageInstallProvider)
+                    {
+                        _powershellService.uninstall(config, packageResult);
+                    }
 
-                        _autoUninstallerService.run(packageResult, config);
+                    _autoUninstallerService.run(packageResult, config);
 
-                        if (packageResult.Success)
-                        {
-                            //todo: v2 clean up package information store for things no longer installed (call it compact?)
-                            _packageInfoService.remove_package_information(packageResult.Package);
-                        }
+                    if (packageResult.Success)
+                    {
+                        //todo: v2 clean up package information store for things no longer installed (call it compact?)
+                        _packageInfoService.remove_package_information(packageResult.Package);
+                    }
 
-                        //todo:prevent reboots
-                    });
+                    //todo:prevent reboots
+                });
 
             var uninstallFailures = packageUninstalls.Count(p => !p.Value.Success);
             this.Log().Warn(() => @"{0}{1} uninstalled {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
@@ -346,25 +347,6 @@ namespace chocolatey.infrastructure.app.services
             return packageUninstalls;
         }
 
-        private void handle_unsuccessful_install(PackageResult packageResult)
-        {
-            foreach (var message in packageResult.Messages.Where(m => m.MessageType == ResultType.Error))
-            {
-                this.Log().Error(message.Message);
-            }
-
-            _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageFailuresLocation);
-            foreach (var file in _fileSystem.get_files(packageResult.InstallLocation, "*.*", SearchOption.AllDirectories))
-            {
-                var badFile = file.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation);
-                _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(badFile));
-                _fileSystem.move_file(file, badFile);
-                //_fileSystem.copy_file_unsafe(file, badFile,overwriteTheExistingFile:true);
-            }
-            Thread.Sleep(2000); // sleep for enough time that the for half a second to allow the folder to be cleared
-            _fileSystem.delete_directory(packageResult.InstallLocation, recursive: true);
-        }
-
         private void ensure_bad_package_path_is_clean(ChocolateyConfiguration config, PackageResult packageResult)
         {
             try
@@ -385,6 +367,52 @@ namespace chocolatey.infrastructure.app.services
                 {
                     this.Log().Error(() => "Attempted to delete bad package install path if existing. Had an error:{0}{1}".format_with(Environment.NewLine, ex.Message));
                 }
+            }
+        }
+
+        private void handle_unsuccessful_install(ChocolateyConfiguration config, PackageResult packageResult)
+        {
+            foreach (var message in packageResult.Messages.Where(m => m.MessageType == ResultType.Error))
+            {
+                this.Log().Error(message.Message);
+            }
+
+            move_bad_package_to_failure_location(packageResult);
+            rollback_previous_version(config, packageResult);
+        }
+
+        private void move_bad_package_to_failure_location(PackageResult packageResult)
+        {
+            _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageFailuresLocation);
+
+            _fileSystem.move_directory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation));
+            _fileSystem.delete_directory(packageResult.InstallLocation, recursive: true);
+        }
+
+        private void rollback_previous_version(ChocolateyConfiguration config, PackageResult packageResult)
+        {
+            var rollbackDirectory = packageResult.InstallLocation + ApplicationParameters.RollbackPackageSuffix;
+            if (!_fileSystem.directory_exists(rollbackDirectory)) return;
+
+            var rollback = true;
+            if (config.PromptForConfirmation)
+            {
+                var selection = InteractivePrompt.prompt_for_confirmation(" Unsuccessful install of {0}.{1}  Do you want to rollback to previous version (package files only)?".format_with(packageResult.Name,Environment.NewLine), new[] { "yes", "no" }, "yes", requireAnswer: true);
+                if (selection.is_equal_to("no")) rollback = false;
+            }
+
+            if (rollback)
+            {
+                _fileSystem.move_directory(rollbackDirectory, packageResult.InstallLocation);
+            }
+            
+            try
+            {
+                _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true);
+            }
+            catch (Exception ex)
+            {
+                this.Log().Warn("Attempted to remove '{0}' but had an error:{1} {2}".format_with(rollbackDirectory, Environment.NewLine, ex.Message));
             }
         }
     }

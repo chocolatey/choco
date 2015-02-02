@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.filesystem
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Text;
+    using System.Threading;
     using platforms;
 
     /// <summary>
@@ -154,17 +155,19 @@ namespace chocolatey.infrastructure.filesystem
             File.Move(filePath, newFilePath);
         }
 
-        public void copy_file(string sourceFilePath, string destFilePath, bool overWriteExisting)
+        public void copy_file(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
         {
-            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFilePath, destFilePath));
-            File.Copy(sourceFilePath, destFilePath, overWriteExisting);
+            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFilePath, destinationFilePath));
+            create_directory_if_not_exists(get_directory_name(destinationFilePath),ignoreError:true);
+            File.Copy(sourceFilePath, destinationFilePath, overwriteExisting);
         }
 
-        public bool copy_file_unsafe(string sourceFileName, string destinationFileName, bool overwriteTheExistingFile)
+        public bool copy_file_unsafe(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
         {
-            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFileName, destinationFileName));
+            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFilePath, destinationFilePath));
+            create_directory_if_not_exists(get_directory_name(destinationFilePath), ignoreError: true);
             //Private Declare Function apiCopyFile Lib "kernel32" Alias "CopyFileA" _
-            int success = CopyFileA(sourceFileName, destinationFileName, overwriteTheExistingFile ? 0 : 1);
+            int success = CopyFileW(sourceFilePath, destinationFilePath, overwriteExisting ? 0 : 1);
             return success == 0;
         }
 
@@ -181,7 +184,7 @@ namespace chocolatey.infrastructure.filesystem
          */
 
         [DllImport("kernel32")]
-        private static extern int CopyFileA(string lpExistingFileName, string lpNewFileName, int bFailIfExists);
+        private static extern int CopyFileW(string lpExistingFileName, string lpNewFileName, int bFailIfExists);
 
         // ReSharper restore InconsistentNaming
 
@@ -278,7 +281,44 @@ namespace chocolatey.infrastructure.filesystem
             Directory.CreateDirectory(directoryPath);
         }
 
+        public void move_directory(string directoryPath, string newDirectoryPath)
+        {
+            create_directory_if_not_exists(newDirectoryPath, ignoreError:true);
+            foreach (var file in get_files(directoryPath, "*.*", SearchOption.AllDirectories).or_empty_list_if_null())
+            {
+                var destinationFile = file.Replace(directoryPath, newDirectoryPath);
+                if (file_exists(destinationFile)) delete_file(destinationFile);
+
+                create_directory_if_not_exists(get_directory_name(destinationFile),ignoreError:true);
+                this.Log().Debug("Moving '{0}'{1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
+                move_file(file, destinationFile);
+            }
+
+            Thread.Sleep(2000); // sleep for enough time to allow the folder to be cleared
+        }
+
+        public void copy_directory(string sourceDirectoryPath, string destinationDirectoryPath, bool overwriteExisting)
+        {
+            create_directory_if_not_exists(destinationDirectoryPath,ignoreError:true);
+
+            foreach (var file in get_files(sourceDirectoryPath, "*.*", SearchOption.AllDirectories).or_empty_list_if_null())
+            {
+                var destinationFile = file.Replace(sourceDirectoryPath, destinationDirectoryPath);
+                create_directory_if_not_exists(get_directory_name(destinationFile), ignoreError: true);
+                this.Log().Debug("Copying '{0}' {1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
+                copy_file(file, destinationFile, overwriteExisting);
+            }
+
+            Thread.Sleep(1500); // sleep for enough time to allow the folder to finish copying
+        }
+
+
         public void create_directory_if_not_exists(string directoryPath)
+        {
+            create_directory_if_not_exists(directoryPath, false);
+        }
+
+        public void create_directory_if_not_exists(string directoryPath, bool ignoreError)
         {
             if (!directory_exists(directoryPath))
             {
@@ -288,12 +328,16 @@ namespace chocolatey.infrastructure.filesystem
                 }
                 catch (SystemException e)
                 {
-                    this.Log().Error("Cannot create directory \"{0}\". Error was:{1}{2}", get_full_path(directoryPath), Environment.NewLine, e);
-                    throw;
+                    if (!ignoreError)
+                    {
+                        this.Log().Error("Cannot create directory \"{0}\". Error was:{1}{2}", get_full_path(directoryPath), Environment.NewLine, e);
+                        throw;
+                    }
+                    
                 }
             }
         }
-
+        
         public void delete_directory(string directoryPath, bool recursive)
         {
             this.Log().Debug(() => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directoryPath)));

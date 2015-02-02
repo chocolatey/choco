@@ -261,8 +261,11 @@ spam/junk folder.");
                 else
                 {
                     //todo: get smarter about realizing multiple versions have been installed before and allowing that
+                    
+                    remove_existing_rollback_directory(packageName);
 
                     IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+                    
                     if (installedPackage != null && (version == null || version == installedPackage.Version) && !config.Force)
                     {
                         string logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
@@ -307,6 +310,19 @@ spam/junk folder.");
             return packageInstalls;
         }
 
+        private void remove_existing_rollback_directory(string packageName)
+        {
+            var rollbackDirectory = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, packageName) + ApplicationParameters.RollbackPackageSuffix;
+            try
+            {
+                _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true);
+            }
+            catch (Exception ex)
+            {
+                this.Log().Warn("Attempted to remove '{0}' but had an error:{1} {2}".format_with(rollbackDirectory, Environment.NewLine, ex.Message));
+            }
+        }
+
         public void upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
             config.Force = false;
@@ -324,22 +340,26 @@ spam/junk folder.");
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
-            var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
-                                                               installSuccessAction: (e) =>
-                                                                   {
-                                                                       var pkg = e.Package;
-                                                                       var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                                                                       results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+            var packageManager = NugetCommon.GetPackageManager(
+                config, 
+                _nugetLogger,
+                installSuccessAction: (e) =>
+                    {
+                        var pkg = e.Package;
+                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                                                                       if (continueAction != null) continueAction.Invoke(results);
-                                                                   },
-                                                               uninstallSuccessAction: null);
+                        if (continueAction != null) continueAction.Invoke(results);
+                    },
+                uninstallSuccessAction: null);
 
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
 
             foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 //todo: get smarter about realizing multiple versions have been installed before and allowing that
+
+                remove_existing_rollback_directory(packageName);
 
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
@@ -419,6 +439,7 @@ spam/junk folder.");
                             packageName,
                             version == null ? null : version.ToString()))
                         {
+                            backup_existing_version(config, installedPackage);
                             packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
                         }
                     }
@@ -426,6 +447,29 @@ spam/junk folder.");
             }
 
             return packageInstalls;
+        }
+
+        public void backup_existing_version(ChocolateyConfiguration config, IPackage installedPackage)
+        {
+            var pathResolver = NugetCommon.GetPathResolver(config, NugetCommon.GetNuGetFileSystem(config, _nugetLogger));
+            var pkgInstallPath = pathResolver.GetInstallPath(installedPackage);
+            if (!_fileSystem.directory_exists(pkgInstallPath))
+            {
+                var chocoPathResolver = pathResolver as ChocolateyPackagePathResolver;
+                if (chocoPathResolver != null)
+                {
+                    chocoPathResolver.UseSideBySidePaths = !chocoPathResolver.UseSideBySidePaths;
+                    pkgInstallPath = chocoPathResolver.GetInstallPath(installedPackage);
+                }
+            }
+
+            if (_fileSystem.directory_exists(pkgInstallPath))
+            {
+                this.Log().Debug("Backing up existing {0} prior to upgrade.".format_with(installedPackage.Id));
+
+                var backupLocation = pkgInstallPath + ApplicationParameters.RollbackPackageSuffix;
+                _fileSystem.copy_directory(pkgInstallPath,backupLocation,overwriteExisting:true);
+            }
         }
 
         public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
@@ -456,6 +500,7 @@ spam/junk folder.");
                                                                        "chocolatey".Log().Info(ChocolateyLoggers.Important, " {0} has been successfully uninstalled.".format_with(pkg.Id));
                                                                    });
 
+            var loopCount = 0;
             packageManager.PackageUninstalling += (s, e) =>
                 {
                     var pkg = e.Package;
@@ -467,10 +512,18 @@ spam/junk folder.");
                     {
                         results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.NugetEventActionHeader));
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, logMessage);
+                        loopCount = 0;
                     }
                     else
                     {
                         "chocolatey".Log().Debug(ChocolateyLoggers.Important, "Another time through!{0}{1}".format_with(Environment.NewLine, logMessage));
+                        loopCount += 1;
+                    }
+
+                    if (loopCount == 10)
+                    {
+                        this.Log().Warn("Loop detected. Attempting to break out. Check for issues with {0}".format_with(pkg.Id));
+                        return;
                     }
 
                     // is this the latest version or have you passed --sxs? This is the only way you get through to the continue action.
@@ -496,6 +549,8 @@ spam/junk folder.");
 
             foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
+                remove_existing_rollback_directory(packageName);
+
                 IList<IPackage> installedPackageVersions = new List<IPackage>();
                 if (string.IsNullOrWhiteSpace(config.Version))
                 {

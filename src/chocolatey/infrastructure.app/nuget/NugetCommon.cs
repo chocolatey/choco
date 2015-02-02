@@ -122,7 +122,15 @@ namespace chocolatey.infrastructure.app.nuget
                         if (chocoPathResolver != null)
                         {
                             chocoPathResolver.UseSideBySidePaths = !chocoPathResolver.UseSideBySidePaths;
-                            packageManager.UninstallPackage(pkg, forceRemove: configuration.Force, removeDependencies: false);
+                            
+                            // an unfound package folder can cause an endless loop.
+                            // look for it and ignore it if doesn't line up with versioning
+                            if (nugetPackagesFileSystem.DirectoryExists(chocoPathResolver.GetInstallPath(pkg)))
+                            {
+                                // this causes this to be called again, which should then call the uninstallSuccessAction below
+                                packageManager.UninstallPackage(pkg, forceRemove: configuration.Force, removeDependencies: false);
+                            }
+                            
                             chocoPathResolver.UseSideBySidePaths = configuration.AllowMultipleVersions;
                         }
                     }

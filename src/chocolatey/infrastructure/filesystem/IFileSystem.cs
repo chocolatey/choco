@@ -153,19 +153,19 @@ namespace chocolatey.infrastructure.filesystem
         /// <summary>
         ///   Copies an existing file to a new file. Overwriting a file of the same name is allowed.
         /// </summary>
-        /// <param name="sourceFilePath">The source file path. Teh File to copy.</param>
-        /// <param name="destFilePath">The dest file path.</param>
-        /// <param name="overWriteExisting">true if the destination file can be overwritten; otherwise, false.</param>
-        void copy_file(string sourceFilePath, string destFilePath, bool overWriteExisting);
+        /// <param name="sourceFilePath">The source file path. The file to copy.</param>
+        /// <param name="destinationFilePath">The destination file path.</param>
+        /// <param name="overwriteExisting">true if the destination file can be overwritten; otherwise, false.</param>
+        void copy_file(string sourceFilePath, string destinationFilePath, bool overwriteExisting);
 
         /// <summary>
         ///   Copies a file from one directory to another using FFI
         /// </summary>
-        /// <param name="sourceFileName">Where is the file now?</param>
-        /// <param name="destinationFileName">Where would you like it to go?</param>
-        /// <param name="overwriteTheExistingFile">If there is an existing file already there, would you like to delete it?</param>
+        /// <param name="sourceFilePath">Where is the file now?</param>
+        /// <param name="destinationFilePath">Where would you like it to go?</param>
+        /// <param name="overwriteExisting">If there is an existing file already there, would you like to delete it?</param>
         /// <returns>true if copy was successful, otherwise false</returns>
-        bool copy_file_unsafe(string sourceFileName, string destinationFileName, bool overwriteTheExistingFile);
+        bool copy_file_unsafe(string sourceFilePath, string destinationFilePath, bool overwriteExisting);
 
         /// <summary>
         ///   Deletes the specified file.
@@ -266,6 +266,21 @@ namespace chocolatey.infrastructure.filesystem
         /// </summary>
         /// <param name="directoryPath">The directory path to create. </param>
         void create_directory(string directoryPath);
+
+        /// <summary>
+        ///   Moves a specified directory to a new location, providing the option to specify a new directory name.
+        /// </summary>
+        /// <param name="directoryPath">The path of the directory to move.</param>
+        /// <param name="newDirectoryPath">The new path for the directory.</param>
+        void move_directory(string directoryPath, string newDirectoryPath);
+
+        /// <summary>
+        ///   Copies an existing directory to a new directory. Overwriting a directory of the same name is allowed.
+        /// </summary>
+        /// <param name="sourceDirectoryPath">The source file directory. The directory to copy.</param>
+        /// <param name="destinationDirectoryPath">The destination directory path.</param>
+        /// <param name="overwriteExisting">true if the destination directory can be overwritten; otherwise, false.</param>
+        void copy_directory(string sourceDirectoryPath, string destinationDirectoryPath, bool overwriteExisting);
 
         /// <summary>
         ///   Creates all directories and subdirectories in the specified path if they have not already been created.
