@@ -26,6 +26,7 @@ namespace chocolatey.infrastructure.app.domain
         //[Description("update - updates package index")] update,
         [Description("upgrade - upgrades packages from various sources")] upgrade,
         [Description("uninstall - uninstalls a package")] uninstall,
+        [Description("sources - [DEPRECATED] use source")] sources,
         [Description("source - view and configure default sources")] source,
         // [Description("config - view and change configuration")] config,
         [Description("unpackself - have chocolatey set it self up")] unpackself,

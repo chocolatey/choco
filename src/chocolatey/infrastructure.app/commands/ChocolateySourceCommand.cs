@@ -26,6 +26,7 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
+    [CommandFor(CommandNameType.sources)]
     [CommandFor(CommandNameType.source)]
     public sealed class ChocolateySourceCommand : ICommand
     {
@@ -83,7 +84,7 @@ namespace chocolatey.infrastructure.app.commands
 
         public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Info(ChocolateyLoggers.Important, "Sources Command");
+            this.Log().Info(ChocolateyLoggers.Important, "Source Command");
             this.Log().Info(@"
 Chocolatey will allow you to interact with sources.
 ");
