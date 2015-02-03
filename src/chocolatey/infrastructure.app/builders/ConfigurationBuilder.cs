@@ -105,6 +105,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, config, configFileSettings);
             config.Features.VirusCheckFiles = set_feature_flag(ApplicationParameters.Features.VirusCheckFiles, config, configFileSettings);
             config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, config, configFileSettings);
+            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowInsecureConfirmation, config, configFileSettings);
         }
 
         private static bool set_feature_flag(string featureName, ChocolateyConfiguration config, ConfigFileSettings configFileSettings)

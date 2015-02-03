@@ -67,6 +67,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string CheckSumFiles = "checksumFiles";
             public static readonly string VirusCheckFiles = "virusCheckFiles";
             public static readonly string AutoUninstaller = "autoUninstaller";
+            public static readonly string AllowInsecureConfirmation = "allowInsecureConfirmation";
         }
 
         public static class Messages
