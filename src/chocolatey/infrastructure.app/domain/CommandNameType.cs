@@ -30,6 +30,7 @@ namespace chocolatey.infrastructure.app.domain
         [Description("uninstall - uninstalls a package")] uninstall,
         [Description("sources - view and configure default sources")] sources,
         [Description("source - view and configure default sources")] source,
+        [Description("feature - view and configure choco features")] feature,
         // [Description("config - view and change configuration")] config,
         [Description("unpackself - have chocolatey set it self up")] unpackself,
         [Description("pack - packages up a nuspec to a compiled nupkg")] pack,

@@ -103,6 +103,36 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
+        public void feature_list(ChocolateyConfiguration configuration)
+        {
+            foreach (var feature in configFileSettings.Features)
+            {
+                this.Log().Info(() => "{0} - {1}".format_with(feature.Name, !feature.Enabled ? "[Disabled]" : "[Enabled]"));
+            }
+        }
+
+        public void feature_disable(ChocolateyConfiguration configuration)
+        {
+            var source = configFileSettings.Features.FirstOrDefault(p => p.Name.is_equal_to(configuration.FeatureCommand.Name));
+            if (source != null && source.Enabled)
+            {
+                source.Enabled = false;
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                this.Log().Info(() => "Disabled {0}".format_with(source.Name));
+            }
+        }
+
+        public void feature_enable(ChocolateyConfiguration configuration)
+        {
+            var source = configFileSettings.Features.FirstOrDefault(p => p.Name.is_equal_to(configuration.FeatureCommand.Name));
+            if (source != null && !source.Enabled)
+            {
+                source.Enabled = true;
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                this.Log().Info(() => "Enabled {0}".format_with(source.Name));
+            }
+        }
+
         public string get_api_key(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction)
         {
             string apiKeyValue = null;

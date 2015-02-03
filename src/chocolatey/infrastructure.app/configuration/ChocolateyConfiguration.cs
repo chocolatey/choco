@@ -36,6 +36,7 @@ namespace chocolatey.infrastructure.app.configuration
             NewCommand = new NewCommandConfiguration();
             ListCommand = new ListCommandConfiguration();
             SourceCommand = new SourcesCommandConfiguration();
+            FeatureCommand = new FeatureCommandConfiguration();
             ApiKeyCommand = new ApiKeyCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
             PinCommand = new PinCommandConfiguration();
@@ -181,6 +182,11 @@ namespace chocolatey.infrastructure.app.configuration
         public SourcesCommandConfiguration SourceCommand { get; private set; }
 
         /// <summary>
+        /// Configuration related specifically to the Feature command
+        /// </summary>
+        public FeatureCommandConfiguration FeatureCommand { get; private set; }
+
+        /// <summary>
         ///   Configuration related specifically to ApiKey command
         /// </summary>
         public ApiKeyCommandConfiguration ApiKeyCommand { get; private set; }
@@ -242,6 +248,12 @@ namespace chocolatey.infrastructure.app.configuration
         public SourceCommandType Command { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+    } 
+    
+    public sealed class FeatureCommandConfiguration
+    {
+        public string Name { get; set; }
+        public FeatureCommandType Command { get; set; }
     }
 
     public sealed class PinCommandConfiguration

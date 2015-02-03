@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="infrastructure.app\attributes\CommandForAttributeSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyApiKeyCommandSpecs.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyFeatureCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInstallCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyNewCommandSpecs.cs" />

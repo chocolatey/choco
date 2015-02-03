@@ -26,6 +26,9 @@ namespace chocolatey.infrastructure.app.services
         void source_remove(ChocolateyConfiguration configuration);
         void source_disable(ChocolateyConfiguration configuration);
         void source_enable(ChocolateyConfiguration configuration);
+        void feature_list(ChocolateyConfiguration configuration);
+        void feature_disable(ChocolateyConfiguration configuration);
+        void feature_enable(ChocolateyConfiguration configuration);
         string get_api_key(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction);
         void set_api_key(ChocolateyConfiguration configuration);
     }
