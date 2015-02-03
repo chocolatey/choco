@@ -31,7 +31,7 @@ param(
   [Parameter(Mandatory=$false)][string]$chocolateyPath = ''
 )
 
-  $chocoNew = $installModule = Join-Path $thisScriptFolder 'chocolateyInstall\choco.exe'
+  $chocoNew = Join-Path $thisScriptFolder 'chocolateyInstall\choco.exe'
   & $chocoNew unpackself --force
 
   $installModule = Join-Path $thisScriptFolder 'chocolateyInstall\helpers\chocolateyInstaller.psm1'
@@ -188,7 +188,30 @@ param(
   }
 
   $chocInstallFolder = Join-Path $thisScriptFolder "chocolateyInstall"
-  Copy-Item $chocInstallFolder\* $chocolateyPath -recurse -force
+  $chocoExe = Join-Path $chocInstallFolder 'choco.exe'
+  $chocoExeDest = Join-Path $chocolateyPath 'choco.exe'
+  #copy this over
+  Copy-Item $chocoExe $chocoExeDest -force
+ & $chocoExeDest unpackself --force
+
+  #$sourceFiles = $chocInstallFolder
+  #$exclude = @('*.config','*.log') #does not work with array properly in POSH v2
+  #Write-Host "sourceFiles = $sourceFiles"
+  #Write-Host "installlocation = $chocolateyPath"
+
+  #Get-ChildItem -Path $sourceFiles -Recurse -Exclude $exclude |
+  #  Copy-Item -Force -Destination {
+  #    if ($_.GetType() -eq [System.IO.FileInfo]) {
+  #      Join-Path $chocolateyPath $_.FullName.Substring($sourceFiles.length)
+  #    } else {
+  #      Join-Path $chocolateyPath $_.Parent.FullName.Substring($sourceFiles.length)
+  #    }
+  #  }
+
+  #$configLocation = "$chocolateyPath\config\chocolatey.config"
+  #if (!(Test-Path ($configLocation))) {
+  #  Copy-Item "$sourceFiles\config\chocolatey.config" -Destination $configLocation
+  #}
 }
 
 function Ensure-ChocolateyLibFiles {
