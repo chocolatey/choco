@@ -179,7 +179,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
                 MockLogger.Verify(l => l.Warn(It.IsAny<string>()), Times.AtLeastOnce);
 
-                MockLogger.MessagesFor(LogLevel.Warn).FirstOrDefault().Contains("DEPRECATION - Pushing to the community feed").ShouldBeTrue();
+                MockLogger.MessagesFor(LogLevel.Warn).FirstOrDefault().Contains("DEPRECATION NOTICE - Pushing to the community feed").ShouldBeTrue();
             }
 
             [Fact]

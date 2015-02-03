@@ -75,8 +75,8 @@ namespace chocolatey.infrastructure.app.commands
             if (string.IsNullOrWhiteSpace(configuration.Sources))
             {
                 this.Log().Warn(ChocolateyLoggers.Important, @"
-DEPRECATION - Pushing to the community feed ({0}) 
- by default is deprecated and will be removed by version 1.0.0. Please 
+DEPRECATION NOTICE - Pushing to the community feed ({0}) 
+ by default is deprecated and will be removed in version 1.0.0. Please 
  update your tools to specify --source explicitly.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
                 configuration.Sources = ApplicationParameters.ChocolateyCommunityFeedPushSource;
             }
