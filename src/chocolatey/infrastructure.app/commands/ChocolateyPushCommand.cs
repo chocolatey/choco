@@ -40,7 +40,6 @@ namespace chocolatey.infrastructure.app.commands
         public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             configuration.Sources = null;
-            //configuration.Source = ApplicationParameters.DefaultChocolateyPushSource;
             configuration.PushCommand.TimeoutInSeconds = 300;
 
             optionSet
@@ -71,6 +70,16 @@ namespace chocolatey.infrastructure.app.commands
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments); // path to .nupkg - assume relative
+
+            //todo: v1 Deprecation - remove default source setting
+            if (string.IsNullOrWhiteSpace(configuration.Sources))
+            {
+                this.Log().Warn(ChocolateyLoggers.Important, @"
+DEPRECATION - Pushing to the community feed ({0}) 
+ by default is deprecated and will be removed by version 1.0.0. Please 
+ update your tools to specify --source explicitly.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+                configuration.Sources = ApplicationParameters.ChocolateyCommunityFeedPushSource;
+            }
 
             if (!string.IsNullOrWhiteSpace(configuration.Sources))
             {

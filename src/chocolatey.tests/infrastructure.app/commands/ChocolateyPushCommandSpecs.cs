@@ -20,6 +20,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using System.Linq;
     using Moq;
     using Should;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
@@ -59,6 +60,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
+        //Yes, configurating [sic]
         public class when_configurating_the_argument_parser : ChocolateyPushCommandSpecsBase
         {
             private OptionSet optionSet;
@@ -144,17 +146,40 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.Input.ShouldEqual(nupkgPath);
             }
 
+            // todo v1 DEPRECATION for default source being set
+            //[Fact]
+            //public void should_not_set_the_apiKey_if_source_is_unset()
+            //{
+            //    reset();
+            //    configSettingsService.Setup(c => c.get_api_key(configuration, null)).Returns(apiKey);
+            //    configuration.PushCommand.Key = "";
+            //    configuration.Sources = "";
+            //    because();
+
+            //    configuration.PushCommand.Key.ShouldEqual("");
+            //    configSettingsService.Verify(c => c.get_api_key(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
+            //}
+
             [Fact]
-            public void should_not_set_the_apiKey_if_source_is_unset()
+            public void should_perform_deprecated_behavior_set_the_source_to_default_feed_if_not_set_explicitly()
             {
                 reset();
-                configSettingsService.Setup(c => c.get_api_key(configuration, null)).Returns(apiKey);
-                configuration.PushCommand.Key = "";
                 configuration.Sources = "";
                 because();
 
-                configuration.PushCommand.Key.ShouldEqual("");
-                configSettingsService.Verify(c => c.get_api_key(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
+                configuration.Sources.ShouldEqual(ApplicationParameters.ChocolateyCommunityFeedPushSource);
+            }          
+            
+            [Fact]
+            public void should_warn_the_user_about_deprecated_behavior_when_source_is_set_to_default_feed_because_not_set_explicitly()
+            {
+                reset();
+                configuration.Sources = "";
+                because();
+
+                MockLogger.Verify(l => l.Warn(It.IsAny<string>()), Times.AtLeastOnce);
+
+                MockLogger.MessagesFor(LogLevel.Warn).FirstOrDefault().Contains("DEPRECATION - Pushing to the community feed").ShouldBeTrue();
             }
 
             [Fact]
