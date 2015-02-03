@@ -86,6 +86,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyApiKeyCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateySourceCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUninstallCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyUpdateCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyVersionCommand.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileFeatureSetting.cs" />
