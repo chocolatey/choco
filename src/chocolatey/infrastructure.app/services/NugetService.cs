@@ -171,7 +171,7 @@ namespace chocolatey.infrastructure.app.services
             string nupkgFilePath = validate_and_return_package_file(config, Constants.PackageExtension);
             if (config.RegularOuptut) this.Log().Info(() => "Attempting to push {0} to {1}".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Sources));
 
-            NugetPush.push_package(config, nupkgFilePath);
+            NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath));
 
             if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
