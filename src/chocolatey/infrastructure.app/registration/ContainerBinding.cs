@@ -75,7 +75,8 @@ namespace chocolatey.infrastructure.app.registration
                             new ChocolateyNewCommand(container.GetInstance<ITemplateService>()),
                             new ChocolateySourceCommand(container.GetInstance<IChocolateyConfigSettingsService>()),
                             new ChocolateyApiKeyCommand(container.GetInstance<IChocolateyConfigSettingsService>()),
-                            new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>())
+                            new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>()),
+                            new ChocolateyVersionCommand(container.GetInstance<IChocolateyPackageService>())
                         };
                     return list.AsReadOnly();
                 }, Lifestyle.Singleton);

@@ -24,6 +24,7 @@ namespace chocolatey.infrastructure.app.domain
         [Description("install - installs packages from various sources")] install,
         [Description("pin - suppress upgrades to a package")] pin,
         //[Description("update - updates package index")] update,
+        [Description("version - [DEPRECATED] checks for upgrades")] version,
         [Description("upgrade - upgrades packages from various sources")] upgrade,
         [Description("uninstall - uninstalls a package")] uninstall,
         [Description("sources - view and configure default sources")] sources,

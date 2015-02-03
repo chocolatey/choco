@@ -26,8 +26,10 @@ namespace chocolatey.infrastructure.app.commands
     using services;
 
     [CommandFor(CommandNameType.upgrade)]
-    public sealed class ChocolateyUpgradeCommand : ICommand
+    public class ChocolateyUpgradeCommand : ICommand
     {
+        //todo v1 Deprecation reseal this class and remove virtuals
+
         private readonly IChocolateyPackageService _packageService;
 
         public ChocolateyUpgradeCommand(IChocolateyPackageService packageService)
@@ -35,7 +37,7 @@ namespace chocolatey.infrastructure.app.commands
             _packageService = packageService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("s=|source=",
@@ -74,13 +76,13 @@ namespace chocolatey.infrastructure.app.commands
                 ;
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
             configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments);
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
             if (string.IsNullOrWhiteSpace(configuration.PackageNames))
             {
@@ -125,12 +127,12 @@ NOTE: Options and switches apply to all items passed, so if you are
 ");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             _packageService.upgrade_noop(configuration);
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             _packageService.upgrade_run(configuration);
         }
