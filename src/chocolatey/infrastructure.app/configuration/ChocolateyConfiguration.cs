@@ -58,6 +58,12 @@ namespace chocolatey.infrastructure.app.configuration
         {
             foreach (var propertyInfo in properties.or_empty_list_if_null())
             {
+                // skip sensitive data info
+                if (propertyInfo.Name == "Password" || propertyInfo.Name == "Key")
+                {
+                    continue;
+                }
+
                 var objectValue = propertyInfo.GetValue(obj, null);
                 if (propertyInfo.PropertyType.is_built_in_system_type())
                 {
