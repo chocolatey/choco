@@ -55,6 +55,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_implement_source()
             {
                 results.ShouldContain(CommandNameType.source.to_string());
+            } 
+            
+            [Fact]
+            public void should_implement_sources()
+            {
+                results.ShouldContain(CommandNameType.sources.to_string());
             }
         }
 
