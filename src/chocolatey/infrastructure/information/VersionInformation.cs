@@ -32,6 +32,20 @@ namespace chocolatey.infrastructure.information
             }
 
             return version;
+        } 
+        
+        public static string get_current_informational_version()
+        {
+            string version = null;
+            var executingAssembly = Assembly.GetCallingAssembly();
+            string location = executingAssembly != null ? executingAssembly.Location : string.Empty;
+
+            if (!string.IsNullOrEmpty(location))
+            {
+                version = FileVersionInfo.GetVersionInfo(location).ProductVersion;
+            }
+
+            return version;
         }
     }
 }

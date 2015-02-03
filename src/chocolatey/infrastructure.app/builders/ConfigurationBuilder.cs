@@ -220,6 +220,7 @@ You can pass options and switches in the following ways:
             config.Information.PlatformType = Platform.get_platform();
             config.Information.PlatformVersion = Platform.get_version();
             config.Information.ChocolateyVersion = VersionInformation.get_current_assembly_version();
+            config.Information.ChocolateyProductVersion = VersionInformation.get_current_informational_version();
             config.Information.FullName = Assembly.GetExecutingAssembly().FullName;
             config.Information.Is64Bit = Environment.Is64BitOperatingSystem;
             config.Information.IsInteractive = Environment.UserInteractive;
