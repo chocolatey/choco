@@ -109,10 +109,16 @@ namespace chocolatey.infrastructure.app.builders
 
         private static bool set_feature_flag(string featureName, ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
         {
+            var enabled = false;
             var feature = configFileSettings.Features.FirstOrDefault(f => f.Name.is_equal_to(featureName));
-            if (feature != null && feature.Enabled) return true;
+            if (feature != null && feature.Enabled) enabled = true;
 
-            return false;
+            if (feature == null)
+            {
+                configFileSettings.Features.Add(new ConfigFileFeatureSetting() { Name = featureName, Enabled = enabled });
+            }
+            
+            return enabled;
         }
 
         private static void set_global_options(IList<string> args, ChocolateyConfiguration config)
