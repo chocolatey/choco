@@ -184,7 +184,12 @@ param(
   $chocoExe = Join-Path $chocolateyPath 'choco.exe'
   if (Test-Path ($chocoExe)) {
     Write-Debug "Renaming '$chocoExe' to '$chocoExe.old'"
-    Move-Item $chocoExe "$chocoExe.old" -force
+    try {
+      Move-Item $chocoExe "$chocoExe.old" -force
+    }
+    catch {
+      Write-Warning "Was not able to rename `'$chocoExe`' to `'$chocoExe.old`'."
+    }
   }
 
   $chocInstallFolder = Join-Path $thisScriptFolder "chocolateyInstall"
