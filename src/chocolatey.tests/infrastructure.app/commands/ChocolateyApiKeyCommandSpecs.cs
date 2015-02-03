@@ -55,6 +55,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_implement_apikey()
             {
                 results.ShouldContain(CommandNameType.apikey.to_string());
+            }  
+            
+            [Fact]
+            public void should_implement_setapikey()
+            {
+                results.ShouldContain(CommandNameType.setapikey.to_string());
             }
         }
 

@@ -25,6 +25,7 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
+    [CommandFor(CommandNameType.setapikey)]
     [CommandFor(CommandNameType.apikey)]
     public sealed class ChocolateyApiKeyCommand : ICommand
     {

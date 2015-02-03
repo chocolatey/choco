@@ -37,5 +37,6 @@ namespace chocolatey.infrastructure.app.domain
         [Description("push - pushes a compiled nupkg")] push,
         [Description("new - generates files necessary for a chocolatey package")] @new,
         [Description("apikey - retrieves or saves an apikey for a particular source")] apikey,
+        [Description("setapikey - retrieves or saves an apikey for a particular source")] setapikey,
     }
 }
