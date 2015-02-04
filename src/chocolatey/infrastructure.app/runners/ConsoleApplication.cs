@@ -51,7 +51,19 @@ namespace chocolatey.infrastructure.app.runners
                         commandArgs,
                         config,
                         (optionSet) => command.configure_argument_parser(optionSet, config),
-                        (unparsedArgs) => command.handle_additional_argument_parsing(unparsedArgs, config),
+                        (unparsedArgs) => { 
+                            command.handle_additional_argument_parsing(unparsedArgs, config);
+
+                            // all options / switches should be parsed, 
+                            //  so show help menu if there are any left
+                            foreach (var unparsedArg in unparsedArgs.or_empty_list_if_null())
+                            {
+                                if (unparsedArg.StartsWith("-") || unparsedArg.StartsWith("/"))
+                                {
+                                    config.HelpRequested = true;
+                                }
+                            }
+                        },
                         () => command.handle_validation(config),
                         () => command.help_message(config));
                 });
