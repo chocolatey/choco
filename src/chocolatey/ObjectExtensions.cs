@@ -15,6 +15,9 @@
 
 namespace chocolatey
 {
+    using System.IO;
+    using System.Runtime.Serialization.Formatters.Binary;
+
     /// <summary>
     ///   Extensions for Object
     /// </summary>
@@ -31,5 +34,17 @@ namespace chocolatey
 
             return input.ToString();
         }
+
+        public static T deep_copy<T>(this T other)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(ms, other);
+                ms.Position = 0;
+                return (T)formatter.Deserialize(ms);
+            }
+        }
+
     }
 }

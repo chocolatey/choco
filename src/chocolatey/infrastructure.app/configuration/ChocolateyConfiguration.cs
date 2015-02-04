@@ -25,6 +25,7 @@ namespace chocolatey.infrastructure.app.configuration
     /// <summary>
     ///   The chocolatey configuration.
     /// </summary>
+    [Serializable]
     public class ChocolateyConfiguration
     {
         public ChocolateyConfiguration()
@@ -202,6 +203,7 @@ namespace chocolatey.infrastructure.app.configuration
         public PinCommandConfiguration PinCommand { get; private set; }
     }
 
+    [Serializable]
     public sealed class InformationCommandConfiguration
     {
         // application set variables
@@ -214,6 +216,7 @@ namespace chocolatey.infrastructure.app.configuration
         public bool IsInteractive { get; set; }
     }
 
+    [Serializable]
     public sealed class FeaturesConfiguration
     {
         public bool AutoUninstaller { get; set; }
@@ -222,6 +225,7 @@ namespace chocolatey.infrastructure.app.configuration
 
     //todo: retrofit other command configs this way
 
+    [Serializable]
     public sealed class ListCommandConfiguration
     {
         // list
@@ -229,6 +233,7 @@ namespace chocolatey.infrastructure.app.configuration
         public bool IncludeRegistryPrograms { get; set; }
     }
 
+    [Serializable]
     public sealed class NewCommandConfiguration
     {
         public NewCommandConfiguration()
@@ -241,31 +246,36 @@ namespace chocolatey.infrastructure.app.configuration
         public IDictionary<string, string> TemplateProperties { get; private set; }
     }
 
+    [Serializable]
     public sealed class SourcesCommandConfiguration
     {
         public string Name { get; set; }
         public SourceCommandType Command { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-    } 
-    
+    }
+
+    [Serializable]
     public sealed class FeatureCommandConfiguration
     {
         public string Name { get; set; }
         public FeatureCommandType Command { get; set; }
     }
 
+    [Serializable]
     public sealed class PinCommandConfiguration
     {
         public string Name { get; set; }
         public PinCommandType Command { get; set; }
     }
 
+    [Serializable]
     public sealed class ApiKeyCommandConfiguration
     {
         public string Key { get; set; }
     }
 
+    [Serializable]
     public sealed class PushCommandConfiguration
     {
         public string Key { get; set; }
