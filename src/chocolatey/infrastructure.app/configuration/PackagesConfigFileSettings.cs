@@ -23,10 +23,10 @@ namespace chocolatey.infrastructure.app.configuration
     ///   XML packages.config configuration file
     /// </summary>
     [Serializable]
-    [XmlRoot("chocolatey")]
+    [XmlRoot("packages")]
     public class PackagesConfigFileSettings
     {
-        [XmlArray("packages")]
+        [XmlElement("package")]
         public HashSet<PackagesConfigFilePackageSetting> Packages { get; set; }
     }
 }

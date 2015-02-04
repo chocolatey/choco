@@ -22,7 +22,7 @@ namespace chocolatey.infrastructure.app.configuration
     ///   XML packages.config file package element
     /// </summary>
     [Serializable]
-    [XmlType("package")]
+    //[XmlType("package")]
     public sealed class PackagesConfigFilePackageSetting
     {
         [XmlAttribute(AttributeName = "id")]
