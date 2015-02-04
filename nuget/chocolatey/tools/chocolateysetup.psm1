@@ -174,24 +174,28 @@ param(
   [string]$chocolateyPath
 )
 
+  Write-Debug "Removing install files in chocolateyInstall, helpers, redirects, and tools"
   "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" | % {
     if (Test-Path $_) {
-      Remove-Item $_ -exclude *.log -recurse -force
+      Remove-Item $_ -exclude *.log -recurse -force -ErrorAction SilentlyContinue
     }
   }
 
+  Write-Debug "Attempting to move choco.exe to choco.exe.old so we can place the new version here."
   # rename the currently running process / it will be locked if it exists
   $chocoExe = Join-Path $chocolateyPath 'choco.exe'
   if (Test-Path ($chocoExe)) {
     Write-Debug "Renaming '$chocoExe' to '$chocoExe.old'"
     try {
-      Move-Item $chocoExe "$chocoExe.old" -force
+      Remove-Item "$chocoExe.old" -force -ErrorAction SilentlyContinue
+      Move-Item $chocoExe "$chocoExe.old" -force -ErrorAction SilentlyContinue
     }
     catch {
       Write-Warning "Was not able to rename `'$chocoExe`' to `'$chocoExe.old`'."
     }
   }
 
+  Write-Debug "Unpacking files required for Chocolatey."
   $chocInstallFolder = Join-Path $thisScriptFolder "chocolateyInstall"
   $chocoExe = Join-Path $chocInstallFolder 'choco.exe'
   $chocoExeDest = Join-Path $chocolateyPath 'choco.exe'
@@ -214,7 +218,7 @@ param(
     "$tempDir\chocolatey.zip", "$chocoPkg" | % {
       if ($_ -ne $null -and $_ -ne '') {
         if (Test-Path $_) {
-          Copy-Item $_ "$chocoPkgDirectory\chocolatey.nupkg" -force
+          Copy-Item $_ "$chocoPkgDirectory\chocolatey.nupkg" -force -ErrorAction SilentlyContinue
         }
       }
     }
@@ -226,7 +230,7 @@ param(
   [string] $chocolateyPath,
   [string] $chocolateyExePath
 )
-
+  Write-Debug "Installing the bin file redirects"
   $redirectsPath = Join-Path $chocolateyPath 'redirects'
   $exeFiles = Get-ChildItem "$redirectsPath" -include @("*.exe","*.cmd") -recurse
   foreach ($exeFile in $exeFiles) {
@@ -236,10 +240,11 @@ param(
     $binFilePathRename = $binFilePath + '.old'
     $batchFilePath = $binFilePath.Replace(".exe",".bat")
     $bashFilePath = $binFilePath.Replace(".exe","")
-    if (Test-Path ($batchFilePath)) { Remove-Item $batchFilePath -force }
-    if (Test-Path ($bashFilePath)) { Remove-Item $bashFilePath -force }
+    if (Test-Path ($batchFilePath)) { Remove-Item $batchFilePath -force -ErrorAction SilentlyContinue }
+    if (Test-Path ($bashFilePath)) { Remove-Item $bashFilePath -force -ErrorAction SilentlyContinue }
     if (Test-Path ($binFilePathRename)) {
       try {
+        Write-Debug "Attempting to remove $binFilePathRename"
         Remove-Item $binFilePathRename -force
       }
       catch {
@@ -248,6 +253,7 @@ param(
     }
     if (Test-Path ($binFilePath)) {
      try {
+        Write-Debug "Attempting to rename $binFilePath to $binFilePathRename"
         Move-Item -path $binFilePath -destination $binFilePathRename -force
       }
       catch {
@@ -256,6 +262,7 @@ param(
     }
 
     try {
+      Write-Debug "Attempting to copy $exeFilePath to $binFilePath"
       Copy-Item -path $exeFilePath -destination $binFilePath -force
     }
     catch {
@@ -272,7 +279,7 @@ param(
   [string]$chocolateyExePath = "$($env:ALLUSERSPROFILE)\chocolatey\bin",
   [string]$chocolateyExePathVariable = "%$($chocInstallVariableName)%\bin"
 )
-
+  Write-Debug "Initializing Chocolatey Path if required"
   $environmentTarget = [System.EnvironmentVariableTarget]::User
   if (Test-ProcessAdminRights) {
     Write-Debug "Administrator installing so using Machine environment variable target instead of User."
@@ -287,10 +294,12 @@ param(
   [string]$chocolateyExePath = "$($env:ALLUSERSPROFILE)\chocolatey\bin",
   [string]$chocolateyExePathVariable = "%$($chocInstallVariableName)%\bin"
 )
+
   $processedMarkerFile = Join-Path $chocolateyExePath '_processed.txt'
   if (!(test-path $processedMarkerFile)) {
     $files = get-childitem $chocolateyExePath -include *.bat -recurse
     if ($files -ne $null -and $files.Count -gt 0) {
+      Write-Debug "Processing Bin files"
       foreach ($file in $files) {
         Write-Output "Processing $($file.Name) to make it portable"
         $fileStream = [System.IO.File]::Open("$file", 'Open', 'Read', 'ReadWrite')
@@ -312,6 +321,7 @@ param(
 function Install-DotNet4IfMissing {
   if ([IntPtr]::Size -eq 8) {$fx="framework64"} else {$fx="framework"}
 
+  Write-Debug "Installing .NET Framework 4.0 if it is missing"
   if (!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
     $NetFx4ClientUrl = 'http://download.microsoft.com/download/5/6/2/562A10F9-C9F4-4313-A044-9C94E0A8FAC8/dotNetFx40_Client_x86_x64.exe'
     $NetFx4FullUrl = 'http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe'
