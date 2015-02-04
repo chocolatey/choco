@@ -253,8 +253,9 @@ namespace chocolatey.infrastructure.app.configuration
         public SourceCommandType Command { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-    } 
-    
+    }
+
+    [Serializable]
     public sealed class FeatureCommandConfiguration
     {
         public string Name { get; set; }
