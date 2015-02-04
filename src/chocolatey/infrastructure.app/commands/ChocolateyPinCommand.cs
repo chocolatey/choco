@@ -64,10 +64,15 @@ namespace chocolatey.infrastructure.app.commands
             }
 
             var command = PinCommandType.unknown;
-            Enum.TryParse(unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault(), true, out command);
+            string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
+            Enum.TryParse(unparsedCommand, true, out command);
 
-            if (command == PinCommandType.unknown) command = PinCommandType.list;
-
+            if (command == PinCommandType.unknown) 
+            {
+                this.Log().Warn("Unkown command {0}. Setting to list.".format_with(unparsedCommand));
+                command = PinCommandType.list;
+            }
+            
             configuration.PinCommand.Command = command;
             configuration.Sources = ApplicationParameters.PackagesLocation;
             configuration.ListCommand.LocalOnly = true;
