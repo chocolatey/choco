@@ -137,8 +137,15 @@ namespace chocolatey.console
 
         private static void remove_old_chocolatey_exe(IFileSystem fileSystem)
         {
-            fileSystem.delete_file(Assembly.GetExecutingAssembly().Location + ".old");
-            fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
+            try
+            {
+                fileSystem.delete_file(Assembly.GetExecutingAssembly().Location + ".old");
+                fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
+            }
+            catch (Exception ex)
+            {
+                "chocolatey".Log().Warn("Attempting to delete choco.exe.old ran into an issue:{0} {1}".format_with(Environment.NewLine,ex.Message));                
+            }
         }
 
         private static void pause_execution_if_debug()
