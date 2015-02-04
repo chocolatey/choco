@@ -306,7 +306,7 @@ namespace chocolatey.tests.infrastructure.app.configuration
 
                 because();
 
-                config.Debug.ShouldBeTrue();
+                config.Debug.ShouldBeFalse();
                 helpMessageContents.ToString().ShouldNotBeEmpty();
             }
         }
