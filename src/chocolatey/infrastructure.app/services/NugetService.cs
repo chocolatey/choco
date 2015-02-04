@@ -253,50 +253,50 @@ spam/junk folder.");
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
-                    //todo: get smarter about realizing multiple versions have been installed before and allowing that
-                    
-                    remove_existing_rollback_directory(packageName);
+                //todo: get smarter about realizing multiple versions have been installed before and allowing that
 
-                    IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
-                    
-                    if (installedPackage != null && (version == null || version == installedPackage.Version) && !config.Force)
-                    {
-                        string logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
-                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
-                        results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                        this.Log().Warn(ChocolateyLoggers.Important, logMessage);
-                        continue;
-                    }
+                remove_existing_rollback_directory(packageName);
 
-                    if (installedPackage != null && (version == null || version == installedPackage.Version) && config.Force)
-                    {
-                        this.Log().Debug(() => "{0} v{1} already installed. Forcing reinstall.".format_with(installedPackage.Id, installedPackage.Version));
-                        version = installedPackage.Version;
-                    }
+                IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
-                    IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
-                    if (availablePackage == null)
-                    {
-                        var logMessage = "{0} not installed. The package was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
-                        this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
-                        results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                        continue;
-                    }
+                if (installedPackage != null && (version == null || version == installedPackage.Version) && !config.Force)
+                {
+                    string logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
+                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
+                    results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                    this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                    continue;
+                }
 
-                    if (installedPackage != null && (installedPackage.Version == availablePackage.Version))
-                    {
-                        packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
-                    }
+                if (installedPackage != null && (version == null || version == installedPackage.Version) && config.Force)
+                {
+                    this.Log().Debug(() => "{0} v{1} already installed. Forcing reinstall.".format_with(installedPackage.Id, installedPackage.Version));
+                    version = installedPackage.Version;
+                }
 
-                    using (packageManager.SourceRepository.StartOperation(
-                        RepositoryOperationNames.Install,
-                        packageName,
-                        version == null ? null : version.ToString()))
-                    {
-                        packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
-                        //packageManager.InstallPackage(packageName, version, configuration.IgnoreDependencies, configuration.Prerelease);
-                    }
+                IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+                if (availablePackage == null)
+                {
+                    var logMessage = "{0} not installed. The package was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
+                    this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
+                    results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    continue;
+                }
+
+                if (installedPackage != null && (installedPackage.Version == availablePackage.Version))
+                {
+                    packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
+                }
+
+                using (packageManager.SourceRepository.StartOperation(
+                    RepositoryOperationNames.Install,
+                    packageName,
+                    version == null ? null : version.ToString()))
+                {
+                    packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
+                    //packageManager.InstallPackage(packageName, version, configuration.IgnoreDependencies, configuration.Prerelease);
+                }
             }
 
             return packageInstalls;
@@ -333,7 +333,7 @@ spam/junk folder.");
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
             var packageManager = NugetCommon.GetPackageManager(
-                config, 
+                config,
                 _nugetLogger,
                 installSuccessAction: (e) =>
                     {
@@ -364,7 +364,7 @@ spam/junk folder.");
                     if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
-                
+
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 if (pkgInfo != null && pkgInfo.IsPinned)
                 {
@@ -460,7 +460,7 @@ spam/junk folder.");
                 this.Log().Debug("Backing up existing {0} prior to upgrade.".format_with(installedPackage.Id));
 
                 var backupLocation = pkgInstallPath + ApplicationParameters.RollbackPackageSuffix;
-                _fileSystem.copy_directory(pkgInstallPath,backupLocation,overwriteExisting:true);
+                _fileSystem.copy_directory(pkgInstallPath, backupLocation, overwriteExisting: true);
             }
         }
 
