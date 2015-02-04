@@ -218,7 +218,6 @@ namespace chocolatey.infrastructure.app.configuration
     {
         public bool AutoUninstaller { get; set; }
         public bool CheckSumFiles { get; set; }
-        public bool VirusCheckFiles { get; set; }
     }
 
     //todo: retrofit other command configs this way
