@@ -91,6 +91,20 @@ DEPRECATION NOTICE - choco version command is deprecated and will be
             base.handle_validation(configuration);
         }
 
+        public override void help_message(ChocolateyConfiguration configuration)
+        {
+            this.Log().Info(ChocolateyLoggers.Important, "[DEPRECATED] Version Command");
+            this.Log().Info(@"
+Version has been deprecated and will be removed in version 1.0.0. 
+
+ If you are attempting to get local installed items, use 
+ `choco list -lo`. 
+
+ If you want to know what has available upgrades, use 
+ `choco upgrade <pkg|all> -whatif`.
+"); 
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
+        }
 
         public override void noop(ChocolateyConfiguration configuration)
         {

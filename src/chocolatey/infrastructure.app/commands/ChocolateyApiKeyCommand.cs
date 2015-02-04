@@ -75,7 +75,8 @@ Anything that doesn't contain source and key will list api keys.
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco apikey [options/switches]
+    choco apikey [<options/switches>]
+    choco setapikey [<options/switches>]
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");

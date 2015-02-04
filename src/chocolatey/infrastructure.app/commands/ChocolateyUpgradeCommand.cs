@@ -90,7 +90,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Upgrade Command");
             this.Log().Info(@"
@@ -100,7 +100,8 @@ Upgrades a package or a list of packages. Some may prefer to use `cup`
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco upgrade pkg [pkg2 pkgN] [options/switches]
+    choco upgrade <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
+    cup <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
 
 NOTE: `all` is a special package keyword that will allow you to upgrade 
  all currently installed packages.

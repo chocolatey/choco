@@ -92,7 +92,7 @@ Pin a package to suppress upgrades.
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco pin [list]|add|remove [options/switches]
+    choco pin [list]|add|remove [<options/switches>]
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");

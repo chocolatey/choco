@@ -91,7 +91,8 @@ Chocolatey will allow you to interact with sources.
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco source [list]|add|remove|disable|enable [options/switches]
+    choco source [list]|add|remove|disable|enable [<options/switches>]
+    choco sources [list]|add|remove|disable|enable [<options/switches>]
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");

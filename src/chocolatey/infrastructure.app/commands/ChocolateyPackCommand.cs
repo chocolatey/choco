@@ -62,7 +62,8 @@ Chocolatey will attempt to package a nuspec into a compiled nupkg. Some
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco pack [path to nuspec] [options/switches]
+    choco pack [<path to nuspec>] [<options/switches>]
+    cpack [<path to nuspec>] [<options/switches>]
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");

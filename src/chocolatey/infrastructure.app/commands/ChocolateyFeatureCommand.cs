@@ -81,7 +81,7 @@ Chocolatey will allow you to interact with features.
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco feature [list]|disable|enable [options/switches]
+    choco feature [list]|disable|enable [<options/switches>]
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");

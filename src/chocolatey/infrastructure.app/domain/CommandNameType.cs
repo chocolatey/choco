@@ -20,15 +20,16 @@ namespace chocolatey.infrastructure.app.domain
     public enum CommandNameType
     {
         [Description("list - lists remote or local packages")] list,
-        [Description("search - searches remote or local packages")] search,
+        [Description("search - searches remote or local packages (alias for list)")] search,
         [Description("install - installs packages from various sources")] install,
         [Description("pin - suppress upgrades to a package")] pin,
         //[Description("update - updates package index")] update,
-        [Description("update - [DEPRECATED] upgrades packages from various sources")] update,
-        [Description("version - [DEPRECATED] checks for upgrades")] version,
+        [Description("update - [DEPRECATED] RESERVED for future use (you are looking for upgrade, these are not the droids you are looking for)")] update,
+        [Description("version - [DEPRECATED] will be removed in v1 - use `cup <pkg|all> -whatif` instead")] version,
         [Description("upgrade - upgrades packages from various sources")] upgrade,
         [Description("uninstall - uninstalls a package")] uninstall,
-        [Description("sources - view and configure default sources")] sources,
+        [Description("sources - view and configure default sources (alias for source)")]
+        sources,
         [Description("source - view and configure default sources")] source,
         [Description("feature - view and configure choco features")] feature,
         // [Description("config - view and change configuration")] config,
@@ -37,6 +38,7 @@ namespace chocolatey.infrastructure.app.domain
         [Description("push - pushes a compiled nupkg")] push,
         [Description("new - generates files necessary for a chocolatey package")] @new,
         [Description("apikey - retrieves or saves an apikey for a particular source")] apikey,
-        [Description("setapikey - retrieves or saves an apikey for a particular source")] setapikey,
+        [Description("setapikey - retrieves or saves an apikey for a particular source (alias for apikey)")]
+        setapikey,
     }
 }

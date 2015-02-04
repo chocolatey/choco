@@ -111,7 +111,7 @@ Chocolatey will generate package specification files for a new package.
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco new name [options/switches] [property=value]
+    choco new <name> [<options/switches>] [<property=value> <propertyN=valueN>]
 
 Possible properties to pass:
     packageversion

@@ -54,5 +54,17 @@ DEPRECATION NOTICE - choco update is deprecated and will be removed or
 
             base.handle_validation(configuration);
         }
+
+        public override void help_message(ChocolateyConfiguration configuration)
+        {
+            this.Log().Info(ChocolateyLoggers.Important, "[DEPRECATED] Update Command");
+            this.Log().Info(@"
+Update has been deprecated and will be removed/replaced in version 
+ 1.0.0 with something that performs the functions of updating package
+ indexes.  Please use `choco upgrade` instead.
+");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
+        }
+
     }
 }

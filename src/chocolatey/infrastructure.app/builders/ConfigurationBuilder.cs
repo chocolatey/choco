@@ -195,27 +195,22 @@ Please run chocolatey with `choco command -help` for specific help on
                         "chocolatey".Log().Info(@"
 You can pass options and switches in the following ways:
 
- * `-` - except for normal switches (not 1 character) when using option
-   blending, see below.
- * `--` - except for one character switches
- * `/`
- * ""Option Blending / Blended Options"": One character switches can be 
-   blended. e.g. `-d` (debug), `-f` (force), `-v` (verbose), and `-y` 
-   (confirm yes) can be blended as `-dfvy`, but you must use `--` for 
-   all other normal options/switches e.g. `--version` instead of 
-   `-version`. If you don't do this, you may have unintended results.
- * ""Use Equals"": You can also include or not include an equals sign 
-   `=` between options and values. And quote the values.
+ * `-`, `/`, or `--` (one character switches should not use `--`)
+ * **Option Bundling / Bundled Options**: One character switches can be
+   bundled. e.g. `-d` (debug), `-f` (force), `-v` (verbose), and `-y` 
+   (confirm yes) can be bundled as `-dfvy`.
+ * **Use Equals**: You can also include or not include an equals sign 
+   `=` between options and values.
+ * **Quote Values**: When you need to quote things, such as when using 
+   spaces, please use single quote marks (`'`). In cmd.exe, you can 
+   also use double double quotes (i.e. `""""yo""""`). This is due to 
+   the hand off to PowerShell - it seems to strip off the outer set of 
+   quotes. TODO: TEST THIS, MAY NOT BE RELEVANT NOW.
  * Options and switches apply to all items passed, so if you are 
-   installing multiple packages, and you use `--version=1.0.0`, it is 
-   going to look for and try to install version 1.0.0 of every package 
-   passed. So please split out multiple package calls when wanting to 
-   pass specific options.
- * When you need to quote things, such as when using spaces in option 
-   values, please use single quote marks ('). In cmd.exe, you can also 
-   use double double quotes (i.e. """"yo""""). This is due to the hand 
-   off to PowerShell - seems to strip off the outer set of quotes. 
-   TODO: TEST THIS, MAY NOT BE RELEVANT NOW.
+   installing multiple packages, and you use `--version=1.0.0`, choco 
+   is going to look for and try to install version 1.0.0 of every 
+   package passed. So please split out multiple package calls when 
+   wanting to pass specific options.
 ");
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, "Default Options and Switches");
                     });

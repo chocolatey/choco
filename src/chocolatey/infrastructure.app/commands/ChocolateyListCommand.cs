@@ -82,8 +82,9 @@ Chocolatey will perform a search for a package local or remote. Some
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco search filter [options/switches]
-    choco list filter [options/switches]
+    choco search <filter> [<options/switches>]
+    choco list <filter> [<options/switches>]
+    clist <filter> [<options/switches>]
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
