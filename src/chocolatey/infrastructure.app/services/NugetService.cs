@@ -253,13 +253,6 @@ spam/junk folder.");
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
-                if (packageName.to_lower().EndsWith(".config"))
-                {
-                    //todo: determine if .config file for packages .config
-                    //todo: determine if config file exists
-                }
-                else
-                {
                     //todo: get smarter about realizing multiple versions have been installed before and allowing that
                     
                     remove_existing_rollback_directory(packageName);
@@ -304,7 +297,6 @@ spam/junk folder.");
                         packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
                         //packageManager.InstallPackage(packageName, version, configuration.IgnoreDependencies, configuration.Prerelease);
                     }
-                }
             }
 
             return packageInstalls;
