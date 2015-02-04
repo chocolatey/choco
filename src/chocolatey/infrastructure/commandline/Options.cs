@@ -816,9 +816,16 @@ namespace chocolatey.infrastructure.commandline
 			if (ParseBool (argument, n, c))
 				return true;
 			// is it a bundled option?
-			if (ParseBundledValue (f, string.Concat (n + s + v), c))
-				return true;
-
+		    try
+		    {
+                if (ParseBundledValue(f, string.Concat(n + s + v), c))
+                    return true;
+		    }
+		    catch (Exception ex)
+		    {
+                "chocolatey".Log().Debug("Parsing {0} resulted in exception:{1} {2}".format_with(argument,Environment.NewLine,ex.Message));
+		    }
+            
 			return false;
 		}
 
@@ -860,6 +867,7 @@ namespace chocolatey.infrastructure.commandline
 
 		private bool ParseBundledValue (string f, string n, OptionContext c)
 		{
+            IDictionary<Option,string> normalOptions = new Dictionary<Option, string>();
 			if (f != "-")
 				return false;
 			for (int i = 0; i < n.Length; ++i) {
@@ -873,22 +881,32 @@ namespace chocolatey.infrastructure.commandline
 									"Cannot bundle unregistered option '{0}'."), opt), opt);
 				}
 				p = this [rn];
-				switch (p.OptionValueType) {
-					case OptionValueType.None:
-						Invoke (c, opt, n, p);
-						break;
-					case OptionValueType.Optional:
-					case OptionValueType.Required: {
-						string v     = n.Substring (i+1);
-						c.Option     = p;
-						c.OptionName = opt;
-						ParseValue (v.Length != 0 ? v : null, c);
-						return true;
-					}
-					default:
-						throw new InvalidOperationException ("Unknown OptionValueType: " + p.OptionValueType);
-				}
+
+                switch (p.OptionValueType)
+                {
+                    case OptionValueType.None:
+                        normalOptions.Add(p, opt);
+                        break;
+                    case OptionValueType.Optional:
+                    case OptionValueType.Required:
+                        {
+                            string v = n.Substring(i + 1);
+                            c.Option = p;
+                            c.OptionName = opt;
+                            ParseValue(v.Length != 0 ? v : null, c);
+                            return true;
+                        }
+                    default:
+                        throw new InvalidOperationException("Unknown OptionValueType: " + p.OptionValueType);
+                }
 			}
+
+            // only invoke options for bundled if all options exist
+		    foreach (var option in normalOptions)
+		    {
+                Invoke(c, option.Value, n, option.Key);
+		    }
+
 			return true;
 		}
 
