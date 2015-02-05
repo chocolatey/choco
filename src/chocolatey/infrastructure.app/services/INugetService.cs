@@ -80,14 +80,15 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="continueAction">The action to continue with for each noop test upgrade.</param>
-        void upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction);
+        /// <returns>what would have upgraded</returns>
+        ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction);
 
         /// <summary>
         ///   Upgrades packages from NuGet related feeds
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
-        /// <returns>results of installs</returns>
+        /// <returns>results of upgrades</returns>
         ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction);
 
         /// <summary>
@@ -102,7 +103,7 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
-        /// <returns>results of installs</returns>
+        /// <returns>results of uninstalls</returns>
         ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction);
     }
 }

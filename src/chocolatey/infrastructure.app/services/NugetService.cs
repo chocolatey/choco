@@ -322,10 +322,10 @@ spam/junk folder.");
             }
         }
 
-        public void upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
             config.Force = false;
-            upgrade_run(config, continueAction, performAction: false);
+            return upgrade_run(config, continueAction, performAction: false);
         }
 
         public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)

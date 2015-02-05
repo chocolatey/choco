@@ -311,7 +311,13 @@ namespace chocolatey.infrastructure.app.services
 
         public void upgrade_noop(ChocolateyConfiguration config)
         {
-            _nugetService.upgrade_noop(config, (pkg) => _powershellService.install_noop(pkg));
+            var noopUpgrades = _nugetService.upgrade_noop(config, (pkg) => _powershellService.install_noop(pkg));
+            if (config.RegularOuptut)
+            {
+                this.Log().Warn(() => @"{0}There are {1} packages available for upgrade.{0} See the log for details.".format_with(
+              Environment.NewLine,
+              noopUpgrades.Count));
+            }
         }
 
         public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config)
