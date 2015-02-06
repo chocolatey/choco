@@ -47,7 +47,7 @@ namespace chocolatey.infrastructure.app.nuget
                           .AsEnumerable()
                           .Where(PackageExtensions.IsListed)
                           .Where(p => configuration.Prerelease || p.IsReleaseVersion())
-                          .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version);
+                          .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version).ToList();
         }
     }
 

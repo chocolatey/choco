@@ -71,8 +71,12 @@ namespace chocolatey.infrastructure.app.services
         {
             var packageResults = new ConcurrentDictionary<string, PackageResult>();
 
-            foreach (var package in NugetList.GetPackages(config, _nugetLogger).or_empty_list_if_null())
+            var packages = NugetList.GetPackages(config, _nugetLogger).ToList();
+
+            foreach (var package in packages.or_empty_list_if_null())
             {
+                this.Log().Debug(() => "[Nuget] {0} {1}".format_with(package.Id, package.Version.to_string()));
+
                 if (logResults)
                 {
                     if (config.RegularOuptut)
@@ -86,10 +90,7 @@ namespace chocolatey.infrastructure.app.services
                         this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0}|{1}".format_with(package.Id, package.Version.to_string()));
                     }
                 }
-                else
-                {
-                    this.Log().Debug(() => "[Nuget] {0} {1}".format_with(package.Id, package.Version.to_string()));
-                }
+
                 packageResults.GetOrAdd(package.Id, new PackageResult(package, null));
             }
 
@@ -352,7 +353,10 @@ spam/junk folder.");
                     },
                 uninstallSuccessAction: null);
 
+            var configIgnoreDependencies = config.IgnoreDependencies;
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
+            config.IgnoreDependencies = configIgnoreDependencies;
+
 
             foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
@@ -636,12 +640,20 @@ spam/junk folder.");
         {
             if (config.PackageNames.is_equal_to("all"))
             {
+
                 config.ListCommand.LocalOnly = true;
                 var sources = config.Sources;
                 config.Sources = ApplicationParameters.PackagesLocation;
                 var pre = config.Prerelease;
                 config.Prerelease = true;
+                var noop = config.Noop;
+                config.Noop = false;
+                config.PackageNames = string.Empty;
+                var input = config.Input;
+                config.Input = string.Empty;
                 var localPackages = list_run(config, logResults: false);
+                config.Input = input;
+                config.Noop = noop;
                 config.Prerelease = pre;
                 config.Sources = sources;
                 config.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator, localPackages.Select((p) => p.Key).or_empty_list_if_null());
