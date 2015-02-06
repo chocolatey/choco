@@ -75,8 +75,6 @@ namespace chocolatey.infrastructure.app.services
 
             foreach (var package in packages.or_empty_list_if_null())
             {
-                this.Log().Debug(() => "[Nuget] {0} {1}".format_with(package.Id, package.Version.to_string()));
-
                 if (logResults)
                 {
                     if (config.RegularOuptut)
@@ -89,6 +87,8 @@ namespace chocolatey.infrastructure.app.services
                     {
                         this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0}|{1}".format_with(package.Id, package.Version.to_string()));
                     }
+                } else {
+                    this.Log().Debug(() => "{0} {1}".format_with(package.Id, package.Version.to_string()));
                 }
 
                 packageResults.GetOrAdd(package.Id, new PackageResult(package, null));
