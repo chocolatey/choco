@@ -225,7 +225,7 @@ spam/junk folder.");
             IList<string> packageNames = config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
             if (packageNames.Count == 1)
             {
-                var packageName = packageNames.FirstOrDefault();
+                var packageName = packageNames.DefaultIfEmpty(string.Empty).FirstOrDefault();
                 if (packageName.EndsWith(Constants.PackageExtension) || packageName.EndsWith(Constants.ManifestExtension))
                 {
                     this.Log().Debug("Updating source and package name to handle *.nupkg or *.nuspec file.");
@@ -368,11 +368,31 @@ spam/junk folder.");
 
                 if (installedPackage == null)
                 {
-                    string logMessage = "{0} is not installed. Cannot upgrade a non-existent package.".format_with(packageName);
-                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                    results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    //todo v1 Deprecation - reimplement error
+                    //string logMessage = "{0} is not installed. Cannot upgrade a non-existent package.".format_with(packageName);
+                    //var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                    //results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                    if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    //if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    //continue;
+
+                    string logMessage = @"
+DEPRECATION NOTICE - Upgrade will no longer install non-installed 
+packages as of version 1.0.0. That is what the install command is for.
+
+
+{0} is not installed. Installing...".format_with(packageName);
+
+                    if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+
+                    var packageNames = config.PackageNames;
+                    config.PackageNames = packageName;
+                    var installResults = install_run(config, continueAction);
+                    foreach (var packageResult in installResults)
+                    {
+                        packageInstalls.GetOrAdd(packageResult.Key, packageResult.Value);
+                    }
+                    config.PackageNames = packageNames;
                     continue;
                 }
 
