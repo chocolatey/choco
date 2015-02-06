@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.runners
     using System.Collections.Generic;
     using SimpleInjector;
     using configuration;
+    using logging;
 
     /// <summary>
     ///   Console application responsible for running chocolatey
@@ -51,7 +52,12 @@ namespace chocolatey.infrastructure.app.runners
                         commandArgs,
                         config,
                         (optionSet) => command.configure_argument_parser(optionSet, config),
-                        (unparsedArgs) => { 
+                        (unparsedArgs) => {
+                            // if debug is bundled with local options, it may not get picked up when global 
+                            // options are parsed. Attempt to set it again once local options are set.
+                            // This does mean some output from debug will be missed (but not much)
+                            if (config.Debug) Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug);
+
                             command.handle_additional_argument_parsing(unparsedArgs, config);
 
                             // all options / switches should be parsed, 
