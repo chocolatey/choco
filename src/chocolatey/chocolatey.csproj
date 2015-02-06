@@ -143,6 +143,7 @@
     <Compile Include="infrastructure.app\services\TemplateService.cs" />
     <Compile Include="infrastructure.app\services\WebPiService.cs" />
     <Compile Include="infrastructure.app\templates\ChocolateyInstallTemplate.cs" />
+    <Compile Include="infrastructure.app\templates\ChocolateyUninstallTemplate.cs" />
     <Compile Include="infrastructure.app\templates\NuspecTemplate.cs" />
     <Compile Include="infrastructure.app\templates\TemplateValues.cs" />
     <Compile Include="infrastructure\adapters\Assembly.cs" />
