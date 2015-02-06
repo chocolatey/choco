@@ -12,6 +12,7 @@ We'll try to capture everything here that you should know about. Please call `ch
 
 ### KNOWN ISSUES
 
+ * [Known Issues](https://github.com/chocolatey/choco/labels/Bug)
  * TEMPORARY `install all` is missing - this is expected to be back in 0.9.10 - see [#23](https://github.com/chocolatey/choco/issues/23)
  * Alternative sources (`webpi`,`ruby`,`python`,`cygwin`, `windowsfeature`) do not work yet. This is expected to be fixed in 0.9.10 - see [#14](https://github.com/chocolatey/choco/issues/14)
  * Progress bar is missing when downloading until we are using internal posh components for Packages - see [#56](https://github.com/chocolatey/choco/issues/56)
@@ -33,13 +34,11 @@ We'll try to capture everything here that you should know about. Please call `ch
  * **Package Maintenance Changes**:
    1. Read the above about apikey changes
    2. Read above about dependency resolution changes.
-   3. `choco push` is deprecating pushing without specifying a source, so you may want to start getting used to using `-s https://chocolatey.org/` when pushing to the community feed - see [Push Command](https://github.com/chocolatey/choco/wiki/CommandsPush)
  * **Deprecated/Removed Commands:**
    1. `installmissing` has been removed. It was deprecated awhile ago, so this should not be a surprise.
    2. `choco version` has been deprecated and will be removed in v1. Use `choco upgrade pkgName --noop` or `choco upgrade pkgName -whatif` instead.
    3. `Write-ChocolateySuccess`, `Write-ChocolateyFailure` have been deprecated.
    4. `update` is now `upgrade`. `update` has been deprecated and will be removed/replaced in v1. Update will be reincarnated later for a different purpose. **Hint**: It rhymes with smackage pindexes.
-   5. `sources` is deprecated for `source` and may be removed in v1. Maybe not. Who knows? ;)
  * PowerShell - Ensure all errors are terminating errors - see [#48](https://github.com/chocolatey/choco/issues/48)
 
 ### FEATURES

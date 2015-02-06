@@ -44,7 +44,7 @@ namespace chocolatey.infrastructure.app.commands
 
             optionSet
                 .Add("s=|source=",
-                     "Source (REQUIRED) - The source we are pushing the package to. Use {0} to push to community feed.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource),
+                     "Source - The source we are pushing the package to. Use {0} to push to community feed.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource),
                      option => configuration.Sources = option)
                 .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The api key for the source. If not specified (and not local file source), does a lookup. If not specified and one is not found for an https source, push will fail.",
@@ -71,13 +71,8 @@ namespace chocolatey.infrastructure.app.commands
         {
             configuration.Input = string.Join(" ", unparsedArguments); // path to .nupkg - assume relative
 
-            //todo: v1 Deprecation - remove default source setting
             if (string.IsNullOrWhiteSpace(configuration.Sources))
             {
-                this.Log().Warn(ChocolateyLoggers.Important, @"
-DEPRECATION NOTICE - Pushing to the community feed ({0}) 
- by default is deprecated and will be removed in version 1.0.0. Please 
- update your tools to specify --source explicitly.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
                 configuration.Sources = ApplicationParameters.ChocolateyCommunityFeedPushSource;
             }
 
