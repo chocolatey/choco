@@ -271,7 +271,7 @@ spam/junk folder.");
                 {
                     string logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
                     var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
-                    results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                    results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                     this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
@@ -411,9 +411,18 @@ packages as of version 1.0.0. That is what the install command is for.
                 {
                     string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
                     var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
-                    results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                    if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    if (config.UpgradeCommand.FailOnUnfound)
+                    {
+                        results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                        if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    }
+                    else
+                    {
+                        results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                        if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                    }
+                
                     continue;
                 }
 

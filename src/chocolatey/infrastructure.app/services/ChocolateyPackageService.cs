@@ -233,16 +233,27 @@ namespace chocolatey.infrastructure.app.services
             }
 
             var installFailures = packageInstalls.Count(p => !p.Value.Success);
-            this.Log().Warn(() => @"{0}{1} installed {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
+            var installWarnings = packageInstalls.Count(p => p.Value.Warning);
+            this.Log().Warn(() => @"{0}{1} installed {2}/{3} package(s). {4} package(s) failed.{5}{0} See the log for details.".format_with(
                 Environment.NewLine,
                 ApplicationParameters.Name,
                 packageInstalls.Count(p => p.Value.Success && !p.Value.Inconclusive),
                 packageInstalls.Count,
-                installFailures));
+                installFailures,
+                installWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, installWarnings)));
+
+            if (installWarnings != 0)
+            {
+                this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
+                foreach (var warning in packageInstalls.Where(p => p.Value.Warning).or_empty_list_if_null())
+                {
+                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
+                }
+            }
 
             if (installFailures != 0)
             {
-                this.Log().Error("Failures");
+                this.Log().Error("Failures:");
                 foreach (var failure in packageInstalls.Where(p => !p.Value.Success).or_empty_list_if_null())
                 {
                     this.Log().Error(" - {0}".format_with(failure.Value.Name));
@@ -334,16 +345,27 @@ namespace chocolatey.infrastructure.app.services
                 );
 
             var upgradeFailures = packageUpgrades.Count(p => !p.Value.Success);
-            this.Log().Warn(() => @"{0}{1} upgraded {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
+            var upgradeWarnings = packageUpgrades.Count(p => p.Value.Warning);
+            this.Log().Warn(() => @"{0}{1} upgraded {2}/{3} package(s). {4} package(s) failed.{5}{0} See the log for details.".format_with(
                 Environment.NewLine,
                 ApplicationParameters.Name,
                 packageUpgrades.Count(p => p.Value.Success && !p.Value.Inconclusive),
                 packageUpgrades.Count,
-                upgradeFailures));
+                upgradeFailures,
+                upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings)));
 
+            if (upgradeWarnings != 0)
+            {
+                this.Log().Warn(ChocolateyLoggers.Important,"Warnings:");
+                foreach (var warning in packageUpgrades.Where(p => p.Value.Warning).or_empty_list_if_null())
+                {
+                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
+                }
+            }    
+            
             if (upgradeFailures != 0)
             {
-                this.Log().Error("Failures");
+                this.Log().Error("Failures:");
                 foreach (var failure in packageUpgrades.Where(p => !p.Value.Success).or_empty_list_if_null())
                 {
                     this.Log().Error(" - {0}".format_with(failure.Value.Name));

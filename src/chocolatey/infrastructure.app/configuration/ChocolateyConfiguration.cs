@@ -37,6 +37,7 @@ namespace chocolatey.infrastructure.app.configuration
             Features = new FeaturesConfiguration();
             NewCommand = new NewCommandConfiguration();
             ListCommand = new ListCommandConfiguration();
+            UpgradeCommand = new UpgradeCommandConfiguration();
             SourceCommand = new SourcesCommandConfiguration();
             FeatureCommand = new FeatureCommandConfiguration();
             ApiKeyCommand = new ApiKeyCommandConfiguration();
@@ -200,6 +201,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public ListCommandConfiguration ListCommand { get; private set; }
 
         /// <summary>
+        ///   Configuration related specifically to Upgrade command
+        /// </summary>
+        public UpgradeCommandConfiguration UpgradeCommand { get; private set; }
+
+        /// <summary>
         ///   Configuration related specifically to New command
         /// </summary>
         public NewCommandConfiguration NewCommand { get; private set; }
@@ -258,6 +264,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         // list
         public bool LocalOnly { get; set; }
         public bool IncludeRegistryPrograms { get; set; }
+    }  
+    
+    [Serializable]
+    public sealed class UpgradeCommandConfiguration
+    {
+        public bool FailOnUnfound { get; set; }
     }
 
     [Serializable]
