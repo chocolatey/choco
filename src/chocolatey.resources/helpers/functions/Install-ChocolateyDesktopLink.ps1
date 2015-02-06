@@ -56,7 +56,6 @@ param(
 
     Write-Debug "Desktop Shortcut created pointing at `'$targetFilePath`'."
 
-    Write-ChocolateySuccess "Install-ChocolateyShortcut completed"
   }	
   catch {
     Write-ChocolateyFailure "Install-ChocolateyDesktopLink" "There were errors attempting to create shortcut. The error message was '$_'."

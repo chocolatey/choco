@@ -109,8 +109,6 @@ directoy, an icon to be used for the shortcut, along with a description and argu
 	    $lnk.Save()
 		
 		Write-Debug "Shortcut created."
-
-		Write-ChocolateySuccess "Install-ChocolateyShortcut completed"
 		
 	}
 	catch {

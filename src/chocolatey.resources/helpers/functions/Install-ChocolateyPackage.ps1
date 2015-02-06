@@ -81,20 +81,14 @@ param(
   [string] $checksumType64 = ''
 )
 
-  try {
-    Write-Debug "Running 'Install-ChocolateyPackage' for $packageName with url:`'$url`', args: `'$silentArgs`', fileType: `'$fileType`', url64bit: `'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`', validExitCodes: `'$validExitCodes`' ";
+  Write-Debug "Running 'Install-ChocolateyPackage' for $packageName with url:`'$url`', args: `'$silentArgs`', fileType: `'$fileType`', url64bit: `'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`', validExitCodes: `'$validExitCodes`' ";
 
-    $chocTempDir = Join-Path $env:TEMP "chocolatey"
-    $tempDir = Join-Path $chocTempDir "$packageName"
+  $chocTempDir = Join-Path $env:TEMP "chocolatey"
+  $tempDir = Join-Path $chocTempDir "$packageName"
 
-    if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
-    $file = Join-Path $tempDir "$($packageName)Install.$fileType"
+  if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
+  $file = Join-Path $tempDir "$($packageName)Install.$fileType"
 
-    Get-ChocolateyWebFile $packageName $file $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64
-    Install-ChocolateyInstallPackage $packageName $fileType $silentArgs $file -validExitCodes $validExitCodes
-    Write-ChocolateySuccess $packageName
-  } catch {
-    Write-ChocolateyFailure $packageName $($_.Exception.Message)
-    throw
-  }
+  Get-ChocolateyWebFile $packageName $file $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64
+  Install-ChocolateyInstallPackage $packageName $fileType $silentArgs $file -validExitCodes $validExitCodes
 }

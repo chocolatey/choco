@@ -72,20 +72,13 @@ param(
 )
   Write-Debug "Running 'Install-ChocolateyZipPackage' for $packageName with url:`'$url`', unzipLocation: `'$unzipLocation`', url64bit: `'$url64bit`', specificFolder: `'$specificFolder`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`' ";
 
-  try {
-    $fileType = 'zip'
+  $fileType = 'zip'
 
-    $chocTempDir = Join-Path $env:TEMP "chocolatey"
-    $tempDir = Join-Path $chocTempDir "$packageName"
-    if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir) | Out-Null}
-    $file = Join-Path $tempDir "$($packageName)Install.$fileType"
-
-    Get-ChocolateyWebFile $packageName $file $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64
-    Get-ChocolateyUnzip "$file" $unzipLocation $specificFolder $packageName
-
-    Write-ChocolateySuccess $packageName
-  } catch {
-    Write-ChocolateyFailure $packageName $($_.Exception.Message)
-    throw
-  }
+  $chocTempDir = Join-Path $env:TEMP "chocolatey"
+  $tempDir = Join-Path $chocTempDir "$packageName"
+  if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir) | Out-Null}
+  $file = Join-Path $tempDir "$($packageName)Install.$fileType"
+  
+  Get-ChocolateyWebFile $packageName $file $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64
+  Get-ChocolateyUnzip "$file" $unzipLocation $specificFolder $packageName
 }

@@ -117,7 +117,6 @@ param(
             Write-ChocolateyFailure $packageName "There was an error installing '$packageName'. The exit code returned was $exitCode."
             return
         }
-        Write-ChocolateySuccess $packageName
     }
     else {
         Write-ChocolateyFailure $packageName "Visual Studio is not installed or the specified version is not present."

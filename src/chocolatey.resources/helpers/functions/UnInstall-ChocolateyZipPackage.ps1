@@ -44,18 +44,11 @@ param(
 )
   Write-Debug "Running 'UnInstall-ChocolateyZipPackage' for $packageName $zipFileName "
   
-  try {
-    $packagelibPath=$env:chocolateyPackageFolder
-    $zipContentFile=(join-path $packagelibPath $zipFileName) + ".txt"
-    $zipContentFile
-    $zipContents=get-content $zipContentFile
-    foreach ($fileInZip in $zipContents) {
-      remove-item "$fileInZip" -ErrorAction SilentlyContinue
-    }
-
-    Write-ChocolateySuccess $packageName
-  } catch {
-      Write-ChocolateyFailure $packageName $($_.Exception.Message)
-    throw 
+  $packagelibPath=$env:chocolateyPackageFolder
+  $zipContentFile=(join-path $packagelibPath $zipFileName) + ".txt"
+  $zipContentFile
+  $zipContents=get-content $zipContentFile
+  foreach ($fileInZip in $zipContents) {
+    remove-item "$fileInZip" -ErrorAction SilentlyContinue
   }
 }
