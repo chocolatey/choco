@@ -52,9 +52,13 @@ namespace chocolatey.infrastructure.app.configuration
         {
             var properties = new StringBuilder();
 
+            this.Log().Debug(ChocolateyLoggers.Important,@"
+NOTE: Hiding sensitive configuration data! Please double and triple 
+ check to be sure no sensitive data is shown, especially if copying 
+ output to a gist for review.");
             output_tostring(properties, GetType().GetProperties(), this, "");
-
             return properties.ToString();
+
         }
 
         private void output_tostring(StringBuilder propertyValues, IEnumerable<PropertyInfo> properties, object obj, string prepend)
