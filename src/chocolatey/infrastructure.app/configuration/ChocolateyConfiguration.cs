@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System.Reflection;
     using System.Text;
     using domain;
+    using logging;
     using platforms;
 
     /// <summary>
@@ -71,10 +72,12 @@ namespace chocolatey.infrastructure.app.configuration
                 {
                     if (!string.IsNullOrWhiteSpace(objectValue.to_string()))
                     {
-                        propertyValues.AppendFormat("{0}{1}='{2}'|",
-                                                    string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
-                                                    propertyInfo.Name,
-                                                    objectValue.to_string());
+                        var output = "{0}{1}='{2}'|".format_with(
+                            string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
+                            propertyInfo.Name,
+                            objectValue.to_string());
+
+                        append_output(propertyValues, output);
                     }
                 }
                 else if (propertyInfo.PropertyType.is_collections_type())
@@ -82,17 +85,37 @@ namespace chocolatey.infrastructure.app.configuration
                     var list = objectValue as IDictionary<string, string>;
                     foreach (var item in list.or_empty_list_if_null())
                     {
-                        propertyValues.AppendFormat("{0}{1}.{2}='{3}'|",
-                                                    string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
-                                                    propertyInfo.Name,
-                                                    item.Key,
-                                                    item.Value);
+                        var output = "{0}{1}.{2}='{3}'|".format_with(
+                            string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
+                            propertyInfo.Name,
+                            item.Key,
+                            item.Value);
+
+                        append_output(propertyValues, output);
                     }
                 }
                 else
                 {
                     output_tostring(propertyValues, propertyInfo.PropertyType.GetProperties(), objectValue, propertyInfo.Name);
                 }
+            }
+        }
+
+        private const int MAX_CONSOLE_LINE_LENGTH = 72;
+        private int _currentLineLength = 0;
+
+        private void append_output(StringBuilder propertyValues, string append)
+        {
+            _currentLineLength += append.Length;
+
+            propertyValues.AppendFormat("{0}{1}{2}",
+                   _currentLineLength < MAX_CONSOLE_LINE_LENGTH ? string.Empty : Environment.NewLine,
+                   append,
+                   append.Length < MAX_CONSOLE_LINE_LENGTH ? string.Empty : Environment.NewLine);
+
+            if (_currentLineLength > MAX_CONSOLE_LINE_LENGTH)
+            {
+                _currentLineLength = append.Length;
             }
         }
 
