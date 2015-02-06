@@ -146,22 +146,8 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.Input.ShouldEqual(nupkgPath);
             }
 
-            // todo v1 DEPRECATION for default source being set
-            //[Fact]
-            //public void should_not_set_the_apiKey_if_source_is_unset()
-            //{
-            //    reset();
-            //    configSettingsService.Setup(c => c.get_api_key(configuration, null)).Returns(apiKey);
-            //    configuration.PushCommand.Key = "";
-            //    configuration.Sources = "";
-            //    because();
-
-            //    configuration.PushCommand.Key.ShouldEqual("");
-            //    configSettingsService.Verify(c => c.get_api_key(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
-            //}
-
             [Fact]
-            public void should_perform_deprecated_behavior_set_the_source_to_default_feed_if_not_set_explicitly()
+            public void should_set_the_source_to_default_feed_if_not_set_explicitly()
             {
                 reset();
                 configuration.Sources = "";
@@ -169,18 +155,6 @@ namespace chocolatey.tests.infrastructure.app.commands
 
                 configuration.Sources.ShouldEqual(ApplicationParameters.ChocolateyCommunityFeedPushSource);
             }          
-            
-            [Fact]
-            public void should_warn_the_user_about_deprecated_behavior_when_source_is_set_to_default_feed_because_not_set_explicitly()
-            {
-                reset();
-                configuration.Sources = "";
-                because();
-
-                MockLogger.Verify(l => l.Warn(It.IsAny<string>()), Times.AtLeastOnce);
-
-                MockLogger.MessagesFor(LogLevel.Warn).FirstOrDefault().Contains("DEPRECATION NOTICE - Pushing to the community feed").ShouldBeTrue();
-            }
 
             [Fact]
             public void should_not_set_the_apiKey_if_source_is_not_found()
