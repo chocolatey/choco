@@ -69,7 +69,7 @@ namespace chocolatey.infrastructure.app.commands
 
             if (command == PinCommandType.unknown) 
             {
-                this.Log().Warn("Unkown command {0}. Setting to list.".format_with(unparsedCommand));
+                this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
                 command = PinCommandType.list;
             }
             
