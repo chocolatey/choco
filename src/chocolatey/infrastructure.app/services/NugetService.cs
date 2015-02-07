@@ -402,6 +402,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
                     var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                     results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                    results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                     if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
@@ -420,6 +421,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     else
                     {
                         results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                        results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                     }
                 
