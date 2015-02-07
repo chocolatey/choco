@@ -16,10 +16,10 @@
 
   <target name="run_normal_tasks">
     <echo level="Warning" message="Uploading Code Coverage Results to Coveralls if ENV['COVERALS_REPO_TOKEN'] is set." />
-    <call target="run_coveralls" if="${environment::variable-exists('COVERALS_REPO_TOKEN')}" />
+    <call target="run_coveralls" if="${environment::variable-exists('COVERALLS_REPO_TOKEN')}" />
   </target>
 
-  <target name="run_coveralls" if="${environment::variable-exists('COVERALS_REPO_TOKEN')}">
+  <target name="run_coveralls" if="${environment::variable-exists('COVERALLS_REPO_TOKEN')}">
     <echo level="Warning" message="Running ${app.coveralls} --opencover '${dirs.codecoverage_results}${path.separator}${file.codecoverage_results}'" />
     <exec program="${app.coveralls}"
           workingdir="${dirs.codecoverage_results}"
