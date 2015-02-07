@@ -89,6 +89,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_add_version_to_the_option_set()
             {
                 optionSet.Contains("version").ShouldBeTrue();
+            }     
+            
+            [Fact]
+            public void should_allow_insensitive_case_Version_to_the_option_set()
+            {
+                optionSet.Contains("Version").ShouldBeTrue();
             }
 
             [Fact]

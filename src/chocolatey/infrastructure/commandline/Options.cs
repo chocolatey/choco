@@ -504,7 +504,8 @@ namespace chocolatey.infrastructure.commandline
 		{
 		}
 
-		public OptionSet (Converter<string, string> localizer)
+        public OptionSet(Converter<string, string> localizer)
+            : base(StringComparer.OrdinalIgnoreCase)
 		{
 			this.localizer = localizer;
 		}
