@@ -24,6 +24,8 @@ Resolve-Path $helpersPath\functions\*.ps1 |
     ? { -not ($_.ProviderPath.Contains(".Tests.")) } |
     % { . $_.ProviderPath }
 
+Write-Debug "Posh version is $($psversiontable.PsVersion.ToString())"
+
 Export-ModuleMember -Function `
 	Get-BinRoot,`
 	Get-CheckSumValid,`
