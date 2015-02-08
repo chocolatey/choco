@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.app.services
 
         public void noop(ChocolateyConfiguration configuration)
         {
-            //todo: something
+            this.Log().Info("Would have made a change to the configuration.");
         }
 
         public void source_list(ChocolateyConfiguration configuration)
