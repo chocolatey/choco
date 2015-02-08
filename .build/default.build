@@ -58,7 +58,6 @@
 
   <target name="build">
     <call target="get_revision" />
-    <call target="shorten_hash" />
     <call target="get_build_number" />
     <call target="update_version_number" />
     <call target="get_drop_directory" />
@@ -91,12 +90,6 @@
     <property name="version.hash" value="${environment::get-variable('uc.app.revision.hash')}" if="${environment::variable-exists('uc.app.revision.hash')}" />
     <property name="version.hash" value="${version.revision}" if="${version.hash == '0'}" />
     <echo level="Warning" message="Using revision number: ${version.revision} and hash: ${version.hash}." />
-  </target>
-
-  <target name="shorten_hash">
-    <echo level="Warning" message="Shortening the length of the version hash '${version.hash}' to 8 digits." />
-    <property name="version.hash" value="${string::substring(version.hash,0,8)}" if="${string::get-length(version.hash) > 8}" />
-    <echo level="Warning" message="The hash is now: ${version.hash}." />
   </target>
 
   <target name="get_build_number">

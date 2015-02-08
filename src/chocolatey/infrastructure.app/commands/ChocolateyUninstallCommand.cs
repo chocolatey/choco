@@ -86,6 +86,11 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(@"
 Uninstalls a package or a list of packages. Some may prefer to use 
  `cuninst` as a shortcut for `choco uninstall`.
+
+NOTE: Automatic Uninstaller (AutoUninstall) is turned off by default 
+ while in preview mode. To turn it on, run the following command:
+
+    feature enable -n autoUninstaller
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");

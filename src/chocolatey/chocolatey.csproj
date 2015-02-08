@@ -160,6 +160,7 @@
     <Compile Include="infrastructure\commands\ICommandExecutor.cs" />
     <Compile Include="infrastructure\commands\PowershellExecutor.cs" />
     <Compile Include="infrastructure\guards\Ensure.cs" />
+    <Compile Include="infrastructure\information\ProcessInformation.cs" />
     <Compile Include="infrastructure\logging\ChocolateyLoggers.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="EnumExtensions.cs" />

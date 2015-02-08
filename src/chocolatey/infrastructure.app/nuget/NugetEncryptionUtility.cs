@@ -28,6 +28,8 @@ namespace chocolatey.infrastructure.app.nuget
 
         internal static string EncryptString(string value)
         {
+            if (string.IsNullOrWhiteSpace(value)) return null;
+
             var decryptedByteArray = Encoding.UTF8.GetBytes(value);
             var encryptedByteArray = ProtectedData.Protect(decryptedByteArray, _entropyBytes, DataProtectionScope.LocalMachine);
             var encryptedString = Convert.ToBase64String(encryptedByteArray);
