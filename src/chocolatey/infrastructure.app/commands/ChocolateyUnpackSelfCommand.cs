@@ -101,7 +101,8 @@ NOTE: This command should only be used when installing Chocolatey, not
                  _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location),
                 folders,
                 ApplicationParameters.ChocolateyFileResources,
-                overwriteExisting: configuration.Force);
+                overwriteExisting: configuration.Force,
+                logOutput: true);
         }
     }
 }

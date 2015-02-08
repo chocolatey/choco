@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.extractors
             }
         }
 
-        public static void extract_all_resources_to_relative_directory(IFileSystem fileSystem, IAssembly assembly, string directoryPath, IList<string> relativeDirectories, string resourcesToInclude, bool overwriteExisting = false)
+        public static void extract_all_resources_to_relative_directory(IFileSystem fileSystem, IAssembly assembly, string directoryPath, IList<string> relativeDirectories, string resourcesToInclude, bool overwriteExisting = false, bool logOutput = false)
         {
             var resourceString = new StringBuilder();
             foreach (var resourceName in assembly.GetManifestResourceNames())
@@ -100,7 +100,7 @@ namespace chocolatey.infrastructure.extractors
                 //var fileLocation = fileSystem.combine_paths("", resourceString.ToString().Split('.')) + resourceName.Substring(fileExtensionLocation);
 
                 var filePath = fileSystem.combine_paths(directoryPath, fileLocation);
-                "chocolatey".Log().Debug("Unpacking {0} to '{1}'".format_with(fileLocation,filePath));
+                if (logOutput) "chocolatey".Log().Debug("Unpacking {0} to '{1}'".format_with(fileLocation,filePath));
                 extract_binary_file_from_assembly(fileSystem, assembly, resourceName, filePath, overwriteExisting);
             }
         }
