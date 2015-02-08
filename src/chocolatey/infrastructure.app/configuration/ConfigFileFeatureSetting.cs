@@ -30,5 +30,8 @@ namespace chocolatey.infrastructure.app.configuration
 
         [XmlAttribute(AttributeName = "enabled")]
         public bool Enabled { get; set; }
+
+        [XmlAttribute(AttributeName = "setExplicitly")]
+        public bool SetExplicitly { get; set; }
     }
 }
