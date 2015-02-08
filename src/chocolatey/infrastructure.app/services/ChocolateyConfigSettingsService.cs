@@ -25,6 +25,7 @@ namespace chocolatey.infrastructure.app.services
     {
         private readonly Lazy<ConfigFileSettings> _configFileSettings;
         private readonly IXmlService _xmlService;
+        private const string NO_CHANGE_MESSAGE = "Nothing to change. Config already set.";
 
         private ConfigFileSettings configFileSettings
         {
@@ -67,6 +68,12 @@ namespace chocolatey.infrastructure.app.services
 
                 this.Log().Info(() => "Added {0} - {1}".format_with(configuration.SourceCommand.Name, configuration.Sources));
             }
+            else
+            {
+                this.Log().Warn(@"
+No changes made. If you are trying to change an existing source, please 
+ remove it first.");
+            }
         }
 
         public void source_remove(ChocolateyConfiguration configuration)
@@ -79,6 +86,10 @@ namespace chocolatey.infrastructure.app.services
 
                 this.Log().Info(() => "Removed {0}".format_with(source.Id));
             }
+            else
+            {
+                this.Log().Warn(NO_CHANGE_MESSAGE);
+            }
         }
 
         public void source_disable(ChocolateyConfiguration configuration)
@@ -90,6 +101,10 @@ namespace chocolatey.infrastructure.app.services
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                 this.Log().Info(() => "Disabled {0}".format_with(source.Id));
             }
+            else
+            {
+                this.Log().Warn(NO_CHANGE_MESSAGE);
+            }
         }
 
         public void source_enable(ChocolateyConfiguration configuration)
@@ -100,6 +115,10 @@ namespace chocolatey.infrastructure.app.services
                 source.Disabled = false;
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                 this.Log().Info(() => "Enabled {0}".format_with(source.Id));
+            }
+            else
+            {
+                this.Log().Warn(NO_CHANGE_MESSAGE);
             }
         }
 
@@ -120,6 +139,10 @@ namespace chocolatey.infrastructure.app.services
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                 this.Log().Info(() => "Disabled {0}".format_with(source.Name));
             }
+            else
+            {
+                this.Log().Warn(NO_CHANGE_MESSAGE);
+            }
         }
 
         public void feature_enable(ChocolateyConfiguration configuration)
@@ -130,6 +153,10 @@ namespace chocolatey.infrastructure.app.services
                 source.Enabled = true;
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                 this.Log().Info(() => "Enabled {0}".format_with(source.Name));
+            }
+            else
+            {
+                this.Log().Warn(NO_CHANGE_MESSAGE);
             }
         }
 
@@ -187,6 +214,10 @@ namespace chocolatey.infrastructure.app.services
                     apiKey.Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key);
                     _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                     this.Log().Info(() => "Updated ApiKey for {0}".format_with(configuration.Sources));
+                }
+                else
+                {
+                    this.Log().Warn(NO_CHANGE_MESSAGE);
                 }
             }
         }
