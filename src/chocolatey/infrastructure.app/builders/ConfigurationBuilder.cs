@@ -186,11 +186,11 @@ namespace chocolatey.infrastructure.app.builders
 ");
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, "Commands");
                         "chocolatey".Log().Info(@"
-{1}
+{0}
 
 Please run chocolatey with `choco command -help` for specific help on 
  each command.
-".format_with(config.Information.ChocolateyVersion, commandsLog.ToString()));
+".format_with(commandsLog.ToString()));
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, @"How To Pass Options / Switches");
                         "chocolatey".Log().Info(@"
 You can pass options and switches in the following ways:

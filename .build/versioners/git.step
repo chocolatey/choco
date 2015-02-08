@@ -23,33 +23,31 @@
   <target name="get_revision">
     <echo level="Warning" message="Getting revision number from working directory '${dirs.current}' or remotely at ${repository.path}."/>
     <!-- try to update the revision -->
-    <getVersionFromGit
-      gitExecutableWithPath="git"
-      repoDirectory="${dirs.current}"
-      repoPath="${repository.path}"
+    <exec
+      program="git"
+      workingdir="${dirs.current}"
+      commandline="describe"
       output="_revision.xml"
       failonerror="false"
+      timeout="15000"
       />
-    <xmlpeek
+     <loadfile
       file="_revision.xml"
-      xpath="/version/revision"
-      property="version.revision"
-      failonerror="false"/>
-    <xmlpeek
-      file="_revision.xml"
-      xpath="/version/hash"
-      property="version.hash"
-      failonerror="false"/>
+      property="version.revision.output"
+      failonerror="false"
+      if="${file::exists('_revision.xml')}"
+     />
+     <property name="version.revision" value="${string::trim(version.revision.output)}" />
     <delete file="_revision.xml" failonerror="false" />
   </target>
 
   <target name="get_externally_provided_revision">
-    <property name="version.hash" value="${environment::get-variable('BUILD_VCS_NUMBER')}" if="${version.hash == '' and environment::variable-exists('BUILD_VCS_NUMBER')}" />
+    <property name="version.revision" value="${environment::get-variable('BUILD_VCS_NUMBER')}" if="${version.revision == '' and environment::variable-exists('BUILD_VCS_NUMBER')}" />
   </target>
 
   <target name="set_version_environment_variable">
     <setenv name="uc.app.revision" value="${version.revision}"/>
-    <setenv name="uc.app.revision.hash" value="${version.hash}"/>
+    <setenv name="uc.app.revision.hash" value="${version.revision}"/>
   </target>
 
 </project>
