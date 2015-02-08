@@ -98,7 +98,7 @@ NOTE: This command should only be used when installing Chocolatey, not
             AssemblyFileExtractor.extract_all_resources_to_relative_directory(
                 _fileSystem,
                 assembly,
-                ApplicationParameters.InstallLocation,
+                 _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location),
                 folders,
                 ApplicationParameters.ChocolateyFileResources,
                 overwriteExisting: configuration.Force);

@@ -4,6 +4,7 @@ $sysDrive = $env:SystemDrive
 $tempDir = $env:TEMP
 $defaultChocolateyPathOld = "$sysDrive\Chocolatey"
 $ErrorActionPreference = 'Stop'
+$debugMode = $false
 
 function Initialize-Chocolatey {
 <#
@@ -30,9 +31,16 @@ function Initialize-Chocolatey {
 param(
   [Parameter(Mandatory=$false)][string]$chocolateyPath = ''
 )
+  if ($env:ChocolateyEnvironmentDebug -ne $null) {
+    $debugMode = $true
+  }
 
   $chocoNew = Join-Path $thisScriptFolder 'chocolateyInstall\choco.exe'
-  & $chocoNew unpackself --force
+  if ($debugMode) {
+    & $chocoNew unpackself -fdv
+  } else {
+    & $chocoNew unpackself -f
+  }
 
   $installModule = Join-Path $thisScriptFolder 'chocolateyInstall\helpers\chocolateyInstaller.psm1'
   Import-Module $installModule -Force
@@ -200,7 +208,12 @@ param(
   $chocoExe = Join-Path $chocInstallFolder 'choco.exe'
   $chocoExeDest = Join-Path $chocolateyPath 'choco.exe'
   Copy-Item $chocoExe $chocoExeDest -force
- & $chocoExeDest unpackself --force
+
+  if ($debugMode) {
+    & $chocoExeDest unpackself -fdv
+  } else {
+    & $chocoExeDest unpackself -f
+  }
 }
 
 function Ensure-ChocolateyLibFiles {
