@@ -132,12 +132,17 @@ No changes made. If you are trying to change an existing source, please
 
         public void feature_disable(ChocolateyConfiguration configuration)
         {
-            var source = configFileSettings.Features.FirstOrDefault(p => p.Name.is_equal_to(configuration.FeatureCommand.Name));
-            if (source != null && source.Enabled)
+            var feature = configFileSettings.Features.FirstOrDefault(p => p.Name.is_equal_to(configuration.FeatureCommand.Name));
+            if (feature != null && (feature.Enabled || !feature.SetExplicitly))
             {
-                source.Enabled = false;
+                if (!feature.Enabled && !feature.SetExplicitly)
+                {
+                    this.Log().Warn(() => "{0} was disabled by default. Explicitly setting value.".format_with(feature.Name));
+                }
+                feature.Enabled = false;
+                feature.SetExplicitly = true;
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                this.Log().Info(() => "Disabled {0}".format_with(source.Name));
+                this.Log().Info(() => "Disabled {0}".format_with(feature.Name));
             }
             else
             {
@@ -147,12 +152,17 @@ No changes made. If you are trying to change an existing source, please
 
         public void feature_enable(ChocolateyConfiguration configuration)
         {
-            var source = configFileSettings.Features.FirstOrDefault(p => p.Name.is_equal_to(configuration.FeatureCommand.Name));
-            if (source != null && !source.Enabled)
+            var feature = configFileSettings.Features.FirstOrDefault(p => p.Name.is_equal_to(configuration.FeatureCommand.Name));
+            if (feature != null && (!feature.Enabled || !feature.SetExplicitly))
             {
-                source.Enabled = true;
+                if (feature.Enabled && !feature.SetExplicitly)
+                {
+                    this.Log().Warn(() => "{0} was enabled by default. Explicitly setting value.".format_with(feature.Name));
+                }
+                feature.Enabled = true;
+                feature.SetExplicitly = true;
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                this.Log().Info(() => "Enabled {0}".format_with(source.Name));
+                this.Log().Info(() => "Enabled {0}".format_with(feature.Name));
             }
             else
             {
