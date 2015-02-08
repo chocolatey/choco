@@ -247,6 +247,9 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string FullName { get; set; }
         public bool Is64Bit { get; set; }
         public bool IsInteractive { get; set; }
+        public bool IsUserAdministrator { get; set; }
+        public bool IsProcessElevated { get; set; }
+
     }
 
     [Serializable]
