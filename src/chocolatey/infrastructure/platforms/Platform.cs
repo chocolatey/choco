@@ -98,7 +98,7 @@ namespace chocolatey.infrastructure.platforms
 
 
         /// <summary>
-        /// Gets the name of the Windows version
+        ///   Gets the name of the Windows version
         /// </summary>
         /// <param name="version">The version.</param>
         /// <remarks>Looked at http://www.csharp411.com/determine-windows-version-and-edition-with-c/</remarks>
@@ -107,9 +107,9 @@ namespace chocolatey.infrastructure.platforms
             var name = "Windows";
             var isServer = false;
 
-            OSVERSIONINFOEX osVersionInfo = new OSVERSIONINFOEX();
-            
-            osVersionInfo.dwOSVersionInfoSize = Marshal.SizeOf(typeof(OSVERSIONINFOEX));
+            var osVersionInfo = new OSVERSIONINFOEX();
+
+            osVersionInfo.dwOSVersionInfoSize = Marshal.SizeOf(typeof (OSVERSIONINFOEX));
             var success = GetVersionEx(ref osVersionInfo);
             if (success)
             {
@@ -119,11 +119,11 @@ namespace chocolatey.infrastructure.platforms
 
             //https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832.aspx
             //switch doesn't like a double, but a string is fine?!
-            string majorMinor = version.Major +"." + version.Minor; 
+            string majorMinor = version.Major + "." + version.Minor;
             switch (majorMinor)
             {
                 case "6.4":
-                    name = isServer ? "Windows Server 2016 (maybe)" : "Windows 10";
+                    name = isServer ? "Windows Server 2016 (?)" : "Windows 10";
                     break;
                 case "6.3":
                     name = isServer ? "Windows Server 2012 R2" : "Windows 8.1";
@@ -173,6 +173,9 @@ namespace chocolatey.infrastructure.platforms
          } OSVERSIONINFOEX, *POSVERSIONINFOEX, *LPOSVERSIONINFOEX;
          */
 
+        // ReSharper disable MemberCanBePrivate.Local
+        // ReSharper disable FieldCanBeMadeReadOnly.Local
+
         [StructLayout(LayoutKind.Sequential)]
         private struct OSVERSIONINFOEX
         {
@@ -181,14 +184,17 @@ namespace chocolatey.infrastructure.platforms
             public int dwMinorVersion;
             public int dwBuildNumber;
             public int dwPlatformId;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
-            public string szCSDVersion;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string szCSDVersion;
             public short wServicePackMajor;
             public short wServicePackMinor;
             public short wSuiteMask;
             public byte wProductType;
             public byte wReserved;
         }
+
+        // ReSharper restore FieldCanBeMadeReadOnly.Local
+        // ReSharper restore MemberCanBePrivate.Local
+
         /*
          https://msdn.microsoft.com/en-us/library/windows/desktop/ms724451.aspx
          BOOL WINAPI GetVersionEx(
