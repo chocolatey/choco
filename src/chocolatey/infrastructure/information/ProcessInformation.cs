@@ -24,6 +24,8 @@ namespace chocolatey.infrastructure.information
     {
         public static bool user_is_administrator()
         {
+            if (Platform.get_platform() != PlatformType.Windows) return false;
+
             var isAdmin = false;
 
             using (var identity = WindowsIdentity.GetCurrent())
@@ -33,25 +35,62 @@ namespace chocolatey.infrastructure.information
                     var principal = new WindowsPrincipal(identity);
                     isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
 
-                    if (!isAdmin && Platform.get_platform() == PlatformType.Windows)
+                    // Any version of Windows less than 6 does not have UAC
+                    // so bail with the answer from the above check
+                    if (Platform.get_version().Major < 6) return isAdmin;
+
+                    if (!isAdmin)
                     {
-                        // We could be subject to a user token under UAC. If we are on Windows, we can perform
-                        // a native call to CheckTokenMembership to determine if the user is an admin, 
-                        // even when the process is not elevated
-                        "chocolatey".Log().Debug("User may be subject to UAC, checking against native CheckTokenMembership.");
+                        // Processes subject to UAC actually have the Administrators group 
+                        // stripped out from the process, and will return false for any 
+                        // check about being an administrator, including a check against
+                        // the native `CheckTokenMembership` or `UserIsAdmin`. Instead we 
+                        // need to perform a not 100% answer on whether they are an admin
+                        // based on if we have a split token.
+                        // Crediting http://www.davidmoore.info/blog/2011/06/20/how-to-check-if-the-current-user-is-an-administrator-even-if-uac-is-on/
+                        // and http://blogs.msdn.com/b/cjacks/archive/2006/10/09/how-to-determine-if-a-user-is-a-member-of-the-administrators-group-with-uac-enabled-on-windows-vista.aspx
+                        // NOTE: from the latter (the original) - 
+                        //    Note that this technique detects if the token is split or not. 
+                        //    In the vast majority of situations, this will determine whether 
+                        //    the user is running as an administrator. However, there are 
+                        //    other user types with advanced permissions which may generate a
+                        //    split token during an interactive login (for example, the 
+                        //    Network Configuration Operators group). If you are using one of 
+                        //    these advanced permission groups, this technique will determine 
+                        //    the elevation type, and not the presence (or absence) of the 
+                        //    administrator credentials.
+                        "chocolatey".Log().Debug(@"User may be subject to UAC, checking for a split token (not 100% 
+ effective).");
 
-                        var adminSid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
-                        IntPtr adminSidPtr = new IntPtr();
-                        var success = ConvertStringSidToSid(adminSid.Value, out adminSidPtr);
-                        if (!success)
+                        int tokenInfLength = Marshal.SizeOf(typeof(int));
+                        IntPtr tokenInformation = Marshal.AllocHGlobal(tokenInfLength);
+
+                        try
                         {
-                            "chocolatey".Log().Warn("Error during native ConvertStringSidToSid call - {0}".format_with(Marshal.GetLastWin32Error()));
+                            var token = identity.Token;
+                            var successfulCall = GetTokenInformation(token, TokenInformationType.TokenElevationType, tokenInformation, tokenInfLength, out tokenInfLength);
+
+                            if (!successfulCall)
+                            {
+                                "chocolatey".Log().Warn("Error during native GetTokenInformation call - {0}".format_with(Marshal.GetLastWin32Error()));
+                                if (tokenInformation != IntPtr.Zero) Marshal.FreeHGlobal(tokenInformation);
+                            }
+
+                            var elevationType = (TokenElevationType)Marshal.ReadInt32(tokenInformation);
+
+                            switch (elevationType)
+                            {
+                                // TokenElevationTypeFull - User has a split token, and the process is running elevated. Assuming they're an administrator.
+                                case TokenElevationType.TokenElevationTypeFull:
+                                // TokenElevationTypeLimited - User has a split token, but the process is not running elevated. Assuming they're an administrator.
+                                case TokenElevationType.TokenElevationTypeLimited:
+                                    isAdmin = true;
+                                    break;
+                            }
                         }
-
-                        success = CheckTokenMembership(IntPtr.Zero, adminSidPtr, out isAdmin);
-                        if (!success)
+                        finally
                         {
-                            "chocolatey".Log().Warn("Error during native CheckTokenMembership call - {0}".format_with(Marshal.GetLastWin32Error()));
+                            if (tokenInformation != IntPtr.Zero) Marshal.FreeHGlobal(tokenInformation);
                         }
                     }
                 }
@@ -62,6 +101,8 @@ namespace chocolatey.infrastructure.information
 
         public static bool process_is_elevated()
         {
+            if (Platform.get_platform() != PlatformType.Windows) return false;
+
             using (var identity = WindowsIdentity.GetCurrent(TokenAccessLevels.Query | TokenAccessLevels.Duplicate))
             {
                 if (identity != null)
@@ -73,6 +114,9 @@ namespace chocolatey.infrastructure.information
 
             return false;
         }
+
+
+        // ReSharper disable InconsistentNaming
 
         /*
          https://msdn.microsoft.com/en-us/library/windows/desktop/aa376402.aspx
@@ -97,5 +141,70 @@ namespace chocolatey.infrastructure.information
 
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern bool CheckTokenMembership(IntPtr tokenHandle, IntPtr sidToCheck, out bool isMember);
+
+        /*
+          https://msdn.microsoft.com/en-us/library/windows/desktop/aa446671.aspx
+          BOOL WINAPI GetTokenInformation(
+            _In_       HANDLE TokenHandle,
+            _In_       TOKEN_INFORMATION_CLASS TokenInformationClass,
+            _Out_opt_  LPVOID TokenInformation,
+            _In_       DWORD TokenInformationLength,
+            _Out_      PDWORD ReturnLength
+          );
+          
+          
+        */
+        [DllImport("advapi32.dll", SetLastError = true)]
+        private static extern bool GetTokenInformation(IntPtr tokenHandle, TokenInformationType tokenInformationClass, IntPtr tokenInformation, int tokenInformationLength, out int returnLength);
+
+        /// <summary>
+        /// Passed to <see cref="GetTokenInformation"/> to specify what
+        /// information about the token to return.
+        /// </summary>
+        enum TokenInformationType
+        {
+            TokenUser = 1,
+            TokenGroups,
+            TokenPrivileges,
+            TokenOwner,
+            TokenPrimaryGroup,
+            TokenDefaultDacl,
+            TokenSource,
+            TokenType,
+            TokenImpersonationLevel,
+            TokenStatistics,
+            TokenRestrictedSids,
+            TokenSessionId,
+            TokenGroupsAndPrivileges,
+            TokenSessionReference,
+            TokenSandBoxInert,
+            TokenAuditPolicy,
+            TokenOrigin,
+            TokenElevationType,
+            TokenLinkedToken,
+            TokenElevation,
+            TokenHasRestrictions,
+            TokenAccessInformation,
+            TokenVirtualizationAllowed,
+            TokenVirtualizationEnabled,
+            TokenIntegrityLevel,
+            TokenUiAccess,
+            TokenMandatoryPolicy,
+            TokenLogonSid,
+            MaxTokenInfoClass
+        }
+
+        /// <summary>
+        /// The elevation type for a user token.
+        /// </summary>
+        enum TokenElevationType
+        {
+            TokenElevationTypeDefault = 1,
+            TokenElevationTypeFull,
+            TokenElevationTypeLimited
+        }
+
+        // ReSharper restore InconsistentNaming
+
     }
 }
