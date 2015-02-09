@@ -242,6 +242,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         // application set variables
         public PlatformType PlatformType { get; set; }
         public Version PlatformVersion { get; set; }
+        public string PlatformName { get; set; }
         public string ChocolateyVersion { get; set; }
         public string ChocolateyProductVersion { get; set; }
         public string FullName { get; set; }
