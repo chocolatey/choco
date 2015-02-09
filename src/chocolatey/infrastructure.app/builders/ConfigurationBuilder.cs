@@ -115,12 +115,12 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
         {
-            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, config, configFileSettings);
-            config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, config, configFileSettings);
-            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowInsecureConfirmation, config, configFileSettings);
+            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings);
+            config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings);
+            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowInsecureConfirmation, configFileSettings);
         }
 
-        private static bool set_feature_flag(string featureName, ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
+        private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings)
         {
             var enabled = false;
             var feature = configFileSettings.Features.FirstOrDefault(f => f.Name.is_equal_to(featureName));
