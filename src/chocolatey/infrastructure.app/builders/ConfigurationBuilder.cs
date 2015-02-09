@@ -79,7 +79,20 @@ namespace chocolatey.infrastructure.app.builders
                 config.Sources = sources.Remove(sources.Length - 1, 1).ToString();
             }
 
-            config.CacheLocation = configFileSettings.CacheLocation;
+            config.CacheLocation = !string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? configFileSettings.CacheLocation : System.Environment.GetEnvironmentVariable("TEMP");
+            if (string.IsNullOrWhiteSpace(config.CacheLocation))
+            {
+              config.CacheLocation =  fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
+            }
+            try
+            {
+                fileSystem.create_directory_if_not_exists(config.CacheLocation);
+            }
+            catch (Exception ex)
+            {
+                "chocolatey".Log().Warn("Could not create temp directory at '{0}':{1} {2}".format_with(config.CacheLocation,Environment.NewLine,ex.Message));
+            }
+            
             config.ContainsLegacyPackageInstalls = configFileSettings.ContainsLegacyPackageInstalls;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
             {

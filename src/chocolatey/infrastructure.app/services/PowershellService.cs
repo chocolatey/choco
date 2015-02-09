@@ -130,11 +130,7 @@ namespace chocolatey.infrastructure.app.services
                     Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
                 }
 
-                if (!string.IsNullOrWhiteSpace(configuration.CacheLocation))
-                {
-                    //refactor - this is possibly temporary until we get all things running Posh into here
-                    Environment.SetEnvironmentVariable("TEMP", configuration.CacheLocation);
-                }
+                Environment.SetEnvironmentVariable("TEMP", configuration.CacheLocation);
 
                 //verify how not silent is passed
                 //if (configuration.NotSilent)

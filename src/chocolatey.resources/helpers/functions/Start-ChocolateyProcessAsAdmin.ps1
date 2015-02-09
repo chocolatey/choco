@@ -76,6 +76,7 @@ Elevating Permissions and running $exeToRun $wrappedStatements. This may take a 
   $s = [System.Diagnostics.Process]::Start($psi)
 
   $chocTempDir = Join-Path $env:TEMP "chocolatey"
+  if (![System.IO.Directory]::Exists($chocTempDir)) { [System.IO.Directory]::CreateDirectory($chocTempDir) | Out-Null }
   $errorFile = Join-Path $chocTempDir "$($s.Id)-error.stream"
   $s.StandardError.ReadToEnd() | Out-File $errorFile
   $s.WaitForExit()
