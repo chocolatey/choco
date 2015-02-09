@@ -112,10 +112,14 @@ namespace chocolatey.infrastructure.app.services
 
                 var package = packageResult.Package;
                 Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION", configuration.Information.ChocolateyVersion);
-                Environment.SetEnvironmentVariable("OS_TYPE", configuration.Information.PlatformType.get_description_or_value());
+                Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION_PRODUCT", configuration.Information.ChocolateyProductVersion);
+                Environment.SetEnvironmentVariable("OS_PLATFORM", configuration.Information.PlatformType.get_description_or_value());
                 Environment.SetEnvironmentVariable("OS_VERSION", configuration.Information.PlatformVersion.to_string());
+                Environment.SetEnvironmentVariable("OS_NAME", configuration.Information.PlatformName.to_string());
                 // experimental until we know if this value returns correctly based on the OS and not the current process.
                 Environment.SetEnvironmentVariable("OS_IS64BIT", configuration.Information.Is64Bit ? "true":"false");
+                Environment.SetEnvironmentVariable("IS_ADMIN", configuration.Information.IsUserAdministrator ? "true":"false");
+                Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", configuration.Information.IsProcessElevated ? "true":"false");
                 Environment.SetEnvironmentVariable("chocolateyPackageName", package.Id);
                 Environment.SetEnvironmentVariable("chocolateyPackageVersion", package.Version.to_string());
                 Environment.SetEnvironmentVariable("chocolateyPackageFolder", ApplicationParameters.PackagesLocation);
@@ -130,11 +134,7 @@ namespace chocolatey.infrastructure.app.services
                     Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
                 }
 
-                if (!string.IsNullOrWhiteSpace(configuration.CacheLocation))
-                {
-                    //refactor - this is possibly temporary until we get all things running Posh into here
-                    Environment.SetEnvironmentVariable("TEMP", configuration.CacheLocation);
-                }
+                Environment.SetEnvironmentVariable("TEMP", configuration.CacheLocation);
 
                 //verify how not silent is passed
                 //if (configuration.NotSilent)

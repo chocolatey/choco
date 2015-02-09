@@ -79,7 +79,20 @@ namespace chocolatey.infrastructure.app.builders
                 config.Sources = sources.Remove(sources.Length - 1, 1).ToString();
             }
 
-            config.CacheLocation = configFileSettings.CacheLocation;
+            config.CacheLocation = !string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? configFileSettings.CacheLocation : System.Environment.GetEnvironmentVariable("TEMP");
+            if (string.IsNullOrWhiteSpace(config.CacheLocation))
+            {
+              config.CacheLocation =  fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
+            }
+            try
+            {
+                fileSystem.create_directory_if_not_exists(config.CacheLocation);
+            }
+            catch (Exception ex)
+            {
+                "chocolatey".Log().Warn("Could not create temp directory at '{0}':{1} {2}".format_with(config.CacheLocation,Environment.NewLine,ex.Message));
+            }
+            
             config.ContainsLegacyPackageInstalls = configFileSettings.ContainsLegacyPackageInstalls;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
             {
@@ -102,12 +115,12 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
         {
-            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, config, configFileSettings);
-            config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, config, configFileSettings);
-            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowInsecureConfirmation, config, configFileSettings);
+            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings);
+            config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings);
+            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowInsecureConfirmation, configFileSettings);
         }
 
-        private static bool set_feature_flag(string featureName, ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
+        private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings)
         {
             var enabled = false;
             var feature = configFileSettings.Features.FirstOrDefault(f => f.Name.is_equal_to(featureName));
@@ -220,6 +233,7 @@ You can pass options and switches in the following ways:
         {
             config.Information.PlatformType = Platform.get_platform();
             config.Information.PlatformVersion = Platform.get_version();
+            config.Information.PlatformName = Platform.get_name();
             config.Information.ChocolateyVersion = VersionInformation.get_current_assembly_version();
             config.Information.ChocolateyProductVersion = VersionInformation.get_current_informational_version();
             config.Information.FullName = Assembly.GetExecutingAssembly().FullName;

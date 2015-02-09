@@ -17,6 +17,7 @@ namespace chocolatey.infrastructure.platforms
 {
     using System;
     using System.ComponentModel;
+    using System.Runtime.InteropServices;
     using adapters;
     using filesystem;
     using Environment = adapters.Environment;
@@ -75,5 +76,129 @@ namespace chocolatey.infrastructure.platforms
         {
             return Environment.OSVersion.Version;
         }
+
+        public static string get_name()
+        {
+            switch (get_platform())
+            {
+                case PlatformType.Linux:
+                    return "Linux";
+                    break;
+                case PlatformType.Mac:
+                    return "OS X";
+                    break;
+                case PlatformType.Windows:
+                    return get_windows_name(get_version());
+                    break;
+                default:
+                    return "";
+                    break;
+            }
+        }
+
+
+        /// <summary>
+        /// Gets the name of the Windows version
+        /// </summary>
+        /// <param name="version">The version.</param>
+        /// <remarks>Looked at http://www.csharp411.com/determine-windows-version-and-edition-with-c/</remarks>
+        private static string get_windows_name(Version version)
+        {
+            var name = "Windows";
+            var isServer = false;
+
+            OSVERSIONINFOEX osVersionInfo = new OSVERSIONINFOEX();
+            
+            osVersionInfo.dwOSVersionInfoSize = Marshal.SizeOf(typeof(OSVERSIONINFOEX));
+            var success = GetVersionEx(ref osVersionInfo);
+            if (success)
+            {
+                isServer = osVersionInfo.wProductType == ServerNT;
+            }
+
+
+            //https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832.aspx
+            //switch doesn't like a double, but a string is fine?!
+            string majorMinor = version.Major +"." + version.Minor; 
+            switch (majorMinor)
+            {
+                case "6.4":
+                    name = isServer ? "Windows Server 2016 (maybe)" : "Windows 10";
+                    break;
+                case "6.3":
+                    name = isServer ? "Windows Server 2012 R2" : "Windows 8.1";
+                    break;
+                case "6.2":
+                    name = isServer ? "Windows Server 2012" : "Windows 8";
+                    break;
+                case "6.1":
+                    name = isServer ? "Windows Server 2008 R2" : "Windows 7";
+                    break;
+                case "6.0":
+                    name = isServer ? "Windows Server 2008" : "Windows Vista";
+                    break;
+                case "5.2":
+                    name = isServer ? "Windows Server 2003" : "Windows XP";
+                    break;
+                case "5.1":
+                    name = "Windows XP";
+                    break;
+                case "5.0":
+                    name = "Windows 2000";
+                    break;
+            }
+
+            return name;
+        }
+
+        // ReSharper disable InconsistentNaming
+
+        private const int ServerNT = 3;
+
+        /*
+         https://msdn.microsoft.com/en-us/library/windows/desktop/ms724833.aspx
+         
+         typedef struct _OSVERSIONINFOEX {
+            DWORD dwOSVersionInfoSize;
+            DWORD dwMajorVersion;
+            DWORD dwMinorVersion;
+            DWORD dwBuildNumber;
+            DWORD dwPlatformId;
+            TCHAR szCSDVersion[128];
+            WORD  wServicePackMajor;
+            WORD  wServicePackMinor;
+            WORD  wSuiteMask;
+            BYTE  wProductType;
+            BYTE  wReserved;
+         } OSVERSIONINFOEX, *POSVERSIONINFOEX, *LPOSVERSIONINFOEX;
+         */
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct OSVERSIONINFOEX
+        {
+            public int dwOSVersionInfoSize;
+            public int dwMajorVersion;
+            public int dwMinorVersion;
+            public int dwBuildNumber;
+            public int dwPlatformId;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+            public string szCSDVersion;
+            public short wServicePackMajor;
+            public short wServicePackMinor;
+            public short wSuiteMask;
+            public byte wProductType;
+            public byte wReserved;
+        }
+        /*
+         https://msdn.microsoft.com/en-us/library/windows/desktop/ms724451.aspx
+         BOOL WINAPI GetVersionEx(
+            _Inout_  LPOSVERSIONINFO lpVersionInfo
+         );
+         */
+
+        [DllImport("kernel32.dll")]
+        private static extern bool GetVersionEx(ref OSVERSIONINFOEX osVersionInfo);
+
+        // ReSharper restore InconsistentNaming
     }
 }
