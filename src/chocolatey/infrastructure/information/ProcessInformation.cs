@@ -24,6 +24,8 @@ namespace chocolatey.infrastructure.information
     {
         public static bool user_is_administrator()
         {
+            if (Platform.get_platform() != PlatformType.Windows) return false;
+
             var isAdmin = false;
 
             using (var identity = WindowsIdentity.GetCurrent())
@@ -62,6 +64,8 @@ namespace chocolatey.infrastructure.information
 
         public static bool process_is_elevated()
         {
+            if (Platform.get_platform() != PlatformType.Windows) return false;
+            
             using (var identity = WindowsIdentity.GetCurrent(TokenAccessLevels.Query | TokenAccessLevels.Duplicate))
             {
                 if (identity != null)
