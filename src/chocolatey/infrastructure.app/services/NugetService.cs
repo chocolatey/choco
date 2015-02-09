@@ -243,6 +243,8 @@ spam/junk folder.");
                 }
             }
 
+            // this is when someone points the source directly at a nupkg 
+            // e.g. -s c:\somelocation\somwere\packagename.nupkg
             if (config.Sources.to_string().EndsWith(Constants.PackageExtension))
             {
                 config.Sources = _fileSystem.get_directory_name(_fileSystem.get_full_path(config.Sources));
