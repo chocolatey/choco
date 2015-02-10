@@ -505,7 +505,26 @@ packages as of version 1.0.0. That is what the install command is for.
                 this.Log().Debug("Backing up existing {0} prior to upgrade.".format_with(installedPackage.Id));
 
                 var backupLocation = pkgInstallPath + ApplicationParameters.RollbackPackageSuffix;
-                _fileSystem.copy_directory(pkgInstallPath, backupLocation, overwriteExisting: true);
+
+                try
+                {
+                    _fileSystem.move_directory(pkgInstallPath, backupLocation);
+                }
+                catch (Exception ex)
+                {
+                    this.Log().Error("Error during backup (move phase):{0} {1}".format_with(Environment.NewLine, ex.Message));
+                }
+                finally
+                {
+                    try
+                    {
+                        _fileSystem.copy_directory(backupLocation, pkgInstallPath, overwriteExisting: true);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Log().Error("Error during backup (reset phase):{0} {1}".format_with(Environment.NewLine, ex.Message));    
+                    }
+                }
             }
         }
 

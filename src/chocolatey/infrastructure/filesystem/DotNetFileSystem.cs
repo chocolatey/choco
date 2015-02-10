@@ -158,7 +158,7 @@ namespace chocolatey.infrastructure.filesystem
 
         public void copy_file(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
         {
-            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFilePath, destinationFilePath));
+            this.Log().Debug(() => "Attempting to copy \"{0}\"{1} to \"{2}\".".format_with(sourceFilePath, Environment.NewLine, destinationFilePath));
             create_directory_if_not_exists(get_directory_name(destinationFilePath),ignoreError:true);
             File.Copy(sourceFilePath, destinationFilePath, overwriteExisting);
         }
@@ -284,15 +284,25 @@ namespace chocolatey.infrastructure.filesystem
 
         public void move_directory(string directoryPath, string newDirectoryPath)
         {
-            create_directory_if_not_exists(newDirectoryPath, ignoreError:true);
-            foreach (var file in get_files(directoryPath, "*.*", SearchOption.AllDirectories).or_empty_list_if_null())
+            try
             {
-                var destinationFile = file.Replace(directoryPath, newDirectoryPath);
-                if (file_exists(destinationFile)) delete_file(destinationFile);
+                this.Log().Debug("Moving '{0}'{1} to '{2}'".format_with(directoryPath, Environment.NewLine, newDirectoryPath));
+                Directory.Move(directoryPath,newDirectoryPath);
+            }
+            catch (Exception ex)
+            {
+                this.Log().Warn("Move failed with message:{0} {1}{0} Attempting backup move method.".format_with(ex.Message));
 
-                create_directory_if_not_exists(get_directory_name(destinationFile),ignoreError:true);
-                this.Log().Debug("Moving '{0}'{1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
-                move_file(file, destinationFile);
+                create_directory_if_not_exists(newDirectoryPath, ignoreError: true);
+                foreach (var file in get_files(directoryPath, "*.*", SearchOption.AllDirectories).or_empty_list_if_null())
+                {
+                    var destinationFile = file.Replace(directoryPath, newDirectoryPath);
+                    if (file_exists(destinationFile)) delete_file(destinationFile);
+
+                    create_directory_if_not_exists(get_directory_name(destinationFile), ignoreError: true);
+                    this.Log().Debug("Moving '{0}'{1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
+                    move_file(file, destinationFile);
+                }
             }
 
             Thread.Sleep(2000); // sleep for enough time to allow the folder to be cleared
@@ -306,7 +316,7 @@ namespace chocolatey.infrastructure.filesystem
             {
                 var destinationFile = file.Replace(sourceDirectoryPath, destinationDirectoryPath);
                 create_directory_if_not_exists(get_directory_name(destinationFile), ignoreError: true);
-                this.Log().Debug("Copying '{0}' {1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
+                //this.Log().Debug("Copying '{0}' {1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
                 copy_file(file, destinationFile, overwriteExisting);
             }
 
