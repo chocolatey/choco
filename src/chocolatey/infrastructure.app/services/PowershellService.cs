@@ -76,11 +76,11 @@ namespace chocolatey.infrastructure.app.services
             return run_action(configuration, packageResult, CommandNameType.uninstall);
         }
 
-        public string wrap_command_with_module(string command)
+        public string wrap_script_with_module(string script)
         {
             var installerModules = _fileSystem.get_files(ApplicationParameters.InstallLocation, "chocolateyInstaller.psm1", SearchOption.AllDirectories);
             var installerModule = installerModules.FirstOrDefault();
-            return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; & import-module -name '{0}';$ErrorActionPreference = 'Stop'; {1}".format_with(installerModule, command);
+            return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; & import-module -name '{0}';$ErrorActionPreference = 'Stop'; & '{1}'".format_with(installerModule, script);
         }
 
         public bool run_action(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command)
@@ -178,7 +178,7 @@ namespace chocolatey.infrastructure.app.services
                 {
                     installerRun = true;
                     var exitCode = PowershellExecutor.execute(
-                        wrap_command_with_module(chocoPowerShellScript),
+                        wrap_script_with_module(chocoPowerShellScript),
                         _fileSystem,
                         configuration.CommandExecutionTimeoutSeconds,
                         (s, e) =>
