@@ -206,6 +206,8 @@ namespace chocolatey.infrastructure.app.services
                 return;
             }
 
+            remove_rollback_if_exists(packageResult);
+
             this.Log().Info(ChocolateyLoggers.Important, " {0} has been {1}ed successfully.".format_with(packageResult.Name, commandName.to_string()));
         }
 
@@ -500,6 +502,14 @@ namespace chocolatey.infrastructure.app.services
             {
                 _fileSystem.move_directory(rollbackDirectory, packageResult.InstallLocation);
             }
+
+            remove_rollback_if_exists(packageResult);
+        }
+
+        private void remove_rollback_if_exists(PackageResult packageResult)
+        {
+            var rollbackDirectory = packageResult.InstallLocation + ApplicationParameters.RollbackPackageSuffix;
+            if (!_fileSystem.directory_exists(rollbackDirectory)) return;
 
             try
             {
