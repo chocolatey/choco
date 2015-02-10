@@ -56,7 +56,16 @@ namespace chocolatey.infrastructure.app.domain
         [XmlElement(ElementName = "user")]
         public string User { get; set; }
 
+        /// <summary>
+        ///   Gets the registry keys.
+        /// </summary>
+        /// <value>
+        ///   The registry keys.
+        /// </value>
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
         [XmlArray("keys")]
-        public List<RegistryApplicationKey> RegistryKeys { get; private set; }
+        public List<RegistryApplicationKey> RegistryKeys { get; set; }
     }
 }
