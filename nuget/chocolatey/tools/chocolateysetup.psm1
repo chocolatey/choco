@@ -122,11 +122,15 @@ param(
   [string]$folder
 )
   $environmentTarget = [System.EnvironmentVariableTarget]::User
+  # removing old variable
   Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue $null -variableType $environmentTarget
   if (Test-ProcessAdminRights) {
     Write-Debug "Administrator installing so using Machine environment variable target instead of User."
     $environmentTarget = [System.EnvironmentVariableTarget]::Machine
+    # removing old variable
     Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue $null -variableType $environmentTarget
+  } else {
+    Write-Warning "Setting ChocolateyInstall Environment Variable on USER and not SYSTEM variables.`n  This is due to either non-administrator install OR the process you are running is not being run as an Administrator."
   }
 
   Write-Output "Creating $chocInstallVariableName as an environment variable (targeting `'$environmentTarget`') `n  Setting $chocInstallVariableName to `'$folder`'"
@@ -297,6 +301,8 @@ param(
   if (Test-ProcessAdminRights) {
     Write-Debug "Administrator installing so using Machine environment variable target instead of User."
     $environmentTarget = [System.EnvironmentVariableTarget]::Machine
+  } else {
+    Write-Warning "Setting ChocolateyInstall Path on USER PATH and not SYSTEM Path.`n  This is due to either non-administrator install OR the process you are running is not being run as an Administrator."
   }
 
   Install-ChocolateyPath -pathToInstall "$chocolateyExePath" -pathType $environmentTarget
