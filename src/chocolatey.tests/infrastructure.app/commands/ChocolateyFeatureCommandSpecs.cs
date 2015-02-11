@@ -41,6 +41,12 @@
             {
                 results.ShouldContain(CommandNameType.feature.to_string());
             } 
+            
+            [Fact]
+            public void should_implement_features()
+            {
+                results.ShouldContain(CommandNameType.features.to_string());
+            } 
         }
 
         public class when_configurating_the_argument_parser : ChocolateyFeatureCommandSpecsBase

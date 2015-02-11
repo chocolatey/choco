@@ -32,6 +32,8 @@ namespace chocolatey.infrastructure.app.domain
         [Description("sources - view and configure default sources (alias for source)")]
         sources,
         [Description("feature - view and configure choco features")] feature,
+        [Description("features - view and configure choco features (alias for feature)")]
+        features,
         // [Description("config - view and change configuration")] config,
         [Description("unpackself - have chocolatey set it self up")] unpackself,
         [Description("pack - packages up a nuspec to a compiled nupkg")] pack,
