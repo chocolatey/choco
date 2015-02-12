@@ -23,6 +23,7 @@ namespace chocolatey.console
     using infrastructure.app.builders;
     using infrastructure.app.configuration;
     using infrastructure.app.runners;
+    using infrastructure.commandline;
     using infrastructure.configuration;
     using infrastructure.extractors;
     using infrastructure.filesystem;
@@ -66,9 +67,7 @@ namespace chocolatey.console
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
 #endif
                 }
-
-                remove_old_chocolatey_exe(fileSystem);
-
+   
                 if (config.HelpRequested)
                 {
                     pause_execution_if_debug();
@@ -79,6 +78,9 @@ namespace chocolatey.console
                 Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug);
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.Information.PlatformType, config.Information.PlatformVersion.to_string()));
                 //"chocolatey".Log().Debug(() => "Command Line: {0}".format_with(Environment.CommandLine));
+
+                warn_when_admin_needs_elevation(config);
+                remove_old_chocolatey_exe(fileSystem);
 
                 LicenseValidation.validate(fileSystem);
 
@@ -132,6 +134,30 @@ namespace chocolatey.console
                 Bootstrap.shutdown();
 
                 Environment.Exit(Environment.ExitCode);
+            }
+        }
+
+        private static void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
+        {
+            // NOTE: blended options may not have been fully initialized yet
+            if (!config.PromptForConfirmation) return; 
+
+            if (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator)
+            {
+                var selection = InteractivePrompt.prompt_for_confirmation(@"
+Chocolatey detected you are not running from an elevated command shell
+ (cmd/powershell). You may experience errors - many functions/packages
+ require admin rights. Only advanced users should run choco w/out an
+ elevated shell. When you open the command shell, you should ensure 
+ that you do so with ""Run as Administrator"" selected.
+
+ Do you want to continue?", new[] { "yes", "no" }, "no", requireAnswer: true);
+
+                if (selection.is_equal_to("no"))
+                {
+                    pause_execution_if_debug();
+                    Environment.Exit(-1);
+                }
             }
         }
 
