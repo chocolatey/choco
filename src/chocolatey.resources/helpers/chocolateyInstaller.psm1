@@ -19,37 +19,12 @@ if ($env:ChocolateyEnvironmentDebug -eq 'true') { $DebugPreference = "Continue";
 $VerbosePreference = "SilentlyContinue"
 if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $VerbosePreference = "Continue"; $verbosity = $true }
 
-# grab functions from files
-Resolve-Path $helpersPath\functions\*.ps1 |
-    ? { -not ($_.ProviderPath.Contains(".Tests.")) } |
-    % { . $_.ProviderPath }
-
 Write-Debug "Posh version is $($psversiontable.PsVersion.ToString())"
 
-Export-ModuleMember -Function `
-	Get-BinRoot,`
-	Get-CheckSumValid,`
-	Get-ChocolateyWebFile,`
-	Get-ChocolateyUnzip,`
-	Get-ProcessorBits,`
-	Get-UACEnabled,`
-	Install-ChocolateyInstallPackage,`
-	Install-ChocolateyPackage,`
-	Install-ChocolateyZipPackage,`
-	Install-ChocolateyPowershellCommand,`
-	Install-ChocolateyPath,`
-	Install-ChocolateyDesktopLink,`
-	Install-ChocolateyPinnedTaskBarItem,`
-	Install-ChocolateyExplorerMenuItem,`
-	Install-ChocolateyFileAssociation,`
-	Install-ChocolateyEnvironmentVariable,`
-	Install-ChocolateyVsixPackage,`
-	Write-ChocolateySuccess,`
-	Write-ChocolateyFailure,`
-	Start-ChocolateyProcessAsAdmin,`
-	Test-ProcessAdminRights,`
-	Uninstall-ChocolateyPackage,`
-	Update-SessionEnvironment,`
-	Get-EnvironmentVariableNames,`
-	Get-EnvironmentVariable,`
-	Set-EnvironmentVariable
+# grab functions from files
+Get-Item $helpersPath\functions\*.ps1 | 
+  ? { -not ($_.Name.Contains(".Tests.")) } |
+    % { 
+	  . $_.FullName;  
+	  Export-ModuleMember -Function $_.BaseName
+    }

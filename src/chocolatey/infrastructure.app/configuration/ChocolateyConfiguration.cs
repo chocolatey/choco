@@ -188,52 +188,82 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <summary>
         ///   Configuration values provided by choco.
         /// </summary>
-        public InformationCommandConfiguration Information { get; private set; }
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public InformationCommandConfiguration Information { get;  set; }
 
         /// <summary>
         ///   Configuration related to features and whether they are enabled.
         /// </summary>
-        public FeaturesConfiguration Features { get; private set; }
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public FeaturesConfiguration Features { get;  set; }
 
         /// <summary>
         ///   Configuration related specifically to List command
         /// </summary>
-        public ListCommandConfiguration ListCommand { get; private set; }
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public ListCommandConfiguration ListCommand { get;  set; }
 
         /// <summary>
         ///   Configuration related specifically to Upgrade command
         /// </summary>
-        public UpgradeCommandConfiguration UpgradeCommand { get; private set; }
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public UpgradeCommandConfiguration UpgradeCommand { get;  set; }
 
         /// <summary>
         ///   Configuration related specifically to New command
         /// </summary>
-        public NewCommandConfiguration NewCommand { get; private set; }
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public NewCommandConfiguration NewCommand { get;  set; }
 
         /// <summary>
         ///   Configuration related specifically to Source command
         /// </summary>
-        public SourcesCommandConfiguration SourceCommand { get; private set; }
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public SourcesCommandConfiguration SourceCommand { get;  set; }
 
         /// <summary>
         /// Configuration related specifically to the Feature command
         /// </summary>
-        public FeatureCommandConfiguration FeatureCommand { get; private set; }
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public FeatureCommandConfiguration FeatureCommand { get;  set; }
 
         /// <summary>
         ///   Configuration related specifically to ApiKey command
         /// </summary>
-        public ApiKeyCommandConfiguration ApiKeyCommand { get; private set; }
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public ApiKeyCommandConfiguration ApiKeyCommand { get;  set; }
 
         /// <summary>
         ///   Configuration related specifically to Push command
         /// </summary>
-        public PushCommandConfiguration PushCommand { get; private set; }
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public PushCommandConfiguration PushCommand { get;  set; }
 
         /// <summary>
         /// Configuration related specifically to Pin command
         /// </summary>
-        public PinCommandConfiguration PinCommand { get; private set; }
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public PinCommandConfiguration PinCommand { get;  set; }
     }
 
     [Serializable]

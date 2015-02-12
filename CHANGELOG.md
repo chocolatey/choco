@@ -96,6 +96,17 @@ Probably a lot of bug fixes that may not make it here, but here are the ones we 
  * Remove references to the Chocolatey gods - see [Chocolatey #669](https://github.com/chocolatey/chocolatey/issues/669)
  * Dat help menu tho. I mean srsly guise - see [Chocolatey #641](https://github.com/chocolatey/chocolatey/issues/641)
 
+##[0.9.8.33](https://github.com/chocolatey/chocolatey/issues?q=label%3Av0.9.8.33+is%3Aclosed) (Feb 11, 2015)
+
+FEATURES:
+
+ * Dynamically export helpers (this fixes helpers that were not visible before) - [#628](https://github.com/chocolatey/chocolatey/pull/628)
+
+IMPROVEMENTS:
+
+ * Accept `-y` as a parameter, Add warning about -y for 0.9.9.
+ * Company name misspelled in shims - [#673](https://github.com/chocolatey/chocolatey/issues/673) and [shimgen #9](https://github.com/chocolatey/shimgen/issues/9)
+
 ##[0.9.8.32](https://github.com/chocolatey/chocolatey/issues?labels=v0.9.8.32&page=1&state=closed) (January 22, 2015)
 
 BUG FIXES:

@@ -3,7 +3,7 @@ $chocInstallVariableName = "ChocolateyInstall"
 $sysDrive = $env:SystemDrive
 $tempDir = $env:TEMP
 $defaultChocolateyPathOld = "$sysDrive\Chocolatey"
-$ErrorActionPreference = 'Stop'
+#$ErrorActionPreference = 'Stop'
 $debugMode = $false
 
 function Initialize-Chocolatey {
@@ -31,7 +31,7 @@ function Initialize-Chocolatey {
 param(
   [Parameter(Mandatory=$false)][string]$chocolateyPath = ''
 )
-  if ($env:ChocolateyEnvironmentDebug -ne $null) {
+  if ($env:ChocolateyEnvironmentDebug -eq 'true') {
     $debugMode = $true
   }
 
@@ -63,6 +63,8 @@ param(
     Set-ChocolateyInstallFolder $chocolateyPath
   }
   Create-DirectoryIfNotExists $chocolateyPath
+
+  Ensure-UserPermissions $chocolateyPath
 
   #set up variables to add
   $chocolateyExePath = Join-Path $chocolateyPath 'bin'
@@ -115,6 +117,10 @@ Run choco /? for a list of functions.
 You may need to shut down and restart powershell and/or consoles
  first prior to using choco.
 "@ | write-Output
+
+  if (-not $allowInsecureRootInstall) {
+    Remove-OldChocolateyInstall $defaultChocolateyPathOld
+  }
 }
 
 function Set-ChocolateyInstallFolder {
@@ -122,11 +128,15 @@ param(
   [string]$folder
 )
   $environmentTarget = [System.EnvironmentVariableTarget]::User
+  # removing old variable
   Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue $null -variableType $environmentTarget
   if (Test-ProcessAdminRights) {
     Write-Debug "Administrator installing so using Machine environment variable target instead of User."
     $environmentTarget = [System.EnvironmentVariableTarget]::Machine
+    # removing old variable
     Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue $null -variableType $environmentTarget
+  } else {
+    Write-Warning "Setting ChocolateyInstall Environment Variable on USER and not SYSTEM variables.`n  This is due to either non-administrator install OR the process you are running is not being run as an Administrator."
   }
 
   Write-Output "Creating $chocInstallVariableName as an environment variable (targeting `'$environmentTarget`') `n  Setting $chocInstallVariableName to `'$folder`'"
@@ -140,6 +150,38 @@ function Get-ChocolateyInstallFolder(){
 
 function Create-DirectoryIfNotExists($folderName){
   if (![System.IO.Directory]::Exists($folderName)) { [System.IO.Directory]::CreateDirectory($folderName) | Out-Null }
+}
+
+function Ensure-UserPermissions {
+param(
+  [string]$folder
+)
+  if (!(Test-ProcessAdminRights)) {
+    Write-Warning "User is not running elevated, cannot set user permissions."
+    return
+  }
+
+  try {
+    # get current user
+
+    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+    # get current acl
+    $acl = Get-Acl $folder
+
+    # define rule to inject
+
+
+    $rights = "Modify"
+    $userAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($currentUser.Name, $rights, "Allow")
+
+    # this is idempotent
+    Write-Output "Adding Modify permission for $($currentUser.Name) to '$folder'"
+    $acl.SetAccessRuleProtection($false,$true)
+    $acl.SetAccessRule($userAccessRule)
+    Set-Acl $folder $acl
+  } catch {
+    Write-Warning "Not able to set permissions for user."
+  }
 }
 
 function Upgrade-OldChocolateyInstall {
@@ -161,15 +203,48 @@ param(
       $updatedPath = [System.Text.RegularExpressions.Regex]::Replace($path,[System.Text.RegularExpressions.Regex]::Escape($chocolateyExePathOld) + '(?>;)?', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
       if ($updatedPath -ne $path) {
         Write-Output "Updating `'$_`' PATH to reflect removal of '$chocolateyPathOld'."
-        Set-EnvironmentVariable -Name 'Path' -Value $updatedPath -Scope $_
+        try {
+          Set-EnvironmentVariable -Name 'Path' -Value $updatedPath -Scope $_ -ErrorAction Stop
+        } catch {
+          Write-Warning "Was not able to remove the old environment variable from PATH. You will need to do this manually"
+        }
+
       }
     }
 
-    Copy-Item "$chocolateyPathOld\bin\*" "$chocolateyPath\bin" -force -recurse
     Copy-Item "$chocolateyPathOld\lib\*" "$chocolateyPath\lib" -force -recurse
+
+    $from = "$chocolateyPathOld\bin"
+    $to ="$chocolateyPath\bin"
+    $exclude = @("choco.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpack.exe", "cpush.exe", "cuninst.exe", "cup.exe", "cver.exe", "RefreshEnv.cmd")
+    Get-ChildItem -Path $from -recurse -Exclude $exclude |
+      % {
+        Write-Debug "Copying $_ `n to $to"
+        if ($_.PSIsContainer) {
+          Copy-Item $_ -Destination (Join-Path $to $_.Parent.FullName.Substring($from.length)) -Force -ErrorAction SilentlyContinue
+        } else {
+          $fileToMove = (Join-Path $to $_.FullName.Substring($from.length))
+          try {
+           Copy-Item $_ -Destination $fileToMove -Exclude $exclude -Force -ErrorAction Stop
+          }
+          catch {
+            Write-Warning "Was not able to move `'$fileToMove`'. You may need to reinstall the shim"
+          }
+        }
+      }
+  }
+}
+
+function Remove-OldChocolateyInstall {
+param(
+  [string]$chocolateyPathOld = "$sysDrive\Chocolatey"
+)
+
+  if (Test-Path $chocolateyPathOld) {
+    Write-Warning "This action will result in Log Errors, you can safely ignore those. `n You may need to finish removing '$chocolateyPathOld' manually."
     try {
       Write-Output "Attempting to remove `'$chocolateyPathOld`'. This may fail if something in the folder is being used or locked."
-      Remove-Item "$($chocolateyPathOld)" -force -recurse
+      Remove-Item "$($chocolateyPathOld)" -force -recurse -ErrorAction Continue
     }
     catch {
       Write-Warning "Was not able to remove `'$chocolateyPathOld`'. You will need to manually remove it."
@@ -185,7 +260,7 @@ param(
   Write-Debug "Removing install files in chocolateyInstall, helpers, redirects, and tools"
   "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" | % {
     if (Test-Path $_) {
-      Remove-Item $_ -exclude *.log -recurse -force -ErrorAction SilentlyContinue
+      Remove-Item $_ -exclude '*.log' -recurse -force -ErrorAction SilentlyContinue
     }
   }
 
@@ -258,7 +333,7 @@ param(
     if (Test-Path ($binFilePathRename)) {
       try {
         Write-Debug "Attempting to remove $binFilePathRename"
-        Remove-Item $binFilePathRename -force
+        Remove-Item $binFilePathRename -force -ErrorAction Stop
       }
       catch {
         Write-Warning "Was not able to remove `'$binFilePathRename`'. This may cause errors."
@@ -267,7 +342,7 @@ param(
     if (Test-Path ($binFilePath)) {
      try {
         Write-Debug "Attempting to rename $binFilePath to $binFilePathRename"
-        Move-Item -path $binFilePath -destination $binFilePathRename -force
+        Move-Item -path $binFilePath -destination $binFilePathRename -force -ErrorAction Stop
       }
       catch {
         Write-Warning "Was not able to rename `'$binFilePath`' to `'$binFilePathRename`'."
@@ -276,7 +351,7 @@ param(
 
     try {
       Write-Debug "Attempting to copy $exeFilePath to $binFilePath"
-      Copy-Item -path $exeFilePath -destination $binFilePath -force
+      Copy-Item -path $exeFilePath -destination $binFilePath -force -ErrorAction Stop
     }
     catch {
       Write-Warning "Was not able to replace `'$binFilePath`' with `'$exeFilePath`'. You may need to do this manually."
@@ -297,6 +372,8 @@ param(
   if (Test-ProcessAdminRights) {
     Write-Debug "Administrator installing so using Machine environment variable target instead of User."
     $environmentTarget = [System.EnvironmentVariableTarget]::Machine
+  } else {
+    Write-Warning "Setting ChocolateyInstall Path on USER PATH and not SYSTEM Path.`n  This is due to either non-administrator install OR the process you are running is not being run as an Administrator."
   }
 
   Install-ChocolateyPath -pathToInstall "$chocolateyExePath" -pathType $environmentTarget

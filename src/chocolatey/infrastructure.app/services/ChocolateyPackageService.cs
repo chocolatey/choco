@@ -206,6 +206,8 @@ namespace chocolatey.infrastructure.app.services
                 return;
             }
 
+            remove_rollback_if_exists(packageResult);
+
             this.Log().Info(ChocolateyLoggers.Important, " {0} has been {1}ed successfully.".format_with(packageResult.Name, commandName.to_string()));
         }
 
@@ -325,9 +327,22 @@ namespace chocolatey.infrastructure.app.services
             var noopUpgrades = _nugetService.upgrade_noop(config, (pkg) => _powershellService.install_noop(pkg));
             if (config.RegularOuptut)
             {
-                this.Log().Warn(() => @"{0}There are {1} packages available for upgrade.{0} See the log for details.".format_with(
-              Environment.NewLine,
-              noopUpgrades.Count));
+                var upgradeWarnings = noopUpgrades.Count(p => p.Value.Warning);
+                this.Log().Warn(() => @"{0}{1} can upgrade {2}/{3} package(s). {4}{0} See the log for details.".format_with(
+                    Environment.NewLine,
+                    ApplicationParameters.Name,
+                    noopUpgrades.Count(p => p.Value.Success && !p.Value.Inconclusive),
+                    noopUpgrades.Count,
+                    upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings)));
+
+                if (upgradeWarnings != 0)
+                {
+                    this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
+                    foreach (var warning in noopUpgrades.Where(p => p.Value.Warning).or_empty_list_if_null())
+                    {
+                        this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
+                    }
+                }
             }
         }
 
@@ -500,6 +515,14 @@ namespace chocolatey.infrastructure.app.services
             {
                 _fileSystem.move_directory(rollbackDirectory, packageResult.InstallLocation);
             }
+
+            remove_rollback_if_exists(packageResult);
+        }
+
+        private void remove_rollback_if_exists(PackageResult packageResult)
+        {
+            var rollbackDirectory = packageResult.InstallLocation + ApplicationParameters.RollbackPackageSuffix;
+            if (!_fileSystem.directory_exists(rollbackDirectory)) return;
 
             try
             {
