@@ -64,6 +64,8 @@ param(
   }
   Create-DirectoryIfNotExists $chocolateyPath
 
+  Ensure-UserPermissions $chocolateyPath
+
   #set up variables to add
   $chocolateyExePath = Join-Path $chocolateyPath 'bin'
   $chocolateyLibPath = Join-Path $chocolateyPath 'lib'
@@ -144,6 +146,38 @@ function Get-ChocolateyInstallFolder(){
 
 function Create-DirectoryIfNotExists($folderName){
   if (![System.IO.Directory]::Exists($folderName)) { [System.IO.Directory]::CreateDirectory($folderName) | Out-Null }
+}
+
+function Ensure-UserPermissions {
+param(
+  [string]$folder
+)
+  if (!(Test-ProcessAdminRights)) {
+    Write-Warning "User is not running elevated, cannot set user permissions."
+    return
+  }
+
+  try {
+    # get current user
+
+    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+    # get current acl
+    $acl = Get-Acl $folder
+
+    # define rule to inject
+
+
+    $rights = "Modify"
+    $userAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($currentUser.Name, $rights, "Allow")
+
+    # this is idempotent
+    Write-Output "Adding Modify permission for $($currentUser.Name) to '$path'"
+    $acl.SetAccessRuleProtection($false,$true)
+    $acl.SetAccessRule($userAccessRule)
+    Set-Acl $folder $acl
+  } catch {
+    Write-Warning "Not able to set permissions for user."
+  }
 }
 
 function Upgrade-OldChocolateyInstall {
