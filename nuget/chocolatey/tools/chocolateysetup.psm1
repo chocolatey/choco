@@ -31,7 +31,7 @@ function Initialize-Chocolatey {
 param(
   [Parameter(Mandatory=$false)][string]$chocolateyPath = ''
 )
-  if ($env:ChocolateyEnvironmentDebug -ne $null) {
+  if ($env:ChocolateyEnvironmentDebug -eq 'true') {
     $debugMode = $true
   }
 
