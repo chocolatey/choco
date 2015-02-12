@@ -360,7 +360,6 @@ spam/junk folder.");
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-
             foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 //todo: get smarter about realizing multiple versions have been installed before and allowing that
@@ -458,9 +457,14 @@ packages as of version 1.0.0. That is what the install command is for.
                 {
                     if (availablePackage.Version > installedPackage.Version)
                     {
+                        string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s)".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version);
+                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
+                        results.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+
                         if (config.RegularOuptut)
                         {
-                            this.Log().Warn("You have {0} v{1} installed. Version {2} is available based on your source(s)".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version));
+                           
+                            this.Log().Warn(logMessage);
                         }
                         else
                         {
