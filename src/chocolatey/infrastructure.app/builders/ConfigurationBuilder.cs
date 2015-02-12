@@ -152,7 +152,7 @@ namespace chocolatey.infrastructure.app.builders
                                  "AcceptLicense - Accept license dialogs automatically.",
                                  option => config.AcceptLicense = option != null)
                             .Add("y|yes|confirm",
-                                 "Confirm all prompts - Chooses default answer instead of prompting. Implies --accept-license",
+                                 "Confirm all prompts - Chooses affirmative answer instead of prompting. Implies --accept-license",
                                  option =>
                                      {
                                          config.PromptForConfirmation = option == null;
