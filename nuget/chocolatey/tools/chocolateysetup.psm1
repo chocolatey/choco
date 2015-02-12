@@ -3,7 +3,7 @@ $chocInstallVariableName = "ChocolateyInstall"
 $sysDrive = $env:SystemDrive
 $tempDir = $env:TEMP
 $defaultChocolateyPathOld = "$sysDrive\Chocolatey"
-$ErrorActionPreference = 'Stop'
+#$ErrorActionPreference = 'Stop'
 $debugMode = $false
 
 function Initialize-Chocolatey {
@@ -173,7 +173,7 @@ param(
     Copy-Item "$chocolateyPathOld\lib\*" "$chocolateyPath\lib" -force -recurse
     try {
       Write-Output "Attempting to remove `'$chocolateyPathOld`'. This may fail if something in the folder is being used or locked."
-      Remove-Item "$($chocolateyPathOld)" -force -recurse
+      Remove-Item "$($chocolateyPathOld)" -force -recurse -ErrorAction Stop
     }
     catch {
       Write-Warning "Was not able to remove `'$chocolateyPathOld`'. You will need to manually remove it."
@@ -262,7 +262,7 @@ param(
     if (Test-Path ($binFilePathRename)) {
       try {
         Write-Debug "Attempting to remove $binFilePathRename"
-        Remove-Item $binFilePathRename -force
+        Remove-Item $binFilePathRename -force -ErrorAction Stop
       }
       catch {
         Write-Warning "Was not able to remove `'$binFilePathRename`'. This may cause errors."
@@ -271,7 +271,7 @@ param(
     if (Test-Path ($binFilePath)) {
      try {
         Write-Debug "Attempting to rename $binFilePath to $binFilePathRename"
-        Move-Item -path $binFilePath -destination $binFilePathRename -force
+        Move-Item -path $binFilePath -destination $binFilePathRename -force -ErrorAction Stop
       }
       catch {
         Write-Warning "Was not able to rename `'$binFilePath`' to `'$binFilePathRename`'."
@@ -280,7 +280,7 @@ param(
 
     try {
       Write-Debug "Attempting to copy $exeFilePath to $binFilePath"
-      Copy-Item -path $exeFilePath -destination $binFilePath -force
+      Copy-Item -path $exeFilePath -destination $binFilePath -force -ErrorAction Stop
     }
     catch {
       Write-Warning "Was not able to replace `'$binFilePath`' with `'$exeFilePath`'. You may need to do this manually."
