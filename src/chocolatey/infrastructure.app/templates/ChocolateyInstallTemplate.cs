@@ -20,6 +20,9 @@ namespace chocolatey.infrastructure.app.templates
         public static string Template =
             @"#NOTE: Please remove any commented lines to tidy up prior to releasing the package, including this one
 
+# stop on all errors
+$ErrorActionPreference = 'Stop';
+
 [[AutomaticPackageNotesInstaller]]
 $packageName = '[[PackageName]]' # arbitrary name for the package, used in messages
 $registryUninstallerKeyName = '[[PackageName]]' #ensure this is the value in the registry

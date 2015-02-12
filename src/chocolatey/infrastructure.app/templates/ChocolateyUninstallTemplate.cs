@@ -20,6 +20,9 @@ namespace chocolatey.infrastructure.app.templates
         public static string Template =
             @"#NOTE: Please remove any commented lines to tidy up prior to releasing the package, including this one
 
+# stop on all errors
+$ErrorActionPreference = 'Stop';
+
 # Auto Uninstaller should be able to detect and handle registry uninstalls (if it is turned on, it is in preview for 0.9.9).
 
 $packageName = '[[PackageName]]'

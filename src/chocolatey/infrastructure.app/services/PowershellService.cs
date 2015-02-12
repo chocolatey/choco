@@ -80,7 +80,11 @@ namespace chocolatey.infrastructure.app.services
         {
             var installerModules = _fileSystem.get_files(ApplicationParameters.InstallLocation, "chocolateyInstaller.psm1", SearchOption.AllDirectories);
             var installerModule = installerModules.FirstOrDefault();
-            return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; & import-module -name '{0}';$ErrorActionPreference = 'Stop'; & '{1}'".format_with(installerModule, script);
+            // removed setting all errors to terminating. Will cause too
+            // many issues in existing packages, including upgrading
+            // Chocolatey from older POSH client due to log errors
+            //$ErrorActionPreference = 'Stop';
+            return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; & import-module -name '{0}'; & '{1}'".format_with(installerModule, script);
         }
 
         public bool run_action(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command)
