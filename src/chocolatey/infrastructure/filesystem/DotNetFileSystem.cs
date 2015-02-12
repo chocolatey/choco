@@ -291,7 +291,7 @@ namespace chocolatey.infrastructure.filesystem
             }
             catch (Exception ex)
             {
-                this.Log().Warn("Move failed with message:{0} {1}{0} Attempting backup move method.".format_with(ex.Message));
+                this.Log().Warn("Move failed with message:{0} {1}{0} Attempting backup move method.".format_with(Environment.NewLine,ex.Message));
 
                 create_directory_if_not_exists(newDirectoryPath, ignoreError: true);
                 foreach (var file in get_files(directoryPath, "*.*", SearchOption.AllDirectories).or_empty_list_if_null())
