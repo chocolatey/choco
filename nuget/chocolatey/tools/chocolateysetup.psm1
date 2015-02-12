@@ -117,6 +117,10 @@ Run choco /? for a list of functions.
 You may need to shut down and restart powershell and/or consoles
  first prior to using choco.
 "@ | write-Output
+
+  if (-not $allowInsecureRootInstall) {
+    Remove-OldChocolateyInstall $defaultChocolateyPathOld
+  }
 }
 
 function Set-ChocolateyInstallFolder {
@@ -171,7 +175,7 @@ param(
     $userAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($currentUser.Name, $rights, "Allow")
 
     # this is idempotent
-    Write-Output "Adding Modify permission for $($currentUser.Name) to '$path'"
+    Write-Output "Adding Modify permission for $($currentUser.Name) to '$folder'"
     $acl.SetAccessRuleProtection($false,$true)
     $acl.SetAccessRule($userAccessRule)
     Set-Acl $folder $acl
@@ -199,15 +203,48 @@ param(
       $updatedPath = [System.Text.RegularExpressions.Regex]::Replace($path,[System.Text.RegularExpressions.Regex]::Escape($chocolateyExePathOld) + '(?>;)?', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
       if ($updatedPath -ne $path) {
         Write-Output "Updating `'$_`' PATH to reflect removal of '$chocolateyPathOld'."
-        Set-EnvironmentVariable -Name 'Path' -Value $updatedPath -Scope $_
+        try {
+          Set-EnvironmentVariable -Name 'Path' -Value $updatedPath -Scope $_ -ErrorAction Stop
+        } catch {
+          Write-Warning "Was not able to remove the old environment variable from PATH. You will need to do this manually"
+        }
+
       }
     }
 
-    Copy-Item "$chocolateyPathOld\bin\*" "$chocolateyPath\bin" -force -recurse
     Copy-Item "$chocolateyPathOld\lib\*" "$chocolateyPath\lib" -force -recurse
+
+    $from = "$chocolateyPathOld\bin"
+    $to ="$chocolateyPath\bin"
+    $exclude = @("choco.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpack.exe", "cpush.exe", "cuninst.exe", "cup.exe", "cver.exe", "RefreshEnv.cmd")
+    Get-ChildItem -Path $from -recurse -Exclude $exclude |
+      % {
+        Write-Debug "Copying $_ `n to $to"
+        if ($_.PSIsContainer) {
+          Copy-Item $_ -Destination (Join-Path $to $_.Parent.FullName.Substring($from.length)) -Force -ErrorAction SilentlyContinue
+        } else {
+          $fileToMove = (Join-Path $to $_.FullName.Substring($from.length))
+          try {
+           Copy-Item $_ -Destination $fileToMove -Exclude $exclude -Force -ErrorAction Stop
+          }
+          catch {
+            Write-Warning "Was not able to move `'$fileToMove`'. You may need to reinstall the shim"
+          }
+        }
+      }
+  }
+}
+
+function Remove-OldChocolateyInstall {
+param(
+  [string]$chocolateyPathOld = "$sysDrive\Chocolatey"
+)
+
+  if (Test-Path $chocolateyPathOld) {
+    Write-Warning "This action will result in Log Errors, you can safely ignore those. `n You may need to finish removing '$chocolateyPathOld' manually."
     try {
       Write-Output "Attempting to remove `'$chocolateyPathOld`'. This may fail if something in the folder is being used or locked."
-      Remove-Item "$($chocolateyPathOld)" -force -recurse -ErrorAction Stop
+      Remove-Item "$($chocolateyPathOld)" -force -recurse -ErrorAction Continue
     }
     catch {
       Write-Warning "Was not able to remove `'$chocolateyPathOld`'. You will need to manually remove it."
@@ -223,7 +260,7 @@ param(
   Write-Debug "Removing install files in chocolateyInstall, helpers, redirects, and tools"
   "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" | % {
     if (Test-Path $_) {
-      Remove-Item $_ -exclude *.log -recurse -force -ErrorAction SilentlyContinue
+      Remove-Item $_ -exclude '*.log' -recurse -force -ErrorAction SilentlyContinue
     }
   }
 
