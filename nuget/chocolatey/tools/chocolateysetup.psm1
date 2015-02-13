@@ -175,7 +175,7 @@ param(
     $userAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($currentUser.Name, $rights, "Allow")
 
     # this is idempotent
-    Write-Output "Adding Modify permission for $($currentUser.Name) to '$folder'"
+    Write-Output "Adding Modify permission for current user to '$folder'"
     $acl.SetAccessRuleProtection($false,$true)
     $acl.SetAccessRule($userAccessRule)
     Set-Acl $folder $acl
