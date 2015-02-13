@@ -204,7 +204,7 @@ param(
     Write-Output "Attempting to upgrade `'$chocolateyPathOld`' to `'$chocolateyPath`'."
     Write-Warning "Copying the contents of `'$chocolateyPathOld`' to `'$chocolateyPath`'. `n This step may fail if you have anything in this folder running or locked."
     Write-Output 'If it fails, just manually copy the rest of the items out and then delete the folder.'
-    Write-Warning "!!!! ATTN: YOU WILL NEED TO CLOSE AND REOPEN YOUR SHELL !!!!"
+    Write-Host "!!!! ATTN: YOU WILL NEED TO CLOSE AND REOPEN YOUR SHELL !!!!" -ForegroundColor Magenta -BackgroundColor Black
 
     $chocolateyExePathOld = Join-Path $chocolateyPathOld 'bin'
     'Machine', 'User' |
@@ -254,8 +254,15 @@ param(
   if (Test-Path $chocolateyPathOld) {
     Write-Warning "This action will result in Log Errors, you can safely ignore those. `n You may need to finish removing '$chocolateyPathOld' manually."
     try {
+      Get-ChildItem -Path "$chocolateyPathOld" | % {
+        if (Test-Path $_.FullName) {
+          Write-Debug "Removing $_ unless matches .log"
+          Remove-Item $_.FullName -exclude *.log -recurse -force -ErrorAction SilentlyContinue
+        }
+      }
+
       Write-Output "Attempting to remove `'$chocolateyPathOld`'. This may fail if something in the folder is being used or locked."
-      Remove-Item "$($chocolateyPathOld)" -force -recurse -ErrorAction Continue
+      Remove-Item "$($chocolateyPathOld)" -force -recurse -ErrorAction Stop
     }
     catch {
       Write-Warning "Was not able to remove `'$chocolateyPathOld`'. You will need to manually remove it."
@@ -271,8 +278,15 @@ param(
 
   Write-Debug "Removing install files in chocolateyInstall, helpers, redirects, and tools"
   "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" | % {
+    #Write-Debug "Checking path $_"
     if (Test-Path $_) {
-      Remove-Item $_ -exclude '*.log' -recurse -force -ErrorAction SilentlyContinue
+      Get-ChildItem -Path "$_" | % {
+        #Write-Debug "Checking child path $_ ($($_.FullName))"
+        if (Test-Path $_.FullName) {
+          Write-Debug "Removing $_ unless matches .log"
+          Remove-Item $_.FullName -exclude *.log -recurse -force -ErrorAction SilentlyContinue
+        }
+      }
     }
   }
 
@@ -334,6 +348,11 @@ param(
   Write-Debug "Install-ChocolateyBinFiles"
   Write-Debug "Installing the bin file redirects"
   $redirectsPath = Join-Path $chocolateyPath 'redirects'
+  if (!(Test-Path "$redirectsPath")) {
+    Write-Warning "$redirectsPath does not exist"
+    return
+  }
+
   $exeFiles = Get-ChildItem "$redirectsPath" -include @("*.exe","*.cmd") -recurse
   foreach ($exeFile in $exeFiles) {
     $exeFilePath = $exeFile.FullName
