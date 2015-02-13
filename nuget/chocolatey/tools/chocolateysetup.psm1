@@ -31,6 +31,8 @@ function Initialize-Chocolatey {
 param(
   [Parameter(Mandatory=$false)][string]$chocolateyPath = ''
 )
+  Write-Debug "Initialize-Chocolatey"
+
   if ($env:ChocolateyEnvironmentDebug -eq 'true') {
     $debugMode = $true
   }
@@ -127,6 +129,8 @@ function Set-ChocolateyInstallFolder {
 param(
   [string]$folder
 )
+  Write-Debug "Set-ChocolateyInstallFolder"
+
   $environmentTarget = [System.EnvironmentVariableTarget]::User
   # removing old variable
   Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue $null -variableType $environmentTarget
@@ -145,10 +149,12 @@ param(
 }
 
 function Get-ChocolateyInstallFolder(){
+  Write-Debug "Get-ChocolateyInstallFolder"
   [Environment]::GetEnvironmentVariable($chocInstallVariableName)
 }
 
 function Create-DirectoryIfNotExists($folderName){
+  Write-Debug "Create-DirectoryIfNotExists"
   if (![System.IO.Directory]::Exists($folderName)) { [System.IO.Directory]::CreateDirectory($folderName) | Out-Null }
 }
 
@@ -156,6 +162,8 @@ function Ensure-UserPermissions {
 param(
   [string]$folder
 )
+  Write-Debug "Ensure-UserPermissions"
+
   if (!(Test-ProcessAdminRights)) {
     Write-Warning "User is not running elevated, cannot set user permissions."
     return
@@ -189,6 +197,8 @@ param(
   [string]$chocolateyPathOld = "$sysDrive\Chocolatey",
   [string]$chocolateyPath =  "$($env:ALLUSERSPROFILE)\chocolatey"
 )
+
+  Write-Debug "Upgrade-OldChocolateyInstall"
 
   if (Test-Path $chocolateyPathOld) {
     Write-Output "Attempting to upgrade `'$chocolateyPathOld`' to `'$chocolateyPath`'."
@@ -239,6 +249,7 @@ function Remove-OldChocolateyInstall {
 param(
   [string]$chocolateyPathOld = "$sysDrive\Chocolatey"
 )
+  Write-Debug "Remove-OldChocolateyInstall"
 
   if (Test-Path $chocolateyPathOld) {
     Write-Warning "This action will result in Log Errors, you can safely ignore those. `n You may need to finish removing '$chocolateyPathOld' manually."
@@ -256,6 +267,7 @@ function Install-ChocolateyFiles {
 param(
   [string]$chocolateyPath
 )
+  Write-Debug "Install-ChocolateyFiles"
 
   Write-Debug "Removing install files in chocolateyInstall, helpers, redirects, and tools"
   "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" | % {
@@ -295,6 +307,7 @@ function Ensure-ChocolateyLibFiles {
 param(
   [string]$chocolateyLibPath
 )
+  Write-Debug "Ensure-ChocolateyLibFiles"
   $chocoPkgDirectory = Join-Path $chocolateyLibPath 'chocolatey'
 
   if ( -not (Test-Path("$chocoPkgDirectory\chocolatey.nupkg")) ) {
@@ -318,6 +331,7 @@ param(
   [string] $chocolateyPath,
   [string] $chocolateyExePath
 )
+  Write-Debug "Install-ChocolateyBinFiles"
   Write-Debug "Installing the bin file redirects"
   $redirectsPath = Join-Path $chocolateyPath 'redirects'
   $exeFiles = Get-ChildItem "$redirectsPath" -include @("*.exe","*.cmd") -recurse
@@ -367,6 +381,7 @@ param(
   [string]$chocolateyExePath = "$($env:ALLUSERSPROFILE)\chocolatey\bin",
   [string]$chocolateyExePathVariable = "%$($chocInstallVariableName)%\bin"
 )
+  Write-Debug "Initialize-ChocolateyPath"
   Write-Debug "Initializing Chocolatey Path if required"
   $environmentTarget = [System.EnvironmentVariableTarget]::User
   if (Test-ProcessAdminRights) {
@@ -384,7 +399,7 @@ param(
   [string]$chocolateyExePath = "$($env:ALLUSERSPROFILE)\chocolatey\bin",
   [string]$chocolateyExePathVariable = "%$($chocInstallVariableName)%\bin"
 )
-
+  Write-Debug "Process-ChocolateyBinFiles"
   $processedMarkerFile = Join-Path $chocolateyExePath '_processed.txt'
   if (!(test-path $processedMarkerFile)) {
     $files = get-childitem $chocolateyExePath -include *.bat -recurse
@@ -409,6 +424,7 @@ param(
 }
 
 function Install-DotNet4IfMissing {
+  Write-Debug "Install-DotNet4IfMissing"
   if ([IntPtr]::Size -eq 8) {$fx="framework64"} else {$fx="framework"}
 
   Write-Debug "Installing .NET Framework 4.0 if it is missing"
