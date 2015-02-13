@@ -31,6 +31,8 @@ function Initialize-Chocolatey {
 param(
   [Parameter(Mandatory=$false)][string]$chocolateyPath = ''
 )
+  Write-Debug "Initialize-Chocolatey"
+
   if ($env:ChocolateyEnvironmentDebug -eq 'true') {
     $debugMode = $true
   }
@@ -105,7 +107,7 @@ Creating Chocolatey folders if they do not already exist.
   $realModule = Join-Path $chocolateyPath "helpers\chocolateyInstaller.psm1"
   Import-Module "$realModule" -Force
 
-  if (-not $allowInsecureRootInstall) {
+  if (-not $allowInsecureRootInstall -and (Test-Path($defaultChocolateyPathOld))) {
     Upgrade-OldChocolateyInstall $defaultChocolateyPathOld $chocolateyPath
     Install-ChocolateyBinFiles $chocolateyPath $chocolateyExePath
   }
@@ -127,6 +129,8 @@ function Set-ChocolateyInstallFolder {
 param(
   [string]$folder
 )
+  Write-Debug "Set-ChocolateyInstallFolder"
+
   $environmentTarget = [System.EnvironmentVariableTarget]::User
   # removing old variable
   Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue $null -variableType $environmentTarget
@@ -145,10 +149,12 @@ param(
 }
 
 function Get-ChocolateyInstallFolder(){
+  Write-Debug "Get-ChocolateyInstallFolder"
   [Environment]::GetEnvironmentVariable($chocInstallVariableName)
 }
 
 function Create-DirectoryIfNotExists($folderName){
+  Write-Debug "Create-DirectoryIfNotExists"
   if (![System.IO.Directory]::Exists($folderName)) { [System.IO.Directory]::CreateDirectory($folderName) | Out-Null }
 }
 
@@ -156,6 +162,8 @@ function Ensure-UserPermissions {
 param(
   [string]$folder
 )
+  Write-Debug "Ensure-UserPermissions"
+
   if (!(Test-ProcessAdminRights)) {
     Write-Warning "User is not running elevated, cannot set user permissions."
     return
@@ -175,7 +183,7 @@ param(
     $userAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($currentUser.Name, $rights, "Allow")
 
     # this is idempotent
-    Write-Output "Adding Modify permission for $($currentUser.Name) to '$folder'"
+    Write-Output "Adding Modify permission for current user to '$folder'"
     $acl.SetAccessRuleProtection($false,$true)
     $acl.SetAccessRule($userAccessRule)
     Set-Acl $folder $acl
@@ -190,11 +198,13 @@ param(
   [string]$chocolateyPath =  "$($env:ALLUSERSPROFILE)\chocolatey"
 )
 
+  Write-Debug "Upgrade-OldChocolateyInstall"
+
   if (Test-Path $chocolateyPathOld) {
     Write-Output "Attempting to upgrade `'$chocolateyPathOld`' to `'$chocolateyPath`'."
     Write-Warning "Copying the contents of `'$chocolateyPathOld`' to `'$chocolateyPath`'. `n This step may fail if you have anything in this folder running or locked."
     Write-Output 'If it fails, just manually copy the rest of the items out and then delete the folder.'
-    Write-Warning "!!!! ATTN: YOU WILL NEED TO CLOSE AND REOPEN YOUR SHELL !!!!"
+    Write-Host "!!!! ATTN: YOU WILL NEED TO CLOSE AND REOPEN YOUR SHELL !!!!" -ForegroundColor Magenta -BackgroundColor Black
 
     $chocolateyExePathOld = Join-Path $chocolateyPathOld 'bin'
     'Machine', 'User' |
@@ -215,7 +225,7 @@ param(
     Copy-Item "$chocolateyPathOld\lib\*" "$chocolateyPath\lib" -force -recurse
 
     $from = "$chocolateyPathOld\bin"
-    $to ="$chocolateyPath\bin"
+    $to = "$chocolateyPath\bin"
     $exclude = @("choco.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpack.exe", "cpush.exe", "cuninst.exe", "cup.exe", "cver.exe", "RefreshEnv.cmd")
     Get-ChildItem -Path $from -recurse -Exclude $exclude |
       % {
@@ -239,12 +249,20 @@ function Remove-OldChocolateyInstall {
 param(
   [string]$chocolateyPathOld = "$sysDrive\Chocolatey"
 )
+  Write-Debug "Remove-OldChocolateyInstall"
 
   if (Test-Path $chocolateyPathOld) {
     Write-Warning "This action will result in Log Errors, you can safely ignore those. `n You may need to finish removing '$chocolateyPathOld' manually."
     try {
+      Get-ChildItem -Path "$chocolateyPathOld" | % {
+        if (Test-Path $_.FullName) {
+          Write-Debug "Removing $_ unless matches .log"
+          Remove-Item $_.FullName -exclude *.log -recurse -force -ErrorAction SilentlyContinue
+        }
+      }
+
       Write-Output "Attempting to remove `'$chocolateyPathOld`'. This may fail if something in the folder is being used or locked."
-      Remove-Item "$($chocolateyPathOld)" -force -recurse -ErrorAction Continue
+      Remove-Item "$($chocolateyPathOld)" -force -recurse -ErrorAction Stop
     }
     catch {
       Write-Warning "Was not able to remove `'$chocolateyPathOld`'. You will need to manually remove it."
@@ -256,11 +274,19 @@ function Install-ChocolateyFiles {
 param(
   [string]$chocolateyPath
 )
+  Write-Debug "Install-ChocolateyFiles"
 
   Write-Debug "Removing install files in chocolateyInstall, helpers, redirects, and tools"
   "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" | % {
+    #Write-Debug "Checking path $_"
     if (Test-Path $_) {
-      Remove-Item $_ -exclude '*.log' -recurse -force -ErrorAction SilentlyContinue
+      Get-ChildItem -Path "$_" | % {
+        #Write-Debug "Checking child path $_ ($($_.FullName))"
+        if (Test-Path $_.FullName) {
+          Write-Debug "Removing $_ unless matches .log"
+          Remove-Item $_.FullName -exclude *.log -recurse -force -ErrorAction SilentlyContinue
+        }
+      }
     }
   }
 
@@ -295,6 +321,7 @@ function Ensure-ChocolateyLibFiles {
 param(
   [string]$chocolateyLibPath
 )
+  Write-Debug "Ensure-ChocolateyLibFiles"
   $chocoPkgDirectory = Join-Path $chocolateyLibPath 'chocolatey'
 
   if ( -not (Test-Path("$chocoPkgDirectory\chocolatey.nupkg")) ) {
@@ -318,8 +345,14 @@ param(
   [string] $chocolateyPath,
   [string] $chocolateyExePath
 )
+  Write-Debug "Install-ChocolateyBinFiles"
   Write-Debug "Installing the bin file redirects"
   $redirectsPath = Join-Path $chocolateyPath 'redirects'
+  if (!(Test-Path "$redirectsPath")) {
+    Write-Warning "$redirectsPath does not exist"
+    return
+  }
+
   $exeFiles = Get-ChildItem "$redirectsPath" -include @("*.exe","*.cmd") -recurse
   foreach ($exeFile in $exeFiles) {
     $exeFilePath = $exeFile.FullName
@@ -367,6 +400,7 @@ param(
   [string]$chocolateyExePath = "$($env:ALLUSERSPROFILE)\chocolatey\bin",
   [string]$chocolateyExePathVariable = "%$($chocInstallVariableName)%\bin"
 )
+  Write-Debug "Initialize-ChocolateyPath"
   Write-Debug "Initializing Chocolatey Path if required"
   $environmentTarget = [System.EnvironmentVariableTarget]::User
   if (Test-ProcessAdminRights) {
@@ -384,7 +418,7 @@ param(
   [string]$chocolateyExePath = "$($env:ALLUSERSPROFILE)\chocolatey\bin",
   [string]$chocolateyExePathVariable = "%$($chocInstallVariableName)%\bin"
 )
-
+  Write-Debug "Process-ChocolateyBinFiles"
   $processedMarkerFile = Join-Path $chocolateyExePath '_processed.txt'
   if (!(test-path $processedMarkerFile)) {
     $files = get-childitem $chocolateyExePath -include *.bat -recurse
@@ -409,6 +443,7 @@ param(
 }
 
 function Install-DotNet4IfMissing {
+  Write-Debug "Install-DotNet4IfMissing"
   if ([IntPtr]::Size -eq 8) {$fx="framework64"} else {$fx="framework"}
 
   Write-Debug "Installing .NET Framework 4.0 if it is missing"

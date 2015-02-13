@@ -2,7 +2,7 @@
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata>
     <id>chocolatey.lib</id>
-    <title>Chocolatey Core</title>
+    <title>Chocolatey Core [PREVIEW]</title>
     <version>0.9.9</version>
     <authors>Rob Reynolds, The Chocolatey Team</authors>
     <owners>Rob Reynolds</owners>
