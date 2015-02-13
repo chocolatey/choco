@@ -107,7 +107,7 @@ Creating Chocolatey folders if they do not already exist.
   $realModule = Join-Path $chocolateyPath "helpers\chocolateyInstaller.psm1"
   Import-Module "$realModule" -Force
 
-  if (-not $allowInsecureRootInstall) {
+  if (-not $allowInsecureRootInstall -and (Test-Path($defaultChocolateyPathOld))) {
     Upgrade-OldChocolateyInstall $defaultChocolateyPathOld $chocolateyPath
     Install-ChocolateyBinFiles $chocolateyPath $chocolateyExePath
   }
@@ -225,7 +225,7 @@ param(
     Copy-Item "$chocolateyPathOld\lib\*" "$chocolateyPath\lib" -force -recurse
 
     $from = "$chocolateyPathOld\bin"
-    $to ="$chocolateyPath\bin"
+    $to = "$chocolateyPath\bin"
     $exclude = @("choco.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpack.exe", "cpush.exe", "cuninst.exe", "cup.exe", "cver.exe", "RefreshEnv.cmd")
     Get-ChildItem -Path $from -recurse -Exclude $exclude |
       % {
