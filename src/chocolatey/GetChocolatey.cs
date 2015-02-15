@@ -58,7 +58,7 @@ namespace chocolatey
 
         private void set_defaults()
         {
-            ConfigurationBuilder.set_up_configuration(null, _configuration, _fileSystem, _container.GetInstance<IXmlService>());
+            ConfigurationBuilder.set_up_configuration(null, _configuration, _fileSystem, _container.GetInstance<IXmlService>(), null);
             Config.initialize_with(_configuration);
 
             _configuration.PromptForConfirmation = false;

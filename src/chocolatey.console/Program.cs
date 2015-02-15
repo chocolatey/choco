@@ -55,7 +55,15 @@ namespace chocolatey.console
                 var config = container.GetInstance<ChocolateyConfiguration>();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
-                ConfigurationBuilder.set_up_configuration(args, config, fileSystem, container.GetInstance<IXmlService>());
+                var warnings = new List<string>();
+
+                ConfigurationBuilder.set_up_configuration(
+                    args,
+                    config,
+                    fileSystem,
+                    container.GetInstance<IXmlService>(),
+                    warning => { warnings.Add(warning); }
+                    );
                 Config.initialize_with(config);
 
                 if (config.RegularOuptut)
@@ -67,7 +75,15 @@ namespace chocolatey.console
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
 #endif
                 }
-   
+
+                if (warnings.Count != 0)
+                {
+                    foreach (var warning in warnings.or_empty_list_if_null())
+                    {
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, warning);    
+                    }
+                }
+
                 if (config.HelpRequested)
                 {
                     pause_execution_if_debug();
