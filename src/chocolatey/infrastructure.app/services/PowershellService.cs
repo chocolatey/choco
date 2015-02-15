@@ -100,6 +100,17 @@ namespace chocolatey.infrastructure.app.services
             }
 
             var packageDirectory = packageResult.InstallLocation;
+            if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
+            {
+                packageResult.Messages.Add(
+                    new ResultMessage(
+                        ResultType.Error,
+                        "Install location is not specific enough, cannot run PowerShell script:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, packageResult.InstallLocation)
+                        )
+                    );
+
+                return false;
+            }
 
             if (!_fileSystem.directory_exists(packageDirectory))
             {
@@ -115,15 +126,16 @@ namespace chocolatey.infrastructure.app.services
                 var failure = false;
 
                 var package = packageResult.Package;
+                Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName,ApplicationParameters.InstallLocation);
                 Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION", configuration.Information.ChocolateyVersion);
                 Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION_PRODUCT", configuration.Information.ChocolateyProductVersion);
                 Environment.SetEnvironmentVariable("OS_PLATFORM", configuration.Information.PlatformType.get_description_or_value());
                 Environment.SetEnvironmentVariable("OS_VERSION", configuration.Information.PlatformVersion.to_string());
                 Environment.SetEnvironmentVariable("OS_NAME", configuration.Information.PlatformName.to_string());
                 // experimental until we know if this value returns correctly based on the OS and not the current process.
-                Environment.SetEnvironmentVariable("OS_IS64BIT", configuration.Information.Is64Bit ? "true":"false");
-                Environment.SetEnvironmentVariable("IS_ADMIN", configuration.Information.IsUserAdministrator ? "true":"false");
-                Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", configuration.Information.IsProcessElevated ? "true":"false");
+                Environment.SetEnvironmentVariable("OS_IS64BIT", configuration.Information.Is64Bit ? "true" : "false");
+                Environment.SetEnvironmentVariable("IS_ADMIN", configuration.Information.IsUserAdministrator ? "true" : "false");
+                Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", configuration.Information.IsProcessElevated ? "true" : "false");
                 Environment.SetEnvironmentVariable("chocolateyPackageName", package.Id);
                 Environment.SetEnvironmentVariable("chocolateyPackageVersion", package.Version.to_string());
                 Environment.SetEnvironmentVariable("chocolateyPackageFolder", ApplicationParameters.PackagesLocation);
@@ -169,7 +181,13 @@ namespace chocolatey.infrastructure.app.services
                 {
                     this.Log().Info(ChocolateyLoggers.Important, () => " Found '{0}':".format_with(_fileSystem.get_file_name(chocoPowerShellScript)));
                     this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents));
-                    var selection = InteractivePrompt.prompt_for_confirmation(" Do you want to run the script?", new[] {"yes", "no", "skip"}, "no", requireAnswer: true);
+                    var selection = InteractivePrompt.prompt_for_confirmation(@"
+Do you want to run the script? 
+ NOTE: If you chooose not to run the script, the installation will 
+ fail.
+ Skip is an advanced option and most likely will never be wanted.
+"
+                        , new[] {"yes", "no", "skip"}, "no", requireAnswer: true);
                     if (selection.is_equal_to("yes")) shouldRun = true;
                     if (selection.is_equal_to("no"))
                     {
@@ -199,7 +217,7 @@ namespace chocolatey.infrastructure.app.services
                                 }
                                 else if (e.Data.StartsWith("VERBOSE:"))
                                 {
-                                    this.Log().Info(ChocolateyLoggers.Verbose,() => " " + e.Data);
+                                    this.Log().Info(ChocolateyLoggers.Verbose, () => " " + e.Data);
                                 }
                                 else
                                 {
@@ -218,7 +236,7 @@ namespace chocolatey.infrastructure.app.services
                         Environment.ExitCode = exitCode;
                         packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Error while running '{0}'.{1} See log for details.".format_with(powershellScript.FirstOrDefault(), Environment.NewLine)));
                     }
-                    packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Ran '{0}'".format_with(powershellScript)));
+                    packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Ran '{0}'".format_with(chocoPowerShellScript)));
                 }
             }
 

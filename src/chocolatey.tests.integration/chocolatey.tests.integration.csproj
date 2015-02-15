@@ -48,6 +48,12 @@
     <Reference Include="Should, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Should.1.1.12.0\lib\Should.dll</HintPath>
     </Reference>
+    <Reference Include="SimpleInjector, Version=2.5.0.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.2.5.0\lib\net40-client\SimpleInjector.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleInjector.Diagnostics">
+      <HintPath>..\packages\SimpleInjector.2.5.0\lib\net40-client\SimpleInjector.Diagnostics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Reactive.Core">
@@ -70,10 +76,45 @@
     <Compile Include="infrastructure\filesystem\DotNetFileSystemSpecs.cs" />
     <Compile Include="MockEventSubscriptionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="NUnitSetup.cs" />
+    <Compile Include="Scenario.cs" />
+    <Compile Include="scenarios\InstallScenarios.cs" />
     <Compile Include="TODO.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="context\badpackage\badpackage.1.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\badpackage\badpackage.nuspec" />
+    <None Include="context\badpackage\tools\chocolateyInstall.ps1" />
+    <None Include="context\hasdependency\hasdependency.1.0.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\hasdependency\hasdependency.nuspec" />
+    <None Include="context\hasdependency\tools\chocolateyinstall.ps1" />
+    <None Include="context\hasdependency\tools\chocolateyuninstall.ps1" />
+    <None Include="context\installpackage\installpackage.1.0.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\installpackage\installpackage.nuspec" />
+    <None Include="context\installpackage\tools\chocolateyinstall.ps1" />
+    <None Include="context\installpackage\tools\chocolateyuninstall.ps1" />
+    <None Include="context\isdependency\isdependency.1.0.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\isdependency\isdependency.nuspec" />
+    <None Include="context\isdependency\tools\chocolateyinstall.ps1" />
+    <None Include="context\isdependency\tools\chocolateyuninstall.ps1" />
+    <None Include="context\upgradepackage\tools\chocolateyinstall.ps1" />
+    <None Include="context\upgradepackage\tools\chocolateyuninstall.ps1" />
+    <None Include="context\upgradepackage\upgradepackage.1.0.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\upgradepackage.1.1.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\upgradepackage.nuspec" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

@@ -42,7 +42,7 @@ namespace chocolatey.infrastructure.app.nuget
             string directory = packageId;
             if (UseSideBySidePaths)
             {
-                directory += "." + version;
+                directory += "." + version.to_string();
             }
             return directory;
         }
@@ -52,7 +52,7 @@ namespace chocolatey.infrastructure.app.nuget
             string fileNameBase = packageId;
             if (UseSideBySidePaths)
             {
-                fileNameBase += "." + version;
+                fileNameBase += "." + version.to_string();
             }
             return fileNameBase + Constants.PackageExtension;
         }

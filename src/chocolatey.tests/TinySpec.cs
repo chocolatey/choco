@@ -20,6 +20,7 @@ namespace chocolatey.tests
 {
     using System;
     using NUnit.Framework;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.logging;
 
     // ReSharper disable InconsistentNaming
@@ -29,15 +30,25 @@ namespace chocolatey.tests
     {
         public static MockLogger MockLogger { get; set; }
 
+        private static readonly string InstallLocationVariable = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName);
+
         [SetUp]
-        public void BeforeEverything()
+        public virtual void BeforeEverything()
         {
             MockLogger = new MockLogger();
             Log.InitializeWith(MockLogger);
+            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, string.Empty);
+        }
+
+        public virtual void before_everything()
+        {
         }
 
         [TearDown]
-        public void AfterEverything() { }
+        public void AfterEverything()
+        {
+            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, InstallLocationVariable);
+        }
     }
 
     [TestFixture]

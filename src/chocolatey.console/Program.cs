@@ -55,7 +55,15 @@ namespace chocolatey.console
                 var config = container.GetInstance<ChocolateyConfiguration>();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
-                ConfigurationBuilder.set_up_configuration(args, config, fileSystem, container.GetInstance<IXmlService>());
+                var warnings = new List<string>();
+
+                ConfigurationBuilder.set_up_configuration(
+                    args,
+                    config,
+                    fileSystem,
+                    container.GetInstance<IXmlService>(),
+                    warning => { warnings.Add(warning); }
+                    );
                 Config.initialize_with(config);
 
                 if (config.RegularOuptut)
@@ -67,7 +75,15 @@ namespace chocolatey.console
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
 #endif
                 }
-   
+
+                if (warnings.Count != 0)
+                {
+                    foreach (var warning in warnings.or_empty_list_if_null())
+                    {
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, warning);    
+                    }
+                }
+
                 if (config.HelpRequested)
                 {
                     pause_execution_if_debug();
@@ -140,7 +156,7 @@ namespace chocolatey.console
         private static void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
         {
             // NOTE: blended options may not have been fully initialized yet
-            if (!config.PromptForConfirmation) return; 
+            if (!config.PromptForConfirmation) return;
 
             if (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator)
             {
@@ -151,7 +167,7 @@ Chocolatey detected you are not running from an elevated command shell
  elevated shell. When you open the command shell, you should ensure 
  that you do so with ""Run as Administrator"" selected.
 
- Do you want to continue?", new[] { "yes", "no" }, "no", requireAnswer: true);
+ Do you want to continue?", new[] {"yes", "no"}, "no", requireAnswer: true);
 
                 if (selection.is_equal_to("no"))
                 {
@@ -170,7 +186,7 @@ Chocolatey detected you are not running from an elevated command shell
             }
             catch (Exception ex)
             {
-                "chocolatey".Log().Warn("Attempting to delete choco.exe.old ran into an issue:{0} {1}".format_with(Environment.NewLine,ex.Message));                
+                "chocolatey".Log().Warn("Attempting to delete choco.exe.old ran into an issue:{0} {1}".format_with(Environment.NewLine, ex.Message));
             }
         }
 

@@ -34,7 +34,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IDictionary<string, ExternalCommandArgument> _shimGenArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
 
-        public ShimGenerationService(IFileSystem fileSystem,ICommandExecutor commandExecutor)
+        public ShimGenerationService(IFileSystem fileSystem, ICommandExecutor commandExecutor)
         {
             _fileSystem = fileSystem;
             _commandExecutor = commandExecutor;
@@ -77,6 +77,14 @@ namespace chocolatey.infrastructure.app.services
         public void install(ChocolateyConfiguration configuration, PackageResult packageResult)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.ShimsLocation);
+
+            if (packageResult.InstallLocation.is_equal_to(ApplicationParameters.InstallLocation) || packageResult.InstallLocation.is_equal_to(ApplicationParameters.PackagesLocation))
+            {
+                var logMessage = "Install location is not specific enough, cannot run shimgen:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, packageResult.InstallLocation);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                this.Log().Error(logMessage);
+                return;
+            }
 
             //gather all .exes in the folder 
             var exeFiles = _fileSystem.get_files(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);

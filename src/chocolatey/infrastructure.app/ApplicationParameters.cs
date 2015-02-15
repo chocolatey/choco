@@ -27,11 +27,12 @@ namespace chocolatey.infrastructure.app
     public static class ApplicationParameters
     {
         private static readonly IFileSystem _fileSystem = new DotNetFileSystem();
+        public static readonly string ChocolateyInstallEnvironmentVariableName = "ChocolateyInstall";
         public static readonly string Name = "Chocolatey";
 #if DEBUG
         public static readonly string InstallLocation = _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location);
 #else
-        public static readonly string InstallLocation = Environment.GetEnvironmentVariable("ChocolateyInstall") ??  _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location);
+        public static readonly string InstallLocation = Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) ?? _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location);
 #endif
 
         public static readonly string CommonAppDataChocolatey = _fileSystem.combine_paths(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), Name);
@@ -70,7 +71,7 @@ namespace chocolatey.infrastructure.app
         {
             public static readonly string CheckSumFiles = "checksumFiles";
             public static readonly string AutoUninstaller = "autoUninstaller";
-            public static readonly string AllowInsecureConfirmation = "allowInsecureConfirmation";
+            public static readonly string AllowGlobalConfirmation = "allowGlobalConfirmation";
         }
 
         public static class Messages

@@ -314,7 +314,7 @@ namespace chocolatey.infrastructure.app.services
                     if (pkgSettings.ForceX86) packageConfig.ForceX86 = true;
                     if (pkgSettings.AllowMultipleVersions) packageConfig.AllowMultipleVersions = true;
                     if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
-             
+
                     packageConfigs.Add(packageConfig);
                 }
             }
@@ -371,13 +371,13 @@ namespace chocolatey.infrastructure.app.services
 
             if (upgradeWarnings != 0)
             {
-                this.Log().Warn(ChocolateyLoggers.Important,"Warnings:");
+                this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
                 foreach (var warning in packageUpgrades.Where(p => p.Value.Warning).or_empty_list_if_null())
                 {
                     this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
                 }
-            }    
-            
+            }
+
             if (upgradeFailures != 0)
             {
                 this.Log().Error("Failures:");
@@ -482,13 +482,32 @@ namespace chocolatey.infrastructure.app.services
 
         private void handle_unsuccessful_install(ChocolateyConfiguration config, PackageResult packageResult)
         {
+            Environment.ExitCode = 1;
+
             foreach (var message in packageResult.Messages.Where(m => m.MessageType == ResultType.Error))
             {
                 this.Log().Error(message.Message);
             }
 
-            move_bad_package_to_failure_location(packageResult);
-            rollback_previous_version(config, packageResult);
+            var packageDirectory = packageResult.InstallLocation;
+            if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
+            {
+                this.Log().Error(ChocolateyLoggers.Important, @"
+Install location is not specific enough, cannot move bad package or
+ rollback previous version. 
+ Erroneous install location captured as '{0}'
+
+ATTENTION: You must take manual action to remove {1} from 
+ {2}. It will show incorrectly as installed 
+ until you do. To remove you can simply delete the folder in question.
+ Chocolatey cannot continue.
+".format_with(packageResult.InstallLocation, packageResult.Name, ApplicationParameters.PackagesLocation));
+            }
+            else
+            {
+                move_bad_package_to_failure_location(packageResult);
+                rollback_previous_version(config, packageResult);
+            }
         }
 
         private void move_bad_package_to_failure_location(PackageResult packageResult)
@@ -496,13 +515,22 @@ namespace chocolatey.infrastructure.app.services
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageFailuresLocation);
 
             _fileSystem.move_directory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation));
-            _fileSystem.delete_directory(packageResult.InstallLocation, recursive: true);
         }
 
         private void rollback_previous_version(ChocolateyConfiguration config, PackageResult packageResult)
         {
             var rollbackDirectory = packageResult.InstallLocation + ApplicationParameters.RollbackPackageSuffix;
-            if (!_fileSystem.directory_exists(rollbackDirectory)) return;
+            if (!_fileSystem.directory_exists(rollbackDirectory))
+            {
+                //search for folder
+                var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackagesLocation, packageResult.Name + "*" + ApplicationParameters.RollbackPackageSuffix);
+                if (possibleRollbacks != null && possibleRollbacks.Count != 0)
+                {
+                    rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
 
             var rollback = true;
             if (config.PromptForConfirmation)
@@ -513,7 +541,7 @@ namespace chocolatey.infrastructure.app.services
 
             if (rollback)
             {
-                _fileSystem.move_directory(rollbackDirectory, packageResult.InstallLocation);
+                _fileSystem.move_directory(rollbackDirectory, rollbackDirectory.Replace(ApplicationParameters.RollbackPackageSuffix, string.Empty));
             }
 
             remove_rollback_if_exists(packageResult);

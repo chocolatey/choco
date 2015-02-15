@@ -58,7 +58,7 @@ namespace chocolatey.infrastructure.filesystem
         #region File
 
         /// <summary>
-        ///   Gets a list of files inside of an existing directory, optionally by pattern and recursive search option.
+        ///   Gets a list of files inside an existing directory, optionally by pattern and recursive search option.
         /// </summary>
         /// <param name="directoryPath">The path to a specified directory.</param>
         /// <param name="pattern">The search pattern.</param>
@@ -232,6 +232,15 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="directoryPath">The path for which an array of subdirectory names is returned. </param>
         /// <returns>An array of the names of subdirectories in "directory".</returns>
         IList<string> get_directories(string directoryPath);
+
+        /// <summary>
+        /// Gets a list of directories inside an existing directory by pattern, and optionally by recursive search option.
+        /// </summary>
+        /// <param name="directoryPath">The parent path</param>
+        /// <param name="pattern">The search pattern.</param>
+        /// <param name="option">The option specifies whether the search operation should include all subdirectories or only the current directory.</param>
+        /// <returns>Returns the names of directories (including their paths).</returns>
+        IList<string> get_directories(string directoryPath, string pattern, SearchOption option = SearchOption.TopDirectoryOnly);
 
         /// <summary>
         ///   Determines whether the given path refers to an existing directory on disk.

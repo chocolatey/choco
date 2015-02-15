@@ -122,7 +122,8 @@ Pin a package to suppress upgrades.
         {
             var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
                                                                installSuccessAction: null,
-                                                               uninstallSuccessAction: null);
+                                                               uninstallSuccessAction: null,
+                                                               addUninstallHandler: false);
 
             switch (configuration.PinCommand.Command)
             {

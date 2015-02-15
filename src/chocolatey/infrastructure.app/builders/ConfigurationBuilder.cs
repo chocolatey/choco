@@ -36,17 +36,17 @@ namespace chocolatey.infrastructure.app.builders
     /// </summary>
     public static class ConfigurationBuilder
     {
-        private static Lazy<IEnvironment> environment_initializer = new Lazy<IEnvironment>(() => new Environment());
+        private static Lazy<IEnvironment> _environmentInitializer = new Lazy<IEnvironment>(() => new Environment());
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IEnvironment> environment)
         {
-            environment_initializer = environment;
+            _environmentInitializer = environment;
         }
 
         private static IEnvironment Environment
         {
-            get { return environment_initializer.Value; }
+            get { return _environmentInitializer.Value; }
         }
 
         /// <summary>
@@ -56,14 +56,15 @@ namespace chocolatey.infrastructure.app.builders
         /// <param name="config">The configuration.</param>
         /// <param name="fileSystem">The file system.</param>
         /// <param name="xmlService">The XML service.</param>
-        public static void set_up_configuration(IList<string> args, ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService)
+        /// <param name="notifyWarnLoggingAction">Notify warn logging action</param>
+        public static void set_up_configuration(IList<string> args, ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService, Action<string> notifyWarnLoggingAction)
         {
-            set_file_configuration(config, fileSystem, xmlService);
+            set_file_configuration(config, fileSystem, xmlService, notifyWarnLoggingAction);
             set_global_options(args, config);
             set_environment_options(config);
         }
 
-        private static void set_file_configuration(ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService)
+        private static void set_file_configuration(ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService, Action<string> notifyWarnLoggingAction)
         {
             var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
             AssemblyFileExtractor.extract_text_file_from_assembly(fileSystem, Assembly.GetExecutingAssembly(), ApplicationParameters.ChocolateyConfigFileResource, globalConfigPath);
@@ -101,6 +102,19 @@ namespace chocolatey.infrastructure.app.builders
             config.CommandExecutionTimeoutSeconds = configFileSettings.CommandExecutionTimeoutSeconds;
 
             set_feature_flags(config, configFileSettings);
+            if (!config.PromptForConfirmation)
+            {
+                if (notifyWarnLoggingAction != null)
+                {
+                    const string logMessage = @"
+Config has insecure allowGlobalConfirmation set to true.
+ This setting lowers the integrity of the security of your system. If
+ this is not intended, please change the setting using the feature
+ command.
+";
+                    notifyWarnLoggingAction.Invoke(logMessage);
+                }
+            }
 
             try
             {
@@ -117,7 +131,7 @@ namespace chocolatey.infrastructure.app.builders
         {
             config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings);
             config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings);
-            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowInsecureConfirmation, configFileSettings);
+            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings);
         }
 
         private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings)

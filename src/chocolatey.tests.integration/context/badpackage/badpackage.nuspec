@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>badpackage</id>
+        <version>1.0</version>
+        <title>badpackage</title>
+        <authors>Rob Reynolds</authors>
+        <owners>Rob Reynolds</owners>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>badpackage - This package errors during install. That is its only purpose</description>
+        <summary>badpackage - This package errors during install</summary>
+        <tags>badpackage</tags>
+    </metadata>
+    <files>
+        <file src="tools\chocolateyInstall.ps1" target="tools\chocolateyInstall.ps1" />
+    </files>
+</package>
