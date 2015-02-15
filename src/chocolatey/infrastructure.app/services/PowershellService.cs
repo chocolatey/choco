@@ -126,6 +126,7 @@ namespace chocolatey.infrastructure.app.services
                 var failure = false;
 
                 var package = packageResult.Package;
+                Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName,ApplicationParameters.InstallLocation);
                 Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION", configuration.Information.ChocolateyVersion);
                 Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION_PRODUCT", configuration.Information.ChocolateyProductVersion);
                 Environment.SetEnvironmentVariable("OS_PLATFORM", configuration.Information.PlatformType.get_description_or_value());
