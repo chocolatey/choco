@@ -77,6 +77,8 @@
     <Compile Include="MockEventSubscriptionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NUnitSetup.cs" />
+    <Compile Include="Scenario.cs" />
+    <Compile Include="scenarios\InstallScenarios.cs" />
     <Compile Include="TODO.cs" />
   </ItemGroup>
   <ItemGroup>
