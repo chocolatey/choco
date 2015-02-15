@@ -180,7 +180,13 @@ namespace chocolatey.infrastructure.app.services
                 {
                     this.Log().Info(ChocolateyLoggers.Important, () => " Found '{0}':".format_with(_fileSystem.get_file_name(chocoPowerShellScript)));
                     this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents));
-                    var selection = InteractivePrompt.prompt_for_confirmation(" Do you want to run the script?", new[] {"yes", "no", "skip"}, "no", requireAnswer: true);
+                    var selection = InteractivePrompt.prompt_for_confirmation(@"
+Do you want to run the script? 
+ NOTE: If you chooose not to run the script, the installation will 
+ fail.
+ Skip is an advanced option and most likely will never be wanted.
+"
+                        , new[] {"yes", "no", "skip"}, "no", requireAnswer: true);
                     if (selection.is_equal_to("yes")) shouldRun = true;
                     if (selection.is_equal_to("no"))
                     {
