@@ -314,7 +314,7 @@ namespace chocolatey.infrastructure.app.services
                     if (pkgSettings.ForceX86) packageConfig.ForceX86 = true;
                     if (pkgSettings.AllowMultipleVersions) packageConfig.AllowMultipleVersions = true;
                     if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
-             
+
                     packageConfigs.Add(packageConfig);
                 }
             }
@@ -371,13 +371,13 @@ namespace chocolatey.infrastructure.app.services
 
             if (upgradeWarnings != 0)
             {
-                this.Log().Warn(ChocolateyLoggers.Important,"Warnings:");
+                this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
                 foreach (var warning in packageUpgrades.Where(p => p.Value.Warning).or_empty_list_if_null())
                 {
                     this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
                 }
-            }    
-            
+            }
+
             if (upgradeFailures != 0)
             {
                 this.Log().Error("Failures:");
