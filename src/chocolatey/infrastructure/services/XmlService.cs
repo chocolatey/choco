@@ -61,11 +61,6 @@ namespace chocolatey.infrastructure.services
             _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(xmlFilePath));
             try
             {
-                if (_fileSystem.file_exists(xmlFilePath))
-                {
-                    _fileSystem.delete_file(xmlFilePath);
-                }
-
                 var xmlSerializer = new XmlSerializer(typeof (XmlType));
                 var textWriter = new StreamWriter(xmlFilePath, append: false, encoding: Encoding.UTF8)
                     {
