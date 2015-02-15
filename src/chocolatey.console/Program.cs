@@ -32,6 +32,7 @@ namespace chocolatey.console
     using infrastructure.registration;
     using infrastructure.services;
     using resources;
+    using Console = System.Console;
     using Environment = System.Environment;
 
     public sealed class Program
