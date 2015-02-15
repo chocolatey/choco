@@ -159,7 +159,7 @@ namespace chocolatey.infrastructure.filesystem
         public void copy_file(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
         {
             this.Log().Debug(() => "Attempting to copy \"{0}\"{1} to \"{2}\".".format_with(sourceFilePath, Environment.NewLine, destinationFilePath));
-            create_directory_if_not_exists(get_directory_name(destinationFilePath),ignoreError:true);
+            create_directory_if_not_exists(get_directory_name(destinationFilePath), ignoreError: true);
             File.Copy(sourceFilePath, destinationFilePath, overwriteExisting);
         }
 
@@ -287,11 +287,11 @@ namespace chocolatey.infrastructure.filesystem
             try
             {
                 this.Log().Debug("Moving '{0}'{1} to '{2}'".format_with(directoryPath, Environment.NewLine, newDirectoryPath));
-                Directory.Move(directoryPath,newDirectoryPath);
+                Directory.Move(directoryPath, newDirectoryPath);
             }
             catch (Exception ex)
             {
-                this.Log().Warn("Move failed with message:{0} {1}{0} Attempting backup move method.".format_with(Environment.NewLine,ex.Message));
+                this.Log().Warn("Move failed with message:{0} {1}{0} Attempting backup move method.".format_with(Environment.NewLine, ex.Message));
 
                 create_directory_if_not_exists(newDirectoryPath, ignoreError: true);
                 foreach (var file in get_files(directoryPath, "*.*", SearchOption.AllDirectories).or_empty_list_if_null())
@@ -313,7 +313,7 @@ namespace chocolatey.infrastructure.filesystem
 
         public void copy_directory(string sourceDirectoryPath, string destinationDirectoryPath, bool overwriteExisting)
         {
-            create_directory_if_not_exists(destinationDirectoryPath,ignoreError:true);
+            create_directory_if_not_exists(destinationDirectoryPath, ignoreError: true);
 
             foreach (var file in get_files(sourceDirectoryPath, "*.*", SearchOption.AllDirectories).or_empty_list_if_null())
             {
@@ -347,11 +347,10 @@ namespace chocolatey.infrastructure.filesystem
                         this.Log().Error("Cannot create directory \"{0}\". Error was:{1}{2}", get_full_path(directoryPath), Environment.NewLine, e);
                         throw;
                     }
-                    
                 }
             }
         }
-        
+
         public void delete_directory(string directoryPath, bool recursive)
         {
             this.Log().Debug(() => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directoryPath)));
