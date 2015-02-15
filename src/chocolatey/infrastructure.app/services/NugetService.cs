@@ -365,7 +365,7 @@ spam/junk folder.");
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 remove_existing_rollback_directory(packageName);
 
@@ -443,7 +443,7 @@ packages as of version 1.0.0. That is what the install command is for.
 
                 //todo enhance FindPackage to return location
 
-                var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation,availablePackage.Id)));
+                var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
 
                 if ((installedPackage.Version > availablePackage.Version))
                 {
@@ -480,7 +480,7 @@ packages as of version 1.0.0. That is what the install command is for.
                         string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s)".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version);
                         results.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                        if (config.RegularOuptut) 
+                        if (config.RegularOuptut)
                         {
                             this.Log().Warn(logMessage);
                         }
@@ -625,7 +625,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     config.ForceDependencies = false;
                 });
 
-            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 remove_existing_rollback_directory(packageName);
 
@@ -715,7 +715,6 @@ packages as of version 1.0.0. That is what the install command is for.
         {
             if (config.PackageNames.is_equal_to("all"))
             {
-
                 config.ListCommand.LocalOnly = true;
                 var sources = config.Sources;
                 config.Sources = ApplicationParameters.PackagesLocation;
