@@ -299,6 +299,7 @@ spam/junk folder.");
 
                 if (installedPackage != null && (installedPackage.Version == availablePackage.Version))
                 {
+                    //todo: see if this fails - if so delete the files - this may fail as it is
                     packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
                 }
 
@@ -431,6 +432,8 @@ packages as of version 1.0.0. That is what the install command is for.
 
                     continue;
                 }
+
+                //todo enhance FindPackage to return location
 
                 if ((installedPackage.Version > availablePackage.Version))
                 {

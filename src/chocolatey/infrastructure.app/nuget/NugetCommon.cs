@@ -127,6 +127,7 @@ namespace chocolatey.infrastructure.app.nuget
                             // look for it and ignore it if doesn't line up with versioning
                             if (nugetPackagesFileSystem.DirectoryExists(chocoPathResolver.GetInstallPath(pkg)))
                             {
+                                //todo: This causes an issue with upgrades.
                                 // this causes this to be called again, which should then call the uninstallSuccessAction below
                                 packageManager.UninstallPackage(pkg, forceRemove: configuration.Force, removeDependencies: false);
                             }
