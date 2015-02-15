@@ -257,6 +257,7 @@ spam/junk folder.");
                                                                    {
                                                                        var pkg = e.Package;
                                                                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                                                                       results.InstallLocation = e.InstallPath;
                                                                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
                                                                        if (continueAction != null) continueAction.Invoke(results);
@@ -353,6 +354,7 @@ spam/junk folder.");
                     {
                         var pkg = e.Package;
                         var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                        results.InstallLocation = e.InstallPath;
                         results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
                         if (continueAction != null) continueAction.Invoke(results);
