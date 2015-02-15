@@ -236,7 +236,7 @@ Do you want to run the script?
                         Environment.ExitCode = exitCode;
                         packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Error while running '{0}'.{1} See log for details.".format_with(powershellScript.FirstOrDefault(), Environment.NewLine)));
                     }
-                    packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Ran '{0}'".format_with(powershellScript)));
+                    packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Ran '{0}'".format_with(chocoPowerShellScript)));
                 }
             }
 
