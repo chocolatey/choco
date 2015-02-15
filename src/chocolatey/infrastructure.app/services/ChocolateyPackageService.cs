@@ -515,7 +515,6 @@ ATTENTION: You must take manual action to remove {1} from
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageFailuresLocation);
 
             _fileSystem.move_directory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation));
-            _fileSystem.delete_directory(packageResult.InstallLocation, recursive: true);
         }
 
         private void rollback_previous_version(ChocolateyConfiguration config, PackageResult packageResult)

@@ -303,6 +303,9 @@ namespace chocolatey.infrastructure.filesystem
                     this.Log().Debug("Moving '{0}'{1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
                     move_file(file, destinationFile);
                 }
+
+                Thread.Sleep(1000); // let the moving files finish up
+                delete_directory_if_exists(directoryPath, recursive: true);
             }
 
             Thread.Sleep(2000); // sleep for enough time to allow the folder to be cleared
