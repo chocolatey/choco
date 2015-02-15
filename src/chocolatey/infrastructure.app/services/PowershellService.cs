@@ -121,9 +121,9 @@ namespace chocolatey.infrastructure.app.services
                 Environment.SetEnvironmentVariable("OS_VERSION", configuration.Information.PlatformVersion.to_string());
                 Environment.SetEnvironmentVariable("OS_NAME", configuration.Information.PlatformName.to_string());
                 // experimental until we know if this value returns correctly based on the OS and not the current process.
-                Environment.SetEnvironmentVariable("OS_IS64BIT", configuration.Information.Is64Bit ? "true":"false");
-                Environment.SetEnvironmentVariable("IS_ADMIN", configuration.Information.IsUserAdministrator ? "true":"false");
-                Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", configuration.Information.IsProcessElevated ? "true":"false");
+                Environment.SetEnvironmentVariable("OS_IS64BIT", configuration.Information.Is64Bit ? "true" : "false");
+                Environment.SetEnvironmentVariable("IS_ADMIN", configuration.Information.IsUserAdministrator ? "true" : "false");
+                Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", configuration.Information.IsProcessElevated ? "true" : "false");
                 Environment.SetEnvironmentVariable("chocolateyPackageName", package.Id);
                 Environment.SetEnvironmentVariable("chocolateyPackageVersion", package.Version.to_string());
                 Environment.SetEnvironmentVariable("chocolateyPackageFolder", ApplicationParameters.PackagesLocation);
@@ -199,7 +199,7 @@ namespace chocolatey.infrastructure.app.services
                                 }
                                 else if (e.Data.StartsWith("VERBOSE:"))
                                 {
-                                    this.Log().Info(ChocolateyLoggers.Verbose,() => " " + e.Data);
+                                    this.Log().Info(ChocolateyLoggers.Verbose, () => " " + e.Data);
                                 }
                                 else
                                 {
