@@ -85,7 +85,7 @@ namespace chocolatey.infrastructure.app.nuget
             return repository;
         }
 
-        public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction)
+        public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
         {
             IFileSystem nugetPackagesFileSystem = GetNuGetFileSystem(configuration, nugetLogger);
             IPackagePathResolver pathResolver = GetPathResolver(configuration, nugetPackagesFileSystem);
@@ -100,7 +100,7 @@ namespace chocolatey.infrastructure.app.nuget
             }
 
             //NOTE DO NOT EVER use this method - packageManager.PackageInstalling += (s, e) =>
-                
+
             packageManager.PackageInstalled += (s, e) =>
                 {
                     var pkg = e.Package;
@@ -109,37 +109,42 @@ namespace chocolatey.infrastructure.app.nuget
                     if (installSuccessAction != null) installSuccessAction.Invoke(e);
                 };
 
-            // NOTE DO NOT EVER use this method, or endless loop - packageManager.PackageUninstalling += (s, e) =>
-                
-            packageManager.PackageUninstalled += (s, e) =>
-                {
-                    IPackage pkg = packageManager.LocalRepository.FindPackage(e.Package.Id, e.Package.Version);
-                    if (pkg != null)
+            if (addUninstallHandler)
+            {
+                // NOTE DO NOT EVER use this method, or endless loop - packageManager.PackageUninstalling += (s, e) =>
+
+
+                packageManager.PackageUninstalled += (s, e) =>
                     {
-                        // install not actually removed, let's clean it up. This is a bug with nuget, where it reports it removed some package and did NOTHING
-                        // this is what happens when you are switching from AllowMultiple to just one and back
-                        var chocoPathResolver = packageManager.PathResolver as ChocolateyPackagePathResolver;
-                        if (chocoPathResolver != null)
+                        IPackage pkg = packageManager.LocalRepository.FindPackage(e.Package.Id, e.Package.Version);
+                        if (pkg != null)
                         {
-                            chocoPathResolver.UseSideBySidePaths = !chocoPathResolver.UseSideBySidePaths;
-                            
-                            // an unfound package folder can cause an endless loop.
-                            // look for it and ignore it if doesn't line up with versioning
-                            if (nugetPackagesFileSystem.DirectoryExists(chocoPathResolver.GetInstallPath(pkg)))
+                            // install not actually removed, let's clean it up. This is a bug with nuget, where it reports it removed some package and did NOTHING
+                            // this is what happens when you are switching from AllowMultiple to just one and back
+                            var chocoPathResolver = packageManager.PathResolver as ChocolateyPackagePathResolver;
+                            if (chocoPathResolver != null)
                             {
-                                //todo: This causes an issue with upgrades.
-                                // this causes this to be called again, which should then call the uninstallSuccessAction below
-                                packageManager.UninstallPackage(pkg, forceRemove: configuration.Force, removeDependencies: false);
+                                chocoPathResolver.UseSideBySidePaths = !chocoPathResolver.UseSideBySidePaths;
+
+                                // an unfound package folder can cause an endless loop.
+                                // look for it and ignore it if doesn't line up with versioning
+                                if (nugetPackagesFileSystem.DirectoryExists(chocoPathResolver.GetInstallPath(pkg)))
+                                {
+                                    //todo: This causes an issue with upgrades.
+                                    // this causes this to be called again, which should then call the uninstallSuccessAction below
+                                    packageManager.UninstallPackage(pkg, forceRemove: configuration.Force, removeDependencies: false);
+                                }
+
+                                chocoPathResolver.UseSideBySidePaths = configuration.AllowMultipleVersions;
                             }
-                            
-                            chocoPathResolver.UseSideBySidePaths = configuration.AllowMultipleVersions;
                         }
-                    }
-                    else
-                    {
-                        if (uninstallSuccessAction != null) uninstallSuccessAction.Invoke(e);
-                    }
-                };
+                        else
+                        {
+                            if (uninstallSuccessAction != null) uninstallSuccessAction.Invoke(e);
+                        }
+                    };
+            }
+
 
             return packageManager;
         }

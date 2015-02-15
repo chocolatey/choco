@@ -24,6 +24,7 @@ namespace chocolatey.infrastructure.app.services
     using adapters;
     using commandline;
     using configuration;
+    using domain;
     using guards;
     using logging;
     using nuget;
@@ -262,7 +263,9 @@ spam/junk folder.");
 
                                                                        if (continueAction != null) continueAction.Invoke(results);
                                                                    },
-                                                               uninstallSuccessAction: null);
+                                                               uninstallSuccessAction: null, 
+                                                               addUninstallHandler: true);
+
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
@@ -300,8 +303,15 @@ spam/junk folder.");
 
                 if (installedPackage != null && (installedPackage.Version == availablePackage.Version))
                 {
-                    //todo: see if this fails - if so delete the files - this may fail as it is
-                    packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
+                    backup_existing_version(config, installedPackage);
+                    try
+                    {
+                        packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Log().Warn("Unable to remove existing package prior to forced reinstall.{0} {1}".format_with(Environment.NewLine,ex.Message));
+                    }
                 }
 
                 using (packageManager.SourceRepository.StartOperation(
@@ -359,7 +369,9 @@ spam/junk folder.");
 
                         if (continueAction != null) continueAction.Invoke(results);
                     },
-                uninstallSuccessAction: null);
+                uninstallSuccessAction: null,
+                addUninstallHandler: false);
+
 
             var configIgnoreDependencies = config.IgnoreDependencies;
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
@@ -411,14 +423,6 @@ packages as of version 1.0.0. That is what the install command is for.
                     if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
-                if (pkgInfo != null && pkgInfo.IsSideBySide)
-                {
-                    //todo: get smarter about realizing multiple versions have been installed before and allowing that
-                }
-                else
-                {
-                    //TODO if the folder has a version on it, we need to rename the folder first.
-                }
 
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                 if (availablePackage == null)
@@ -441,7 +445,10 @@ packages as of version 1.0.0. That is what the install command is for.
                     continue;
                 }
 
-                //todo enhance FindPackage to return location
+                if (pkgInfo != null && pkgInfo.IsSideBySide)
+                {
+                    //todo: get smarter about realizing multiple versions have been installed before and allowing that
+                }
 
                 var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
 
@@ -498,14 +505,47 @@ packages as of version 1.0.0. That is what the install command is for.
                             packageName,
                             version == null ? null : version.ToString()))
                         {
+                            rename_legacy_package_version(config, installedPackage, pkgInfo);
                             backup_existing_version(config, installedPackage);
-                            packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
+                            if (config.Force && (installedPackage.Version == availablePackage.Version))
+                            {
+                                //todo: delete the files
+                                packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
+                            }
+                            else
+                            {
+                                packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
+                            }
                         }
                     }
                 }
             }
 
             return packageInstalls;
+        }
+
+        public void rename_legacy_package_version(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
+        {
+            if (pkgInfo != null && pkgInfo.IsSideBySide) return;
+
+            var installDirectory = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id);
+            if (!_fileSystem.directory_exists(installDirectory))
+            {
+                // if the folder has a version on it, we need to rename the folder first.
+                var pathResolver = new ChocolateyPackagePathResolver(NugetCommon.GetNuGetFileSystem(config, _nugetLogger), useSideBySidePaths: true);
+                installDirectory = pathResolver.GetInstallPath(installedPackage);
+                if (_fileSystem.directory_exists(installDirectory))
+                {
+                    try
+                    {
+                        _fileSystem.move_directory(installDirectory, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id));
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Log().Error("Error during old package rename:{0} {1}".format_with(Environment.NewLine, ex.Message));
+                    }
+                }
+            }
         }
 
         public void backup_existing_version(ChocolateyConfiguration config, IPackage installedPackage)
@@ -576,7 +616,8 @@ packages as of version 1.0.0. That is what the install command is for.
                                                                    {
                                                                        var pkg = e.Package;
                                                                        "chocolatey".Log().Info(ChocolateyLoggers.Important, " {0} has been successfully uninstalled.".format_with(pkg.Id));
-                                                                   });
+                                                                   },
+                                                                   addUninstallHandler: true);
 
             var loopCount = 0;
             packageManager.PackageUninstalling += (s, e) =>
