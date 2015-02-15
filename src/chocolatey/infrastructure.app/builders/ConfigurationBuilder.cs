@@ -36,17 +36,17 @@ namespace chocolatey.infrastructure.app.builders
     /// </summary>
     public static class ConfigurationBuilder
     {
-        private static Lazy<IEnvironment> environment_initializer = new Lazy<IEnvironment>(() => new Environment());
+        private static Lazy<IEnvironment> _environmentInitializer = new Lazy<IEnvironment>(() => new Environment());
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IEnvironment> environment)
         {
-            environment_initializer = environment;
+            _environmentInitializer = environment;
         }
 
         private static IEnvironment Environment
         {
-            get { return environment_initializer.Value; }
+            get { return _environmentInitializer.Value; }
         }
 
         /// <summary>
