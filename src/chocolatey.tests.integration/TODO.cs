@@ -32,6 +32,8 @@ namespace chocolatey.tests.integration
          *  - upgrade noop
          *  - uninstall noop
          *  - uninstall happy path
+         *  - upgrade with dependencies
+         *  - upgrade as a dependency
          *  
          * List scenarios:
          *  - list local
