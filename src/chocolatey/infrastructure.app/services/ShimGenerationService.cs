@@ -97,15 +97,15 @@ namespace chocolatey.infrastructure.app.services
                 var exitCode = _commandExecutor.execute(
                     _shimGenExePath, argsForPackage, configuration.CommandExecutionTimeoutSeconds,
                     (s, e) =>
-                    {
-                        if (string.IsNullOrWhiteSpace(e.Data)) return;
-                        this.Log().Debug(() => " [ShimGen] {0}".format_with(e.Data));
-                    },
+                        {
+                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            this.Log().Debug(() => " [ShimGen] {0}".format_with(e.Data));
+                        },
                     (s, e) =>
-                    {
-                        if (string.IsNullOrWhiteSpace(e.Data)) return;
-                        this.Log().Error(() => " [ShimGen] {0}".format_with(e.Data));
-                    }
+                        {
+                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            this.Log().Error(() => " [ShimGen] {0}".format_with(e.Data));
+                        }
                     );
 
                 if (exitCode != 0)
