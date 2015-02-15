@@ -32,7 +32,6 @@ namespace chocolatey.console
     using infrastructure.registration;
     using infrastructure.services;
     using resources;
-    using Console = System.Console;
     using Environment = System.Environment;
 
     public sealed class Program
@@ -156,7 +155,7 @@ namespace chocolatey.console
         private static void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
         {
             // NOTE: blended options may not have been fully initialized yet
-            if (!config.PromptForConfirmation) return; 
+            if (!config.PromptForConfirmation) return;
 
             if (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator)
             {
@@ -167,7 +166,7 @@ Chocolatey detected you are not running from an elevated command shell
  elevated shell. When you open the command shell, you should ensure 
  that you do so with ""Run as Administrator"" selected.
 
- Do you want to continue?", new[] { "yes", "no" }, "no", requireAnswer: true);
+ Do you want to continue?", new[] {"yes", "no"}, "no", requireAnswer: true);
 
                 if (selection.is_equal_to("no"))
                 {
@@ -186,7 +185,7 @@ Chocolatey detected you are not running from an elevated command shell
             }
             catch (Exception ex)
             {
-                "chocolatey".Log().Warn("Attempting to delete choco.exe.old ran into an issue:{0} {1}".format_with(Environment.NewLine,ex.Message));                
+                "chocolatey".Log().Warn("Attempting to delete choco.exe.old ran into an issue:{0} {1}".format_with(Environment.NewLine, ex.Message));
             }
         }
 
