@@ -367,8 +367,6 @@ spam/junk folder.");
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                //todo: get smarter about realizing multiple versions have been installed before and allowing that
-
                 remove_existing_rollback_directory(packageName);
 
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
@@ -412,6 +410,14 @@ packages as of version 1.0.0. That is what the install command is for.
                     pinnedResults.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                     if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                     continue;
+                }
+                if (pkgInfo != null && pkgInfo.IsSideBySide)
+                {
+                    //todo: get smarter about realizing multiple versions have been installed before and allowing that
+                }
+                else
+                {
+                    //TODO if the folder has a version on it, we need to rename the folder first.
                 }
 
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
