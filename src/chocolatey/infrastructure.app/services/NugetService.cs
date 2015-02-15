@@ -405,9 +405,9 @@ packages as of version 1.0.0. That is what the install command is for.
                 if (pkgInfo != null && pkgInfo.IsPinned)
                 {
                     string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
-                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                    results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                    results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                    var pinnedResults = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                    pinnedResults.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                    pinnedResults.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                     if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
@@ -416,17 +416,17 @@ packages as of version 1.0.0. That is what the install command is for.
                 if (availablePackage == null)
                 {
                     string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
-                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
+                    var unfoundResults = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
 
                     if (config.UpgradeCommand.FailOnUnfound)
                     {
-                        results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                        unfoundResults.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     }
                     else
                     {
-                        results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                        results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        unfoundResults.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                        unfoundResults.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                     }
 
@@ -435,10 +435,11 @@ packages as of version 1.0.0. That is what the install command is for.
 
                 //todo enhance FindPackage to return location
 
+                var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation,availablePackage.Id)));
+
                 if ((installedPackage.Version > availablePackage.Version))
                 {
                     string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
-                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
                     results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
 
                     if (config.RegularOuptut) this.Log().Info(ChocolateyLoggers.Important, logMessage);
@@ -448,14 +449,20 @@ packages as of version 1.0.0. That is what the install command is for.
                 if (installedPackage.Version == availablePackage.Version)
                 {
                     string logMessage = "{0} v{1} is the latest version available based on your source(s).".format_with(installedPackage.Id, installedPackage.Version);
-                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
-                    if (results.Messages.Count((p) => p.Message == ApplicationParameters.Messages.ContinueChocolateyAction) == 0)
+
+                    if (!config.Force)
                     {
-                        results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        if (results.Messages.Count((p) => p.Message == ApplicationParameters.Messages.ContinueChocolateyAction) == 0)
+                        {
+                            results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        }
+
+                        if (config.RegularOuptut) this.Log().Info(logMessage);
+                        continue;
                     }
 
+                    results.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
                     if (config.RegularOuptut) this.Log().Info(logMessage);
-                    if (!config.Force) continue;
                 }
 
                 if ((availablePackage.Version > installedPackage.Version) || config.Force)
@@ -463,7 +470,6 @@ packages as of version 1.0.0. That is what the install command is for.
                     if (availablePackage.Version > installedPackage.Version)
                     {
                         string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s)".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version);
-                        var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
                         results.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
                         if (config.RegularOuptut) 

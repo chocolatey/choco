@@ -482,13 +482,32 @@ namespace chocolatey.infrastructure.app.services
 
         private void handle_unsuccessful_install(ChocolateyConfiguration config, PackageResult packageResult)
         {
+            Environment.ExitCode = 1;
+
             foreach (var message in packageResult.Messages.Where(m => m.MessageType == ResultType.Error))
             {
                 this.Log().Error(message.Message);
             }
 
-            move_bad_package_to_failure_location(packageResult);
-            rollback_previous_version(config, packageResult);
+            var packageDirectory = packageResult.InstallLocation;
+            if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
+            {
+                this.Log().Error(ChocolateyLoggers.Important, @"
+Install location is not specific enough, cannot move bad package or
+ rollback previous version. 
+ Erroneous install location captured as '{0}'
+
+ATTENTION: You must take manual action to remove {1} from 
+ {2}. It will show incorrectly as installed 
+ until you do. To remove you can simply delete the folder in question.
+ Chocolatey cannot continue.
+".format_with(packageResult.InstallLocation, packageResult.Name, ApplicationParameters.PackagesLocation));
+            }
+            else
+            {
+                move_bad_package_to_failure_location(packageResult);
+                rollback_previous_version(config, packageResult);
+            }
         }
 
         private void move_bad_package_to_failure_location(PackageResult packageResult)

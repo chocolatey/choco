@@ -100,6 +100,17 @@ namespace chocolatey.infrastructure.app.services
             }
 
             var packageDirectory = packageResult.InstallLocation;
+            if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
+            {
+                packageResult.Messages.Add(
+                    new ResultMessage(
+                        ResultType.Error,
+                        "Install location is not specific enough, cannot run PowerShell script:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, packageResult.InstallLocation)
+                        )
+                    );
+
+                return false;
+            }
 
             if (!_fileSystem.directory_exists(packageDirectory))
             {

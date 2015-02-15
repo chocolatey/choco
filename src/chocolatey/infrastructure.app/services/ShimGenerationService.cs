@@ -78,6 +78,14 @@ namespace chocolatey.infrastructure.app.services
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.ShimsLocation);
 
+            if (packageResult.InstallLocation.is_equal_to(ApplicationParameters.InstallLocation) || packageResult.InstallLocation.is_equal_to(ApplicationParameters.PackagesLocation))
+            {
+                var logMessage = "Install location is not specific enough, cannot run shimgen:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, packageResult.InstallLocation);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                this.Log().Error(logMessage);
+                return;
+            }
+
             //gather all .exes in the folder 
             var exeFiles = _fileSystem.get_files(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
             foreach (string file in exeFiles)
