@@ -520,7 +520,17 @@ ATTENTION: You must take manual action to remove {1} from
         private void rollback_previous_version(ChocolateyConfiguration config, PackageResult packageResult)
         {
             var rollbackDirectory = packageResult.InstallLocation + ApplicationParameters.RollbackPackageSuffix;
-            if (!_fileSystem.directory_exists(rollbackDirectory)) return;
+            if (!_fileSystem.directory_exists(rollbackDirectory))
+            {
+                //search for folder
+                var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackagesLocation, packageResult.Name + "*" + ApplicationParameters.RollbackPackageSuffix);
+                if (possibleRollbacks != null && possibleRollbacks.Count != 0)
+                {
+                    rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
 
             var rollback = true;
             if (config.PromptForConfirmation)
@@ -531,7 +541,7 @@ ATTENTION: You must take manual action to remove {1} from
 
             if (rollback)
             {
-                _fileSystem.move_directory(rollbackDirectory, packageResult.InstallLocation);
+                _fileSystem.move_directory(rollbackDirectory, rollbackDirectory.Replace(ApplicationParameters.RollbackPackageSuffix, string.Empty));
             }
 
             remove_rollback_if_exists(packageResult);
