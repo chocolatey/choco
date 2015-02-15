@@ -254,6 +254,11 @@ namespace chocolatey.infrastructure.filesystem
             return Directory.GetDirectories(directoryPath);
         }
 
+        public IList<string> get_directories(string directoryPath, string pattern, SearchOption option = SearchOption.TopDirectoryOnly)
+        {
+            return Directory.GetDirectories(directoryPath, pattern, option);
+        }
+
         public bool directory_exists(string directoryPath)
         {
             return Directory.Exists(directoryPath);
