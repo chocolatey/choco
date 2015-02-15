@@ -87,7 +87,9 @@ namespace chocolatey.infrastructure.app.services
                     {
                         this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0}|{1}".format_with(package.Id, package.Version.to_string()));
                     }
-                } else {
+                }
+                else
+                {
                     this.Log().Debug(() => "{0} {1}".format_with(package.Id, package.Version.to_string()));
                 }
 
@@ -222,7 +224,7 @@ spam/junk folder.");
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
 
-            IList<string> packageNames = config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
+            IList<string> packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
             if (packageNames.Count == 1)
             {
                 var packageName = packageNames.DefaultIfEmpty(string.Empty).FirstOrDefault();
@@ -360,7 +362,7 @@ spam/junk folder.");
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 //todo: get smarter about realizing multiple versions have been installed before and allowing that
 
@@ -426,7 +428,7 @@ packages as of version 1.0.0. That is what the install command is for.
                         results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                     }
-                
+
                     continue;
                 }
 
@@ -440,7 +442,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     continue;
                 }
 
-                if ((installedPackage.Version == availablePackage.Version))
+                if (installedPackage.Version == availablePackage.Version)
                 {
                     string logMessage = "{0} v{1} is the latest version available based on your source(s).".format_with(installedPackage.Id, installedPackage.Version);
                     var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
@@ -453,7 +455,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     if (!config.Force) continue;
                 }
 
-                if (availablePackage.Version > installedPackage.Version || config.Force)
+                if ((availablePackage.Version > installedPackage.Version) || config.Force)
                 {
                     if (availablePackage.Version > installedPackage.Version)
                     {
@@ -461,9 +463,8 @@ packages as of version 1.0.0. That is what the install command is for.
                         var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
                         results.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                        if (config.RegularOuptut)
+                        if (config.RegularOuptut) 
                         {
-                           
                             this.Log().Warn(logMessage);
                         }
                         else
@@ -526,7 +527,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     }
                     catch (Exception ex)
                     {
-                        this.Log().Error("Error during backup (reset phase):{0} {1}".format_with(Environment.NewLine, ex.Message));    
+                        this.Log().Error("Error during backup (reset phase):{0} {1}".format_with(Environment.NewLine, ex.Message));
                     }
                 }
             }
@@ -607,7 +608,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     config.ForceDependencies = false;
                 });
 
-            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 remove_existing_rollback_directory(packageName);
 
