@@ -15,7 +15,6 @@
 
   <target name="start_recorder">
     <record name="${log.build}" autoflush="true" level="Info" action="Start" failonerror="false" />
-
   </target>
 
   <target name="report_start_time">

@@ -78,6 +78,7 @@
       <in>
         <items>
           <exclude name="${dirs.build.code}/lib/**" />
+          <exclude name="${dirs.build.code}/_PublishedApplications/**" />
           <exclude name="${dirs.build.code}/**/TestFu.dll" />
           <include name="${dirs.build.code}/**/*Test*dll" />
           <include name="${dirs.build.code}/**/*test*dll" />
