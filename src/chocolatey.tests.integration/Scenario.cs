@@ -33,6 +33,30 @@ namespace chocolatey.tests.integration
             return _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
         }
 
+        public static void reset(ChocolateyConfiguration config)
+        {
+            string packagesInstallPath = _fileSystem.combine_paths(get_top_level(), "lib");
+
+            _fileSystem.delete_directory_if_exists(config.CacheLocation, recursive: true);
+            _fileSystem.delete_directory_if_exists(config.Sources, recursive: true);
+            _fileSystem.delete_directory_if_exists(packagesInstallPath, recursive: true);
+
+            _fileSystem.create_directory(config.CacheLocation);
+            _fileSystem.create_directory(config.Sources);
+            _fileSystem.create_directory(packagesInstallPath);
+        }
+
+        public static void set_files_in_source(ChocolateyConfiguration config, string pattern)
+        {
+            var contextDir = _fileSystem.combine_paths(get_top_level(), "context");
+            var files = _fileSystem.get_files(contextDir, pattern, SearchOption.AllDirectories);
+
+            foreach (var file in files.or_empty_list_if_null())
+            {
+                _fileSystem.copy_file(_fileSystem.get_full_path(file), _fileSystem.combine_paths(config.Sources, _fileSystem.get_file_name(file)), overwriteExisting: true);
+            }
+        }
+
         private static ChocolateyConfiguration baseline_configuration()
         {
             var config = NUnitSetup.Container.GetInstance<ChocolateyConfiguration>();
@@ -61,56 +85,18 @@ namespace chocolatey.tests.integration
             return config;
         }
 
-       
-        
-        private static ChocolateyConfiguration set_baseline()
-        {
-            var config = baseline_configuration();
-
-            string packagesInstallPath = _fileSystem.combine_paths(get_top_level(), "lib");
-
-            _fileSystem.delete_directory_if_exists(config.CacheLocation, recursive: true);
-            _fileSystem.delete_directory_if_exists(config.Sources, recursive: true);
-            _fileSystem.delete_directory_if_exists(packagesInstallPath, recursive: true);
-
-            _fileSystem.create_directory(config.CacheLocation);
-            _fileSystem.create_directory(config.Sources);
-            _fileSystem.create_directory(packagesInstallPath);
-
-            return config;
-        }
-
-        private static void set_files_in_source(ChocolateyConfiguration config, string pattern)
-        {
-            var contextDir = _fileSystem.combine_paths(get_top_level(), "context");
-            var files = _fileSystem.get_files(contextDir, pattern, SearchOption.AllDirectories);
-
-            foreach (var file in files.or_empty_list_if_null())
-            {
-                _fileSystem.copy_file(_fileSystem.get_full_path(file), _fileSystem.combine_paths(config.Sources, _fileSystem.get_file_name(file)), overwriteExisting: true);
-            }
-        }
-
         public static ChocolateyConfiguration install()
         {
-            var config = set_baseline();
+            var config = baseline_configuration();
             config.CommandName = CommandNameType.install.to_string();
-            config.PackageNames = config.Input = "installpackage";
-
-            set_files_in_source(config, config.Input + "*" + Constants.PackageExtension);
-            set_files_in_source(config, "badpackage*" + Constants.PackageExtension);
 
             return config;
         }
 
         public static ChocolateyConfiguration upgrade()
         {
-            var config = set_baseline();
-            config.CommandName = CommandNameType.install.to_string();
-            config.PackageNames = config.Input = "upgradepackage";
-
-            //arrange for upgrade
-
+            var config = baseline_configuration();
+            config.CommandName = CommandNameType.upgrade.to_string();
 
             return config;
         }

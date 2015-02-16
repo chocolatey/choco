@@ -18,6 +18,7 @@ namespace chocolatey.tests.integration.scenarios
     using System.Collections.Concurrent;
     using System.IO;
     using System.Linq;
+    using NuGet;
     using Should;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
@@ -35,6 +36,11 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 Configuration = Scenario.install();
+                Scenario.reset(Configuration);
+                Configuration.PackageNames = Configuration.Input = "installpackage";
+                Scenario.set_files_in_source(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
+                Scenario.set_files_in_source(Configuration, "badpackage*" + Constants.PackageExtension);
+
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
             }
         }
