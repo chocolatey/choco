@@ -23,6 +23,7 @@
       </fileset>
     </delete>
     <delete dir="${dirs.drop}${path.separator}${folder.app.drop}${path.separator}infrastructure" />
+    <delete dir="${dirs.drop}${path.separator}${folder.app.drop}${path.separator}context" />
 
     <property name="dirs.drop.console" value="${dirs.drop}${path.separator}${folder.app.drop}${path.separator}console" />
     <echo level="Warning" message="Renaming ${dirs.drop}${path.separator}_PublishedApplications${path.separator}chocolatey.console to ${dirs.drop.console}." />

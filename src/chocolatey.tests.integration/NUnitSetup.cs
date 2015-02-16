@@ -16,9 +16,12 @@
 namespace chocolatey.tests.integration
 {
     using System.Collections.Generic;
+    using System.Reflection;
     using NUnit.Framework;
     using SimpleInjector;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.builders;
+    using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.registration;
@@ -29,19 +32,61 @@ namespace chocolatey.tests.integration
     [SetUpFixture]
     public class NUnitSetup : tests.NUnitSetup
     {
+        public static Container Container { get; set; }
+
         public override void BeforeEverything()
         {
-            base.BeforeEverything();
-
             Container = SimpleInjectorContainer.initialize();
+            fix_application_parameter_variables(Container);
             var config = Container.GetInstance<ChocolateyConfiguration>();
+            unpack_self(Container,config);
 
+            base.BeforeEverything();
+            
             ConfigurationBuilder.set_up_configuration(new List<string>(), config, Container.GetInstance<IFileSystem>(), Container.GetInstance<IXmlService>(), null);
         }
 
-        public static Container Container { get; set; }
-    }
+        /// <summary>
+        /// Most of the application parameters are already set by runtime and are readonly values. 
+        ///  They need to be updated, so we can do that with reflection. 
+        /// </summary>
+        private static void fix_application_parameter_variables(Container container)
+        {
+            var fileSystem = container.GetInstance<IFileSystem>();
 
+            var applicationLocation = fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
+            
+            var field = typeof (ApplicationParameters).GetField("InstallLocation");
+            field.SetValue(null, applicationLocation);
+
+            field = typeof (ApplicationParameters).GetField("LicenseFileLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "license", "chocolatey.license.xml"));
+
+            field = typeof (ApplicationParameters).GetField("LoggingLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "logs"));
+
+            field = typeof (ApplicationParameters).GetField("GlobalConfigFileLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "config", "chocolatey.config"));
+
+            field = typeof (ApplicationParameters).GetField("PackagesLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "lib"));
+
+            field = typeof (ApplicationParameters).GetField("PackageFailuresLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "lib-bad"));
+
+            field = typeof (ApplicationParameters).GetField("ShimsLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "bin"));
+
+            field = typeof (ApplicationParameters).GetField("ChocolateyPackageInfoStoreLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, ".chocolatey"));
+        }
+
+        private void unpack_self(Container container, ChocolateyConfiguration config)
+        {
+           var unpackCommand = container.GetInstance<ChocolateyUnpackSelfCommand>();
+            unpackCommand.run(config);
+        }
+    }
 
     // ReSharper restore InconsistentNaming
 }

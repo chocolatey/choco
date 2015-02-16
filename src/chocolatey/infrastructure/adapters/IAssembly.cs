@@ -49,6 +49,18 @@ namespace chocolatey.infrastructure.adapters
         string Location { get; }
 
         /// <summary>
+        /// Gets the location of the assembly as specified originally, for example, in an <see cref="T:System.Reflection.AssemblyName"/> object.
+        /// 
+        /// </summary>
+        /// 
+        /// <returns>
+        /// The location of the assembly as specified originally.
+        /// 
+        /// </returns>
+        /// <PermissionSet><IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/></PermissionSet>
+        string CodeBase { get; }
+
+        /// <summary>
         ///   Returns the underlying Assembly when necessary for libraries outside of the internal.
         /// </summary>
         /// <value>

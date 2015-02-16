@@ -15,16 +15,14 @@
 
 namespace chocolatey.tests.integration
 {
-    using System.Collections.Generic;
+    using System;
     using System.IO;
     using System.Reflection;
     using NuGet;
-    using SimpleInjector;
-    using chocolatey.infrastructure.app.builders;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.services;
 
     public class Scenario
     {
@@ -32,7 +30,7 @@ namespace chocolatey.tests.integration
 
         public static string get_top_level()
         {
-            return _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location);
+            return _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
         }
 
         private static ChocolateyConfiguration baseline_configuration()
@@ -63,6 +61,8 @@ namespace chocolatey.tests.integration
             return config;
         }
 
+       
+        
         private static ChocolateyConfiguration set_baseline()
         {
             var config = baseline_configuration();
@@ -72,11 +72,11 @@ namespace chocolatey.tests.integration
             _fileSystem.delete_directory_if_exists(config.CacheLocation, recursive: true);
             _fileSystem.delete_directory_if_exists(config.Sources, recursive: true);
             _fileSystem.delete_directory_if_exists(packagesInstallPath, recursive: true);
-            
+
             _fileSystem.create_directory(config.CacheLocation);
             _fileSystem.create_directory(config.Sources);
             _fileSystem.create_directory(packagesInstallPath);
-         
+
             return config;
         }
 

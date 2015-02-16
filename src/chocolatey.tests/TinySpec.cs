@@ -35,9 +35,9 @@ namespace chocolatey.tests
         [SetUp]
         public virtual void BeforeEverything()
         {
+            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, string.Empty);
             MockLogger = new MockLogger();
             Log.InitializeWith(MockLogger);
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, string.Empty);
         }
 
         public virtual void before_everything()
@@ -135,8 +135,8 @@ namespace chocolatey.tests
         {
             Reason = reason;
         }
-    }   
-    
+    }
+
     public class PendingAttribute : IgnoreAttribute
     {
         public PendingAttribute(string reason)

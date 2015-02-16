@@ -40,6 +40,11 @@ namespace chocolatey.infrastructure.adapters
         {
             get { return _assembly.Location; }
         }
+        
+        public string CodeBase
+        {
+            get { return _assembly.CodeBase; }
+        }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public System.Reflection.Assembly UnderlyingType

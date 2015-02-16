@@ -19,8 +19,7 @@ SET build.config.settings="%DIR%\.uppercut"
 
 if %ERRORLEVEL% NEQ 0 goto errors
 
-%NANT% /logger:"NAnt.Core.DefaultLogger" /quiet /nologo /f:"%BUILD_DIR%.build\analyzers\test.step" %1 -D:build.config.settings=%build.config.settings%
-%NANT% /logger:"NAnt.Core.DefaultLogger" /quiet /nologo /f:"%BUILD_DIR%.build\analyzers\test.step" open_results -D:build.config.settings=%build.config.settings%
+%NANT% /logger:"NAnt.Core.DefaultLogger" /nologo /f:"%BUILD_DIR%.build\analyzers\test.step" %1 -D:build.config.settings=%build.config.settings%
 
 if %ERRORLEVEL% NEQ 0 goto errors
 

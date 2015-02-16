@@ -30,9 +30,9 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyInstallEnvironmentVariableName = "ChocolateyInstall";
         public static readonly string Name = "Chocolatey";
 #if DEBUG
-        public static readonly string InstallLocation = _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location);
+        public static readonly string InstallLocation = _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
 #else
-        public static readonly string InstallLocation = Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) ?? _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location);
+        public static readonly string InstallLocation = Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) ?? _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
 #endif
 
         public static readonly string CommonAppDataChocolatey = _fileSystem.combine_paths(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), Name);
@@ -48,9 +48,9 @@ namespace chocolatey.infrastructure.app
         public static readonly string OfficialChocolateyPublicKey = "79d02ea9cad655eb";
 
         public static string PackagesLocation = _fileSystem.combine_paths(InstallLocation, "lib");
-        public static string PackageFailuresLocation = _fileSystem.combine_paths(InstallLocation, "lib-bad");
-        public static string ShimsLocation = _fileSystem.combine_paths(InstallLocation, "bin");
-        public static string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
+        public static readonly string PackageFailuresLocation = _fileSystem.combine_paths(InstallLocation, "lib-bad");
+        public static readonly string ShimsLocation = _fileSystem.combine_paths(InstallLocation, "bin");
+        public static readonly string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";

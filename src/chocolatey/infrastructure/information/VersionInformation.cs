@@ -23,7 +23,7 @@ namespace chocolatey.infrastructure.information
         public static string get_current_assembly_version()
         {
             string version = null;
-            var executingAssembly = Assembly.GetCallingAssembly();
+            var executingAssembly = Assembly.GetExecutingAssembly();
             string location = executingAssembly != null ? executingAssembly.Location : string.Empty;
 
             if (!string.IsNullOrEmpty(location))
@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.information
         public static string get_current_informational_version()
         {
             string version = null;
-            var executingAssembly = Assembly.GetCallingAssembly();
+            var executingAssembly = Assembly.GetExecutingAssembly();
             string location = executingAssembly != null ? executingAssembly.Location : string.Empty;
 
             if (!string.IsNullOrEmpty(location))

@@ -181,7 +181,7 @@ Chocolatey detected you are not running from an elevated command shell
         {
             try
             {
-                fileSystem.delete_file(Assembly.GetExecutingAssembly().Location + ".old");
+                fileSystem.delete_file(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty) + ".old");
                 fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
             }
             catch (Exception ex)
