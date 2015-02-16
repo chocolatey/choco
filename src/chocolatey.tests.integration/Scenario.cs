@@ -32,7 +32,7 @@ namespace chocolatey.tests.integration
 
         public static string get_top_level()
         {
-            return _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().Location);
+            return _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
         }
 
         private static ChocolateyConfiguration baseline_configuration()
