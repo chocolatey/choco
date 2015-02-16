@@ -48,9 +48,9 @@ namespace chocolatey.infrastructure.app
         public static readonly string OfficialChocolateyPublicKey = "79d02ea9cad655eb";
 
         public static string PackagesLocation = _fileSystem.combine_paths(InstallLocation, "lib");
-        public static string PackageFailuresLocation = _fileSystem.combine_paths(InstallLocation, "lib-bad");
-        public static string ShimsLocation = _fileSystem.combine_paths(InstallLocation, "bin");
-        public static string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
+        public static readonly string PackageFailuresLocation = _fileSystem.combine_paths(InstallLocation, "lib-bad");
+        public static readonly string ShimsLocation = _fileSystem.combine_paths(InstallLocation, "bin");
+        public static readonly string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
