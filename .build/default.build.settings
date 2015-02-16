@@ -185,13 +185,19 @@
   <property name="app.strongname" value="${dirs.program_files_x86}${path.separator}Microsoft SDKs${path.separator}Windows${path.separator}v6.0A${path.separator}Bin${path.separator}sn.exe" if="${not file::exists(app.strongname)}" />
 
   <property name="app.metrics" value="${dirs.program_files}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" overwrite="false" />
-  <property name="app.metrics" value="${dirs.program_files_x86}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" if="${not file::exists(app.metrics)}" />
+  <property name="app.metrics" value="${dirs.program_files}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" overwrite="false" />
+  <property name="app.metrics" value="${dirs.program_files_x86}${path.separator}Microsoft Visual Studio 11.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" if="${not file::exists(app.metrics)}" />
+  <property name="app.metrics" value="${dirs.program_files_x86}${path.separator}Microsoft Visual Studio 11.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" if="${not file::exists(app.metrics)}" />
   <property name="run.metrics" value="${file::exists(app.metrics)}" overwrite="false" />
 
   <property name="app.fxcop" value="${path::get-full-path(dirs.program_files)}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}FxCopCmd.exe" overwrite="false" />
   <property name="app.fxcop" value="${path::get-full-path(dirs.program_files_x86)}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
   <property name="app.fxcop" value="${path::get-full-path(dirs.program_files)}${path.separator}Microsoft Fxcop 10.0${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
   <property name="app.fxcop" value="${path::get-full-path(dirs.program_files_x86)}${path.separator}Microsoft Fxcop 10.0${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
+  <property name="app.fxcop" value="${path::get-full-path(dirs.program_files)}${path.separator}Microsoft Visual Studio 11.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}FxCopCmd.exe" overwrite="false" />
+  <property name="app.fxcop" value="${path::get-full-path(dirs.program_files_x86)}${path.separator}Microsoft Visual Studio 11.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
+  <property name="app.fxcop" value="${path::get-full-path(dirs.program_files)}${path.separator}Microsoft Fxcop 11.0${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
+  <property name="app.fxcop" value="${path::get-full-path(dirs.program_files_x86)}${path.separator}Microsoft Fxcop 11.0${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
   <property name="app.fxcop_project" value="${project.name}.fxcop" overwrite="false" />
   <!--<property name="file.fxcop_project" value="${path::combine(dirs.solution, app.fxcop_project)}" overwrite="false" /-->
   <property name="file.fxcop_project" value="${dirs.current}${path.separator}${path_to_solution}${path.separator}${app.fxcop_project}" overwrite="false" />
