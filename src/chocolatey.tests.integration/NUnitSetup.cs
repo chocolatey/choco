@@ -74,6 +74,9 @@ namespace chocolatey.tests.integration
             field = typeof (ApplicationParameters).GetField("PackageFailuresLocation");
             field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "lib-bad"));
 
+            field = typeof(ApplicationParameters).GetField("PackageBackupLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "lib-bkp"));
+
             field = typeof (ApplicationParameters).GetField("ShimsLocation");
             field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "bin"));
 

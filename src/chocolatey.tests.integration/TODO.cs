@@ -23,8 +23,6 @@ namespace chocolatey.tests.integration
          *  - value overridden
          *  
          * Install/Upgrade/Uninstall scenarios:
-         *  - happy path
-         *  - install, then upgrade happy path
          *  - sxs to normal
          *  - normal to sxs
          *  - installed, force install
@@ -38,9 +36,6 @@ namespace chocolatey.tests.integration
          * List scenarios:
          *  - list local
          *  - list lp
-         *  
-         * New scenarios:
-         *  - run happy path
          * 
          */
     }

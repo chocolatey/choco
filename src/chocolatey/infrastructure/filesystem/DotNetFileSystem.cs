@@ -251,11 +251,16 @@ namespace chocolatey.infrastructure.filesystem
 
         public IList<string> get_directories(string directoryPath)
         {
+            if (!directory_exists(directoryPath)) return new List<string>();
+                
             return Directory.GetDirectories(directoryPath);
+
         }
 
         public IList<string> get_directories(string directoryPath, string pattern, SearchOption option = SearchOption.TopDirectoryOnly)
         {
+            if (!directory_exists(directoryPath)) return new List<string>();
+            
             return Directory.GetDirectories(directoryPath, pattern, option);
         }
 
