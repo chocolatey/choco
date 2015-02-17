@@ -263,7 +263,7 @@ spam/junk folder.");
 
                                                                        if (continueAction != null) continueAction.Invoke(results);
                                                                    },
-                                                               uninstallSuccessAction: null, 
+                                                               uninstallSuccessAction: null,
                                                                addUninstallHandler: true);
 
 
@@ -310,16 +310,16 @@ spam/junk folder.");
                     }
                     catch (Exception ex)
                     {
-                        this.Log().Warn("Unable to remove existing package prior to forced reinstall.{0} {1}".format_with(Environment.NewLine,ex.Message));
+                        this.Log().Warn("Unable to remove existing package prior to forced reinstall.{0} {1}".format_with(Environment.NewLine, ex.Message));
                     }
                 }
 
                 try
                 {
                     using (packageManager.SourceRepository.StartOperation(
-                    RepositoryOperationNames.Install,
-                    packageName,
-                    version == null ? null : version.ToString()))
+                        RepositoryOperationNames.Install,
+                        packageName,
+                        version == null ? null : version.ToString()))
                     {
                         packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
                         //packageManager.InstallPackage(packageName, version, configuration.IgnoreDependencies, configuration.Prerelease);
@@ -627,7 +627,7 @@ packages as of version 1.0.0. That is what the install command is for.
                                                                        var pkg = e.Package;
                                                                        "chocolatey".Log().Info(ChocolateyLoggers.Important, " {0} has been successfully uninstalled.".format_with(pkg.Id));
                                                                    },
-                                                                   addUninstallHandler: true);
+                                                               addUninstallHandler: true);
 
             var loopCount = 0;
             packageManager.PackageUninstalling += (s, e) =>
