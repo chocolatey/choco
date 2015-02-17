@@ -339,7 +339,16 @@ spam/junk folder.");
 
         private void remove_existing_rollback_directory(string packageName)
         {
-            var rollbackDirectory = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, packageName) + ApplicationParameters.RollbackPackageSuffix;
+            var rollbackDirectory = _fileSystem.combine_paths(ApplicationParameters.PackageBackupLocation, packageName);
+            if (!_fileSystem.directory_exists(rollbackDirectory))
+            {
+                //search for folder
+                var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackageBackupLocation, packageName + "*");
+                if (possibleRollbacks != null && possibleRollbacks.Count != 0)
+                {
+                    rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
+                }
+            }
             try
             {
                 _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true);
@@ -460,7 +469,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     //todo: get smarter about realizing multiple versions have been installed before and allowing that
                 }
 
-                var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
+                var results = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
 
                 if ((installedPackage.Version > availablePackage.Version))
                 {
@@ -560,6 +569,8 @@ packages as of version 1.0.0. That is what the install command is for.
 
         public void backup_existing_version(ChocolateyConfiguration config, IPackage installedPackage)
         {
+            _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageBackupLocation);
+
             var pathResolver = NugetCommon.GetPathResolver(config, NugetCommon.GetNuGetFileSystem(config, _nugetLogger));
             var pkgInstallPath = pathResolver.GetInstallPath(installedPackage);
             if (!_fileSystem.directory_exists(pkgInstallPath))
@@ -576,7 +587,7 @@ packages as of version 1.0.0. That is what the install command is for.
             {
                 this.Log().Debug("Backing up existing {0} prior to upgrade.".format_with(installedPackage.Id));
 
-                var backupLocation = pkgInstallPath + ApplicationParameters.RollbackPackageSuffix;
+                var backupLocation = pkgInstallPath.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
 
                 try
                 {

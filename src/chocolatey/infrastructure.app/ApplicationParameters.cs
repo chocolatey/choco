@@ -49,12 +49,12 @@ namespace chocolatey.infrastructure.app
 
         public static string PackagesLocation = _fileSystem.combine_paths(InstallLocation, "lib");
         public static readonly string PackageFailuresLocation = _fileSystem.combine_paths(InstallLocation, "lib-bad");
+        public static readonly string PackageBackupLocation = _fileSystem.combine_paths(InstallLocation, "lib-bkp");
         public static readonly string ShimsLocation = _fileSystem.combine_paths(InstallLocation, "bin");
         public static readonly string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
-        public static readonly string RollbackPackageSuffix = "._.old";
 
         /// <summary>
         ///   Default is 45 minutes

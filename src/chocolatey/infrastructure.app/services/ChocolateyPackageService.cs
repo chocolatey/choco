@@ -519,11 +519,11 @@ ATTENTION: You must take manual action to remove {1} from
 
         private void rollback_previous_version(ChocolateyConfiguration config, PackageResult packageResult)
         {
-            var rollbackDirectory = packageResult.InstallLocation + ApplicationParameters.RollbackPackageSuffix;
+            var rollbackDirectory = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
             if (!_fileSystem.directory_exists(rollbackDirectory))
             {
                 //search for folder
-                var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackagesLocation, packageResult.Name + "*" + ApplicationParameters.RollbackPackageSuffix);
+                var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackageBackupLocation, packageResult.Name + "*");
                 if (possibleRollbacks != null && possibleRollbacks.Count != 0)
                 {
                     rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
@@ -541,7 +541,7 @@ ATTENTION: You must take manual action to remove {1} from
 
             if (rollback)
             {
-                _fileSystem.move_directory(rollbackDirectory, rollbackDirectory.Replace(ApplicationParameters.RollbackPackageSuffix, string.Empty));
+                _fileSystem.move_directory(rollbackDirectory, rollbackDirectory.Replace(ApplicationParameters.PackageBackupLocation, ApplicationParameters.PackagesLocation));
             }
 
             remove_rollback_if_exists(packageResult);
@@ -549,9 +549,19 @@ ATTENTION: You must take manual action to remove {1} from
 
         private void remove_rollback_if_exists(PackageResult packageResult)
         {
-            var rollbackDirectory = packageResult.InstallLocation + ApplicationParameters.RollbackPackageSuffix;
-            if (!_fileSystem.directory_exists(rollbackDirectory)) return;
+            var rollbackDirectory = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
+            if (!_fileSystem.directory_exists(rollbackDirectory))
+            {
+                //search for folder
+                var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackageBackupLocation, packageResult.Name + "*");
+                if (possibleRollbacks != null && possibleRollbacks.Count != 0)
+                {
+                    rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
+                }
+            }
 
+            if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
+          
             try
             {
                 _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true);
