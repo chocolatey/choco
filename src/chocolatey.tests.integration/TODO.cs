@@ -23,7 +23,6 @@ namespace chocolatey.tests.integration
          *  - value overridden
          *  
          * Install/Upgrade/Uninstall scenarios:
-         *  - install, then upgrade happy path
          *  - sxs to normal
          *  - normal to sxs
          *  - installed, force install
