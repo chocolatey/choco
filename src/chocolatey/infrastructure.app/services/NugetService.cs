@@ -314,13 +314,23 @@ spam/junk folder.");
                     }
                 }
 
-                using (packageManager.SourceRepository.StartOperation(
+                try
+                {
+                    using (packageManager.SourceRepository.StartOperation(
                     RepositoryOperationNames.Install,
                     packageName,
                     version == null ? null : version.ToString()))
+                    {
+                        packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
+                        //packageManager.InstallPackage(packageName, version, configuration.IgnoreDependencies, configuration.Prerelease);
+                    }
+                }
+                catch (Exception ex)
                 {
-                    packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
-                    //packageManager.InstallPackage(packageName, version, configuration.IgnoreDependencies, configuration.Prerelease);
+                    var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
+                    this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
+                    results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                 }
             }
 
