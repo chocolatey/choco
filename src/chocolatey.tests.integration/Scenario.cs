@@ -15,13 +15,13 @@
 
 namespace chocolatey.tests.integration
 {
-    using System;
     using System.IO;
     using System.Reflection;
+    using System.Threading;
     using NuGet;
-    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
+    using chocolatey.infrastructure.app.nuget;
     using chocolatey.infrastructure.filesystem;
 
     public class Scenario
@@ -33,27 +33,56 @@ namespace chocolatey.tests.integration
             return _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
         }
 
+        public static string get_package_install_path()
+        {
+            return _fileSystem.combine_paths(get_top_level(), "lib");
+        }
+
         public static void reset(ChocolateyConfiguration config)
         {
-            string packagesInstallPath = _fileSystem.combine_paths(get_top_level(), "lib");
+            Thread.Sleep(200);
+            string packagesInstallPath = get_package_install_path();
+            string badPackagesPath = get_package_install_path() + "-bad";
+            string backupPackagesPath = get_package_install_path() + "-bkp";
 
             _fileSystem.delete_directory_if_exists(config.CacheLocation, recursive: true);
             _fileSystem.delete_directory_if_exists(config.Sources, recursive: true);
             _fileSystem.delete_directory_if_exists(packagesInstallPath, recursive: true);
+            _fileSystem.delete_directory_if_exists(badPackagesPath, recursive: true);
+            _fileSystem.delete_directory_if_exists(backupPackagesPath, recursive: true);
 
             _fileSystem.create_directory(config.CacheLocation);
             _fileSystem.create_directory(config.Sources);
             _fileSystem.create_directory(packagesInstallPath);
+            _fileSystem.create_directory(badPackagesPath);
+            _fileSystem.create_directory(backupPackagesPath);
         }
 
-        public static void set_files_in_source(ChocolateyConfiguration config, string pattern)
+        public static void add_packages_to_source_location(ChocolateyConfiguration config, string pattern)
         {
+            _fileSystem.create_directory_if_not_exists(config.Sources);
             var contextDir = _fileSystem.combine_paths(get_top_level(), "context");
             var files = _fileSystem.get_files(contextDir, pattern, SearchOption.AllDirectories);
 
             foreach (var file in files.or_empty_list_if_null())
             {
                 _fileSystem.copy_file(_fileSystem.get_full_path(file), _fileSystem.combine_paths(config.Sources, _fileSystem.get_file_name(file)), overwriteExisting: true);
+            }
+        }
+
+        public static void install_package(ChocolateyConfiguration config, string packageId, string version)
+        {
+            var packageInstallPath = get_package_install_path();
+            var pattern = "{0}.{1}{2}".format_with(packageId, string.IsNullOrWhiteSpace(version) ? "*" : version, Constants.PackageExtension);
+            var files = _fileSystem.get_files(config.Sources, pattern);
+            foreach (var file in files)
+            {
+                //var pkgPath = _fileSystem.combine_paths(packageInstallPath, packageId);
+                var packageManager = NugetCommon.GetPackageManager(config,new ChocolateyNugetLogger(), null, null, false);
+                packageManager.InstallPackage(new OptimizedZipPackage(file), false,false);
+                      
+               // _fileSystem.create_directory_if_not_exists(pkgPath);
+               // _fileSystem.copy_file(file, _fileSystem.combine_paths(pkgPath, _fileSystem.get_file_name(file)), overwriteExisting: true);
             }
         }
 
@@ -81,6 +110,7 @@ namespace chocolatey.tests.integration
             config.SkipPackageInstallProvider = false;
             config.Sources = _fileSystem.get_full_path(_fileSystem.combine_paths(get_top_level(), "packages"));
             config.Version = null;
+            config.Debug = true;
 
             return config;
         }

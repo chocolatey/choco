@@ -38,8 +38,8 @@ namespace chocolatey.tests.integration.scenarios
                 Configuration = Scenario.install();
                 Scenario.reset(Configuration);
                 Configuration.PackageNames = Configuration.Input = "installpackage";
-                Scenario.set_files_in_source(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
-                Scenario.set_files_in_source(Configuration, "badpackage*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "badpackage*" + Constants.PackageExtension);
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
             }
