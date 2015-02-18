@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,20 +42,20 @@ namespace chocolatey.tests.integration
             unpack_self(Container,config);
 
             base.BeforeEverything();
-            
+
             ConfigurationBuilder.set_up_configuration(new List<string>(), config, Container.GetInstance<IFileSystem>(), Container.GetInstance<IXmlService>(), null);
         }
 
         /// <summary>
-        /// Most of the application parameters are already set by runtime and are readonly values. 
-        ///  They need to be updated, so we can do that with reflection. 
+        /// Most of the application parameters are already set by runtime and are readonly values.
+        ///  They need to be updated, so we can do that with reflection.
         /// </summary>
         private static void fix_application_parameter_variables(Container container)
         {
             var fileSystem = container.GetInstance<IFileSystem>();
 
             var applicationLocation = fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
-            
+
             var field = typeof (ApplicationParameters).GetField("InstallLocation");
             field.SetValue(null, applicationLocation);
 
