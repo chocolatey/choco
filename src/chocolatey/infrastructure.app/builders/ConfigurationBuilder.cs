@@ -226,6 +226,9 @@ You can pass options and switches in the following ways:
  * **Option Bundling / Bundled Options**: One character switches can be
    bundled. e.g. `-d` (debug), `-f` (force), `-v` (verbose), and `-y` 
    (confirm yes) can be bundled as `-dfvy`.
+ * ***Note:*** If `debug` or `verbose` are bundled with local options 
+   (not the global ones above), some logging may not show up until after
+   the local options are parsed.
  * **Use Equals**: You can also include or not include an equals sign 
    `=` between options and values.
  * **Quote Values**: When you need to quote things, such as when using 
