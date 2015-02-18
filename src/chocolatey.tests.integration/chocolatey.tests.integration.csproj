@@ -99,8 +99,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="context\installpackage\installpackage.nuspec" />
+    <None Include="context\installpackage\tools\Casemismatch.exe.ignore" />
     <None Include="context\installpackage\tools\chocolateyinstall.ps1" />
     <None Include="context\installpackage\tools\chocolateyuninstall.ps1" />
+    <None Include="context\installpackage\tools\graphical.exe.gui" />
+    <None Include="context\installpackage\tools\not.installed.exe.ignore" />
     <None Include="context\isdependency\isdependency.1.0.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -109,6 +112,7 @@
     <None Include="context\isdependency\tools\chocolateyuninstall.ps1" />
     <None Include="context\upgradepackage\tools\chocolateyinstall.ps1" />
     <None Include="context\upgradepackage\tools\chocolateyuninstall.ps1" />
+    <None Include="context\upgradepackage\tools\graphical.exe.gui" />
     <None Include="context\upgradepackage\upgradepackage.1.0.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -135,6 +139,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="context\installpackage\tools\casemismatch.exe" />
+    <Content Include="context\installpackage\tools\console.exe" />
+    <Content Include="context\installpackage\tools\graphical.exe" />
+    <Content Include="context\installpackage\tools\not.installed.exe" />
+    <Content Include="context\upgradepackage\tools\console.exe" />
+    <Content Include="context\upgradepackage\tools\graphical.exe" />
     <Content Include="infrastructure\filesystem\CopyMe.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
