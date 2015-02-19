@@ -30,6 +30,7 @@ namespace chocolatey.infrastructure.app.services
     using nuget;
     using platforms;
     using results;
+    using tolerance;
     using DateTime = adapters.DateTime;
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
@@ -304,14 +305,11 @@ spam/junk folder.");
                 if (installedPackage != null && (installedPackage.Version == availablePackage.Version))
                 {
                     backup_existing_version(config, installedPackage);
-                    try
-                    {
-                        packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
-                    }
-                    catch (Exception ex)
-                    {
-                        this.Log().Warn("Unable to remove existing package prior to forced reinstall.{0} {1}".format_with(Environment.NewLine, ex.Message));
-                    }
+
+                    FaultTolerance.try_catch_with_logging_exception(
+                        () => packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies),
+                        "Unable to remove existing package prior to forced reinstall",
+                        logWarningInsteadOfError: true);
                 }
 
                 try
@@ -349,14 +347,13 @@ spam/junk folder.");
                     rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
                 }
             }
-            try
-            {
-                _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true);
-            }
-            catch (Exception ex)
-            {
-                this.Log().Warn("Attempted to remove '{0}' but had an error:{1} {2}".format_with(rollbackDirectory, Environment.NewLine, ex.Message));
-            }
+
+            if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
+
+            FaultTolerance.try_catch_with_logging_exception(
+                () => _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true),
+                "Attempted to remove '{0}' but had an error:".format_with(rollbackDirectory),
+                logWarningInsteadOfError: true);
         }
 
         public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
@@ -555,14 +552,9 @@ packages as of version 1.0.0. That is what the install command is for.
                 installDirectory = pathResolver.GetInstallPath(installedPackage);
                 if (_fileSystem.directory_exists(installDirectory))
                 {
-                    try
-                    {
-                        _fileSystem.move_directory(installDirectory, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id));
-                    }
-                    catch (Exception ex)
-                    {
-                        this.Log().Error("Error during old package rename:{0} {1}".format_with(Environment.NewLine, ex.Message));
-                    }
+                    FaultTolerance.try_catch_with_logging_exception(
+                        () =>  _fileSystem.move_directory(installDirectory, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)),
+                        "Error during old package rename");
                 }
             }
         }

@@ -27,6 +27,7 @@ namespace chocolatey.infrastructure.app.services
     using logging;
     using platforms;
     using results;
+    using tolerance;
 
     public class ChocolateyPackageService : IChocolateyPackageService
     {
@@ -459,25 +460,16 @@ namespace chocolatey.infrastructure.app.services
 
         private void ensure_bad_package_path_is_clean(ChocolateyConfiguration config, PackageResult packageResult)
         {
-            try
-            {
-                string badPackageInstallPath = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation);
-                if (_fileSystem.directory_exists(badPackageInstallPath))
-                {
-                    _fileSystem.delete_directory(badPackageInstallPath, recursive: true);
-                }
-            }
-            catch (Exception ex)
-            {
-                if (config.Debug)
-                {
-                    this.Log().Error(() => "Attempted to delete bad package install path if existing. Had an error:{0}{1}".format_with(Environment.NewLine, ex));
-                }
-                else
-                {
-                    this.Log().Error(() => "Attempted to delete bad package install path if existing. Had an error:{0}{1}".format_with(Environment.NewLine, ex.Message));
-                }
-            }
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                    {
+                        string badPackageInstallPath = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation);
+                        if (_fileSystem.directory_exists(badPackageInstallPath))
+                        {
+                            _fileSystem.delete_directory(badPackageInstallPath, recursive: true);
+                        }
+                    },
+                "Attempted to delete bad package install path if existing. Had an error");
         }
 
         private void handle_unsuccessful_install(ChocolateyConfiguration config, PackageResult packageResult)

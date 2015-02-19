@@ -29,6 +29,7 @@ namespace chocolatey.infrastructure.app.builders
     using infrastructure.services;
     using logging;
     using platforms;
+    using tolerance;
     using Environment = adapters.Environment;
 
     /// <summary>
@@ -83,17 +84,14 @@ namespace chocolatey.infrastructure.app.builders
             config.CacheLocation = !string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? configFileSettings.CacheLocation : System.Environment.GetEnvironmentVariable("TEMP");
             if (string.IsNullOrWhiteSpace(config.CacheLocation))
             {
-              config.CacheLocation =  fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
+                config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
             }
-            try
-            {
-                fileSystem.create_directory_if_not_exists(config.CacheLocation);
-            }
-            catch (Exception ex)
-            {
-                "chocolatey".Log().Warn("Could not create temp directory at '{0}':{1} {2}".format_with(config.CacheLocation,Environment.NewLine,ex.Message));
-            }
-            
+
+            FaultTolerance.try_catch_with_logging_exception(
+              () => fileSystem.create_directory_if_not_exists(config.CacheLocation),
+              "Could not create temp directory at '{0}'".format_with(config.CacheLocation),
+              logWarningInsteadOfError: true);
+
             config.ContainsLegacyPackageInstalls = configFileSettings.ContainsLegacyPackageInstalls;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
             {
@@ -116,15 +114,12 @@ Config has insecure allowGlobalConfirmation set to true.
                 }
             }
 
-            try
-            {
-                // save so all updated configuration items get set to existing config
-                xmlService.serialize(configFileSettings, globalConfigPath);
-            }
-            catch (Exception ex)
-            {
-                "chocolatey".Log().Warn(() => "Error updating '{0}'. Please ensure you have permissions to do so.{1} {2}".format_with(globalConfigPath, Environment.NewLine, ex.Message));
-            }
+
+            // save so all updated configuration items get set to existing config
+            FaultTolerance.try_catch_with_logging_exception(
+                () => xmlService.serialize(configFileSettings, globalConfigPath),
+                "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
+                logWarningInsteadOfError: true);
         }
 
         private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
