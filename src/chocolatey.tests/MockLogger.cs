@@ -40,7 +40,10 @@ namespace chocolatey.tests
         {
             Messages.Clear();
             this.ResetCalls();
+            LogMessagesToConsole = false;
         }
+
+        public bool LogMessagesToConsole { get; set; }
 
         private readonly Lazy<ConcurrentDictionary<string, IList<string>>> _messages = new Lazy<ConcurrentDictionary<string, IList<string>>>();
 
@@ -62,6 +65,10 @@ namespace chocolatey.tests
         {
             var list = _messages.Value.GetOrAdd(logLevel.ToString(), new List<string>());
             list.Add(message);
+            if (LogMessagesToConsole)
+            {
+                System.Console.WriteLine("[{0}] {1}".format_with(logLevel.to_string(),message));
+            }
         }
 
         public void Debug(string message, params object[] formatting)

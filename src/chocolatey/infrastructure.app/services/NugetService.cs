@@ -30,6 +30,7 @@ namespace chocolatey.infrastructure.app.services
     using nuget;
     using platforms;
     using results;
+    using tolerance;
     using DateTime = adapters.DateTime;
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
@@ -209,11 +210,14 @@ spam/junk folder.");
 
             var tempInstallsLocation = _fileSystem.combine_paths(_fileSystem.get_temp_path(), ApplicationParameters.Name, "TempInstalls_" + DateTime.Now.ToString("yyyyMMdd_HHmmss_ffff"));
             _fileSystem.create_directory_if_not_exists(tempInstallsLocation);
+            
+            var installLocation = ApplicationParameters.PackagesLocation;
             ApplicationParameters.PackagesLocation = tempInstallsLocation;
 
             install_run(config, continueAction);
 
             _fileSystem.delete_directory(tempInstallsLocation, recursive: true);
+            ApplicationParameters.PackagesLocation = installLocation;
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
@@ -271,7 +275,7 @@ spam/junk folder.");
             {
                 //todo: get smarter about realizing multiple versions have been installed before and allowing that
 
-                remove_existing_rollback_directory(packageName);
+                remove_rollback_directory_if_exists(packageName);
 
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
@@ -304,14 +308,11 @@ spam/junk folder.");
                 if (installedPackage != null && (installedPackage.Version == availablePackage.Version))
                 {
                     backup_existing_version(config, installedPackage);
-                    try
-                    {
-                        packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
-                    }
-                    catch (Exception ex)
-                    {
-                        this.Log().Warn("Unable to remove existing package prior to forced reinstall.{0} {1}".format_with(Environment.NewLine, ex.Message));
-                    }
+
+                    FaultTolerance.try_catch_with_logging_exception(
+                        () => packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies),
+                        "Unable to remove existing package prior to forced reinstall",
+                        logWarningInsteadOfError: true);
                 }
 
                 try
@@ -337,7 +338,7 @@ spam/junk folder.");
             return packageInstalls;
         }
 
-        private void remove_existing_rollback_directory(string packageName)
+        public void remove_rollback_directory_if_exists(string packageName)
         {
             var rollbackDirectory = _fileSystem.combine_paths(ApplicationParameters.PackageBackupLocation, packageName);
             if (!_fileSystem.directory_exists(rollbackDirectory))
@@ -349,14 +350,13 @@ spam/junk folder.");
                     rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
                 }
             }
-            try
-            {
-                _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true);
-            }
-            catch (Exception ex)
-            {
-                this.Log().Warn("Attempted to remove '{0}' but had an error:{1} {2}".format_with(rollbackDirectory, Environment.NewLine, ex.Message));
-            }
+
+            if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
+
+            FaultTolerance.try_catch_with_logging_exception(
+                () => _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true),
+                "Attempted to remove '{0}' but had an error:".format_with(rollbackDirectory),
+                logWarningInsteadOfError: true);
         }
 
         public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
@@ -398,7 +398,7 @@ spam/junk folder.");
 
             foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                remove_existing_rollback_directory(packageName);
+                remove_rollback_directory_if_exists(packageName);
 
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
@@ -555,14 +555,9 @@ packages as of version 1.0.0. That is what the install command is for.
                 installDirectory = pathResolver.GetInstallPath(installedPackage);
                 if (_fileSystem.directory_exists(installDirectory))
                 {
-                    try
-                    {
-                        _fileSystem.move_directory(installDirectory, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id));
-                    }
-                    catch (Exception ex)
-                    {
-                        this.Log().Error("Error during old package rename:{0} {1}".format_with(Environment.NewLine, ex.Message));
-                    }
+                    FaultTolerance.try_catch_with_logging_exception(
+                        () =>  _fileSystem.move_directory(installDirectory, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)),
+                        "Error during old package rename");
                 }
             }
         }
@@ -689,7 +684,7 @@ packages as of version 1.0.0. That is what the install command is for.
 
             foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                remove_existing_rollback_directory(packageName);
+                remove_rollback_directory_if_exists(packageName);
 
                 IList<IPackage> installedPackageVersions = new List<IPackage>();
                 if (string.IsNullOrWhiteSpace(config.Version))
@@ -787,7 +782,9 @@ packages as of version 1.0.0. That is what the install command is for.
                 config.PackageNames = string.Empty;
                 var input = config.Input;
                 config.Input = string.Empty;
+                
                 var localPackages = list_run(config, logResults: false);
+
                 config.Input = input;
                 config.Noop = noop;
                 config.Prerelease = pre;

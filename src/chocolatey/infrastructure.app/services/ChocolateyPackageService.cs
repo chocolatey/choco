@@ -27,6 +27,7 @@ namespace chocolatey.infrastructure.app.services
     using logging;
     using platforms;
     using results;
+    using tolerance;
 
     public class ChocolateyPackageService : IChocolateyPackageService
     {
@@ -459,25 +460,16 @@ namespace chocolatey.infrastructure.app.services
 
         private void ensure_bad_package_path_is_clean(ChocolateyConfiguration config, PackageResult packageResult)
         {
-            try
-            {
-                string badPackageInstallPath = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation);
-                if (_fileSystem.directory_exists(badPackageInstallPath))
-                {
-                    _fileSystem.delete_directory(badPackageInstallPath, recursive: true);
-                }
-            }
-            catch (Exception ex)
-            {
-                if (config.Debug)
-                {
-                    this.Log().Error(() => "Attempted to delete bad package install path if existing. Had an error:{0}{1}".format_with(Environment.NewLine, ex));
-                }
-                else
-                {
-                    this.Log().Error(() => "Attempted to delete bad package install path if existing. Had an error:{0}{1}".format_with(Environment.NewLine, ex.Message));
-                }
-            }
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                    {
+                        string badPackageInstallPath = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation);
+                        if (_fileSystem.directory_exists(badPackageInstallPath))
+                        {
+                            _fileSystem.delete_directory(badPackageInstallPath, recursive: true);
+                        }
+                    },
+                "Attempted to delete bad package install path if existing. Had an error");
         }
 
         private void handle_unsuccessful_install(ChocolateyConfiguration config, PackageResult packageResult)
@@ -549,27 +541,7 @@ ATTENTION: You must take manual action to remove {1} from
 
         private void remove_rollback_if_exists(PackageResult packageResult)
         {
-            var rollbackDirectory = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
-            if (!_fileSystem.directory_exists(rollbackDirectory))
-            {
-                //search for folder
-                var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackageBackupLocation, packageResult.Name + "*");
-                if (possibleRollbacks != null && possibleRollbacks.Count != 0)
-                {
-                    rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
-          
-            try
-            {
-                _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true);
-            }
-            catch (Exception ex)
-            {
-                this.Log().Warn("Attempted to remove '{0}' but had an error:{1} {2}".format_with(rollbackDirectory, Environment.NewLine, ex.Message));
-            }
+            _nugetService.remove_rollback_directory_if_exists(packageResult.Name);
         }
     }
 }

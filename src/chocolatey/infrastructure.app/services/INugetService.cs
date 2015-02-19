@@ -105,5 +105,11 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
         /// <returns>results of uninstalls</returns>
         ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction);
+
+        /// <summary>
+        /// Remove the rollback directory for a package if it exists
+        /// </summary>
+        /// <param name="packageName">Name of the package.</param>
+        void remove_rollback_directory_if_exists(string packageName);
     }
 }

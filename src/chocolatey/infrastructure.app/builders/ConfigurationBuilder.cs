@@ -29,6 +29,7 @@ namespace chocolatey.infrastructure.app.builders
     using infrastructure.services;
     using logging;
     using platforms;
+    using tolerance;
     using Environment = adapters.Environment;
 
     /// <summary>
@@ -83,17 +84,14 @@ namespace chocolatey.infrastructure.app.builders
             config.CacheLocation = !string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? configFileSettings.CacheLocation : System.Environment.GetEnvironmentVariable("TEMP");
             if (string.IsNullOrWhiteSpace(config.CacheLocation))
             {
-              config.CacheLocation =  fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
+                config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
             }
-            try
-            {
-                fileSystem.create_directory_if_not_exists(config.CacheLocation);
-            }
-            catch (Exception ex)
-            {
-                "chocolatey".Log().Warn("Could not create temp directory at '{0}':{1} {2}".format_with(config.CacheLocation,Environment.NewLine,ex.Message));
-            }
-            
+
+            FaultTolerance.try_catch_with_logging_exception(
+              () => fileSystem.create_directory_if_not_exists(config.CacheLocation),
+              "Could not create temp directory at '{0}'".format_with(config.CacheLocation),
+              logWarningInsteadOfError: true);
+
             config.ContainsLegacyPackageInstalls = configFileSettings.ContainsLegacyPackageInstalls;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
             {
@@ -116,15 +114,12 @@ Config has insecure allowGlobalConfirmation set to true.
                 }
             }
 
-            try
-            {
-                // save so all updated configuration items get set to existing config
-                xmlService.serialize(configFileSettings, globalConfigPath);
-            }
-            catch (Exception ex)
-            {
-                "chocolatey".Log().Warn(() => "Error updating '{0}'. Please ensure you have permissions to do so.{1} {2}".format_with(globalConfigPath, Environment.NewLine, ex.Message));
-            }
+
+            // save so all updated configuration items get set to existing config
+            FaultTolerance.try_catch_with_logging_exception(
+                () => xmlService.serialize(configFileSettings, globalConfigPath),
+                "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
+                logWarningInsteadOfError: true);
         }
 
         private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
@@ -142,9 +137,9 @@ Config has insecure allowGlobalConfirmation set to true.
 
             if (feature == null)
             {
-                configFileSettings.Features.Add(new ConfigFileFeatureSetting() { Name = featureName, Enabled = enabled });
+                configFileSettings.Features.Add(new ConfigFileFeatureSetting {Name = featureName, Enabled = enabled});
             }
-            
+
             return enabled;
         }
 
@@ -189,7 +184,7 @@ Config has insecure allowGlobalConfirmation set to true.
                                  option => config.CacheLocation = option)
                             .Add("allowunofficial|allow-unofficial|allowunofficialbuild|allow-unofficial-build",
                                  "AllowUnofficialBuild - When not using the official build you must set this flag for choco to continue.",
-                                 option => config.AllowUnofficialBuild =  option != null)
+                                 option => config.AllowUnofficialBuild = option != null)
                             ;
                     },
                 (unparsedArgs) =>
@@ -226,6 +221,9 @@ You can pass options and switches in the following ways:
  * **Option Bundling / Bundled Options**: One character switches can be
    bundled. e.g. `-d` (debug), `-f` (force), `-v` (verbose), and `-y` 
    (confirm yes) can be bundled as `-dfvy`.
+ * ***Note:*** If `debug` or `verbose` are bundled with local options 
+   (not the global ones above), some logging may not show up until after
+   the local options are parsed.
  * **Use Equals**: You can also include or not include an equals sign 
    `=` between options and values.
  * **Quote Values**: When you need to quote things, such as when using 

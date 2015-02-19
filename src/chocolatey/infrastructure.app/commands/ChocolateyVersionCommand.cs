@@ -55,8 +55,8 @@ namespace chocolatey.infrastructure.app.commands
         {
             base.handle_additional_argument_parsing(unparsedArguments, configuration);
 
-
             configuration.Noop = true;
+
             if (configuration.ListCommand.LocalOnly)
             {
                 configuration.Noop = false;
