@@ -96,6 +96,41 @@ namespace chocolatey.tests.integration.scenarios
             }
         } 
         
+        public class when_noop_installing_a_package_that_does_not_exist : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "somethingnonexisting";
+                Configuration.Noop = true;
+            }
+
+            public override void Because()
+            {
+                Service.install_noop(Configuration);
+            }
+
+            [Fact]
+            public void should_not_install_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_it_would_have_used_Nuget_to_install_a_package()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
+                {
+                    if (message.Contains("would have used NuGet to install packages")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+        } 
+        
         public class when_installing_a_package_happy_path : ScenariosBase
         {
             private PackageResult packageResult;
