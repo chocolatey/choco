@@ -218,6 +218,7 @@
     <Compile Include="infrastructure\services\SystemDateTimeUtcService.cs" />
     <Compile Include="infrastructure\tokens\TokenReplacer.cs" />
     <Compile Include="ILogExtensions.cs" />
+    <Compile Include="infrastructure\tolerance\FaultTolerance.cs" />
     <Compile Include="LogExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
