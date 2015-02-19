@@ -145,7 +145,6 @@ namespace chocolatey.infrastructure.app.nuget
                     };
             }
 
-
             return packageManager;
         }
     }
