@@ -25,7 +25,6 @@ namespace chocolatey.tests.integration
          * Install/Upgrade/Uninstall scenarios:
          *  - uninstall noop
          *  - uninstall happy path
-         *  - upgrade noop
          *  - upgrade with dependencies
          *  - upgrade as a dependency
          *  

@@ -38,12 +38,139 @@ namespace chocolatey.tests.integration.scenarios
                 Scenario.reset(Configuration);
                 Configuration.PackageNames = Configuration.Input = "upgradepackage";
                 Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "installpackage*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "badpackage*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration,"installpackage", "1.0.0");
                 Scenario.install_package(Configuration,"upgradepackage", "1.0.0");
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
             }
         }
 
+        public class when_noop_upgrading_a_package_that_has_available_upgrades : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Noop = true;
+            }
+
+            public override void Because()
+            {
+                Service.upgrade_noop(Configuration);
+            }
+
+            [Fact]
+            public void should_contain_older_version_in_directory()
+            {
+                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames,"tools","console.exe");
+
+                File.ReadAllText(shimFile).ShouldEqual("1.0.0");
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_a_new_version_is_available()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source(s)")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }  
+            
+            [Fact]
+            public void should_contain_a_message_that_a_package_can_be_upgraded()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("can upgrade 1/1")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+        }     
+        
+        public class when_noop_upgrading_a_package_that_does_not_have_available_upgrades : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Noop = true;
+                Configuration.PackageNames = Configuration.Input = "installpackage";
+            }
+
+            public override void Because()
+            {
+                Service.upgrade_noop(Configuration);
+            }
+            
+            [Fact]
+            public void should_contain_a_message_that_you_have_the_latest_version_available()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
+                {
+                    if (message.Contains("installpackage v1.0.0 is the latest version available based on your source(s)")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }  
+            
+            [Fact]
+            public void should_contain_a_message_that_no_packages_can_be_upgraded()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("can upgrade 0/1")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+        } 
+        
+        public class when_noop_upgrading_a_package_that_does_not_exist : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Noop = true;
+                Configuration.PackageNames = Configuration.Input = "nonexistingpackage";
+            }
+
+            public override void Because()
+            {
+                Service.upgrade_noop(Configuration);
+            }
+            
+            [Fact]
+            public void should_contain_a_message_the_package_was_not_found()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).or_empty_list_if_null())
+                {
+                    if (message.Contains("nonexistingpackage not installed. The package was not found with the source(s) listed")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }  
+            
+            [Fact]
+            public void should_contain_a_message_that_no_packages_can_be_upgraded()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("can upgrade 0/0")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+        } 
+        
         public class when_upgrading_an_existing_package_happy_path : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -66,6 +193,14 @@ namespace chocolatey.tests.integration.scenarios
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
                 Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_newer_version_in_directory()
+            {
+                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+
+                File.ReadAllText(shimFile).ShouldEqual("1.1.0");
             }
 
             [Fact]
@@ -122,5 +257,8 @@ namespace chocolatey.tests.integration.scenarios
                 _packageResult.Version.ShouldEqual("1.1.0");
             }
         }
+
+   
+  
     }
 }
