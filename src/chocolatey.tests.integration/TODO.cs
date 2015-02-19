@@ -25,7 +25,6 @@ namespace chocolatey.tests.integration
          * Install/Upgrade/Uninstall scenarios:
          *  - sxs to normal
          *  - normal to sxs
-         *  - installed, force install
          *  - install noop
          *  - upgrade noop
          *  - uninstall noop

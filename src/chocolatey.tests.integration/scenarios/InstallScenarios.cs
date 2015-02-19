@@ -16,13 +16,16 @@
 namespace chocolatey.tests.integration.scenarios
 {
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using NuGet;
     using Should;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
+    using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.results;
+    using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
     public class InstallScenarios
     {
@@ -31,6 +34,7 @@ namespace chocolatey.tests.integration.scenarios
             protected ConcurrentDictionary<string, PackageResult> Results;
             protected ChocolateyConfiguration Configuration;
             protected IChocolateyPackageService Service;
+            protected CommandExecutor CommandExecutor;
 
             public override void Context()
             {
@@ -41,6 +45,8 @@ namespace chocolatey.tests.integration.scenarios
                 Scenario.add_packages_to_source_location(Configuration, "badpackage*" + Constants.PackageExtension);
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+
+                CommandExecutor = new CommandExecutor(NUnitSetup.Container.GetInstance<IFileSystem>());
             }
         }
 
@@ -66,6 +72,88 @@ namespace chocolatey.tests.integration.scenarios
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
                 Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_create_a_shim_for_console_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_create_a_shim_for_graphical_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_ignored_executable_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "not.installed.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_mismatched_case_ignored_executable_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "casemismatch.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_have_a_console_shim_that_is_set_for_non_gui_access()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    );
+
+                var messageFound = false;
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains("is gui? False")) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("GUI false message not found");
+            }
+
+            [Fact]
+            public void should_have_a_graphical_shim_that_is_set_for_gui_access()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    );
+
+                var messageFound = false;
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains("is gui? True")) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("GUI true message not found");
             }
 
             [Fact]
@@ -109,8 +197,120 @@ namespace chocolatey.tests.integration.scenarios
             {
                 packageResult.Version.ShouldEqual("1.0.0");
             }
-        }      
-        
+        }
+
+        public class when_installing_packages_with_packages_config : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                var packagesConfig = "{0}\\context\\testing.packages.config".format_with(Scenario.get_top_level());
+                Configuration.PackageNames = Configuration.Input = packagesConfig;
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "upgradepackage*" + Constants.PackageExtension);
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_install_where_install_location_reports()
+            {
+                foreach (var packageResult in Results)
+                {
+                    if (packageResult.Value.Name.is_equal_to("missingpackage")) continue;
+
+                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_install_expected_packages_in_the_lib_directory()
+            {
+                var packagesExpected = new List<string> {"installpackage", "hasdependency", "isdependency", "upgradepackage"};
+                foreach (var package in packagesExpected)
+                {
+                    var packageDir = Path.Combine(Scenario.get_top_level(), "lib", package);
+                    Directory.Exists(packageDir).ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_install_the_dependency_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_installed_4_out_of_5_packages_successfully()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("4/5")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_upgradepackage_with_an_expected_specified_version_was_installed()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgradepackage v1.0.0")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result_for_all_but_expected_missing_package()
+            {
+                foreach (var packageResult in Results)
+                {
+                    if (packageResult.Value.Name.is_equal_to("missingpackage")) continue;
+
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_a_successful_package_result_for_missing_package()
+            {
+                foreach (var packageResult in Results)
+                {
+                    if (!packageResult.Value.Name.is_equal_to("missingpackage")) continue;
+
+                    packageResult.Value.Success.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+        }
+
         public class when_installing_an_already_installed_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -145,8 +345,8 @@ namespace chocolatey.tests.integration.scenarios
                 }
 
                 installWarning.ShouldBeTrue();
-            }   
-            
+            }
+
             [Fact]
             public void should_contain_a_message_about_force_to_reinstall()
             {
@@ -155,7 +355,7 @@ namespace chocolatey.tests.integration.scenarios
                 {
                     foreach (var message in messageType.Value)
                     {
-                        if (message.Contains("Use --force to reinstall")) installWarning = true;    
+                        if (message.Contains("Use --force to reinstall")) installWarning = true;
                     }
                 }
 
@@ -174,7 +374,7 @@ namespace chocolatey.tests.integration.scenarios
                 packageResult.Warning.ShouldBeTrue();
             }
         }
-       
+
         public class when_force_installing_an_already_installed_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -280,7 +480,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 Directory.Exists(packageDir).ShouldBeTrue();
             }
-      
+
             [Fact]
             public void should_install_the_dependency_in_the_lib_directory()
             {
@@ -444,8 +644,8 @@ namespace chocolatey.tests.integration.scenarios
 
                 errorFound.ShouldBeTrue();
             }
-        } 
-        
+        }
+
         public class when_installing_a_package_ignoring_dependencies_that_cannot_be_found : ScenariosBase
         {
             private PackageResult packageResult;
