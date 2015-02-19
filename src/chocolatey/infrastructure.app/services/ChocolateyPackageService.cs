@@ -541,27 +541,7 @@ ATTENTION: You must take manual action to remove {1} from
 
         private void remove_rollback_if_exists(PackageResult packageResult)
         {
-            var rollbackDirectory = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
-            if (!_fileSystem.directory_exists(rollbackDirectory))
-            {
-                //search for folder
-                var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackageBackupLocation, packageResult.Name + "*");
-                if (possibleRollbacks != null && possibleRollbacks.Count != 0)
-                {
-                    rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
-          
-            try
-            {
-                _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true);
-            }
-            catch (Exception ex)
-            {
-                this.Log().Warn("Attempted to remove '{0}' but had an error:{1} {2}".format_with(rollbackDirectory, Environment.NewLine, ex.Message));
-            }
+            _nugetService.remove_rollback_directory_if_exists(packageResult.Name);
         }
     }
 }
