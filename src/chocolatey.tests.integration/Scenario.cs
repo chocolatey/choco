@@ -19,6 +19,7 @@ namespace chocolatey.tests.integration
     using System.Reflection;
     using System.Threading;
     using NuGet;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.nuget;
@@ -44,16 +45,19 @@ namespace chocolatey.tests.integration
             string packagesInstallPath = get_package_install_path();
             string badPackagesPath = get_package_install_path() + "-bad";
             string backupPackagesPath = get_package_install_path() + "-bkp";
+            string shimsPath = ApplicationParameters.ShimsLocation;
 
             _fileSystem.delete_directory_if_exists(config.CacheLocation, recursive: true);
             _fileSystem.delete_directory_if_exists(config.Sources, recursive: true);
             _fileSystem.delete_directory_if_exists(packagesInstallPath, recursive: true);
+            _fileSystem.delete_directory_if_exists(shimsPath, recursive: true);
             _fileSystem.delete_directory_if_exists(badPackagesPath, recursive: true);
             _fileSystem.delete_directory_if_exists(backupPackagesPath, recursive: true);
 
             _fileSystem.create_directory(config.CacheLocation);
             _fileSystem.create_directory(config.Sources);
             _fileSystem.create_directory(packagesInstallPath);
+            _fileSystem.create_directory(shimsPath);
             _fileSystem.create_directory(badPackagesPath);
             _fileSystem.create_directory(backupPackagesPath);
         }
