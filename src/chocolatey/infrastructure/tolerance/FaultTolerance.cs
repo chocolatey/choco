@@ -19,6 +19,9 @@ namespace chocolatey.infrastructure.tolerance
     using System.Threading;
     using configuration;
 
+    /// <summary>
+    /// Provides methods that are able to tolerate faults and recover
+    /// </summary>
     public class FaultTolerance
     {
         private static bool log_is_in_debug_mode()
@@ -36,6 +39,13 @@ namespace chocolatey.infrastructure.tolerance
             return debugging;
         }
 
+        /// <summary>
+        /// Tries an action the specified number of tries, warning on each failure and erroring on the last.
+        /// </summary>
+        /// <param name="numberOfTries">The number of tries.</param>
+        /// <param name="action">The action.</param>
+        /// <param name="waitDurationMilliseconds">The wait duration in milliseconds.</param>
+        /// <param name="increaseRetryByMilliseconds">The time for each try to increase the wait duration by in milliseconds.</param>
         public static void retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0)
         {
             if (action == null) return;
@@ -51,6 +61,16 @@ namespace chocolatey.infrastructure.tolerance
                 increaseRetryByMilliseconds);
         }
 
+        /// <summary>
+        /// Tries a function the specified number of tries, warning on each failure and erroring on the last.
+        /// </summary>
+        /// <typeparam name="T">The type of the return value from the function.</typeparam>
+        /// <param name="numberOfTries">The number of tries.</param>
+        /// <param name="function">The function.</param>
+        /// <param name="waitDurationMilliseconds">The wait duration in milliseconds.</param>
+        /// <param name="increaseRetryByMilliseconds">The time for each try to increase the wait duration by in milliseconds.</param>
+        /// <returns>The return value from the function</returns>
+        /// <exception cref="System.ApplicationException">You must specify a number of retries greater than zero.</exception>
         public static T retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0)
         {
             if (function == null) return default(T);
@@ -91,6 +111,13 @@ namespace chocolatey.infrastructure.tolerance
             return returnValue;
         }
 
+        /// <summary>
+        /// Wraps an action with a try/catch, logging an error when it fails.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        /// <param name="errorMessage">The error message.</param>
+        /// <param name="throwError">if set to <c>true</c> [throw error].</param>
+        /// <param name="logWarningInsteadOfError">if set to <c>true</c> log as warning instead of error.</param>
         public static void try_catch_with_logging_exception(Action action, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false)
         {
             if (action == null) return;
@@ -107,6 +134,15 @@ namespace chocolatey.infrastructure.tolerance
                 );
         }
 
+        /// <summary>
+        /// Wraps a function with a try/catch, logging an error when it fails.
+        /// </summary>
+        /// <typeparam name="T">The type of the return value from the function.</typeparam>
+        /// <param name="function">The function.</param>
+        /// <param name="errorMessage">The error message.</param>
+        /// <param name="throwError">if set to <c>true</c> [throw error].</param>
+        /// <param name="logWarningInsteadOfError">if set to <c>true</c> log as warning instead of error.</param>
+        /// <returns>The return value from the function</returns>
         public static T try_catch_with_logging_exception<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false)
         {
             if (function == null) return default(T);
