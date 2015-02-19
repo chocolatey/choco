@@ -110,6 +110,9 @@
     <None Include="context\isdependency\isdependency.nuspec" />
     <None Include="context\isdependency\tools\chocolateyinstall.ps1" />
     <None Include="context\isdependency\tools\chocolateyuninstall.ps1" />
+    <None Include="context\testing.packages.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\upgradepackage\tools\chocolateyinstall.ps1" />
     <None Include="context\upgradepackage\tools\chocolateyuninstall.ps1" />
     <None Include="context\upgradepackage\tools\graphical.exe.gui" />
