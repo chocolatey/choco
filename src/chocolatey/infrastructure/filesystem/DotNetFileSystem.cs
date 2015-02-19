@@ -23,6 +23,7 @@ namespace chocolatey.infrastructure.filesystem
     using System.Text;
     using System.Threading;
     using platforms;
+    using tolerance;
 
     /// <summary>
     ///   Implementation of IFileSystem for Dot Net
@@ -30,6 +31,17 @@ namespace chocolatey.infrastructure.filesystem
     /// <remarks>Normally we avoid regions, however this has so many methods that we are making an exception.</remarks>
     public sealed class DotNetFileSystem : IFileSystem
     {
+        private const int RETRY_TIMES = 2;
+
+        private void allow_retries(Action action)
+        {
+            FaultTolerance.retry(
+               RETRY_TIMES,
+               action,
+               waitDurationMilliseconds: 200,
+               increaseRetryByMilliseconds: 100);
+        }
+
         #region Path
 
         public string combine_paths(string leftItem, params string[] rightItems)
@@ -153,14 +165,16 @@ namespace chocolatey.infrastructure.filesystem
 
         public void move_file(string filePath, string newFilePath)
         {
-            File.Move(filePath, newFilePath);
+            allow_retries(() => File.Move(filePath, newFilePath));
+            //Thread.Sleep(10);
         }
 
         public void copy_file(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
         {
             this.Log().Debug(() => "Attempting to copy \"{0}\"{1} to \"{2}\".".format_with(sourceFilePath, Environment.NewLine, destinationFilePath));
             create_directory_if_not_exists(get_directory_name(destinationFilePath), ignoreError: true);
-            File.Copy(sourceFilePath, destinationFilePath, overwriteExisting);
+
+            allow_retries(() => File.Copy(sourceFilePath, destinationFilePath, overwriteExisting));
         }
 
         public bool copy_file_unsafe(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
@@ -194,7 +208,7 @@ namespace chocolatey.infrastructure.filesystem
             this.Log().Debug(() => "Attempting to delete file \"{0}\".".format_with(filePath));
             if (file_exists(filePath))
             {
-                File.Delete(filePath);
+                allow_retries(() => File.Delete(filePath));
             }
         }
 
@@ -220,14 +234,17 @@ namespace chocolatey.infrastructure.filesystem
 
         public void write_file(string filePath, string fileText, Encoding encoding)
         {
-            using (FileStream fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
-            using (var streamWriter = new StreamWriter(fileStream, encoding))
-            {
-                streamWriter.Write(fileText);
-                streamWriter.Flush();
-                streamWriter.Close();
-                fileStream.Close();
-            }
+            allow_retries(() =>
+                {
+                    using (FileStream fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
+                    using (var streamWriter = new StreamWriter(fileStream, encoding))
+                    {
+                        streamWriter.Write(fileText);
+                        streamWriter.Flush();
+                        streamWriter.Close();
+                        fileStream.Close();
+                    }
+                });
         }
 
         public void write_file(string filePath, Func<Stream> getStream)
@@ -289,7 +306,7 @@ namespace chocolatey.infrastructure.filesystem
         public void create_directory(string directoryPath)
         {
             this.Log().Debug(() => "Attempting to create directory \"{0}\".".format_with(get_full_path(directoryPath)));
-            Directory.CreateDirectory(directoryPath);
+            allow_retries(() => Directory.CreateDirectory(directoryPath));
         }
 
         public void move_directory(string directoryPath, string newDirectoryPath)
@@ -297,7 +314,7 @@ namespace chocolatey.infrastructure.filesystem
             try
             {
                 this.Log().Debug("Moving '{0}'{1} to '{2}'".format_with(directoryPath, Environment.NewLine, newDirectoryPath));
-                Directory.Move(directoryPath, newDirectoryPath);
+                allow_retries(() => Directory.Move(directoryPath, newDirectoryPath));
             }
             catch (Exception ex)
             {
@@ -363,7 +380,7 @@ namespace chocolatey.infrastructure.filesystem
         public void delete_directory(string directoryPath, bool recursive)
         {
             this.Log().Debug(() => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directoryPath)));
-            Directory.Delete(directoryPath, recursive);
+            allow_retries(() => Directory.Delete(directoryPath, recursive));
         }
 
         public void delete_directory_if_exists(string directoryPath, bool recursive)
