@@ -39,7 +39,10 @@ namespace chocolatey.tests.integration
             Container = SimpleInjectorContainer.initialize();
             fix_application_parameter_variables(Container);
             var config = Container.GetInstance<ChocolateyConfiguration>();
+            var force = config.Force;
+            config.Force = true;
             unpack_self(Container,config);
+            config.Force = force;
 
             base.BeforeEverything();
 
