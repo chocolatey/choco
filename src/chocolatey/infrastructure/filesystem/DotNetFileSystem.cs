@@ -31,12 +31,12 @@ namespace chocolatey.infrastructure.filesystem
     /// <remarks>Normally we avoid regions, however this has so many methods that we are making an exception.</remarks>
     public sealed class DotNetFileSystem : IFileSystem
     {
-        private const int RETRY_TIMES = 2;
+        private const int TIMES_TO_TRY_OPERATION = 3;
 
         private void allow_retries(Action action)
         {
             FaultTolerance.retry(
-               RETRY_TIMES,
+               TIMES_TO_TRY_OPERATION,
                action,
                waitDurationMilliseconds: 200,
                increaseRetryByMilliseconds: 100);

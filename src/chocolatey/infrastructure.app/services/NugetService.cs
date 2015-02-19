@@ -423,11 +423,19 @@ packages as of version 1.0.0. That is what the install command is for.
 
                     var packageNames = config.PackageNames;
                     config.PackageNames = packageName;
-                    var installResults = install_run(config, continueAction);
-                    foreach (var packageResult in installResults)
+                    if (config.Noop)
                     {
-                        packageInstalls.GetOrAdd(packageResult.Key, packageResult.Value);
+                        install_noop(config,continueAction);
                     }
+                    else
+                    {
+                        var installResults = install_run(config, continueAction);
+                        foreach (var packageResult in installResults)
+                        {
+                            packageInstalls.GetOrAdd(packageResult.Key, packageResult.Value);
+                        }
+                    }
+                    
                     config.PackageNames = packageNames;
                     continue;
                 }
