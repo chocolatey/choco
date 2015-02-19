@@ -41,7 +41,6 @@ namespace chocolatey.tests.integration
 
         public static void reset(ChocolateyConfiguration config)
         {
-            Thread.Sleep(200);
             string packagesInstallPath = get_package_install_path();
             string badPackagesPath = get_package_install_path() + "-bad";
             string backupPackagesPath = get_package_install_path() + "-bkp";
