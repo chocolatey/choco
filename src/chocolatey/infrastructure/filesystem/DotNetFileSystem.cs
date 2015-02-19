@@ -252,7 +252,7 @@ namespace chocolatey.infrastructure.filesystem
         public IList<string> get_directories(string directoryPath)
         {
             if (!directory_exists(directoryPath)) return new List<string>();
-                
+
             return Directory.GetDirectories(directoryPath);
 
         }
@@ -260,7 +260,7 @@ namespace chocolatey.infrastructure.filesystem
         public IList<string> get_directories(string directoryPath, string pattern, SearchOption option = SearchOption.TopDirectoryOnly)
         {
             if (!directory_exists(directoryPath)) return new List<string>();
-            
+
             return Directory.GetDirectories(directoryPath, pattern, option);
         }
 
@@ -335,7 +335,6 @@ namespace chocolatey.infrastructure.filesystem
 
             Thread.Sleep(1500); // sleep for enough time to allow the folder to finish copying
         }
-
 
         public void create_directory_if_not_exists(string directoryPath)
         {

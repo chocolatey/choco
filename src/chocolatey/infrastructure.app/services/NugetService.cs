@@ -787,7 +787,9 @@ packages as of version 1.0.0. That is what the install command is for.
                 config.PackageNames = string.Empty;
                 var input = config.Input;
                 config.Input = string.Empty;
+                
                 var localPackages = list_run(config, logResults: false);
+
                 config.Input = input;
                 config.Noop = noop;
                 config.Prerelease = pre;

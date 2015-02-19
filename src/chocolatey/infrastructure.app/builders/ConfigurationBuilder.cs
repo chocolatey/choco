@@ -142,9 +142,9 @@ Config has insecure allowGlobalConfirmation set to true.
 
             if (feature == null)
             {
-                configFileSettings.Features.Add(new ConfigFileFeatureSetting() { Name = featureName, Enabled = enabled });
+                configFileSettings.Features.Add(new ConfigFileFeatureSetting {Name = featureName, Enabled = enabled});
             }
-            
+
             return enabled;
         }
 
@@ -189,7 +189,7 @@ Config has insecure allowGlobalConfirmation set to true.
                                  option => config.CacheLocation = option)
                             .Add("allowunofficial|allow-unofficial|allowunofficialbuild|allow-unofficial-build",
                                  "AllowUnofficialBuild - When not using the official build you must set this flag for choco to continue.",
-                                 option => config.AllowUnofficialBuild =  option != null)
+                                 option => config.AllowUnofficialBuild = option != null)
                             ;
                     },
                 (unparsedArgs) =>
