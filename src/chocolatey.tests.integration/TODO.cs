@@ -23,12 +23,9 @@ namespace chocolatey.tests.integration
          *  - value overridden
          *  
          * Install/Upgrade/Uninstall scenarios:
-         *  - sxs to normal
-         *  - normal to sxs
-         *  - install noop
-         *  - upgrade noop
          *  - uninstall noop
          *  - uninstall happy path
+         *  - upgrade noop
          *  - upgrade with dependencies
          *  - upgrade as a dependency
          *  
