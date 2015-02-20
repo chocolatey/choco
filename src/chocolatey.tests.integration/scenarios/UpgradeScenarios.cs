@@ -15,9 +15,11 @@
 
 namespace chocolatey.tests.integration.scenarios
 {
+    using System;
     using System.Collections.Concurrent;
     using System.IO;
     using System.Linq;
+    using NUnit.Framework;
     using NuGet;
     using Should;
     using chocolatey.infrastructure.app.configuration;
@@ -40,8 +42,11 @@ namespace chocolatey.tests.integration.scenarios
                 Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
                 Scenario.add_packages_to_source_location(Configuration, "installpackage*" + Constants.PackageExtension);
                 Scenario.add_packages_to_source_location(Configuration, "badpackage*" + Constants.PackageExtension);
-                Scenario.install_package(Configuration,"installpackage", "1.0.0");
-                Scenario.install_package(Configuration,"upgradepackage", "1.0.0");
+                Scenario.install_package(Configuration, "installpackage", "1.0.0");
+                Scenario.install_package(Configuration, "upgradepackage", "1.0.0");
+                Configuration.SkipPackageInstallProvider = true;
+                Scenario.install_package(Configuration, "badpackage", "1.0");
+                Configuration.SkipPackageInstallProvider = false;
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
             }
@@ -63,7 +68,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_contain_older_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames,"tools","console.exe");
+                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).ShouldEqual("1.0.0");
             }
@@ -78,8 +83,8 @@ namespace chocolatey.tests.integration.scenarios
                 }
 
                 expectedMessage.ShouldBeTrue();
-            }  
-            
+            }
+
             [Fact]
             public void should_contain_a_message_that_a_package_can_be_upgraded()
             {
@@ -106,7 +111,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Service.upgrade_noop(Configuration);
             }
-            
+
             [Fact]
             public void should_contain_a_message_that_you_have_the_latest_version_available()
             {
@@ -117,8 +122,8 @@ namespace chocolatey.tests.integration.scenarios
                 }
 
                 expectedMessage.ShouldBeTrue();
-            }  
-            
+            }
+
             [Fact]
             public void should_contain_a_message_that_no_packages_can_be_upgraded()
             {
@@ -145,7 +150,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Service.upgrade_noop(Configuration);
             }
-            
+
             [Fact]
             public void should_contain_a_message_the_package_was_not_found()
             {
@@ -156,8 +161,8 @@ namespace chocolatey.tests.integration.scenarios
                 }
 
                 expectedMessage.ShouldBeTrue();
-            }  
-            
+            }
+
             [Fact]
             public void should_contain_a_message_that_no_packages_can_be_upgraded()
             {
@@ -169,8 +174,8 @@ namespace chocolatey.tests.integration.scenarios
 
                 expectedMessage.ShouldBeTrue();
             }
-        } 
-        
+        }
+
         public class when_upgrading_an_existing_package_happy_path : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -213,7 +218,7 @@ namespace chocolatey.tests.integration.scenarios
                 }
 
                 upgradedSuccessMessage.ShouldBeTrue();
-            }    
+            }
             
             [Fact]
             public void should_contain_a_warning_message_with_old_and_new_versions()

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>badpackage</id>
-        <version>1.0</version>
+        <version>2.0</version>
         <title>badpackage</title>
         <authors>Rob Reynolds</authors>
         <owners>Rob Reynolds</owners>
@@ -12,6 +12,6 @@
         <tags>badpackage</tags>
     </metadata>
     <files>
-        <file src="tools\chocolateyInstall.ps1" target="tools\chocolateyInstall.ps1" />
+        <file src="tools\**" target="tools" />
     </files>
 </package>

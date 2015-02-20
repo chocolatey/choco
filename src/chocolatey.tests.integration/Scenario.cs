@@ -75,17 +75,12 @@ namespace chocolatey.tests.integration
 
         public static void install_package(ChocolateyConfiguration config, string packageId, string version)
         {
-            var packageInstallPath = get_package_install_path();
             var pattern = "{0}.{1}{2}".format_with(packageId, string.IsNullOrWhiteSpace(version) ? "*" : version, Constants.PackageExtension);
             var files = _fileSystem.get_files(config.Sources, pattern);
             foreach (var file in files)
             {
-                //var pkgPath = _fileSystem.combine_paths(packageInstallPath, packageId);
                 var packageManager = NugetCommon.GetPackageManager(config,new ChocolateyNugetLogger(), null, null, false);
                 packageManager.InstallPackage(new OptimizedZipPackage(file), false,false);
-                      
-               // _fileSystem.create_directory_if_not_exists(pkgPath);
-               // _fileSystem.copy_file(file, _fileSystem.combine_paths(pkgPath, _fileSystem.get_file_name(file)), overwriteExisting: true);
             }
         }
 

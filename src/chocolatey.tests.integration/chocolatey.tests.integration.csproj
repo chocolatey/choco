@@ -87,8 +87,12 @@
     <None Include="context\badpackage\badpackage.1.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\badpackage\badpackage.2.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\badpackage\badpackage.nuspec" />
     <None Include="context\badpackage\tools\chocolateyInstall.ps1" />
+    <None Include="context\badpackage\tools\chocolateyUninstall.ps1" />
     <None Include="context\hasdependency\hasdependency.1.0.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -27,6 +27,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.results;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
+
     public class InstallScenarios
     {
         public abstract class ScenariosBase : TinySpec
@@ -42,7 +43,7 @@ namespace chocolatey.tests.integration.scenarios
                 Scenario.reset(Configuration);
                 Configuration.PackageNames = Configuration.Input = "installpackage";
                 Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "badpackage*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "badpackage.1*" + Constants.PackageExtension);
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
 
