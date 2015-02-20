@@ -137,8 +137,11 @@ namespace chocolatey.infrastructure.app.services
                 Environment.SetEnvironmentVariable("IS_ADMIN", configuration.Information.IsUserAdministrator ? "true" : "false");
                 Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", configuration.Information.IsProcessElevated ? "true" : "false");
                 Environment.SetEnvironmentVariable("chocolateyPackageName", package.Id);
+                Environment.SetEnvironmentVariable("packageName", package.Id);
                 Environment.SetEnvironmentVariable("chocolateyPackageVersion", package.Version.to_string());
+                Environment.SetEnvironmentVariable("packageVersion", package.Version.to_string());
                 Environment.SetEnvironmentVariable("chocolateyPackageFolder", ApplicationParameters.PackagesLocation);
+                Environment.SetEnvironmentVariable("packageFolder", ApplicationParameters.PackagesLocation);
                 Environment.SetEnvironmentVariable("installerArguments", configuration.InstallArguments);
                 Environment.SetEnvironmentVariable("chocolateyPackageParameters", configuration.PackageParameters);
                 if (configuration.ForceX86)
