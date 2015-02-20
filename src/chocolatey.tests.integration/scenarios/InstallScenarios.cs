@@ -27,6 +27,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.results;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
+
     public class InstallScenarios
     {
         public abstract class ScenariosBase : TinySpec
@@ -42,7 +43,7 @@ namespace chocolatey.tests.integration.scenarios
                 Scenario.reset(Configuration);
                 Configuration.PackageNames = Configuration.Input = "installpackage";
                 Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "badpackage*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "badpackage.1*" + Constants.PackageExtension);
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
 
@@ -125,6 +126,18 @@ namespace chocolatey.tests.integration.scenarios
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
                 {
                     if (message.Contains("would have used NuGet to install packages")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }  
+            
+            [Fact]
+            public void should_contain_a_message_that_it_was_unable_to_find_package()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).or_empty_list_if_null())
+                {
+                    if (message.Contains("somethingnonexisting not installed. The package was not found with the source(s) listed")) expectedMessage = true;
                 }
 
                 expectedMessage.ShouldBeTrue();
@@ -286,9 +299,10 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 var packagesConfig = "{0}\\context\\testing.packages.config".format_with(Scenario.get_top_level());
-                Configuration.PackageNames = Configuration.Input = packagesConfig;
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency*" + Constants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency*" + Constants.PackageExtension);
+                Configuration.PackageNames = Configuration.Input = packagesConfig; 
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
                 Scenario.add_packages_to_source_location(Configuration, "upgradepackage*" + Constants.PackageExtension);
             }
 
@@ -333,7 +347,7 @@ namespace chocolatey.tests.integration.scenarios
                 bool installedSuccessfully = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
                 {
-                    if (message.Contains("4/5")) installedSuccessfully = true;
+                    if (message.Contains("5/6")) installedSuccessfully = true;
                 }
 
                 installedSuccessfully.ShouldBeTrue();
@@ -536,8 +550,9 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "hasdependency";
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency*" + Constants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
             }
 
             public override void Because()
@@ -576,7 +591,7 @@ namespace chocolatey.tests.integration.scenarios
                 bool installedSuccessfully = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
                 {
-                    if (message.Contains("2/2")) installedSuccessfully = true;
+                    if (message.Contains("3/3")) installedSuccessfully = true;
                 }
 
                 installedSuccessfully.ShouldBeTrue();

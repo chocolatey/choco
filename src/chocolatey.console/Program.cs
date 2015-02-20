@@ -29,6 +29,7 @@ namespace chocolatey.console
     using infrastructure.filesystem;
     using infrastructure.licensing;
     using infrastructure.logging;
+    using infrastructure.platforms;
     using infrastructure.registration;
     using infrastructure.services;
     using resources;
@@ -65,6 +66,8 @@ namespace chocolatey.console
                     warning => { warnings.Add(warning); }
                     );
                 Config.initialize_with(config);
+
+                trap_exit_scenarios(config);
 
                 if (config.RegularOuptut)
                 {
@@ -151,6 +154,13 @@ namespace chocolatey.console
 
                 Environment.Exit(Environment.ExitCode);
             }
+        }
+
+        static EventHandler _handler;
+
+        private static void trap_exit_scenarios(ChocolateyConfiguration config)
+        {
+            ExitScenarioHandler.SetHandler();
         }
 
         private static void warn_when_admin_needs_elevation(ChocolateyConfiguration config)

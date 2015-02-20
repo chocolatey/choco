@@ -79,6 +79,7 @@
     <Compile Include="NUnitSetup.cs" />
     <Compile Include="Scenario.cs" />
     <Compile Include="scenarios\InstallScenarios.cs" />
+    <Compile Include="scenarios\UninstallScenarios.cs" />
     <Compile Include="scenarios\UpgradeScenarios.cs" />
     <Compile Include="TODO.cs" />
   </ItemGroup>
@@ -87,9 +88,31 @@
     <None Include="context\badpackage\badpackage.1.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\badpackage\badpackage.2.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\badpackage\badpackage.nuspec" />
     <None Include="context\badpackage\tools\chocolateyInstall.ps1" />
+    <None Include="context\badpackage\tools\chocolateyUninstall.ps1" />
     <None Include="context\hasdependency\hasdependency.1.0.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\hasdependency\hasdependency.1.0.1.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\hasdependency\hasdependency.1.1.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\hasdependency\hasdependency.1.5.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\hasdependency\hasdependency.1.6.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\hasdependency\hasdependency.2.0.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\hasdependency\hasdependency.2.1.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="context\hasdependency\hasdependency.nuspec" />
@@ -107,9 +130,33 @@
     <None Include="context\isdependency\isdependency.1.0.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\isdependency\isdependency.1.0.1.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\isdependency\isdependency.1.1.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\isdependency\isdependency.2.0.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\isdependency\isdependency.nuspec" />
     <None Include="context\isdependency\tools\chocolateyinstall.ps1" />
     <None Include="context\isdependency\tools\chocolateyuninstall.ps1" />
+    <None Include="context\isexactversiondependency\isexactversiondependency.1.0.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\isexactversiondependency\isexactversiondependency.1.0.1.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\isexactversiondependency\isexactversiondependency.1.1.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\isexactversiondependency\isexactversiondependency.2.0.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\isexactversiondependency\isexactversiondependency.nuspec" />
+    <None Include="context\isexactversiondependency\tools\chocolateyinstall.ps1" />
+    <None Include="context\isexactversiondependency\tools\chocolateyuninstall.ps1" />
     <None Include="context\testing.packages.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

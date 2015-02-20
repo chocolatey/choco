@@ -282,7 +282,7 @@ spam/junk folder.");
                 if (installedPackage != null && (version == null || version == installedPackage.Version) && !config.Force)
                 {
                     string logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
-                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, ApplicationParameters.PackagesLocation));
+                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
                     results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                     results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                     this.Log().Warn(ChocolateyLoggers.Important, logMessage);
@@ -390,7 +390,6 @@ spam/junk folder.");
                     },
                 uninstallSuccessAction: null,
                 addUninstallHandler: false);
-
 
             var configIgnoreDependencies = config.IgnoreDependencies;
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
@@ -536,7 +535,9 @@ packages as of version 1.0.0. That is what the install command is for.
                             backup_existing_version(config, installedPackage);
                             if (config.Force && (installedPackage.Version == availablePackage.Version))
                             {
-                                //todo: delete the files
+                                FaultTolerance.try_catch_with_logging_exception(
+                                  () => _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id), recursive:true),
+                                  "Error during force upgrade");
                                 packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
                             }
                             else
@@ -756,6 +757,17 @@ packages as of version 1.0.0. That is what the install command is for.
 
                 foreach (var packageVersion in packageVersionsToRemove)
                 {
+                    var pkgInfo = _packageInfoService.get_package_information(packageVersion);
+                    if (pkgInfo != null && pkgInfo.IsPinned)
+                    {
+                        string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
+                        var pinnedResults = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                        pinnedResults.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                        pinnedResults.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        continue;
+                    }
+                    
                     if (performAction)
                     {
                         using (packageManager.SourceRepository.StartOperation(
@@ -763,12 +775,15 @@ packages as of version 1.0.0. That is what the install command is for.
                             packageName,
                             version == null ? null : version.ToString()))
                         {
+                            rename_legacy_package_version(config, packageVersion, pkgInfo);
+                            backup_existing_version(config, packageVersion);
                             packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
                         }
                     }
                     else
                     {
-                        packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, ApplicationParameters.PackagesLocation));
+                        var result = packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, packageVersion.Id)));
+                        if (continueAction != null) continueAction.Invoke(result);
                     }
                 }
             }
