@@ -79,6 +79,7 @@
     <Compile Include="NUnitSetup.cs" />
     <Compile Include="Scenario.cs" />
     <Compile Include="scenarios\InstallScenarios.cs" />
+    <Compile Include="scenarios\UninstallScenarios.cs" />
     <Compile Include="scenarios\UpgradeScenarios.cs" />
     <Compile Include="TODO.cs" />
   </ItemGroup>

@@ -23,7 +23,9 @@ namespace chocolatey.tests.integration
          *  - value overridden
          *  
          * Install/Upgrade/Uninstall scenarios:
-         *  - uninstall noop
+         *  - install dependency, then try to install something that depends on newer version
+         *   - where other package is cool with it
+         *   - where other package can't be happy
          *  - uninstall happy path
          *  - upgrade with dependencies
          *  - upgrade as a dependency
