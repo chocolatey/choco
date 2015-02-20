@@ -202,7 +202,7 @@ namespace chocolatey.infrastructure.app.services
             if (!packageResult.Success)
             {
                 this.Log().Error(ChocolateyLoggers.Important, "{0} {1} not successful.".format_with(packageResult.Name, commandName.to_string()));
-                handle_unsuccessful_install(config, packageResult);
+                handle_unsuccessful_operation(config, packageResult, movePackageToFailureLocation: true, attemptRollback: true);
 
                 return;
             }
@@ -219,7 +219,6 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info(@"Installing the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
             this.Log().Info(@"By installing you accept licenses for the packages.");
-
 
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
 
@@ -274,7 +273,7 @@ namespace chocolatey.infrastructure.app.services
         private IEnumerable<ChocolateyConfiguration> set_config_from_package_names_and_packages_config(ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls)
         {
             // if there are any .config files, split those off of the config. Then return the config without those package names.
-            foreach (var packageConfigFile in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.Contains(".config")).ToList())
+            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.Contains(".config")).ToList())
             {
                 config.PackageNames = config.PackageNames.Replace(packageConfigFile, string.Empty);
 
@@ -353,7 +352,12 @@ namespace chocolatey.infrastructure.app.services
 
             this.Log().Info(@"Upgrading the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
-            this.Log().Info(@"By installing you accept licenses for the packages.");
+            this.Log().Info(@"By upgrading you accept licenses for the packages.");
+
+            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.Contains(".config")).ToList())
+            {
+                throw new ApplicationException("A packages.config file is only used with installs.");
+            }
 
             var packageUpgrades = _nugetService.upgrade_run(
                 config,
@@ -398,7 +402,7 @@ namespace chocolatey.infrastructure.app.services
 
         public void uninstall_noop(ChocolateyConfiguration config)
         {
-            _nugetService.uninstall_noop(config, (pkg) => { _powershellService.uninstall_noop(pkg); });
+            _nugetService.uninstall_noop(config, (pkg) => _powershellService.uninstall_noop(pkg));
         }
 
         public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config)
@@ -406,32 +410,42 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info(@"Uninstalling the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
 
+            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.Contains(".config")).ToList())
+            {
+                throw new ApplicationException("A packages.config file is only used with installs.");
+            }
+
             var packageUninstalls = _nugetService.uninstall_run(
                 config,
                 (packageResult) =>
+                {
+                    if (!_fileSystem.directory_exists(packageResult.InstallLocation))
                     {
-                        if (!_fileSystem.directory_exists(packageResult.InstallLocation))
-                        {
-                            packageResult.InstallLocation += ".{0}".format_with(packageResult.Package.Version.to_string());
-                        }
+                        packageResult.InstallLocation += ".{0}".format_with(packageResult.Package.Version.to_string());
+                    }
 
-                        _shimgenService.uninstall(config, packageResult);
+                    _shimgenService.uninstall(config, packageResult);
 
-                        if (!config.SkipPackageInstallProvider)
-                        {
-                            _powershellService.uninstall(config, packageResult);
-                        }
+                    if (!config.SkipPackageInstallProvider)
+                    {
+                        _powershellService.uninstall(config, packageResult);
+                    }
 
-                        _autoUninstallerService.run(packageResult, config);
+                    _autoUninstallerService.run(packageResult, config);
 
-                        if (packageResult.Success)
-                        {
-                            //todo: v2 clean up package information store for things no longer installed (call it compact?)
-                            _packageInfoService.remove_package_information(packageResult.Package);
-                        }
+                    if (packageResult.Success)
+                    {
+                        //todo: v2 clean up package information store for things no longer installed (call it compact?)
+                        uninstall_cleanup(config, packageResult);
+                    }
+                    else
+                    {
+                        this.Log().Error(ChocolateyLoggers.Important, "{0} {1} not successful.".format_with(packageResult.Name, "uninstall"));
+                        handle_unsuccessful_operation(config, packageResult, movePackageToFailureLocation: false, attemptRollback: false);
+                    }
 
-                        //todo:prevent reboots
-                    });
+                    //todo:prevent reboots
+                });
 
             var uninstallFailures = packageUninstalls.Count(p => !p.Value.Success);
             this.Log().Warn(() => @"{0}{1} uninstalled {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
@@ -458,21 +472,50 @@ namespace chocolatey.infrastructure.app.services
             return packageUninstalls;
         }
 
+        private void uninstall_cleanup(ChocolateyConfiguration config, PackageResult packageResult)
+        {
+            _packageInfoService.remove_package_information(packageResult.Package);
+            ensure_bad_package_path_is_clean(config, packageResult);
+            remove_rollback_if_exists(packageResult);
+            if (config.Force)
+            {
+                var packageDirectory = _fileSystem.combine_paths(packageResult.InstallLocation);
+
+                if (string.IsNullOrWhiteSpace(packageDirectory) || !_fileSystem.directory_exists(packageDirectory)) return;
+
+                if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
+                {
+                    packageResult.Messages.Add(
+                        new ResultMessage(
+                            ResultType.Error,
+                            "Install location is not specific enough, cannot force remove directory:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, packageResult.InstallLocation)
+                            )
+                        );
+                    return;
+                }
+
+                FaultTolerance.try_catch_with_logging_exception(
+                    () => _fileSystem.delete_directory_if_exists(packageDirectory, recursive: true),
+                    "Attempted to remove '{0}' but had an error:".format_with(packageDirectory),
+                    logWarningInsteadOfError: true);
+            }
+        }
+
         private void ensure_bad_package_path_is_clean(ChocolateyConfiguration config, PackageResult packageResult)
         {
             FaultTolerance.try_catch_with_logging_exception(
                 () =>
+                {
+                    string badPackageInstallPath = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation);
+                    if (_fileSystem.directory_exists(badPackageInstallPath))
                     {
-                        string badPackageInstallPath = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation);
-                        if (_fileSystem.directory_exists(badPackageInstallPath))
-                        {
-                            _fileSystem.delete_directory(badPackageInstallPath, recursive: true);
-                        }
-                    },
+                        _fileSystem.delete_directory(badPackageInstallPath, recursive: true);
+                    }
+                },
                 "Attempted to delete bad package install path if existing. Had an error");
         }
 
-        private void handle_unsuccessful_install(ChocolateyConfiguration config, PackageResult packageResult)
+        private void handle_unsuccessful_operation(ChocolateyConfiguration config, PackageResult packageResult, bool movePackageToFailureLocation, bool attemptRollback)
         {
             Environment.ExitCode = 1;
 
@@ -481,24 +524,27 @@ namespace chocolatey.infrastructure.app.services
                 this.Log().Error(message.Message);
             }
 
-            var packageDirectory = packageResult.InstallLocation;
-            if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
+            if (attemptRollback || movePackageToFailureLocation)
             {
-                this.Log().Error(ChocolateyLoggers.Important, @"
-Install location is not specific enough, cannot move bad package or
- rollback previous version. 
- Erroneous install location captured as '{0}'
+                var packageDirectory = packageResult.InstallLocation;
+                if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
+                {
+                    this.Log().Error(ChocolateyLoggers.Important, @"
+Package location is not specific enough, cannot move bad package or
+ rollback previous version. Erroneous install location captured as 
+ '{0}'
 
 ATTENTION: You must take manual action to remove {1} from 
  {2}. It will show incorrectly as installed 
  until you do. To remove you can simply delete the folder in question.
- Chocolatey cannot continue.
 ".format_with(packageResult.InstallLocation, packageResult.Name, ApplicationParameters.PackagesLocation));
-            }
-            else
-            {
-                move_bad_package_to_failure_location(packageResult);
-                rollback_previous_version(config, packageResult);
+                }
+                else
+                {
+                    if (movePackageToFailureLocation) move_bad_package_to_failure_location(packageResult);
+
+                    if (attemptRollback) rollback_previous_version(config, packageResult);
+                }
             }
         }
 
@@ -527,7 +573,7 @@ ATTENTION: You must take manual action to remove {1} from
             var rollback = true;
             if (config.PromptForConfirmation)
             {
-                var selection = InteractivePrompt.prompt_for_confirmation(" Unsuccessful install of {0}.{1}  Do you want to rollback to previous version (package files only)?".format_with(packageResult.Name, Environment.NewLine), new[] {"yes", "no"}, "yes", requireAnswer: true);
+                var selection = InteractivePrompt.prompt_for_confirmation(" Unsuccessful operation for {0}.{1}  Do you want to rollback to previous version (package files only)?".format_with(packageResult.Name, Environment.NewLine), new[] { "yes", "no" }, "yes", requireAnswer: true);
                 if (selection.is_equal_to("no")) rollback = false;
             }
 
