@@ -95,10 +95,16 @@ param(
   $unzipOps = {
     param($7zip, $destination, $fileFullPath, [ref]$exitCodeRef)
     Write-Debug "Calling '$7zip x -aoa -o`"$destination`" -y `"$fileFullPath`"'"
-    $process = Start-Process $7zip -ArgumentList "x -aoa -o`"$destination`" -y `"$fileFullPath`"" -Wait -WindowStyle Hidden -PassThru
+    $process = Start-Process "$7zip" -ArgumentList "x -aoa -o`"$destination`" -y `"$fileFullPath`"" -Wait -WindowStyle Hidden -PassThru
     #$process = Start-Process $7zip -ArgumentList "x -aoa -o`"$destination`" -y `"$fileFullPath`"" -Wait -NoNewWindow -PassThru
-    # this is here for specific cases in Posh v3 where -Wait is not honored
-    try { if (!($process.HasExited)) { Wait-Process -Id $process.Id } } catch { }
+    
+	# this is here for specific cases in Posh v3 where -Wait is not honored
+	$currentPreference = $ErrorActionPreference
+	$ErrorActionPreference = 'SilentlyContinue'
+    if (!($process.HasExited)) { 
+      Wait-Process -Id $process.Id 
+    } 
+	$ErrorActionPreference = $currentPreference
 
     $exitCodeRef.Value = $process.ExitCode
   }
