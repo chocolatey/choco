@@ -129,6 +129,18 @@ namespace chocolatey.tests.integration.scenarios
                 }
 
                 expectedMessage.ShouldBeTrue();
+            }  
+            
+            [Fact]
+            public void should_contain_a_message_that_it_was_unable_to_find_package()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).or_empty_list_if_null())
+                {
+                    if (message.Contains("somethingnonexisting not installed. The package was not found with the source(s) listed")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
             }
         } 
         
