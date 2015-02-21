@@ -607,12 +607,14 @@ packages as of version 1.0.0. That is what the install command is for.
 
                 var backupLocation = pkgInstallPath.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
 
+                var errored = false;
                 try
                 {
                     _fileSystem.move_directory(pkgInstallPath, backupLocation);
                 }
                 catch (Exception ex)
                 {
+                    errored = true;
                     this.Log().Error("Error during backup (move phase):{0} {1}".format_with(Environment.NewLine, ex.Message));
                 }
                 finally
@@ -623,12 +625,21 @@ packages as of version 1.0.0. That is what the install command is for.
                     }
                     catch (Exception ex)
                     {
+                        errored = true;
                         this.Log().Error("Error during backup (reset phase):{0} {1}".format_with(Environment.NewLine, ex.Message));
                     }
                 }
 
                 backup_configuration_files(pkgInstallPath, installedPackage.Version.to_string());
 
+                if (errored)
+                {
+                    this.Log().Warn(ChocolateyLoggers.Important,
+                                    @"There was an error accessing files. This could mean there is a 
+ process locking the folder or files. Please make sure nothing is 
+ running that would lock the files or folders in this directory prior 
+ to upgrade. If the package fails to upgrade, this is likely the cause.");
+                }
             }
         }
 
