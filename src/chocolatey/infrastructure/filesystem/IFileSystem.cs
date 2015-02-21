@@ -67,6 +67,15 @@ namespace chocolatey.infrastructure.filesystem
         IEnumerable<string> get_files(string directoryPath, string pattern = "*.*", SearchOption option = SearchOption.TopDirectoryOnly);
 
         /// <summary>
+        /// Gets a list of files inside an existing directory with extensions and optionally recursive search option.
+        /// </summary>
+        /// <param name="directoryPath">The directory path.</param>
+        /// <param name="extensions">The extensions.</param>
+        /// <param name="option">The option.</param>
+        /// <returns>Returns the names of files (including their paths).</returns>
+        IEnumerable<string> get_files(string directoryPath, string[] extensions, SearchOption option = SearchOption.TopDirectoryOnly);
+
+        /// <summary>
         ///   Does the file exist?
         /// </summary>
         /// <param name="filePath">The file to check.</param>
