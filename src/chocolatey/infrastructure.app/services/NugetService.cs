@@ -335,6 +335,7 @@ spam/junk folder.");
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                     results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    if (continueAction != null) continueAction.Invoke(results);
                 }
             }
 
@@ -529,24 +530,34 @@ packages as of version 1.0.0. That is what the install command is for.
 
                     if (performAction)
                     {
-                        using (packageManager.SourceRepository.StartOperation(
-                            RepositoryOperationNames.Update,
-                            packageName,
-                            version == null ? null : version.ToString()))
+                        try
                         {
-                            rename_legacy_package_version(config, installedPackage, pkgInfo);
-                            backup_existing_version(config, installedPackage);
-                            if (config.Force && (installedPackage.Version == availablePackage.Version))
+                            using (packageManager.SourceRepository.StartOperation(
+                                RepositoryOperationNames.Update,
+                                packageName,
+                                version == null ? null : version.ToString()))
                             {
-                                FaultTolerance.try_catch_with_logging_exception(
-                                  () => _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id), recursive:true),
-                                  "Error during force upgrade");
-                                packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
+                                rename_legacy_package_version(config, installedPackage, pkgInfo);
+                                backup_existing_version(config, installedPackage);
+                                if (config.Force && (installedPackage.Version == availablePackage.Version))
+                                {
+                                    FaultTolerance.try_catch_with_logging_exception(
+                                        () => _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id), recursive: true),
+                                        "Error during force upgrade");
+                                    packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
+                                }
+                                else
+                                {
+                                    packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
+                                }
                             }
-                            else
-                            {
-                                packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
-                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
+                            this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                            results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            if (continueAction != null) continueAction.Invoke(results);
                         }
                     }
                 }
