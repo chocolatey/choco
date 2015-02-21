@@ -554,7 +554,9 @@ ATTENTION: You must take manual action to remove {1} from
 
             if (packageResult.InstallLocation != null && _fileSystem.directory_exists(packageResult.InstallLocation))
             {
-                _fileSystem.move_directory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation));
+                FaultTolerance.try_catch_with_logging_exception(
+                 () => _fileSystem.move_directory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation)),
+                 "Could not move bad package to failure directory It will show as installed.{0} {1}{0} The error".format_with(Environment.NewLine,packageResult.InstallLocation));
             }
         }
 
