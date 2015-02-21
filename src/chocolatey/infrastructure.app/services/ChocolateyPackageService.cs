@@ -552,11 +552,16 @@ ATTENTION: You must take manual action to remove {1} from
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageFailuresLocation);
 
-            _fileSystem.move_directory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation));
+            if (packageResult.InstallLocation != null && _fileSystem.directory_exists(packageResult.InstallLocation))
+            {
+                _fileSystem.move_directory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation));
+            }
         }
 
         private void rollback_previous_version(ChocolateyConfiguration config, PackageResult packageResult)
         {
+            if (packageResult.InstallLocation == null) return;
+            
             var rollbackDirectory = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
             if (!_fileSystem.directory_exists(rollbackDirectory))
             {
@@ -569,6 +574,8 @@ ATTENTION: You must take manual action to remove {1} from
             }
 
             if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
+
+            this.Log().Debug("Attempting rollback");
 
             var rollback = true;
             if (config.PromptForConfirmation)
