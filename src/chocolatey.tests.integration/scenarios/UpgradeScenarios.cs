@@ -214,8 +214,8 @@ namespace chocolatey.tests.integration.scenarios
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
                 Directory.Exists(packageDir).ShouldBeTrue();
-            }   
-            
+            }
+
             [Fact]
             public void should_delete_the_rollback()
             {
@@ -315,8 +315,8 @@ namespace chocolatey.tests.integration.scenarios
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
                 Directory.Exists(packageDir).ShouldBeTrue();
-            }   
-            
+            }
+
             [Fact]
             public void should_delete_the_rollback()
             {
@@ -403,7 +403,7 @@ namespace chocolatey.tests.integration.scenarios
                 Results = Service.upgrade_run(Configuration);
                 _packageResult = Results.FirstOrDefault().Value;
             }
-            
+
             [Fact]
             public void should_contain_a_message_that_you_have_the_latest_version_available()
             {
@@ -435,15 +435,15 @@ namespace chocolatey.tests.integration.scenarios
 
                 Directory.Exists(packageDir).ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_not_remove_the_package_from_the_lib_directory()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
                 Directory.Exists(packageDir).ShouldBeTrue();
-            }   
-            
+            }
+
             [Fact]
             public void should_have_a_successful_package_result()
             {
@@ -461,7 +461,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 _packageResult.Warning.ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_match_the_existing_version_of_one_dot_zero_dot_zero()
             {
@@ -482,11 +482,10 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.LogMessagesToConsole = true;
                 Results = Service.upgrade_run(Configuration);
                 _packageResult = Results.FirstOrDefault().Value;
             }
-            
+
             [Fact]
             public void should_contain_a_message_that_you_have_the_latest_version_available()
             {
@@ -518,15 +517,15 @@ namespace chocolatey.tests.integration.scenarios
 
                 Directory.Exists(packageDir).ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_not_remove_the_package_from_the_lib_directory()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
                 Directory.Exists(packageDir).ShouldBeTrue();
-            }   
-            
+            }
+
             [Fact]
             public void should_have_a_successful_package_result()
             {
@@ -544,7 +543,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 _packageResult.Warning.ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_match_the_existing_version_of_one_dot_zero_dot_zero()
             {
@@ -597,7 +596,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.Exists(fileAdded).ShouldBeTrue();
             }
-         
+
             [Fact]
             public void should_contain_newer_version_in_directory()
             {
@@ -641,8 +640,8 @@ namespace chocolatey.tests.integration.scenarios
             {
                 _packageResult.Version.ShouldEqual("1.1.0");
             }
-        }      
-        
+        }
+
         public class when_upgrading_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -667,7 +666,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.ReadAllText(fileChanged).ShouldEqual("hellow");
             }
-         
+
             [Fact]
             public void should_contain_newer_version_in_directory()
             {

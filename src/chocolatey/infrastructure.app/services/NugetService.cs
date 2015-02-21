@@ -35,6 +35,8 @@ namespace chocolatey.infrastructure.app.services
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
 
+    //todo - this monolith is too large. Refactor once test coverage is up.
+
     public class NugetService : INugetService
     {
         private readonly IFileSystem _fileSystem;
@@ -210,7 +212,7 @@ spam/junk folder.");
 
             var tempInstallsLocation = _fileSystem.combine_paths(_fileSystem.get_temp_path(), ApplicationParameters.Name, "TempInstalls_" + DateTime.Now.ToString("yyyyMMdd_HHmmss_ffff"));
             _fileSystem.create_directory_if_not_exists(tempInstallsLocation);
-            
+
             var installLocation = ApplicationParameters.PackagesLocation;
             ApplicationParameters.PackagesLocation = tempInstallsLocation;
 
@@ -257,18 +259,19 @@ spam/junk folder.");
                 config.Sources = _fileSystem.get_directory_name(_fileSystem.get_full_path(config.Sources));
             }
 
-            var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
-                                                               installSuccessAction: (e) =>
-                                                                   {
-                                                                       var pkg = e.Package;
-                                                                       var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                                                                       results.InstallLocation = e.InstallPath;
-                                                                       results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+            var packageManager = NugetCommon.GetPackageManager(
+                config, _nugetLogger,
+                installSuccessAction: (e) =>
+                    {
+                        var pkg = e.Package;
+                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                        results.InstallLocation = e.InstallPath;
+                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                                                                       if (continueAction != null) continueAction.Invoke(results);
-                                                                   },
-                                                               uninstallSuccessAction: null,
-                                                               addUninstallHandler: true);
+                        if (continueAction != null) continueAction.Invoke(results);
+                    },
+                uninstallSuccessAction: null,
+                addUninstallHandler: true);
 
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
@@ -424,7 +427,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     config.PackageNames = packageName;
                     if (config.Noop)
                     {
-                        install_noop(config,continueAction);
+                        install_noop(config, continueAction);
                     }
                     else
                     {
@@ -434,7 +437,7 @@ packages as of version 1.0.0. That is what the install command is for.
                             packageInstalls.GetOrAdd(packageResult.Key, packageResult.Value);
                         }
                     }
-                    
+
                     config.PackageNames = packageNames;
                     continue;
                 }
@@ -565,7 +568,7 @@ packages as of version 1.0.0. That is what the install command is for.
                 if (_fileSystem.directory_exists(installDirectory))
                 {
                     FaultTolerance.try_catch_with_logging_exception(
-                        () =>  _fileSystem.move_directory(installDirectory, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)),
+                        () => _fileSystem.move_directory(installDirectory, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)),
                         "Error during old package rename");
                 }
             }
@@ -783,7 +786,7 @@ packages as of version 1.0.0. That is what the install command is for.
                         if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
-                    
+
                     if (performAction)
                     {
                         using (packageManager.SourceRepository.StartOperation(
@@ -821,7 +824,7 @@ packages as of version 1.0.0. That is what the install command is for.
                 config.PackageNames = string.Empty;
                 var input = config.Input;
                 config.Input = string.Empty;
-                
+
                 var localPackages = list_run(config, logResults: false);
 
                 config.Input = input;
