@@ -159,7 +159,7 @@ namespace chocolatey.infrastructure.app.services
                 pkgInfo.IsSideBySide = true;
             }
 
-            if (config.Information.PlatformType == PlatformType.Windows)
+            if (packageResult.Success && config.Information.PlatformType == PlatformType.Windows)
             {
                 if (!config.SkipPackageInstallProvider)
                 {
@@ -193,7 +193,7 @@ namespace chocolatey.infrastructure.app.services
             }
             else
             {
-                this.Log().Info(ChocolateyLoggers.Important, () => " Skipping Powershell and shimgen portions of the install due to non-Windows.");
+                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping Powershell and shimgen portions of the install due to non-Windows.");
             }
 
             _packageInfoService.save_package_information(pkgInfo);
