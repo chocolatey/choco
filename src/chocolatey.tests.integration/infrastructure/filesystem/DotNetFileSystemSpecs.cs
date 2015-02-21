@@ -17,6 +17,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
 {
     using System;
     using System.IO;
+    using System.Linq;
     using NUnit.Framework;
     using Should;
     using chocolatey.infrastructure.filesystem;
@@ -80,11 +81,11 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
                 string filePath = FileSystem.combine_paths(ContextPath, "chocolateyInstall.ps1");
 
                 FileSystem.write_file(filePath, "yo");
-                var actual = FileSystem.get_files(ContextPath, "chocolateyInstall.ps1", SearchOption.AllDirectories);
+                var actual = FileSystem.get_files(ContextPath, "chocolateyInstall.ps1", SearchOption.AllDirectories).ToList();
                 FileSystem.delete_file(filePath);
 
                 actual.ShouldNotBeEmpty();
-                actual.Count.ShouldEqual(1);
+                actual.Count().ShouldEqual(1);
             }
 
             [Fact]
@@ -93,11 +94,11 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
                 string filePath = FileSystem.combine_paths(ContextPath, "chocolateyInstall.ps1");
 
                 FileSystem.write_file(filePath, "yo");
-                var actual = FileSystem.get_files(ContextPath, "chocolateyinstall.ps1", SearchOption.AllDirectories);
+                var actual = FileSystem.get_files(ContextPath, "chocolateyinstall.ps1", SearchOption.AllDirectories).ToList();
                 FileSystem.delete_file(filePath);
 
                 actual.ShouldNotBeEmpty();
-                actual.Count.ShouldEqual(1);
+                actual.Count().ShouldEqual(1);
             }
 
             [Fact]

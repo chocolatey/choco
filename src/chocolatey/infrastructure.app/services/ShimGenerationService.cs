@@ -88,7 +88,7 @@ namespace chocolatey.infrastructure.app.services
 
             //gather all .exes in the folder 
             var exeFiles = _fileSystem.get_files(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
-            foreach (string file in exeFiles)
+            foreach (string file in exeFiles.or_empty_list_if_null())
             {
                 if (_fileSystem.file_exists(file + ".ignore")) continue;
                 bool isGui = _fileSystem.file_exists(file + ".gui");
@@ -132,7 +132,7 @@ namespace chocolatey.infrastructure.app.services
         {
             //gather all .exes in the folder 
             var exeFiles = _fileSystem.get_files(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
-            foreach (string file in exeFiles)
+            foreach (string file in exeFiles.or_empty_list_if_null())
             {
                 if (_fileSystem.file_exists(file + ".ignore")) continue;
 

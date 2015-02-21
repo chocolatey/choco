@@ -562,7 +562,7 @@ ATTENTION: You must take manual action to remove {1} from
             {
                 //search for folder
                 var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackageBackupLocation, packageResult.Name + "*");
-                if (possibleRollbacks != null && possibleRollbacks.Count != 0)
+                if (possibleRollbacks != null && possibleRollbacks.Count() != 0)
                 {
                     rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
                 }

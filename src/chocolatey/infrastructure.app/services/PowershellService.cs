@@ -47,7 +47,7 @@ namespace chocolatey.infrastructure.app.services
 
             var packageDirectory = packageResult.InstallLocation;
             var installScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories);
-            if (installScript.Count != 0)
+            if (installScript.Count() != 0)
             {
                 var chocoInstall = installScript.FirstOrDefault();
 
@@ -119,7 +119,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             var powershellScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories);
-            if (powershellScript.Count != 0)
+            if (powershellScript.Count() != 0)
             {
                 var chocoPowerShellScript = powershellScript.FirstOrDefault();
 

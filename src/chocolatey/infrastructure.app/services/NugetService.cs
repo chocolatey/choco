@@ -113,7 +113,7 @@ namespace chocolatey.infrastructure.app.services
         {
             Func<IFileSystem, string> getLocalFiles = (fileSystem) =>
                 {
-                    var filesFound = fileSystem.get_files(fileSystem.get_current_directory(), "*" + extension).or_empty_list_if_null();
+                    var filesFound = fileSystem.get_files(fileSystem.get_current_directory(), "*" + extension).ToList().or_empty_list_if_null();
                     Ensure.that(() => filesFound)
                           .meets((files) => files.Count() == 1,
                                  (name, value) => { throw new FileNotFoundException("No {0} files (or more than 1) were found to build in '{1}'. Please specify the {0} file or try in a different directory.".format_with(extension, _fileSystem.get_current_directory())); });
@@ -345,7 +345,7 @@ spam/junk folder.");
             {
                 //search for folder
                 var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackageBackupLocation, packageName + "*");
-                if (possibleRollbacks != null && possibleRollbacks.Count != 0)
+                if (possibleRollbacks != null && possibleRollbacks.Count() != 0)
                 {
                     rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
                 }

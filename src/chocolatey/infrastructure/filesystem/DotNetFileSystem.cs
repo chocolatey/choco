@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.filesystem
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading;
@@ -82,9 +83,9 @@ namespace chocolatey.infrastructure.filesystem
 
         #region File
 
-        public IList<string> get_files(string directoryPath, string pattern = "*.*", SearchOption option = SearchOption.TopDirectoryOnly)
+        public IEnumerable<string> get_files(string directoryPath, string pattern = "*.*", SearchOption option = SearchOption.TopDirectoryOnly)
         {
-            return Directory.GetFiles(directoryPath, pattern, option);
+            return Directory.EnumerateFiles(directoryPath, pattern, option);
         }
 
         public bool file_exists(string filePath)
@@ -266,19 +267,18 @@ namespace chocolatey.infrastructure.filesystem
             return Directory.GetCurrentDirectory();
         }
 
-        public IList<string> get_directories(string directoryPath)
+        public IEnumerable<string> get_directories(string directoryPath)
         {
             if (!directory_exists(directoryPath)) return new List<string>();
 
-            return Directory.GetDirectories(directoryPath);
-
+            return Directory.EnumerateDirectories(directoryPath);
         }
 
-        public IList<string> get_directories(string directoryPath, string pattern, SearchOption option = SearchOption.TopDirectoryOnly)
+        public IEnumerable<string> get_directories(string directoryPath, string pattern, SearchOption option = SearchOption.TopDirectoryOnly)
         {
             if (!directory_exists(directoryPath)) return new List<string>();
 
-            return Directory.GetDirectories(directoryPath, pattern, option);
+            return Directory.EnumerateDirectories(directoryPath, pattern, option);
         }
 
         public bool directory_exists(string directoryPath)
