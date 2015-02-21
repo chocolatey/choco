@@ -664,7 +664,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
 
-                File.ReadAllText(fileChanged).ShouldEqual("hellow");
+                File.ReadAllText(fileChanged).ShouldNotEqual("hellow");
             }
 
             [Fact]
@@ -741,12 +741,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_contain_a_message_that_no_packages_can_be_upgraded()
+            public void should_contain_a_message_that_no_packages_were_upgraded()
             {
                 bool expectedMessage = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
                 {
-                    if (message.Contains("upgraded 0/0")) expectedMessage = true;
+                    if (message.Contains("upgraded 0/1")) expectedMessage = true;
                 }
 
                 expectedMessage.ShouldBeTrue();
