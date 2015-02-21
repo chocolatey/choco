@@ -39,6 +39,11 @@ namespace chocolatey.infrastructure.app.services
         public ChocolateyPackageInformation get_package_information(IPackage package)
         {
             var packageInformation = new ChocolateyPackageInformation(package);
+            if (package == null)
+            {
+                this.Log().Debug("No package information as package is null.");
+                return packageInformation;
+            }
 
             var pkgStorePath = _fileSystem.combine_paths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".format_with(package.Id, package.Version.to_string()));
             if (!_fileSystem.directory_exists(pkgStorePath))
@@ -63,6 +68,12 @@ namespace chocolatey.infrastructure.app.services
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.ChocolateyPackageInfoStoreLocation);
             _fileSystem.ensure_file_attribute_set(ApplicationParameters.ChocolateyPackageInfoStoreLocation, FileAttributes.Hidden);
+
+            if (packageInformation.Package == null)
+            {
+                this.Log().Debug("No package information to save as package is null.");
+                return;
+            }
 
             var pkgStorePath = _fileSystem.combine_paths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".format_with(packageInformation.Package.Id, packageInformation.Package.Version.to_string()));
             _fileSystem.create_directory_if_not_exists(pkgStorePath);
