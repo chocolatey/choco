@@ -61,6 +61,8 @@ namespace chocolatey.infrastructure.app
         /// </summary>
         public static int DefaultWaitForExitInSeconds = 2700;
 
+        public static readonly string[] ConfigFileExtensions = new string[] {".autoconf",".config",".conf",".cfg",".jsc",".json",".jsonp",".ini",".xml",".yaml"};
+
         public static class Tools
         {
             //public static readonly string WebPiCmdExe = _fileSystem.combine_paths(InstallLocation, "nuget.exe");

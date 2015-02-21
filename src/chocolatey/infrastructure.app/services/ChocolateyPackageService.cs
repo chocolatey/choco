@@ -159,7 +159,7 @@ namespace chocolatey.infrastructure.app.services
                 pkgInfo.IsSideBySide = true;
             }
 
-            if (config.Information.PlatformType == PlatformType.Windows)
+            if (packageResult.Success && config.Information.PlatformType == PlatformType.Windows)
             {
                 if (!config.SkipPackageInstallProvider)
                 {
@@ -193,7 +193,7 @@ namespace chocolatey.infrastructure.app.services
             }
             else
             {
-                this.Log().Info(ChocolateyLoggers.Important, () => " Skipping Powershell and shimgen portions of the install due to non-Windows.");
+                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping Powershell and shimgen portions of the install due to non-Windows.");
             }
 
             _packageInfoService.save_package_information(pkgInfo);
@@ -552,23 +552,32 @@ ATTENTION: You must take manual action to remove {1} from
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageFailuresLocation);
 
-            _fileSystem.move_directory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation));
+            if (packageResult.InstallLocation != null && _fileSystem.directory_exists(packageResult.InstallLocation))
+            {
+                FaultTolerance.try_catch_with_logging_exception(
+                 () => _fileSystem.move_directory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation)),
+                 "Could not move bad package to failure directory It will show as installed.{0} {1}{0} The error".format_with(Environment.NewLine,packageResult.InstallLocation));
+            }
         }
 
         private void rollback_previous_version(ChocolateyConfiguration config, PackageResult packageResult)
         {
+            if (packageResult.InstallLocation == null) return;
+            
             var rollbackDirectory = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
             if (!_fileSystem.directory_exists(rollbackDirectory))
             {
                 //search for folder
                 var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackageBackupLocation, packageResult.Name + "*");
-                if (possibleRollbacks != null && possibleRollbacks.Count != 0)
+                if (possibleRollbacks != null && possibleRollbacks.Count() != 0)
                 {
                     rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
                 }
             }
 
             if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
+
+            this.Log().Debug("Attempting rollback");
 
             var rollback = true;
             if (config.PromptForConfirmation)

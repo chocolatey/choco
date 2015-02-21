@@ -35,6 +35,8 @@ namespace chocolatey.infrastructure.app.services
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
 
+    //todo - this monolith is too large. Refactor once test coverage is up.
+
     public class NugetService : INugetService
     {
         private readonly IFileSystem _fileSystem;
@@ -113,7 +115,7 @@ namespace chocolatey.infrastructure.app.services
         {
             Func<IFileSystem, string> getLocalFiles = (fileSystem) =>
                 {
-                    var filesFound = fileSystem.get_files(fileSystem.get_current_directory(), "*" + extension).or_empty_list_if_null();
+                    var filesFound = fileSystem.get_files(fileSystem.get_current_directory(), "*" + extension).ToList().or_empty_list_if_null();
                     Ensure.that(() => filesFound)
                           .meets((files) => files.Count() == 1,
                                  (name, value) => { throw new FileNotFoundException("No {0} files (or more than 1) were found to build in '{1}'. Please specify the {0} file or try in a different directory.".format_with(extension, _fileSystem.get_current_directory())); });
@@ -210,7 +212,7 @@ spam/junk folder.");
 
             var tempInstallsLocation = _fileSystem.combine_paths(_fileSystem.get_temp_path(), ApplicationParameters.Name, "TempInstalls_" + DateTime.Now.ToString("yyyyMMdd_HHmmss_ffff"));
             _fileSystem.create_directory_if_not_exists(tempInstallsLocation);
-            
+
             var installLocation = ApplicationParameters.PackagesLocation;
             ApplicationParameters.PackagesLocation = tempInstallsLocation;
 
@@ -257,18 +259,19 @@ spam/junk folder.");
                 config.Sources = _fileSystem.get_directory_name(_fileSystem.get_full_path(config.Sources));
             }
 
-            var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
-                                                               installSuccessAction: (e) =>
-                                                                   {
-                                                                       var pkg = e.Package;
-                                                                       var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                                                                       results.InstallLocation = e.InstallPath;
-                                                                       results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+            var packageManager = NugetCommon.GetPackageManager(
+                config, _nugetLogger,
+                installSuccessAction: (e) =>
+                    {
+                        var pkg = e.Package;
+                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                        results.InstallLocation = e.InstallPath;
+                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                                                                       if (continueAction != null) continueAction.Invoke(results);
-                                                                   },
-                                                               uninstallSuccessAction: null,
-                                                               addUninstallHandler: true);
+                        if (continueAction != null) continueAction.Invoke(results);
+                    },
+                uninstallSuccessAction: null,
+                addUninstallHandler: true);
 
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
@@ -332,6 +335,7 @@ spam/junk folder.");
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                     results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    if (continueAction != null) continueAction.Invoke(results);
                 }
             }
 
@@ -345,7 +349,7 @@ spam/junk folder.");
             {
                 //search for folder
                 var possibleRollbacks = _fileSystem.get_directories(ApplicationParameters.PackageBackupLocation, packageName + "*");
-                if (possibleRollbacks != null && possibleRollbacks.Count != 0)
+                if (possibleRollbacks != null && possibleRollbacks.Count() != 0)
                 {
                     rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
                 }
@@ -424,7 +428,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     config.PackageNames = packageName;
                     if (config.Noop)
                     {
-                        install_noop(config,continueAction);
+                        install_noop(config, continueAction);
                     }
                     else
                     {
@@ -434,7 +438,7 @@ packages as of version 1.0.0. That is what the install command is for.
                             packageInstalls.GetOrAdd(packageResult.Key, packageResult.Value);
                         }
                     }
-                    
+
                     config.PackageNames = packageNames;
                     continue;
                 }
@@ -526,24 +530,34 @@ packages as of version 1.0.0. That is what the install command is for.
 
                     if (performAction)
                     {
-                        using (packageManager.SourceRepository.StartOperation(
-                            RepositoryOperationNames.Update,
-                            packageName,
-                            version == null ? null : version.ToString()))
+                        try
                         {
-                            rename_legacy_package_version(config, installedPackage, pkgInfo);
-                            backup_existing_version(config, installedPackage);
-                            if (config.Force && (installedPackage.Version == availablePackage.Version))
+                            using (packageManager.SourceRepository.StartOperation(
+                                RepositoryOperationNames.Update,
+                                packageName,
+                                version == null ? null : version.ToString()))
                             {
-                                FaultTolerance.try_catch_with_logging_exception(
-                                  () => _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id), recursive:true),
-                                  "Error during force upgrade");
-                                packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
+                                rename_legacy_package_version(config, installedPackage, pkgInfo);
+                                backup_existing_version(config, installedPackage);
+                                if (config.Force && (installedPackage.Version == availablePackage.Version))
+                                {
+                                    FaultTolerance.try_catch_with_logging_exception(
+                                        () => _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id), recursive: true),
+                                        "Error during force upgrade");
+                                    packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
+                                }
+                                else
+                                {
+                                    packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
+                                }
                             }
-                            else
-                            {
-                                packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
-                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
+                            this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                            results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            if (continueAction != null) continueAction.Invoke(results);
                         }
                     }
                 }
@@ -565,7 +579,7 @@ packages as of version 1.0.0. That is what the install command is for.
                 if (_fileSystem.directory_exists(installDirectory))
                 {
                     FaultTolerance.try_catch_with_logging_exception(
-                        () =>  _fileSystem.move_directory(installDirectory, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)),
+                        () => _fileSystem.move_directory(installDirectory, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)),
                         "Error during old package rename");
                 }
             }
@@ -593,12 +607,14 @@ packages as of version 1.0.0. That is what the install command is for.
 
                 var backupLocation = pkgInstallPath.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
 
+                var errored = false;
                 try
                 {
                     _fileSystem.move_directory(pkgInstallPath, backupLocation);
                 }
                 catch (Exception ex)
                 {
+                    errored = true;
                     this.Log().Error("Error during backup (move phase):{0} {1}".format_with(Environment.NewLine, ex.Message));
                 }
                 finally
@@ -609,9 +625,34 @@ packages as of version 1.0.0. That is what the install command is for.
                     }
                     catch (Exception ex)
                     {
+                        errored = true;
                         this.Log().Error("Error during backup (reset phase):{0} {1}".format_with(Environment.NewLine, ex.Message));
                     }
                 }
+
+                backup_configuration_files(pkgInstallPath, installedPackage.Version.to_string());
+
+                if (errored)
+                {
+                    this.Log().Warn(ChocolateyLoggers.Important,
+                                    @"There was an error accessing files. This could mean there is a 
+ process locking the folder or files. Please make sure nothing is 
+ running that would lock the files or folders in this directory prior 
+ to upgrade. If the package fails to upgrade, this is likely the cause.");
+                }
+            }
+        }
+
+        private void backup_configuration_files(string packageInstallPath, string version)
+        {
+            var configFiles = _fileSystem.get_files(packageInstallPath, ApplicationParameters.ConfigFileExtensions, SearchOption.AllDirectories);
+            foreach (var file in configFiles.or_empty_list_if_null())
+            {
+                var backupName = "{0}.{1}.{2}".format_with(_fileSystem.get_file_name_without_extension(file), version, _fileSystem.get_file_extension(file));
+
+                FaultTolerance.try_catch_with_logging_exception(
+                    () => _fileSystem.copy_file(file, _fileSystem.combine_paths(_fileSystem.get_directory_name(file), backupName), overwriteExisting: true),
+                    "Error backing up configuration file");
             }
         }
 
@@ -767,7 +808,7 @@ packages as of version 1.0.0. That is what the install command is for.
                         if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
-                    
+
                     if (performAction)
                     {
                         using (packageManager.SourceRepository.StartOperation(
@@ -805,7 +846,7 @@ packages as of version 1.0.0. That is what the install command is for.
                 config.PackageNames = string.Empty;
                 var input = config.Input;
                 config.Input = string.Empty;
-                
+
                 var localPackages = list_run(config, logResults: false);
 
                 config.Input = input;

@@ -68,7 +68,7 @@ namespace chocolatey
         /// <summary>
         ///   This is an optional helper to give you the correct settings for a logger. You can still set this in the set by calling propConfig.Logger without having to call this method.
         /// </summary>
-        /// <param name="logger">This is the logger you want RoundhousE to also use.</param>
+        /// <param name="logger">This is the logger you want Chocolatey to also use.</param>
         /// <returns></returns>
         public GetChocolatey SetCustomLogging(ILog logger)
         {
