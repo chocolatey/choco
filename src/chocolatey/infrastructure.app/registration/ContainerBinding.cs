@@ -42,7 +42,6 @@ namespace chocolatey.infrastructure.app.registration
         public void RegisterComponents(Container container)
         {
             var configuration = Config.get_configuration_settings();
-            Log.InitializeWith<Log4NetLog>();
 
             container.Register(() => configuration, Lifestyle.Singleton);
             container.Register<IFileSystem, DotNetFileSystem>(Lifestyle.Singleton);
