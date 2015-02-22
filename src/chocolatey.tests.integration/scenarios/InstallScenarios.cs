@@ -473,11 +473,15 @@ namespace chocolatey.tests.integration.scenarios
         public class when_force_installing_an_already_installed_package : ScenariosBase
         {
             private PackageResult packageResult;
+            private string modifiedText = "bob";
 
             public override void Context()
             {
                 base.Context();
                 Scenario.install_package(Configuration, "installpackage", "1.0.0");
+                var fileToModify = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                File.WriteAllText(fileToModify,modifiedText);
+                
                 Configuration.Force = true;
             }
 
@@ -494,11 +498,26 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_install_a_package_in_the_lib_directory()
+            public void should_install_the_package_in_the_lib_directory()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
                 Directory.Exists(packageDir).ShouldBeTrue();
+            }   
+            
+            [Fact]
+            public void should_remove_and_re_add_the_package_files_in_the_lib_directory()
+            {
+                var modifiedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                File.ReadAllText(modifiedFile).ShouldNotEqual(modifiedText);
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
             }
 
             [Fact]
@@ -544,6 +563,174 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        public class when_force_installing_an_already_installed_package_with_a_read_and_delete_share_locked_file : ScenariosBase
+        {
+            private PackageResult packageResult;
+            private FileStream fileStream;
+
+            public override void Context()
+            {
+                base.Context();
+                Scenario.install_package(Configuration, "installpackage", "1.0.0");
+                Configuration.Force = true;
+                var fileToOpen = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                fileStream = new FileStream(fileToOpen, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read | FileShare.Delete);
+            }
+
+            public override void AfterObservations()
+            {
+                base.AfterObservations();
+                fileStream.Close();
+            }
+            
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+                packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_install_where_install_location_reports()
+            {
+                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_be_able_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_it_installed_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("1/1")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_have_a_version_of_one_dot_zero_dot_zero()
+            {
+                packageResult.Version.ShouldEqual("1.0.0");
+            }
+        }
+
+        public class when_force_installing_an_already_installed_package_with_with_an_exclusively_locked_file : ScenariosBase
+        {
+            private PackageResult packageResult;
+            private FileStream fileStream;
+
+            public override void Context()
+            {
+                base.Context();
+                Scenario.install_package(Configuration, "installpackage", "1.0.0");
+                Configuration.Force = true;
+                var fileToOpen = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                fileStream = new FileStream(fileToOpen, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            }
+
+            public override void AfterObservations()
+            {
+                base.AfterObservations();
+                fileStream.Close();
+            }
+            
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+                packageResult = Results.FirstOrDefault().Value;
+            }
+            
+            [Fact]
+            public void should_have_a_package_installed_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            [Pending("Force install with file locked leaves inconsistent state - GH-114")]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_there_was_nothing_to_do()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("0/0")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            [Pending("Force install with file locked leaves inconsistent state - GH-114")]
+            public void should_not_have_a_successful_package_result()
+            {
+                packageResult.Success.ShouldBeFalse();
+            }
+
+            [Fact]
+            [Pending("Force install with file locked leaves inconsistent state - GH-114")]
+            public void should_not_have_inconclusive_package_result()
+            {
+                packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            [Pending("Force install with file locked leaves inconsistent state - GH-114")]
+            public void should_not_have_warning_package_result()
+            {
+                packageResult.Warning.ShouldBeFalse();
+            }
+        }
+        
         public class when_installing_a_package_with_dependencies_happy : ScenariosBase
         {
             public override void Context()
