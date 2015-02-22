@@ -554,7 +554,7 @@ packages as of version 1.0.0. That is what the install command is for.
                         }
                         catch (Exception ex)
                         {
-                            var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
+                            var logMessage = "{0} not upgraded. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                             if (continueAction != null) continueAction.Invoke(results);
