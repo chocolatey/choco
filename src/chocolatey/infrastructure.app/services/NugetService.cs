@@ -325,7 +325,7 @@ spam/junk folder.");
                         packageName,
                         version == null ? null : version.ToString()))
                     {
-                        packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
+                        packageManager.InstallPackage(availablePackage,ignoreDependencies: config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
                         //packageManager.InstallPackage(packageName, version, configuration.IgnoreDependencies, configuration.Prerelease);
                     }
                 }
