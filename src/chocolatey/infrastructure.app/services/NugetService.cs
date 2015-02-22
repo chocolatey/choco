@@ -811,14 +811,25 @@ packages as of version 1.0.0. That is what the install command is for.
 
                     if (performAction)
                     {
-                        using (packageManager.SourceRepository.StartOperation(
-                            RepositoryOperationNames.Install,
-                            packageName,
-                            version == null ? null : version.ToString()))
+                        try
                         {
-                            rename_legacy_package_version(config, packageVersion, pkgInfo);
-                            backup_existing_version(config, packageVersion);
-                            packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
+                            using (packageManager.SourceRepository.StartOperation(
+                                RepositoryOperationNames.Install,
+                                packageName,
+                                version == null ? null : version.ToString()))
+                            {
+                                rename_legacy_package_version(config, packageVersion, pkgInfo);
+                                backup_existing_version(config, packageVersion);
+                                packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            var logMessage = "{0} not uninstalled. An error occurred during uninstall:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
+                            this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                            var result = packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, packageVersion.Id)));
+                            result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            // do not call continueAction - will result in multiple passes
                         }
                     }
                     else
