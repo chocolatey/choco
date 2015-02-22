@@ -103,8 +103,6 @@ namespace chocolatey.tests.infrastructure.tolerance
             {
                 reset();
 
-                MockLogger.LogMessagesToConsole = true;
-
                 var i = 0;
                 FaultTolerance.retry(3, () => { i += 1; }, waitDurationMilliseconds: 0);
 
