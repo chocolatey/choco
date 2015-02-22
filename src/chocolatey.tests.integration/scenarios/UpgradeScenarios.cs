@@ -233,6 +233,14 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
+            }
+
+            [Fact]
             public void should_contain_a_warning_message_that_it_upgraded_successfully()
             {
                 bool upgradedSuccessMessage = false;
@@ -315,6 +323,14 @@ namespace chocolatey.tests.integration.scenarios
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
                 Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
             }
 
             [Fact]
@@ -445,6 +461,14 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_be_the_same_version_of_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
             public void should_have_a_successful_package_result()
             {
                 _packageResult.Success.ShouldBeTrue();
@@ -524,6 +548,14 @@ namespace chocolatey.tests.integration.scenarios
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
                 Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_be_the_same_version_of_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
             }
 
             [Fact]
@@ -609,6 +641,14 @@ namespace chocolatey.tests.integration.scenarios
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
                 Directory.Exists(packageDir).ShouldBeTrue();
+            }
+            
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
             }
 
             [Fact]
@@ -720,6 +760,14 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_not_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
             public void should_contain_a_warning_message_that_it_was_not_able_to_upgrade()
             {
                 bool upgradedSuccessMessage = false;
@@ -796,6 +844,14 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
+            }
+
+            [Fact]
             public void should_contain_a_warning_message_that_it_upgraded_successfully()
             {
                 bool upgradedSuccessMessage = false;
@@ -863,6 +919,14 @@ namespace chocolatey.tests.integration.scenarios
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).ShouldEqual("1.1.0");
+            }
+          
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
             }
 
             [Fact]
@@ -1001,11 +1065,27 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_not_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
             public void should_put_the_package_in_the_lib_bad_directory()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames);
 
                 Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_the_erroring_upgraded_package_in_the_lib_bad_directory()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("2.0.0.0");
             }
 
             [Fact]
