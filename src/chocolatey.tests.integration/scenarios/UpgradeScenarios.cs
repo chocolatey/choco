@@ -572,7 +572,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        public class when_upgrading_an_existing_package_with_a_read_and_delete_share_locked_file : ScenariosBase
+        public class when_upgrading_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
 
@@ -650,9 +650,27 @@ namespace chocolatey.tests.integration.scenarios
 
                 upgradeMessage.ShouldBeTrue();
             }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
         }
 
-        public class when_upgrading_an_existing_package_with_an_exclusively_locked_file : ScenariosBase
+        public class when_upgrading_a_package_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
 
@@ -678,13 +696,7 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_upgrade_where_install_location_reports()
-            {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_upgrade_a_package_in_the_lib_directory()
+            public void should_have_a_package_installed_in_the_lib_directory()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
@@ -748,7 +760,6 @@ namespace chocolatey.tests.integration.scenarios
             {
                 _packageResult.Warning.ShouldBeFalse();
             }
-
         }
 
         public class when_upgrading_a_package_with_added_files : ScenariosBase

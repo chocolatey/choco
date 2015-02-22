@@ -313,6 +313,158 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        public class when_uninstalling_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            private FileStream fileStream;
+
+            public override void Context()
+            {
+                base.Context();
+                var fileToOpen = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                fileStream = new FileStream(fileToOpen, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read | FileShare.Delete);
+            }
+
+            public override void AfterObservations()
+            {
+                base.AfterObservations();
+                fileStream.Close();
+            }
+
+            public override void Because()
+            {
+                Results = Service.uninstall_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_uninstall_the_package_from_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_be_able_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_it_uninstalled_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("uninstalled 1/1")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+            
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+        }
+
+        public class when_uninstalling_a_package_with_an_exclusively_locked_file : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            private FileStream fileStream;
+
+            public override void Context()
+            {
+                base.Context();
+                var fileToOpen = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                fileStream = new FileStream(fileToOpen, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            }
+
+            public override void AfterObservations()
+            {
+                base.AfterObservations();
+                fileStream.Close();
+            }
+
+            public override void Because()
+            {
+                Results = Service.uninstall_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+            
+            [Fact]
+            public void should_not_be_able_to_remove_the_package_from_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_old_files_in_directory()
+            {
+                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+
+                File.Exists(shimFile).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_it_was_not_able_to_uninstall()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("uninstalled 0/1")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+        }
+
         public class when_uninstalling_a_package_with_added_files : ScenariosBase
         {
             private PackageResult packageResult;
