@@ -54,7 +54,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_noop_upgrading_a_package_that_has_available_upgrades : ScenariosBase
         {
             public override void Context()
@@ -109,7 +109,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_noop_upgrading_a_package_that_does_not_have_available_upgrades : ScenariosBase
         {
             public override void Context()
@@ -157,7 +157,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_noop_upgrading_a_package_that_does_not_exist : ScenariosBase
         {
             public override void Context()
@@ -197,7 +197,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_upgrading_an_existing_package_happy_path : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -301,7 +301,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_force_upgrading_a_package : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -411,7 +411,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_that_does_not_have_available_upgrades : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -501,7 +501,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_force_upgrading_a_package_that_does_not_have_available_upgrades : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -592,7 +592,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_upgrading_packages_with_packages_config : ScenariosBase
         {
             public override void Context()
@@ -614,7 +614,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -653,7 +653,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 Directory.Exists(packageDir).ShouldBeTrue();
             }
-            
+
             [Fact]
             public void should_upgrade_the_package()
             {
@@ -721,7 +721,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -822,7 +822,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_added_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -901,7 +901,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -934,7 +934,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.ReadAllText(shimFile).ShouldEqual("1.1.0");
             }
-          
+
             [Fact]
             public void should_upgrade_the_package()
             {
@@ -980,7 +980,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_that_does_not_exist : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1055,7 +1055,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUpgradeCommand))]
+        [Concern(typeof (ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;
