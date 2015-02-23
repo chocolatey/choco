@@ -82,12 +82,12 @@
 
 #### when force installing an already installed package with with an exclusively locked file
 
+ * [PENDING] should delete the rollback
+ * [PENDING] should not have a successful package result
+ * [PENDING] should not have inconclusive package result
+ * [PENDING] should not have warning package result
  * should contain a message that there was nothing to do
- * should delete the rollback
  * should have a package installed in the lib directory
- * should not have a successful package result
- * should not have inconclusive package result
- * should not have warning package result
  * should still have the package installed with the expected version of the package
 
 #### when installing a package happy path
