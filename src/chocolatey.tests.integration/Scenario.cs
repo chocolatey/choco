@@ -52,6 +52,7 @@ namespace chocolatey.tests.integration
             _fileSystem.delete_directory_if_exists(shimsPath, recursive: true);
             _fileSystem.delete_directory_if_exists(badPackagesPath, recursive: true);
             _fileSystem.delete_directory_if_exists(backupPackagesPath, recursive: true);
+            _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(get_top_level(), ".chocolatey"), recursive: true);
 
             _fileSystem.create_directory(config.CacheLocation);
             _fileSystem.create_directory(config.Sources);
@@ -59,6 +60,7 @@ namespace chocolatey.tests.integration
             _fileSystem.create_directory(shimsPath);
             _fileSystem.create_directory(badPackagesPath);
             _fileSystem.create_directory(backupPackagesPath);
+            _fileSystem.create_directory(_fileSystem.combine_paths(get_top_level(), ".chocolatey"));
         }
 
         public static void add_packages_to_source_location(ChocolateyConfiguration config, string pattern)
