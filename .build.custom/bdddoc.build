@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="BDDDocRunner" default="go">
+  <property name="build.config.settings" value="__NONE__" overwrite="false" />
+  <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
+  <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
+  <property name="dirs.current" value="${directory::get-current-directory()}" />
+  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <property name="folder.build_scripts" value="build" overwrite="false" />
+  <include buildfile="${dirs.current}${path.separator}${folder.build_scripts}${path.separator}default.build.settings" />
+  <property name="build.step.name" value="${project::get-name()}" />
+  <property name="build.step.path" value="${project::get-buildfile-path()}" />
+  <!-- build step customizations below this -->
+
+  <property name="files.bdddoc_results" value="${dirs.current}${path.separator}Scenarios.md" overwrite="false" />
+  <property name="app.bdddoc.console" value="${path::get-full-path(dirs.lib)}${path.separator}bdddoc${path.separator}bdddoc.console.exe" overwrite="false" />
+  <property name="test_attribute" value="FactAttribute" overwrite="false" />
+  <property name="test_assembly" value="__TEST_ASSEMBLY__" overwrite="false" />
+
+  <target name="go" depends="run_bdddoc" />
+
+  <target name="run_bdddoc" description="Running BDDDoc">
+    <echo level="Warning" message="Running ${app.bdddoc.console} ${dirs.build.code}${path.separator}${test_assembly} ${test_attribute} ${files.bdddoc_results} markdown"/>
+    
+     <exec
+        program="${app.bdddoc.console}"
+        workingdir="${dirs.build.code}"
+        failonerror="${fail.build.on.error}"
+        if="${platform::is-windows()}"
+        >
+      <arg value='"${dirs.build.code}${path.separator}${test_assembly}"' />
+      <arg value="${test_attribute}" />
+      <arg value='"${files.bdddoc_results}"' />
+      <arg value="markdown" />
+      <arg value='custom_header="Chocolatey Usage Scenarios"' />
+    </exec>
+  </target>
+
+</project>

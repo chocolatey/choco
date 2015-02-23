@@ -21,6 +21,8 @@ namespace chocolatey.tests.integration.scenarios
     using System.Linq;
     using NuGet;
     using Should;
+    using bdddoc.core;
+    using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commands;
@@ -50,6 +52,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_noop_installing_a_package : ScenariosBase
         {
             public override void Context()
@@ -94,8 +97,9 @@ namespace chocolatey.tests.integration.scenarios
 
                 expectedMessage.ShouldBeTrue();
             }
-        } 
-        
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_noop_installing_a_package_that_does_not_exist : ScenariosBase
         {
             public override void Context()
@@ -141,8 +145,9 @@ namespace chocolatey.tests.integration.scenarios
 
                 expectedMessage.ShouldBeTrue();
             }
-        } 
-        
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_happy_path : ScenariosBase
         {
             private PackageResult packageResult;
@@ -300,6 +305,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_packages_with_packages_config : ScenariosBase
         {
             public override void Context()
@@ -413,6 +419,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_an_already_installed_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -485,6 +492,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -586,6 +594,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult packageResult;
@@ -685,6 +694,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package_with_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult packageResult;
@@ -769,7 +779,8 @@ namespace chocolatey.tests.integration.scenarios
                 packageResult.Warning.ShouldBeFalse();
             }
         }
-        
+
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_exists_but_a_version_that_does_not_exist : ScenariosBase
         {
             private PackageResult packageResult;
@@ -861,6 +872,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_does_not_exist : ScenariosBase
         {
             private PackageResult packageResult;
@@ -946,6 +958,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1039,6 +1052,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_side_by_side_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1110,8 +1124,9 @@ namespace chocolatey.tests.integration.scenarios
             {
                 packageResult.Version.ShouldEqual("1.0.0");
             }
-        } 
-        
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_switching_a_normal_package_to_a_side_by_side_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1185,8 +1200,9 @@ namespace chocolatey.tests.integration.scenarios
             {
                 packageResult.Version.ShouldEqual("1.0.0");
             }
-        }  
-        
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_switching_a_side_by_side_package_to_a_normal_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1263,6 +1279,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_with_dependencies_happy : ScenariosBase
         {
             public override void Context()
@@ -1352,7 +1369,8 @@ namespace chocolatey.tests.integration.scenarios
                 }
             }
         }
-        
+
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package_with_dependencies : ScenariosBase
         {
             public override void Context()
@@ -1463,6 +1481,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package_forcing_dependencies : ScenariosBase
         {
             public override void Context()
@@ -1571,8 +1590,9 @@ namespace chocolatey.tests.integration.scenarios
                     packageResult.Value.Warning.ShouldBeFalse();
                 }
             }
-        } 
-        
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package_ignoring_dependencies : ScenariosBase
         {
             public override void Context()
@@ -1681,8 +1701,9 @@ namespace chocolatey.tests.integration.scenarios
                     packageResult.Value.Warning.ShouldBeFalse();
                 }
             }
-        }   
-        
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package_forcing_and_ignoring_dependencies : ScenariosBase
         {
             public override void Context()
@@ -1784,6 +1805,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_with_dependencies_and_dependency_cannot_be_found : ScenariosBase
         {
             public override void Context()
@@ -1892,6 +1914,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_ignoring_dependencies_that_cannot_be_found : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1977,6 +2000,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_depends_on_a_newer_version_of_an_installed_dependency : ScenariosBase
         {
             public override void Context()
@@ -2076,6 +2100,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_depends_on_an_unavailable_newer_version_of_an_installed_dependency : ScenariosBase
         {
             public override void Context()
@@ -2142,6 +2167,7 @@ namespace chocolatey.tests.integration.scenarios
 
         }  
         
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_depends_on_an_unavailable_newer_version_of_an_installed_dependency_ignoring_dependencies : ScenariosBase
         {
             public override void Context()
