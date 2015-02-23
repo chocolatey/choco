@@ -1172,10 +1172,5 @@ namespace chocolatey.tests.integration.scenarios
                 errorFound.ShouldBeTrue();
             }
         }
-
-        //pinned package upgrade scenario
-        //open a file in package folder (holding lock)
-        //upgrade dependencies
-        //when upgrading a file that has locked dependency
     }
 }
