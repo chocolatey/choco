@@ -26,10 +26,7 @@ namespace chocolatey.tests.integration
          *  - install force pinned package
          *  - install with dependency error
          *  
-         *  - upgrade with dependencies
-         *  - upgrade as a dependency
          *  - upgrade pinned package
-         *  - upgrade legacy versions as dependency
          *  - when upgrading a file that has locked dependency 
          *  - upgrade with dependency error
          *  

@@ -1172,5 +1172,727 @@ namespace chocolatey.tests.integration.scenarios
                 errorFound.ShouldBeTrue();
             }
         }
+
+        [Concern(typeof (ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_package_with_dependencies_happy : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "hasdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("2.1.0.0");
+            }
+
+            [Fact]
+            public void should_upgrade_the_minimum_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("2.0.0.0");
+            }
+
+            [Fact]
+            public void should_upgrade_the_exact_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("2.0.0.0");
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_everything_upgraded_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 3/3")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+        }
+
+        [Concern(typeof (ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_package_with_unavailable_dependencies : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "hasdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency.1*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_not_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            public void should_not_upgrade_the_minimum_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            public void should_not_upgrade_the_exact_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_it_was_unable_to_upgrade_anything()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 0/1")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_have_an_error_package_result()
+            {
+                bool errorFound = false;
+
+                foreach (var packageResult in Results)
+                {
+                    foreach (var message in packageResult.Value.Messages)
+                    {
+                        if (message.MessageType == ResultType.Error)
+                        {
+                            errorFound = true;
+                        }
+                    }
+                }
+
+                errorFound.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_expected_error_in_package_result()
+            {
+                bool errorFound = false;
+
+                foreach (var packageResult in Results)
+                {
+                    foreach (var message in packageResult.Value.Messages)
+                    {
+                        if (message.MessageType == ResultType.Error)
+                        {
+                            if (message.Message.Contains("Unable to resolve dependency 'isexactversiondependency")) errorFound = true;
+                        }
+                    }
+                }
+
+                errorFound.ShouldBeTrue();
+            }
+        }
+
+        [Concern(typeof (ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_package_with_unavailable_dependencies_ignoring_dependencies : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "hasdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency.1*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Configuration.IgnoreDependencies = true;
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("2.1.0.0");
+            }
+
+            [Fact]
+            public void should_not_upgrade_the_minimum_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            public void should_not_upgrade_the_exact_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_it_upgraded_only_the_package_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+        }
+
+        [Concern(typeof (ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_dependency_happy : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "isdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.1*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
+            }
+
+            [Fact]
+            public void should_not_upgrade_the_parent_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            public void should_not_upgrade_the_exact_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            public void should_contain_a_message_the_dependency_upgraded_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+        }
+
+        [Concern(typeof (ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_dependency_legacy_folder_version : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "isdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.1*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
+                Configuration.AllowMultipleVersions = true;
+                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Configuration.AllowMultipleVersions = false;
+
+                string dotChocolatey = Path.Combine(Scenario.get_top_level(), ".chocolatey");
+                if (Directory.Exists(dotChocolatey))
+                {
+                    Directory.Delete(dotChocolatey);
+                }
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
+            }
+
+            [Fact]
+            public void should_remove_the_legacy_folder_version_of_the_package()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency.1.0.0");
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }           
+            
+            [Fact]
+            public void should_replace_the_legacy_folder_version_of_the_package_with_a_lib_package_folder_that_has_no_version()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_upgrade_the_parent_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency.1.0.0", "hasdependency.1.0.0.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            } 
+            
+            [Fact]
+            public void should_not_add_a_versionless_parent_package_folder_to_the_lib_dir()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency");
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }   
+            
+            [Fact]
+            public void should_leave_the_parent_package_as_legacy_folder()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency.1.0.0");
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_upgrade_the_exact_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency.1.0.0", "isexactversiondependency.1.0.0.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            public void should_leave_the_exact_version_package_as_legacy_folder()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency.1.0.0");
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_add_a_versionless_exact_version_package_folder_to_the_lib_dir()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency");
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }   
+
+            [Fact]
+            public void should_contain_a_message_the_dependency_upgraded_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+        }
+
+        [Concern(typeof (ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_dependency_with_parent_that_depends_on_a_range_less_than_upgrade_version : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "isdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("2.1.0.0");
+            }
+
+            [Fact]
+            public void should_upgrade_the_parent_package_to_lowest_version_that_meets_new_dependency_version()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.1.0");
+            }
+
+            [Fact]
+            public void should_upgrade_the_exact_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.1.0");
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_everything_upgraded_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 3/3")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+        }
+
+        [Concern(typeof (ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_legacy_folder_dependency_with_parent_that_depends_on_a_range_less_than_upgrade_version : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "isdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
+                Configuration.AllowMultipleVersions = true;
+                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Configuration.AllowMultipleVersions = false;
+
+                string dotChocolatey = Path.Combine(Scenario.get_top_level(), ".chocolatey");
+                if (Directory.Exists(dotChocolatey))
+                {
+                    Directory.Delete(dotChocolatey);
+                }
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("2.1.0.0");
+            }
+
+            [Fact]
+            public void should_remove_the_legacy_folder_version_of_the_package()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency.1.0.0");
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_replace_the_legacy_folder_version_of_the_package_with_a_lib_package_folder_that_has_no_version()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_upgrade_the_parent_package_to_lowest_version_that_meets_new_dependency_version()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.1.0");
+            }
+
+            [Fact]
+            public void should_replace_the_legacy_folder_version_of_the_parent_package_with_a_lib_package_folder_that_has_no_version()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency");
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            [Pending("Legacy packages are left when implicit - GH-117")]
+            public void should_remove_the_legacy_folder_version_of_the_parent_package()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency.1.0.0");
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_upgrade_the_exact_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.1.0");
+            }
+
+            [Fact]
+            public void should_replace_the_legacy_folder_version_of_the_exact_version_package_with_a_lib_package_folder_that_has_no_version()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency");
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            [Pending("Legacy packages are left when implicit - GH-117")]
+            public void should_remove_the_legacy_folder_version_of_the_exact_version_package()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency.1.0.0");
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }   
+
+            [Fact]
+            public void should_contain_a_message_that_everything_upgraded_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 3/3")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+        }
     }
 }
