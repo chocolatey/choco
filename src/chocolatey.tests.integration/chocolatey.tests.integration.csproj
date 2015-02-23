@@ -154,6 +154,9 @@
     <None Include="context\isdependency\isdependency.2.0.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\isdependency\isdependency.2.1.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\isdependency\isdependency.nuspec" />
     <None Include="context\isdependency\tools\chocolateyinstall.ps1" />
     <None Include="context\isdependency\tools\chocolateyuninstall.ps1" />

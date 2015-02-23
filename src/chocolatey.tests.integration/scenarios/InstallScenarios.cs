@@ -1545,11 +1545,11 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_reinstall_the_floating_dependency_with_the_latest_version_that_is_available()
+            public void should_reinstall_the_floating_dependency_with_the_latest_version_that_satisfies_the_dependency()
             {
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 var package = new OptimizedZipPackage(packageFile);
-                package.Version.Version.to_string().ShouldEqual("2.0.0.0");
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
             } 
             
             [Fact]
@@ -2510,7 +2510,7 @@ namespace chocolatey.tests.integration.scenarios
             [Pending("NuGet does not deal with version conflicts - GH-116")]
             public void should_not_upgrade_the_exact_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 var package = new OptimizedZipPackage(packageFile);
                 package.Version.Version.to_string().ShouldEqual("1.0.0.0");
             } 
@@ -2578,6 +2578,5 @@ namespace chocolatey.tests.integration.scenarios
                 errorFound.ShouldBeTrue();
             }
         }
-
     }
 }
