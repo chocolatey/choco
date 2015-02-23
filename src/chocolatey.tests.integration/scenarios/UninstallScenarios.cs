@@ -22,6 +22,8 @@ namespace chocolatey.tests.integration.scenarios
     using NUnit.Framework;
     using NuGet;
     using Should;
+    using bdddoc.core;
+    using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commands;
@@ -55,6 +57,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_noop_uninstalling_a_package : ScenariosBase
         {
             public override void Context()
@@ -101,6 +104,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_noop_uninstalling_a_package_that_does_not_exist : ScenariosBase
         {
             public override void Context()
@@ -128,6 +132,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_happy_path : ScenariosBase
         {
             private PackageResult packageResult;
@@ -205,8 +210,9 @@ namespace chocolatey.tests.integration.scenarios
             {
                 packageResult.Name.ShouldEqual(Configuration.PackageNames);
             }
-        } 
-        
+        }
+
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_force_uninstalling_a_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -292,6 +298,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_packages_with_packages_config : ScenariosBase
         {
             public override void Context()
@@ -313,6 +320,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -385,6 +393,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -465,6 +474,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_added_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -562,6 +572,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -657,8 +668,9 @@ namespace chocolatey.tests.integration.scenarios
             {
                 packageResult.Name.ShouldEqual(Configuration.PackageNames);
             }
-        }    
-        
+        }
+
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_force_uninstalling_a_package_with_added_and_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -763,7 +775,8 @@ namespace chocolatey.tests.integration.scenarios
                 packageResult.Name.ShouldEqual(Configuration.PackageNames);
             }
         }
-        
+
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_that_does_not_exist : ScenariosBase
         {
             private PackageResult packageResult;
@@ -838,6 +851,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;
