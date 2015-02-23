@@ -56,8 +56,8 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("params=|parameters=|pkgparameters=|packageparameters=|package-parameters=",
                      "PackageParameters - Parameters to pass to the package. Defaults to unspecified.",
                      option => configuration.PackageParameters = option)
-                .Add("x|forcedependencies|force-dependencies",
-                     "ForceDependencies - Force dependencies to be uninstalled when uninstalling package(s). Defaults to false.",
+                .Add("x|forcedependencies|force-dependencies|removedependencies|remove-dependencies",
+                     "RemoveDependencies - Uninstall dependencies when uninstalling package(s). Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
                 .Add("n|skippowershell|skip-powershell",
                      "Skip Powershell - Do not run chocolateyUninstall.ps1. Defaults to false.",
