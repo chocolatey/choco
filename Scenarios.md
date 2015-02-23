@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 24 Scenarios(s) , 196 Observations(s) ]
+### ChocolateyInstallCommand [ 24 Scenario(s), 196 Observation(s) ]
 
 #### when force installing an already installed package
 
@@ -270,7 +270,7 @@
  * should not have inconclusive package result
  * should not have warning package result
 
-### ChocolateyUninstallCommand [ 12 Scenarios(s) , 82 Observations(s) ]
+### ChocolateyUninstallCommand [ 12 Scenario(s), 82 Observation(s) ]
 
 #### when force uninstalling a package
 
@@ -390,7 +390,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 14 Scenarios(s) , 104 Observations(s) ]
+### ChocolateyUpgradeCommand [ 14 Scenario(s), 104 Observation(s) ]
 
 #### when force upgrading a package
 
