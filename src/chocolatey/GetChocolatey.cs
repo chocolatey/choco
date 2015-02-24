@@ -33,6 +33,9 @@ namespace chocolatey
 
     // ReSharper disable InconsistentNaming
 
+    /// <summary>
+    /// Entry point for API
+    /// </summary>
     public static class Lets
     {
         public static GetChocolatey GetChocolatey()
@@ -41,12 +44,18 @@ namespace chocolatey
         }
     }
 
+    /// <summary>
+    /// The place where all the magic happens.
+    /// </summary>
     public class GetChocolatey
     {
         private readonly ChocolateyConfiguration _configuration;
         private readonly Container _container;
         private readonly IFileSystem _fileSystem;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GetChocolatey"/> class.
+        /// </summary>
         public GetChocolatey()
         {
             _configuration = new ChocolateyConfiguration();
@@ -69,7 +78,7 @@ namespace chocolatey
         ///   This is an optional helper to give you the correct settings for a logger. You can still set this in the set by calling propConfig.Logger without having to call this method.
         /// </summary>
         /// <param name="logger">This is the logger you want Chocolatey to also use.</param>
-        /// <returns></returns>
+        /// <returns>This <see cref="GetChocolatey"/> instance</returns>
         public GetChocolatey SetCustomLogging(ILog logger)
         {
             Log.InitializeWith(logger);
@@ -80,7 +89,7 @@ namespace chocolatey
         ///   Set your options for running chocolatey here. It looks like Set(c => {c.CommandName = "install"; c.PackageNames = "bob";}).Run();
         /// </summary>
         /// <param name="propConfig">The configuration to set</param>
-        /// <returns>Itself so you can chain each of these</returns>
+        /// <returns>This <see cref="GetChocolatey"/> instance</returns>
         public GetChocolatey Set(Action<ChocolateyConfiguration> propConfig)
         {
             propConfig.Invoke(_configuration);
