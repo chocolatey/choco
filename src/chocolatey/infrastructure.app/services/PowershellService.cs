@@ -15,9 +15,9 @@
 
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
     using System.IO;
     using System.Linq;
+    using adapters;
     using commandline;
     using configuration;
     using domain;
@@ -25,6 +25,7 @@ namespace chocolatey.infrastructure.app.services
     using infrastructure.commands;
     using logging;
     using results;
+    using Environment = System.Environment;
 
     public class PowershellService : IPowershellService
     {
@@ -32,7 +33,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly string _customImports;
 
         public PowershellService(IFileSystem fileSystem)
-            : this(fileSystem, null)
+            : this(fileSystem, new CustomString(string.Empty))
         {
         }
 
@@ -41,7 +42,7 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="fileSystem">The file system.</param>
         /// <param name="customImports">The custom imports. This should be everything you need minus the &amp; to start and the ending semi-colon.</param>
-        public PowershellService(IFileSystem fileSystem, string customImports)
+        public PowershellService(IFileSystem fileSystem, CustomString customImports)
         {
             _fileSystem = fileSystem;
             _customImports = customImports;
