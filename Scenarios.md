@@ -1,6 +1,17 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 24 Scenario(s), 196 Observation(s) ]
+### ChocolateyInstallCommand [ 27 Scenario(s), 221 Observation(s) ]
+
+#### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
+
+ * should contain a warning message that it was unable to install any packages
+ * should have an error package result
+ * should have expected error in package result
+ * should not have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should not install a package in the lib directory
+ * should not upgrade the dependency
 
 #### when force installing an already installed package
 
@@ -39,7 +50,7 @@
  * should not have warning package result
  * should reinstall the exact same version of the exact dependency
  * should reinstall the exact same version of the package
- * should reinstall the floating dependency with the latest version that is available
+ * should reinstall the floating dependency with the latest version that satisfies the dependency
 
 #### when force installing an already installed package ignoring dependencies
 
@@ -195,14 +206,37 @@
 
 #### when installing a package with dependencies happy
 
- * should contain a warning message that it installed successfully
+ * should contain a message that everything installed successfully
  * should have a successful package result
  * should have a version of one dot zero dot zero
  * should install a package in the lib directory
  * should install the dependency in the lib directory
+ * should install the expected version of the dependency
  * should install where install location reports
  * should not have inconclusive package result
  * should not have warning package result
+
+#### when installing a package with dependencies on a newer version of a package than an existing package has with that dependency
+
+ * should contain a message that it installed successfully
+ * should have a successful package result
+ * should install a package in the lib directory
+ * should install where install location reports
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should upgrade the dependency
+
+#### when installing a package with dependencies on a newer version of a package than are allowed by an existing package with that dependency
+
+ * [PENDING] should contain a message that it was unable to install any packages
+ * [PENDING] should have an error package result
+ * [PENDING] should not have a successful package result
+ * [PENDING] should not have inconclusive package result
+ * [PENDING] should not have warning package result
+ * [PENDING] should not install the conflicting package
+ * [PENDING] should not install the conflicting package in the lib directory
+ * [PENDING] should not upgrade the exact version dependency
+ * [PENDING] should not upgrade the minimum version dependency
 
 #### when installing a side by side package
 
@@ -390,7 +424,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 14 Scenario(s), 104 Observation(s) ]
+### ChocolateyUpgradeCommand [ 21 Scenario(s), 167 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -436,6 +470,58 @@
  * should contain a message that a package can be upgraded
  * should contain older version in directory
  * should not create a rollback
+
+#### when upgrading a dependency happy
+
+ * should contain a message the dependency upgraded successfully
+ * should have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should not upgrade the exact version dependency
+ * should not upgrade the parent package
+ * should upgrade the package
+
+#### when upgrading a dependency legacy folder version
+
+ * should contain a message the dependency upgraded successfully
+ * should have a successful package result
+ * should leave the exact version package as legacy folder
+ * should leave the parent package as legacy folder
+ * should not add a versionless exact version package folder to the lib dir
+ * should not add a versionless parent package folder to the lib dir
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should not upgrade the exact version dependency
+ * should not upgrade the parent package
+ * should remove the legacy folder version of the package
+ * should replace the legacy folder version of the package with a lib package folder that has no version
+ * should upgrade the package
+
+#### when upgrading a dependency with parent that depends on a range less than upgrade version
+
+ * should contain a message that everything upgraded successfully
+ * should have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should upgrade the exact version dependency
+ * should upgrade the package
+ * should upgrade the parent package to lowest version that meets new dependency version
+
+#### when upgrading a legacy folder dependency with parent that depends on a range less than upgrade version
+
+ * [PENDING] should remove the legacy folder version of the exact version package
+ * [PENDING] should remove the legacy folder version of the parent package
+ * should contain a message that everything upgraded successfully
+ * should have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should remove the legacy folder version of the package
+ * should replace the legacy folder version of the exact version package with a lib package folder that has no version
+ * should replace the legacy folder version of the package with a lib package folder that has no version
+ * should replace the legacy folder version of the parent package with a lib package folder that has no version
+ * should upgrade the exact version dependency
+ * should upgrade the package
+ * should upgrade the parent package to lowest version that meets new dependency version
 
 #### when upgrading a package that does not exist
 
@@ -517,6 +603,38 @@
  * should not have inconclusive package result
  * should not have warning package result
  * should update the changed file
+ * should upgrade the package
+
+#### when upgrading a package with dependencies happy
+
+ * should contain a message that everything upgraded successfully
+ * should have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should upgrade the exact version dependency
+ * should upgrade the minimum version dependency
+ * should upgrade the package
+
+#### when upgrading a package with unavailable dependencies
+
+ * should contain a message that it was unable to upgrade anything
+ * should have an error package result
+ * should have expected error in package result
+ * should not have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should not upgrade the exact version dependency
+ * should not upgrade the minimum version dependency
+ * should not upgrade the package
+
+#### when upgrading a package with unavailable dependencies ignoring dependencies
+
+ * should contain a message that it upgraded only the package successfully
+ * should have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should not upgrade the exact version dependency
+ * should not upgrade the minimum version dependency
  * should upgrade the package
 
 #### when upgrading an existing package happy path
