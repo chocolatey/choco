@@ -18,13 +18,13 @@ namespace chocolatey.infrastructure.app.registration
     using System.Collections.Generic;
     using NuGet;
     using SimpleInjector;
+    using adapters;
     using commands;
     using events;
     using filesystem;
     using infrastructure.commands;
     using infrastructure.configuration;
     using infrastructure.services;
-    using logging;
     using nuget;
     using services;
     using IFileSystem = filesystem.IFileSystem;
@@ -58,6 +58,7 @@ namespace chocolatey.infrastructure.app.registration
             container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);
             container.Register<IAutomaticUninstallerService, AutomaticUninstallerService>(Lifestyle.Singleton);
             container.Register<ICommandExecutor, CommandExecutor>(Lifestyle.Singleton);
+            container.Register(() => new CustomString(string.Empty));
 
             //todo:refactor - this should be autowired
             container.Register<IEnumerable<ICommand>>(() =>
@@ -66,7 +67,7 @@ namespace chocolatey.infrastructure.app.registration
                         {
                             new ChocolateyListCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyInstallCommand(container.GetInstance<IChocolateyPackageService>()),
-                            new ChocolateyPinCommand(container.GetInstance<IChocolateyPackageInformationService>(),container.GetInstance<ILogger>(),container.GetInstance<INugetService>()),
+                            new ChocolateyPinCommand(container.GetInstance<IChocolateyPackageInformationService>(), container.GetInstance<ILogger>(), container.GetInstance<INugetService>()),
                             new ChocolateyUpgradeCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyUninstallCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyPackCommand(container.GetInstance<IChocolateyPackageService>()),
