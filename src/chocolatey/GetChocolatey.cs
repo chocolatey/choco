@@ -102,13 +102,13 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Registers an overriding component. Does not require a dependency on
-        /// Simple Injector.
+        /// Registers a container component. Does not require a dependency on Simple Injector.
+        /// Will override existing component if registered.
         /// </summary>
         /// <param name="service">The service.</param>
         /// <param name="implementation">The implementation.</param>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
-        public GetChocolatey RegisterOverridingComponent(Type service, Type implementation)
+        public GetChocolatey RegisterContainerComponent(Type service, Type implementation)
         {
             _container.Register(service,implementation,Lifestyle.Singleton);
 
@@ -116,28 +116,29 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Registers an overriding component. Does not require a dependency on
-        /// Simple Injector.
+        /// Registers a container component. Does not require a dependency on Simple Injector. 
+        /// Will override existing component if registered.
         /// </summary>
         /// <typeparam name="Service">The type of the service.</typeparam>
         /// <typeparam name="Implementation">The type of the Implementation.</typeparam>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
-        public GetChocolatey RegisterOverridingComponent<Service,Implementation>() 
+        public GetChocolatey RegisterContainerComponent<Service,Implementation>() 
             where Service : class 
             where Implementation : class, Service
         {
-            return RegisterOverridingComponent<Service, Implementation>(Lifestyle.Singleton);
+            return RegisterContainerComponent<Service, Implementation>(Lifestyle.Singleton);
         }
 
         /// <summary>
-        /// Registers an overriding component.
+        /// Registers a container component. 
+        /// Will override existing component if registered.
         /// NOTE: This requires you take a dependency on SimpleInjector.
         /// </summary>
         /// <typeparam name="Service">The type of the service.</typeparam>
         /// <typeparam name="Implementation">The type of the Implementation.</typeparam>
         /// <param name="lifestyle">The lifestyle.</param>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
-        public GetChocolatey RegisterOverridingComponent<Service,Implementation>(Lifestyle lifestyle) 
+        public GetChocolatey RegisterContainerComponent<Service,Implementation>(Lifestyle lifestyle) 
             where Service : class 
             where Implementation : class, Service
         {
@@ -147,13 +148,13 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Registers an overriding component. Does not require a dependency on
-        /// Simple Injector.
+        /// Registers a container component. Does not require a dependency on Simple Injector. 
+        /// Will override existing component if registered.
         /// </summary>
         /// <typeparam name="Service">The type of the ervice.</typeparam>
         /// <param name="implementationCreator">The implementation creator.</param>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
-        public GetChocolatey RegisterOverridingComponent<Service>(Func<Service> implementationCreator)
+        public GetChocolatey RegisterContainerComponent<Service>(Func<Service> implementationCreator)
              where Service : class
         {
             _container.Register(implementationCreator,Lifestyle.Singleton);
@@ -162,13 +163,13 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Register overriding components when you need to do multiple setups and
-        /// want to work with the container directly. 
+        /// Register container components when you need to do multiple setups and want to work with the container directly. 
+        /// Will override existing components if registered.
         /// NOTE: This requires you take a dependency on SimpleInjector.
         /// </summary>
         /// <param name="containerSetup">The container setup.</param>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
-        public GetChocolatey RegisterOverridingComponents(Action<Container> containerSetup)
+        public GetChocolatey RegisterContainerComponents(Action<Container> containerSetup)
         {
             if (containerSetup != null)
             {
