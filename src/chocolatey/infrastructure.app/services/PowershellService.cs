@@ -29,10 +29,22 @@ namespace chocolatey.infrastructure.app.services
     public class PowershellService : IPowershellService
     {
         private readonly IFileSystem _fileSystem;
+        private readonly string _customImports;
 
         public PowershellService(IFileSystem fileSystem)
+            : this(fileSystem, null)
+        {
+        }
+
+        /// <summary>
+        ///   Initializes a new instance of the <see cref="PowershellService" /> class.
+        /// </summary>
+        /// <param name="fileSystem">The file system.</param>
+        /// <param name="customImports">The custom imports. This should be everything you need minus the &amp; to start and the ending semi-colon.</param>
+        public PowershellService(IFileSystem fileSystem, string customImports)
         {
             _fileSystem = fileSystem;
+            _customImports = customImports;
         }
 
         public void noop_action(PackageResult packageResult, CommandNameType command)
@@ -84,7 +96,12 @@ namespace chocolatey.infrastructure.app.services
             // many issues in existing packages, including upgrading
             // Chocolatey from older POSH client due to log errors
             //$ErrorActionPreference = 'Stop';
-            return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; & import-module -name '{0}'; & '{1}'".format_with(installerModule, script);
+            return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; & import-module -name '{0}';{2} & '{1}'"
+                .format_with(
+                    installerModule,
+                    script,
+                    string.IsNullOrWhiteSpace(_customImports) ? string.Empty : "& {0}".format_with(_customImports.EndsWith(";") ? _customImports : _customImports + ";")
+                );
         }
 
         public bool run_action(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command)
