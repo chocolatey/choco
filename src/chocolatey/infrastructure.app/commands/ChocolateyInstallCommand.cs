@@ -91,6 +91,10 @@ namespace chocolatey.infrastructure.app.commands
             {
                 throw new ApplicationException("Package name is required. Please pass at least one package name to install.");
             }
+            if (configuration.ForceDependencies && !configuration.Force)
+            {
+                throw new ApplicationException("Force dependencies can only be used with force also turned on.");
+            }
         }
 
         public void help_message(ChocolateyConfiguration configuration)

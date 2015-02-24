@@ -23,12 +23,22 @@ namespace chocolatey.tests.integration
          *  - value overridden
          *  
          * Install/Upgrade/Uninstall scenarios:
-         *  - install dependency, then try to install something that depends on newer version
-         *   - where other package is cool with it
-         *   - where other package can't be happy
-         *  - uninstall happy path
-         *  - upgrade with dependencies
-         *  - upgrade as a dependency
+         *  - install force pinned package
+         *  - install with dependency error
+         *  
+         *  - upgrade pinned package
+         *  - when upgrading a file that has locked dependency 
+         *  - upgrade with dependency error
+         *  
+         *  - uninstall pinned package
+         *  - uninstall with dependency error
+         *  - uninstall with dependencies
+         *  - uninstall with dependencies force
+         *  - uninstall with dependencies removing dependencies
+         *  - uninstall with dependencies force / not removing dependencies
+         *  - uninstall with dependencies force / removing dependencies
+         *  - uninstall as a dependency
+         *  - uninstall as a dependency with force
          *  
          * List scenarios:
          *  - list local

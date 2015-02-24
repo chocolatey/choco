@@ -952,12 +952,5 @@ namespace chocolatey.tests.integration.scenarios
                 errorFound.ShouldBeTrue();
             }
         }
-
-        //uninstall pinned package
-        //uninstalling with dependencies
-        //uninstalling with dependencies force
-        //uninstalling with dependencies force / force dependencies
-        //uninstalling a dependency
-        //uninstalling a dependency with force
     }
 }

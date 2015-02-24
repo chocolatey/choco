@@ -1322,15 +1322,23 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_contain_a_warning_message_that_it_installed_successfully()
+            public void should_install_the_expected_version_of_the_dependency()
             {
-                bool installedSuccessfully = false;
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            } 
+
+            [Fact]
+            public void should_contain_a_message_that_everything_installed_successfully()
+            {
+                bool expectedMessage = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
                 {
-                    if (message.Contains("3/3")) installedSuccessfully = true;
+                    if (message.Contains("3/3")) expectedMessage = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                expectedMessage.ShouldBeTrue();
             }
 
             [Fact]
@@ -1537,11 +1545,11 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_reinstall_the_floating_dependency_with_the_latest_version_that_is_available()
+            public void should_reinstall_the_floating_dependency_with_the_latest_version_that_satisfies_the_dependency()
             {
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 var package = new OptimizedZipPackage(packageFile);
-                package.Version.Version.to_string().ShouldEqual("2.0.0.0");
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
             } 
             
             [Fact]
@@ -2248,6 +2256,326 @@ namespace chocolatey.tests.integration.scenarios
                 {
                     packageResult.Value.Warning.ShouldBeFalse();
                 }
+            }
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_force_installing_a_package_that_depends_on_an_unavailable_newer_version_of_an_installed_dependency_forcing_dependencies : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "hasdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.1.6.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Configuration.Force = true;
+                Configuration.ForceDependencies = true;
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_not_install_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_upgrade_the_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            } 
+            
+            [Fact]
+            public void should_contain_a_warning_message_that_it_was_unable_to_install_any_packages()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("0/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_have_an_error_package_result()
+            {
+                bool errorFound = false;
+
+                foreach (var packageResult in Results)
+                {
+                    foreach (var message in packageResult.Value.Messages)
+                    {
+                        if (message.MessageType == ResultType.Error)
+                        {
+                            errorFound = true;
+                        }
+                    }
+                }
+
+                errorFound.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_expected_error_in_package_result()
+            {
+                bool errorFound = false;
+
+                foreach (var packageResult in Results)
+                {
+                    foreach (var message in packageResult.Value.Messages)
+                    {
+                        if (message.MessageType == ResultType.Error)
+                        {
+                            if (message.Message.Contains("Unable to resolve dependency 'isdependency")) errorFound = true;
+                        }
+                    }
+                }
+
+                errorFound.ShouldBeTrue();
+            }
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_with_dependencies_on_a_newer_version_of_a_package_than_an_existing_package_has_with_that_dependency : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "conflictingdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "conflictingdependency.1.0.1*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.1.0.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_install_where_install_location_reports()
+            {
+                foreach (var packageResult in Results)
+                {
+                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_install_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_upgrade_the_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.1.0");
+            } 
+      
+            [Fact]
+            public void should_contain_a_message_that_it_installed_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("installed 2/2")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+        } 
+        
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_with_dependencies_on_a_newer_version_of_a_package_than_are_allowed_by_an_existing_package_with_that_dependency : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "conflictingdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "conflictingdependency.2.1.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_install_the_conflicting_package()
+            {
+                foreach (var packageResult in Results)
+                {
+                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_install_the_conflicting_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_upgrade_the_minimum_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }         
+            
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_upgrade_the_exact_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            } 
+      
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_contain_a_message_that_it_was_unable_to_install_any_packages()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("installed 0/3")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_have_an_error_package_result()
+            {
+                bool errorFound = false;
+
+                foreach (var packageResult in Results)
+                {
+                    foreach (var message in packageResult.Value.Messages)
+                    {
+                        if (message.MessageType == ResultType.Error)
+                        {
+                            errorFound = true;
+                        }
+                    }
+                }
+
+                errorFound.ShouldBeTrue();
             }
         }
     }

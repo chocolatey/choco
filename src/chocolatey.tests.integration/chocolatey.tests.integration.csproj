@@ -97,6 +97,18 @@
     <None Include="context\badpackage\badpackage.nuspec" />
     <None Include="context\badpackage\tools\chocolateyInstall.ps1" />
     <None Include="context\badpackage\tools\chocolateyUninstall.ps1" />
+    <None Include="context\conflictingdependency\conflictingdependency.1.0.1.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\conflictingdependency\conflictingdependency.2.0.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\conflictingdependency\conflictingdependency.2.1.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\conflictingdependency\conflictingdependency.nuspec" />
+    <None Include="context\conflictingdependency\tools\chocolateyinstall.ps1" />
+    <None Include="context\conflictingdependency\tools\chocolateyuninstall.ps1" />
     <None Include="context\hasdependency\hasdependency.1.0.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -140,6 +152,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="context\isdependency\isdependency.2.0.0.nupkg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\isdependency\isdependency.2.1.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="context\isdependency\isdependency.nuspec" />
