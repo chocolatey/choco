@@ -126,7 +126,7 @@ namespace chocolatey.infrastructure.app.services
                 var failure = false;
 
                 var package = packageResult.Package;
-                Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName,ApplicationParameters.InstallLocation);
+                Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, ApplicationParameters.InstallLocation);
                 Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION", configuration.Information.ChocolateyVersion);
                 Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION_PRODUCT", configuration.Information.ChocolateyProductVersion);
                 Environment.SetEnvironmentVariable("OS_PLATFORM", configuration.Information.PlatformType.get_description_or_value());
@@ -184,13 +184,14 @@ namespace chocolatey.infrastructure.app.services
                 {
                     this.Log().Info(ChocolateyLoggers.Important, () => " Found '{0}':".format_with(_fileSystem.get_file_name(chocoPowerShellScript)));
                     this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents));
-                    var selection = InteractivePrompt.prompt_for_confirmation(@"
+                    var selection = InteractivePrompt
+                        .prompt_for_confirmation(@"
 Do you want to run the script? 
  NOTE: If you chooose not to run the script, the installation will 
  fail.
  Skip is an advanced option and most likely will never be wanted.
 "
-                        , new[] {"yes", "no", "skip"}, "no", requireAnswer: true);
+                                                 , new[] {"yes", "no", "skip"}, "no", requireAnswer: true);
                     if (selection.is_equal_to("yes")) shouldRun = true;
                     if (selection.is_equal_to("no"))
                     {
