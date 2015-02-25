@@ -44,6 +44,7 @@ namespace chocolatey.tests.infrastructure.app.configuration
             public override void Context()
             {
                 ConfigurationOptions.initialize_with(new Lazy<IConsole>(() => console.Object));
+                ConfigurationOptions.reset_options();
                 console.Setup((c) => c.Error).Returns(writer);
             }
 

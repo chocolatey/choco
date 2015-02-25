@@ -58,8 +58,10 @@ namespace chocolatey
         /// </summary>
         public GetChocolatey()
         {
+            Log4NetAppenderConfiguration.configure();
+            Bootstrap.initialize();
             _configuration = new ChocolateyConfiguration();
-            _container = SimpleInjectorContainer.initialize();
+            _container = SimpleInjectorContainer.Container;
             _fileSystem = _container.GetInstance<IFileSystem>();
 
             set_defaults();
@@ -67,7 +69,7 @@ namespace chocolatey
 
         private void set_defaults()
         {
-            ConfigurationBuilder.set_up_configuration(null, _configuration, _fileSystem, _container.GetInstance<IXmlService>(), null);
+            ConfigurationBuilder.set_up_configuration(new List<string>(), _configuration, _fileSystem, _container.GetInstance<IXmlService>(), null);
             Config.initialize_with(_configuration);
 
             _configuration.PromptForConfirmation = false;

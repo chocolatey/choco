@@ -61,6 +61,7 @@ namespace chocolatey.infrastructure.app.builders
         public static void set_up_configuration(IList<string> args, ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService, Action<string> notifyWarnLoggingAction)
         {
             set_file_configuration(config, fileSystem, xmlService, notifyWarnLoggingAction);
+            ConfigurationOptions.reset_options();
             set_global_options(args, config);
             set_environment_options(config);
         }
