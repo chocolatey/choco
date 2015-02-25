@@ -34,6 +34,11 @@ namespace chocolatey.infrastructure.app.configuration
             _console = console;
         }
 
+        public static void reset_options()
+        {
+            _optionSet.Clear();
+        }
+
         private static IConsole Console
         {
             get { return _console.Value; }
