@@ -34,10 +34,11 @@ namespace chocolatey.infrastructure.logging
         private static bool _alreadyConfiguredFileAppender;
 
         /// <summary>
-        ///   Pulls xmlconfiguration from embedded location and applies it. Then it configures a file appender to the specified output directory.
+        ///   Pulls xmlconfiguration from embedded location and applies it. 
+        ///   Then it configures a file appender to the specified output directory if one is provided.
         /// </summary>
         /// <param name="outputDirectory">The output directory.</param>
-        public static void configure(string outputDirectory)
+        public static void configure(string outputDirectory = null)
         {
             var assembly = Assembly.GetExecutingAssembly();
             var resource = ApplicationParameters.Log4NetConfigurationResource;
@@ -49,7 +50,11 @@ namespace chocolatey.infrastructure.logging
             Stream xmlConfigStream = assembly.get_manifest_stream(resource);
 
             XmlConfigurator.Configure(xmlConfigStream);
-            set_file_appender(outputDirectory);
+
+            if (outputDirectory != null)
+            {
+                set_file_appender(outputDirectory);
+            }
 
             _logger.DebugFormat("Configured {0} from assembly {1}", resource, assembly.FullName);
         }
