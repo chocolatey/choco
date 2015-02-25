@@ -95,6 +95,10 @@ namespace chocolatey.infrastructure.app.configuration
                 {
                     configuration.CommandName = commandName;
                 }
+                else if (commandName.is_equal_to("-v") || commandName.is_equal_to("--version"))
+                {
+                    // skip help menu
+                }
                 else
                 {
                     configuration.HelpRequested = true;

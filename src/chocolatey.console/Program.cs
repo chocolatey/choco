@@ -18,6 +18,7 @@ namespace chocolatey.console
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using infrastructure.adapters;
     using infrastructure.app;
     using infrastructure.app.builders;
@@ -58,7 +59,7 @@ namespace chocolatey.console
 
                 var warnings = new List<string>();
 
-                ConfigurationBuilder.set_up_configuration(
+               ConfigurationBuilder.set_up_configuration(
                     args,
                     config,
                     fileSystem,
@@ -66,6 +67,8 @@ namespace chocolatey.console
                     warning => { warnings.Add(warning); }
                     );
                 Config.initialize_with(config);
+
+                report_version_and_exit_if_requested(args, config);
 
                 trap_exit_scenarios(config);
 
@@ -153,6 +156,19 @@ namespace chocolatey.console
                 Bootstrap.shutdown();
 
                 Environment.Exit(Environment.ExitCode);
+            }
+        }
+
+        private static void report_version_and_exit_if_requested(string[] args, ChocolateyConfiguration config)
+        {
+            if (args == null || args.Length == 0) return;
+
+            var firstArg = args.FirstOrDefault();
+            if (firstArg.is_equal_to("-v") || firstArg.is_equal_to("--version"))
+            {
+                "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0}".format_with(config.Information.ChocolateyProductVersion));
+                pause_execution_if_debug();
+                Environment.Exit(0);
             }
         }
 
