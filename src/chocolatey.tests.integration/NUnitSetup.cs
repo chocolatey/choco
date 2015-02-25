@@ -36,7 +36,7 @@ namespace chocolatey.tests.integration
 
         public override void BeforeEverything()
         {
-            Container = SimpleInjectorContainer.initialize();
+            Container = SimpleInjectorContainer.Container;
             fix_application_parameter_variables(Container);
             var config = Container.GetInstance<ChocolateyConfiguration>();
             var force = config.Force;
