@@ -52,7 +52,7 @@ namespace chocolatey.console
                 Bootstrap.initialize();
                 Bootstrap.startup();
 
-                var container = SimpleInjectorContainer.initialize();
+                var container = SimpleInjectorContainer.Container;
                 var config = container.GetInstance<ChocolateyConfiguration>();
                 var fileSystem = container.GetInstance<IFileSystem>();
 

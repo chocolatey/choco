@@ -24,7 +24,7 @@ namespace chocolatey.infrastructure.registration
     /// </summary>
     public static class SimpleInjectorContainer
     {
-        private static readonly Lazy<Container> _container = new Lazy<Container>(() => new Container());
+        private static readonly Lazy<Container> _container = new Lazy<Container>(initialize);
 
         /// <summary>
         ///   Gets the container.
@@ -37,25 +37,21 @@ namespace chocolatey.infrastructure.registration
         /// <summary>
         ///   Initializes the container
         /// </summary>
-        public static Container initialize()
+        private static Container initialize()
         {
-            Container.Options.AllowOverridingRegistrations = true;
-            var originalConstructorResolutionBehavior = Container.Options.ConstructorResolutionBehavior;
-            Container.Options.ConstructorResolutionBehavior = new SimpleInjectorContainerResolutionBehavior(originalConstructorResolutionBehavior);
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = true;
+            var originalConstructorResolutionBehavior = container.Options.ConstructorResolutionBehavior;
+            container.Options.ConstructorResolutionBehavior = new SimpleInjectorContainerResolutionBehavior(originalConstructorResolutionBehavior);
 
-            initialize_container(Container);
-
-#if DEBUG
-            Container.Verify();
-#endif
-
-            return Container;
-        }
-
-        private static void initialize_container(Container container)
-        {
             var binding = new ContainerBinding();
             binding.RegisterComponents(container);
+
+#if DEBUG
+            container.Verify();
+#endif
+
+            return container;
         }
     }
 }

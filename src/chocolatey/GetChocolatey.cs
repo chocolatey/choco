@@ -59,7 +59,7 @@ namespace chocolatey
         public GetChocolatey()
         {
             _configuration = new ChocolateyConfiguration();
-            _container = SimpleInjectorContainer.initialize();
+            _container = SimpleInjectorContainer.Container;
             _fileSystem = _container.GetInstance<IFileSystem>();
 
             set_defaults();
