@@ -60,7 +60,7 @@ param(
   Write-Debug "Running 'Get-ChocolateyUnzip' with fileFullPath:`'$fileFullPath`'', destination: `'$destination`', specificFolder: `'$specificFolder``, packageName: `'$packageName`'";
 
   if ($packageName) {
-    $packagelibPath = Join-Path $env:ChocolateyPackageFolder $packageName
+    $packagelibPath = $env:ChocolateyPackageFolder
     if (!(Test-Path -path $packagelibPath)) {
       New-Item $packagelibPath -type directory
     }
