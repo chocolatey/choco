@@ -19,6 +19,9 @@ if ($env:ChocolateyEnvironmentDebug -eq 'true') { $DebugPreference = "Continue";
 $VerbosePreference = "SilentlyContinue"
 if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $VerbosePreference = "Continue"; $verbosity = $true }
 
+# ensure module loading preference is on
+$PSModuleAutoLoadingPreference = "All";
+
 Write-Debug "Posh version is $($psversiontable.PsVersion.ToString())"
 
 # grab functions from files
