@@ -32,19 +32,20 @@ param(
   Write-Debug "Running 'Install-ChocolateyDesktopLink' with targetFilePath:`'$targetFilePath`'";
   
   if(!$targetFilePath) {
-    Write-ChocolateyFailure "Install-ChocolateyDesktopLink" "Missing TargetFilePath input parameter."
-    return
+    throw "Install-ChocolateyDesktopLink - `$targetFilePath can not be null."
   }
   
   if(!(Test-Path($targetFilePath))) {
-    Write-ChocolateyFailure "Install-ChocolateyDesktopLink" "TargetPath does not exist, so can't create shortcut."
-    return
+	Write-Warning "'$targetFilePath' does not exist. If it is not created the shortcut will not be valid."
   }
 
   Write-Debug "Creating Shortcut..."
   
   try {
     $desktop = $([System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::DesktopDirectory))
+	if(!(Test-Path($desktop))) {
+	  [System.IO.Directory]::CreateDirectory($desktop) | Out-Null
+    }
     $link = Join-Path $desktop "$([System.IO.Path]::GetFileName($targetFilePath)).lnk"
     $workingDirectory = $([System.IO.Path]::GetDirectoryName($targetFilePath))
 
@@ -58,6 +59,6 @@ param(
 
   }	
   catch {
-    Write-ChocolateyFailure "Install-ChocolateyDesktopLink" "There were errors attempting to create shortcut. The error message was '$_'."
+    throw $_.Exception
   }	
 }

@@ -46,9 +46,11 @@ param(
   
   $packagelibPath=$env:chocolateyPackageFolder
   $zipContentFile=(join-path $packagelibPath $zipFileName) + ".txt"
-  $zipContentFile
-  $zipContents=get-content $zipContentFile
-  foreach ($fileInZip in $zipContents) {
-    remove-item "$fileInZip" -ErrorAction SilentlyContinue
+  if ((Test-Path -path $zipContentFile)) {
+    $zipContentFile
+    $zipContents=get-content $zipContentFile
+    foreach ($fileInZip in $zipContents) {
+      remove-item "$fileInZip" -ErrorAction SilentlyContinue
+    }
   }
 }

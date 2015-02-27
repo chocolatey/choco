@@ -96,8 +96,7 @@ param(
     if($version){
         $vnum=$version.PSPath.Substring($version.PSPath.LastIndexOf('\')+1)
         if($vnum -as [int] -lt 10) {
-            Write-ChocolateyFailure $packageName "This installed VS version, $vnum, does not support installing VSIX packages. Version 10 is the minimum acceptable version."
-            return
+            throw "This installed VS version, $vnum, does not support installing VSIX packages. Version 10 is the minimum acceptable version."
         }
         $dir=(get-itemProperty $version.PSPath "InstallDir").InstallDir
         $installer = Join-Path $dir "VsixInstaller.exe"
@@ -108,18 +107,16 @@ param(
             Get-ChocolateyWebFile $packageName $download $vsixUrl -checksum $checksum -checksumType $checksumType
         }
         catch {
-            Write-ChocolateyFailure $packageName "There were errors attempting to retrieve the vsix from $vsixUrl. The error message was '$_'."
-            return
+            throw "There were errors attempting to retrieve the vsix from $vsixUrl. The error message was '$_'."
         }
         Write-Debug "Installing VSIX using $installer"
         $exitCode = Install-Vsix "$installer" "$download"
         if($exitCode -gt 0 -and $exitCode -ne 1001) { #1001: Already installed
-            Write-ChocolateyFailure $packageName "There was an error installing '$packageName'. The exit code returned was $exitCode."
-            return
+           throw "There was an error installing '$packageName'. The exit code returned was $exitCode."
         }
     }
     else {
-        Write-ChocolateyFailure $packageName "Visual Studio is not installed or the specified version is not present."
+        throw "Visual Studio is not installed or the specified version is not present."
     }
 }
 

@@ -196,6 +196,11 @@ namespace chocolatey.infrastructure.app.services
                 if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping Powershell and shimgen portions of the install due to non-Windows.");
             }
 
+            if (packageResult.Success)
+            {
+                handle_extension_packages(config, packageResult);
+            }
+            
             _packageInfoService.save_package_information(pkgInfo);
             ensure_bad_package_path_is_clean(config, packageResult);
 
@@ -477,6 +482,8 @@ namespace chocolatey.infrastructure.app.services
             _packageInfoService.remove_package_information(packageResult.Package);
             ensure_bad_package_path_is_clean(config, packageResult);
             remove_rollback_if_exists(packageResult);
+            handle_extension_packages(config, packageResult);
+            
             if (config.Force)
             {
                 var packageDirectory = _fileSystem.combine_paths(packageResult.InstallLocation);
@@ -496,8 +503,35 @@ namespace chocolatey.infrastructure.app.services
 
                 FaultTolerance.try_catch_with_logging_exception(
                     () => _fileSystem.delete_directory_if_exists(packageDirectory, recursive: true),
-                    "Attempted to remove '{0}' but had an error:".format_with(packageDirectory),
+                    "Attempted to remove '{0}' but had an error".format_with(packageDirectory),
                     logWarningInsteadOfError: true);
+            }
+        }
+
+        private void handle_extension_packages(ChocolateyConfiguration config, PackageResult packageResult)
+        {
+            if (packageResult == null) return;
+            _fileSystem.create_directory_if_not_exists(ApplicationParameters.ExtensionsLocation);
+
+            if (!packageResult.Name.to_lower().EndsWith(".extension")) return;
+
+            var pkgExtensions = _fileSystem.combine_paths(ApplicationParameters.ExtensionsLocation, packageResult.Name);
+            FaultTolerance.try_catch_with_logging_exception(
+                () => _fileSystem.delete_directory_if_exists(pkgExtensions, recursive: true),
+                "Attempted to remove '{0}' but had an error".format_with(pkgExtensions));
+
+            if (!config.CommandName.is_equal_to(CommandNameType.uninstall.to_string()))
+            {
+                if (packageResult.InstallLocation == null) return;
+
+                _fileSystem.create_directory_if_not_exists(pkgExtensions);
+                FaultTolerance.try_catch_with_logging_exception(
+                    () => _fileSystem.copy_directory(packageResult.InstallLocation, pkgExtensions, overwriteExisting: true),
+                    "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".format_with(Environment.NewLine, packageResult.InstallLocation, pkgExtensions));
+
+                string logMessage = "Installed/updated extension for {0}. You will be able to use it on next run.".format_with(packageResult.Name);
+                this.Log().Warn(logMessage);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
             }
         }
 

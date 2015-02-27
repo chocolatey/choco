@@ -66,32 +66,32 @@ directoy, an icon to be used for the shortcut, along with a description and argu
 	Write-Debug "Running 'Install-ChocolateyShortcut' with parameters ShortcutFilePath: `'$shortcutFilePath`', TargetPath: `'$targetPath`', WorkingDirectory: `'$workingDirectory`', Arguments: `'$arguments`', IconLocation: `'$iconLocation`', Description: `'$description`'";
 
 	if(!$shortcutFilePath) {
-		Write-ChocolateyFailure "Install-ChocolateyShortcut" "Missing ShortCutFilePath input parameter."
-		return
+	  throw "Install-ChocolateyShortcut - `$shortcutFilePath can not be null."
 	}
 	
+	$shortcutDirectory = $([System.IO.Path]::GetDirectoryName($shortcutFilePath))
+	if (!(Test-Path($shortcutDirectory))) {
+	  [System.IO.Directory]::CreateDirectory($shortcutDirectory) | Out-Null  
+    }
+
 	if(!$targetPath) {
-		Write-ChocolateyFailure "Install-ChocolateyShortcut" "Missing TargetPath input parameter."
-		return
+	  throw "Install-ChocolateyShortcut - `$targetFilePath can not be null."
 	}
-	
+		
 	if(!(Test-Path($targetPath))) {
-		Write-ChocolateyFailure "Install-ChocolateyShortcut" "TargetPath does not exist, so can't create shortcut."
-		return
+	  Write-Warning "'$targetFilePath' does not exist. If it is not created the shortcut will not be valid."
 	}
 	
 	if($iconLocation) {
 		if(!(Test-Path($iconLocation))) {
-			Write-ChocolateyFailure "Install-ChocolateyShortcut" "IconLocation does not exist, so can't create shortcut."
-			return
+		  Write-Warning "'$iconLocation' does not exist. A default icon will be used."
 		}
 	}
 	
-	if($workingDirectory) {
-		if(!(Test-Path($workingDirectory))) {
-			Write-ChocolateyFailure "Install-ChocolateyShortcut" "WorkingDirectory does not exist, so can't create shortcut."
-			return
-		}
+	if ($workingDirectory) {
+	  if (!(Test-Path($workingDirectory))) {
+		[System.IO.Directory]::CreateDirectory($workingDirectory) | Out-Null  
+      }
 	}
 	
 	Write-Debug "Creating Shortcut..."
@@ -103,15 +103,17 @@ directoy, an icon to be used for the shortcut, along with a description and argu
 		$lnk.WorkingDirectory = $workingDirectory
 	    $lnk.Arguments = $arguments
 	    if($iconLocation) {
-	        $lnk.IconLocation = $iconLocation
+	      $lnk.IconLocation = $iconLocation
 	    }
-	    $lnk.Description = $description
+		if ($description) {
+		  $lnk.Description = $description
+		}
+	   
 	    $lnk.Save()
 		
 		Write-Debug "Shortcut created."
-		
 	}
 	catch {
-		Write-ChocolateyFailure "Install-ChocolateyShortcut" "There were errors attempting to create shortcut. The error message was '$_'."
+		throw $_.Exception
 	}
 }

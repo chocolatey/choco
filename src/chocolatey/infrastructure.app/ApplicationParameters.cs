@@ -52,6 +52,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string PackageBackupLocation = _fileSystem.combine_paths(InstallLocation, "lib-bkp");
         public static readonly string ShimsLocation = _fileSystem.combine_paths(InstallLocation, "bin");
         public static readonly string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
+        public static readonly string ExtensionsLocation = _fileSystem.combine_paths(InstallLocation, "extensions");
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
