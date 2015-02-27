@@ -66,31 +66,26 @@ directoy, an icon to be used for the shortcut, along with a description and argu
 	Write-Debug "Running 'Install-ChocolateyShortcut' with parameters ShortcutFilePath: `'$shortcutFilePath`', TargetPath: `'$targetPath`', WorkingDirectory: `'$workingDirectory`', Arguments: `'$arguments`', IconLocation: `'$iconLocation`', Description: `'$description`'";
 
 	if(!$shortcutFilePath) {
-		Write-ChocolateyFailure "Install-ChocolateyShortcut" "Missing ShortCutFilePath input parameter."
-		return
+		throw "Install-ChocolateyShortcut" "Missing ShortCutFilePath input parameter."
 	}
 	
 	if(!$targetPath) {
-		Write-ChocolateyFailure "Install-ChocolateyShortcut" "Missing TargetPath input parameter."
-		return
+		throw "Install-ChocolateyShortcut" "Missing TargetPath input parameter."
 	}
 	
 	if(!(Test-Path($targetPath))) {
-		Write-ChocolateyFailure "Install-ChocolateyShortcut" "TargetPath does not exist, so can't create shortcut."
-		return
+		throw "Install-ChocolateyShortcut" "TargetPath does not exist, so can't create shortcut."
 	}
 	
 	if($iconLocation) {
 		if(!(Test-Path($iconLocation))) {
-			Write-ChocolateyFailure "Install-ChocolateyShortcut" "IconLocation does not exist, so can't create shortcut."
-			return
+			throw "Install-ChocolateyShortcut" "IconLocation does not exist, so can't create shortcut."
 		}
 	}
 	
 	if($workingDirectory) {
 		if(!(Test-Path($workingDirectory))) {
-			Write-ChocolateyFailure "Install-ChocolateyShortcut" "WorkingDirectory does not exist, so can't create shortcut."
-			return
+			throw "Install-ChocolateyShortcut" "WorkingDirectory does not exist, so can't create shortcut."
 		}
 	}
 	
@@ -112,6 +107,6 @@ directoy, an icon to be used for the shortcut, along with a description and argu
 		
 	}
 	catch {
-		Write-ChocolateyFailure "Install-ChocolateyShortcut" "There were errors attempting to create shortcut. The error message was '$_'."
+		throw $_.Exception
 	}
 }

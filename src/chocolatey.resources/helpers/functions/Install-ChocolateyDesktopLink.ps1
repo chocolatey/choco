@@ -32,12 +32,12 @@ param(
   Write-Debug "Running 'Install-ChocolateyDesktopLink' with targetFilePath:`'$targetFilePath`'";
   
   if(!$targetFilePath) {
-    Write-ChocolateyFailure "Install-ChocolateyDesktopLink" "Missing TargetFilePath input parameter."
+    throw "Install-ChocolateyDesktopLink" "Missing TargetFilePath input parameter."
     return
   }
   
   if(!(Test-Path($targetFilePath))) {
-    Write-ChocolateyFailure "Install-ChocolateyDesktopLink" "TargetPath does not exist, so can't create shortcut."
+    throw "Install-ChocolateyDesktopLink" "TargetPath does not exist, so can't create shortcut."
     return
   }
 
@@ -58,6 +58,6 @@ param(
 
   }	
   catch {
-    Write-ChocolateyFailure "Install-ChocolateyDesktopLink" "There were errors attempting to create shortcut. The error message was '$_'."
+    throw $_.Exception
   }	
 }
