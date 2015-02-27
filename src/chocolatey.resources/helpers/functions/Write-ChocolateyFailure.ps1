@@ -20,4 +20,6 @@ param(
   Write-Warning "Write-ChocolateyFailure is deprecated. If you are the package maintainer, please use 'throw `$_.Exception' instead."
     
   $error | %{ $_.Exception | fl * | Out-String }
+
+  throw "$failureMessage"
 }
