@@ -210,6 +210,14 @@ namespace chocolatey.tests.integration.scenarios
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "casemismatch.exe");
 
                 File.Exists(shimfile).ShouldBeFalse();
+            }     
+            
+            [Fact]
+            public void should_not_create_an_extensions_folder_for_the_pacakge()
+            {
+                var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
+
+                Directory.Exists(extensionsDirectory).ShouldBeFalse();
             }
 
             [Fact]
