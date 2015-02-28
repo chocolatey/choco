@@ -82,7 +82,8 @@ namespace chocolatey.console
 #endif
                 }
 
-                if (warnings.Count != 0)
+                
+                if (warnings.Count != 0 && config.RegularOuptut)
                 {
                     foreach (var warning in warnings.or_empty_list_if_null())
                     {
