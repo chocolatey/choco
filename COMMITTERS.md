@@ -1,5 +1,14 @@
-Committing
-==========
+Committers
+============
+
+## Branch Targeting
+
+* Stable currently targeting 0.9.9.x
+* Master currently targeting 0.9.10.x
+
+Depending on where your fix/enhancement goes, please target the proper branch. Community members always target master, but committers should know where the fix they are presenting goes. It makes it much easier to push the shiny green button on a pull request. If you are not sure where to target, ask.
+
+## Summary
 
 We like to see folks contributing to Chocolatey. If you are a committer, we'd like to see you help from time to time with triage and the pull request process.
 
@@ -47,3 +56,21 @@ Unless there is something wrong with the code, we don't ask contributors to reba
 Once you have reviewed the change set and determined it is ready for merge, the next steps are to bring it local and evaluate the code further by actually working with it, running the tests locally and adding any additional commits or fix-ups that are necessary in a local branch.
 
 When merging the user's contribution, it should be done with `git merge --log --no-ff` to create a merge commit so that in case there is an issue it becomes easier to revert later, and so that we can see where the code came from should we ever need to go find it later (more information on this can be found [here](https://www.kernel.org/pub/software/scm/git/docs/git-merge.html) and also a discussion on why this is a good idea [here](http://differential.io/blog/best-way-to-merge-a-github-pull-request)).
+
+### Merge Retargeting to Stable
+
+Because we ask contributors to target master, sometimes a fix/enhancement may need to be retargeted to stable. This process is somewhat easy thanks to git. In most cases you won't even need to ask the user to do this for you.
+
+ * Add the user's remote.
+ * `git fetch user`
+ * `git checkout branch_from_user`
+ * `git rebase --onto stable master` - this uses the local branch, starts with latest stable and reapplies the commits from the branch to it, removing all commits that were only on the master.
+ * `build.bat` - build and test
+ * `git checkout stable`
+ * `git merge branch_from_user --log --no-ff`
+ * `git branch -d branch_from_user`
+
+References
+
+ * http://pivotallabs.com/git-rebase-onto/
+ * http://git-scm.com/book/ch3-6.html
