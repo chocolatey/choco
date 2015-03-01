@@ -71,12 +71,6 @@ namespace chocolatey.tests
             {
                 _chocolatey2.ShouldNotBeNull();
             }
-
-            [Fact]
-            public void should_have_distinct_configurations()
-            {
-                _chocolatey1.GetConfiguration().ShouldNotEqual(_chocolatey2.GetConfiguration());
-            }
         }
     }
 }
