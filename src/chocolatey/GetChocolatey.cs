@@ -49,9 +49,8 @@ namespace chocolatey
     /// </summary>
     public class GetChocolatey
     {
-        private readonly ChocolateyConfiguration _configuration;
         private readonly Container _container;
-        private readonly IFileSystem _fileSystem;
+        private Action<ChocolateyConfiguration> _propConfig;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GetChocolatey"/> class.
@@ -60,20 +59,7 @@ namespace chocolatey
         {
             Log4NetAppenderConfiguration.configure();
             Bootstrap.initialize();
-            _configuration = new ChocolateyConfiguration();
             _container = SimpleInjectorContainer.Container;
-            _fileSystem = _container.GetInstance<IFileSystem>();
-
-            set_defaults();
-        }
-
-        private void set_defaults()
-        {
-            ConfigurationBuilder.set_up_configuration(new List<string>(), _configuration, _fileSystem, _container.GetInstance<IXmlService>(), null);
-            Config.initialize_with(_configuration);
-
-            _configuration.PromptForConfirmation = false;
-            _configuration.AcceptLicense = true;
         }
 
         /// <summary>
@@ -94,13 +80,8 @@ namespace chocolatey
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
         public GetChocolatey Set(Action<ChocolateyConfiguration> propConfig)
         {
-            propConfig.Invoke(_configuration);
+            _propConfig = propConfig;
             return this;
-        }
-
-        public ChocolateyConfiguration GetConfiguration()
-        {
-            return _configuration;
         }
 
         /// <summary>
@@ -195,9 +176,25 @@ namespace chocolatey
                     "tools"
                 };
 
-            AssemblyFileExtractor.extract_all_resources_to_relative_directory(_fileSystem, Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
+            AssemblyFileExtractor.extract_all_resources_to_relative_directory(_container.GetInstance<IFileSystem>(), Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
+            var configuration = create_configuration(new List<string>());
             var runner = new GenericRunner();
-            runner.run(_configuration, _container, isConsole: false, parseArgs: null);
+            runner.run(configuration, _container, isConsole: false, parseArgs: null);
+        }
+
+        private ChocolateyConfiguration create_configuration(IList<string> args)
+        {
+            var configuration = new ChocolateyConfiguration();
+            ConfigurationBuilder.set_up_configuration(args, configuration, _container.GetInstance<IFileSystem>(), _container.GetInstance<IXmlService>(), null);
+            Config.initialize_with(configuration);
+
+            configuration.PromptForConfirmation = false;
+            configuration.AcceptLicense = true;
+            if (_propConfig != null)
+            {
+                _propConfig.Invoke(configuration);
+            }
+            return configuration;
         }
     }
 
