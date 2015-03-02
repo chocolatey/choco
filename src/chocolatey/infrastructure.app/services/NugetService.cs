@@ -315,10 +315,20 @@ spam/junk folder.");
 
                     backup_existing_version(config, installedPackage);
 
-                    FaultTolerance.try_catch_with_logging_exception(
-                        () => packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies),
-                        "Unable to remove existing package prior to forced reinstall",
-                        logWarningInsteadOfError: true);
+                    try
+                    {
+                        packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
+                        if (!results.InstallLocation.is_equal_to(ApplicationParameters.PackagesLocation))
+                        {
+                            _fileSystem.delete_directory_if_exists(results.InstallLocation, recursive: true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        string logMessage = "{0}:{1} {2}".format_with("Unable to remove existing package prior to forced reinstall", Environment.NewLine, ex.Message);
+                        this.Log().Warn(logMessage);
+                        results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                    }
                 }
 
                 try

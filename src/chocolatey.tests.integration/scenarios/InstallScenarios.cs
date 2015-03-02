@@ -835,12 +835,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_contain_a_message_that_there_was_nothing_to_do()
+            public void should_contain_a_message_that_it_was_unable_to_reinstall_successfully()
             {
                 bool expectedMessage = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
                 {
-                    if (message.Contains("0/0")) expectedMessage = true;
+                    if (message.Contains("0/1")) expectedMessage = true;
                 }
 
                 expectedMessage.ShouldBeTrue();
@@ -854,10 +854,9 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            [Pending("Force install with file locked leaves inconsistent state - GH-114")]
-            public void should_not_have_inconclusive_package_result()
+            public void should_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.ShouldBeTrue();
             }
 
             [Fact]

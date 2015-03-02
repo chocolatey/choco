@@ -105,10 +105,10 @@
 
  * [PENDING] should delete the rollback
  * [PENDING] should not have a successful package result
- * [PENDING] should not have inconclusive package result
  * [PENDING] should not have warning package result
- * should contain a message that there was nothing to do
+ * should contain a message that it was unable to reinstall successfully
  * should have a package installed in the lib directory
+ * should have inconclusive package result
  * should still have the package installed with the expected version of the package
 
 #### when installing a package happy path
