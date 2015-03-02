@@ -537,6 +537,8 @@ namespace chocolatey.infrastructure.app.services
 
         private void ensure_bad_package_path_is_clean(ChocolateyConfiguration config, PackageResult packageResult)
         {
+            if (packageResult.InstallLocation == null) return;
+
             FaultTolerance.try_catch_with_logging_exception(
                 () =>
                 {

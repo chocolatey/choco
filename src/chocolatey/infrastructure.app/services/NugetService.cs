@@ -308,8 +308,11 @@ spam/junk folder.");
                     continue;
                 }
 
-                if (installedPackage != null && (installedPackage.Version == availablePackage.Version))
+                if (installedPackage != null && (installedPackage.Version == availablePackage.Version) && config.Force)
                 {
+                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    results.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
+
                     backup_existing_version(config, installedPackage);
 
                     FaultTolerance.try_catch_with_logging_exception(
