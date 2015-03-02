@@ -167,19 +167,22 @@ namespace chocolatey
         /// </summary>
         public void Run()
         {
-            //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
-            IList<string> folders = new List<string>
-                {
-                    "helpers",
-                    "functions",
-                    "redirects",
-                    "tools"
-                };
-
-            AssemblyFileExtractor.extract_all_resources_to_relative_directory(_container.GetInstance<IFileSystem>(), Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
+            extract_resources();
             var configuration = create_configuration(new List<string>());
             var runner = new GenericRunner();
             runner.run(configuration, _container, isConsole: false, parseArgs: null);
+        }
+
+        /// <summary>
+        ///   Call this method to run chocolatey after you have set the options.
+        /// <param name="args">Commandline arguments to add to configuration.</param>
+        /// </summary>
+        public void RunConsole(string[] args)
+        {
+            extract_resources();
+            var configuration = create_configuration(new List<string>(args));
+            var runner = new ConsoleApplication();
+            runner.run(args, configuration, _container);
         }
 
         private ChocolateyConfiguration create_configuration(IList<string> args)
@@ -195,6 +198,20 @@ namespace chocolatey
                 _propConfig.Invoke(configuration);
             }
             return configuration;
+        }
+
+        private void extract_resources()
+        {
+            //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
+            IList<string> folders = new List<string>
+            {
+                "helpers",
+                "functions",
+                "redirects",
+                "tools"
+            };
+
+            AssemblyFileExtractor.extract_all_resources_to_relative_directory(_container.GetInstance<IFileSystem>(), Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
         }
     }
 
