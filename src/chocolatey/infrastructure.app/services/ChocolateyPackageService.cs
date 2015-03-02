@@ -278,7 +278,7 @@ namespace chocolatey.infrastructure.app.services
         private IEnumerable<ChocolateyConfiguration> set_config_from_package_names_and_packages_config(ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls)
         {
             // if there are any .config files, split those off of the config. Then return the config without those package names.
-            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.Contains(".config")).ToList())
+            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.EndsWith(".config")).ToList())
             {
                 config.PackageNames = config.PackageNames.Replace(packageConfigFile, string.Empty);
 
@@ -359,7 +359,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
             this.Log().Info(@"By upgrading you accept licenses for the packages.");
 
-            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.Contains(".config")).ToList())
+            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.EndsWith(".config")).ToList())
             {
                 throw new ApplicationException("A packages.config file is only used with installs.");
             }
@@ -415,7 +415,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info(@"Uninstalling the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
 
-            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.Contains(".config")).ToList())
+            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.EndsWith(".config")).ToList())
             {
                 throw new ApplicationException("A packages.config file is only used with installs.");
             }
