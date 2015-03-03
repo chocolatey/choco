@@ -79,7 +79,7 @@ Custom unofficial builds are not allowed by default.
                     else
                     {
                         this.Log().Warn(ChocolateyLoggers.Important, @"
-choco.exe is not an official build (bypassed with --allow-unofficial).
+Chocolatey is not an official build (bypassed with --allow-unofficial).
  If you are seeing this message and it is not expected, your system may 
  now be in a bad state. Only official builds are to be trusted.
 "
@@ -105,4 +105,5 @@ choco.exe is not an official build (bypassed with --allow-unofficial).
             }
         }
     }
+
 }
