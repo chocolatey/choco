@@ -99,7 +99,11 @@ param(
         [System.IO.Directory]::CreateDirectory($fileDirectory) | Out-Null  
       }
 	  
-      $writer = new-object System.IO.FileStream $fileName, "Create"
+	  try {
+	     $writer = new-object System.IO.FileStream $fileName, "Create"
+	  } catch {
+		throw $_.Exception
+	  }
     }
     [byte[]]$buffer = new-object byte[] 1048576
     [long]$total = [long]$count = [long]$iterLoop =0
