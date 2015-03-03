@@ -603,6 +603,86 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_force_installing_an_already_installed_package_that_errors : ScenariosBase
+        {
+            private PackageResult packageResult;
+            private string modifiedText = "bob";
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "badpackage";
+                Configuration.SkipPackageInstallProvider = true;
+                Scenario.install_package(Configuration, "badpackage", "1.0");
+                Configuration.SkipPackageInstallProvider = false;
+                Configuration.Force = true;
+
+                var fileToModify = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                File.WriteAllText(fileToModify, modifiedText);
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+                packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_restore_the_backup_version_of_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+            
+            [Fact]
+            public void should_restore_the_original_files_in_the_package_lib_folder()
+            {
+                var modifiedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                File.ReadAllText(modifiedFile).ShouldEqual(modifiedText);
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_it_was_unsuccessful()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("0/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_a_successful_package_result()
+            {
+                packageResult.Success.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                packageResult.Warning.ShouldBeFalse();
+            }
+
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult packageResult;
@@ -755,12 +835,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_contain_a_message_that_there_was_nothing_to_do()
+            public void should_contain_a_message_that_it_was_unable_to_reinstall_successfully()
             {
                 bool expectedMessage = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
                 {
-                    if (message.Contains("0/0")) expectedMessage = true;
+                    if (message.Contains("0/1")) expectedMessage = true;
                 }
 
                 expectedMessage.ShouldBeTrue();
@@ -774,10 +854,9 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            [Pending("Force install with file locked leaves inconsistent state - GH-114")]
-            public void should_not_have_inconclusive_package_result()
+            public void should_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.ShouldBeTrue();
             }
 
             [Fact]

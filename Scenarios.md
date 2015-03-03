@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 27 Scenario(s), 221 Observation(s) ]
+### ChocolateyInstallCommand [ 28 Scenario(s), 229 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -65,6 +65,16 @@
  * should not touch the floating dependency
  * should reinstall the exact same version of the package
 
+#### when force installing an already installed package that errors
+
+ * should contain a message that it was unsuccessful
+ * should delete the rollback
+ * should not have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should restore the backup version of the package
+ * should restore the original files in the package lib folder
+
 #### when force installing an already installed package with a read and delete share locked file
 
  * config should match package result name
@@ -95,10 +105,10 @@
 
  * [PENDING] should delete the rollback
  * [PENDING] should not have a successful package result
- * [PENDING] should not have inconclusive package result
  * [PENDING] should not have warning package result
- * should contain a message that there was nothing to do
+ * should contain a message that it was unable to reinstall successfully
  * should have a package installed in the lib directory
+ * should have inconclusive package result
  * should still have the package installed with the expected version of the package
 
 #### when installing a package happy path
@@ -116,6 +126,7 @@
  * should install where install location reports
  * should not create a shim for ignored executable in the bin directory
  * should not create a shim for mismatched case ignored executable in the bin directory
+ * should not create an extensions folder for the pacakge
  * should not have inconclusive package result
  * should not have warning package result
 
