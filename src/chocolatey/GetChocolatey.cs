@@ -213,6 +213,15 @@ namespace chocolatey
 
             AssemblyFileExtractor.extract_all_resources_to_relative_directory(_container.GetInstance<IFileSystem>(), Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
         }
+
+        public IEnumerable<T> List<T>()
+        {
+            extract_resources();
+            var configuration = create_configuration(new List<string>());
+            configuration.RegularOuptut = true;
+            var runner = new GenericRunner();
+            return runner.list<T>(configuration, _container, isConsole: false, parseArgs: null);
+        }
     }
 
     // ReSharper restore InconsistentNaming

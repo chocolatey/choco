@@ -13,10 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 namespace chocolatey.infrastructure.app.runners
 {
     using System;
     using System.Linq;
+    using System.Collections.Generic;
     using SimpleInjector;
     using adapters;
     using attributes;
@@ -28,7 +30,7 @@ namespace chocolatey.infrastructure.app.runners
 
     public sealed class GenericRunner
     {
-        public void run(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
+        private ICommand find_command(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
         {
             var commands = container.GetAllInstances<ICommand>();
             var command = commands.Where((c) =>
@@ -83,7 +85,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
  If you are seeing this message and it is not expected, your system may 
  now be in a bad state. Only official builds are to be trusted.
 "
-                         );
+                        );
 
                     }
                 }
@@ -96,14 +98,38 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                     }
 
                     command.noop(config);
+                    return null;
                 }
-                else
+            }
+            return command;
+        }
+
+        public void run(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
+        {
+            var command = find_command(config, container, isConsole, parseArgs);
+            if(command != null)
+            {
+                this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                command.run(config);
+            }
+        }
+
+        public IEnumerable<T> list<T>(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
+        {
+            var command = find_command(config, container, isConsole, parseArgs) as IListCommand<T>;
+            if (command == null)
+            {
+                if (!string.IsNullOrWhiteSpace(config.CommandName))
                 {
-                    this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
-                    command.run(config);
+                    throw new Exception("The implementation of '{0}' does not support listing '{1}'".format_with(config.CommandName, typeof(T).Name));
                 }
+                return new List<T>();
+            }
+            else
+            {
+                this.Log().Debug("_ {0}:{1} - Normal List Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                return command.list(config);
             }
         }
     }
-
 }
