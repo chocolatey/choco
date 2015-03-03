@@ -81,7 +81,6 @@ We'll try to capture everything here that you should know about. Please call `ch
    2. `choco version` has been deprecated and will be removed in v1. Use `choco upgrade pkgName --noop` or `choco upgrade pkgName -whatif` instead.
    3. `Write-ChocolateySuccess`, `Write-ChocolateyFailure` have been deprecated.
    4. `update` is now `upgrade`. `update` has been deprecated and will be removed/replaced in v1. Update will be reincarnated later for a different purpose. **Hint**: It rhymes with smackage pindexes.
- * PowerShell - Ensure all errors are terminating errors - see [#48](https://github.com/chocolatey/choco/issues/48)
 
 ### FEATURES
 
