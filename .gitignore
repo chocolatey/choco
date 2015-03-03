@@ -32,3 +32,6 @@ SolutionVersion.vb
 
 .DS_Store
 *.db
+src/_dotCover.chocolatey/
+src/_dotTrace.chocolatey/
+src/chocolatey.sln.GhostDoc.xml
