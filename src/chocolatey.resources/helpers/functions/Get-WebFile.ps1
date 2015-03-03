@@ -93,8 +93,13 @@ param(
   if($res.StatusCode -eq 200) {
     [long]$goal = $res.ContentLength
     $reader = $res.GetResponseStream()
-    if($fileName) {
-       $writer = new-object System.IO.FileStream $fileName, "Create"
+    if ($fileName) {
+      $fileDirectory = $([System.IO.Path]::GetDirectoryName($fileName))
+      if (!(Test-Path($fileDirectory))) {
+        [System.IO.Directory]::CreateDirectory($fileDirectory) | Out-Null  
+      }
+	  
+      $writer = new-object System.IO.FileStream $fileName, "Create"
     }
     [byte[]]$buffer = new-object byte[] 1048576
     [long]$total = [long]$count = [long]$iterLoop =0
