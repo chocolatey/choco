@@ -161,6 +161,7 @@
     <Compile Include="infrastructure\commandline\ExitScenarioHandler.cs" />
     <Compile Include="infrastructure\commandline\InteractivePrompt.cs" />
     <Compile Include="infrastructure\commands\ICommandExecutor.cs" />
+    <Compile Include="infrastructure\commands\IListCommand.cs" />
     <Compile Include="infrastructure\commands\PowershellExecutor.cs" />
     <Compile Include="infrastructure\guards\Ensure.cs" />
     <Compile Include="infrastructure\information\ProcessInformation.cs" />
