@@ -175,8 +175,8 @@ Config has insecure allowGlobalConfirmation set to true.
                                  "NoOp - Don't actually do anything.",
                                  option => config.Noop = option != null)
                             .Add("r|limitoutput|limit-output",
-                                 "LimitOuptut - Limit the output to essential information",
-                                 option => config.RegularOuptut = option == null)
+                                 "LimitOutput - Limit the output to essential information",
+                                 option => config.RegularOutput = option == null)
                             .Add("execution-timeout=",
                                  "CommandExecutionTimeoutSeconds - Override the default execution timeout in the configuration of {0} seconds.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
                                  option => config.CommandExecutionTimeoutSeconds = int.Parse(option))

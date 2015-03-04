@@ -78,7 +78,7 @@ namespace chocolatey.infrastructure.app.services
             else
             {
                 var list = _nugetService.list_run(config, logResults: true);
-                if (config.RegularOuptut)
+                if (config.RegularOutput)
                 {
                     this.Log().Warn(() => @"{0} packages {1}.".format_with(list.Count, config.ListCommand.LocalOnly ? "installed" : "found"));
 
@@ -330,7 +330,7 @@ namespace chocolatey.infrastructure.app.services
         public void upgrade_noop(ChocolateyConfiguration config)
         {
             var noopUpgrades = _nugetService.upgrade_noop(config, (pkg) => _powershellService.install_noop(pkg));
-            if (config.RegularOuptut)
+            if (config.RegularOutput)
             {
                 var upgradeWarnings = noopUpgrades.Count(p => p.Value.Warning);
                 this.Log().Warn(() => @"{0}{1} can upgrade {2}/{3} package(s). {4}{0} See the log for details.".format_with(

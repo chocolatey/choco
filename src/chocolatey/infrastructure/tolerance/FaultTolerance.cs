@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.tolerance
         }
 
         /// <summary>
-        /// Tries an action the specified number of tries, warning on each failure and erroring on the last.
+        /// Tries an action the specified number of tries, warning on each failure and raises error on the last attempt.
         /// </summary>
         /// <param name="numberOfTries">The number of tries.</param>
         /// <param name="action">The action.</param>
@@ -62,7 +62,7 @@ namespace chocolatey.infrastructure.tolerance
         }
 
         /// <summary>
-        /// Tries a function the specified number of tries, warning on each failure and erroring on the last.
+        /// Tries a function the specified number of tries, warning on each failure and raises error on the last attempt.
         /// </summary>
         /// <typeparam name="T">The type of the return value from the function.</typeparam>
         /// <param name="numberOfTries">The number of tries.</param>

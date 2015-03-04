@@ -47,14 +47,14 @@ namespace chocolatey.infrastructure.app.services
                 throw new ApplicationException("The location for the template already exists. You can:{0} 1. Remove '{1}'{0} 2. Use --force{0} 3. Specify a different name".format_with(Environment.NewLine, packageLocation));
             }
 
-            if (configuration.RegularOuptut) this.Log().Info(() => "Creating a new package specification at {0}".format_with(packageLocation));
+            if (configuration.RegularOutput) this.Log().Info(() => "Creating a new package specification at {0}".format_with(packageLocation));
             try
             {
                 _fileSystem.delete_directory_if_exists(packageLocation, recursive: true);
             }
             catch (Exception ex)
             {
-                if (configuration.RegularOuptut) this.Log().Warn(() => "{0}".format_with(ex.Message));
+                if (configuration.RegularOutput) this.Log().Warn(() => "{0}".format_with(ex.Message));
             }
             _fileSystem.create_directory_if_not_exists(packageLocation);
             var packageToolsLocation = _fileSystem.combine_paths(packageLocation, "tools");
@@ -76,7 +76,7 @@ namespace chocolatey.infrastructure.app.services
                 }
                 catch (Exception)
                 {
-                    if (configuration.RegularOuptut) this.Log().Warn("Property {0} was not found for replacement in the Template Values.".format_with(property.Key));
+                    if (configuration.RegularOutput) this.Log().Warn("Property {0} was not found for replacement in the Template Values.".format_with(property.Key));
                 }
             }
 
@@ -97,7 +97,7 @@ namespace chocolatey.infrastructure.app.services
         {
             template = TokenReplacer.replace_tokens(tokens, template);
 
-            if (configuration.RegularOuptut) this.Log().Info(() => "Generating template to a file{0} at '{1}'".format_with(Environment.NewLine, fileLocation));
+            if (configuration.RegularOutput) this.Log().Info(() => "Generating template to a file{0} at '{1}'".format_with(Environment.NewLine, fileLocation));
             this.Log().Debug(() => "{0}".format_with(template));
             _fileSystem.write_file(fileLocation, template, encoding);
         }

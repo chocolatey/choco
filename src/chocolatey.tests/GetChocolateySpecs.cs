@@ -37,13 +37,13 @@ namespace chocolatey.tests
             }
 
             [Fact]
-            public void should_get_chocolotey()
+            public void should_get_chocolatey()
             {
                 _chocolatey.ShouldNotBeNull();
             }
 
             [Fact]
-            public void should_conigure_log4net()
+            public void should_configure_log4net()
             {
                 LogManager.GetRepository().Configured.ShouldBeTrue();
             }
@@ -61,13 +61,13 @@ namespace chocolatey.tests
             }
 
             [Fact]
-            public void should_get_instantiated_chocolotey1()
+            public void should_get_instantiated_chocolatey1()
             {
                 _chocolatey1.ShouldNotBeNull();
             }
 
             [Fact]
-            public void should_get_instantiated_chocolotey2()
+            public void should_get_instantiated_chocolatey2()
             {
                 _chocolatey2.ShouldNotBeNull();
             }

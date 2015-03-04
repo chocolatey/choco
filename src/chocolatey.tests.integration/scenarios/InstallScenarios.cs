@@ -213,7 +213,7 @@ namespace chocolatey.tests.integration.scenarios
             }     
             
             [Fact]
-            public void should_not_create_an_extensions_folder_for_the_pacakge()
+            public void should_not_create_an_extensions_folder_for_the_package()
             {
                 var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
 
