@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using configuration;
     using infrastructure.services;
@@ -43,12 +44,22 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info("Would have made a change to the configuration.");
         }
 
-        public void source_list(ChocolateyConfiguration configuration)
+        public IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration)
         {
+            var list = new List<ChocolateySource>();
             foreach (var source in configFileSettings.Sources)
             {
-                this.Log().Info(() => "{0}{1} - {2}".format_with(source.Id, source.Disabled ? " [Disabled]" : string.Empty, source.Value));
+                if (configuration.RegularOuptut) { 
+                    this.Log().Info(() => "{0}{1} - {2}".format_with(source.Id, source.Disabled ? " [Disabled]" : string.Empty, source.Value));
+                }
+                list.Add(new ChocolateySource {
+                    Id = source.Id,
+                    Value = source.Value,
+                    Disabled =  source.Disabled,
+                    Authenticated = string.IsNullOrWhiteSpace(source.Password)
+                });
             }
+            return list;
         }
 
         public void source_add(ChocolateyConfiguration configuration)
