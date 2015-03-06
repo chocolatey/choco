@@ -44,16 +44,16 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("n=|name=",
                      "Name - the name of the source. Required with some actions. Defaults to empty.",
-                     option => configuration.SourceCommand.Name = option)
+                     option => configuration.SourceCommand.Name = option.remove_surrounding_quotes())
                 .Add("s=|source=",
                      "Source - The source. Defaults to empty.",
-                     option => configuration.Sources = option)
+                     option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
-                     option => configuration.SourceCommand.Username = option)
+                     option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())
                 .Add("p=|password=",
                      "Password - the user's password to the source. Encrypted in chocolatey.config file.",
-                     option => configuration.SourceCommand.Password = option)
+                     option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
                 ;
         }
 

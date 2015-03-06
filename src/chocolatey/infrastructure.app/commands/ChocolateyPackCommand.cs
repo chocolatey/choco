@@ -39,7 +39,7 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("version=",
                      "Version - The version you would like to insert into the package.",
-                     option => configuration.Version = option)
+                     option => configuration.Version = option.remove_surrounding_quotes())
                 ;
         }
 

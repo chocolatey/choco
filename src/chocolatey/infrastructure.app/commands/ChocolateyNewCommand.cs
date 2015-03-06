@@ -47,15 +47,15 @@ namespace chocolatey.infrastructure.app.commands
                      "Name [Required]- the name of the package. Can be passed as first parameter without \"--name=\".",
                      option =>
                          {
-                             configuration.NewCommand.Name = option;
-                             configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, option);
+                             configuration.NewCommand.Name = option.remove_surrounding_quotes();
+                             configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, option.remove_surrounding_quotes());
                          })
                 .Add("version=",
                      "Version - the version of the package. Can also be passed as the property PackageVersion=somevalue",
-                     option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.VersionPropertyName, option))
+                     option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.VersionPropertyName, option.remove_surrounding_quotes()))
                 .Add("maintainer=",
                      "Maintainer - the name of the maintainer. Can also be passed as the property MaintainerName=somevalue",
-                     option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.MaintainerPropertyName, option))
+                     option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.MaintainerPropertyName, option.remove_surrounding_quotes()))
                 ;
             //todo: template type
         }

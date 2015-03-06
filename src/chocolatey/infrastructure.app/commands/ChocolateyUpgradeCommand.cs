@@ -42,10 +42,10 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("s=|source=",
                      "Source - The source to find the package(s) to install. Special sources include: ruby, webpi, cygwin, windowsfeatures, and python. Defaults to default feeds.",
-                     option => configuration.Sources = option)
+                     option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("version=",
                      "Version - A specific version to install. Defaults to unspecified.",
-                     option => configuration.Version = option)
+                     option => configuration.Version = option.remove_surrounding_quotes())
                 .Add("pre|prerelease",
                      "Prerelease - Include Prereleases? Defaults to false.",
                      option => configuration.Prerelease = option != null)
@@ -54,7 +54,7 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.ForceX86 = option != null)
                 .Add("ia=|installargs=|installarguments=|install-arguments=",
                      "InstallArguments - Install Arguments to pass to the native installer in the package. Defaults to unspecified.",
-                     option => configuration.InstallArguments = option)
+                     option => configuration.InstallArguments = option.remove_surrounding_quotes())
                 .Add("o|override|overrideargs|overridearguments|override-arguments",
                      "OverrideArguments - Should install arguments be used exclusively without appending to current package passed arguments? Defaults to false.",
                      option => configuration.OverrideArguments = option != null)
@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.NotSilent = option != null)
                 .Add("params=|parameters=|pkgparameters=|packageparameters=|package-parameters=",
                      "PackageParameters - Parameters to pass to the package. Defaults to unspecified.",
-                     option => configuration.PackageParameters = option)
+                     option => configuration.PackageParameters = option.remove_surrounding_quotes())
                 .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
                      "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false.",
                      option => configuration.AllowMultipleVersions = option != null)

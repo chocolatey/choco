@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("s=|source=",
                      "Source - Source location for install. Can include special 'webpi'. Defaults to sources.",
-                     option => configuration.Sources = option)
+                     option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("l|lo|localonly|local-only",
                      "LocalOnly - Only search against local machine items.",
                      option => configuration.ListCommand.LocalOnly = option != null)

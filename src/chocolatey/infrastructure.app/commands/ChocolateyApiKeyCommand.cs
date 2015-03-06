@@ -43,10 +43,10 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("s=|source=",
                      "Source [REQUIRED] - The source location for the key",
-                     option => configuration.Sources = option)
+                     option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The api key for the source.",
-                     option => configuration.ApiKeyCommand.Key = option)
+                     option => configuration.ApiKeyCommand.Key = option.remove_surrounding_quotes())
                 ;
         }
 
