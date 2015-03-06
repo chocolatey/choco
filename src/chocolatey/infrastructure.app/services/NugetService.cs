@@ -457,15 +457,8 @@ packages as of version 1.0.0. That is what the install command is for.
                 }
 
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
-                if (pkgInfo != null && pkgInfo.IsPinned)
-                {
-                    string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
-                    var pinnedResults = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                    pinnedResults.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                    pinnedResults.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                    if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
-                    continue;
-                }
+                bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
+                
 
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                 if (availablePackage == null)
@@ -482,7 +475,15 @@ packages as of version 1.0.0. That is what the install command is for.
                     {
                         unfoundResults.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                         unfoundResults.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        }
+                        else
+                        {
+                            //last one is whether this package is pinned or not
+                            this.Log().Info("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
+                        }
                     }
 
                     continue;
@@ -500,7 +501,14 @@ packages as of version 1.0.0. That is what the install command is for.
                     string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
                     results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
 
-                    if (config.RegularOutput) this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                    if (config.RegularOutput)
+                    {
+                        this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                    }
+                    else
+                    {
+                        this.Log().Info("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
+                    }
                     continue;
                 }
 
@@ -515,7 +523,15 @@ packages as of version 1.0.0. That is what the install command is for.
                             results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         }
 
-                        if (config.RegularOutput) this.Log().Info(logMessage);
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Info(logMessage);
+                        }
+                        else
+                        {
+                            this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
+                        }
+                            
                         continue;
                     }
 
@@ -536,9 +552,18 @@ packages as of version 1.0.0. That is what the install command is for.
                         }
                         else
                         {
-                            //last one is whether this package is pinned or not
-                            this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, "false"));
+                            this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
                         }
+                    }
+
+                    if (isPinned)
+                    {
+                        string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
+                        results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                        results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+
+                        continue;
                     }
 
                     if (performAction)
