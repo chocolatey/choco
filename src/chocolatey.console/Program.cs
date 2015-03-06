@@ -72,7 +72,7 @@ namespace chocolatey.console
 
                 trap_exit_scenarios(config);
 
-                if (config.RegularOuptut)
+                if (config.RegularOutput)
                 {
                     "logfile".Log().Info(() => "".PadRight(60, '='));
 #if DEBUG
@@ -83,7 +83,7 @@ namespace chocolatey.console
                 }
 
                 
-                if (warnings.Count != 0 && config.RegularOuptut)
+                if (warnings.Count != 0 && config.RegularOutput)
                 {
                     foreach (var warning in warnings.or_empty_list_if_null())
                     {

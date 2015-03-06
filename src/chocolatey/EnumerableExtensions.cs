@@ -48,7 +48,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        ///   Joins the specified IEnumerables.
+        ///   Joins the specified IEnumerable to required separator.
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="separator">The value to put in between elements</param>

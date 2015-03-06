@@ -50,7 +50,7 @@ namespace chocolatey.tests.infrastructure.information
             }
 
             [Fact]
-            public void should_be_transferrable_to_Version()
+            public void should_be_transferable_to_Version()
             {
                 new Version(result).ShouldNotBeNull();
             }

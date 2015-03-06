@@ -108,7 +108,7 @@ namespace chocolatey.tests.integration
             config.OverrideArguments = false;
             config.Prerelease = false;
             config.PromptForConfirmation = false;
-            config.RegularOuptut = true;
+            config.RegularOutput = true;
             config.SkipPackageInstallProvider = false;
             config.Sources = _fileSystem.get_full_path(_fileSystem.combine_paths(get_top_level(), "packages"));
             config.Version = null;

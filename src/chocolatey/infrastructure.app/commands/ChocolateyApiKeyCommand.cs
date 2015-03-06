@@ -112,7 +112,7 @@ In order to save your API key for {0},
             {
                 _configSettingsService.get_api_key(configuration, (key) =>
                     {
-                        if (configuration.RegularOuptut)
+                        if (configuration.RegularOutput)
                         {
                             this.Log().Info(() => "{0} - {1}".format_with(key.Source, key.Key));
                         }

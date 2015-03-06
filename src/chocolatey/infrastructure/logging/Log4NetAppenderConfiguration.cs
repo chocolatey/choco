@@ -34,7 +34,7 @@ namespace chocolatey.infrastructure.logging
         private static bool _alreadyConfiguredFileAppender;
 
         /// <summary>
-        ///   Pulls xmlconfiguration from embedded location and applies it. 
+        ///   Pulls xml configuration from embedded location and applies it. 
         ///   Then it configures a file appender to the specified output directory if one is provided.
         /// </summary>
         /// <param name="outputDirectory">The output directory.</param>

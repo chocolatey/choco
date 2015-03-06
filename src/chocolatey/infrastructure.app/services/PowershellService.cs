@@ -205,7 +205,7 @@ namespace chocolatey.infrastructure.app.services
                     var selection = InteractivePrompt
                         .prompt_for_confirmation(@"
 Do you want to run the script? 
- NOTE: If you chooose not to run the script, the installation will 
+ NOTE: If you choose not to run the script, the installation will 
  fail.
  Skip is an advanced option and most likely will never be wanted.
 "
