@@ -40,13 +40,13 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("version=",
                      "Version - A specific version to uninstall. Defaults to unspecified.",
-                     option => configuration.Version = option)
+                     option => configuration.Version = option.remove_surrounding_quotes())
                 .Add("a|allversions|all-versions",
                      "AllVersions - Uninstall all versions? Defaults to false.",
                      option => configuration.AllVersions = option != null)
                 .Add("ua=|uninstallargs=|uninstallarguments=|uninstall-arguments=",
                      "UninstallArguments - Uninstall Arguments to pass to the native installer in the package. Defaults to unspecified.",
-                     option => configuration.InstallArguments = option)
+                     option => configuration.InstallArguments = option.remove_surrounding_quotes())
                 .Add("o|override|overrideargs|overridearguments|override-arguments",
                      "OverrideArguments - Should uninstall arguments be used exclusively without appending to current package passed arguments? Defaults to false.",
                      option => configuration.OverrideArguments = option != null)
@@ -55,7 +55,7 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.NotSilent = option != null)
                 .Add("params=|parameters=|pkgparameters=|packageparameters=|package-parameters=",
                      "PackageParameters - Parameters to pass to the package. Defaults to unspecified.",
-                     option => configuration.PackageParameters = option)
+                     option => configuration.PackageParameters = option.remove_surrounding_quotes())
                 .Add("x|forcedependencies|force-dependencies|removedependencies|remove-dependencies",
                      "RemoveDependencies - Uninstall dependencies when uninstalling package(s). Defaults to false.",
                      option => configuration.ForceDependencies = option != null)

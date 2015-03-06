@@ -31,7 +31,7 @@ namespace chocolatey.infrastructure.app.configuration
     {
         public ChocolateyConfiguration()
         {
-            RegularOuptut = true;
+            RegularOutput = true;
             PromptForConfirmation = true;
             Information = new InformationCommandConfiguration();
             Features = new FeaturesConfiguration();
@@ -150,7 +150,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool Force { get; set; }
         public bool Noop { get; set; }
         public bool HelpRequested { get; set; }
-        public bool RegularOuptut { get; set; }
+        public bool RegularOutput { get; set; }
         public bool PromptForConfirmation { get; set; }
         public bool AcceptLicense { get; set; }
         public bool AllowUnofficialBuild { get; set; }

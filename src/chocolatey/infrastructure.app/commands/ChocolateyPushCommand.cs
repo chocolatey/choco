@@ -45,10 +45,10 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("s=|source=",
                      "Source - The source we are pushing the package to. Use {0} to push to community feed.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource),
-                     option => configuration.Sources = option)
+                     option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The api key for the source. If not specified (and not local file source), does a lookup. If not specified and one is not found for an https source, push will fail.",
-                     option => configuration.PushCommand.Key = option)
+                     option => configuration.PushCommand.Key = option.remove_surrounding_quotes())
                 .Add("t=|timeout=",
                      "Timeout (in seconds) - The time to allow a package push to occur before timing out. Defaults to 300 seconds (5 minutes).",
                      option =>

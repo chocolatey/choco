@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("s=|source=",
                      "Source - Source location for install. Can include special 'webpi'. Defaults to sources.",
-                     option => configuration.Sources = option)
+                     option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("l|lo|localonly|local-only",
                      "LocalOnly - Only search against local machine items.",
                      option => configuration.ListCommand.LocalOnly = option != null)
@@ -48,7 +48,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Prerelease - Include Prereleases? Defaults to false.",
                      option => configuration.Prerelease = option != null)
                 .Add("p|includeprograms|include-programs",
-                     "IncludePrograms - Used in conjuction with LocalOnly, filters out apps chocolatey has listed as packages and includes those in the list. Defaults to false.",
+                     "IncludePrograms - Used in conjunction with LocalOnly, filters out apps chocolatey has listed as packages and includes those in the list. Defaults to false.",
                      option => configuration.ListCommand.IncludeRegistryPrograms = option != null)
                 .Add("a|all|allversions|all-versions",
                      "AllVersions - include results from all versions.",

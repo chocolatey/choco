@@ -81,7 +81,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 if (logResults)
                 {
-                    if (config.RegularOuptut)
+                    if (config.RegularOutput)
                     {
                         this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0} {1}".format_with(package.Id, package.Version.to_string()));
                         if (config.Verbose) this.Log().Info(() => " {0}{1} Description: {2}{1} Tags: {3}{1} Number of Downloads: {4}{1}".format_with(package.Title.escape_curly_braces(), Environment.NewLine, package.Description.escape_curly_braces(), package.Tags.escape_curly_braces(), package.DownloadCount <= 0 ? "n/a" : package.DownloadCount.to_string()));
@@ -183,11 +183,11 @@ namespace chocolatey.infrastructure.app.services
         public void push_run(ChocolateyConfiguration config)
         {
             string nupkgFilePath = validate_and_return_package_file(config, Constants.PackageExtension);
-            if (config.RegularOuptut) this.Log().Info(() => "Attempting to push {0} to {1}".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Sources));
+            if (config.RegularOutput) this.Log().Info(() => "Attempting to push {0} to {1}".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Sources));
 
             NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath));
 
-            if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, () => @"
+            if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
 Your package may be subject to moderation. A moderator will review the
 package prior to acceptance. You should have received an email. If you
@@ -253,7 +253,7 @@ spam/junk folder.");
             }
 
             // this is when someone points the source directly at a nupkg 
-            // e.g. -s c:\somelocation\somwere\packagename.nupkg
+            // e.g. -s c:\somelocation\somewhere\packagename.nupkg
             if (config.Sources.to_string().EndsWith(Constants.PackageExtension))
             {
                 config.Sources = _fileSystem.get_directory_name(_fileSystem.get_full_path(config.Sources));
@@ -425,7 +425,7 @@ spam/junk folder.");
                     //var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                     //results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                    //if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    //if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     //continue;
 
                     string logMessage = @"
@@ -435,7 +435,7 @@ packages as of version 1.0.0. That is what the install command is for.
 
 {0} is not installed. Installing...".format_with(packageName);
 
-                    if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                    if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
 
                     var packageNames = config.PackageNames;
                     config.PackageNames = packageName;
@@ -457,15 +457,8 @@ packages as of version 1.0.0. That is what the install command is for.
                 }
 
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
-                if (pkgInfo != null && pkgInfo.IsPinned)
-                {
-                    string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
-                    var pinnedResults = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                    pinnedResults.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                    pinnedResults.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                    if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
-                    continue;
-                }
+                bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
+                
 
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                 if (availablePackage == null)
@@ -476,13 +469,21 @@ packages as of version 1.0.0. That is what the install command is for.
                     if (config.UpgradeCommand.FailOnUnfound)
                     {
                         unfoundResults.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                        if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     }
                     else
                     {
                         unfoundResults.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                         unfoundResults.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                        if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        }
+                        else
+                        {
+                            //last one is whether this package is pinned or not
+                            this.Log().Info("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
+                        }
                     }
 
                     continue;
@@ -500,7 +501,14 @@ packages as of version 1.0.0. That is what the install command is for.
                     string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
                     results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
 
-                    if (config.RegularOuptut) this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                    if (config.RegularOutput)
+                    {
+                        this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                    }
+                    else
+                    {
+                        this.Log().Info("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
+                    }
                     continue;
                 }
 
@@ -515,12 +523,20 @@ packages as of version 1.0.0. That is what the install command is for.
                             results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         }
 
-                        if (config.RegularOuptut) this.Log().Info(logMessage);
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Info(logMessage);
+                        }
+                        else
+                        {
+                            this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
+                        }
+                            
                         continue;
                     }
 
                     results.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
-                    if (config.RegularOuptut) this.Log().Info(logMessage);
+                    if (config.RegularOutput) this.Log().Info(logMessage);
                 }
 
                 if ((availablePackage.Version > installedPackage.Version) || config.Force)
@@ -530,15 +546,24 @@ packages as of version 1.0.0. That is what the install command is for.
                         string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s)".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version);
                         results.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                        if (config.RegularOuptut)
+                        if (config.RegularOutput)
                         {
                             this.Log().Warn(logMessage);
                         }
                         else
                         {
-                            //last one is whether this package is pinned or not
-                            this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, "false"));
+                            this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
                         }
+                    }
+
+                    if (isPinned)
+                    {
+                        string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
+                        results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                        results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+
+                        continue;
                     }
 
                     if (performAction)
@@ -766,7 +791,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     var results = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                     results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                    if (config.RegularOuptut) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
 
@@ -798,13 +823,13 @@ packages as of version 1.0.0. That is what the install command is for.
                         if (selection.is_equal_to(allVersionsChoice))
                         {
                             packageVersionsToRemove = installedPackageVersions.ToList();
-                            if (config.RegularOuptut) this.Log().Info(() => "You selected to remove all versions of {0}".format_with(packageName));
+                            if (config.RegularOutput) this.Log().Info(() => "You selected to remove all versions of {0}".format_with(packageName));
                         }
                         else
                         {
                             IPackage pkg = installedPackageVersions.FirstOrDefault((p) => p.Version.to_string().is_equal_to(selection));
                             packageVersionsToRemove.Add(pkg);
-                            if (config.RegularOuptut) this.Log().Info(() => "You selected {0} v{1}".format_with(pkg.Id, pkg.Version.to_string()));
+                            if (config.RegularOutput) this.Log().Info(() => "You selected {0} v{1}".format_with(pkg.Id, pkg.Version.to_string()));
                         }
                     }
                 }
@@ -818,7 +843,7 @@ packages as of version 1.0.0. That is what the install command is for.
                         var pinnedResults = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                         pinnedResults.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                         pinnedResults.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                        if (config.RegularOuptut) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
 

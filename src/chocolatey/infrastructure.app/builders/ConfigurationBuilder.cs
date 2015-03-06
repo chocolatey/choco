@@ -175,14 +175,14 @@ Config has insecure allowGlobalConfirmation set to true.
                                  "NoOp - Don't actually do anything.",
                                  option => config.Noop = option != null)
                             .Add("r|limitoutput|limit-output",
-                                 "LimitOuptut - Limit the output to essential information",
-                                 option => config.RegularOuptut = option == null)
+                                 "LimitOutput - Limit the output to essential information",
+                                 option => config.RegularOutput = option == null)
                             .Add("execution-timeout=",
                                  "CommandExecutionTimeoutSeconds - Override the default execution timeout in the configuration of {0} seconds.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
-                                 option => config.CommandExecutionTimeoutSeconds = int.Parse(option))
+                                 option => config.CommandExecutionTimeoutSeconds = int.Parse(option.remove_surrounding_quotes()))
                             .Add("c=|cache=|cachelocation=|cache-location=",
                                  "CacheLocation - Location for download cache, defaults to %TEMP% or value in chocolatey.config file.",
-                                 option => config.CacheLocation = option)
+                                 option => config.CacheLocation = option.remove_surrounding_quotes())
                             .Add("allowunofficial|allow-unofficial|allowunofficialbuild|allow-unofficial-build",
                                  "AllowUnofficialBuild - When not using the official build you must set this flag for choco to continue.",
                                  option => config.AllowUnofficialBuild = option != null)

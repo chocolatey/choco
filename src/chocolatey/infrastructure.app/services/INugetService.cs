@@ -29,7 +29,7 @@ namespace chocolatey.infrastructure.app.services
         void list_noop(ChocolateyConfiguration config);
 
         /// <summary>
-        ///   Lists/searches for pacakge against nuget related feeds.
+        ///   Lists/searches for package against nuget related feeds.
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="logResults">Should results be logged?</param>

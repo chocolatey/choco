@@ -92,7 +92,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
                 if (config.Noop)
                 {
-                    if (config.RegularOuptut)
+                    if (config.RegularOutput)
                     {
                         this.Log().Info("_ {0}:{1} - Noop Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
                     }

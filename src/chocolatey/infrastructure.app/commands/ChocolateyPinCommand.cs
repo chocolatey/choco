@@ -47,10 +47,10 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("n=|name=",
                      "Name - the name of the package. Required with some actions. Defaults to empty.",
-                     option => configuration.PinCommand.Name = option)
+                     option => configuration.PinCommand.Name = option.remove_surrounding_quotes())
                 .Add("version=",
                      "Version - Used when multiple versions of a package are installed.  Defaults to empty.",
-                     option => configuration.Version = option)
+                     option => configuration.Version = option.remove_surrounding_quotes())
                 ;
         }
 

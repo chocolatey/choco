@@ -52,7 +52,7 @@ namespace chocolatey.infrastructure.logging
         ///   This should be done only once per object name.
         /// </summary>
         /// <param name="objectName">Name of the object.</param>
-        /// <returns>ILog instance for an object if log type has been intialized; otherwise null</returns>
+        /// <returns>ILog instance for an object if log type has been initialized; otherwise null</returns>
         public static ILog GetLoggerFor(string objectName)
         {
             ILog logger = _logger;
