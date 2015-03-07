@@ -49,7 +49,7 @@ namespace chocolatey.infrastructure.app.services
             var list = new List<ChocolateySource>();
             foreach (var source in configFileSettings.Sources)
             {
-                if (configuration.RegularOuptut) { 
+                if (configuration.RegularOutput) { 
                     this.Log().Info(() => "{0}{1} - {2}".format_with(source.Id, source.Disabled ? " [Disabled]" : string.Empty, source.Value));
                 }
                 list.Add(new ChocolateySource {

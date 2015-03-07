@@ -218,7 +218,7 @@ namespace chocolatey
         {
             extract_resources();
             var configuration = create_configuration(new List<string>());
-            configuration.RegularOuptut = true;
+            configuration.RegularOutput = true;
             var runner = new GenericRunner();
             return runner.list<T>(configuration, _container, isConsole: false, parseArgs: null);
         }
