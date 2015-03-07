@@ -40,6 +40,24 @@ In that mess there is a link to the [Helper Reference](https://github.com/chocol
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/master/CHANGELOG.md
 
+## 0.9.9.2
+
+### BUG FIXES
+
+ * Fix - Allow passing install arguments again (regression in 0.9.9 series) - see [#150](https://github.com/chocolatey/choco/issues/150)
+ * Fix - Allow apostrophes to be used as quotes - quoting style that worked with previous client - see [#141](https://github.com/chocolatey/choco/issues/141)
+ * Fix - Shims write errors to stderr - see [#142](https://github.com/chocolatey/choco/issues/142) and [ShimGen #14](https://github.com/chocolatey/shimgen/issues/14)
+
+### IMPROVEMENTS
+
+ * Upgrade `-r` should always return a value - see [#153](https://github.com/chocolatey/choco/issues/153)
+
+## 0.9.9.1
+
+### BUG FIXES
+
+ * Fix - Get-BinRoot broken - see [#144](https://github.com/chocolatey/choco/issues/144)
+
 ##0.9.9
 
 This also includes issues that were being tracked in the old Chocolatey repository: [Chocolatey 0.9.9](https://github.com/chocolatey/chocolatey/issues?q=is%3Aclosed+label%3Av0.9.9).
