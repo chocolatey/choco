@@ -94,7 +94,7 @@ namespace chocolatey.infrastructure.app.services
                     this.Log().Debug(() => "{0} {1}".format_with(pkg.Id, pkg.Version.to_string()));
                 }
 
-                yield return new PackageResult(pkg, null);
+                yield return new PackageResult(pkg, null, config.Sources);
             }
         }
 
