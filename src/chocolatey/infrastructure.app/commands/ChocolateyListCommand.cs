@@ -22,11 +22,12 @@ namespace chocolatey.infrastructure.app.commands
     using domain;
     using infrastructure.commands;
     using logging;
+    using results;
     using services;
 
     [CommandFor(CommandNameType.list)]
     [CommandFor(CommandNameType.search)]
-    public sealed class ChocolateyListCommand : ICommand
+    public sealed class ChocolateyListCommand : IListCommand<PackageResult>
     {
         private readonly IChocolateyPackageService _packageService;
 
@@ -115,6 +116,11 @@ Chocolatey will perform a search for a package local or remote. Some
         public void run(ChocolateyConfiguration configuration)
         {
             _packageService.list_run(configuration, logResults: true);
+        }
+
+        public IEnumerable<PackageResult> list(ChocolateyConfiguration configuration)
+        {
+            return _packageService.list_run(configuration, logResults: false);
         }
 
         public bool may_require_admin_access()

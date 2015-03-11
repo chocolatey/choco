@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
-        public void list_run(ChocolateyConfiguration config, bool logResults)
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
         {
             this.Log().Debug(() => "Searching for package information");
 
@@ -83,23 +83,32 @@ namespace chocolatey.infrastructure.app.services
                 //install webpi if not installed
                 //run the webpi command 
                 this.Log().Warn("Command not yet functional, stay tuned...");
+                return new PackageResult[]{};
             }
             else
             {
-                var list = _nugetService.list_run(config, logResults: true);
+                var list = _nugetService.list_run(config, logResults: logResults).ToList();
                 if (config.RegularOutput)
                 {
-                    this.Log().Warn(() => @"{0} packages {1}.".format_with(list.Count(), config.ListCommand.LocalOnly ? "installed" : "found"));
-
-                    if (config.ListCommand.LocalOnly && config.ListCommand.IncludeRegistryPrograms)
-                    {
-                        report_registry_programs(config, list);
-                    }
+                    this.Log().Warn(() => @"{0} packages {1}.".format_with(list.Count, config.ListCommand.LocalOnly ? "installed" : "found"));
                 }
+                if (!config.ListCommand.LocalOnly && !config.ListCommand.IncludeRegistryPrograms)
+                {
+                    return list;
+                }
+
+                // in this case, we need to a list we can enumerate multiple times and append to
+
+                if (config.ListCommand.LocalOnly && config.ListCommand.IncludeRegistryPrograms)
+                {
+                    report_registry_programs(config, list);
+                }
+
+                return list;
             }
         }
 
-        private void report_registry_programs(ChocolateyConfiguration config, IEnumerable<PackageResult> list)
+        private void report_registry_programs(ChocolateyConfiguration config, List<PackageResult> list)
         {
             var itemsToRemoveFromMachine = new List<string>();
             foreach (var packageResult in list)
@@ -111,6 +120,7 @@ namespace chocolatey.infrastructure.app.services
                     {
                         continue;
                     }
+
                     var key = pkginfo.RegistrySnapshot.RegistryKeys.FirstOrDefault();
                     if (key != null)
                     {
@@ -118,16 +128,26 @@ namespace chocolatey.infrastructure.app.services
                     }
                 }
             }
+
             var machineInstalled = _registryService.get_installer_keys().RegistryKeys.Where((p) => p.is_in_programs_and_features() && !itemsToRemoveFromMachine.Contains(p.DisplayName)).OrderBy((p) => p.DisplayName).Distinct().ToList();
             if (machineInstalled.Count != 0)
             {
                 this.Log().Info(() => "");
-                foreach (var key in machineInstalled.or_empty_list_if_null())
+                foreach (var key in machineInstalled)
                 {
-                    this.Log().Info("{0}|{1}".format_with(key.DisplayName, key.DisplayVersion));
-                    if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation.escape_curly_braces(), Environment.NewLine, key.UninstallString.escape_curly_braces()));
+                    if (config.RegularOutput)
+                    {
+                        this.Log().Info("{0}|{1}".format_with(key.DisplayName, key.DisplayVersion));
+                        if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation.escape_curly_braces(), Environment.NewLine, key.UninstallString.escape_curly_braces()));
+                    }
+
+                    list.Add( new PackageResult(key.DisplayName, key.DisplayName, key.InstallLocation) );
                 }
-                this.Log().Warn(() => @"{0} applications not managed with Chocolatey.".format_with(machineInstalled.Count));
+
+                if (config.RegularOutput)
+                {
+                    this.Log().Warn(() => @"{0} applications not managed with Chocolatey.".format_with(machineInstalled.Count));
+                }
             }
         }
 
