@@ -342,7 +342,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                     new PackageResult(package.Object, null),
                     new PackageResult(pinnedPackage.Object, null)
                 };
-                nugetService.Setup(n => n.list_run(It.IsAny<ChocolateyConfiguration>(), true)).Returns(packageResults);
+                nugetService.Setup(n => n.list_run(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
                 configuration.PinCommand.Command = PinCommandType.list;
             }
 
@@ -414,7 +414,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.PinCommand.Command = PinCommandType.list;
                 command.run(configuration);
 
-                nugetService.Verify(n => n.list_run(It.IsAny<ChocolateyConfiguration>(), true), Times.Once);
+                nugetService.Verify(n => n.list_run(It.IsAny<ChocolateyConfiguration>()), Times.Once);
             }
             
             [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object.")]

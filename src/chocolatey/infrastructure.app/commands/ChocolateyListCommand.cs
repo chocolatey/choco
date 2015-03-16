@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.app.commands
 {
     using System.Collections.Generic;
+    using System.Linq;
     using attributes;
     using commandline;
     using configuration;
@@ -115,12 +116,15 @@ Chocolatey will perform a search for a package local or remote. Some
 
         public void run(ChocolateyConfiguration configuration)
         {
-            _packageService.list_run(configuration, logResults: true);
+            // you must leave the .ToList() here or else the method won't be evaluated!
+            _packageService.list_run(configuration).ToList();
         }
 
         public IEnumerable<PackageResult> list(ChocolateyConfiguration configuration)
         {
-            return _packageService.list_run(configuration, logResults: false);
+            configuration.QuietOutput = true;
+            // here it's up to the caller to enumerate the results
+            return _packageService.list_run(configuration);
         }
 
         public bool may_require_admin_access()
