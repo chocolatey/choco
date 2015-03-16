@@ -208,7 +208,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_call_service_list_run()
             {
-                packageService.Verify(c => c.list_run(configuration, true), Times.Once);
+                packageService.Verify(c => c.list_run(configuration), Times.Once);
             }
         }
     }
