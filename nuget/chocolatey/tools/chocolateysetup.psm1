@@ -37,6 +37,8 @@ param(
     $debugMode = $true
   }
 
+  Install-DotNet4IfMissing
+
   $chocoNew = Join-Path $thisScriptFolder 'chocolateyInstall\choco.exe'
   if ($debugMode) {
     & $chocoNew unpackself -fdv
@@ -103,7 +105,7 @@ Creating Chocolatey folders if they do not already exist.
   $chocolateyExePathVariable = $chocolateyExePath.ToLower().Replace($chocolateyPath.ToLower(), "%DIR%..\").Replace("\\","\")
   Initialize-ChocolateyPath $chocolateyExePath $chocolateyExePathVariable
   Process-ChocolateyBinFiles $chocolateyExePath $chocolateyExePathVariable
-  Install-DotNet4IfMissing
+
   $realModule = Join-Path $chocolateyPath "helpers\chocolateyInstaller.psm1"
   Import-Module "$realModule" -Force
 
@@ -169,16 +171,15 @@ param(
     return
   }
 
+  $currentEA = $ErrorActionPreference
+  $ErrorActionPreference = 'Stop'
   try {
     # get current user
-
     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
     # get current acl
     $acl = Get-Acl $folder
 
-    # define rule to inject
-
-
+    # define rule to set
     $rights = "Modify"
     $userAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($currentUser.Name, $rights, "Allow")
 
@@ -190,6 +191,7 @@ param(
   } catch {
     Write-Warning "Not able to set permissions for user."
   }
+  $ErrorActionPreference = $currentEA
 }
 
 function Upgrade-OldChocolateyInstall {
@@ -278,7 +280,8 @@ param(
 
   Write-Debug "Removing install files in chocolateyInstall, helpers, redirects, and tools"
   "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" | % {
-    #Write-Debug "Checking path $_"
+    #Write-Debug "Checking path $_"
+
     if (Test-Path $_) {
       Get-ChildItem -Path "$_" | % {
         #Write-Debug "Checking child path $_ ($($_.FullName))"
@@ -448,6 +451,7 @@ function Install-DotNet4IfMissing {
 
   Write-Debug "Installing .NET Framework 4.0 if it is missing"
   if (!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
+    Write-Host "Downloading and installing .NET Framework 4.0"
     $NetFx4ClientUrl = 'http://download.microsoft.com/download/5/6/2/562A10F9-C9F4-4313-A044-9C94E0A8FAC8/dotNetFx40_Client_x86_x64.exe'
     $NetFx4FullUrl = 'http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe'
     Install-ChocolateyPackage "NetFx4.0" 'exe' -silentArgs "/q /norestart /repair /log `'$tempDir\NetFx4Install.log`'" -url "$NetFx4FullUrl" -url64bit "$NetFx4FullUrl" -validExitCodes @(0, 3010)
