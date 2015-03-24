@@ -171,16 +171,15 @@ param(
     return
   }
 
+  $currentEA = $ErrorActionPreference
+  $ErrorActionPreference = 'Stop'
   try {
     # get current user
-
     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
     # get current acl
     $acl = Get-Acl $folder
 
-    # define rule to inject
-
-
+    # define rule to set
     $rights = "Modify"
     $userAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($currentUser.Name, $rights, "Allow")
 
@@ -192,6 +191,7 @@ param(
   } catch {
     Write-Warning "Not able to set permissions for user."
   }
+  $ErrorActionPreference = $currentEA
 }
 
 function Upgrade-OldChocolateyInstall {
@@ -280,7 +280,8 @@ param(
 
   Write-Debug "Removing install files in chocolateyInstall, helpers, redirects, and tools"
   "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" | % {
-    #Write-Debug "Checking path $_"
+    #Write-Debug "Checking path $_"
+
     if (Test-Path $_) {
       Get-ChildItem -Path "$_" | % {
         #Write-Debug "Checking child path $_ ($($_.FullName))"
