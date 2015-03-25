@@ -816,7 +816,7 @@ packages as of version 1.0.0. That is what the install command is for.
                             choices.Add(allVersionsChoice);
                         }
 
-                        var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), choices, abortChoice, true);
+                        var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), choices, defaultChoice: null, requireAnswer: true);
 
                         if (string.IsNullOrWhiteSpace(selection)) continue;
                         if (selection.is_equal_to(abortChoice)) continue;
