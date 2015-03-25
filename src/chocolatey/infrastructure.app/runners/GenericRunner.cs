@@ -125,7 +125,7 @@ Chocolatey detected you are not running from an elevated command shell
  elevated shell. When you open the command shell, you should ensure 
  that you do so with ""Run as Administrator"" selected.
 
- Do you want to continue?", new[] { "yes", "no" }, "no", requireAnswer: true);
+ Do you want to continue?", new[] { "yes", "no" }, defaultChoice: null, requireAnswer: true);
 
                 if (selection.is_equal_to("no"))
                 {
