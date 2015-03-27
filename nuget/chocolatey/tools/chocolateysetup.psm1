@@ -446,15 +446,41 @@ param(
 }
 
 function Install-DotNet4IfMissing {
+  # we can't take advantage of any chocolatey module functions, because they
+  # haven't been unpacked because they require .NET Framework 4.0
+
   Write-Debug "Install-DotNet4IfMissing"
   if ([IntPtr]::Size -eq 8) {$fx="framework64"} else {$fx="framework"}
 
-  Write-Debug "Installing .NET Framework 4.0 if it is missing"
-  if (!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
-    Write-Host "Downloading and installing .NET Framework 4.0"
-    $NetFx4ClientUrl = 'http://download.microsoft.com/download/5/6/2/562A10F9-C9F4-4313-A044-9C94E0A8FAC8/dotNetFx40_Client_x86_x64.exe'
-    $NetFx4FullUrl = 'http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe'
-    Install-ChocolateyPackage "NetFx4.0" 'exe' -silentArgs "/q /norestart /repair /log `'$tempDir\NetFx4Install.log`'" -url "$NetFx4FullUrl" -url64bit "$NetFx4FullUrl" -validExitCodes @(0, 3010)
+  $NetFx4ClientUrl = 'http://download.microsoft.com/download/5/6/2/562A10F9-C9F4-4313-A044-9C94E0A8FAC8/dotNetFx40_Client_x86_x64.exe'
+  $NetFx4FullUrl = 'http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe'
+  $NetFx4Path = "$tempDir"
+  $NetFx4InstallerFile = 'dotNetFx40.exe'
+  $NetFx4Installer = Join-Path $NetFx4Path $NetFx4InstallerFile
+
+  if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
+    if (!(Test-Path $NetFx4Path)) {
+      Write-Host "Creating folder `'$NetFx4Path`'"
+      $null = New-Item -Path "$NetFx4Path" -ItemType Directory
+    }
+
+    if (!(Test-Path $NetFx4Installer)) {
+      Write-Host "Downloading `'$NetFx4FullUrl`' to `'$NetFx4Installer`' - this may take awhile with no output"
+      (New-Object Net.WebClient).DownloadFile("$NetFx4FullUrl","$NetFx4Installer")
+    }
+
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.WorkingDirectory = "$NetFx4Path"
+    $psi.FileName = "$NetFx4InstallerFile"
+    $psi.Arguments = "/q /norestart /repair /log `'$NetFx4Path\NetFx4Install.log`'"
+    $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Minimized;
+
+    Write-Host "Installing `'$NetFx4Installer`' - this may take awhile with no output"
+    $s = [System.Diagnostics.Process]::Start($psi);
+    $s.WaitForExit();
+    if ($s.ExitCode -ne 0 -and $s.ExitCode -ne 3010) {
+      Write-Warning ".NET Framework install failed with exit code `'$($s.ExitCode)`'. `n This will cause the rest of the install to fail."
+    }
   }
 }
 
