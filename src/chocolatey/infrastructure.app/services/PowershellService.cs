@@ -196,15 +196,15 @@ namespace chocolatey.infrastructure.app.services
                 //}
 
                 this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".format_with(chocoPowerShellScript));
-                string chocoPowerShellScriptContents = _fileSystem.read_file(chocoPowerShellScript).escape_curly_braces();
-                this.Log().Debug(chocoPowerShellScriptContents);
+                string chocoPowerShellScriptContents = _fileSystem.read_file(chocoPowerShellScript);
+                this.Log().Debug(chocoPowerShellScriptContents.escape_curly_braces());
 
                 bool shouldRun = !configuration.PromptForConfirmation;
 
                 if (!shouldRun)
                 {
                     this.Log().Info(ChocolateyLoggers.Important, () => " Found '{0}':".format_with(_fileSystem.get_file_name(chocoPowerShellScript)));
-                    this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents));
+                    this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents.escape_curly_braces()));
                     var selection = InteractivePrompt
                         .prompt_for_confirmation(@"
 Do you want to run the script? 
