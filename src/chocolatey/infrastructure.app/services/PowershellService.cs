@@ -160,8 +160,10 @@ namespace chocolatey.infrastructure.app.services
                 Environment.SetEnvironmentVariable("packageVersion", package.Version.to_string());
                 Environment.SetEnvironmentVariable("chocolateyPackageFolder", packageDirectory);
                 Environment.SetEnvironmentVariable("packageFolder", packageDirectory);
+                Environment.SetEnvironmentVariable("installArguments", configuration.InstallArguments);
                 Environment.SetEnvironmentVariable("installerArguments", configuration.InstallArguments);
                 Environment.SetEnvironmentVariable("chocolateyInstallArguments", configuration.InstallArguments);
+                Environment.SetEnvironmentVariable("packageParameters", configuration.PackageParameters);
                 Environment.SetEnvironmentVariable("chocolateyPackageParameters", configuration.PackageParameters);
                 if (configuration.ForceX86)
                 {
