@@ -90,6 +90,15 @@ param(
     $checksumType = $checksumType64
   }
 
+  try {
+    $fileDirectory = $([System.IO.Path]::GetDirectoryName($fileFullPath))
+    if (!(Test-Path($fileDirectory))) {
+      [System.IO.Directory]::CreateDirectory($fileDirectory) | Out-Null  
+    }
+  } catch {
+    Write-Host "Attempt to create directory failed for '$fileFullPath'."
+  }
+
   $forceX86 = $env:chocolateyForceX86;
   if ($forceX86) {
     Write-Debug "User specified -x86 so forcing 32 bit"
