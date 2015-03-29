@@ -65,7 +65,7 @@ namespace chocolatey.infrastructure.app.services
                 var chocoInstall = installScript.FirstOrDefault();
 
                 this.Log().Info("Would have run '{0}':".format_with(chocoInstall));
-                this.Log().Warn(_fileSystem.read_file(chocoInstall));
+                this.Log().Warn(_fileSystem.read_file(chocoInstall).escape_curly_braces());
             }
         }
 
