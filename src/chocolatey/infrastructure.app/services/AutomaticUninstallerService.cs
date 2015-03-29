@@ -81,6 +81,7 @@ namespace chocolatey.infrastructure.app.services
                 var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault();
                 uninstallArgs.Remove(uninstallExe);
                 uninstallExe = uninstallExe.remove_surrounding_quotes();
+                if (uninstallExe.is_equal_to("msiexec.exe")) uninstallExe = _fileSystem.combine_paths(Environment.SystemDirectory, uninstallExe);
                 this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
 
                 //todo: ultimately we should merge keys with logging
