@@ -136,11 +136,14 @@ namespace chocolatey
             return input;
         }
 
+        private static Regex open_brace_regex = new Regex("(?<!{){(?!{)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
+        private static Regex close_brace_regex = new Regex("(?<!})}(?!})", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
+
         public static string escape_curly_braces(this string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
-            return input.Replace("{", "{{").Replace("}", "}}");
+            return open_brace_regex.Replace(close_brace_regex.Replace(input,"}}"),"{{");
         }
     }
 }

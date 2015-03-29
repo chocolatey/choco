@@ -43,7 +43,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Debug(Func<string> message)
         {
-            if (_logger.IsDebugEnabled) _logger.Debug(decorate_message_with_audit_information(message.Invoke().escape_curly_braces()));
+            if (_logger.IsDebugEnabled) _logger.DebugFormat(decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
         }
 
         public void Info(string message, params object[] formatting)
@@ -53,8 +53,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Info(Func<string> message)
         {
-            var messageT = decorate_message_with_audit_information(message.Invoke().escape_curly_braces());
-            if (_logger.IsInfoEnabled) _logger.Info(decorate_message_with_audit_information(message.Invoke().escape_curly_braces()));
+            if (_logger.IsInfoEnabled) _logger.InfoFormat(decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
         }
 
         public void Warn(string message, params object[] formatting)
@@ -64,7 +63,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Warn(Func<string> message)
         {
-            if (_logger.IsWarnEnabled) _logger.Warn(decorate_message_with_audit_information(message.Invoke().escape_curly_braces()));
+            if (_logger.IsWarnEnabled) _logger.WarnFormat(decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
         }
 
         public void Error(string message, params object[] formatting)
@@ -76,7 +75,7 @@ namespace chocolatey.infrastructure.logging
         public void Error(Func<string> message)
         {
             // don't need to check for enabled at this level
-            _logger.Error(decorate_message_with_audit_information(message.Invoke().escape_curly_braces()));
+            _logger.ErrorFormat(decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
         }
 
         public void Fatal(string message, params object[] formatting)
@@ -88,7 +87,7 @@ namespace chocolatey.infrastructure.logging
         public void Fatal(Func<string> message)
         {
             // don't need to check for enabled at this level
-            _logger.Fatal(decorate_message_with_audit_information(message.Invoke().escape_curly_braces()));
+            _logger.FatalFormat(decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
         }
 
         public string decorate_message_with_audit_information(string message)
