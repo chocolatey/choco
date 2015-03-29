@@ -19,6 +19,16 @@ if ($env:ChocolateyEnvironmentDebug -eq 'true') { $DebugPreference = "Continue";
 $VerbosePreference = "SilentlyContinue"
 if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $VerbosePreference = "Continue"; $verbosity = $true }
 
+$installArguments = $env:chocolateyInstallArguments
+
+$overrideArgs = false
+if ($env:chocolateyInstallOverride -eq 'true') { $overrideArgs = true }
+
+$forceX86 = false
+if ($env:chocolateyForceX86 -eq 'true') { $forceX86 = true }
+
+$packageParameters = $env:chocolateyPackageParameters
+
 # ensure module loading preference is on
 $PSModuleAutoLoadingPreference = "All";
 
