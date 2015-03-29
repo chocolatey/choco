@@ -1,4 +1,22 @@
-## [0.9.9.2](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.2+is%3Aclosed) (March 6, 2015)
+## [0.9.9.3](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.3+is%3Aclosed) (March 29, 2015)
+
+### BUG FIXES
+
+ * Fix - Install .NET Framework immediately during install - see [#168](https://github.com/chocolatey/choco/issues/168)
+ * Fix - Do not error on Set-Acl during install/upgrade - see [#163](https://github.com/chocolatey/choco/issues/163)
+ * Fix - Do not escape curly braces in powershell script - see [#208](https://github.com/chocolatey/choco/issues/208)
+ * Fix - Formatting issues on --noop command logging - see [#202](https://github.com/chocolatey/choco/issues/202)
+ * Fix - Uninstaller check doesn't find 32-bit registry keys - see [#197](https://github.com/chocolatey/choco/issues/197)
+ * Fix - Uninstaller errors on short path to msiexec - see [#211](https://github.com/chocolatey/choco/issues/211)
+
+### IMPROVEMENTS
+
+ * Some packages use non-API variables like $installArguments - see [#207](https://github.com/chocolatey/choco/issues/207)
+ * Add Generate-BinFile to Helpers (widely used but never part of API) - see [#145](https://github.com/chocolatey/choco/issues/145)
+ * Add Remove-BinFile to Helpers - see [#195](https://github.com/chocolatey/choco/issues/195)
+ * Get-ChocolateyWebFile should create path if it doesn't exist - see [#167](https://github.com/chocolatey/choco/issues/167)
+
+## [0.9.9.2](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.2+is%3Aclosed) (March 6, 2015)
 
 ### BUG FIXES
 
@@ -10,7 +28,7 @@
 
  * Upgrade `-r` should always return a value - see [#153](https://github.com/chocolatey/choco/issues/153)
 
-## [0.9.9.1](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.1+is%3Aclosed) (March 3, 2015)
+## [0.9.9.1](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.1+is%3Aclosed) (March 3, 2015)
 
 ### BUG FIXES
 
