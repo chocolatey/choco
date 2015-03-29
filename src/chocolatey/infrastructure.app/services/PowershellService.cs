@@ -89,20 +89,34 @@ namespace chocolatey.infrastructure.app.services
             return run_action(configuration, packageResult, CommandNameType.uninstall);
         }
 
-        public string wrap_script_with_module(string script)
+        public string wrap_script_with_module(string script, ChocolateyConfiguration config)
         {
             var installerModules = _fileSystem.get_files(ApplicationParameters.InstallLocation, "chocolateyInstaller.psm1", SearchOption.AllDirectories);
             var installerModule = installerModules.FirstOrDefault();
+            var scriptRunners = _fileSystem.get_files(ApplicationParameters.InstallLocation, "chocolateyScriptRunner.ps1", SearchOption.AllDirectories);
+            var scriptRunner = scriptRunners.FirstOrDefault();
             // removed setting all errors to terminating. Will cause too
             // many issues in existing packages, including upgrading
             // Chocolatey from older POSH client due to log errors
             //$ErrorActionPreference = 'Stop';
-            return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; & import-module -name '{0}';{2} & '{1}'"
+            return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; & import-module -name '{0}';{2} & '{1}' {3}"
                 .format_with(
                     installerModule,
-                    script,
-                    string.IsNullOrWhiteSpace(_customImports) ? string.Empty : "& {0}".format_with(_customImports.EndsWith(";") ? _customImports : _customImports + ";")
+                    scriptRunner,
+                    string.IsNullOrWhiteSpace(_customImports) ? string.Empty : "& {0}".format_with(_customImports.EndsWith(";") ? _customImports : _customImports + ";"),
+                    get_script_arguments(script,config)
                 );
+        }
+
+        private string get_script_arguments(string script, ChocolateyConfiguration config)
+        {
+            return "-packageScript '{0}' -installArguments '{1}' -forceX86 {2} -packageParameters '{3}' -overrideArgs {4}".format_with(
+                script,
+                config.InstallArguments,
+                config.ForceX86 ? "$true" : "$false",
+                config.PackageParameters,
+                config.OverrideArguments ? "$true" : "$false"
+             );
         }
 
         public bool run_action(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command)
@@ -225,7 +239,7 @@ Do you want to run the script?
                 {
                     installerRun = true;
                     var exitCode = PowershellExecutor.execute(
-                        wrap_script_with_module(chocoPowerShellScript),
+                        wrap_script_with_module(chocoPowerShellScript, configuration),
                         _fileSystem,
                         configuration.CommandExecutionTimeoutSeconds,
                         (s, e) =>
