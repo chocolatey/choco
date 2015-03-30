@@ -1,4 +1,14 @@
-## [0.9.9.3](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.3+is%3Aclosed) (March 29, 2015)
+## [0.9.9.4](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.4+is%3Aclosed) (March 30, 2015)
+
+### BUG FIXES
+
+ * Fix - The term 'false' is not recognized as the name of a cmdlet - see [#215](https://github.com/chocolatey/choco/issues/215)
+
+### IMPROVEMENTS
+
+ * Some packages use non-API variables like $installArguments - see [#207](https://github.com/chocolatey/choco/issues/207)
+
+ ## [0.9.9.3](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.3+is%3Aclosed) (March 29, 2015)
 
 ### BUG FIXES
 
