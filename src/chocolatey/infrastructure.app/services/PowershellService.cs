@@ -110,12 +110,12 @@ namespace chocolatey.infrastructure.app.services
 
         private string get_script_arguments(string script, ChocolateyConfiguration config)
         {
-            return "-packageScript '{0}' -installArguments '{1}' -forceX86 {2} -packageParameters '{3}' -overrideArgs {4}".format_with(
+            return "-packageScript '{0}' -installArguments '{1}' -packageParameters '{2}'{3}{4}".format_with(
                 script,
                 config.InstallArguments,
-                config.ForceX86 ? "$true" : "$false",
                 config.PackageParameters,
-                config.OverrideArguments ? "$true" : "$false"
+                config.ForceX86 ? " -forceX86" : string.Empty,
+                config.OverrideArguments ? " -overrideArgs" : string.Empty
              );
         }
 
