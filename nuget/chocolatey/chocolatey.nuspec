@@ -40,6 +40,16 @@ In that mess there is a link to the [Helper Reference](https://github.com/chocol
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/master/CHANGELOG.md
 
+## 0.9.9.4
+
+### BUG FIXES
+
+ * Fix - The term 'false' is not recognized as the name of a cmdlet - see [#215](https://github.com/chocolatey/choco/issues/215)
+
+### IMPROVEMENTS
+
+ * Some packages use non-API variables like $installArguments - see [#207](https://github.com/chocolatey/choco/issues/207)
+
 ## 0.9.9.3
 
 ### BUG FIXES
