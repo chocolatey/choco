@@ -21,10 +21,10 @@ if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $VerbosePreference = "Contin
 
 $installArguments = $env:chocolateyInstallArguments
 
-$overrideArgs = false
+$overrideArgs = $false
 if ($env:chocolateyInstallOverride -eq 'true') { $overrideArgs = true }
 
-$forceX86 = false
+$forceX86 = $false
 if ($env:chocolateyForceX86 -eq 'true') { $forceX86 = true }
 
 $packageParameters = $env:chocolateyPackageParameters
