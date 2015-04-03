@@ -206,7 +206,7 @@ namespace chocolatey.infrastructure.app.services
 
             if (!packageResult.Success)
             {
-                this.Log().Error(ChocolateyLoggers.Important, "{0} {1} not successful.".format_with(packageResult.Name, commandName.to_string()));
+                this.Log().Error(ChocolateyLoggers.Important, "The {0} of {1} was NOT successful.".format_with(commandName.to_string(), packageResult.Name));
                 handle_unsuccessful_operation(config, packageResult, movePackageToFailureLocation: true, attemptRollback: true);
 
                 return;
@@ -214,7 +214,7 @@ namespace chocolatey.infrastructure.app.services
 
             remove_rollback_if_exists(packageResult);
 
-            this.Log().Info(ChocolateyLoggers.Important, " {0} has been {1}ed successfully.".format_with(packageResult.Name, commandName.to_string()));
+            this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".format_with( commandName.to_string(), packageResult.Name));
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
