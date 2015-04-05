@@ -23,10 +23,11 @@ namespace chocolatey.infrastructure.app.commands
     using domain;
     using infrastructure.commands;
     using logging;
+    using results;
     using services;
 
     [CommandFor(CommandNameType.install)]
-    public sealed class ChocolateyInstallCommand : ICommand
+    public sealed class ChocolateyInstallCommand : IListCommand<PackageResult>
     {
         private readonly IChocolateyPackageService _packageService;
 
@@ -164,6 +165,11 @@ NOTE: Options and switches apply to all items passed, so if you are
         public void run(ChocolateyConfiguration configuration)
         {
             _packageService.install_run(configuration);
+        }
+
+        public IEnumerable<PackageResult> list(ChocolateyConfiguration configuration)
+        {
+            return _packageService.install_run(configuration).Values;
         }
     }
 }
