@@ -90,9 +90,14 @@ namespace chocolatey.infrastructure.app.services
             {
                 var packages = new List<IPackage>();
 
+                if (config.ListCommand.LocalOnly)
+                {
+                    config.Sources = ApplicationParameters.PackagesLocation;
+                    config.Prerelease = true;
+                }
                 foreach (var package in _nugetService.list_run(config))
                 {
-                    if (!config.ListCommand.LocalOnly && !config.ListCommand.IncludeRegistryPrograms)
+                    if (!config.ListCommand.LocalOnly || !config.ListCommand.IncludeRegistryPrograms)
                     {
                         yield return package;
                     }
@@ -489,7 +494,7 @@ Would have determined packages that are out of date based on what is
             this.Log().Info(@"Uninstalling the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
 
-            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.EndsWith(".config")).ToList())
+            if (config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Any(p => p.EndsWith(".config")))
             {
                 throw new ApplicationException("A packages.config file is only used with installs.");
             }

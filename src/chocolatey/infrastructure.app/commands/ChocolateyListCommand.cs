@@ -68,12 +68,6 @@ namespace chocolatey.infrastructure.app.commands
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
-
-            if (configuration.ListCommand.LocalOnly)
-            {
-                configuration.Sources = ApplicationParameters.PackagesLocation;
-                configuration.Prerelease = true;
-            }
         }
 
         public void handle_validation(ChocolateyConfiguration configuration)
