@@ -17,6 +17,7 @@ namespace chocolatey.infrastructure.app.services
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using configuration;
     using results;
 
@@ -34,7 +35,7 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="config">The configuration.</param>
         /// <param name="logResults">Should results be logged?</param>
         /// <returns></returns>
-        ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration config, bool logResults);
+        IEnumerable<PackageResult> list_run(ChocolateyConfiguration config, bool logResults);
 
         /// <summary>
         ///   Run pack in noop mode.
