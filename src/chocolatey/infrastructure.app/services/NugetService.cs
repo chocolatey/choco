@@ -160,7 +160,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             string outputFile = builder.Id + "." + builder.Version + Constants.PackageExtension;
-            string outputPath = _fileSystem.combine_paths(nuspecDirectory, outputFile);
+            string outputPath = _fileSystem.combine_paths(_fileSystem.get_current_directory(), outputFile);
 
             this.Log().Info(() => "Attempting to build package from '{0}'.".format_with(_fileSystem.get_file_name(nuspecFilePath)));
 
