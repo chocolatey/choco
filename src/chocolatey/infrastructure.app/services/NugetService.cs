@@ -134,6 +134,7 @@ namespace chocolatey.infrastructure.app.services
         {
             string nuspecFilePath = validate_and_return_package_file(config, Constants.ManifestExtension);
             var nuspecDirectory = _fileSystem.get_full_path(_fileSystem.get_directory_name(nuspecFilePath));
+            if (string.IsNullOrWhiteSpace(nuspecDirectory)) nuspecDirectory = _fileSystem.get_current_directory();
 
             IDictionary<string, string> properties = new Dictionary<string, string>();
             // Set the version property if the flag is set
