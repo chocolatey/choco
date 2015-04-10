@@ -146,7 +146,7 @@ namespace chocolatey.infrastructure.app.services
             // Initialize the property provider based on what was passed in using the properties flag
             var propertyProvider = new DictionaryPropertyProvider(properties);
 
-            var basePath = _fileSystem.get_current_directory();
+            var basePath = nuspecDirectory;
             if (config.Information.PlatformType != PlatformType.Windows)
             {
                 //bug with nuspec and tools/** folder location on Windows.
