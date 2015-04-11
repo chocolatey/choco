@@ -66,6 +66,8 @@ namespace chocolatey.infrastructure.filesystem
 
         public string get_full_path(string path)
         {
+            if (string.IsNullOrWhiteSpace(path)) return path;
+
             return Path.GetFullPath(path);
         }
 

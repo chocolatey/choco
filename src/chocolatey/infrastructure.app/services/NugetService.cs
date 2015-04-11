@@ -134,6 +134,7 @@ namespace chocolatey.infrastructure.app.services
         {
             string nuspecFilePath = validate_and_return_package_file(config, Constants.ManifestExtension);
             var nuspecDirectory = _fileSystem.get_full_path(_fileSystem.get_directory_name(nuspecFilePath));
+            if (string.IsNullOrWhiteSpace(nuspecDirectory)) nuspecDirectory = _fileSystem.get_current_directory();
 
             IDictionary<string, string> properties = new Dictionary<string, string>();
             // Set the version property if the flag is set
@@ -145,7 +146,7 @@ namespace chocolatey.infrastructure.app.services
             // Initialize the property provider based on what was passed in using the properties flag
             var propertyProvider = new DictionaryPropertyProvider(properties);
 
-            var basePath = _fileSystem.get_current_directory();
+            var basePath = nuspecDirectory;
             if (config.Information.PlatformType != PlatformType.Windows)
             {
                 //bug with nuspec and tools/** folder location on Windows.
@@ -159,7 +160,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             string outputFile = builder.Id + "." + builder.Version + Constants.PackageExtension;
-            string outputPath = _fileSystem.combine_paths(nuspecDirectory, outputFile);
+            string outputPath = _fileSystem.combine_paths(_fileSystem.get_current_directory(), outputFile);
 
             this.Log().Info(() => "Attempting to build package from '{0}'.".format_with(_fileSystem.get_file_name(nuspecFilePath)));
 
