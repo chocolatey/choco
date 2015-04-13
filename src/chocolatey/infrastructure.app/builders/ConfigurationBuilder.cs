@@ -89,9 +89,9 @@ namespace chocolatey.infrastructure.app.builders
             }
 
             FaultTolerance.try_catch_with_logging_exception(
-              () => fileSystem.create_directory_if_not_exists(config.CacheLocation),
-              "Could not create temp directory at '{0}'".format_with(config.CacheLocation),
-              logWarningInsteadOfError: true);
+                () => fileSystem.create_directory_if_not_exists(config.CacheLocation),
+                "Could not create temp directory at '{0}'".format_with(config.CacheLocation),
+                logWarningInsteadOfError: true);
 
             config.ContainsLegacyPackageInstalls = configFileSettings.ContainsLegacyPackageInstalls;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
