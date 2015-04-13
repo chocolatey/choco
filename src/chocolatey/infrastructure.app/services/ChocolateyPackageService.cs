@@ -241,13 +241,15 @@ namespace chocolatey.infrastructure.app.services
 
             var installFailures = packageInstalls.Count(p => !p.Value.Success);
             var installWarnings = packageInstalls.Count(p => p.Value.Warning);
-            this.Log().Warn(() => @"{0}{1} installed {2}/{3} package(s). {4} package(s) failed.{5}{0} See the log for details.".format_with(
+            this.Log().Warn(() => @"{0}{1} installed {2}/{3} package(s). {4} package(s) failed.{5}{0} See the log for details ({6}).".format_with(
                 Environment.NewLine,
                 ApplicationParameters.Name,
                 packageInstalls.Count(p => p.Value.Success && !p.Value.Inconclusive),
                 packageInstalls.Count,
                 installFailures,
-                installWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, installWarnings)));
+                installWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, installWarnings),
+                _fileSystem.combine_paths(ApplicationParameters.LoggingLocation,ApplicationParameters.LoggingFile)
+                ));
 
             if (installWarnings != 0)
             {
@@ -333,12 +335,14 @@ namespace chocolatey.infrastructure.app.services
             if (config.RegularOutput)
             {
                 var upgradeWarnings = noopUpgrades.Count(p => p.Value.Warning);
-                this.Log().Warn(() => @"{0}{1} can upgrade {2}/{3} package(s). {4}{0} See the log for details.".format_with(
+                this.Log().Warn(() => @"{0}{1} can upgrade {2}/{3} package(s). {4}{0} See the log for details ({5}).".format_with(
                     Environment.NewLine,
                     ApplicationParameters.Name,
                     noopUpgrades.Count(p => p.Value.Success && !p.Value.Inconclusive),
                     noopUpgrades.Count,
-                    upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings)));
+                    upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings),
+                    _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
+                    ));
 
                 if (upgradeWarnings != 0)
                 {
@@ -371,13 +375,15 @@ namespace chocolatey.infrastructure.app.services
 
             var upgradeFailures = packageUpgrades.Count(p => !p.Value.Success);
             var upgradeWarnings = packageUpgrades.Count(p => p.Value.Warning);
-            this.Log().Warn(() => @"{0}{1} upgraded {2}/{3} package(s). {4} package(s) failed.{5}{0} See the log for details.".format_with(
+            this.Log().Warn(() => @"{0}{1} upgraded {2}/{3} package(s). {4} package(s) failed.{5}{0} See the log for details ({6}).".format_with(
                 Environment.NewLine,
                 ApplicationParameters.Name,
                 packageUpgrades.Count(p => p.Value.Success && !p.Value.Inconclusive),
                 packageUpgrades.Count,
                 upgradeFailures,
-                upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings)));
+                upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings),
+                _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
+                ));
 
             if (upgradeWarnings != 0)
             {
@@ -453,12 +459,14 @@ namespace chocolatey.infrastructure.app.services
                 });
 
             var uninstallFailures = packageUninstalls.Count(p => !p.Value.Success);
-            this.Log().Warn(() => @"{0}{1} uninstalled {2}/{3} packages. {4} packages failed.{0}See the log for details.".format_with(
+            this.Log().Warn(() => @"{0}{1} uninstalled {2}/{3} packages. {4} packages failed.{0} See the log for details ({5}).".format_with(
                 Environment.NewLine,
                 ApplicationParameters.Name,
                 packageUninstalls.Count(p => p.Value.Success && !p.Value.Inconclusive),
                 packageUninstalls.Count,
-                uninstallFailures));
+                uninstallFailures,
+                _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
+                ));
 
             if (uninstallFailures != 0)
             {
