@@ -226,7 +226,7 @@ Do you want to run the script?
  fail.
  Skip is an advanced option and most likely will never be wanted.
 "
-                                                 , new[] {"yes", "no", "skip"}, "no", requireAnswer: true);
+                                                 , new[] { "yes", "no", "skip" }, defaultChoice: null, requireAnswer: true);
                     if (selection.is_equal_to("yes")) shouldRun = true;
                     if (selection.is_equal_to("no"))
                     {
