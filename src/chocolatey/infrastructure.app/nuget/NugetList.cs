@@ -22,7 +22,7 @@ namespace chocolatey.infrastructure.app.nuget
 
     // ReSharper disable InconsistentNaming
 
-    public sealed class NugetList
+    public static class NugetList
     {
         public static IEnumerable<IPackage> GetPackages(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
@@ -31,7 +31,8 @@ namespace chocolatey.infrastructure.app.nuget
 
             if (configuration.AllVersions)
             {
-                return results.Where(PackageExtensions.IsListed).OrderBy(p => p.Id).ToList();
+                // just trust the server order, don't sort because that's a blocking operation
+                return results.Where(PackageExtensions.IsListed);
             }
 
             if (configuration.Prerelease && packageRepository.SupportsPrereleasePackages)
@@ -43,11 +44,12 @@ namespace chocolatey.infrastructure.app.nuget
                 results = results.Where(p => p.IsLatestVersion);
             }
 
-            return results.OrderBy(p => p.Id)
-                          .AsEnumerable()
-                          .Where(PackageExtensions.IsListed)
-                          .Where(p => configuration.Prerelease || p.IsReleaseVersion())
-                          .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version).ToList();
+            // just trust the server order, don't sort because that's a blocking operation
+            // also don't worry about multiple versions, considering Is*LatestVersion only applies to one
+            return results.Where(PackageExtensions.IsListed)
+                          .Where(p => configuration.Prerelease || p.IsReleaseVersion());
+                       // .OrderBy(p => p.Id).ThenByDescending(p => p.Version)
+                       // .GroupBy(p => p.Id).Select(g => g.First());
         }
     }
 

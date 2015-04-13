@@ -150,7 +150,19 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool Force { get; set; }
         public bool Noop { get; set; }
         public bool HelpRequested { get; set; }
+        // TODO: Should just use output levels: Debug, Verbose, Info (Regular), Important, Error (Quiet)
+        /// <summary>
+        /// Gets or sets a value indicating whether output should be limited.
+        /// This supports the --limit-output parameter.
+        /// </summary>
+        /// <value><c>true</c> for regular output; <c>false</c> for limited output.</value>
         public bool RegularOutput { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether console logging should be supressed. 
+        /// This is for use by API calls which surface results in alternate forms.
+        /// </summary>
+        /// <value><c>true</c> for no output; <c>false</c> for regular or limited output.</value>
+        public bool Quiet { get; set; }
         public bool PromptForConfirmation { get; set; }
         public bool AcceptLicense { get; set; }
         public bool AllowUnofficialBuild { get; set; }

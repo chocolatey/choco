@@ -115,7 +115,7 @@ Version has been deprecated and will be removed in version 1.0.0.
         {
             if (configuration.ListCommand.LocalOnly)
             {
-                _packageService.list_run(configuration,logResults:true);
+                _packageService.list_run(configuration);
             }
             else
             {

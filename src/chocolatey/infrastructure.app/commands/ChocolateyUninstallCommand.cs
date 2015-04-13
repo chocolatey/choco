@@ -23,13 +23,14 @@ namespace chocolatey.infrastructure.app.commands
     using domain;
     using infrastructure.commands;
     using logging;
+    using results;
     using services;
 
     [CommandFor(CommandNameType.uninstall)]
-    public sealed class ChocolateyUninstallCommand : ICommand
+	public sealed class ChocolateyUninstallCommand : IListCommand<PackageResult>
     {
         private readonly IChocolateyPackageService _packageService;
-
+	
         public ChocolateyUninstallCommand(IChocolateyPackageService packageService)
         {
             _packageService = packageService;
@@ -129,6 +130,11 @@ NOTE: Options and switches apply to all items passed, so if you are
         public void run(ChocolateyConfiguration configuration)
         {
             _packageService.uninstall_run(configuration);
+        }
+
+        public IEnumerable<PackageResult> list(ChocolateyConfiguration configuration)
+        {
+            return _packageService.uninstall_run(configuration).Values;
         }
     }
 }
