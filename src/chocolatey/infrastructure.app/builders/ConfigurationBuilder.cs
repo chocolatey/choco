@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.app.builders
 
             var configFileSettings = xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
             var sources = new StringBuilder();
-            foreach (var source in configFileSettings.Sources.or_empty_list_if_null())
+            foreach (var source in configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null())
             {
                 sources.AppendFormat("{0};", source.Value);
             }
