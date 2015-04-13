@@ -139,5 +139,10 @@ Chocolatey will allow you to interact with sources.
                     break;
             }
         }
+
+        public bool may_require_admin_access()
+        {
+            return true;
+        }
     }
 }

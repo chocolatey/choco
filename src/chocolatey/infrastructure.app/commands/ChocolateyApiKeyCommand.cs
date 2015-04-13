@@ -127,5 +127,10 @@ In order to save your API key for {0},
                 _configSettingsService.set_api_key(configuration);
             }
         }
+
+        public bool may_require_admin_access()
+        {
+            return true;
+        }
     }
 }

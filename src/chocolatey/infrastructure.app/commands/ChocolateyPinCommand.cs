@@ -165,5 +165,10 @@ Pin a package to suppress upgrades.
             pkgInfo.IsPinned = config.PinCommand.Command == PinCommandType.add;
             _packageInfoService.save_package_information(pkgInfo);
         }
+
+        public bool may_require_admin_access()
+        {
+            return true;
+        }
     }
 }

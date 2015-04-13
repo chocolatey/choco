@@ -109,5 +109,10 @@ Chocolatey will perform a search for a package local or remote. Some
         {
             _packageService.list_run(configuration, logResults: true);
         }
+
+        public bool may_require_admin_access()
+        {
+            return false;
+        }
     }
 }

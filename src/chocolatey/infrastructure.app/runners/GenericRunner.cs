@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.runners
     using SimpleInjector;
     using adapters;
     using attributes;
+    using commandline;
     using configuration;
     using infrastructure.commands;
     using logging;
@@ -49,6 +50,11 @@ namespace chocolatey.infrastructure.app.runners
             }
             else
             {
+                if (command.may_require_admin_access())
+                {
+                    warn_when_admin_needs_elevation(config);
+                }
+
                 if (parseArgs != null)
                 {
                     parseArgs.Invoke(command);
@@ -104,6 +110,29 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                 }
             }
         }
-    }
 
+        public void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
+        {
+            // NOTE: blended options may not have been fully initialized yet
+            if (!config.PromptForConfirmation) return;
+
+            if (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator)
+            {
+                var selection = InteractivePrompt.prompt_for_confirmation(@"
+Chocolatey detected you are not running from an elevated command shell
+ (cmd/powershell). You may experience errors - many functions/packages
+ require admin rights. Only advanced users should run choco w/out an
+ elevated shell. When you open the command shell, you should ensure 
+ that you do so with ""Run as Administrator"" selected.
+
+ Do you want to continue?", new[] { "yes", "no" }, "no", requireAnswer: true);
+
+                if (selection.is_equal_to("no"))
+                {
+                    Environment.Exit(-1);
+                }
+            }
+        }
+
+    }
 }

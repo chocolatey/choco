@@ -120,5 +120,10 @@ Chocolatey will allow you to interact with features.
                     break;
             }
         }
+
+        public bool may_require_admin_access()
+        {
+            return true;
+        }
     }
 }

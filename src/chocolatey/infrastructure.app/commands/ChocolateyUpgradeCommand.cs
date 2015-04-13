@@ -140,5 +140,10 @@ NOTE: Options and switches apply to all items passed, so if you are
         {
             _packageService.upgrade_run(configuration);
         }
+
+        public bool may_require_admin_access()
+        {
+            return true;
+        }
     }
 }

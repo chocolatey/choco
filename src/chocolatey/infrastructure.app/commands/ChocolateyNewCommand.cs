@@ -143,5 +143,10 @@ Possible properties to pass:
         {
             _templateService.generate(configuration);
         }
+
+        public bool may_require_admin_access()
+        {
+            return false;
+        }
     }
 }

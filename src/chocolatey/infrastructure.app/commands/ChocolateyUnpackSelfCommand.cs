@@ -104,5 +104,10 @@ NOTE: This command should only be used when installing Chocolatey, not
                 overwriteExisting: configuration.Force,
                 logOutput: true);
         }
+
+        public bool may_require_admin_access()
+        {
+            return true;
+        }
     }
 }
