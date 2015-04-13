@@ -797,7 +797,7 @@ packages as of version 1.0.0. That is what the install command is for.
                 }
 
                 var packageVersionsToRemove = installedPackageVersions.ToList();
-                if (!config.AllVersions)
+                if (!config.AllVersions && installedPackageVersions.Count > 1)
                 {
                     if (config.PromptForConfirmation)
                     {
