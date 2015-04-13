@@ -217,16 +217,19 @@ namespace chocolatey.infrastructure.app.services
 
                 if (!shouldRun)
                 {
-                    this.Log().Info(ChocolateyLoggers.Important, () => " Found '{0}':".format_with(_fileSystem.get_file_name(chocoPowerShellScript)));
-                    this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents.escape_curly_braces()));
-                    var selection = InteractivePrompt
-                        .prompt_for_confirmation(@"
-Do you want to run the script? 
- NOTE: If you choose not to run the script, the installation will 
- fail.
- Skip is an advanced option and most likely will never be wanted.
-"
-                                                 , new[] {"yes", "no", "skip"}, "no", requireAnswer: true);
+                    this.Log().Info(ChocolateyLoggers.Important, () => "The package {0} wants to run '{1}'.".format_with(package.Id, _fileSystem.get_file_name(chocoPowerShellScript)));
+                    this.Log().Info(ChocolateyLoggers.Important, () => "Note: If you don't run this script, the installation will fail.");
+                    
+                    var selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run the script?", new[] {"yes", "no", "print"}, "no", requireAnswer: true);
+
+                    if (selection.is_equal_to("print"))
+                    {
+                        this.Log().Info(ChocolateyLoggers.Important, "------ BEGIN SCRIPT ------");
+                        this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents.escape_curly_braces()));
+                        this.Log().Info(ChocolateyLoggers.Important, "------- END SCRIPT -------");
+                        selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run this script?", new[] { "yes", "no" }, "no", requireAnswer: true);
+                    }
+
                     if (selection.is_equal_to("yes")) shouldRun = true;
                     if (selection.is_equal_to("no"))
                     {
