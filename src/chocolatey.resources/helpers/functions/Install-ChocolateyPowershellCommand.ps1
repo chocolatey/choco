@@ -29,7 +29,7 @@ param(
   Get-ChocolateyWebFile $packageName $psFileFullPath $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64
   }
   
-  $nugetPath = $(Split-Path -parent $(Split-Path -parent $helpersPath))
+  $nugetPath = $(Split-Path -parent $helpersPath)
   $nugetExePath = Join-Path $nuGetPath 'bin'
   
   $cmdName = [System.IO.Path]::GetFileNameWithoutExtension($psFileFullPath)
