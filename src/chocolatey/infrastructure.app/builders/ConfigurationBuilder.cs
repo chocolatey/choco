@@ -101,20 +101,6 @@ namespace chocolatey.infrastructure.app.builders
             config.CommandExecutionTimeoutSeconds = configFileSettings.CommandExecutionTimeoutSeconds;
 
             set_feature_flags(config, configFileSettings);
-            if (!config.PromptForConfirmation)
-            {
-                if (notifyWarnLoggingAction != null)
-                {
-                    const string logMessage = @"
-Config has insecure allowGlobalConfirmation set to true.
- This setting lowers the integrity of the security of your system. If
- this is not intended, please change the setting using the feature
- command.
-";
-                    notifyWarnLoggingAction.Invoke(logMessage);
-                }
-            }
-
 
             // save so all updated configuration items get set to existing config
             FaultTolerance.try_catch_with_logging_exception(
