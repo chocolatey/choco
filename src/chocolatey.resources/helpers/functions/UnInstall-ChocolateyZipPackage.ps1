@@ -50,7 +50,7 @@ param(
     $zipContentFile
     $zipContents=get-content $zipContentFile
     foreach ($fileInZip in $zipContents) {
-      remove-item "$fileInZip" -ErrorAction SilentlyContinue
+      remove-item -Path "$fileInZip" -ErrorAction SilentlyContinue -Recurse -Force
     }
   }
 }
