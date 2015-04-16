@@ -46,6 +46,24 @@ OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to 'md5'
 .PARAMETER ChecksumType64
 OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to ChecksumType
 
+.PARAMETER options
+OPTIONAL - Specify custom headers
+
+Example:
+-------- 
+	$options = 
+	@{
+		Headers = @{
+			Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'; 
+			'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
+			'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
+			Cookie = 'products.download.email=ewilde@gmail.com';
+			Referer = 'http://submain.com/download/ghostdoc/';
+		}
+	}
+	
+	Get-ChocolateyWebFile 'ghostdoc' 'http://submain.com/download/GhostDoc_v4.0.zip' -options $options
+
 .EXAMPLE
 Get-ChocolateyWebFile '__NAME__' 'C:\somepath\somename.exe' 'URL' '64BIT_URL_DELETE_IF_NO_64BIT'
 
@@ -64,7 +82,8 @@ param(
   [string] $checksum = '',
   [string] $checksumType = '',
   [string] $checksum64 = '',
-  [string] $checksumType64 = $checksumType
+  [string] $checksumType64 = $checksumType,
+  [hashtable] $options = @{Headers=@{}}
 )
   Write-Debug "Running 'Get-ChocolateyWebFile' for $packageName with url:`'$url`', fileFullPath:`'$fileFullPath`', url64bit:`'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`'";
 
@@ -137,7 +156,7 @@ param(
     if ($needsDownload) {
       Write-Host "Downloading $packageName $bitPackage bit
   from `'$url`'"
-      Get-WebFile $url $fileFullPath
+      Get-WebFile $url $fileFullPath -options $options
     }
   } elseif ($url.StartsWith('ftp')) {
     Write-Host "Ftp-ing $packageName
