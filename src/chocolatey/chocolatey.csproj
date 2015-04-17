@@ -101,6 +101,7 @@
     <Compile Include="infrastructure.app\runners\GenericRunner.cs" />
     <Compile Include="infrastructure.app\services\AutomaticUninstallerService.cs" />
     <Compile Include="infrastructure.app\services\ChocolateyConfigSettingsService.cs" />
+    <Compile Include="infrastructure.app\services\ScriptCsService.cs" />
     <Compile Include="infrastructure\adapters\CustomString.cs" />
     <Compile Include="infrastructure.app\services\IChocolateyConfigSettingsService.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileApiKeySetting.cs" />
@@ -132,7 +133,7 @@
     <Compile Include="infrastructure.app\services\IChocolateyPackageInformationService.cs" />
     <Compile Include="infrastructure.app\services\IChocolateyPackageService.cs" />
     <Compile Include="infrastructure.app\services\INugetService.cs" />
-    <Compile Include="infrastructure.app\services\IPowershellService.cs" />
+    <Compile Include="infrastructure.app\services\IInstallProviderService.cs" />
     <Compile Include="infrastructure.app\services\IRegistryService.cs" />
     <Compile Include="infrastructure.app\services\IShimGenerationService.cs" />
     <Compile Include="infrastructure.app\services\IAutomaticUninstallerService.cs" />

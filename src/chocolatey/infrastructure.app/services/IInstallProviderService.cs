@@ -18,7 +18,7 @@ namespace chocolatey.infrastructure.app.services
     using configuration;
     using results;
 
-    public interface IPowershellService
+    public interface IInstallProviderService
     {
         /// <summary>
         ///   Noops the specified package install.
@@ -47,5 +47,7 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="packageResult">The package result.</param>
         /// <returns>true if the chocolateyUninstall.ps1 was found, even if it has failures</returns>
         bool uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
+
+        bool can_be_used(ChocolateyConfiguration configuration);
     }
 }

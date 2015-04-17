@@ -49,7 +49,18 @@ namespace chocolatey.infrastructure.app.registration
             //nuget
             container.Register<ILogger, ChocolateyNugetLogger>(Lifestyle.Singleton);
             container.Register<INugetService, NugetService>(Lifestyle.Singleton);
-            container.Register<IPowershellService, PowershellService>(Lifestyle.Singleton);
+            container.Register<IEnumerable<IInstallProviderService>>(() =>
+            {
+                var list = new List<IInstallProviderService>
+                        {
+                            new PowershellService(container.GetInstance<IFileSystem>()),
+                            new ScriptCsService(container.GetInstance<IFileSystem>())
+                        };
+                return list.AsReadOnly();
+            }, Lifestyle.Singleton);
+            container.Register<IInstallProviderService, PowershellService>(Lifestyle.Singleton);
+
+            //container.Register<IScriptCsService, ScriptCsService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageInformationService, ChocolateyPackageInformationService>(Lifestyle.Singleton);
             container.Register<IShimGenerationService, ShimGenerationService>(Lifestyle.Singleton);
             container.Register<IRegistryService, RegistryService>(Lifestyle.Singleton);
