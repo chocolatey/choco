@@ -65,7 +65,7 @@ namespace chocolatey.infrastructure.app.nuget
                     }
                     else
                     {
-                        repositories.Add(new DataServicePackageRepository(uri));
+                      repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri)));
                     }
                 }
                 catch (Exception)
