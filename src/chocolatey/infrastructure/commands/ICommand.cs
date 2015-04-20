@@ -57,5 +57,11 @@ namespace chocolatey.infrastructure.commands
         /// </summary>
         /// <param name="config">The configuration.</param>
         void run(ChocolateyConfiguration config);
+
+        /// <summary>
+        /// This command may require admin rights
+        /// </summary>
+        /// <returns></returns>
+        bool may_require_admin_access();
     }
 }

@@ -177,5 +177,10 @@ A common error is `Failed to process request. 'The specified API key
         {
             _packageService.push_run(configuration);
         }
+
+        public bool may_require_admin_access()
+        {
+            return false;
+        }
     }
 }

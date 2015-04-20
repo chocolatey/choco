@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-BinFile {
+function Uninstall-BinFile {
 param(
   [string] $name, 
   [string] $path
 )
-  Write-Debug "Running 'Remove-BinFile' for $name with path:`'$path`'";
+  Write-Debug "Running 'Uninstall-BinFile' for $name with path:`'$path`'";
 
+  $nugetPath = [System.IO.Path]::GetFullPath((Join-Path "$helpersPath" '..\'))
+  $nugetExePath = Join-Path "$nugetPath" 'bin'
   $packageBatchFileName = Join-Path $nugetExePath "$name.bat"
   $packageBashFileName = Join-Path $nugetExePath "$name"
   $packageShimFileName = Join-Path $nugetExePath "$name.exe"
@@ -28,7 +30,7 @@ param(
   Write-Debug "Attempting to remove the batch and bash shortcuts: $packageBatchFileName and $packageBashFileName"
 
   if (Test-Path $packageBatchFileName) {
-    Write-Host "Removing batch file $packageBatchFileName which pointed to `'$path`'." -ForegroundColor $Note
+    Write-Host "Removing batch file $packageBatchFileName which pointed to `'$path`'."
     Remove-Item $packageBatchFileName
   }
   else {
@@ -36,7 +38,7 @@ param(
   }
 
   if (Test-Path $packageBashFileName) {
-    Write-Host "Removing bash file $packageBashFileName which pointed to `'$path`'." -ForegroundColor $Note
+    Write-Host "Removing bash file $packageBashFileName which pointed to `'$path`'."
     Remove-Item $packageBashFileName
   }
   else {
@@ -45,10 +47,12 @@ param(
 
   Write-Debug "Attempting to remove the shim: $packageShimFileName"
   if (Test-Path $packageShimFileName) {
-    Write-Host "Removing shim $packageShimFileName which pointed to `'$path`'." -ForegroundColor $Note
+    Write-Host "Removing shim $packageShimFileName which pointed to `'$path`'."
     Remove-Item $packageShimFileName
   }
   else {
     Write-Debug "Tried to remove shim $packageShimFileName but it was already removed."
   }
 }
+
+Set-Alias Remove-BinFile Uninstall-BinFile

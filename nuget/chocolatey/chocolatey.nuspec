@@ -40,6 +40,35 @@ In that mess there is a link to the [Helper Reference](https://github.com/chocol
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/master/CHANGELOG.md
 
+## 0.9.9.5
+
+### BREAKING CHANGES
+
+ * Renamed short option `p` to `i` for list --include-programs so that `p` could be ubiquitous for password across commands that optionally can pass a password - see [#240](https://github.com/chocolatey/choco/issues/240)
+
+### BUG FIXES
+
+ * Fix - Secure Sources Not Working - see [#240](https://github.com/chocolatey/choco/issues/240)
+ * Fix - Generate-BinFile / Remove-BinFile - see [#230](https://github.com/chocolatey/choco/issues/230)
+ * Fix - cpack should only include files from nuspec - see [#232](https://github.com/chocolatey/choco/issues/232)
+ * Fix - cpack should leave nupkg in current directory - see [#231](https://github.com/chocolatey/choco/issues/231)
+ * Fix - Install-PowerShellCommand uses incorrect path - see [#241](https://github.com/chocolatey/choco/issues/241)
+ * Fix - choco list source with redirects does not resolve - see [#171](https://github.com/chocolatey/choco/issues/171)
+ * Fix - choco tried to resolve disabled repo - see [#169](https://github.com/chocolatey/choco/issues/169)
+ * Fix - cpack nuspec results in "The path is not of a legal form" - see [#164](https://github.com/chocolatey/choco/issues/164)
+ * Fix - cpack hangs on security related issue - see [#160](https://github.com/chocolatey/choco/issues/160)
+ * Fix - spelling error in "package has been upgradeed successfully" - see [#64](https://github.com/chocolatey/choco/issues/64)
+
+### IMPROVEMENTS
+
+ * Api Key and Source matching could be more intuitive - see [#228](https://github.com/chocolatey/choco/issues/238)
+ * Remove warning about allowGlobalConfirmation being enabled - see [#237](https://github.com/chocolatey/choco/issues/237)
+ * Include log file path when saying 'See the log for details' - see [#187](https://github.com/chocolatey/choco/issues/187)
+ * Uninstall prompts for version when there is only one installed - see [#186](https://github.com/chocolatey/choco/issues/186)
+ * Do not offer a default option when prompting for a user choice - see [#185](https://github.com/chocolatey/choco/issues/185)
+ * Remove the warning note about skipping, and instead show the warning when selecting skip - see [#183](https://github.com/chocolatey/choco/issues/183)
+ * Do not print PowerShell install/update scripts by default - see [#182](https://github.com/chocolatey/choco/issues/182)
+
 ## 0.9.9.4
 
 ### BUG FIXES

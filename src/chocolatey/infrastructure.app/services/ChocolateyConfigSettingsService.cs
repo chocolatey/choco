@@ -187,7 +187,7 @@ No changes made. If you are trying to change an existing source, please
 
             if (!string.IsNullOrWhiteSpace(configuration.Sources))
             {
-                var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Sources));
+                var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.TrimEnd('/').is_equal_to(configuration.Sources.TrimEnd('/')));
                 if (apiKey != null)
                 {
                     apiKeyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();

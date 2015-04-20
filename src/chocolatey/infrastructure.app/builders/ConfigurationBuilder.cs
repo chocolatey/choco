@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.app.builders
 
             var configFileSettings = xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
             var sources = new StringBuilder();
-            foreach (var source in configFileSettings.Sources.or_empty_list_if_null())
+            foreach (var source in configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null())
             {
                 sources.AppendFormat("{0};", source.Value);
             }
@@ -82,6 +82,8 @@ namespace chocolatey.infrastructure.app.builders
                 config.Sources = sources.Remove(sources.Length - 1, 1).ToString();
             }
 
+            set_machine_sources(config, configFileSettings);
+
             config.CacheLocation = !string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? configFileSettings.CacheLocation : System.Environment.GetEnvironmentVariable("TEMP");
             if (string.IsNullOrWhiteSpace(config.CacheLocation))
             {
@@ -89,9 +91,9 @@ namespace chocolatey.infrastructure.app.builders
             }
 
             FaultTolerance.try_catch_with_logging_exception(
-              () => fileSystem.create_directory_if_not_exists(config.CacheLocation),
-              "Could not create temp directory at '{0}'".format_with(config.CacheLocation),
-              logWarningInsteadOfError: true);
+                () => fileSystem.create_directory_if_not_exists(config.CacheLocation),
+                "Could not create temp directory at '{0}'".format_with(config.CacheLocation),
+                logWarningInsteadOfError: true);
 
             config.ContainsLegacyPackageInstalls = configFileSettings.ContainsLegacyPackageInstalls;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
@@ -101,26 +103,26 @@ namespace chocolatey.infrastructure.app.builders
             config.CommandExecutionTimeoutSeconds = configFileSettings.CommandExecutionTimeoutSeconds;
 
             set_feature_flags(config, configFileSettings);
-            if (!config.PromptForConfirmation)
-            {
-                if (notifyWarnLoggingAction != null)
-                {
-                    const string logMessage = @"
-Config has insecure allowGlobalConfirmation set to true.
- This setting lowers the integrity of the security of your system. If
- this is not intended, please change the setting using the feature
- command.
-";
-                    notifyWarnLoggingAction.Invoke(logMessage);
-                }
-            }
-
 
             // save so all updated configuration items get set to existing config
             FaultTolerance.try_catch_with_logging_exception(
                 () => xmlService.serialize(configFileSettings, globalConfigPath),
                 "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
                 logWarningInsteadOfError: true);
+        }
+
+        private static void set_machine_sources(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
+        {
+            foreach (var source in configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null())
+            {
+                config.MachineSources.Add(new MachineSourceConfiguration
+                    {
+                        Key = source.Value,
+                        Name = source.Id,
+                        Username = source.UserName,
+                        EncryptedPassword = source.Password
+                    });
+            }
         }
 
         private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
@@ -228,10 +230,12 @@ You can pass options and switches in the following ways:
  * **Use Equals**: You can also include or not include an equals sign 
    `=` between options and values.
  * **Quote Values**: When you need to quote things, such as when using 
-   spaces, please use single quote marks (`'`). In cmd.exe, you can 
-   also use double double quotes (i.e. `""""yo""""`). This is due to 
-   the hand off to PowerShell - it seems to strip off the outer set of 
-   quotes. TODO: TEST THIS, MAY NOT BE RELEVANT NOW.
+   spaces, please use apostrophes (`'value'`). In cmd.exe you may be 
+   able to use just double quotes (`""value""`) but in powershell.exe 
+   you may need to either escape the quotes with backticks 
+   (`` `""value`"" ``) or use a combination of double quotes and 
+   apostrophes (`""'value'""`). This is due to the hand off to 
+   PowerShell - it seems to strip off the outer set of quotes.
  * Options and switches apply to all items passed, so if you are 
    installing multiple packages, and you use `--version=1.0.0`, choco 
    is going to look for and try to install version 1.0.0 of every 

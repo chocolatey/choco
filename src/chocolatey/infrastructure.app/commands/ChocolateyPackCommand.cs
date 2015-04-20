@@ -86,5 +86,10 @@ Chocolatey will attempt to package a nuspec into a compiled nupkg. Some
         {
             _packageService.pack_run(configuration);
         }
+
+        public bool may_require_admin_access()
+        {
+            return false;
+        }
     }
 }

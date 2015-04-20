@@ -69,7 +69,7 @@ namespace chocolatey.infrastructure.app.commands
 
             if (command == PinCommandType.unknown) 
             {
-                this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
+                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
                 command = PinCommandType.list;
             }
             
@@ -164,6 +164,11 @@ Pin a package to suppress upgrades.
 
             pkgInfo.IsPinned = config.PinCommand.Command == PinCommandType.add;
             _packageInfoService.save_package_information(pkgInfo);
+        }
+
+        public bool may_require_admin_access()
+        {
+            return true;
         }
     }
 }

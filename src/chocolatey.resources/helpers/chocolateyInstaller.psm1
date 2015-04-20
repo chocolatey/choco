@@ -39,7 +39,7 @@ Get-Item $helpersPath\functions\*.ps1 |
   ? { -not ($_.Name.Contains(".Tests.")) } |
     % { 
 	  . $_.FullName;  
-	  Export-ModuleMember -Function $_.BaseName
+	  #Export-ModuleMember -Function $_.BaseName
     }
 
 # load extensions if they exist
@@ -49,3 +49,5 @@ if(Test-Path($extensionsPath)) {
   #Resolve-Path $extensionsPath\**\*\*.psm1 | % { Write-Debug "Importing `'$_`'"; Import-Module $_.ProviderPath }
   Get-ChildItem $extensionsPath -recurse -filter "*.psm1" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }
 }
+
+Export-ModuleMember -Function * -Alias *

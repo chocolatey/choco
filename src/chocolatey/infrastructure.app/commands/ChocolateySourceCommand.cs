@@ -71,7 +71,7 @@ namespace chocolatey.infrastructure.app.commands
             Enum.TryParse(unparsedCommand, true, out command);
             if (command == SourceCommandType.unknown)
             {
-                this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
+                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
                 command = SourceCommandType.list;
             }
 
@@ -143,6 +143,11 @@ Chocolatey will allow you to interact with sources.
         public IEnumerable<ChocolateySource> list(ChocolateyConfiguration configuration)
         {
             return _configSettingsService.source_list(configuration);
+        }
+
+        public bool may_require_admin_access()
+        {
+            return true;
         }
     }
 }

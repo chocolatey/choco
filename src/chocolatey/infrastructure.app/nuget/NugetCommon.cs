@@ -54,6 +54,10 @@ namespace chocolatey.infrastructure.app.nuget
             IEnumerable<string> sources = configuration.Sources.Split(new[] {";", ","}, StringSplitOptions.RemoveEmptyEntries);
 
             IList<IPackageRepository> repositories = new List<IPackageRepository>();
+
+            // ensure credentials can be grabbed from configuration
+            HttpClient.DefaultCredentialProvider = new ChocolateyNugetCredentialProvider(configuration);
+
             foreach (var source in sources.or_empty_list_if_null())
             {
                 try
@@ -65,7 +69,7 @@ namespace chocolatey.infrastructure.app.nuget
                     }
                     else
                     {
-                        repositories.Add(new DataServicePackageRepository(uri));
+                      repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri)));
                     }
                 }
                 catch (Exception)
@@ -76,7 +80,7 @@ namespace chocolatey.infrastructure.app.nuget
 
             //todo well that didn't work on failing repos... grrr
             var repository = new AggregateRepository(repositories) {IgnoreFailingRepositories = true};
-            //,ResolveDependenciesVertically = true};
+            //repository.ResolveDependenciesVertically = true;
             if (configuration.Debug)
             {
                 repository.Logger = nugetLogger;

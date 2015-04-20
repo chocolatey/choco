@@ -12,15 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Generate-BinFile {
+function Install-BinFile {
 param(
   [string] $name,
   [string] $path,
   [switch] $useStart,
   [string] $command = ''
 )
-  Write-Debug "Running 'Generate-BinFile' for $name with path:`'$path`'|`$useStart:$useStart|`$command:$command";
+  Write-Debug "Running 'Install-BinFile' for $name with path:`'$path`'|`$useStart:$useStart|`$command:$command";
 
+  $nugetPath = [System.IO.Path]::GetFullPath((Join-Path "$helpersPath" '..\'))
+  $nugetExePath = Join-Path "$nugetPath" 'bin'
   $packageBatchFileName = Join-Path $nugetExePath "$name.bat"
   $packageBashFileName = Join-Path $nugetExePath "$name"
   $packageShimFileName = Join-Path $nugetExePath "$name.exe"
@@ -68,16 +70,16 @@ param(
   }
 
   if (Test-Path ($packageShimFileName)) {
-    Write-Host "Added $packageShimFileName shim pointed to `'$path`'." -ForegroundColor $Note
+    Write-Host "Added $packageShimFileName shim pointed to `'$path`'."
   } else {
     Write-Warning "An error occurred generating shim, using old method."
 
     $path = "%DIR%$($path)"
     $pathBash = $path.Replace("%DIR%..\","`$DIR/../").Replace("\","/")
-    Write-Host "Adding $packageBatchFileName and pointing to `'$path`'." -ForegroundColor $Note
-    Write-Host "Adding $packageBashFileName and pointing to `'$path`'." -ForegroundColor $Note
+    Write-Host "Adding $packageBatchFileName and pointing to `'$path`'."
+    Write-Host "Adding $packageBashFileName and pointing to `'$path`'."
     if ($useStart) {
-      Write-Host "Setting up $name as a non-command line application."  -ForegroundColor $Note
+      Write-Host "Setting up $name as a non-command line application."
 "@echo off
 SET DIR=%~dp0%
 start """" ""$path"" %*" | Out-File $packageBatchFileName -encoding ASCII
@@ -101,3 +103,6 @@ exit /b %ERRORLEVEL%" | Out-File $packageBatchFileName -encoding ASCII
     }
   }
 }
+
+Set-Alias Generate-BinFile Install-BinFile
+Set-Alias Add-BinFile Install-BinFile

@@ -39,6 +39,7 @@ namespace chocolatey.infrastructure.app.configuration
             ListCommand = new ListCommandConfiguration();
             UpgradeCommand = new UpgradeCommandConfiguration();
             SourceCommand = new SourcesCommandConfiguration();
+            MachineSources = new List<MachineSourceConfiguration>();
             FeatureCommand = new FeatureCommandConfiguration();
             ApiKeyCommand = new ApiKeyCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
@@ -67,7 +68,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
             foreach (var propertyInfo in properties.or_empty_list_if_null())
             {
                 // skip sensitive data info
-                if (propertyInfo.Name == "Password" || propertyInfo.Name == "Key")
+                if (propertyInfo.Name == "Password" || propertyInfo.Name == "Key" || propertyInfo.Name == "MachineSources")
                 {
                     continue;
                 }
@@ -231,7 +232,15 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public SourcesCommandConfiguration SourceCommand { get;  set; }
+        public SourcesCommandConfiguration SourceCommand { get;  set; }        
+        
+        /// <summary>
+        ///   Default Machine Sources Configuration
+        /// </summary>
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public IList<MachineSourceConfiguration> MachineSources { get; set; }
 
         /// <summary>
         /// Configuration related specifically to the Feature command
@@ -326,6 +335,15 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public SourceCommandType Command { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+    }
+
+    [Serializable]
+    public sealed class MachineSourceConfiguration
+    {
+        public string Name { get; set; }
+        public string Key { get; set; }
+        public string Username { get; set; }
+        public string EncryptedPassword { get; set; }
     }
 
     [Serializable]

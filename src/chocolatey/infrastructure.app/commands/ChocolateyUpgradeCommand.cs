@@ -76,6 +76,12 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("failonunfound|fail-on-unfound",
                      "Fail On Unfound Packages - If a package is not found in feeds specified, fail instead of warn.",
                      option => configuration.UpgradeCommand.FailOnUnfound = option != null)
+                .Add("u=|user=",
+                     "User - used with authenticated feeds. Defaults to empty.",
+                     option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())
+                .Add("p=|password=",
+                     "Password - the user's password to the source. Defaults to empty.",
+                     option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
                 ;
         }
 
@@ -139,6 +145,11 @@ NOTE: Options and switches apply to all items passed, so if you are
         public virtual void run(ChocolateyConfiguration configuration)
         {
             _packageService.upgrade_run(configuration);
+        }
+
+        public bool may_require_admin_access()
+        {
+            return true;
         }
     }
 }
