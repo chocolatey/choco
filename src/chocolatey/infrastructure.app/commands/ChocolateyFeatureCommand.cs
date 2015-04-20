@@ -62,7 +62,7 @@ namespace chocolatey.infrastructure.app.commands
             Enum.TryParse(unparsedCommand, true, out command);
             if (command == FeatureCommandType.unknown)
             {
-                this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
+                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
                 command = FeatureCommandType.list;
             }
 
