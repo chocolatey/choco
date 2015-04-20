@@ -82,6 +82,8 @@ namespace chocolatey.infrastructure.app.builders
                 config.Sources = sources.Remove(sources.Length - 1, 1).ToString();
             }
 
+            set_machine_sources(config, configFileSettings);
+
             config.CacheLocation = !string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? configFileSettings.CacheLocation : System.Environment.GetEnvironmentVariable("TEMP");
             if (string.IsNullOrWhiteSpace(config.CacheLocation))
             {
@@ -107,6 +109,20 @@ namespace chocolatey.infrastructure.app.builders
                 () => xmlService.serialize(configFileSettings, globalConfigPath),
                 "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
                 logWarningInsteadOfError: true);
+        }
+
+        private static void set_machine_sources(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
+        {
+            foreach (var source in configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null())
+            {
+                config.MachineSources.Add(new MachineSourceConfiguration
+                    {
+                        Key = source.Value,
+                        Name = source.Id,
+                        Username = source.UserName,
+                        EncryptedPassword = source.Password
+                    });
+            }
         }
 
         private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
