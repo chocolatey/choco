@@ -47,12 +47,18 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("pre|prerelease",
                      "Prerelease - Include Prereleases? Defaults to false.",
                      option => configuration.Prerelease = option != null)
-                .Add("p|includeprograms|include-programs",
+                .Add("i|includeprograms|include-programs",
                      "IncludePrograms - Used in conjunction with LocalOnly, filters out apps chocolatey has listed as packages and includes those in the list. Defaults to false.",
                      option => configuration.ListCommand.IncludeRegistryPrograms = option != null)
                 .Add("a|all|allversions|all-versions",
                      "AllVersions - include results from all versions.",
                      option => configuration.AllVersions = option != null)
+                .Add("u=|user=",
+                     "User - used with authenticated feeds. Defaults to empty.",
+                     option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())
+                .Add("p=|password=",
+                     "Password - the user's password to the source. Defaults to empty.",
+                     option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
                 ;
             //todo exact name
         }

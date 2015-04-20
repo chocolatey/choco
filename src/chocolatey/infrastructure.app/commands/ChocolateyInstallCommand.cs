@@ -74,6 +74,12 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("n|skippowershell|skip-powershell",
                      "Skip Powershell - Do not run chocolateyInstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
+                .Add("u=|user=",
+                     "User - used with authenticated feeds. Defaults to empty.",
+                     option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())
+                .Add("p=|password=",
+                     "Password - the user's password to the source. Defaults to empty.",
+                     option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
                 ;
 
             //todo: Checksum / ChecksumType defaults to md5 / package name can be a url / installertype
