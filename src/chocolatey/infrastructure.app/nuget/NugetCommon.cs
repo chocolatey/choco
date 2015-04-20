@@ -54,6 +54,10 @@ namespace chocolatey.infrastructure.app.nuget
             IEnumerable<string> sources = configuration.Sources.Split(new[] {";", ","}, StringSplitOptions.RemoveEmptyEntries);
 
             IList<IPackageRepository> repositories = new List<IPackageRepository>();
+
+            // ensure credentials can be grabbed from configuration
+            HttpClient.DefaultCredentialProvider = new ChocolateyNugetCredentialProvider(configuration);
+
             foreach (var source in sources.or_empty_list_if_null())
             {
                 try
