@@ -116,8 +116,8 @@
     <EmbeddedResource Include="helpers\functions\Test-ProcessAdminRights.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="helpers\functions\Generate-BinFile.ps1" />
-    <EmbeddedResource Include="helpers\functions\Remove-BinFile.ps1" />
+    <EmbeddedResource Include="helpers\functions\Install-BinFile.ps1" />
+    <EmbeddedResource Include="helpers\functions\Uninstall-BinFile.ps1" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="helpers\chocolateyScriptRunner.ps1" />
