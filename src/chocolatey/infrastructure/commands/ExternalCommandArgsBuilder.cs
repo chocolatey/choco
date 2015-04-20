@@ -70,6 +70,9 @@ namespace chocolatey.infrastructure.commands
         {
             foreach (var prop in properties.or_empty_list_if_null())
             {
+                //todo: need a better way of handling
+                if (prop.Name == "MachineSources") continue;
+
                 if (prop.PropertyType.is_built_in_system_type())
                 {
                     var propName = "{0}{1}".format_with(
