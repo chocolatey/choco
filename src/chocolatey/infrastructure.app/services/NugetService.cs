@@ -232,7 +232,7 @@ spam/junk folder.");
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
 
-            IList<string> packageNames = config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
+            IList<string> packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
             if (packageNames.Count == 1)
             {
                 var packageName = packageNames.DefaultIfEmpty(string.Empty).FirstOrDefault();
@@ -339,7 +339,7 @@ spam/junk folder.");
                         packageName,
                         version == null ? null : version.ToString()))
                     {
-                        packageManager.InstallPackage(availablePackage,ignoreDependencies: config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
+                        packageManager.InstallPackage(availablePackage, ignoreDependencies: config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
                         //packageManager.InstallPackage(packageName, version, configuration.IgnoreDependencies, configuration.Prerelease);
                     }
                 }
@@ -413,7 +413,7 @@ spam/junk folder.");
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 remove_rollback_directory_if_exists(packageName);
 
@@ -459,7 +459,7 @@ packages as of version 1.0.0. That is what the install command is for.
 
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
-                
+
 
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                 if (availablePackage == null)
@@ -532,7 +532,7 @@ packages as of version 1.0.0. That is what the install command is for.
                         {
                             this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
                         }
-                            
+
                         continue;
                     }
 
@@ -771,7 +771,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     config.ForceDependencies = false;
                 });
 
-            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 remove_rollback_directory_if_exists(packageName);
 
@@ -860,6 +860,7 @@ packages as of version 1.0.0. That is what the install command is for.
                                 rename_legacy_package_version(config, packageVersion, pkgInfo);
                                 backup_existing_version(config, packageVersion);
                                 packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
+                                ensure_nupkg_is_removed(packageVersion, pkgInfo);
                             }
                         }
                         catch (Exception ex)
@@ -880,6 +881,23 @@ packages as of version 1.0.0. That is what the install command is for.
             }
 
             return packageUninstalls;
+        }
+
+        /// <summary>
+        /// NuGet will happily report a package has been uninstalled, even if it doesn't always remove the nupkg.
+        /// Ensure that the package is deleted or throw an error.
+        /// </summary>
+        /// <param name="removedPackage">The installed package.</param>
+        /// <param name="pkgInfo">The package information.</param>
+        private void ensure_nupkg_is_removed(IPackage removedPackage, ChocolateyPackageInformation pkgInfo)
+        {
+            var isSideBySide = pkgInfo != null && pkgInfo.IsSideBySide;
+
+            var nupkgFile = "{0}{1}.nupkg".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty);
+            var installDir = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, "{0}{1}".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty));
+            var nupkg = _fileSystem.combine_paths(installDir, nupkgFile);
+            
+            _fileSystem.delete_file(nupkg);
         }
 
         private void set_package_names_if_all_is_specified(ChocolateyConfiguration config, Action customAction)

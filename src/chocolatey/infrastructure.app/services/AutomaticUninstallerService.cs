@@ -68,7 +68,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString));
 
-                if (!_fileSystem.directory_exists(key.InstallLocation) || !_registryService.value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation))
+                if ((!string.IsNullOrWhiteSpace(key.InstallLocation) && !_fileSystem.directory_exists(key.InstallLocation)) || !_registryService.value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation))
                 {
                     this.Log().Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means.");
                     this.Log().Debug(() => " Searched for install path '{0}' - found? {1}".format_with(key.InstallLocation.escape_curly_braces(), _fileSystem.directory_exists(key.InstallLocation)));
@@ -77,11 +77,10 @@ namespace chocolatey.infrastructure.app.services
                 }
 
                 // split on " /" and " -" for quite a bit more accuracy
-                IList<string> uninstallArgs = key.UninstallString.to_string().Split(new[] {" /", " -"}, StringSplitOptions.RemoveEmptyEntries).ToList();
-                var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault();
-                uninstallArgs.Remove(uninstallExe);
+                IList<string> uninstallArgsSplit = key.UninstallString.to_string().Split(new[] {" /", " -"}, StringSplitOptions.RemoveEmptyEntries).ToList();
+                var uninstallExe = uninstallArgsSplit.DefaultIfEmpty(string.Empty).FirstOrDefault();
+                var uninstallArgs = key.UninstallString.to_string().Replace(uninstallExe.to_string(), string.Empty);
                 uninstallExe = uninstallExe.remove_surrounding_quotes();
-                if (uninstallExe.is_equal_to("msiexec.exe")) uninstallExe = _fileSystem.combine_paths(Environment.SystemDirectory, uninstallExe);
                 this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
 
                 //todo: ultimately we should merge keys with logging
@@ -101,7 +100,7 @@ namespace chocolatey.infrastructure.app.services
                             installer = new NsisInstaller();
                             break;
                         case InstallerType.InstallShield:
-                            installer = new CustomInstaller();
+                            installer = new InstallShieldInstaller();
                             break;
                         default:
                             // skip
@@ -110,14 +109,14 @@ namespace chocolatey.infrastructure.app.services
 
                     this.Log().Debug(() => " Installer type is '{0}'".format_with(installer.GetType().Name));
 
-                    uninstallArgs.Add(installer.build_uninstall_command_arguments());
+                    uninstallArgs += " " + installer.build_uninstall_command_arguments();
                 }
 
-                this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs.@join(" ")));
+                this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs));
 
                 var exitCode = _commandExecutor.execute(
-                    uninstallExe, 
-                    uninstallArgs.@join(" "), 
+                    uninstallExe,
+                    uninstallArgs.trim_safe(), 
                     config.CommandExecutionTimeoutSeconds,
                     (s, e) =>
                         {
@@ -128,7 +127,8 @@ namespace chocolatey.infrastructure.app.services
                         {
                             if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
                             this.Log().Error(() => " [AutoUninstaller] {0}".format_with(e.Data));
-                        });
+                        },
+                    updateProcessPath: false);
 
                 if (exitCode != 0)
                 {

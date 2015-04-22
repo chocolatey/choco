@@ -113,7 +113,8 @@ namespace chocolatey.infrastructure.app.services
                         {
                             if (string.IsNullOrWhiteSpace(e.Data)) return;
                             this.Log().Error(() => " [ShimGen] {0}".format_with(e.Data));
-                        }
+                        },
+                    updateProcessPath: true
                     );
 
                 if (exitCode != 0)

@@ -125,7 +125,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_add_short_version_of_includeprograms_to_the_option_set()
             {
-                optionSet.Contains("p").ShouldBeTrue();
+                optionSet.Contains("i").ShouldBeTrue();
             }
 
             [Fact]

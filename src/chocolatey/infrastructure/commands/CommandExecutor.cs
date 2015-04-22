@@ -57,7 +57,8 @@ namespace chocolatey.infrastructure.commands
             string arguments,
             int waitForExitInSeconds,
             Action<object, DataReceivedEventArgs> stdOutAction,
-            Action<object, DataReceivedEventArgs> stdErrAction
+            Action<object, DataReceivedEventArgs> stdErrAction,
+            bool updateProcessPath = true
             )
         {
             return execute(process,
@@ -66,7 +67,7 @@ namespace chocolatey.infrastructure.commands
                            file_system.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)),
                            stdOutAction,
                            stdErrAction,
-                           updateProcessPath: true
+                           updateProcessPath
                 );
         }
 
