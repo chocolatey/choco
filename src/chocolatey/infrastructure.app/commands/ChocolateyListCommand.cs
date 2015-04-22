@@ -96,10 +96,11 @@ Chocolatey will perform a search for a package local or remote. Some
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
     choco list --local-only
-    choco list -lp
-    choco list -lap
+    choco list -li
+    choco list -lai
     choco search git
     choco search git -s ""https://somewhere/out/there""
+    choco search bob -s ""https://somewhere/protected"" -u user -p pass
 
 ");
 
