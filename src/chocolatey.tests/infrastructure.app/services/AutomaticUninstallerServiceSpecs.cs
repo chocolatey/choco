@@ -108,7 +108,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>()), Times.Never);
+                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
         }
 
@@ -134,7 +134,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>()), Times.Never);
+                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
         }
 
@@ -160,7 +160,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>()), Times.Never);
+                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
         }
 
@@ -187,7 +187,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>()), Times.Never);
+                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
         }
 
@@ -214,7 +214,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>()), Times.Never);
+                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
         }
 
@@ -243,7 +243,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>()), Times.Never);
+                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
         }
 
@@ -263,7 +263,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, installerType.build_uninstall_command_arguments().trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>()), Times.Never);
+                commandExecutor.Verify(c => c.execute(expectedUninstallString, installerType.build_uninstall_command_arguments().trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
         }    
         
@@ -299,7 +299,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var uninstallArgs = useInstallerDefaultArgs ? installer.build_uninstall_command_arguments().trim_safe() : registryUninstallArgs.trim_safe();
 
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, uninstallArgs, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>()), Times.Never);
+                commandExecutor.Verify(c => c.execute(expectedUninstallString, uninstallArgs, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
 
             [Fact]

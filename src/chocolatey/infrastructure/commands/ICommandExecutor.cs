@@ -28,7 +28,8 @@ namespace chocolatey.infrastructure.commands
             string arguments,
             int waitForExitInSeconds,
             Action<object, DataReceivedEventArgs> stdOutAction,
-            Action<object, DataReceivedEventArgs> stdErrAction
-            );
+            Action<object, DataReceivedEventArgs> stdErrAction,
+            bool updateProcessPath
+            ); 
     }
 }

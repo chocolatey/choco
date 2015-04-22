@@ -128,7 +128,8 @@ namespace chocolatey.infrastructure.app.services
                         {
                             if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
                             this.Log().Error(() => " [AutoUninstaller] {0}".format_with(e.Data));
-                        });
+                        },
+                    updateProcessPath: false);
 
                 if (exitCode != 0)
                 {
