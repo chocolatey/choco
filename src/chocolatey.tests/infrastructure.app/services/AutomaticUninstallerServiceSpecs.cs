@@ -189,6 +189,42 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
+        } 
+        
+        public class when_install_location_is_empty : AutomaticUninstallerServiceSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                fileSystem.ResetCalls();
+                registryKeys.Clear();
+                registryKeys.Add(new RegistryApplicationKey
+                {
+                    InstallLocation = string.Empty,
+                    UninstallString = originalUninstallString,
+                    HasQuietUninstall = false,
+                    KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat"
+                });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_call_get_package_information()
+            {
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_call_command_executor()
+            {
+                var args = installerType.build_uninstall_command_arguments().trim_safe();
+                commandExecutor.Verify(c => c.execute(expectedUninstallString, args, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
+            }
         }
 
         public class when_registry_location_does_not_exist : AutomaticUninstallerServiceSpecsBase
