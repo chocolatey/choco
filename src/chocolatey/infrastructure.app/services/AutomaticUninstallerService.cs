@@ -77,11 +77,10 @@ namespace chocolatey.infrastructure.app.services
                 }
 
                 // split on " /" and " -" for quite a bit more accuracy
-                IList<string> uninstallArgs = key.UninstallString.to_string().Split(new[] {" /", " -"}, StringSplitOptions.RemoveEmptyEntries).ToList();
-                var uninstallExe = uninstallArgs.DefaultIfEmpty(string.Empty).FirstOrDefault();
-                uninstallArgs.Remove(uninstallExe);
+                IList<string> uninstallArgsSplit = key.UninstallString.to_string().Split(new[] {" /", " -"}, StringSplitOptions.RemoveEmptyEntries).ToList();
+                var uninstallExe = uninstallArgsSplit.DefaultIfEmpty(string.Empty).FirstOrDefault();
+                var uninstallArgs = key.UninstallString.to_string().Replace(uninstallExe.to_string(), string.Empty);
                 uninstallExe = uninstallExe.remove_surrounding_quotes();
-                if (uninstallExe.is_equal_to("msiexec.exe")) uninstallExe = _fileSystem.combine_paths(Environment.SystemDirectory, uninstallExe);
                 this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
 
                 //todo: ultimately we should merge keys with logging
@@ -110,14 +109,14 @@ namespace chocolatey.infrastructure.app.services
 
                     this.Log().Debug(() => " Installer type is '{0}'".format_with(installer.GetType().Name));
 
-                    uninstallArgs.Add(installer.build_uninstall_command_arguments());
+                    uninstallArgs += " " + installer.build_uninstall_command_arguments();
                 }
 
-                this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs.@join(" ")));
+                this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs));
 
                 var exitCode = _commandExecutor.execute(
-                    uninstallExe, 
-                    uninstallArgs.@join(" "), 
+                    uninstallExe,
+                    uninstallArgs.trim_safe(), 
                     config.CommandExecutionTimeoutSeconds,
                     (s, e) =>
                         {

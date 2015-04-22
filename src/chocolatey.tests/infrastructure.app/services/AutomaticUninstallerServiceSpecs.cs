@@ -299,14 +299,14 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, installerType.build_uninstall_command_arguments().trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(c => c.execute(expectedUninstallString, installerType.build_uninstall_command_arguments().trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
             }
         }    
         
         public class when_AutomaticUninstallerService_defines_uninstall_switches : AutomaticUninstallerServiceSpecsBase
         {
             private Action because;
-            private readonly string registryUninstallArgs = "bob";
+            private readonly string registryUninstallArgs = "/bob";
 
             public override void Because()
             {
@@ -316,16 +316,18 @@ namespace chocolatey.tests.infrastructure.app.services
             public void reset()
             {
                 Context();
+                registryKeys.Clear();
+                commandExecutor.ResetCalls();
             }
 
-            private void test_installertype(IInstaller installer,bool useInstallerDefaultArgs)
+            private void test_installertype(IInstaller installer, bool hasQuietUninstallString)
             {
                 reset();
                 registryKeys.Add(new RegistryApplicationKey
                 {
                     InstallLocation = @"C:\Program Files (x86)\WinDirStat",
-                    UninstallString =  "{0} {1}".format_with(originalUninstallString,registryUninstallArgs),
-                    HasQuietUninstall = false,
+                    UninstallString =  "{0} {1}".format_with(originalUninstallString, registryUninstallArgs),
+                    HasQuietUninstall = hasQuietUninstallString,
                     KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
                     InstallerType = installer.InstallerType,
                 });
@@ -333,69 +335,69 @@ namespace chocolatey.tests.infrastructure.app.services
                 
                 because();
 
-                var uninstallArgs = useInstallerDefaultArgs ? installer.build_uninstall_command_arguments().trim_safe() : registryUninstallArgs.trim_safe();
+                var uninstallArgs = !hasQuietUninstallString ? registryUninstallArgs.trim_safe() + " " + installer.build_uninstall_command_arguments().trim_safe() : registryUninstallArgs.trim_safe();
 
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, uninstallArgs, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(c => c.execute(expectedUninstallString, uninstallArgs, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
             }
 
             [Fact]
             public void should_use_CustomInstaller_uninstall_args_when_installtype_is_unknown_and_has_quiet_uninstall_is_false()
             {
-                test_installertype(new CustomInstaller(), useInstallerDefaultArgs: true);
+                test_installertype(new CustomInstaller(), hasQuietUninstallString: false);
             }  
             
             [Fact]
             public void should_use_registry_uninstall_args_when_installtype_is_unknown_and_has_quiet_uninstall_is_true()
             {
-                test_installertype(new CustomInstaller(), useInstallerDefaultArgs: false);
+                test_installertype(new CustomInstaller(), hasQuietUninstallString: true);
             }  
             
             [Fact]
             public void should_use_MsiInstaller_uninstall_args_when_installtype_is_msi_and_has_quiet_uninstall_is_false()
             {
-                test_installertype(new MsiInstaller(), useInstallerDefaultArgs: true);
+                test_installertype(new MsiInstaller(), hasQuietUninstallString: false);
             }  
             
             [Fact]
             public void should_use_registry_uninstall_args_when_installtype_is_msi_and_has_quiet_uninstall_is_true()
             {
-                test_installertype(new MsiInstaller(), useInstallerDefaultArgs: false);
+                test_installertype(new MsiInstaller(), hasQuietUninstallString: true);
             } 
              
             [Fact]
             public void should_use_InnoSetupInstaller_uninstall_args_when_installtype_is_innosetup_and_has_quiet_uninstall_is_false()
             {
-                test_installertype(new InnoSetupInstaller(), useInstallerDefaultArgs: true);
+                test_installertype(new InnoSetupInstaller(), hasQuietUninstallString: false);
             }  
             
             [Fact]
             public void should_use_registry_uninstall_args_when_installtype_is_innosetup_and_has_quiet_uninstall_is_true()
             {
-                test_installertype(new InnoSetupInstaller(), useInstallerDefaultArgs: false);
+                test_installertype(new InnoSetupInstaller(), hasQuietUninstallString: true);
             }   
             
             [Fact]
             public void should_use_InstallShieldInstaller_uninstall_args_when_installtype_is_installshield_and_has_quiet_uninstall_is_false()
             {
-                test_installertype(new InstallShieldInstaller(), useInstallerDefaultArgs: true);
+                test_installertype(new InstallShieldInstaller(), hasQuietUninstallString: false);
             }  
             
             [Fact]
             public void should_use_registry_uninstall_args_when_installtype_is_installshield_and_has_quiet_uninstall_is_true()
             {
-                test_installertype(new InstallShieldInstaller(), useInstallerDefaultArgs: false);
+                test_installertype(new InstallShieldInstaller(), hasQuietUninstallString: true);
             }  
             
             [Fact]
             public void should_use_NsisInstaller_uninstall_args_when_installtype_is_nsis_and_has_quiet_uninstall_is_false()
             {
-                test_installertype(new NsisInstaller(), useInstallerDefaultArgs: true);
+                test_installertype(new NsisInstaller(), hasQuietUninstallString: false);
             }  
             
             [Fact]
             public void should_use_registry_uninstall_args_when_installtype_is_nsis_and_has_quiet_uninstall_is_true()
             {
-                test_installertype(new NsisInstaller(), useInstallerDefaultArgs: false);
+                test_installertype(new NsisInstaller(), hasQuietUninstallString: true);
             }  
         }
     }
