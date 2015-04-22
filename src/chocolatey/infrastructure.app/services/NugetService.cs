@@ -232,7 +232,7 @@ spam/junk folder.");
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
 
-            IList<string> packageNames = config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
+            IList<string> packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
             if (packageNames.Count == 1)
             {
                 var packageName = packageNames.DefaultIfEmpty(string.Empty).FirstOrDefault();
@@ -339,7 +339,7 @@ spam/junk folder.");
                         packageName,
                         version == null ? null : version.ToString()))
                     {
-                        packageManager.InstallPackage(availablePackage,ignoreDependencies: config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
+                        packageManager.InstallPackage(availablePackage, ignoreDependencies: config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
                         //packageManager.InstallPackage(packageName, version, configuration.IgnoreDependencies, configuration.Prerelease);
                     }
                 }
@@ -413,7 +413,7 @@ spam/junk folder.");
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 remove_rollback_directory_if_exists(packageName);
 
@@ -459,7 +459,7 @@ packages as of version 1.0.0. That is what the install command is for.
 
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
-                
+
 
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                 if (availablePackage == null)
@@ -532,7 +532,7 @@ packages as of version 1.0.0. That is what the install command is for.
                         {
                             this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
                         }
-                            
+
                         continue;
                     }
 
@@ -771,7 +771,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     config.ForceDependencies = false;
                 });
 
-            foreach (string packageName in config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
                 remove_rollback_directory_if_exists(packageName);
 
