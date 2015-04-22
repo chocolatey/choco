@@ -101,7 +101,7 @@ namespace chocolatey.infrastructure.app.services
                             installer = new NsisInstaller();
                             break;
                         case InstallerType.InstallShield:
-                            installer = new CustomInstaller();
+                            installer = new InstallShieldInstaller();
                             break;
                         default:
                             // skip
