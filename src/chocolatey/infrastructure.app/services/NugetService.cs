@@ -860,6 +860,7 @@ packages as of version 1.0.0. That is what the install command is for.
                                 rename_legacy_package_version(config, packageVersion, pkgInfo);
                                 backup_existing_version(config, packageVersion);
                                 packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
+                                ensure_nupkg_is_removed(packageVersion, pkgInfo);
                             }
                         }
                         catch (Exception ex)
@@ -880,6 +881,23 @@ packages as of version 1.0.0. That is what the install command is for.
             }
 
             return packageUninstalls;
+        }
+
+        /// <summary>
+        /// NuGet will happily report a package has been uninstalled, even if it doesn't always remove the nupkg.
+        /// Ensure that the package is deleted or throw an error.
+        /// </summary>
+        /// <param name="removedPackage">The installed package.</param>
+        /// <param name="pkgInfo">The package information.</param>
+        private void ensure_nupkg_is_removed(IPackage removedPackage, ChocolateyPackageInformation pkgInfo)
+        {
+            var isSideBySide = pkgInfo != null && pkgInfo.IsSideBySide;
+
+            var nupkgFile = "{0}{1}.nupkg".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty);
+            var installDir = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, "{0}{1}".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty));
+            var nupkg = _fileSystem.combine_paths(installDir, nupkgFile);
+            
+            _fileSystem.delete_file(nupkg);
         }
 
         private void set_package_names_if_all_is_specified(ChocolateyConfiguration config, Action customAction)
