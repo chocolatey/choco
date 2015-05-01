@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -253,7 +253,7 @@ spam/junk folder.");
                 }
             }
 
-            // this is when someone points the source directly at a nupkg 
+            // this is when someone points the source directly at a nupkg
             // e.g. -s c:\somelocation\somewhere\packagename.nupkg
             if (config.Sources.to_string().EndsWith(Constants.PackageExtension))
             {
@@ -430,11 +430,9 @@ spam/junk folder.");
                     //continue;
 
                     string logMessage = @"
-DEPRECATION NOTICE - Upgrade will no longer install non-installed 
+DEPRECATION NOTICE - Upgrade will no longer install non-installed
 packages as of version 1.0.0. That is what the install command is for.
 
-
-{0} is not installed. Installing...".format_with(packageName);
 
                     if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
 
@@ -674,9 +672,9 @@ packages as of version 1.0.0. That is what the install command is for.
                 if (errored)
                 {
                     this.Log().Warn(ChocolateyLoggers.Important,
-                                    @"There was an error accessing files. This could mean there is a 
- process locking the folder or files. Please make sure nothing is 
- running that would lock the files or folders in this directory prior 
+                                    @"There was an error accessing files. This could mean there is a
+ process locking the folder or files. Please make sure nothing is
+ running that would lock the files or folders in this directory prior
  to upgrade. If the package fails to upgrade, this is likely the cause.");
                 }
             }
@@ -896,7 +894,7 @@ packages as of version 1.0.0. That is what the install command is for.
             var nupkgFile = "{0}{1}.nupkg".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty);
             var installDir = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, "{0}{1}".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty));
             var nupkg = _fileSystem.combine_paths(installDir, nupkgFile);
-            
+
             _fileSystem.delete_file(nupkg);
         }
 
