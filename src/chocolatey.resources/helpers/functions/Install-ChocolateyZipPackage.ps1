@@ -63,7 +63,7 @@ param(
   [string] $packageName,
   [string] $url,
   [string] $unzipLocation,
-  [string] $url64bit = $url,
+  [string] $url64bit = '',
   [string] $specificFolder ="",
   [string] $checksum = '',
   [string] $checksumType = '',

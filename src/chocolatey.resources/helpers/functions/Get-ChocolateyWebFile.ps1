@@ -85,9 +85,10 @@ param(
     # only set if urls are different
     if ($url32bit -ne $url64bit) {
       $checksum = $checksum64
+	  if ($checkSumType64 -ne '') {
+        $checksumType = $checksumType64
+	  }
     }
-
-    $checksumType = $checksumType64
   }
 
   try {
