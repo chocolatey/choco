@@ -51,12 +51,16 @@ namespace chocolatey.infrastructure.app.services
                 return packageInformation;
             }
 
-            string registrySnapshotFile = _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE);
-            if (_fileSystem.file_exists(registrySnapshotFile))
-            {
-                packageInformation.RegistrySnapshot = _registryService.read_from_file(registrySnapshotFile);
-            }
-
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                    {
+                        packageInformation.RegistrySnapshot = _registryService.read_from_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE)); 
+                    }, 
+                    "Unable to read registry snapshot file", 
+                    throwError: false, 
+                    logWarningInsteadOfError: true
+                 );     
+            
             packageInformation.HasSilentUninstall = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, SILENT_UNINSTALLER_FILE));
             packageInformation.IsSideBySide = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, SIDE_BY_SIDE_FILE));
             packageInformation.IsPinned = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, PIN_FILE));
