@@ -687,7 +687,7 @@ packages as of version 1.0.0. That is what the install command is for.
             var configFiles = _fileSystem.get_files(packageInstallPath, ApplicationParameters.ConfigFileExtensions, SearchOption.AllDirectories);
             foreach (var file in configFiles.or_empty_list_if_null())
             {
-                var backupName = "{0}.{1}.{2}".format_with(_fileSystem.get_file_name_without_extension(file), version, _fileSystem.get_file_extension(file));
+                var backupName = "{0}.{1}".format_with(_fileSystem.get_file_name(file), version);
 
                 FaultTolerance.try_catch_with_logging_exception(
                     () => _fileSystem.copy_file(file, _fileSystem.combine_paths(_fileSystem.get_directory_name(file), backupName), overwriteExisting: true),
