@@ -114,6 +114,6 @@ directoy, an icon to be used for the shortcut, along with a description and argu
 		Write-Debug "Shortcut created."
 	}
 	catch {
-		throw $_.Exception
+		Write-Warning "Unable to create shortcut. Error captured was $($_.Exception.Message)."
 	}
 }

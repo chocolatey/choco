@@ -24,5 +24,19 @@ $version = $env:packageVersion
 $packageName = $env:packageName
 $packageFolder = $env:packageFolder
 
+$helpersPath = (Split-Path -parent $MyInvocation.MyCommand.Definition);
+$nugetChocolateyPath = (Split-Path -parent $helpersPath)
+$nugetPath = $nugetChocolateyPath
+$nugetExePath = Join-Path $nuGetPath 'bin'
+$nugetLibPath = Join-Path $nuGetPath 'lib'
+$badLibPath = Join-Path $nuGetPath 'lib-bad'
+$extensionsPath = Join-Path $nugetPath 'extensions'
+$chocInstallVariableName = "ChocolateyInstall"
+$chocoTools = Join-Path $nuGetPath 'tools'
+$nugetExe = Join-Path $chocoTools 'nuget.exe'
+$7zip = Join-Path $chocoTools '7za.exe'
+$ShimGen = Join-Path $chocoTools 'shimgen.exe'
+$checksumExe = Join-Path $chocoTools 'checksum.exe'
+
 Write-Debug "Running `'$packageScript`'";
 & "$packageScript"
