@@ -55,10 +55,10 @@ param(
     $lnk.WorkingDirectory = $workingDirectory
     $lnk.Save()
 
-    Write-Debug "Desktop Shortcut created pointing at `'$targetFilePath`'."
+    Write-Host "Desktop Shortcut created pointing at `'$targetFilePath`'."
 
   }	
   catch {
-    throw $_.Exception
+    Write-Warning "Unable to create desktop link. Error captured was $($_.Exception.Message)."
   }	
 }

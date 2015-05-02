@@ -76,8 +76,7 @@ try {
   Write-Host "'$menuKey' explorer menu item has been created"
 }
 catch {
-    $errorMessage = "'$menuKey' explorer menu item was not created $($_.Exception.Message)"
-    Write-Error $errorMessage
-    throw $errorMessage
+    $errorMessage = "'$menuKey' explorer menu item was not created - $($_.Exception.Message)"
+	Write-Warning $errorMessage
   }
 }
