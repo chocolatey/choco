@@ -53,6 +53,7 @@ namespace chocolatey.infrastructure.app.registration
             container.Register<IChocolateyPackageInformationService, ChocolateyPackageInformationService>(Lifestyle.Singleton);
             container.Register<IShimGenerationService, ShimGenerationService>(Lifestyle.Singleton);
             container.Register<IRegistryService, RegistryService>(Lifestyle.Singleton);
+            container.Register<IFilesService, FilesService>(Lifestyle.Singleton);
             container.Register<ITemplateService, TemplateService>(Lifestyle.Singleton);
             container.Register<IChocolateyConfigSettingsService, ChocolateyConfigSettingsService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);
