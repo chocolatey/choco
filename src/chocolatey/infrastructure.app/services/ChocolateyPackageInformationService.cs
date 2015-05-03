@@ -15,10 +15,12 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using System.IO;
     using System.Text;
     using NuGet;
     using domain;
+    using tolerance;
     using IFileSystem = filesystem.IFileSystem;
 
     internal class ChocolateyPackageInformationService : IChocolateyPackageInformationService
