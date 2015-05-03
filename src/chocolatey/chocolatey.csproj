@@ -166,6 +166,8 @@
     <Compile Include="infrastructure\commandline\InteractivePrompt.cs" />
     <Compile Include="infrastructure\commands\ICommandExecutor.cs" />
     <Compile Include="infrastructure\commands\PowershellExecutor.cs" />
+    <Compile Include="infrastructure\cryptography\IHashProvider.cs" />
+    <Compile Include="infrastructure\cryptography\Md5HashProvider.cs" />
     <Compile Include="infrastructure\guards\Ensure.cs" />
     <Compile Include="infrastructure\information\ProcessInformation.cs" />
     <Compile Include="infrastructure\logging\ChocolateyLoggers.cs" />
