@@ -30,7 +30,7 @@ namespace chocolatey.infrastructure.app.services
     /// <summary>
     ///   Allows comparing registry
     /// </summary>
-    public class RegistryService : IRegistryService
+    public sealed class RegistryService : IRegistryService
     {
         private readonly IXmlService _xmlService;
         private readonly IFileSystem _fileSystem;
@@ -206,7 +206,7 @@ namespace chocolatey.infrastructure.app.services
         {
             //todo: make this check less crazy...
             return get_installer_keys().RegistryKeys.Any(k => k.KeyPath == keyPath);
-            
+
             //return Microsoft.Win32.Registry.GetValue(keyPath, value, null) != null;
         }
 
