@@ -231,6 +231,11 @@ namespace chocolatey.infrastructure.filesystem
             return File.ReadAllText(filePath, get_file_encoding(filePath));
         }
 
+        public byte[] read_file_bytes(string filePath)
+        {
+            return File.ReadAllBytes(filePath);
+        }
+
         public FileStream open_file_readonly(string filePath)
         {
             return File.OpenRead(filePath);
