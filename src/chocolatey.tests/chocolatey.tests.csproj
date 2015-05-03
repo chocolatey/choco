@@ -82,6 +82,7 @@
     <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />
     <Compile Include="infrastructure\commands\PowershellExecutorSpecs.cs" />
     <Compile Include="infrastructure\configuration\ConfigSpecs.cs" />
+    <Compile Include="infrastructure\cryptography\Md5HashProviderSpecs.cs" />
     <Compile Include="infrastructure\events\context\FakeEvent.cs" />
     <Compile Include="infrastructure\events\context\FakeSubscriber.cs" />
     <Compile Include="infrastructure\events\EventSubscriptionManagerSpecs.cs" />
