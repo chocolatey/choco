@@ -49,11 +49,15 @@ namespace chocolatey.infrastructure.app.services
 
         public void save_to_file(PackageFiles snapshot, string filePath)
         {
+            if (snapshot == null) return;
+
             _xmlService.serialize(snapshot, filePath);
         }
 
         public PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config)
         {
+            if (packageResult == null) return null;
+
             var installDirectory = packageResult.InstallLocation;
             if (installDirectory.is_equal_to(ApplicationParameters.InstallLocation) || installDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
             {
@@ -65,11 +69,14 @@ namespace chocolatey.infrastructure.app.services
 
             var packageFiles = new PackageFiles();
 
+            this.Log().Debug(() => "Capturing package files in '{0}'".format_with(installDirectory));
             //gather all files in the folder 
             var files = _fileSystem.get_files(installDirectory, pattern: "*.*", option: SearchOption.AllDirectories);
             foreach (string file in files.or_empty_list_if_null())
             {
-                packageFiles.Files.Add(new PackageFile { Path = file, Checksum = _hashProvider.hash_file(file)});
+                var hash = _hashProvider.hash_file(file);
+                this.Log().Debug(() => " Found '{0}'{1}  with checksum '{2}'".format_with(file, Environment.NewLine, hash));
+                packageFiles.Files.Add(new PackageFile { Path = file, Checksum = hash});
             }
 
             return packageFiles;

@@ -76,7 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />
-    <Compile Include="infrastructure\cryptography\Md5HashProviderSpecs.cs" />
+    <Compile Include="infrastructure\cryptography\CrytpoHashProviderSpecs.cs" />
     <Compile Include="infrastructure\filesystem\DotNetFileSystemSpecs.cs" />
     <Compile Include="MockEventSubscriptionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

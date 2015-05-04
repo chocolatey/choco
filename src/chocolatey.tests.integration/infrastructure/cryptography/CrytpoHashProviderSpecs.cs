@@ -13,39 +13,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.tests.infrastructure.cryptography
+namespace chocolatey.tests.integration.infrastructure.cryptography
 {
     using System;
+    using System.IO;
+    using System.Reflection;
     using System.Security.Cryptography;
-    using Moq;
     using Should;
     using chocolatey.infrastructure.cryptography;
     using chocolatey.infrastructure.filesystem;
 
-    public class Md5HashProviderSpecs
+    public class CrytpoHashProviderSpecs
     {
-        public abstract class Md5HashProviderSpecsBase : TinySpec
+        public abstract class CrytpoHashProviderSpecsBase : TinySpec
         {
-            protected Md5HashProvider Provider;
-            protected Mock<IFileSystem> FileSystem = new Mock<IFileSystem>();
+            protected CrytpoHashProvider Provider;
+            protected DotNetFileSystem FileSystem;
+            protected string ContextDirectory;
 
             public override void Context()
             {
-                Provider = new Md5HashProvider(FileSystem.Object);
+                FileSystem = new DotNetFileSystem();
+                Provider = new CrytpoHashProvider(FileSystem,CryptoHashProviderType.Md5);
+                ContextDirectory = FileSystem.combine_paths(FileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)), "context");
             }
         }
 
-        public class when_Md5HashProvider_provides_a_hash : Md5HashProviderSpecsBase
+        public class when_HashProvider_provides_a_hash : CrytpoHashProviderSpecsBase
         {
             private string result;
-            private string filePath = "c:\\path\\does\\not\\matter.txt";
-            private readonly byte[] byteArray = new byte[] {23, 25, 27};
+            private string filePath;
 
             public override void Context()
             {
                 base.Context();
-                FileSystem.Setup(x => x.file_exists(It.IsAny<string>())).Returns(true);
-                FileSystem.Setup(x => x.read_file_bytes(filePath)).Returns(byteArray);
+                filePath = FileSystem.combine_paths(ContextDirectory, "testing.packages.config");
             }
 
             public override void Because()
@@ -56,7 +58,7 @@ namespace chocolatey.tests.infrastructure.cryptography
             [Fact]
             public void should_provide_the_correct_hash_based_on_a_checksum()
             {
-                var expected = BitConverter.ToString(MD5.Create().ComputeHash(byteArray)).Replace("-", string.Empty);
+                var expected = BitConverter.ToString(MD5.Create().ComputeHash(File.ReadAllBytes(filePath))).Replace("-", string.Empty);
 
                 result.ShouldEqual(expected);
             }
