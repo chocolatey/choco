@@ -15,11 +15,35 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using configuration;
     using domain;
+    using results;
 
+    /// <summary>
+    /// The files service for capturing and handling file snapshots.
+    /// </summary>
     public interface IFilesService
     {
+        /// <summary>
+        /// Read the package files file from the specified filepath.
+        /// </summary>
+        /// <param name="filepath">The filepath.</param>
+        /// <returns>PackageFiles with entries based on the file if it exists, otherwise null</returns>
         PackageFiles read_from_file(string filepath);
+
+        /// <summary>
+        /// Saves the files snapshot to the specifed file path.
+        /// </summary>
+        /// <param name="snapshot">The snapshot.</param>
+        /// <param name="filePath">The file path.</param>
         void save_to_file(PackageFiles snapshot, string filePath);
+
+        /// <summary>
+        /// Captures the snapshot of the package files
+        /// </summary>
+        /// <param name="packageResult">The package result.</param>
+        /// <param name="config">The configuration.</param>
+        /// <returns>PackageFiles with entries based on the install location of the package.</returns>
+        PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config);
     }
 }

@@ -15,19 +15,26 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
+    using System.IO;
+    using configuration;
+    using cryptography;
     using domain;
     using filesystem;
     using infrastructure.services;
+    using results;
 
     public sealed class FilesService : IFilesService
     {
         private readonly IXmlService _xmlService;
         private readonly IFileSystem _fileSystem;
+        private readonly IHashProvider _hashProvider;
 
-        public FilesService(IXmlService xmlService, IFileSystem fileSystem)
+        public FilesService(IXmlService xmlService, IFileSystem fileSystem, IHashProvider hashProvider)
         {
             _xmlService = xmlService;
             _fileSystem = fileSystem;
+            _hashProvider = hashProvider;
         }
 
         public PackageFiles read_from_file(string filePath)
@@ -43,6 +50,29 @@ namespace chocolatey.infrastructure.app.services
         public void save_to_file(PackageFiles snapshot, string filePath)
         {
             _xmlService.serialize(snapshot, filePath);
+        }
+
+        public PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config)
+        {
+            var installDirectory = packageResult.InstallLocation;
+            if (installDirectory.is_equal_to(ApplicationParameters.InstallLocation) || installDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
+            {
+                var logMessage = "Install location is not specific enough, cannot capture files:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, packageResult.InstallLocation);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                this.Log().Error(logMessage);
+                return null;
+            }
+
+            var packageFiles = new PackageFiles();
+
+            //gather all files in the folder 
+            var files = _fileSystem.get_files(installDirectory, pattern: "*.*", option: SearchOption.AllDirectories);
+            foreach (string file in files.or_empty_list_if_null())
+            {
+                packageFiles.Files.Add(new PackageFile { Path = file, Checksum = _hashProvider.hash_file(file)});
+            }
+
+            return packageFiles;
         }
     }
 }
