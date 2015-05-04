@@ -32,7 +32,7 @@ namespace chocolatey.infrastructure.app.services
     public class ChocolateyPackageService : IChocolateyPackageService
     {
         private readonly INugetService _nugetService;
-        private readonly IPowershellService _powershellService;
+        private readonly IEnumerable<IInstallProviderService> _installProviders;
         private readonly IShimGenerationService _shimgenService;
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
@@ -40,10 +40,10 @@ namespace chocolatey.infrastructure.app.services
         private readonly IAutomaticUninstallerService _autoUninstallerService;
         private readonly IXmlService _xmlService;
 
-        public ChocolateyPackageService(INugetService nugetService, IPowershellService powershellService, IShimGenerationService shimgenService, IFileSystem fileSystem, IRegistryService registryService, IChocolateyPackageInformationService packageInfoService, IAutomaticUninstallerService autoUninstallerService, IXmlService xmlService)
+        public ChocolateyPackageService(INugetService nugetService, IEnumerable<IInstallProviderService> installProviders, IShimGenerationService shimgenService, IFileSystem fileSystem, IRegistryService registryService, IChocolateyPackageInformationService packageInfoService, IAutomaticUninstallerService autoUninstallerService, IXmlService xmlService)
         {
             _nugetService = nugetService;
-            _powershellService = powershellService;
+            _installProviders = installProviders;
             _shimgenService = shimgenService;
             _fileSystem = fileSystem;
             _registryService = registryService;
@@ -147,7 +147,13 @@ namespace chocolatey.infrastructure.app.services
             // each package can specify its own configuration values    
             foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, new ConcurrentDictionary<string, PackageResult>()).or_empty_list_if_null())
             {
-                _nugetService.install_noop(packageConfig, (pkg) => _powershellService.install_noop(pkg));
+                _nugetService.install_noop(packageConfig, (pkg) =>
+                    {
+                        foreach (var installProvider in _installProviders.Where(ip => ip.can_be_used(config)).or_empty_list_if_null())
+                        {
+                            installProvider.install_noop(pkg);
+                        }
+                    });
             }
         }
 
@@ -159,41 +165,55 @@ namespace chocolatey.infrastructure.app.services
                 pkgInfo.IsSideBySide = true;
             }
 
-            if (packageResult.Success && config.Information.PlatformType == PlatformType.Windows)
+            if (packageResult.Success)
             {
                 if (!config.SkipPackageInstallProvider)
                 {
-                    var before = _registryService.get_installer_keys();
+                    Registry before = null;
+                    if (config.Information.PlatformType == PlatformType.Windows)
+                    {
+                        before = _registryService.get_installer_keys();
+                    }
 
-                    var powerShellRan = _powershellService.install(config, packageResult);
-                    if (powerShellRan)
+                    var providerRan = false;
+                    foreach (var installProvider in _installProviders.Where(ip => ip.can_be_used(config)).or_empty_list_if_null())
+                    {
+                        if (providerRan == true) break;
+
+                        providerRan = installProvider.install(config, packageResult);
+                    }
+
+                    if (providerRan)
                     {
                         //todo: prevent reboots
                     }
 
-                    var difference = _registryService.get_differences(before, _registryService.get_installer_keys());
-                    if (difference.RegistryKeys.Count != 0)
+                    if (config.Information.PlatformType == PlatformType.Windows)
                     {
-                        //todo v1 - determine the installer type and write it to the snapshot
-                        //todo v1 - note keys passed in 
-                        pkgInfo.RegistrySnapshot = difference;
-
-                        var key = difference.RegistryKeys.FirstOrDefault();
-                        if (key != null && key.HasQuietUninstall)
+                        var difference = _registryService.get_differences(before, _registryService.get_installer_keys());
+                        if (difference.RegistryKeys.Count != 0)
                         {
-                            pkgInfo.HasSilentUninstall = true;
+                            //todo v1 - determine the installer type and write it to the snapshot
+                            //todo v1 - note keys passed in 
+                            pkgInfo.RegistrySnapshot = difference;
+
+                            var key = difference.RegistryKeys.FirstOrDefault();
+                            if (key != null && key.HasQuietUninstall)
+                            {
+                                pkgInfo.HasSilentUninstall = true;
+                            }
                         }
                     }
                 }
 
-                if (packageResult.Success)
+                if (packageResult.Success && config.Information.PlatformType == PlatformType.Windows)
                 {
                     _shimgenService.install(config, packageResult);
                 }
-            }
-            else
-            {
-                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping Powershell and shimgen portions of the install due to non-Windows.");
+                else
+                {
+                    this.Log().Info(ChocolateyLoggers.Important, () => " Skipping shimgen portion of the install due to non-Windows.");
+                }
             }
 
             if (packageResult.Success)
@@ -331,7 +351,14 @@ namespace chocolatey.infrastructure.app.services
 
         public void upgrade_noop(ChocolateyConfiguration config)
         {
-            var noopUpgrades = _nugetService.upgrade_noop(config, (pkg) => _powershellService.install_noop(pkg));
+            var noopUpgrades = _nugetService.upgrade_noop(config, (pkg) =>
+                    {
+                        foreach (var installProvider in _installProviders.Where(ip => ip.can_be_used(config)).or_empty_list_if_null())
+                        {
+                            installProvider.install_noop(pkg);
+                        }
+                    }); 
+
             if (config.RegularOutput)
             {
                 var upgradeWarnings = noopUpgrades.Count(p => p.Value.Warning);
@@ -413,7 +440,13 @@ namespace chocolatey.infrastructure.app.services
 
         public void uninstall_noop(ChocolateyConfiguration config)
         {
-            _nugetService.uninstall_noop(config, (pkg) => _powershellService.uninstall_noop(pkg));
+            _nugetService.uninstall_noop(config, (pkg) =>
+                    {
+                        foreach (var installProvider in _installProviders.Where(ip => ip.can_be_used(config)).or_empty_list_if_null())
+                        {
+                            installProvider.uninstall_noop(pkg);
+                        }
+                    });
         }
 
         public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config)
@@ -439,7 +472,10 @@ namespace chocolatey.infrastructure.app.services
 
                     if (!config.SkipPackageInstallProvider)
                     {
-                        _powershellService.uninstall(config, packageResult);
+                        foreach (var installProvider in _installProviders.Where(ip => ip.can_be_used(config)).or_empty_list_if_null())
+                        {
+                            installProvider.uninstall(config, packageResult);
+                        }
                     }
 
                     _autoUninstallerService.run(packageResult, config);
