@@ -41,9 +41,9 @@ param(
 
   $chocoNew = Join-Path $thisScriptFolder 'chocolateyInstall\choco.exe'
   if ($debugMode) {
-    & $chocoNew unpackself -fdv
+    & $chocoNew unpackself -fdvy
   } else {
-    & $chocoNew unpackself -f
+    & $chocoNew unpackself -fy
   }
 
   $installModule = Join-Path $thisScriptFolder 'chocolateyInstall\helpers\chocolateyInstaller.psm1'
@@ -314,9 +314,9 @@ param(
   Copy-Item $chocoExe $chocoExeDest -force
 
   if ($debugMode) {
-    & $chocoExeDest unpackself -fdv
+    & $chocoExeDest unpackself -fdvy
   } else {
-    & $chocoExeDest unpackself -f
+    & $chocoExeDest unpackself -fy
   }
 }
 
