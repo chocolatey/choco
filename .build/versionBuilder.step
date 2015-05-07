@@ -34,7 +34,7 @@
 
     <exec
     program="${app.strongname}"
-    commandline="-p ${path.key.name.private} ${path.key.name.public}"
+    commandline='-p "${path.key.name.private}" "${path.key.name.public}"'
     if="${file::exists(app.strongname)}"
     />
   </target>
