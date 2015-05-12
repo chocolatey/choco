@@ -45,5 +45,12 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="config">The configuration.</param>
         /// <returns>PackageFiles with entries based on the install location of the package.</returns>
         PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config);
+
+        /// <summary>
+        /// Gets a PackageFile from the filepath
+        /// </summary>
+        /// <param name="file">The file.</param>
+        /// <returns>PackageFile object</returns>
+        PackageFile get_package_file(string file);
     }
 }

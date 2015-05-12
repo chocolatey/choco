@@ -74,12 +74,18 @@ namespace chocolatey.infrastructure.app.services
             var files = _fileSystem.get_files(installDirectory, pattern: "*.*", option: SearchOption.AllDirectories);
             foreach (string file in files.or_empty_list_if_null())
             {
-                var hash = _hashProvider.hash_file(file);
-                this.Log().Debug(() => " Found '{0}'{1}  with checksum '{2}'".format_with(file, Environment.NewLine, hash));
-                packageFiles.Files.Add(new PackageFile { Path = file, Checksum = hash});
+                packageFiles.Files.Add(get_package_file(file));
             }
 
             return packageFiles;
+        }
+
+        public PackageFile get_package_file(string file)
+        {
+            var hash = _hashProvider.hash_file(file);
+            this.Log().Debug(() => " Found '{0}'{1}  with checksum '{2}'".format_with(file, Environment.NewLine, hash));
+            
+            return new PackageFile { Path = file, Checksum = hash };
         }
     }
 }

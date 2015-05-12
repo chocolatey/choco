@@ -42,6 +42,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _nugetLogger;
         private readonly IChocolateyPackageInformationService _packageInfoService;
+        private readonly IFilesService _filesService;
         private readonly Lazy<IDateTime> datetime_initializer = new Lazy<IDateTime>(() => new DateTime());
 
         private IDateTime DateTime
@@ -55,11 +56,13 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="fileSystem">The file system.</param>
         /// <param name="nugetLogger">The nuget logger</param>
         /// <param name="packageInfoService">Package information service</param>
-        public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService)
+        /// <param name="filesService">The files service</param>
+        public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService, IFilesService filesService)
         {
             _fileSystem = fileSystem;
             _nugetLogger = nugetLogger;
             _packageInfoService = packageInfoService;
+            _filesService = filesService;
         }
 
         public void list_noop(ChocolateyConfiguration config)
@@ -861,6 +864,7 @@ packages as of version 1.0.0. That is what the install command is for.
                                 backup_existing_version(config, packageVersion);
                                 packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
                                 ensure_nupkg_is_removed(packageVersion, pkgInfo);
+                                remove_installation_files(packageVersion, pkgInfo);
                             }
                         }
                         catch (Exception ex)
@@ -898,6 +902,24 @@ packages as of version 1.0.0. That is what the install command is for.
             var nupkg = _fileSystem.combine_paths(installDir, nupkgFile);
             
             _fileSystem.delete_file(nupkg);
+        }
+
+        public void remove_installation_files(IPackage removedPackage, ChocolateyPackageInformation pkgInfo)
+        {
+            var isSideBySide = pkgInfo != null && pkgInfo.IsSideBySide;
+            var installDir = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, "{0}{1}".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty));
+
+            if (_fileSystem.directory_exists(installDir) && pkgInfo != null && pkgInfo.FilesSnapshot != null)
+            {
+                foreach (var file in _fileSystem.get_files(installDir, "*.*", SearchOption.AllDirectories).or_empty_list_if_null())
+                {
+                    var fileSnapshot = pkgInfo.FilesSnapshot.Files.FirstOrDefault(f => f.Path.is_equal_to(file));
+                    if (fileSnapshot != null && fileSnapshot.Checksum == _filesService.get_package_file(file).Checksum)
+                    {
+                        _fileSystem.delete_file(file);
+                    }
+                }
+            }
         }
 
         private void set_package_names_if_all_is_specified(ChocolateyConfiguration config, Action customAction)
