@@ -878,6 +878,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     }
                     else
                     {
+                        // continue action won't be found b/c we are not actually uninstalling (this is noop)
                         var result = packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, packageVersion.Id)));
                         if (continueAction != null) continueAction.Invoke(result);
                     }
