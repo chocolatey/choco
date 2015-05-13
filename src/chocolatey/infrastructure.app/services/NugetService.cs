@@ -921,6 +921,11 @@ packages as of version 1.0.0. That is what the install command is for.
                     }
                 }
             }
+
+            if (_fileSystem.directory_exists(installDir) && !_fileSystem.get_files(installDir, "*.*", SearchOption.AllDirectories).or_empty_list_if_null().Any())
+            {
+                _fileSystem.delete_directory_if_exists(installDir, recursive: true);
+            }
         }
 
         private void set_package_names_if_all_is_specified(ChocolateyConfiguration config, Action customAction)

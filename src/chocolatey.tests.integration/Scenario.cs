@@ -23,10 +23,14 @@ namespace chocolatey.tests.integration
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.nuget;
+    using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.filesystem;
 
     public class Scenario
     {
+
+        private static IChocolateyPackageService _service;
+
         private static readonly DotNetFileSystem _fileSystem = new DotNetFileSystem();
 
         public static string get_top_level()
@@ -79,13 +83,26 @@ namespace chocolatey.tests.integration
 
         public static void install_package(ChocolateyConfiguration config, string packageId, string version)
         {
-            var pattern = "{0}.{1}{2}".format_with(packageId, string.IsNullOrWhiteSpace(version) ? "*" : version, Constants.PackageExtension);
-            var files = _fileSystem.get_files(config.Sources, pattern);
-            foreach (var file in files)
+            if (_service == null)
             {
-                var packageManager = NugetCommon.GetPackageManager(config,new ChocolateyNugetLogger(), null, null, false);
-                packageManager.InstallPackage(new OptimizedZipPackage(file), false,false);
+                _service= NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
             }
+
+            var originalPackageName = config.PackageNames;
+            var originalPackageVersion = config.Version;
+
+            config.PackageNames = packageId;
+            config.Version = version;
+            _service.install_run(config);
+            config.PackageNames = originalPackageName;
+            config.Version = originalPackageVersion;
+            //var pattern = "{0}.{1}{2}".format_with(packageId, string.IsNullOrWhiteSpace(version) ? "*" : version, Constants.PackageExtension);
+            //var files = _fileSystem.get_files(config.Sources, pattern);
+            //foreach (var file in files)
+            //{
+            //    var packageManager = NugetCommon.GetPackageManager(config, new ChocolateyNugetLogger(), null, null, false);
+            //    packageManager.InstallPackage(new OptimizedZipPackage(file), false,false);
+            //}
         }
 
         private static ChocolateyConfiguration baseline_configuration()

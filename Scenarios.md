@@ -126,7 +126,7 @@
  * should install where install location reports
  * should not create a shim for ignored executable in the bin directory
  * should not create a shim for mismatched case ignored executable in the bin directory
- * should not create an extensions folder for the pacakge
+ * should not create an extensions folder for the package
  * should not have inconclusive package result
  * should not have warning package result
 
@@ -315,7 +315,7 @@
  * should not have inconclusive package result
  * should not have warning package result
 
-### ChocolateyUninstallCommand [ 12 Scenario(s), 82 Observation(s) ]
+### ChocolateyUninstallCommand [ 12 Scenario(s), 83 Observation(s) ]
 
 #### when force uninstalling a package
 
@@ -359,6 +359,7 @@
  * should contain a warning message that it uninstalled successfully
  * should delete a shim for console in the bin directory
  * should delete a shim for graphical in the bin directory
+ * should delete any files created during the install
  * should delete the rollback
  * should have a successful package result
  * should not have inconclusive package result
