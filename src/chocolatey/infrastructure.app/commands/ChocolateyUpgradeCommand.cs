@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("n|skippowershell|skip-powershell",
                      "Skip Powershell - Do not run chocolateyInstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
-                 .Add("failonunfound|fail-on-unfound",
+                .Add("failonunfound|fail-on-unfound",
                      "Fail On Unfound Packages - If a package is not found in feeds specified, fail instead of warn.",
                      option => configuration.UpgradeCommand.FailOnUnfound = option != null)
                 .Add("u=|user=",
