@@ -927,8 +927,11 @@ packages as of version 1.0.0. That is what the install command is for.
             var nupkgFile = "{0}{1}.nupkg".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty);
             var installDir = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, "{0}{1}".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty));
             var nupkg = _fileSystem.combine_paths(installDir, nupkgFile);
-            
-            _fileSystem.delete_file(nupkg);
+
+            FaultTolerance.try_catch_with_logging_exception(
+                () => _fileSystem.delete_file(nupkg),
+                "Error deleting nupkg file",
+                throwError: true);
         }
 
         public void remove_installation_files(IPackage removedPackage, ChocolateyPackageInformation pkgInfo)
@@ -943,7 +946,9 @@ packages as of version 1.0.0. That is what the install command is for.
                     var fileSnapshot = pkgInfo.FilesSnapshot.Files.FirstOrDefault(f => f.Path.is_equal_to(file));
                     if (fileSnapshot != null && fileSnapshot.Checksum == _filesService.get_package_file(file).Checksum)
                     {
-                        _fileSystem.delete_file(file);
+                        FaultTolerance.try_catch_with_logging_exception(
+                            () => _fileSystem.delete_file(file),
+                            "Error deleting file");
                     }
                 }
             }
