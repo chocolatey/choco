@@ -26,6 +26,7 @@ namespace chocolatey.infrastructure.app.domain
 
         public IPackage Package { get; set; }
         public Registry RegistrySnapshot { get; set; }
+        public PackageFiles FilesSnapshot { get; set; }
         public bool HasSilentUninstall { get; set; }
         public bool IsSideBySide { get; set; }
         public bool IsPinned { get; set; }

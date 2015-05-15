@@ -37,10 +37,14 @@ namespace chocolatey.infrastructure.app.services
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
         private readonly IChocolateyPackageInformationService _packageInfoService;
+        private readonly IFilesService _filesService;
         private readonly IAutomaticUninstallerService _autoUninstallerService;
         private readonly IXmlService _xmlService;
 
-        public ChocolateyPackageService(INugetService nugetService, IPowershellService powershellService, IShimGenerationService shimgenService, IFileSystem fileSystem, IRegistryService registryService, IChocolateyPackageInformationService packageInfoService, IAutomaticUninstallerService autoUninstallerService, IXmlService xmlService)
+        public ChocolateyPackageService(INugetService nugetService, IPowershellService powershellService, 
+            IShimGenerationService shimgenService, IFileSystem fileSystem, IRegistryService registryService, 
+            IChocolateyPackageInformationService packageInfoService, IFilesService filesService,
+            IAutomaticUninstallerService autoUninstallerService, IXmlService xmlService)
         {
             _nugetService = nugetService;
             _powershellService = powershellService;
@@ -48,6 +52,7 @@ namespace chocolatey.infrastructure.app.services
             _fileSystem = fileSystem;
             _registryService = registryService;
             _packageInfoService = packageInfoService;
+            _filesService = filesService;
             _autoUninstallerService = autoUninstallerService;
             _xmlService = xmlService;
         }
@@ -185,6 +190,8 @@ namespace chocolatey.infrastructure.app.services
                         }
                     }
                 }
+
+                pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
 
                 if (packageResult.Success)
                 {

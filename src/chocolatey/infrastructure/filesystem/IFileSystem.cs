@@ -197,6 +197,13 @@ namespace chocolatey.infrastructure.filesystem
         string read_file(string filePath);
 
         /// <summary>
+        /// Returns the contents of a file as bytes.
+        /// </summary>
+        /// <param name="filePath">The filepath.</param>
+        /// <returns>A byte array of the file contents</returns>
+        byte[] read_file_bytes(string filePath);
+
+        /// <summary>
         ///   Opens a file
         /// </summary>
         /// <param name="filePath">Path to the file name</param>
@@ -330,5 +337,6 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="path">The path.</param>
         /// <param name="attributes">The attributes.</param>
         void ensure_file_attribute_set(string path, FileAttributes attributes);
+
     }
 }

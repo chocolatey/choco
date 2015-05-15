@@ -31,16 +31,16 @@ namespace chocolatey.infrastructure.app.nuget
             switch (level)
             {
                 case MessageLevel.Debug:
-                    this.Log().Debug(message, args);
+                    this.Log().Debug("[NuGet] " + message, args);
                     break;
                 case MessageLevel.Info:
-                    this.Log().Info(message, args);
+                    this.Log().Info("[NuGet] " + message, args);
                     break;
                 case MessageLevel.Warning:
-                    this.Log().Warn(message, args);
+                    this.Log().Warn("[NuGet] " + message, args);
                     break;
                 case MessageLevel.Error:
-                    this.Log().Error(message, args);
+                    this.Log().Error("[NuGet] " + message, args);
                     break;
             }
         }

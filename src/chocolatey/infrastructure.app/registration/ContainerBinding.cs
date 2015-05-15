@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.registration
     using SimpleInjector;
     using adapters;
     using commands;
+    using cryptography;
     using events;
     using filesystem;
     using infrastructure.commands;
@@ -28,6 +29,7 @@ namespace chocolatey.infrastructure.app.registration
     using nuget;
     using services;
     using IFileSystem = filesystem.IFileSystem;
+    using IHashProvider = cryptography.IHashProvider;
 
     // ReSharper disable InconsistentNaming
 
@@ -53,6 +55,8 @@ namespace chocolatey.infrastructure.app.registration
             container.Register<IChocolateyPackageInformationService, ChocolateyPackageInformationService>(Lifestyle.Singleton);
             container.Register<IShimGenerationService, ShimGenerationService>(Lifestyle.Singleton);
             container.Register<IRegistryService, RegistryService>(Lifestyle.Singleton);
+            container.Register<IFilesService, FilesService>(Lifestyle.Singleton);
+            container.Register<IHashProvider>(() => new CrytpoHashProvider(container.GetInstance<IFileSystem>(), CryptoHashProviderType.Md5), Lifestyle.Singleton);
             container.Register<ITemplateService, TemplateService>(Lifestyle.Singleton);
             container.Register<IChocolateyConfigSettingsService, ChocolateyConfigSettingsService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);
