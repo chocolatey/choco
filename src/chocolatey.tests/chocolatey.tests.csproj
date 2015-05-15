@@ -68,6 +68,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyInstallCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyNewCommandSpecs.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyOutdatedCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPackCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPinCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPushCommandSpecs.cs" />
@@ -77,11 +78,14 @@
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommandSpecs.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigurationOptionsSpec.cs" />
     <Compile Include="infrastructure.app\services\AutomaticUninstallerServiceSpecs.cs" />
+    <Compile Include="infrastructure.app\services\FilesServiceSpecs.cs" />
+    <Compile Include="infrastructure.app\services\NugetServiceSpecs.cs" />
     <Compile Include="infrastructure\commands\ExternalCommandArgsBuilderSpecs.cs" />
     <Compile Include="infrastructure\commandline\InteractivePromptSpecs.cs" />
     <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />
     <Compile Include="infrastructure\commands\PowershellExecutorSpecs.cs" />
     <Compile Include="infrastructure\configuration\ConfigSpecs.cs" />
+    <Compile Include="infrastructure\cryptography\CrytpoHashProvider.cs" />
     <Compile Include="infrastructure\events\context\FakeEvent.cs" />
     <Compile Include="infrastructure\events\context\FakeSubscriber.cs" />
     <Compile Include="infrastructure\events\EventSubscriptionManagerSpecs.cs" />

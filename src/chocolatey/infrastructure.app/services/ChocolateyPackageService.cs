@@ -37,10 +37,14 @@ namespace chocolatey.infrastructure.app.services
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
         private readonly IChocolateyPackageInformationService _packageInfoService;
+        private readonly IFilesService _filesService;
         private readonly IAutomaticUninstallerService _autoUninstallerService;
         private readonly IXmlService _xmlService;
 
-        public ChocolateyPackageService(INugetService nugetService, IPowershellService powershellService, IShimGenerationService shimgenService, IFileSystem fileSystem, IRegistryService registryService, IChocolateyPackageInformationService packageInfoService, IAutomaticUninstallerService autoUninstallerService, IXmlService xmlService)
+        public ChocolateyPackageService(INugetService nugetService, IPowershellService powershellService, 
+            IShimGenerationService shimgenService, IFileSystem fileSystem, IRegistryService registryService, 
+            IChocolateyPackageInformationService packageInfoService, IFilesService filesService,
+            IAutomaticUninstallerService autoUninstallerService, IXmlService xmlService)
         {
             _nugetService = nugetService;
             _powershellService = powershellService;
@@ -48,6 +52,7 @@ namespace chocolatey.infrastructure.app.services
             _fileSystem = fileSystem;
             _registryService = registryService;
             _packageInfoService = packageInfoService;
+            _filesService = filesService;
             _autoUninstallerService = autoUninstallerService;
             _xmlService = xmlService;
         }
@@ -186,6 +191,8 @@ namespace chocolatey.infrastructure.app.services
                     }
                 }
 
+                pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
+
                 if (packageResult.Success)
                 {
                     _shimgenService.install(config, packageResult);
@@ -275,6 +282,48 @@ namespace chocolatey.infrastructure.app.services
             }
 
             return packageInstalls;
+        }
+
+        public void outdated_noop(ChocolateyConfiguration config)
+        {
+            this.Log().Info(@"
+Would have determined packages that are out of date based on what is 
+ installed and what versions are available for upgrade.");
+        }
+
+        public void outdated_run(ChocolateyConfiguration config)
+        {
+            this.Log().Info(ChocolateyLoggers.Important, @"Outdated Packages
+ Output is package name | current version | available version | pinned?
+");
+
+            config.PackageNames = ApplicationParameters.AllPackages;
+            config.UpgradeCommand.NotifyOnlyAvailableUpgrades = true;
+
+            var output = config.RegularOutput;
+            config.RegularOutput = false;
+            var oudatedPackages = _nugetService.upgrade_noop(config, null);
+            config.RegularOutput = output;
+            
+            if (config.RegularOutput)
+            {
+                var upgradeWarnings = oudatedPackages.Count(p => p.Value.Warning);
+                this.Log().Warn(() => @"{0}{1} has determined {2} package(s) are outdated. {3}.".format_with(
+                    Environment.NewLine,
+                    ApplicationParameters.Name,
+                    oudatedPackages.Count(p => p.Value.Success && !p.Value.Inconclusive),
+                    upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings)
+                    ));
+
+                if (upgradeWarnings != 0)
+                {
+                    this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
+                    foreach (var warning in oudatedPackages.Where(p => p.Value.Warning).or_empty_list_if_null())
+                    {
+                        this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
+                    }
+                }
+            }
         }
 
         private IEnumerable<ChocolateyConfiguration> set_config_from_package_names_and_packages_config(ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls)

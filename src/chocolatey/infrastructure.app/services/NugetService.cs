@@ -42,6 +42,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _nugetLogger;
         private readonly IChocolateyPackageInformationService _packageInfoService;
+        private readonly IFilesService _filesService;
         private readonly Lazy<IDateTime> datetime_initializer = new Lazy<IDateTime>(() => new DateTime());
 
         private IDateTime DateTime
@@ -55,11 +56,13 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="fileSystem">The file system.</param>
         /// <param name="nugetLogger">The nuget logger</param>
         /// <param name="packageInfoService">Package information service</param>
-        public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService)
+        /// <param name="filesService">The files service</param>
+        public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService, IFilesService filesService)
         {
             _fileSystem = fileSystem;
             _nugetLogger = nugetLogger;
             _packageInfoService = packageInfoService;
+            _filesService = filesService;
         }
 
         public void list_noop(ChocolateyConfiguration config)
@@ -265,11 +268,11 @@ spam/junk folder.");
                 installSuccessAction: (e) =>
                     {
                         var pkg = e.Package;
-                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                        results.InstallLocation = e.InstallPath;
-                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+                        var packageResult = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                        packageResult.InstallLocation = e.InstallPath;
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                        if (continueAction != null) continueAction.Invoke(results);
+                        if (continueAction != null) continueAction.Invoke(packageResult);
                     },
                 uninstallSuccessAction: null,
                 addUninstallHandler: true);
@@ -286,9 +289,9 @@ spam/junk folder.");
                 if (installedPackage != null && (version == null || version == installedPackage.Version) && !config.Force)
                 {
                     string logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
-                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
-                    results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                    results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                    var nullResult = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    nullResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                    nullResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                     this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
@@ -304,31 +307,31 @@ spam/junk folder.");
                 {
                     var logMessage = "{0} not installed. The package was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
-                    results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    var noPkgResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
+                    noPkgResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     continue;
                 }
 
                 if (installedPackage != null && (installedPackage.Version == availablePackage.Version) && config.Force)
                 {
-                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
-                    results.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
+                    var forcedResult = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    forcedResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
 
-                    backup_existing_version(config, installedPackage);
+                    backup_existing_version(config, installedPackage, _packageInfoService.get_package_information(installedPackage));
 
                     try
                     {
                         packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
-                        if (!results.InstallLocation.is_equal_to(ApplicationParameters.PackagesLocation))
+                        if (!forcedResult.InstallLocation.is_equal_to(ApplicationParameters.PackagesLocation))
                         {
-                            _fileSystem.delete_directory_if_exists(results.InstallLocation, recursive: true);
+                            _fileSystem.delete_directory_if_exists(forcedResult.InstallLocation, recursive: true);
                         }
                     }
                     catch (Exception ex)
                     {
                         string logMessage = "{0}:{1} {2}".format_with("Unable to remove existing package prior to forced reinstall", Environment.NewLine, ex.Message);
                         this.Log().Warn(logMessage);
-                        results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        forcedResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                     }
                 }
 
@@ -347,9 +350,9 @@ spam/junk folder.");
                 {
                     var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                    var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
-                    results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                    if (continueAction != null) continueAction.Invoke(results);
+                    var errorResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
+                    errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    if (continueAction != null) continueAction.Invoke(errorResult);
                 }
             }
 
@@ -400,11 +403,11 @@ spam/junk folder.");
                 installSuccessAction: (e) =>
                     {
                         var pkg = e.Package;
-                        var results = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
-                        results.InstallLocation = e.InstallPath;
-                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+                        var packageResult = packageInstalls.GetOrAdd(pkg.Id.to_lower(), new PackageResult(pkg, e.InstallPath));
+                        packageResult.InstallLocation = e.InstallPath;
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                        if (continueAction != null) continueAction.Invoke(results);
+                        if (continueAction != null) continueAction.Invoke(packageResult);
                     },
                 uninstallSuccessAction: null,
                 addUninstallHandler: false);
@@ -423,8 +426,8 @@ spam/junk folder.");
                 {
                     //todo v1 Deprecation - reimplement error
                     //string logMessage = "{0} is not installed. Cannot upgrade a non-existent package.".format_with(packageName);
-                    //var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                    //results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    //var result = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                    //result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
                     //if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     //continue;
@@ -447,9 +450,9 @@ packages as of version 1.0.0. That is what the install command is for.
                     else
                     {
                         var installResults = install_run(config, continueAction);
-                        foreach (var packageResult in installResults)
+                        foreach (var result in installResults)
                         {
-                            packageInstalls.GetOrAdd(packageResult.Key, packageResult.Value);
+                            packageInstalls.GetOrAdd(result.Key, result.Value);
                         }
                     }
 
@@ -465,17 +468,17 @@ packages as of version 1.0.0. That is what the install command is for.
                 if (availablePackage == null)
                 {
                     string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
-                    var unfoundResults = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
+                    var unfoundResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
 
                     if (config.UpgradeCommand.FailOnUnfound)
                     {
-                        unfoundResults.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                        unfoundResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     }
                     else
                     {
-                        unfoundResults.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                        unfoundResults.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        unfoundResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                        unfoundResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         if (config.RegularOutput)
                         {
                             this.Log().Warn(ChocolateyLoggers.Important, logMessage);
@@ -495,21 +498,25 @@ packages as of version 1.0.0. That is what the install command is for.
                     //todo: get smarter about realizing multiple versions have been installed before and allowing that
                 }
 
-                var results = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
+                var packageResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
 
                 if ((installedPackage.Version > availablePackage.Version))
                 {
                     string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
-                    results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                    packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
 
-                    if (config.RegularOutput)
+                    if (!config.UpgradeCommand.NotifyOnlyAvailableUpgrades)
                     {
-                        this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                        }
+                        else
+                        {
+                            this.Log().Info("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
+                        }
                     }
-                    else
-                    {
-                        this.Log().Info("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
-                    }
+
                     continue;
                 }
 
@@ -519,24 +526,27 @@ packages as of version 1.0.0. That is what the install command is for.
 
                     if (!config.Force)
                     {
-                        if (results.Messages.Count((p) => p.Message == ApplicationParameters.Messages.ContinueChocolateyAction) == 0)
+                        if (packageResult.Messages.Count((p) => p.Message == ApplicationParameters.Messages.ContinueChocolateyAction) == 0)
                         {
-                            results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         }
 
-                        if (config.RegularOutput)
+                        if (!config.UpgradeCommand.NotifyOnlyAvailableUpgrades)
                         {
-                            this.Log().Info(logMessage);
+                            if (config.RegularOutput)
+                            {
+                                this.Log().Info(logMessage);
+                            }
+                            else
+                            {
+                                this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
+                            }
                         }
-                        else
-                        {
-                            this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
-                        }
-
+                        
                         continue;
                     }
 
-                    results.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+                    packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
                     if (config.RegularOutput) this.Log().Info(logMessage);
                 }
 
@@ -544,8 +554,8 @@ packages as of version 1.0.0. That is what the install command is for.
                 {
                     if (availablePackage.Version > installedPackage.Version)
                     {
-                        string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s)".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version);
-                        results.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+                        string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version);
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
                         if (config.RegularOutput)
                         {
@@ -560,8 +570,8 @@ packages as of version 1.0.0. That is what the install command is for.
                     if (isPinned)
                     {
                         string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
-                        results.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                        results.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
 
                         continue;
@@ -577,7 +587,7 @@ packages as of version 1.0.0. That is what the install command is for.
                                 version == null ? null : version.ToString()))
                             {
                                 rename_legacy_package_version(config, installedPackage, pkgInfo);
-                                backup_existing_version(config, installedPackage);
+                                backup_existing_version(config, installedPackage, pkgInfo);
                                 if (config.Force && (installedPackage.Version == availablePackage.Version))
                                 {
                                     FaultTolerance.try_catch_with_logging_exception(
@@ -595,8 +605,8 @@ packages as of version 1.0.0. That is what the install command is for.
                         {
                             var logMessage = "{0} not upgraded. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                            results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                            if (continueAction != null) continueAction.Invoke(results);
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            if (continueAction != null) continueAction.Invoke(packageResult);
                         }
                     }
                 }
@@ -624,7 +634,7 @@ packages as of version 1.0.0. That is what the install command is for.
             }
         }
 
-        public void backup_existing_version(ChocolateyConfiguration config, IPackage installedPackage)
+        public void backup_existing_version(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation packageInfo)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageBackupLocation);
 
@@ -669,7 +679,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     }
                 }
 
-                backup_configuration_files(pkgInstallPath, installedPackage.Version.to_string());
+                backup_changed_files(pkgInstallPath, config, packageInfo);
 
                 if (errored)
                 {
@@ -682,16 +692,41 @@ packages as of version 1.0.0. That is what the install command is for.
             }
         }
 
-        private void backup_configuration_files(string packageInstallPath, string version)
+        public void backup_changed_files(string packageInstallPath, ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
         {
-            var configFiles = _fileSystem.get_files(packageInstallPath, ApplicationParameters.ConfigFileExtensions, SearchOption.AllDirectories);
-            foreach (var file in configFiles.or_empty_list_if_null())
-            {
-                var backupName = "{0}.{1}.{2}".format_with(_fileSystem.get_file_name_without_extension(file), version, _fileSystem.get_file_extension(file));
+            if (packageInfo == null || packageInfo.Package == null) return;
 
-                FaultTolerance.try_catch_with_logging_exception(
-                    () => _fileSystem.copy_file(file, _fileSystem.combine_paths(_fileSystem.get_directory_name(file), backupName), overwriteExisting: true),
-                    "Error backing up configuration file");
+            var version = packageInfo.Package.Version.to_string();
+
+            if (packageInfo.FilesSnapshot == null || packageInfo.FilesSnapshot.Files.Count == 0)
+            {
+                var configFiles = _fileSystem.get_files(packageInstallPath, ApplicationParameters.ConfigFileExtensions, SearchOption.AllDirectories);
+                foreach (var file in configFiles.or_empty_list_if_null())
+                {
+                    var backupName = "{0}.{1}".format_with(_fileSystem.get_file_name(file), version);
+
+                    FaultTolerance.try_catch_with_logging_exception(
+                        () => _fileSystem.copy_file(file, _fileSystem.combine_paths(_fileSystem.get_directory_name(file), backupName), overwriteExisting: true),
+                        "Error backing up configuration file");
+                }
+            }
+            else
+            {
+                var currentFiles = _filesService.capture_package_files(packageInstallPath, config);
+                foreach (var currentFile in currentFiles.Files.or_empty_list_if_null())
+                {
+                    var installedFile = packageInfo.FilesSnapshot.Files.FirstOrDefault(x => x.Path.is_equal_to(currentFile.Path));
+                    if (installedFile != null)
+                    {
+                        if (!currentFile.Checksum.is_equal_to(installedFile.Checksum))
+                        {
+                            var backupName = "{0}.{1}".format_with(_fileSystem.get_file_name(currentFile.Path), version);
+                            FaultTolerance.try_catch_with_logging_exception(
+                                () => _fileSystem.copy_file(currentFile.Path, _fileSystem.combine_paths(_fileSystem.get_directory_name(currentFile.Path), backupName), overwriteExisting: true),
+                                "Error backing up changed file");
+                        }
+                    }
+                }
             }
         }
 
@@ -730,11 +765,12 @@ packages as of version 1.0.0. That is what the install command is for.
                     var pkg = e.Package;
 
                     // this section fires twice sometimes, like for older packages in a sxs install...
-                    var results = packageUninstalls.GetOrAdd(pkg.Id.to_lower() + "." + pkg.Version.to_string(), new PackageResult(pkg, e.InstallPath));
+                    var packageResult = packageUninstalls.GetOrAdd(pkg.Id.to_lower() + "." + pkg.Version.to_string(), new PackageResult(pkg, e.InstallPath));
+                    packageResult.InstallLocation = e.InstallPath;
                     string logMessage = "{0}{1} v{2}{3}".format_with(Environment.NewLine, pkg.Id, pkg.Version.to_string(), config.Force ? " (forced)" : string.Empty);
-                    if (results.Messages.Count((p) => p.Message == ApplicationParameters.Messages.NugetEventActionHeader) == 0)
+                    if (packageResult.Messages.Count((p) => p.Message == ApplicationParameters.Messages.NugetEventActionHeader) == 0)
                     {
-                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.NugetEventActionHeader));
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.NugetEventActionHeader));
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, logMessage);
                         loopCount = 0;
                     }
@@ -754,8 +790,8 @@ packages as of version 1.0.0. That is what the install command is for.
                     var latestVersion = packageManager.LocalRepository.FindPackage(e.Package.Id);
                     if (latestVersion.Version == pkg.Version || config.AllowMultipleVersions)
                     {
-                        results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
-                        if (continueAction != null) continueAction.Invoke(results);
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+                        if (continueAction != null) continueAction.Invoke(packageResult);
                     }
                     else
                     {
@@ -789,8 +825,8 @@ packages as of version 1.0.0. That is what the install command is for.
                 if (installedPackageVersions.Count == 0)
                 {
                     string logMessage = "{0} is not installed. Cannot uninstall a non-existent package.".format_with(packageName);
-                    var results = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                    results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    var missingResult = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                    missingResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
                     if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     continue;
@@ -841,9 +877,9 @@ packages as of version 1.0.0. That is what the install command is for.
                     if (pkgInfo != null && pkgInfo.IsPinned)
                     {
                         string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
-                        var pinnedResults = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                        pinnedResults.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                        pinnedResults.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        var pinnedResult = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                        pinnedResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                        pinnedResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                         continue;
                     }
@@ -858,9 +894,10 @@ packages as of version 1.0.0. That is what the install command is for.
                                 version == null ? null : version.ToString()))
                             {
                                 rename_legacy_package_version(config, packageVersion, pkgInfo);
-                                backup_existing_version(config, packageVersion);
+                                backup_existing_version(config, packageVersion, pkgInfo);
                                 packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
                                 ensure_nupkg_is_removed(packageVersion, pkgInfo);
+                                remove_installation_files(packageVersion, pkgInfo);
                             }
                         }
                         catch (Exception ex)
@@ -874,6 +911,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     }
                     else
                     {
+                        // continue action won't be found b/c we are not actually uninstalling (this is noop)
                         var result = packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, packageVersion.Id)));
                         if (continueAction != null) continueAction.Invoke(result);
                     }
@@ -896,13 +934,41 @@ packages as of version 1.0.0. That is what the install command is for.
             var nupkgFile = "{0}{1}.nupkg".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty);
             var installDir = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, "{0}{1}".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty));
             var nupkg = _fileSystem.combine_paths(installDir, nupkgFile);
-            
-            _fileSystem.delete_file(nupkg);
+
+            FaultTolerance.try_catch_with_logging_exception(
+                () => _fileSystem.delete_file(nupkg),
+                "Error deleting nupkg file",
+                throwError: true);
+        }
+
+        public void remove_installation_files(IPackage removedPackage, ChocolateyPackageInformation pkgInfo)
+        {
+            var isSideBySide = pkgInfo != null && pkgInfo.IsSideBySide;
+            var installDir = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, "{0}{1}".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty));
+
+            if (_fileSystem.directory_exists(installDir) && pkgInfo != null && pkgInfo.FilesSnapshot != null)
+            {
+                foreach (var file in _fileSystem.get_files(installDir, "*.*", SearchOption.AllDirectories).or_empty_list_if_null())
+                {
+                    var fileSnapshot = pkgInfo.FilesSnapshot.Files.FirstOrDefault(f => f.Path.is_equal_to(file));
+                    if (fileSnapshot != null && fileSnapshot.Checksum == _filesService.get_package_file(file).Checksum)
+                    {
+                        FaultTolerance.try_catch_with_logging_exception(
+                            () => _fileSystem.delete_file(file),
+                            "Error deleting file");
+                    }
+                }
+            }
+
+            if (_fileSystem.directory_exists(installDir) && !_fileSystem.get_files(installDir, "*.*", SearchOption.AllDirectories).or_empty_list_if_null().Any())
+            {
+                _fileSystem.delete_directory_if_exists(installDir, recursive: true);
+            }
         }
 
         private void set_package_names_if_all_is_specified(ChocolateyConfiguration config, Action customAction)
         {
-            if (config.PackageNames.is_equal_to("all"))
+            if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
             {
                 config.ListCommand.LocalOnly = true;
                 var sources = config.Sources;

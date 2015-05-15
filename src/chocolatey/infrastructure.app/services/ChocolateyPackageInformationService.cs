@@ -15,25 +15,30 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using System.IO;
     using System.Text;
     using NuGet;
     using domain;
+    using tolerance;
     using IFileSystem = filesystem.IFileSystem;
 
     internal class ChocolateyPackageInformationService : IChocolateyPackageInformationService
     {
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
+        private readonly IFilesService _filesService;
         private const string REGISTRY_SNAPSHOT_FILE = ".registry";
+        private const string FILES_SNAPSHOT_FILE = ".files";
         private const string SILENT_UNINSTALLER_FILE = ".silentUninstaller";
         private const string SIDE_BY_SIDE_FILE = ".sxs";
         private const string PIN_FILE = ".pin";
 
-        public ChocolateyPackageInformationService(IFileSystem fileSystem, IRegistryService registryService)
+        public ChocolateyPackageInformationService(IFileSystem fileSystem, IRegistryService registryService, IFilesService filesService)
         {
             _fileSystem = fileSystem;
             _registryService = registryService;
+            _filesService = filesService;
         }
 
         public ChocolateyPackageInformation get_package_information(IPackage package)
@@ -51,12 +56,26 @@ namespace chocolatey.infrastructure.app.services
                 return packageInformation;
             }
 
-            string registrySnapshotFile = _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE);
-            if (_fileSystem.file_exists(registrySnapshotFile))
-            {
-                packageInformation.RegistrySnapshot = _registryService.read_from_file(registrySnapshotFile);
-            }
-
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                    {
+                        packageInformation.RegistrySnapshot = _registryService.read_from_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE)); 
+                    }, 
+                    "Unable to read registry snapshot file", 
+                    throwError: false, 
+                    logWarningInsteadOfError: true
+                 );     
+            
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                    {
+                        packageInformation.FilesSnapshot = _filesService.read_from_file(_fileSystem.combine_paths(pkgStorePath, FILES_SNAPSHOT_FILE)); 
+                    }, 
+                    "Unable to read files snapshot file", 
+                    throwError: false, 
+                    logWarningInsteadOfError: true
+                 );
+           
             packageInformation.HasSilentUninstall = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, SILENT_UNINSTALLER_FILE));
             packageInformation.IsSideBySide = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, SIDE_BY_SIDE_FILE));
             packageInformation.IsPinned = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, PIN_FILE));
@@ -81,6 +100,11 @@ namespace chocolatey.infrastructure.app.services
             if (packageInformation.RegistrySnapshot != null)
             {
                 _registryService.save_to_file(packageInformation.RegistrySnapshot, _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE));
+            }
+
+            if (packageInformation.FilesSnapshot != null)
+            {
+                _filesService.save_to_file(packageInformation.FilesSnapshot, _fileSystem.combine_paths(pkgStorePath, FILES_SNAPSHOT_FILE));
             }
 
             if (packageInformation.HasSilentUninstall)

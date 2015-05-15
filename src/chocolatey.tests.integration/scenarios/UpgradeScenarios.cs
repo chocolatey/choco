@@ -1562,7 +1562,7 @@ namespace chocolatey.tests.integration.scenarios
                 string dotChocolatey = Path.Combine(Scenario.get_top_level(), ".chocolatey");
                 if (Directory.Exists(dotChocolatey))
                 {
-                    Directory.Delete(dotChocolatey);
+                    Directory.Delete(dotChocolatey, recursive: true);
                 }
             }
 
@@ -1584,8 +1584,8 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency.1.0.0");
                 Directory.Exists(packageDir).ShouldBeFalse();
-            }           
-            
+            }
+
             [Fact]
             public void should_replace_the_legacy_folder_version_of_the_package_with_a_lib_package_folder_that_has_no_version()
             {
@@ -1599,15 +1599,15 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency.1.0.0", "hasdependency.1.0.0.nupkg");
                 var package = new OptimizedZipPackage(packageFile);
                 package.Version.Version.to_string().ShouldEqual("1.0.0.0");
-            } 
-            
+            }
+
             [Fact]
             public void should_not_add_a_versionless_parent_package_folder_to_the_lib_dir()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency");
                 Directory.Exists(packageDir).ShouldBeFalse();
-            }   
-            
+            }
+
             [Fact]
             public void should_leave_the_parent_package_as_legacy_folder()
             {
@@ -1635,7 +1635,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency");
                 Directory.Exists(packageDir).ShouldBeFalse();
-            }   
+            }
 
             [Fact]
             public void should_contain_a_message_the_dependency_upgraded_successfully()
@@ -1778,7 +1778,7 @@ namespace chocolatey.tests.integration.scenarios
                 string dotChocolatey = Path.Combine(Scenario.get_top_level(), ".chocolatey");
                 if (Directory.Exists(dotChocolatey))
                 {
-                    Directory.Delete(dotChocolatey);
+                    Directory.Delete(dotChocolatey, recursive: true);
                 }
             }
 
@@ -1853,7 +1853,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency.1.0.0");
                 Directory.Exists(packageDir).ShouldBeFalse();
-            }   
+            }
 
             [Fact]
             public void should_contain_a_message_that_everything_upgraded_successfully()

@@ -56,6 +56,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
+        public static readonly string AllPackages = "all";
 
         /// <summary>
         ///   Default is 45 minutes
@@ -63,6 +64,8 @@ namespace chocolatey.infrastructure.app
         public static int DefaultWaitForExitInSeconds = 2700;
 
         public static readonly string[] ConfigFileExtensions = new string[] {".autoconf",".config",".conf",".cfg",".jsc",".json",".jsonp",".ini",".xml",".yaml"};
+       
+        public static string HashProviderFileTooBig = "UnableToDetectChanges_FileTooBig";
 
         public static class Tools
         {

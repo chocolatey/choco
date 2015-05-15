@@ -27,6 +27,7 @@ namespace chocolatey.infrastructure.app.domain
         //[Description("update - updates package index")] update,
         [Description("update - [DEPRECATED] RESERVED for future use (you are looking for upgrade, these are not the droids you are looking for)")] update,
         [Description("upgrade - upgrades packages from various sources")] upgrade,
+        [Description("outdated - retrieves packages that are outdated. Similar to upgrade all --noop")] outdated,
         [Description("uninstall - uninstalls a package")] uninstall,
         [Description("source - view and configure default sources")] source,
         [Description("sources - view and configure default sources (alias for source)")]

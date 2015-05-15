@@ -233,7 +233,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             {
                 if (FileSystem.directory_exists(TestDirectory))
                 {
-                    Directory.Delete(TestDirectory);
+                    Directory.Delete(TestDirectory, recursive: true);
                 }
 
                 FileSystem.create_directory(TestDirectory);

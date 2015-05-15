@@ -76,6 +76,18 @@ namespace chocolatey.infrastructure.app.services
         ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config);
 
         /// <summary>
+        ///  Run outdated in noop mode
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        void outdated_noop(ChocolateyConfiguration config);
+
+        /// <summary>
+        /// Determines all packages that are out of date
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        void outdated_run(ChocolateyConfiguration config);
+
+        /// <summary>
         ///   Run upgrade in noop mode
         /// </summary>
         /// <param name="config">The configuration.</param>

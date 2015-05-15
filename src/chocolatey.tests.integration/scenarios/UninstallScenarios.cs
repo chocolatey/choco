@@ -176,6 +176,14 @@ namespace chocolatey.tests.integration.scenarios
             }
             
             [Fact]
+            public void should_delete_any_files_created_during_the_install()
+            {
+                var generatedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames,"simplefile.txt");
+
+                File.Exists(generatedFile).ShouldBeFalse();
+            }
+            
+            [Fact]
             public void should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
                 bool installedSuccessfully = false;
