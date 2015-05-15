@@ -961,7 +961,7 @@ packages as of version 1.0.0. That is what the install command is for.
 
         private void set_package_names_if_all_is_specified(ChocolateyConfiguration config, Action customAction)
         {
-            if (config.PackageNames.is_equal_to("all"))
+            if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
             {
                 config.ListCommand.LocalOnly = true;
                 var sources = config.Sources;

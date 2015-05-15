@@ -56,6 +56,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
+        public static readonly string AllPackages = "all";
 
         /// <summary>
         ///   Default is 45 minutes
