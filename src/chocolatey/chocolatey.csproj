@@ -81,6 +81,7 @@
     <Compile Include="GetChocolatey.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyFeatureCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyNewCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyOutdatedCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPackCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPinCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPushCommand.cs" />

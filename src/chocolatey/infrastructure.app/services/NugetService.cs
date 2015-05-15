@@ -505,14 +505,18 @@ packages as of version 1.0.0. That is what the install command is for.
                     string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
                     packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
 
-                    if (config.RegularOutput)
+                    if (!config.UpgradeCommand.NotifyOnlyAvailableUpgrades)
                     {
-                        this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                        }
+                        else
+                        {
+                            this.Log().Info("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
+                        }
                     }
-                    else
-                    {
-                        this.Log().Info("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
-                    }
+
                     continue;
                 }
 
@@ -527,15 +531,18 @@ packages as of version 1.0.0. That is what the install command is for.
                             packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         }
 
-                        if (config.RegularOutput)
+                        if (!config.UpgradeCommand.NotifyOnlyAvailableUpgrades)
                         {
-                            this.Log().Info(logMessage);
+                            if (config.RegularOutput)
+                            {
+                                this.Log().Info(logMessage);
+                            }
+                            else
+                            {
+                                this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
+                            }
                         }
-                        else
-                        {
-                            this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
-                        }
-
+                        
                         continue;
                     }
 
@@ -547,7 +554,7 @@ packages as of version 1.0.0. That is what the install command is for.
                 {
                     if (availablePackage.Version > installedPackage.Version)
                     {
-                        string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s)".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version);
+                        string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version);
                         packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
                         if (config.RegularOutput)

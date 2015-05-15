@@ -68,6 +68,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyInstallCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyNewCommandSpecs.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyOutdatedCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPackCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPinCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPushCommandSpecs.cs" />

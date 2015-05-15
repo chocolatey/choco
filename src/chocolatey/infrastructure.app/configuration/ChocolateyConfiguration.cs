@@ -313,6 +313,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class UpgradeCommandConfiguration
     {
         public bool FailOnUnfound { get; set; }
+        public bool NotifyOnlyAvailableUpgrades { get; set; }
     }
 
     [Serializable]
