@@ -192,9 +192,15 @@
             }
 
             [Fact]
-            public void should_return_null()
+            public void should_return_a_non_null_object()
             {
-                result.ShouldBeNull();
+                result.ShouldNotBeNull();
+            } 
+            
+            [Fact]
+            public void should_return_empty_package_files()
+            {
+                result.Files.ShouldBeEmpty();
             }
         }  
         

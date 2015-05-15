@@ -317,7 +317,7 @@ spam/junk folder.");
                     var forcedResult = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
                     forcedResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
 
-                    backup_existing_version(config, installedPackage);
+                    backup_existing_version(config, installedPackage, _packageInfoService.get_package_information(installedPackage));
 
                     try
                     {
@@ -580,7 +580,7 @@ packages as of version 1.0.0. That is what the install command is for.
                                 version == null ? null : version.ToString()))
                             {
                                 rename_legacy_package_version(config, installedPackage, pkgInfo);
-                                backup_existing_version(config, installedPackage);
+                                backup_existing_version(config, installedPackage, pkgInfo);
                                 if (config.Force && (installedPackage.Version == availablePackage.Version))
                                 {
                                     FaultTolerance.try_catch_with_logging_exception(
@@ -627,7 +627,7 @@ packages as of version 1.0.0. That is what the install command is for.
             }
         }
 
-        public void backup_existing_version(ChocolateyConfiguration config, IPackage installedPackage)
+        public void backup_existing_version(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation packageInfo)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageBackupLocation);
 
@@ -672,7 +672,7 @@ packages as of version 1.0.0. That is what the install command is for.
                     }
                 }
 
-                backup_configuration_files(pkgInstallPath, installedPackage.Version.to_string());
+                backup_changed_files(pkgInstallPath, config, packageInfo);
 
                 if (errored)
                 {
@@ -685,16 +685,41 @@ packages as of version 1.0.0. That is what the install command is for.
             }
         }
 
-        private void backup_configuration_files(string packageInstallPath, string version)
+        public void backup_changed_files(string packageInstallPath, ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
         {
-            var configFiles = _fileSystem.get_files(packageInstallPath, ApplicationParameters.ConfigFileExtensions, SearchOption.AllDirectories);
-            foreach (var file in configFiles.or_empty_list_if_null())
-            {
-                var backupName = "{0}.{1}".format_with(_fileSystem.get_file_name(file), version);
+            if (packageInfo == null || packageInfo.Package == null) return;
 
-                FaultTolerance.try_catch_with_logging_exception(
-                    () => _fileSystem.copy_file(file, _fileSystem.combine_paths(_fileSystem.get_directory_name(file), backupName), overwriteExisting: true),
-                    "Error backing up configuration file");
+            var version = packageInfo.Package.Version.to_string();
+
+            if (packageInfo.FilesSnapshot == null || packageInfo.FilesSnapshot.Files.Count == 0)
+            {
+                var configFiles = _fileSystem.get_files(packageInstallPath, ApplicationParameters.ConfigFileExtensions, SearchOption.AllDirectories);
+                foreach (var file in configFiles.or_empty_list_if_null())
+                {
+                    var backupName = "{0}.{1}".format_with(_fileSystem.get_file_name(file), version);
+
+                    FaultTolerance.try_catch_with_logging_exception(
+                        () => _fileSystem.copy_file(file, _fileSystem.combine_paths(_fileSystem.get_directory_name(file), backupName), overwriteExisting: true),
+                        "Error backing up configuration file");
+                }
+            }
+            else
+            {
+                var currentFiles = _filesService.capture_package_files(packageInstallPath, config);
+                foreach (var currentFile in currentFiles.Files.or_empty_list_if_null())
+                {
+                    var installedFile = packageInfo.FilesSnapshot.Files.FirstOrDefault(x => x.Path.is_equal_to(currentFile.Path));
+                    if (installedFile != null)
+                    {
+                        if (!currentFile.Checksum.is_equal_to(installedFile.Checksum))
+                        {
+                            var backupName = "{0}.{1}".format_with(_fileSystem.get_file_name(currentFile.Path), version);
+                            FaultTolerance.try_catch_with_logging_exception(
+                                () => _fileSystem.copy_file(currentFile.Path, _fileSystem.combine_paths(_fileSystem.get_directory_name(currentFile.Path), backupName), overwriteExisting: true),
+                                "Error backing up changed file");
+                        }
+                    }
+                }
             }
         }
 
@@ -862,7 +887,7 @@ packages as of version 1.0.0. That is what the install command is for.
                                 version == null ? null : version.ToString()))
                             {
                                 rename_legacy_package_version(config, packageVersion, pkgInfo);
-                                backup_existing_version(config, packageVersion);
+                                backup_existing_version(config, packageVersion, pkgInfo);
                                 packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
                                 ensure_nupkg_is_removed(packageVersion, pkgInfo);
                                 remove_installation_files(packageVersion, pkgInfo);

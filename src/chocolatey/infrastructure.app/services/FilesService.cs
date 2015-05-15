@@ -56,7 +56,7 @@ namespace chocolatey.infrastructure.app.services
 
         public PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config)
         {
-            if (packageResult == null) return null;
+            if (packageResult == null) return new PackageFiles();
 
             var installDirectory = packageResult.InstallLocation;
             if (installDirectory.is_equal_to(ApplicationParameters.InstallLocation) || installDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
@@ -72,15 +72,15 @@ namespace chocolatey.infrastructure.app.services
 
         public PackageFiles capture_package_files(string directory, ChocolateyConfiguration config)
         {
+            var packageFiles = new PackageFiles();
+
             if (directory.is_equal_to(ApplicationParameters.InstallLocation) || directory.is_equal_to(ApplicationParameters.PackagesLocation))
             {
                 var logMessage = "Install location is not specific enough, cannot capture files:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, directory);
                 this.Log().Error(logMessage);
-                return null;
+                return packageFiles;
             }
-
-            var packageFiles = new PackageFiles();
-
+            
             this.Log().Debug(() => "Capturing package files in '{0}'".format_with(directory));
             //gather all files in the folder 
             var files = _fileSystem.get_files(directory, pattern: "*.*", option: SearchOption.AllDirectories);
