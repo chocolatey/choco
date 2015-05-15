@@ -56,13 +56,5 @@ namespace chocolatey.infrastructure.app.domain
         [XmlArray("files")]
         public List<PackageFile> Files { get; set; }
 
-        /// <summary>
-        ///   Gets or sets the package checksum.
-        /// </summary>
-        /// <value>
-        ///   The package checksum.
-        /// </value>
-        [XmlElement(ElementName = "packageChecksum")]
-        public string PackageChecksum { get; set; }
     }
 }
