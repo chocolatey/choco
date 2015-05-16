@@ -82,8 +82,7 @@ namespace chocolatey.infrastructure.app.services
                 var uninstallArgs = key.UninstallString.to_string().Replace(uninstallExe.to_string(), string.Empty);
                 uninstallExe = uninstallExe.remove_surrounding_quotes();
                 this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
-
-                //todo: ultimately we should merge keys with logging
+                
                 if (!key.HasQuietUninstall)
                 {
                     IInstaller installer = new CustomInstaller();
@@ -109,6 +108,8 @@ namespace chocolatey.infrastructure.app.services
 
                     this.Log().Debug(() => " Installer type is '{0}'".format_with(installer.GetType().Name));
 
+
+                    //todo: ultimately we should merge keys with logging
                     uninstallArgs += " " + installer.build_uninstall_command_arguments();
                 }
 
@@ -125,7 +126,7 @@ namespace chocolatey.infrastructure.app.services
 
                 var exitCode = _commandExecutor.execute(
                     uninstallExe,
-                    uninstallArgs.trim_safe(), 
+                    uninstallArgs.trim_safe(),
                     config.CommandExecutionTimeoutSeconds,
                     (s, e) =>
                         {
