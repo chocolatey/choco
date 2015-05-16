@@ -1,8 +1,8 @@
-## [0.9.9.6](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.6+is%3Aclosed) (unreleased)
+## [0.9.9.6](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.6+is%3Aclosed) (May 16, 2015)
 
 Some really large fixes this release, especially removing all files that are installed to the package directory if they haven't changed, including ensuring that the nupkg file is always removed on successful uninstalls. The really big add some folks are going to like is the new outdated command. Some more variables that were misused have been brought back, which allows some packages (like Atom) to be installed again without issue. If you can believe some people never read these, we decided to add a note to the installer prompt to let people know about -y.
 
-### FEATURES
+### FEATURES
 
  * Outdated Command - Use `choco outdated` to see outdated packages - see [#170](https://github.com/chocolatey/choco/issues/170)
 
