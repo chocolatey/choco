@@ -80,7 +80,7 @@ namespace chocolatey.infrastructure.app.nuget
 
             //todo well that didn't work on failing repos... grrr
             var repository = new AggregateRepository(repositories) {IgnoreFailingRepositories = true};
-            //repository.ResolveDependenciesVertically = true;
+            repository.ResolveDependenciesVertically = true;
             if (configuration.Debug)
             {
                 repository.Logger = nugetLogger;
