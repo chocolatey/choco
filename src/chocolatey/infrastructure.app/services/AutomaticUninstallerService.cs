@@ -112,6 +112,15 @@ namespace chocolatey.infrastructure.app.services
                     uninstallArgs += " " + installer.build_uninstall_command_arguments();
                 }
 
+                if (key.InstallerType == InstallerType.Msi)
+                {
+                    //because sometimes the key is set with /i to allow for modify :/
+                    uninstallArgs = uninstallArgs.Replace("/I{", "/X{");
+                    uninstallArgs = uninstallArgs.Replace("/i{", "/X{");
+                    uninstallArgs = uninstallArgs.Replace("/I ", "/X ");
+                    uninstallArgs = uninstallArgs.Replace("/i ", "/X ");
+                }
+
                 this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs));
 
                 var exitCode = _commandExecutor.execute(
