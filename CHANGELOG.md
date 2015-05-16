@@ -1,3 +1,30 @@
+## [0.9.9.6](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.6+is%3Aclosed) (unreleased)
+
+Some really large fixes this release, especially removing all files that are installed to the package directory if they haven't changed, including ensuring that the nupkg file is always removed on successful uninstalls. The really big add some folks are going to like is the new outdated command. Some more variables that were misused have been brought back, which allows some packages (like Atom) to be installed again without issue. If you can believe some people never read these, we decided to add a note to the installer prompt to let people know about -y.
+
+### FEATURES
+
+ * Outdated Command - Use `choco outdated` to see outdated packages - see [#170](https://github.com/chocolatey/choco/issues/170)
+
+### BUG FIXES
+
+ * Fix - NotSilent Switch Not Working - see [#281](https://github.com/chocolatey/choco/issues/281)
+ * Fix - Silent installation of choco without admin is not possible - see [#274](https://github.com/chocolatey/choco/issues/274)
+ * Fix - Package resolves to latest version from any source - see [#279](https://github.com/chocolatey/choco/issues/279)
+ * Fix - Install fails when shortcut creation fails - see [#264](https://github.com/chocolatey/choco/issues/264)
+ * Fix - Error deserializing response of type Registry - see [#257](https://github.com/chocolatey/choco/issues/257)
+ * Fix - Auto uninstaller should not depend on optional InstallLocation value - see [#255](https://github.com/chocolatey/choco/issues/255)
+ * Fix - Nupkg is left but reported as successfully uninstalled by NuGet - see [#254](https://github.com/chocolatey/choco/issues/254)
+ * Fix - SHA1 checksum compared as MD5 for Install-ChocolateyZipPackage - see [#253](https://github.com/chocolatey/choco/issues/253)
+ * Fix - Auto uninstaller strips off "/" and "-" in arguments - see [#212](https://github.com/chocolatey/choco/issues/212)
+
+### IMPROVEMENTS
+
+ * Uninstall removes all installed files if unchanged - see [#121](https://github.com/chocolatey/choco/issues/121)
+ * Auto uninstaller should convert /I to /X for Msi Uninstalls - see [#271](https://github.com/chocolatey/choco/issues/271)
+ * Bring back more variables for feature parity - see [#267](https://github.com/chocolatey/choco/issues/267)
+ * Mention -y in the prompt - see [#265](https://github.com/chocolatey/choco/issues/265)
+
 ## [0.9.9.5](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.5+is%3Aclosed) (April 20, 2015)
 
 ### BREAKING CHANGES
