@@ -190,12 +190,10 @@ namespace chocolatey.infrastructure.app.services
 
                 Environment.SetEnvironmentVariable("TEMP", configuration.CacheLocation);
 
-                //verify how not silent is passed
-                //if (configuration.NotSilent)
-                //{
-                //    Environment.SetEnvironmentVariable("installerArguments", "  ");
-                //    Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
-                //}
+                if (configuration.NotSilent)
+                {
+                    Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
+                }
                 if (configuration.Debug)
                 {
                     Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
