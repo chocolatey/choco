@@ -64,7 +64,7 @@ Some really large fixes this release, especially removing all files that are ins
 
  * Some packages use non-API variables like $installArguments - see [#207](https://github.com/chocolatey/choco/issues/207)
 
- ## [0.9.9.3](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.3+is%3Aclosed) (March 29, 2015)
+## [0.9.9.3](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.3+is%3Aclosed) (March 29, 2015)
 
 ### BUG FIXES
 
