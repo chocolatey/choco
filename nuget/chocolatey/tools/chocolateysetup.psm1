@@ -465,7 +465,7 @@ param(
     $netFx4InstallTries += 1
 
     if (!(Test-Path $NetFx4Installer)) {
-      Write-Host "Downloading `'$NetFx4Url`' to `'$NetFx4Installer`' - the installer is 40+ MBs, so this could take awhile on a slow connection."
+      Write-Host "Downloading `'$NetFx4Url`' to `'$NetFx4Installer`' - the installer is 40+ MBs, so this could take a while on a slow connection."
       (New-Object Net.WebClient).DownloadFile("$NetFx4Url","$NetFx4Installer")
     }
 
