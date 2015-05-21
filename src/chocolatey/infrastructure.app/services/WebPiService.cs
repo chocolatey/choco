@@ -47,14 +47,14 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         private void set_cmd_args_dictionaries()
         {
-            set_webpi_list_dictionary(_listArguments);
-            set_webpi_install_dictionary(_installArguments);
+            set_list_dictionary(_listArguments);
+            set_install_dictionary(_installArguments);
         }
 
         /// <summary>
         ///   Sets webpicmd list dictionary
         /// </summary>
-        private void set_webpi_list_dictionary(IDictionary<string, ExternalCommandArgument> args)
+        private void set_list_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
             args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "/List", Required = true});
             args.Add("_list_option_", new ExternalCommandArgument {ArgumentOption = "/ListOption:All", Required = true});
@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.app.services
         /// <summary>
         ///   Sets webpicmd install dictionary
         /// </summary>
-        private void set_webpi_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
+        private void set_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
             args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "/Install", Required = true});
             args.Add("_accept_eula_", new ExternalCommandArgument {ArgumentOption = "/AcceptEula", Required = true});
