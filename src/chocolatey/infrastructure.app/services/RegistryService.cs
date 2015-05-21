@@ -206,8 +206,6 @@ namespace chocolatey.infrastructure.app.services
         {
             //todo: make this check less crazy...
             return get_installer_keys().RegistryKeys.Any(k => k.KeyPath == keyPath);
-
-            //return Microsoft.Win32.Registry.GetValue(keyPath, value, null) != null;
         }
 
         public Registry read_from_file(string filePath)
