@@ -54,6 +54,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
         public static readonly string ExtensionsLocation = _fileSystem.combine_paths(InstallLocation, "extensions");
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
+        public static readonly string ChocolateyCommunityFeedSource = "https://chocolatey.org/api/v2/";
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
         public static readonly string AllPackages = "all";
@@ -86,19 +87,23 @@ namespace chocolatey.infrastructure.app
             public static readonly string NugetEventActionHeader = "Nuget called an event";
         }
 
+        public static class SourceRunner
+        {
+            public static readonly string WebPiName = "Web Platform Installer";
+            public static readonly string WebPiPackage = "webpicmd";
+            public static readonly string WebPiExe = "webpicmd.exe";
+        }
+
         public static class OutputParser
         {
-            //todo: This becomes the WebPI parsing stuff instead
-            public static class Nuget
+            public static class WebPi
             {
                 public const string PACKAGE_NAME_GROUP = "PkgName";
-                public const string PACKAGE_VERSION_GROUP = "PkgVersion";
-                public static readonly Regex AlreadyInstalled = new Regex(@"already installed", RegexOptions.Compiled);
-                public static readonly Regex NotInstalled = new Regex(@"not installed", RegexOptions.Compiled);
-                public static readonly Regex Installing = new Regex(@"Installing", RegexOptions.Compiled);
-                public static readonly Regex ResolvingDependency = new Regex(@"Attempting to resolve dependency", RegexOptions.Compiled);
-                public static readonly Regex PackageName = new Regex(@"'(?<{0}>[.\S]+)\s?".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
-                public static readonly Regex PackageVersion = new Regex(@"(?<{0}>[\d\.]+[\-\w]*)[[)]?'".format_with(PACKAGE_VERSION_GROUP), RegexOptions.Compiled);
+                public static readonly Regex Installing =new Regex(@"Started installing:", RegexOptions.Compiled);
+                public static readonly Regex Installed = new Regex(@"Install completed \(Success\):", RegexOptions.Compiled);
+                public static readonly Regex AlreadyInstalled = new Regex(@"No products to be installed \(either not available or already installed\)", RegexOptions.Compiled);
+                //public static readonly Regex NotInstalled = new Regex(@"not installed", RegexOptions.Compiled);
+                public static readonly Regex PackageName = new Regex(@"'(?<{0}>[^']*)'".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
             }
         }
 

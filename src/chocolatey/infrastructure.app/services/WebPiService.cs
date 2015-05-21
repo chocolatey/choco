@@ -20,26 +20,25 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
     using configuration;
+    using domain;
     using infrastructure.commands;
     using logging;
     using results;
 
-    public interface IWebPiService
-    {
-    }
-
-    //todo this is the old nuget.exe installer code that needs cleaned up for webpi
-    public class WebPiService : IWebPiService
+    public sealed class WebPiService : ISourceRunner
     {
         private readonly ICommandExecutor _commandExecutor;
+        private readonly INugetService _nugetService;
         private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
-        private readonly string _webPiExePath = "webpicmd"; //ApplicationParameters.Tools.NugetExe;
-        private readonly IDictionary<string, ExternalCommandArgument> _webPiListArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
-        private readonly IDictionary<string, ExternalCommandArgument> _webPiInstallArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
+        private readonly string _exePath = ApplicationParameters.SourceRunner.WebPiExe;
+        private readonly string _appName = ApplicationParameters.SourceRunner.WebPiName;
+        private readonly IDictionary<string, ExternalCommandArgument> _listArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
+        private readonly IDictionary<string, ExternalCommandArgument> _installArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
-        public WebPiService(ICommandExecutor commandExecutor)
+        public WebPiService(ICommandExecutor commandExecutor, INugetService nugetService)
         {
             _commandExecutor = commandExecutor;
+            _nugetService = nugetService;
             set_cmd_args_dictionaries();
         }
 
@@ -48,93 +47,179 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         private void set_cmd_args_dictionaries()
         {
-            //set_webpi_list_dictionary();
-            set_webpi_install_dictionary();
+            set_webpi_list_dictionary(_listArguments);
+            set_webpi_install_dictionary(_installArguments);
+        }
+
+        /// <summary>
+        ///   Sets webpicmd list dictionary
+        /// </summary>
+        private void set_webpi_list_dictionary(IDictionary<string, ExternalCommandArgument> args)
+        {
+            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "/List", Required = true});
+            args.Add("_list_option_", new ExternalCommandArgument {ArgumentOption = "/ListOption:All", Required = true});
         }
 
         /// <summary>
         ///   Sets webpicmd install dictionary
         /// </summary>
-        private void set_webpi_install_dictionary()
+        private void set_webpi_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-            _webPiInstallArguments.Add("_install_", new ExternalCommandArgument {ArgumentOption = "install", Required = true});
-            _webPiInstallArguments.Add("_package_name_", new ExternalCommandArgument {ArgumentOption = PACKAGE_NAME_TOKEN, Required = true});
-            _webPiInstallArguments.Add("Version", new ExternalCommandArgument {ArgumentOption = "-version ",});
-            _webPiInstallArguments.Add("_output_directory_", new ExternalCommandArgument
+            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "/Install", Required = true});
+            args.Add("_accept_eula_", new ExternalCommandArgument {ArgumentOption = "/AcceptEula", Required = true});
+            args.Add("_suppress_reboot_", new ExternalCommandArgument {ArgumentOption = "/SuppressReboot", Required = true});
+            args.Add("_package_name_", new ExternalCommandArgument
                 {
-                    ArgumentOption = "-outputdirectory ",
-                    ArgumentValue = "{0}".format_with(ApplicationParameters.PackagesLocation),
-                    QuoteValue = true,
+                    ArgumentOption = "/Products:",
+                    ArgumentValue = PACKAGE_NAME_TOKEN,
+                    QuoteValue = false,
                     Required = true
                 });
-            _webPiInstallArguments.Add("Sources", new ExternalCommandArgument {ArgumentOption = "-source ", QuoteValue = true});
-            _webPiInstallArguments.Add("Prerelease", new ExternalCommandArgument {ArgumentOption = "-prerelease"});
-            _webPiInstallArguments.Add("_non_interactive_", new ExternalCommandArgument {ArgumentOption = "-noninteractive", Required = true});
-            _webPiInstallArguments.Add("_no_cache_", new ExternalCommandArgument {ArgumentOption = "-nocache", Required = true});
+        }
+
+        public SourceType SourceType
+        {
+            get { return SourceType.webpi; }
+        }
+
+        public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
+        {
+            var runnerConfig = new ChocolateyConfiguration
+                {
+                    PackageNames = ApplicationParameters.SourceRunner.WebPiPackage,
+                    Sources = ApplicationParameters.PackagesLocation,
+                    Debug = config.Debug,
+                    Force = config.Force,
+                    Verbose = config.Verbose,
+                    CommandExecutionTimeoutSeconds = config.CommandExecutionTimeoutSeconds,
+                    CacheLocation = config.CacheLocation,
+                    RegularOutput = config.RegularOutput,
+                    PromptForConfirmation = false,
+                    AcceptLicense = true,
+                };
+            runnerConfig.ListCommand.LocalOnly = true;
+
+            var localPackages = _nugetService.list_run(runnerConfig, logResults: false);
+
+            if (!localPackages.ContainsKey(ApplicationParameters.SourceRunner.WebPiPackage))
+            {
+                runnerConfig.Sources = ApplicationParameters.ChocolateyCommunityFeedSource;
+
+                var prompt = config.PromptForConfirmation;
+                config.PromptForConfirmation = false;
+                _nugetService.install_run(runnerConfig, ensureAction.Invoke);
+                config.PromptForConfirmation = prompt;
+            }
+        }
+
+        public void list_noop(ChocolateyConfiguration config)
+        {
+            var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
+            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath, args));
+        }
+
+        public ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
+        {
+            var packageResults = new ConcurrentDictionary<string, PackageResult>();
+            var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
+
+            //var whereToStartRecording = "---";
+            //var whereToStopRecording = "--";
+            //var recordingValues = false;
+
+            Environment.ExitCode = _commandExecutor.execute(
+                _exePath,
+                args,
+                config.CommandExecutionTimeoutSeconds,
+                workingDirectory: ApplicationParameters.ShimsLocation,
+                stdOutAction: (s, e) =>
+                    {
+                        var logMessage = e.Data;
+                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (logResults)
+                        {
+                            this.Log().Info(e.Data);
+                        }
+                        else
+                        {
+                            this.Log().Debug(() => "[{0}] {1}".format_with(_appName, logMessage));
+                        }
+
+                        //if (recordingValues)
+                        //{
+                        //    var lineParts = logMessage.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        //    if (lineParts.Length > 1)
+                        //    {
+                        //        var pkgResult = new PackageResult(lineParts[0], null, null);
+                        //        packageResults.GetOrAdd(lineParts[0], pkgResult);
+                        //    }
+                        //}
+
+                        //if (logMessage.Contains(whereToStartRecording)) recordingValues = true;
+                    },
+                stdErrAction: (s, e) =>
+                    {
+                        if (string.IsNullOrWhiteSpace(e.Data)) return;
+                        this.Log().Error(() => "{0}".format_with(e.Data));
+                    },
+                updateProcessPath: false
+                );
+
+            return packageResults;
+        }
+
+        public void install_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        {
+            var args = ExternalCommandArgsBuilder.build_arguments(config, _installArguments);
+            args = args.Replace(PACKAGE_NAME_TOKEN, config.PackageNames.Replace(';', ','));
+            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath, args));
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
         {
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
-
-            var args = ExternalCommandArgsBuilder.build_arguments(configuration, _webPiInstallArguments);
+            var args = ExternalCommandArgsBuilder.build_arguments(configuration, _installArguments);
 
             foreach (var packageToInstall in configuration.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
             {
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
                 var exitCode = _commandExecutor.execute(
-                    _webPiExePath, argsForPackage, configuration.CommandExecutionTimeoutSeconds,
+                    _exePath,
+                    argsForPackage,
+                    configuration.CommandExecutionTimeoutSeconds,
+                    ApplicationParameters.ShimsLocation,
                     (s, e) =>
                         {
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Debug(() => " [WebPI] {0}".format_with(logMessage));
+                            this.Log().Info(() => " [{0}] {1}".format_with(_appName, logMessage));
 
-                            var packageName = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageName, ApplicationParameters.OutputParser.Nuget.PACKAGE_NAME_GROUP);
-                            var packageVersion = get_value_from_output(logMessage, ApplicationParameters.OutputParser.Nuget.PackageVersion, ApplicationParameters.OutputParser.Nuget.PACKAGE_VERSION_GROUP);
-
-                            if (ApplicationParameters.OutputParser.Nuget.ResolvingDependency.IsMatch(logMessage))
-                            {
-                                return;
-                            }
-
-                            var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, packageVersion, _webPiInstallArguments["_output_directory_"].ArgumentValue));
-
-                            if (ApplicationParameters.OutputParser.Nuget.NotInstalled.IsMatch(logMessage))
-                            {
-                                this.Log().Error("{0} not installed: {1}".format_with(packageName, logMessage));
-                                results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-
-                                return;
-                            }
-
-                            if (ApplicationParameters.OutputParser.Nuget.Installing.IsMatch(logMessage))
-                            {
-                                return;
-                            }
-
-                            if (string.IsNullOrWhiteSpace(packageName)) return;
-
-                            this.Log().Info(ChocolateyLoggers.Important, "{0} {1}".format_with(packageName, !string.IsNullOrWhiteSpace(packageVersion) ? "v" + packageVersion : string.Empty));
-
-                            if (ApplicationParameters.OutputParser.Nuget.AlreadyInstalled.IsMatch(logMessage) && !configuration.Force)
+                            var packageName = get_value_from_output(logMessage, ApplicationParameters.OutputParser.WebPi.PackageName, ApplicationParameters.OutputParser.WebPi.PACKAGE_NAME_GROUP);
+                            var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                            if (ApplicationParameters.OutputParser.WebPi.AlreadyInstalled.IsMatch(logMessage))
                             {
                                 results.Messages.Add(new ResultMessage(ResultType.Inconclusive, packageName));
-                                this.Log().Warn(" Already installed.");
-                                this.Log().Warn(ChocolateyLoggers.Important, " Use -force if you want to reinstall.".format_with(Environment.NewLine));
+                                this.Log().Warn(ChocolateyLoggers.Important, " [{0}] {1} already installed or doesn't exist. --force has no effect.".format_with(_appName, string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
                                 return;
                             }
 
-                            results.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
-                            if (continueAction != null)
+                            if (ApplicationParameters.OutputParser.WebPi.Installing.IsMatch(logMessage))
                             {
-                                continueAction.Invoke(results);
+                                this.Log().Info(ChocolateyLoggers.Important, "{0}".format_with(packageName));
+                                return;
+                            }
+                           
+                            //if (string.IsNullOrWhiteSpace(packageName)) return;
+
+                            if (ApplicationParameters.OutputParser.WebPi.Installed.IsMatch(logMessage))
+                            {
+                                this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
                             }
                         },
                     (s, e) =>
                         {
                             if (string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Error(() => "{0}".format_with(e.Data));
+                            this.Log().Error(() => "[{0}] {1}".format_with(_appName, e.Data));
                         },
                     updateProcessPath: false
                     );
@@ -145,6 +230,27 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
             return packageInstalls;
+        }
+
+        public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        {
+            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement upgrade".format_with(_appName));
+            return new ConcurrentDictionary<string, PackageResult>();
+        }
+
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        {
+            throw new NotImplementedException("{0} does not implement upgrade".format_with(_appName));
+        }
+
+        public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        {
+            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement uninstall".format_with(_appName));
+        }
+
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        {
+            throw new NotImplementedException("{0} does not implement uninstall".format_with(_appName));
         }
 
         /// <summary>
