@@ -59,7 +59,7 @@ namespace chocolatey.infrastructure.app.services
 
         public void list_noop(ChocolateyConfiguration config)
         {
-            if (config.Sources.is_equal_to(SpecialSourceType.webpi.to_string()))
+            if (config.Sources.is_equal_to(SourceType.webpi.to_string()))
             {
                 //todo: webpi
             }
@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.app.services
         {
             this.Log().Debug(() => "Searching for package information");
 
-            if (config.Sources.is_equal_to(SpecialSourceType.webpi.to_string()))
+            if (config.Sources.is_equal_to(SourceType.webpi.to_string()))
             {
                 //todo: webpi
                 //install webpi if not installed
