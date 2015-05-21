@@ -65,6 +65,16 @@ namespace chocolatey.infrastructure.app.services
             _filesService = filesService;
         }
 
+        public SourceType SourceType
+        {
+            get { return SourceType.normal; }
+        }
+
+        public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
+        {
+            // nothing to do. Nuget.Core is already part of Chocolatey
+        }
+
         public void list_noop(ChocolateyConfiguration config)
         {
             this.Log().Info("{0} would have searched for '{1}' against the following source(s) :\"{2}\"".format_with(
