@@ -114,6 +114,7 @@ Chocolatey will perform a search for a package local or remote. Some
 
         public void run(ChocolateyConfiguration configuration)
         {
+            _packageService.ensure_source_app_installed(configuration);
             _packageService.list_run(configuration, logResults: true);
         }
 

@@ -128,6 +128,7 @@ NOTE: Options and switches apply to all items passed, so if you are
 
         public void run(ChocolateyConfiguration configuration)
         {
+            _packageService.ensure_source_app_installed(configuration);
             _packageService.uninstall_run(configuration);
         }
 
