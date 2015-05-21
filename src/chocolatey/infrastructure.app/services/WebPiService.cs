@@ -30,8 +30,16 @@ namespace chocolatey.infrastructure.app.services
         private readonly ICommandExecutor _commandExecutor;
         private readonly INugetService _nugetService;
         private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
-        private readonly string _exePath = ApplicationParameters.SourceRunner.WebPiExe;
-        private readonly string _appName = ApplicationParameters.SourceRunner.WebPiName;
+        private const string EXE_PATH = "webpicmd.exe";
+        private const string APP_NAME = "Web Platform Installer";
+        public const string WEB_PI_PACKAGE = "webpicmd";
+        public const string PACKAGE_NAME_GROUP = "PkgName";
+        public static readonly Regex InstallingRegex = new Regex(@"Started installing:", RegexOptions.Compiled);
+        public static readonly Regex InstalledRegex = new Regex(@"Install completed \(Success\):", RegexOptions.Compiled);
+        public static readonly Regex AlreadyInstalledRegex = new Regex(@"No products to be installed \(either not available or already installed\)", RegexOptions.Compiled);
+        //public static readonly Regex NotInstalled = new Regex(@"not installed", RegexOptions.Compiled);
+        public static readonly Regex PackageNameRegex = new Regex(@"'(?<{0}>[^']*)'".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
+      
         private readonly IDictionary<string, ExternalCommandArgument> _listArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
         private readonly IDictionary<string, ExternalCommandArgument> _installArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -86,7 +94,7 @@ namespace chocolatey.infrastructure.app.services
         {
             var runnerConfig = new ChocolateyConfiguration
                 {
-                    PackageNames = ApplicationParameters.SourceRunner.WebPiPackage,
+                    PackageNames = WEB_PI_PACKAGE,
                     Sources = ApplicationParameters.PackagesLocation,
                     Debug = config.Debug,
                     Force = config.Force,
@@ -101,7 +109,7 @@ namespace chocolatey.infrastructure.app.services
 
             var localPackages = _nugetService.list_run(runnerConfig, logResults: false);
 
-            if (!localPackages.ContainsKey(ApplicationParameters.SourceRunner.WebPiPackage))
+            if (!localPackages.ContainsKey(WEB_PI_PACKAGE))
             {
                 runnerConfig.Sources = ApplicationParameters.ChocolateyCommunityFeedSource;
 
@@ -115,7 +123,7 @@ namespace chocolatey.infrastructure.app.services
         public void list_noop(ChocolateyConfiguration config)
         {
             var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath, args));
+            this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH, args));
         }
 
         public ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
@@ -128,7 +136,7 @@ namespace chocolatey.infrastructure.app.services
             //var recordingValues = false;
 
             Environment.ExitCode = _commandExecutor.execute(
-                _exePath,
+                EXE_PATH,
                 args,
                 config.CommandExecutionTimeoutSeconds,
                 workingDirectory: ApplicationParameters.ShimsLocation,
@@ -142,7 +150,7 @@ namespace chocolatey.infrastructure.app.services
                         }
                         else
                         {
-                            this.Log().Debug(() => "[{0}] {1}".format_with(_appName, logMessage));
+                            this.Log().Debug(() => "[{0}] {1}".format_with(APP_NAME, logMessage));
                         }
 
                         //if (recordingValues)
@@ -172,7 +180,7 @@ namespace chocolatey.infrastructure.app.services
         {
             var args = ExternalCommandArgsBuilder.build_arguments(config, _installArguments);
             args = args.Replace(PACKAGE_NAME_TOKEN, config.PackageNames.Replace(';', ','));
-            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath, args));
+            this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH, args));
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
@@ -184,7 +192,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
                 var exitCode = _commandExecutor.execute(
-                    _exePath,
+                    EXE_PATH,
                     argsForPackage,
                     configuration.CommandExecutionTimeoutSeconds,
                     ApplicationParameters.ShimsLocation,
@@ -192,26 +200,24 @@ namespace chocolatey.infrastructure.app.services
                         {
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Info(() => " [{0}] {1}".format_with(_appName, logMessage));
+                            this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage));
 
-                            var packageName = get_value_from_output(logMessage, ApplicationParameters.OutputParser.WebPi.PackageName, ApplicationParameters.OutputParser.WebPi.PACKAGE_NAME_GROUP);
+                            var packageName = get_value_from_output(logMessage, PackageNameRegex, PACKAGE_NAME_GROUP);
                             var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                            if (ApplicationParameters.OutputParser.WebPi.AlreadyInstalled.IsMatch(logMessage))
+                            if (AlreadyInstalledRegex.IsMatch(logMessage))
                             {
                                 results.Messages.Add(new ResultMessage(ResultType.Inconclusive, packageName));
-                                this.Log().Warn(ChocolateyLoggers.Important, " [{0}] {1} already installed or doesn't exist. --force has no effect.".format_with(_appName, string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
+                                this.Log().Warn(ChocolateyLoggers.Important, " [{0}] {1} already installed or doesn't exist. --force has no effect.".format_with(APP_NAME, string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
                                 return;
                             }
 
-                            if (ApplicationParameters.OutputParser.WebPi.Installing.IsMatch(logMessage))
+                            if (InstallingRegex.IsMatch(logMessage))
                             {
                                 this.Log().Info(ChocolateyLoggers.Important, "{0}".format_with(packageName));
                                 return;
                             }
                            
-                            //if (string.IsNullOrWhiteSpace(packageName)) return;
-
-                            if (ApplicationParameters.OutputParser.WebPi.Installed.IsMatch(logMessage))
+                            if (InstalledRegex.IsMatch(logMessage))
                             {
                                 this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
                             }
@@ -219,7 +225,7 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             if (string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Error(() => "[{0}] {1}".format_with(_appName, e.Data));
+                            this.Log().Error(() => "[{0}] {1}".format_with(APP_NAME, e.Data));
                         },
                     updateProcessPath: false
                     );
@@ -234,23 +240,23 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement upgrade".format_with(_appName));
+            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement upgrade".format_with(APP_NAME));
             return new ConcurrentDictionary<string, PackageResult>();
         }
 
         public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            throw new NotImplementedException("{0} does not implement upgrade".format_with(_appName));
+            throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
         }
 
         public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement uninstall".format_with(_appName));
+            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement uninstall".format_with(APP_NAME));
         }
 
         public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            throw new NotImplementedException("{0} does not implement uninstall".format_with(_appName));
+            throw new NotImplementedException("{0} does not implement uninstall".format_with(APP_NAME));
         }
 
         /// <summary>
