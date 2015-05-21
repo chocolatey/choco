@@ -76,7 +76,26 @@ namespace chocolatey.infrastructure.commands
             return execute(process, arguments, waitForExitInSeconds, workingDirectory, null, null, updateProcessPath: true);
         }
 
-        public static int execute(string process,
+        public int execute(string process,
+                                  string arguments,
+                                  int waitForExitInSeconds,
+                                  string workingDirectory,
+                                  Action<object, DataReceivedEventArgs> stdOutAction,
+                                  Action<object, DataReceivedEventArgs> stdErrAction,
+                                  bool updateProcessPath
+            )
+        {
+            return execute_static(process,
+                          arguments,
+                          waitForExitInSeconds,
+                          file_system.get_directory_name(Assembly.GetExecutingAssembly().Location),
+                          stdOutAction,
+                          stdErrAction,
+                          updateProcessPath
+               );
+        }
+
+        public static int execute_static(string process,
                                   string arguments,
                                   int waitForExitInSeconds,
                                   string workingDirectory,

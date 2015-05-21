@@ -46,7 +46,7 @@ namespace chocolatey.infrastructure.commands
             //-NoProfile -NoLogo -ExecutionPolicy unrestricted -Command "[System.Threading.Thread]::CurrentThread.CurrentCulture = ''; [System.Threading.Thread]::CurrentThread.CurrentUICulture = '';& '%DIR%chocolatey.ps1' %PS_ARGS%"
             string arguments = "-NoProfile -NoLogo -ExecutionPolicy Bypass -Command \"{0}\"".format_with(command);
 
-            return CommandExecutor.execute(
+            return CommandExecutor.execute_static(
                 _powershell,
                 arguments,
                 waitForExitSeconds,
