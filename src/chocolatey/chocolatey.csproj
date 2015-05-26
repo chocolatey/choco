@@ -111,6 +111,7 @@
     <Compile Include="infrastructure.app\services\IFilesService.cs" />
     <Compile Include="infrastructure.app\services\ISourceRunner.cs" />
     <Compile Include="infrastructure.app\services\RubyGemsService.cs" />
+    <Compile Include="infrastructure.app\services\WindowsFeatureService.cs" />
     <Compile Include="infrastructure\adapters\CustomString.cs" />
     <Compile Include="infrastructure.app\services\IChocolateyConfigSettingsService.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileApiKeySetting.cs" />
