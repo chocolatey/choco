@@ -48,7 +48,7 @@
         }
 
         /// <summary>
-        ///   Sets webpicmd list dictionary
+        ///   Sets list dictionary
         /// </summary>
         private void set_list_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
@@ -58,7 +58,7 @@
         }
 
         /// <summary>
-        ///   Sets webpicmd install dictionary
+        ///   Sets install dictionary
         /// </summary>
         private void set_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
@@ -170,18 +170,18 @@
             this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH, args));
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
-            var args = ExternalCommandArgsBuilder.build_arguments(configuration, _installArguments);
+            var packageResults = new ConcurrentDictionary<string, PackageResult>();
+            var args = ExternalCommandArgsBuilder.build_arguments(config, _installArguments);
 
-            foreach (var packageToInstall in configuration.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var packageToInstall in config.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
             {
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
                 var exitCode = _commandExecutor.execute(
                     EXE_PATH,
                     argsForPackage,
-                    configuration.CommandExecutionTimeoutSeconds,
+                    config.CommandExecutionTimeoutSeconds,
                     (s, e) =>
                         {
                             var logMessage = e.Data;
@@ -191,7 +191,7 @@
                             if (InstallingRegex.IsMatch(logMessage))
                             {
                                 var packageName = get_value_from_output(logMessage, PackageNameFetchingRegex, PACKAGE_NAME_GROUP);
-                                var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                                var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                                 this.Log().Info(ChocolateyLoggers.Important, "{0}".format_with(packageName));
                                 return;
                             }
@@ -201,7 +201,7 @@
                             if (InstalledRegex.IsMatch(logMessage))
                             {
                                 var packageName = get_value_from_output(logMessage, PackageNameInstalledRegex, PACKAGE_NAME_GROUP);
-                                var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                                var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
 
                                 results.Messages.Add(new ResultMessage(ResultType.Note, packageName));
                                 this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
@@ -217,7 +217,7 @@
 
                             if (ErrorNotFoundRegex.IsMatch(logMessage))
                             {
-                                var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                                var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                                 results.Messages.Add(new ResultMessage(ResultType.Error, packageName));
                             }
                         },
@@ -229,7 +229,8 @@
                     Environment.ExitCode = exitCode;
                 }
             }
-            return packageInstalls;
+
+            return packageResults;
         }
 
         public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)

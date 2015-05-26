@@ -60,7 +60,7 @@ namespace chocolatey.infrastructure.app.services
         }
 
         /// <summary>
-        ///   Sets webpicmd list dictionary
+        ///   Sets list dictionary
         /// </summary>
         private void set_list_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
@@ -69,7 +69,7 @@ namespace chocolatey.infrastructure.app.services
         }
 
         /// <summary>
-        ///   Sets webpicmd install dictionary
+        ///   Sets install dictionary
         /// </summary>
         private void set_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
@@ -183,18 +183,18 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH, args));
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration configuration, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
-            var args = ExternalCommandArgsBuilder.build_arguments(configuration, _installArguments);
+            var packageResults = new ConcurrentDictionary<string, PackageResult>();
+            var args = ExternalCommandArgsBuilder.build_arguments(config, _installArguments);
 
-            foreach (var packageToInstall in configuration.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var packageToInstall in config.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
             {
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
                 var exitCode = _commandExecutor.execute(
                     EXE_PATH,
                     argsForPackage,
-                    configuration.CommandExecutionTimeoutSeconds,
+                    config.CommandExecutionTimeoutSeconds,
                     ApplicationParameters.ShimsLocation,
                     (s, e) =>
                         {
@@ -203,7 +203,7 @@ namespace chocolatey.infrastructure.app.services
                             this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage));
 
                             var packageName = get_value_from_output(logMessage, PackageNameRegex, PACKAGE_NAME_GROUP);
-                            var results = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                            var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                             if (AlreadyInstalledRegex.IsMatch(logMessage))
                             {
                                 results.Messages.Add(new ResultMessage(ResultType.Inconclusive, packageName));
@@ -235,7 +235,8 @@ namespace chocolatey.infrastructure.app.services
                     Environment.ExitCode = exitCode;
                 }
             }
-            return packageInstalls;
+
+            return packageResults;
         }
 
         public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
