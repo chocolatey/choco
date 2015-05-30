@@ -60,9 +60,14 @@ Install-ChocolateyVsixPackage ""$packageName"" ""$url""
 #Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
 # add specific files as shortcuts to the desktop
 #$target = Join-Path $toolsDir ""$($packageName).exe""
-#Install-ChocolateyDesktopLink $target
+# Install-ChocolateyShortcut -shortcutFilePath ""<path>"" -targetPath ""<path>"" [-workDirectory ""C:\"" -arguments ""C:\test.txt"" -iconLocation ""C:\test.ico"" -description ""This is the description""]
 # outputs the bitness of the OS (either ""32"" or ""64"")
 #$osBitness = Get-ProcessorBits
+#Install-ChocolateyEnvironmentVariable -variableName ""SOMEVAR"" -variableValue ""value"" [-variableType = 'Machine' #Defaults to 'User']
+
+#Install-ChocolateyFileAssociation 
+#Install-BinFile ## only use this for non-exe files - chocolatey will automatically pick up the exe files and shim them automatically
+## https://github.com/chocolatey/choco/wiki/CreatePackages#how-do-i-exclude-executables-from-getting-batch-redirects
 
 # PORTABLE EXAMPLE
 #$binRoot = Get-BinRoot
