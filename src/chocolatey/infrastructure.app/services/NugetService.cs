@@ -424,6 +424,16 @@ spam/junk folder.");
 
                 if (installedPackage == null)
                 {
+                    if (config.UpgradeCommand.FailOnNotInstalled)
+                    {
+                        string failLogMessage = "{0} is not installed. Cannot upgrade a non-existent package.".format_with(packageName);
+                        var result = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                        result.Messages.Add(new ResultMessage(ResultType.Error, failLogMessage));
+                        if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, failLogMessage);
+
+                        continue;
+                    }
+
                     string logMessage = @"{0} is not installed. Installing...".format_with(packageName);
 
                     if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
