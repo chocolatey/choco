@@ -75,8 +75,8 @@ param(
   }
   if ($fileType -like 'exe') {
     if ($overrideArguments) {
+      Write-Host "Overriding package arguments with `'$additionalInstallArgs`'";
       Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes
-      write-host "Overriding package arguments with `'$additionalInstallArgs`'";
     } else {
       Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes
     }
