@@ -22,7 +22,7 @@ SET TEST_ASSEMBLY_NAME="chocolatey.tests.integration.dll"
 
 if %ERRORLEVEL% NEQ 0 goto errors
 
-echo "This step of running integration specs can take a long time with no output"
+::echo "This step of running integration specs can take a long time with no output"
 
 ::%NANT% /logger:"NAnt.Core.DefaultLogger" /nologo /f:"%BUILD_DIR%.build\analyzers\test.step" all -D:build.config.settings=%build.config.settings%
 %NANT% /logger:"NAnt.Core.DefaultLogger" /nologo /f:"%BUILD_DIR%.build.custom\bdddoc.build" -D:build.config.settings=%build.config.settings% -D:app.bdddoc=%APP_BDDDOC% -D:test_assembly=%TEST_ASSEMBLY_NAME%

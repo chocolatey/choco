@@ -436,7 +436,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 21 Scenario(s), 167 Observation(s) ]
+### ChocolateyUpgradeCommand [ 23 Scenario(s), 183 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -540,9 +540,11 @@
  * should contain a message that no packages were upgraded
  * should contain a message the package was not found
  * should have an error package result
+ * should have expected error in package result
  * should not have a successful package result
  * should not have inconclusive package result
  * should not have warning package result
+ * should not install a package in the lib directory
 
 #### when upgrading a package that does not have available upgrades
 
@@ -558,7 +560,7 @@
 
 #### when upgrading a package that errors
 
- * should contain a warning message that it was unable to install a package
+ * should contain a warning message that it was unable to upgrade a package
  * should delete the rollback
  * should have an error package result
  * should have expected error in package result
@@ -569,6 +571,26 @@
  * should not remove package from the lib directory
  * should not upgrade the package
  * should put the package in the lib bad directory
+
+#### when upgrading a package that is not installed
+
+ * should contain a warning message that it upgraded successfully
+ * should have a successful package result
+ * should install a package in the lib directory
+ * should install where install location reports
+ * should not have a rollback directory
+ * should not have inconclusive package result
+ * should not have warning package result
+
+#### when upgrading a package that is not installed and failing on not installed
+
+ * should contain a warning message that it was unable to upgrade a package
+ * should have an error package result
+ * should have expected error in package result
+ * should not have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should not install a package in the lib directory
 
 #### when upgrading a package with a read and delete share locked file
 
