@@ -114,8 +114,6 @@ Upgrades a package or a list of packages. Some may prefer to use `cup`
 
 NOTE: `all` is a special package keyword that will allow you to upgrade 
  all currently installed packages.
-
-NOTE: If you do not have a package installed, upgrade will error.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
