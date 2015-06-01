@@ -998,6 +998,14 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_not_install_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
             public void should_contain_a_message_the_package_was_not_found()
             {
                 bool expectedMessage = false;
@@ -1053,6 +1061,22 @@ namespace chocolatey.tests.integration.scenarios
 
                 errorFound.ShouldBeTrue();
             }
+            
+            [Fact]
+            public void should_have_expected_error_in_package_result()
+            {
+                bool errorFound = false;
+                foreach (var message in packageResult.Messages)
+                {
+                    if (message.MessageType == ResultType.Error)
+                    {
+                        if (message.Message.Contains("The package was not found")) errorFound = true;
+                    }
+                }
+
+                errorFound.ShouldBeTrue();
+            }
+
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
@@ -1272,7 +1296,7 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_contain_a_warning_message_that_it_was_unable_to_install_a_package()
+            public void should_contain_a_warning_message_that_it_was_unable_to_upgrade_a_package()
             {
                 bool installedSuccessfully = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
