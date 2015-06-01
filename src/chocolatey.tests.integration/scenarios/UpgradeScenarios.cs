@@ -998,6 +998,14 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_not_install_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
             public void should_contain_a_message_the_package_was_not_found()
             {
                 bool expectedMessage = false;
@@ -1048,6 +1056,181 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.MessageType == ResultType.Error)
                     {
                         errorFound = true;
+                    }
+                }
+
+                errorFound.ShouldBeTrue();
+            }
+            
+            [Fact]
+            public void should_have_expected_error_in_package_result()
+            {
+                bool errorFound = false;
+                foreach (var message in packageResult.Messages)
+                {
+                    if (message.MessageType == ResultType.Error)
+                    {
+                        if (message.Message.Contains("The package was not found")) errorFound = true;
+                    }
+                }
+
+                errorFound.ShouldBeTrue();
+            }
+
+        }
+
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_package_that_is_not_installed : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "installpackage";
+                Service.uninstall_run(Configuration);
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_install_where_install_location_reports()
+            {
+                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_a_rollback_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+        }     
+        
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_package_that_is_not_installed_and_failing_on_not_installed : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "installpackage";
+                Service.uninstall_run(Configuration);
+                Configuration.UpgradeCommand.FailOnNotInstalled = true;
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_not_install_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+            
+            [Fact]
+            public void should_contain_a_warning_message_that_it_was_unable_to_upgrade_a_package()
+            {
+                bool notInstalled = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("0/1")) notInstalled = true;
+                }
+
+                notInstalled.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_have_an_error_package_result()
+            {
+                bool errorFound = false;
+                foreach (var message in _packageResult.Messages)
+                {
+                    if (message.MessageType == ResultType.Error)
+                    {
+                        errorFound = true;
+                    }
+                }
+
+                errorFound.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_expected_error_in_package_result()
+            {
+                bool errorFound = false;
+                foreach (var message in _packageResult.Messages)
+                {
+                    if (message.MessageType == ResultType.Error)
+                    {
+                        if (message.Message.Contains("Cannot upgrade a non-existent package")) errorFound = true;
                     }
                 }
 
@@ -1113,7 +1296,7 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_contain_a_warning_message_that_it_was_unable_to_install_a_package()
+            public void should_contain_a_warning_message_that_it_was_unable_to_upgrade_a_package()
             {
                 bool installedSuccessfully = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())

@@ -76,6 +76,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("failonunfound|fail-on-unfound",
                      "Fail On Unfound Packages - If a package is not found in feeds specified, fail instead of warn.",
                      option => configuration.UpgradeCommand.FailOnUnfound = option != null)
+                .Add("failonnotinstalled|fail-on-not-installed",
+                     "Fail On Non-installed Packages - If a package is not already intalled, fail instead of installing.",
+                     option => configuration.UpgradeCommand.FailOnNotInstalled = option != null)
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
                      option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())
@@ -114,8 +117,6 @@ Upgrades a package or a list of packages. Some may prefer to use `cup`
 
 NOTE: `all` is a special package keyword that will allow you to upgrade 
  all currently installed packages.
-
-NOTE: If you do not have a package installed, upgrade will error.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");

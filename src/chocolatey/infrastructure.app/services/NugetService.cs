@@ -424,20 +424,17 @@ spam/junk folder.");
 
                 if (installedPackage == null)
                 {
-                    //todo v1 Deprecation - reimplement error
-                    //string logMessage = "{0} is not installed. Cannot upgrade a non-existent package.".format_with(packageName);
-                    //var result = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                    //result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    if (config.UpgradeCommand.FailOnNotInstalled)
+                    {
+                        string failLogMessage = "{0} is not installed. Cannot upgrade a non-existent package.".format_with(packageName);
+                        var result = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                        result.Messages.Add(new ResultMessage(ResultType.Error, failLogMessage));
+                        if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, failLogMessage);
 
-                    //if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                    //continue;
+                        continue;
+                    }
 
-                    string logMessage = @"
-DEPRECATION NOTICE - Upgrade will no longer install non-installed 
-packages as of version 1.0.0. That is what the install command is for.
-
-
-{0} is not installed. Installing...".format_with(packageName);
+                    string logMessage = @"{0} is not installed. Installing...".format_with(packageName);
 
                     if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
 

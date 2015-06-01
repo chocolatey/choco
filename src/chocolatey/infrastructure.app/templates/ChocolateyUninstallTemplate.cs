@@ -30,6 +30,7 @@ $packageName = '[[PackageName]]'
 # registry uninstaller key name is the key that is found at HKLM:\Software\Windows\CurrentVersion\Uninstall\ THE NAME
 $registryUninstallerKeyName = '[[PackageName]]' #ensure this is the value in the registry
 $msiProductCodeGuid = '{insert it here}'
+$shouldUninstall = $true
 
 $local_key     = ""HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\$registryUninstallerKeyName""
 # local key 6432 probably never exists

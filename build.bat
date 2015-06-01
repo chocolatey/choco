@@ -17,6 +17,8 @@ SET build.config.settings="%DIR%\.uppercut"
 
 if %ERRORLEVEL% NEQ 0 goto errors
 
+call %DIR%\documentscenarios.bat
+
 goto finish
 
 :usage
