@@ -22,14 +22,15 @@ namespace chocolatey.infrastructure.app.services
     using commandline;
     using configuration;
     using domain;
-    using filesystem;
     using infrastructure.services;
     using logging;
+    using NuGet;
     using platforms;
     using results;
     using tolerance;
+    using IFileSystem = filesystem.IFileSystem;
 
-    public class ChocolateyPackageService : IChocolateyPackageService
+	public class ChocolateyPackageService : IChocolateyPackageService
     {
         private readonly INugetService _nugetService;
         private readonly IPowershellService _powershellService;
@@ -69,7 +70,7 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
-        public void list_run(ChocolateyConfiguration config, bool logResults)
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
             this.Log().Debug(() => "Searching for package information");
 
@@ -79,51 +80,68 @@ namespace chocolatey.infrastructure.app.services
                 //install webpi if not installed
                 //run the webpi command 
                 this.Log().Warn("Command not yet functional, stay tuned...");
+                yield break;
             }
             else
             {
-                var list = _nugetService.list_run(config, logResults: true);
-                if (config.RegularOutput)
-                {
-                    this.Log().Warn(() => @"{0} packages {1}.".format_with(list.Count, config.ListCommand.LocalOnly ? "installed" : "found"));
+                var packages = new List<IPackage>();
 
-                    if (config.ListCommand.LocalOnly && config.ListCommand.IncludeRegistryPrograms)
+                if (config.ListCommand.LocalOnly)
+                {
+                    config.Sources = ApplicationParameters.PackagesLocation;
+                    config.Prerelease = true;
+                }
+                foreach (var package in _nugetService.list_run(config))
+                {
+                    if (!config.ListCommand.LocalOnly || !config.ListCommand.IncludeRegistryPrograms)
                     {
-                        report_registry_programs(config, list);
+                        yield return package;
+                    }
+
+                    if (config.ListCommand.LocalOnly && config.ListCommand.IncludeRegistryPrograms && package.Package != null)
+                    {
+                        packages.Add(package.Package);
+                    }
+                }
+
+                if (config.ListCommand.LocalOnly && config.ListCommand.IncludeRegistryPrograms)
+                {
+                    foreach (var installed in report_registry_programs(config, packages))
+                    {
+                        yield return installed;
                     }
                 }
             }
         }
 
-        private void report_registry_programs(ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> list)
+        private IEnumerable<PackageResult> report_registry_programs(ChocolateyConfiguration config, IEnumerable<IPackage> list)
         {
-            var itemsToRemoveFromMachine = new List<string>();
-            foreach (var packageResult in list)
+            var itemsToRemoveFromMachine = list.Select(package => _packageInfoService.get_package_information(package)).
+                                                Where(p => p.RegistrySnapshot != null).
+                                                Select(p => p.RegistrySnapshot.RegistryKeys.FirstOrDefault()).
+                                                Where(p => p != null).
+                                                Select(p => p.DisplayName).ToList();
+
+            var count = 0;
+            var machineInstalled = _registryService.get_installer_keys().RegistryKeys.
+                                                Where((p) => p.is_in_programs_and_features() && !itemsToRemoveFromMachine.Contains(p.DisplayName)).
+                                                OrderBy((p) => p.DisplayName).Distinct();
+            this.Log().Info(() => "");
+            foreach (var key in machineInstalled)
             {
-                if (packageResult.Value != null && packageResult.Value.Package != null)
-                {
-                    var pkginfo = _packageInfoService.get_package_information(packageResult.Value.Package);
-                    if (pkginfo.RegistrySnapshot == null)
-                    {
-                        continue;
-                    }
-                    var key = pkginfo.RegistrySnapshot.RegistryKeys.FirstOrDefault();
-                    if (key != null)
-                    {
-                        itemsToRemoveFromMachine.Add(key.DisplayName);
-                    }
-                }
+               if (config.RegularOutput)
+               {
+                  this.Log().Info("{0}|{1}".format_with(key.DisplayName, key.DisplayVersion));
+                  if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation.escape_curly_braces(), Environment.NewLine, key.UninstallString.escape_curly_braces()));
+               }
+               count++;
+
+               yield return new PackageResult(key.DisplayName, key.DisplayName, key.InstallLocation);
             }
-            var machineInstalled = _registryService.get_installer_keys().RegistryKeys.Where((p) => p.is_in_programs_and_features() && !itemsToRemoveFromMachine.Contains(p.DisplayName)).OrderBy((p) => p.DisplayName).Distinct().ToList();
-            if (machineInstalled.Count != 0)
+
+            if (config.RegularOutput)
             {
-                this.Log().Info(() => "");
-                foreach (var key in machineInstalled.or_empty_list_if_null())
-                {
-                    this.Log().Info("{0}|{1}".format_with(key.DisplayName, key.DisplayVersion));
-                    if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation.escape_curly_braces(), Environment.NewLine, key.UninstallString.escape_curly_braces()));
-                }
-                this.Log().Warn(() => @"{0} applications not managed with Chocolatey.".format_with(machineInstalled.Count));
+               this.Log().Warn(() => @"{0} applications not managed with Chocolatey.".format_with(count));
             }
         }
 
@@ -470,7 +488,7 @@ Would have determined packages that are out of date based on what is
             this.Log().Info(@"Uninstalling the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
 
-            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.EndsWith(".config")).ToList())
+            if (config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Any(p => p.EndsWith(".config")))
             {
                 throw new ApplicationException("A packages.config file is only used with installs.");
             }

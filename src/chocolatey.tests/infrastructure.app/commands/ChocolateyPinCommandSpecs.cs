@@ -337,10 +337,12 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.Sources = ApplicationParameters.PackagesLocation;
                 configuration.ListCommand.LocalOnly = true;
                 configuration.AllVersions = true;
-                var packageResults = new ConcurrentDictionary<string, PackageResult>(); 
-                packageResults.GetOrAdd("regular", new PackageResult(package.Object, null));
-                packageResults.GetOrAdd("pinned", new PackageResult(pinnedPackage.Object, null));
-                nugetService.Setup(n => n.list_run(It.IsAny<ChocolateyConfiguration>(), false)).Returns(packageResults);
+                var packageResults = new []
+                {
+                    new PackageResult(package.Object, null),
+                    new PackageResult(pinnedPackage.Object, null)
+                };
+                nugetService.Setup(n => n.list_run(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
                 configuration.PinCommand.Command = PinCommandType.list;
             }
 
@@ -412,7 +414,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.PinCommand.Command = PinCommandType.list;
                 command.run(configuration);
 
-                nugetService.Verify(n => n.list_run(It.IsAny<ChocolateyConfiguration>(), false), Times.Once);
+                nugetService.Verify(n => n.list_run(It.IsAny<ChocolateyConfiguration>()), Times.Once);
             }
             
             [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object.")]
