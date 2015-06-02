@@ -1,4 +1,19 @@
-﻿namespace chocolatey.infrastructure.app.services
+﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.infrastructure.app.services
 {
     using System;
     using System.Collections.Concurrent;
@@ -10,16 +25,15 @@
     using filesystem;
     using infrastructure.commands;
     using logging;
-    using platforms;
     using results;
 
     /// <summary>
-    /// Alternative Source for Enabling Windows Features
+    ///   Alternative Source for Enabling Windows Features
     /// </summary>
     /// <remarks>
-    /// https://technet.microsoft.com/en-us/library/hh825265.aspx?f=255&MSPPError=-2147217396
-    /// Win 7 - https://technet.microsoft.com/en-us/library/dd744311.aspx
-    /// Maybe Win2003/2008 - http://www.wincert.net/forum/files/file/8-deployment-image-servicing-and-management-dism/ | http://wincert.net/leli55PK/DISM/
+    ///   https://technet.microsoft.com/en-us/library/hh825265.aspx?f=255&MSPPError=-2147217396
+    ///   Win 7 - https://technet.microsoft.com/en-us/library/dd744311.aspx
+    ///   Maybe Win2003/2008 - http://www.wincert.net/forum/files/file/8-deployment-image-servicing-and-management-dism/ | http://wincert.net/leli55PK/DISM/
     /// </remarks>
     public sealed class WindowsFeatureService : ISourceRunner
     {
@@ -76,7 +90,7 @@
         private void set_list_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
             set_common_args(args);
-            args.Add("_features_", new ExternalCommandArgument { ArgumentOption = FEATURES_VALUE, Required = true });
+            args.Add("_features_", new ExternalCommandArgument {ArgumentOption = FEATURES_VALUE, Required = true});
             args.Add("_format_", new ExternalCommandArgument {ArgumentOption = FORMAT_VALUE, Required = true});
         }
 
@@ -85,9 +99,9 @@
         /// </summary>
         private void set_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-           set_common_args(args);
+            set_common_args(args);
 
-            args.Add("_all_", new ExternalCommandArgument { ArgumentOption = ALL_TOKEN, Required = true });
+            args.Add("_all_", new ExternalCommandArgument {ArgumentOption = ALL_TOKEN, Required = true});
             args.Add("_feature_", new ExternalCommandArgument {ArgumentOption = "/Enable-Feature", Required = true});
             args.Add("_package_name_", new ExternalCommandArgument
                 {
@@ -103,7 +117,7 @@
         /// </summary>
         private void set_uninstall_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-           set_common_args(args);
+            set_common_args(args);
 
             // uninstall feature completely in 8/2012+ - /Remove
             // would need /source to bring it back
@@ -120,8 +134,8 @@
 
         private void set_common_args(IDictionary<string, ExternalCommandArgument> args)
         {
-            args.Add("_online_", new ExternalCommandArgument { ArgumentOption = "/Online", Required = true });
-            args.Add("_english_", new ExternalCommandArgument { ArgumentOption = "/English", Required = true });
+            args.Add("_online_", new ExternalCommandArgument {ArgumentOption = "/Online", Required = true});
+            args.Add("_english_", new ExternalCommandArgument {ArgumentOption = "/English", Required = true});
             args.Add("_loglevel_", new ExternalCommandArgument
                 {
                     ArgumentOption = "/LogLevel=",
@@ -130,7 +144,7 @@
                     Required = true
                 });
 
-            args.Add("_no_restart_", new ExternalCommandArgument { ArgumentOption = "/NoRestart", Required = true });
+            args.Add("_no_restart_", new ExternalCommandArgument {ArgumentOption = "/NoRestart", Required = true});
         }
 
         public SourceType SourceType
@@ -146,7 +160,7 @@
         public void set_executable_path_if_not_set()
         {
             if (!string.IsNullOrWhiteSpace(_exePath)) return;
-                
+
             foreach (var location in _exeLocations)
             {
                 if (_fileSystem.file_exists(location))
@@ -200,7 +214,7 @@
             return packageResults;
         }
 
-        public string build_args(ChocolateyConfiguration config,IDictionary<string, ExternalCommandArgument> argsDictionary)
+        public string build_args(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> argsDictionary)
         {
             var args = ExternalCommandArgsBuilder.build_arguments(config, argsDictionary);
 
@@ -234,9 +248,9 @@
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
             set_executable_path_if_not_set();
-            var args = build_args(config, _installArguments);  
+            var args = build_args(config, _installArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>();
-           
+
             foreach (var packageToInstall in config.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
             {
                 var packageName = packageToInstall;
@@ -319,7 +333,7 @@
             var args = build_args(config, _uninstallArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>();
 
-            foreach (var packageToInstall in config.PackageNames.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var packageToInstall in config.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
             {
                 var packageName = packageToInstall;
                 var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageName, null, null));
@@ -339,30 +353,30 @@
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
                     (s, e) =>
-                    {
-                        var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage));
-
-                        if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
                         {
-                            results.Messages.Add(new ResultMessage(ResultType.Error, packageName));
-                        }
+                            var logMessage = e.Data;
+                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage));
 
-                        if (InstalledRegex.IsMatch(logMessage))
-                        {
-                            results.Messages.Add(new ResultMessage(ResultType.Note, packageName));
-                            this.Log().Info(ChocolateyLoggers.Important, " {0} has been uninstalled successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
-                        }
-                    },
+                            if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
+                            {
+                                results.Messages.Add(new ResultMessage(ResultType.Error, packageName));
+                            }
+
+                            if (InstalledRegex.IsMatch(logMessage))
+                            {
+                                results.Messages.Add(new ResultMessage(ResultType.Note, packageName));
+                                this.Log().Info(ChocolateyLoggers.Important, " {0} has been uninstalled successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
+                            }
+                        },
                     (s, e) =>
-                    {
-                        var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage));
+                        {
+                            var logMessage = e.Data;
+                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage));
 
-                        results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                    },
+                            results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                        },
                     updateProcessPath: false
                     );
 
