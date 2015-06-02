@@ -18,6 +18,8 @@
     /// </summary>
     /// <remarks>
     /// https://technet.microsoft.com/en-us/library/hh825265.aspx?f=255&MSPPError=-2147217396
+    /// Win 7 - https://technet.microsoft.com/en-us/library/dd744311.aspx
+    /// Maybe Win2003/2008 - http://www.wincert.net/forum/files/file/8-deployment-image-servicing-and-management-dism/ | http://wincert.net/leli55PK/DISM/
     /// </remarks>
     public sealed class WindowsFeatureService : ISourceRunner
     {
