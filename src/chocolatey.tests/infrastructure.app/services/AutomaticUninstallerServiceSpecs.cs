@@ -77,7 +77,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 packageResults.GetOrAdd("regular", packageResult);
 
                 fileSystem.Setup(f => f.directory_exists(registryKeys.FirstOrDefault().InstallLocation)).Returns(true);
-                registryService.Setup(r => r.value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(true);
+                registryService.Setup(r => r.installer_value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(true);
                 fileSystem.Setup(f => f.get_full_path(expectedUninstallString)).Returns(expectedUninstallString);
             }
         }
@@ -235,7 +235,7 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
                 registryService.ResetCalls();
-                registryService.Setup(r => r.value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(false);
+                registryService.Setup(r => r.installer_value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(false);
             }
 
             public override void Because()
@@ -264,7 +264,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 fileSystem.ResetCalls();
                 fileSystem.Setup(f => f.directory_exists(registryKeys.FirstOrDefault().InstallLocation)).Returns(false);
                 registryService.ResetCalls();
-                registryService.Setup(r => r.value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(false);
+                registryService.Setup(r => r.installer_value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(false);
             }
 
             public override void Because()

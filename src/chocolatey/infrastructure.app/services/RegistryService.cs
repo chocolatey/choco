@@ -202,9 +202,8 @@ namespace chocolatey.infrastructure.app.services
             _xmlService.serialize(snapshot, filePath);
         }
 
-        public bool value_exists(string keyPath, string value)
+        public bool installer_value_exists(string keyPath, string value)
         {
-            //todo: make this check less crazy...
             return get_installer_keys().RegistryKeys.Any(k => k.KeyPath == keyPath);
         }
 
