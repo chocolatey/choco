@@ -93,9 +93,10 @@ namespace chocolatey.infrastructure.app.registration
                     var list = new List<ISourceRunner>
                         {
                             container.GetInstance<INugetService>(),
-                            new WebPiService(container.GetInstance<ICommandExecutor>(),container.GetInstance<INugetService>()),
-                            new WindowsFeatureService(container.GetInstance<ICommandExecutor>(),container.GetInstance<INugetService>(),container.GetInstance<IFileSystem>()),
-                            new RubyGemsService(container.GetInstance<ICommandExecutor>(),container.GetInstance<INugetService>())
+                            new WebPiService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>()),
+                            new WindowsFeatureService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>()),
+                            new CygwinService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>(), container.GetInstance<IRegistryService>()),
+                            new RubyGemsService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>())
                         };
                     return list.AsReadOnly();
                 }, Lifestyle.Singleton);
