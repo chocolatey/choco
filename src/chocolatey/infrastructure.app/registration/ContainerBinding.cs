@@ -87,7 +87,7 @@ namespace chocolatey.infrastructure.app.registration
                         };
                     return list.AsReadOnly();
                 }, Lifestyle.Singleton);
-            
+
             container.Register<IEnumerable<ISourceRunner>>(() =>
                 {
                     var list = new List<ISourceRunner>
