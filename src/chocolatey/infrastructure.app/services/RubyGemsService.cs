@@ -132,7 +132,7 @@
 
         public ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
         {
-            var packageResults = new ConcurrentDictionary<string, PackageResult>();
+            var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
             var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
             
             Environment.ExitCode = _commandExecutor.execute(
@@ -172,7 +172,7 @@
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            var packageResults = new ConcurrentDictionary<string, PackageResult>();
+            var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
             var args = ExternalCommandArgsBuilder.build_arguments(config, _installArguments);
 
             foreach (var packageToInstall in config.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
@@ -236,7 +236,7 @@
         public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
             this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement upgrade".format_with(APP_NAME));
-            return new ConcurrentDictionary<string, PackageResult>();
+            return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
         }
 
         public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
