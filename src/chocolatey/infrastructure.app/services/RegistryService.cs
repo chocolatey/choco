@@ -216,5 +216,30 @@ namespace chocolatey.infrastructure.app.services
 
             return _xmlService.deserialize<Registry>(filePath);
         }
+
+        public RegistryKey get_key(RegistryHive hive, string subKeyPath)
+        {
+            IList<RegistryKey> keyLocations = new List<RegistryKey>();
+            if (Environment.Is64BitOperatingSystem)
+            {
+                keyLocations.Add(RegistryKey.OpenBaseKey(hive, RegistryView.Registry64));
+            }
+
+            keyLocations.Add(RegistryKey.OpenBaseKey(hive, RegistryView.Registry32));
+
+            foreach (var topLevelRegistryKey in keyLocations)
+            {
+                using (topLevelRegistryKey)
+                {
+                    var key = topLevelRegistryKey.OpenSubKey(subKeyPath, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
+                    if (key != null)
+                    {
+                        return key;
+                    }
+                }
+            }
+
+            return null;
+        }
     }
 }
