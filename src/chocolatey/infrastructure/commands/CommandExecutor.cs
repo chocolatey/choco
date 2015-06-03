@@ -124,7 +124,8 @@ namespace chocolatey.infrastructure.commands
                     WorkingDirectory = workingDirectory,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Minimized
                 };
 
             using (var p = initialize_process())
