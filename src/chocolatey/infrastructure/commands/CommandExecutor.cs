@@ -49,7 +49,7 @@ namespace chocolatey.infrastructure.commands
 
         public int execute(string process, string arguments, int waitForExitInSeconds)
         {
-            return execute(process, arguments, waitForExitInSeconds, file_system.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)));
+            return execute(process, arguments, waitForExitInSeconds, file_system.get_directory_name(file_system.get_current_assembly_path()));
         }
 
         public int execute(
@@ -64,7 +64,7 @@ namespace chocolatey.infrastructure.commands
             return execute(process,
                            arguments,
                            waitForExitInSeconds,
-                           file_system.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)),
+                           file_system.get_directory_name(file_system.get_current_assembly_path()),
                            stdOutAction,
                            stdErrAction,
                            updateProcessPath

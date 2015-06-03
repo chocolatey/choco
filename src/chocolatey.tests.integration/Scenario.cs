@@ -35,7 +35,7 @@ namespace chocolatey.tests.integration
 
         public static string get_top_level()
         {
-            return _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
+            return _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path());
         }
 
         public static string get_package_install_path()

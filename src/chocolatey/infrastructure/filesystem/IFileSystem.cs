@@ -53,6 +53,12 @@ namespace chocolatey.infrastructure.filesystem
         /// <returns></returns>
         char get_path_directory_separator_char();
 
+        /// <summary>
+        /// Gets the location of the executing assembly
+        /// </summary>
+        /// <returns>The path to the executing assembly</returns>
+        string get_current_assembly_path();
+
         #endregion
 
         #region File

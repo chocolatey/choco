@@ -50,7 +50,7 @@ namespace chocolatey.infrastructure.commands
                 _powershell,
                 arguments,
                 waitForExitSeconds,
-                workingDirectory: fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)),
+                workingDirectory: fileSystem.get_directory_name(fileSystem.get_current_assembly_path()),
                 stdOutAction: stdOutAction,
                 stdErrAction: stdErrAction,
                 updateProcessPath: true

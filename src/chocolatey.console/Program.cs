@@ -183,7 +183,7 @@ namespace chocolatey.console
         {
             try
             {
-                fileSystem.delete_file(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty) + ".old");
+                fileSystem.delete_file(fileSystem.get_current_assembly_path() + ".old");
                 fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
             }
             catch (Exception ex)

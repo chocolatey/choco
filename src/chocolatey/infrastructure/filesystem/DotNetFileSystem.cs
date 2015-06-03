@@ -81,6 +81,11 @@ namespace chocolatey.infrastructure.filesystem
             return Path.DirectorySeparatorChar;
         }
 
+        public string get_current_assembly_path()
+        {
+            return Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty);
+        }
+    
         #endregion
 
         #region File
