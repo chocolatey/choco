@@ -245,7 +245,7 @@ namespace chocolatey.infrastructure.filesystem
         /// <summary>
         ///   Gets the current working directory of the application.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The path to the directory</returns>
         string get_current_directory();
 
         /// <summary>
