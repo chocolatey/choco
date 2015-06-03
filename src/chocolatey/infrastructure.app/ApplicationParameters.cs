@@ -59,6 +59,13 @@ namespace chocolatey.infrastructure.app
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
         public static readonly string AllPackages = "all";
 
+        public static class Environment
+        {
+            public static readonly string Path = "Path";
+            public static readonly string PathExtensions = "PATHEXT";
+            public static readonly string PathExtensionsSeparator = ";";
+        }
+
         /// <summary>
         ///   Default is 45 minutes
         /// </summary>

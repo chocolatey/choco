@@ -38,5 +38,10 @@ namespace chocolatey.infrastructure.adapters
         {
             get { return System.Environment.NewLine; }
         }
+
+        public string GetEnvironmentVariable(string variable)
+        {
+            return System.Environment.GetEnvironmentVariable(variable);
+        }
     }
 }

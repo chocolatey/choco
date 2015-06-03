@@ -62,6 +62,13 @@ namespace chocolatey.infrastructure.adapters
         /// </returns>
         /// <filterpriority>1</filterpriority>
         string NewLine { get; }
+
+        /// <summary>
+        /// Gets the environment variable.
+        /// </summary>
+        /// <param name="variable">The variable.</param>
+        /// <returns></returns>
+        string GetEnvironmentVariable(string variable);
     }
 
     // ReSharper restore InconsistentNaming
