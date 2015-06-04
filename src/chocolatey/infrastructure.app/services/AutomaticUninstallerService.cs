@@ -149,7 +149,7 @@ namespace chocolatey.infrastructure.app.services
                         },
                     updateProcessPath: false);
 
-                if (exitCode != 0)
+                if (!installer.ValidUninstallExitCodes.Contains(exitCode))
                 {
                     Environment.ExitCode = exitCode;
                     string logMessage = " Auto uninstaller failed. Please remove machine installation manually.";
