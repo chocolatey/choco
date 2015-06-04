@@ -15,10 +15,9 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
     using System.Collections.Generic;
 
-    public class CustomInstaller : IInstaller
+    public class CustomInstaller : InstallerBase
     {
         public CustomInstaller()
         {
@@ -32,34 +31,26 @@ namespace chocolatey.infrastructure.app.domain
             UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
             SilentUninstall = "/S";
             OtherUninstallOptions = "";
-            ValidExitCodes = new List<int> {0};
+            ValidInstallExitCodes = new List<int> { 0 };
+            ValidUninstallExitCodes = new List<int> { 0 };
         }
 
-        public InstallerType InstallerType
+        public override InstallerType InstallerType
         {
             get { return InstallerType.Custom; }
         }
 
-        public string InstallExecutable { get; private set; }
-        public string SilentInstall { get; private set; }
-        public string NoReboot { get; private set; }
-        public string LogFile { get; private set; }
-        public string CustomInstallLocation { get; private set; }
-        public string Language { get; private set; }
-        public string OtherInstallOptions { get; private set; }
-        public string UninstallExecutable { get; private set; }
-        public string SilentUninstall { get; private set; }
-        public string OtherUninstallOptions { get; private set; }
-        public IEnumerable<int> ValidExitCodes { get; private set; }
-
-        public string build_install_command_arguments()
+        public override string build_install_command_arguments(bool customInstallLocation, bool languageRequested)
         {
-            throw new NotImplementedException();
+            if (customInstallLocation) this.Log().Warn("CustomInstaller doesn't support custom install locations.");
+            if (languageRequested) this.Log().Warn("CustomInstaller doesn't support custom language options.");
+           
+            return string.Empty;
         }
 
-        public string build_uninstall_command_arguments()
+        public override string build_uninstall_command_arguments()
         {
-            return "{0} {1}".format_with(SilentUninstall, OtherInstallOptions);
+            return string.Empty;
         }
     }
 }

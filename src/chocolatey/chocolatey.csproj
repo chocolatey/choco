@@ -95,6 +95,7 @@
     <Compile Include="infrastructure.app\configuration\PackagesConfigFilePackageSetting.cs" />
     <Compile Include="infrastructure.app\configuration\PackagesConfigFileSettings.cs" />
     <Compile Include="infrastructure.app\domain\FeatureCommandType.cs" />
+    <Compile Include="infrastructure.app\domain\InstallerBase.cs" />
     <Compile Include="infrastructure.app\domain\PackageFile.cs" />
     <Compile Include="infrastructure.app\domain\PackageFiles.cs" />
     <Compile Include="infrastructure.app\domain\PinCommandType.cs" />

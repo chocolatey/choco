@@ -24,7 +24,7 @@ namespace chocolatey.infrastructure.app.domain
     /// <remarks>
     ///   http://www.jrsoftware.org/ishelp/index.php?topic=setupcmdline
     /// </remarks>
-    public class InnoSetupInstaller : IInstaller
+    public class InnoSetupInstaller : InstallerBase
     {
         public InnoSetupInstaller()
         {
@@ -38,34 +38,14 @@ namespace chocolatey.infrastructure.app.domain
             UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
             SilentUninstall = "/VERYSILENT";
             OtherUninstallOptions = "/SUPPRESSMSGBOXES";
-            ValidExitCodes = new List<int> {0};
+            // http://www.jrsoftware.org/ishelp/index.php?topic=setupexitcodes
+            ValidInstallExitCodes = new List<int> { 0 };
+            ValidUninstallExitCodes = new List<int> { 0 };
         }
 
-        public InstallerType InstallerType
+        public override InstallerType InstallerType
         {
             get { return InstallerType.InnoSetup; }
-        }
-
-        public string InstallExecutable { get; private set; }
-        public string SilentInstall { get; private set; }
-        public string NoReboot { get; private set; }
-        public string LogFile { get; private set; }
-        public string CustomInstallLocation { get; private set; }
-        public string Language { get; private set; }
-        public string OtherInstallOptions { get; private set; }
-        public string UninstallExecutable { get; private set; }
-        public string SilentUninstall { get; private set; }
-        public string OtherUninstallOptions { get; private set; }
-        public IEnumerable<int> ValidExitCodes { get; private set; }
-
-        public string build_install_command_arguments()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string build_uninstall_command_arguments()
-        {
-            return "{0} {1} {2}".format_with(SilentUninstall, NoReboot, OtherUninstallOptions);
         }
     }
 }
