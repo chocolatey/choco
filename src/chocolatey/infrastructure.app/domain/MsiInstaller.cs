@@ -15,7 +15,6 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -28,7 +27,7 @@ namespace chocolatey.infrastructure.app.domain
     ///   http://www.advancedinstaller.com/user-guide/msiexec.html
     ///   1603 search for return value 3 http://blogs.msdn.com/b/astebner/archive/2005/08/01/446328.aspx
     /// </remarks>
-    public class MsiInstaller : IInstaller
+    public class MsiInstaller : InstallerBase
     {
         public MsiInstaller()
         {
@@ -44,37 +43,21 @@ namespace chocolatey.infrastructure.app.domain
             // http://msdn.microsoft.com/en-us/library/aa367559.aspx
             OtherInstallOptions = "ALLUSERS=1 DISABLEDESKTOPSHORTCUT=1 ADDDESKTOPICON=0 ADDSTARTMENU=0";
             UninstallExecutable = "msiexec.exe";
+            //todo: eventually will need this
             //SilentUninstall = "/qn /x{0}".format_with(InstallTokens.UNINSTALLER_LOCATION);
             SilentUninstall = "/qn";
             OtherUninstallOptions = "";
-            ValidExitCodes = new List<int> {0, 3010};
+            // https://msdn.microsoft.com/en-us/library/aa376931.aspx
+            // https://support.microsoft.com/en-us/kb/290158
+            ValidInstallExitCodes = new List<int> {0, 1641, 3010};
+            // we allow unknown 1605/1614 b/c it may have already been uninstalled 
+            // and that's okay
+            ValidUninstallExitCodes = new List<int> {0, 1605, 1614, 1641, 3010};
         }
 
-        public InstallerType InstallerType
+        public override InstallerType InstallerType
         {
             get { return InstallerType.Msi; }
-        }
-
-        public string InstallExecutable { get; private set; }
-        public string SilentInstall { get; private set; }
-        public string NoReboot { get; private set; }
-        public string LogFile { get; private set; }
-        public string OtherInstallOptions { get; private set; }
-        public string CustomInstallLocation { get; private set; }
-        public string Language { get; private set; }
-        public string UninstallExecutable { get; private set; }
-        public string SilentUninstall { get; private set; }
-        public string OtherUninstallOptions { get; private set; }
-        public IEnumerable<int> ValidExitCodes { get; private set; }
-
-        public string build_install_command_arguments()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string build_uninstall_command_arguments()
-        {
-            return "{0} {1} {2}".format_with(SilentUninstall, NoReboot, OtherUninstallOptions);
         }
     }
 }

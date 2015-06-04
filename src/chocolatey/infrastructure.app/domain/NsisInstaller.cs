@@ -15,7 +15,6 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -26,7 +25,7 @@ namespace chocolatey.infrastructure.app.domain
     ///   It is impossible to look at registry and determine a NSIS installer
     ///   NSIS has no logging or language options. The command line usage is very little.
     /// </remarks>
-    public class NsisInstaller : IInstaller
+    public class NsisInstaller : InstallerBase
     {
         public NsisInstaller()
         {
@@ -34,40 +33,20 @@ namespace chocolatey.infrastructure.app.domain
             SilentInstall = "/S";
             NoReboot = "";
             LogFile = "";
+            // must come last and contain no quotes, even if there are spaces
             CustomInstallLocation = "/D={0}".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION); //must be last thing specified and no quotes
             Language = "";
             OtherInstallOptions = "";
             UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
             SilentUninstall = "/S";
             OtherUninstallOptions = "";
-            ValidExitCodes = new List<int> {0};
+            ValidInstallExitCodes = new List<int> { 0 };
+            ValidUninstallExitCodes = new List<int> { 0 };
         }
 
-        public InstallerType InstallerType
+        public override InstallerType InstallerType
         {
             get { return InstallerType.Nsis; }
-        }
-
-        public string InstallExecutable { get; private set; }
-        public string SilentInstall { get; private set; }
-        public string NoReboot { get; private set; }
-        public string LogFile { get; private set; }
-        public string CustomInstallLocation { get; private set; }
-        public string Language { get; private set; }
-        public string OtherInstallOptions { get; private set; }
-        public string UninstallExecutable { get; private set; }
-        public string SilentUninstall { get; private set; }
-        public string OtherUninstallOptions { get; private set; }
-        public IEnumerable<int> ValidExitCodes { get; private set; }
-
-        public string build_install_command_arguments()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string build_uninstall_command_arguments()
-        {
-            return "{0} {1}".format_with(SilentUninstall, OtherInstallOptions);
         }
     }
 }

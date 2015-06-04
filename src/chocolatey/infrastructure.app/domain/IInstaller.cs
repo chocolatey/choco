@@ -30,9 +30,10 @@ namespace chocolatey.infrastructure.app.domain
         string UninstallExecutable { get; }
         string SilentUninstall { get; }
         string OtherUninstallOptions { get; }
-        IEnumerable<int> ValidExitCodes { get; }
+        IEnumerable<int> ValidInstallExitCodes { get; }
+        IEnumerable<int> ValidUninstallExitCodes { get; }
 
-        string build_install_command_arguments();
+        string build_install_command_arguments(bool customInstallLocation, bool languageRequested);
         string build_uninstall_command_arguments();
     }
 }

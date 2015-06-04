@@ -58,6 +58,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 CommandExecutor.initialize_with(new Lazy<IFileSystem>(() => fileSystem.Object), () => process.Object);
 
                 service = new AutomaticUninstallerService(packageInfoService.Object, fileSystem.Object, registryService.Object, commandExecutor.Object);
+                service.WaitForCleanup = false;
                 config.Features.AutoUninstaller = true;
                 package.Setup(p => p.Id).Returns("regular");
                 package.Setup(p => p.Version).Returns(new SemanticVersion("1.2.0"));
@@ -307,6 +308,7 @@ namespace chocolatey.tests.infrastructure.app.services
         {
             private Action because;
             private readonly string registryUninstallArgs = "/bob";
+            private readonly string logLocation = "c:\\yes\\dude\\1.2.3-beta";
 
             public override void Because()
             {
@@ -332,12 +334,15 @@ namespace chocolatey.tests.infrastructure.app.services
                     InstallerType = installer.InstallerType,
                 });
                 packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                fileSystem.Setup(x => x.combine_paths(config.CacheLocation, It.IsAny<string>(), It.IsAny<string>())).Returns(logLocation);
                 
                 because();
 
-                var uninstallArgs = !hasQuietUninstallString ? registryUninstallArgs.trim_safe() + " " + installer.build_uninstall_command_arguments().trim_safe() : registryUninstallArgs.trim_safe();
+                var installerTypeArgs = installer.build_uninstall_command_arguments().trim_safe().Replace(InstallTokens.PACKAGE_LOCATION, logLocation);
 
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, uninstallArgs, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
+                var uninstallArgs = !hasQuietUninstallString ? registryUninstallArgs.trim_safe() + " " + installerTypeArgs : registryUninstallArgs.trim_safe();
+
+                commandExecutor.Verify(c => c.execute(expectedUninstallString, uninstallArgs.trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
             }
 
             [Fact]
