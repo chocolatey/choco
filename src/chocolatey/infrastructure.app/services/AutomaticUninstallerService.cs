@@ -119,7 +119,7 @@ namespace chocolatey.infrastructure.app.services
 
                 if (key.InstallerType == InstallerType.Msi)
                 {
-                    //because sometimes the key is set with /i to allow for modify :/
+                    // because sometimes the key is set with /i to allow for modify :/
                     uninstallArgs = uninstallArgs.Replace("/I{", "/X{");
                     uninstallArgs = uninstallArgs.Replace("/i{", "/X{");
                     uninstallArgs = uninstallArgs.Replace("/I ", "/X ");
