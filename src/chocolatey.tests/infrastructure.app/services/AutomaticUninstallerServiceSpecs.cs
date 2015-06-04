@@ -22,7 +22,6 @@ namespace chocolatey.tests.infrastructure.app.services
     using System.Linq;
     using Moq;
     using NuGet;
-    using Should;
     using chocolatey.infrastructure.adapters;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
@@ -192,8 +191,8 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
-        } 
-        
+        }
+
         public class when_install_location_is_empty : AutomaticUninstallerServiceSpecsBase
         {
             public override void Context()
@@ -202,12 +201,12 @@ namespace chocolatey.tests.infrastructure.app.services
                 fileSystem.ResetCalls();
                 registryKeys.Clear();
                 registryKeys.Add(new RegistryApplicationKey
-                {
-                    InstallLocation = string.Empty,
-                    UninstallString = originalUninstallString,
-                    HasQuietUninstall = true,
-                    KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat"
-                });
+                    {
+                        InstallLocation = string.Empty,
+                        UninstallString = originalUninstallString,
+                        HasQuietUninstall = true,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat"
+                    });
                 packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
             }
 
@@ -304,27 +303,25 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 commandExecutor.Verify(c => c.execute(expectedUninstallString, installerType.build_uninstall_command_arguments().trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
             }
-        }    
-                
+        }
+
         public class when_AutomaticUninstallerService_cannot_determine_silent_install_arguments : AutomaticUninstallerServiceSpecsBase
         {
-
             public override void Context()
             {
                 base.Context();
                 registryKeys.Clear();
                 commandExecutor.ResetCalls();
                 registryKeys.Add(new RegistryApplicationKey
-                {
-                    InstallLocation = @"C:\Program Files (x86)\WinDirStat",
-                    UninstallString = "{0} {1}".format_with(originalUninstallString, "/bob"),
-                    HasQuietUninstall = false,
-                    KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
-                    InstallerType = InstallerType.Unknown,
-                });
+                    {
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = "{0} {1}".format_with(originalUninstallString, "/bob"),
+                        HasQuietUninstall = false,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                        InstallerType = InstallerType.Unknown,
+                    });
                 packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
-                fileSystem.Setup(x => x.combine_paths(config.CacheLocation, It.IsAny<string>(), It.IsAny<string>())).Returns("");
-                
+                fileSystem.Setup(x => x.combine_paths(config.CacheLocation, "chocolatey", It.IsAny<string>(), It.IsAny<string>())).Returns("");
             }
 
             // under normal circumstances, it prompts so the user can decide, but if -y is passed it will skip
@@ -339,14 +336,14 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - Installer type was not detected and no silent uninstall key exists."), Times.Once);
             }
-            
+
             [Fact]
             public void should_not_call_command_executor()
             {
                 commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
-        }    
-        
+        }
+
         public class when_AutomaticUninstallerService_defines_uninstall_switches : AutomaticUninstallerServiceSpecsBase
         {
             private Action because;
@@ -369,16 +366,16 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 reset();
                 registryKeys.Add(new RegistryApplicationKey
-                {
-                    InstallLocation = @"C:\Program Files (x86)\WinDirStat",
-                    UninstallString =  "{0} {1}".format_with(originalUninstallString, registryUninstallArgs),
-                    HasQuietUninstall = hasQuietUninstallString,
-                    KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
-                    InstallerType = installer.InstallerType,
-                });
+                    {
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = "{0} {1}".format_with(originalUninstallString, registryUninstallArgs),
+                        HasQuietUninstall = hasQuietUninstallString,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                        InstallerType = installer.InstallerType,
+                    });
                 packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
-                fileSystem.Setup(x => x.combine_paths(config.CacheLocation, It.IsAny<string>(), It.IsAny<string>())).Returns(logLocation);
-                
+                fileSystem.Setup(x => x.combine_paths(config.CacheLocation, "chocolatey", It.IsAny<string>(), It.IsAny<string>())).Returns(logLocation);
+
                 because();
 
                 var installerTypeArgs = installer.build_uninstall_command_arguments().trim_safe().Replace(InstallTokens.PACKAGE_LOCATION, logLocation);
@@ -393,60 +390,60 @@ namespace chocolatey.tests.infrastructure.app.services
             //{
             //    test_installertype(new CustomInstaller(), hasQuietUninstallString: false);
             //}  
-            
+
             [Fact]
             public void should_use_registry_uninstall_args_when_installtype_is_unknown_and_has_quiet_uninstall_is_true()
             {
                 test_installertype(new CustomInstaller(), hasQuietUninstallString: true);
-            }  
-            
+            }
+
             [Fact]
             public void should_use_MsiInstaller_uninstall_args_when_installtype_is_msi_and_has_quiet_uninstall_is_false()
             {
                 test_installertype(new MsiInstaller(), hasQuietUninstallString: false);
-            }  
-            
+            }
+
             [Fact]
             public void should_use_registry_uninstall_args_when_installtype_is_msi_and_has_quiet_uninstall_is_true()
             {
                 test_installertype(new MsiInstaller(), hasQuietUninstallString: true);
-            } 
-             
+            }
+
             [Fact]
             public void should_use_InnoSetupInstaller_uninstall_args_when_installtype_is_innosetup_and_has_quiet_uninstall_is_false()
             {
                 test_installertype(new InnoSetupInstaller(), hasQuietUninstallString: false);
-            }  
-            
+            }
+
             [Fact]
             public void should_use_registry_uninstall_args_when_installtype_is_innosetup_and_has_quiet_uninstall_is_true()
             {
                 test_installertype(new InnoSetupInstaller(), hasQuietUninstallString: true);
-            }   
-            
+            }
+
             [Fact]
             public void should_use_InstallShieldInstaller_uninstall_args_when_installtype_is_installshield_and_has_quiet_uninstall_is_false()
             {
                 test_installertype(new InstallShieldInstaller(), hasQuietUninstallString: false);
-            }  
-            
+            }
+
             [Fact]
             public void should_use_registry_uninstall_args_when_installtype_is_installshield_and_has_quiet_uninstall_is_true()
             {
                 test_installertype(new InstallShieldInstaller(), hasQuietUninstallString: true);
-            }  
-            
+            }
+
             [Fact]
             public void should_use_NsisInstaller_uninstall_args_when_installtype_is_nsis_and_has_quiet_uninstall_is_false()
             {
                 test_installertype(new NsisInstaller(), hasQuietUninstallString: false);
-            }  
-            
+            }
+
             [Fact]
             public void should_use_registry_uninstall_args_when_installtype_is_nsis_and_has_quiet_uninstall_is_true()
             {
                 test_installertype(new NsisInstaller(), hasQuietUninstallString: true);
-            }  
+            }
         }
     }
 }
