@@ -65,7 +65,7 @@ $installerType = 'MSI'
 # Uninstall-ChocolateyPackage msiargs (facepalm).
 $silentArgs = ""$msiProductCodeGuid /qn /norestart""
 # https://msdn.microsoft.com/en-us/library/aa376931(v=vs.85).aspx
-$validExitCodes = @(0, 3010, 1614, 1641)
+$validExitCodes = @(0, 3010, 1605, 1614, 1641)
 # Don't pass anything for file, it is ignored for msi (facepalm number 2) 
 # Alternatively if you need to pass a path to an msi, determine that and use
 # it instead of $msiProductCodeGuid in silentArgs, still very first
