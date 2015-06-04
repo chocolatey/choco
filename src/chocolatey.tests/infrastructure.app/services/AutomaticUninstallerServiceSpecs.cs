@@ -323,8 +323,7 @@ namespace chocolatey.tests.infrastructure.app.services
                     InstallerType = InstallerType.Unknown,
                 });
                 packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
-                fileSystem.Setup(x => x.combine_paths(config.CacheLocation, It.IsAny<string>(), It.IsAny<string>())).Returns("");
-                
+                fileSystem.Setup(x => x.combine_paths(config.CacheLocation, "chocolatey", It.IsAny<string>(), It.IsAny<string>())).Returns("");
             }
 
             // under normal circumstances, it prompts so the user can decide, but if -y is passed it will skip
@@ -377,8 +376,8 @@ namespace chocolatey.tests.infrastructure.app.services
                     InstallerType = installer.InstallerType,
                 });
                 packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
-                fileSystem.Setup(x => x.combine_paths(config.CacheLocation, It.IsAny<string>(), It.IsAny<string>())).Returns(logLocation);
-                
+                fileSystem.Setup(x => x.combine_paths(config.CacheLocation, "chocolatey", It.IsAny<string>(), It.IsAny<string>())).Returns(logLocation);
+
                 because();
 
                 var installerTypeArgs = installer.build_uninstall_command_arguments().trim_safe().Replace(InstallTokens.PACKAGE_LOCATION, logLocation);
