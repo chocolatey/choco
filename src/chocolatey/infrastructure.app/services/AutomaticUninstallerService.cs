@@ -39,7 +39,10 @@ namespace chocolatey.infrastructure.app.services
             _fileSystem = fileSystem;
             _registryService = registryService;
             _commandExecutor = commandExecutor;
+            WaitForCleanup = true;
         }
+
+        public bool WaitForCleanup { get; set; }
 
         public void run(PackageResult packageResult, ChocolateyConfiguration config)
         {
@@ -65,9 +68,12 @@ namespace chocolatey.infrastructure.app.services
             }
 
             this.Log().Info(" Running auto uninstaller...");
-            this.Log().Debug("Sleeping for {0} seconds to allow Windows to finish cleaning up.".format_with(SLEEP_TIME));
-            Thread.Sleep((int)TimeSpan.FromSeconds(SLEEP_TIME).TotalMilliseconds);
-
+            if (WaitForCleanup)
+            {
+                this.Log().Debug("Sleeping for {0} seconds to allow Windows to finish cleaning up.".format_with(SLEEP_TIME));
+                Thread.Sleep((int)TimeSpan.FromSeconds(SLEEP_TIME).TotalMilliseconds);
+            }
+            
             foreach (var key in registryKeys.or_empty_list_if_null())
             {
                 this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString));
@@ -86,36 +92,27 @@ namespace chocolatey.infrastructure.app.services
                 var uninstallArgs = key.UninstallString.to_string().Replace(uninstallExe.to_string(), string.Empty);
                 uninstallExe = uninstallExe.remove_surrounding_quotes();
                 this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
-                
-                if (!key.HasQuietUninstall)
+
+
+                IInstaller installer = new CustomInstaller();
+
+                switch (key.InstallerType)
                 {
-                    IInstaller installer = new CustomInstaller();
-
-                    switch (key.InstallerType)
-                    {
-                        case InstallerType.Msi:
-                            installer = new MsiInstaller();
-                            break;
-                        case InstallerType.InnoSetup:
-                            installer = new InnoSetupInstaller();
-                            break;
-                        case InstallerType.Nsis:
-                            installer = new NsisInstaller();
-                            break;
-                        case InstallerType.InstallShield:
-                            installer = new InstallShieldInstaller();
-                            break;
-                        default:
-                            // skip
-                            break;
-                    }
-
-                    this.Log().Debug(() => " Installer type is '{0}'".format_with(installer.GetType().Name));
-
-
-                    //todo: ultimately we should merge keys with logging
-                    uninstallArgs += " " + installer.build_uninstall_command_arguments();
+                    case InstallerType.Msi:
+                        installer = new MsiInstaller();
+                        break;
+                    case InstallerType.InnoSetup:
+                        installer = new InnoSetupInstaller();
+                        break;
+                    case InstallerType.Nsis:
+                        installer = new NsisInstaller();
+                        break;
+                    case InstallerType.InstallShield:
+                        installer = new InstallShieldInstaller();
+                        break;
                 }
+
+                this.Log().Debug(() => " Installer type is '{0}'".format_with(installer.GetType().Name));
 
                 if (key.InstallerType == InstallerType.Msi)
                 {
@@ -124,6 +121,14 @@ namespace chocolatey.infrastructure.app.services
                     uninstallArgs = uninstallArgs.Replace("/i{", "/X{");
                     uninstallArgs = uninstallArgs.Replace("/I ", "/X ");
                     uninstallArgs = uninstallArgs.Replace("/i ", "/X ");
+                }
+
+                if (!key.HasQuietUninstall)
+                {
+                    //todo: ultimately we should merge keys
+                    uninstallArgs += " " + installer.build_uninstall_command_arguments();
+                    var logLocation = _fileSystem.combine_paths(config.CacheLocation, pkgInfo.Package.Id, pkgInfo.Package.Version.to_string());
+                    uninstallArgs = uninstallArgs.Replace(InstallTokens.PACKAGE_LOCATION, logLocation);
                 }
 
                 this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs));
@@ -153,7 +158,7 @@ namespace chocolatey.infrastructure.app.services
                 }
                 else
                 {
-                    this.Log().Info(() => " Auto uninstaller has successfully uninstalled {0} from your machine.".format_with(packageResult.Package.Id));
+                    this.Log().Info(() => " Auto uninstaller has successfully uninstalled {0} or detected previous uninstall.".format_with(packageResult.Package.Id));
                 }
             }
         }
