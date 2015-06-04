@@ -96,6 +96,7 @@ namespace chocolatey.infrastructure.app.registration
                             new WebPiService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>()),
                             new WindowsFeatureService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>()),
                             new CygwinService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>(), container.GetInstance<IRegistryService>()),
+                            new PythonService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>(), container.GetInstance<IRegistryService>()),
                             new RubyGemsService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>())
                         };
                     return list.AsReadOnly();
