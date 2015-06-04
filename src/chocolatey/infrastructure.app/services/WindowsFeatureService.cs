@@ -251,7 +251,7 @@ namespace chocolatey.infrastructure.app.services
             var args = build_args(config, _installArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
-            foreach (var packageToInstall in config.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var packageToInstall in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var packageName = packageToInstall;
                 var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageName, null, null));
@@ -333,7 +333,7 @@ namespace chocolatey.infrastructure.app.services
             var args = build_args(config, _uninstallArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
-            foreach (var packageToInstall in config.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var packageToInstall in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var packageName = packageToInstall;
                 var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageName, null, null));

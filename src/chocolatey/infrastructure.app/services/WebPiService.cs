@@ -188,7 +188,7 @@ namespace chocolatey.infrastructure.app.services
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
             var args = ExternalCommandArgsBuilder.build_arguments(config, _installArguments);
 
-            foreach (var packageToInstall in config.PackageNames.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var packageToInstall in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
                 var exitCode = _commandExecutor.execute(
