@@ -127,23 +127,28 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
         {
-            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings);
-            config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings);
-            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings);
+            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings, defaultEnabled: true);
+            config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings, defaultEnabled: true);
+            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false);
         }
 
-        private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings)
+        private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings, bool defaultEnabled)
         {
-            var enabled = false;
             var feature = configFileSettings.Features.FirstOrDefault(f => f.Name.is_equal_to(featureName));
-            if (feature != null && feature.Enabled) enabled = true;
 
             if (feature == null)
             {
-                configFileSettings.Features.Add(new ConfigFileFeatureSetting {Name = featureName, Enabled = enabled});
+                configFileSettings.Features.Add(new ConfigFileFeatureSetting {Name = featureName, Enabled = defaultEnabled});
+            }
+            else
+            {
+                if (!feature.SetExplicitly && feature.Enabled != defaultEnabled)
+                {
+                    feature.Enabled = defaultEnabled;
+                }
             }
 
-            return enabled;
+            return feature != null ? feature.Enabled : defaultEnabled;
         }
 
         private static void set_global_options(IList<string> args, ChocolateyConfiguration config)
