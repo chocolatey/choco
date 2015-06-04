@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using commandline;
     using configuration;
     using domain;
     using filesystem;
@@ -132,6 +133,22 @@ namespace chocolatey.infrastructure.app.services
                 }
 
                 this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs));
+
+                if (!key.HasQuietUninstall &&  installer.GetType() == typeof(CustomInstaller))
+                {
+                    var skipUninstaller = true;
+                    if (config.PromptForConfirmation)
+                    {
+                        var selection = InteractivePrompt.prompt_for_confirmation("Uninstall may not be silent (could not detect). Proceed?", new[] {"yes", "no"}, defaultChoice: null, requireAnswer: true);
+                        if (selection.is_equal_to("no")) skipUninstaller = false;
+                    }
+
+                    if (skipUninstaller)
+                    {
+                        this.Log().Info(" Skipping auto uninstaller - Installer type was not detected and no silent uninstall key exists.");
+                        return;
+                    }
+                }
 
                 var exitCode = _commandExecutor.execute(
                     uninstallExe,
