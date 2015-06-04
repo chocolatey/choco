@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using configuration;
     using domain;
     using filesystem;
@@ -30,6 +31,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
         private readonly ICommandExecutor _commandExecutor;
+        private const int SLEEP_TIME = 5;
 
         public AutomaticUninstallerService(IChocolateyPackageInformationService packageInfoService, IFileSystem fileSystem, IRegistryService registryService, ICommandExecutor commandExecutor)
         {
@@ -63,6 +65,8 @@ namespace chocolatey.infrastructure.app.services
             }
 
             this.Log().Info(" Running auto uninstaller...");
+            this.Log().Debug("Sleeping for {0} seconds to allow Windows to finish cleaning up.".format_with(SLEEP_TIME));
+            Thread.Sleep((int)TimeSpan.FromSeconds(SLEEP_TIME).TotalMilliseconds);
 
             foreach (var key in registryKeys.or_empty_list_if_null())
             {
