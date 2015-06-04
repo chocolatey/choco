@@ -74,36 +74,31 @@ namespace chocolatey.infrastructure.app.services
                                 ));
         }
 
-        public ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration config, bool logResults = true)
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
         {
-            var packageResults = new ConcurrentDictionary<string, PackageResult>();
-
-            var packages = NugetList.GetPackages(config, _nugetLogger).ToList();
-
-            foreach (var package in packages.or_empty_list_if_null())
+            foreach (var package in NugetList.GetPackages(config, _nugetLogger))
             {
+                var pkg = package; // for lamda access
                 if (logResults)
                 {
                     if (config.RegularOutput)
                     {
-                        this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0} {1}".format_with(package.Id, package.Version.to_string()));
-                        if (config.Verbose) this.Log().Info(() => " {0}{1} Description: {2}{1} Tags: {3}{1} Number of Downloads: {4}{1}".format_with(package.Title.escape_curly_braces(), Environment.NewLine, package.Description.escape_curly_braces(), package.Tags.escape_curly_braces(), package.DownloadCount <= 0 ? "n/a" : package.DownloadCount.to_string()));
-                        // Maintainer(s):{3}{1} | package.Owners.join(", ") - null at the moment
+                        this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0} {1}".format_with(pkg.Id, pkg.Version.to_string()));
+                        if (config.Verbose) this.Log().Info(() => " {0}{1} Description: {2}{1} Tags: {3}{1} Number of Downloads: {4}{1}".format_with(pkg.Title.escape_curly_braces(), Environment.NewLine, pkg.Description.escape_curly_braces(), pkg.Tags.escape_curly_braces(), pkg.DownloadCount <= 0 ? "n/a" : pkg.DownloadCount.to_string()));
+                        // Maintainer(s):{3}{1} | pkg.Owners.join(", ") - null at the moment
                     }
                     else
                     {
-                        this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0}|{1}".format_with(package.Id, package.Version.to_string()));
+                        this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0}|{1}".format_with(pkg.Id, pkg.Version.to_string()));
                     }
                 }
                 else
                 {
-                    this.Log().Debug(() => "{0} {1}".format_with(package.Id, package.Version.to_string()));
+                    this.Log().Debug(() => "{0} {1}".format_with(pkg.Id, pkg.Version.to_string()));
                 }
 
-                packageResults.GetOrAdd(package.Id, new PackageResult(package, null));
+                yield return new PackageResult(pkg, null);
             }
-
-            return packageResults;
         }
 
         public void pack_noop(ChocolateyConfiguration config)
@@ -978,13 +973,11 @@ spam/junk folder.");
                 var input = config.Input;
                 config.Input = string.Empty;
 
-                var localPackages = list_run(config, logResults: false);
-
+                config.PackageNames = list_run(config, false).Select(p => p.Name).@join(ApplicationParameters.PackageNamesSeparator);
                 config.Input = input;
                 config.Noop = noop;
                 config.Prerelease = pre;
                 config.Sources = sources;
-                config.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator, localPackages.Select((p) => p.Key).or_empty_list_if_null());
 
                 if (customAction != null) customAction.Invoke();
             }
