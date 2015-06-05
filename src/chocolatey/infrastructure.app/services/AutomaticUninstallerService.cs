@@ -159,7 +159,7 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Debug(() => " [AutoUninstaller] {0}".format_with(e.Data));
+                            this.Log().Info(() => " [AutoUninstaller] {0}".format_with(e.Data));
                         },
                     (s, e) =>
                         {
