@@ -509,6 +509,11 @@ Would have determined packages that are out of date based on what is
                         handle_unsuccessful_operation(config, packageResult, movePackageToFailureLocation: false, attemptRollback: false);
                     }
 
+                    if (!packageResult.Success)
+                    {
+                        // throw an error so that NuGet Service doesn't attempt to continue with package removal
+                        throw new ApplicationException("{0} {1} not successful.".format_with(packageResult.Name, "uninstall"));
+                    }
                 });
 
             var uninstallFailures = packageUninstalls.Count(p => !p.Value.Success);
