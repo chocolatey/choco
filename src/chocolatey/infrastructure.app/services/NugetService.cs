@@ -65,6 +65,16 @@ namespace chocolatey.infrastructure.app.services
             _filesService = filesService;
         }
 
+        public SourceType SourceType
+        {
+            get { return SourceType.normal; }
+        }
+
+        public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
+        {
+            // nothing to do. Nuget.Core is already part of Chocolatey
+        }
+
         public void list_noop(ChocolateyConfiguration config)
         {
             this.Log().Info("{0} would have searched for '{1}' against the following source(s) :\"{2}\"".format_with(
@@ -76,7 +86,7 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration config, bool logResults = true)
         {
-            var packageResults = new ConcurrentDictionary<string, PackageResult>();
+            var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             var packages = NugetList.GetPackages(config, _nugetLogger).ToList();
 
@@ -229,7 +239,7 @@ spam/junk folder.");
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
-            var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
+            var packageInstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             //todo: handle all
 
@@ -394,7 +404,7 @@ spam/junk folder.");
         public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, bool performAction)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
-            var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
+            var packageInstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
             var packageManager = NugetCommon.GetPackageManager(
@@ -744,7 +754,7 @@ spam/junk folder.");
 
         public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, bool performAction)
         {
-            var packageUninstalls = new ConcurrentDictionary<string, PackageResult>();
+            var packageUninstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
             var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,

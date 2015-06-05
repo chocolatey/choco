@@ -1,19 +1,4 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// 
-// You may obtain a copy of the License at
-// 
-// 	http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-namespace chocolatey.infrastructure.app.services
+﻿namespace chocolatey.infrastructure.app.services
 {
     using System;
     using System.Collections.Concurrent;
@@ -25,25 +10,28 @@ namespace chocolatey.infrastructure.app.services
     using logging;
     using results;
 
-    public sealed class WebPiService : ISourceRunner
+    public sealed class RubyGemsService : ISourceRunner
     {
         private readonly ICommandExecutor _commandExecutor;
         private readonly INugetService _nugetService;
         private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
-        private const string EXE_PATH = "webpicmd.exe";
-        private const string APP_NAME = "Web Platform Installer";
-        public const string WEB_PI_PACKAGE = "webpicmd";
+        private const string EXE_PATH = "cmd.exe";
+        private const string APP_NAME = "Ruby Gems";
+        public const string RUBY_PORTABLE_PACKAGE = "ruby.portable";
+        public const string RUBY_PACKAGE = "ruby";
         public const string PACKAGE_NAME_GROUP = "PkgName";
-        public static readonly Regex InstallingRegex = new Regex(@"Started installing:", RegexOptions.Compiled);
-        public static readonly Regex InstalledRegex = new Regex(@"Install completed \(Success\):", RegexOptions.Compiled);
-        public static readonly Regex AlreadyInstalledRegex = new Regex(@"No products to be installed \(either not available or already installed\)", RegexOptions.Compiled);
-        //public static readonly Regex NotInstalled = new Regex(@"not installed", RegexOptions.Compiled);
-        public static readonly Regex PackageNameRegex = new Regex(@"'(?<{0}>[^']*)'".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
-      
+        public static readonly Regex InstallingRegex = new Regex(@"Fetching:", RegexOptions.Compiled);
+        public static readonly Regex InstalledRegex = new Regex(@"Successfully installed", RegexOptions.Compiled);
+        public static readonly Regex ErrorNotFoundRegex = new Regex(@"ERROR:  Could not find a valid gem", RegexOptions.Compiled);
+        public static readonly Regex PackageNameFetchingRegex = new Regex(@"Fetching: (?<{0}>.*)\-".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
+        public static readonly Regex PackageNameInstalledRegex = new Regex(@"Successfully installed (?<{0}>.*)\-".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
+        public static readonly Regex PackageNameErrorRegex = new Regex(@"'(?<{0}>[^']*)'".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
+
+
         private readonly IDictionary<string, ExternalCommandArgument> _listArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
         private readonly IDictionary<string, ExternalCommandArgument> _installArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
-        public WebPiService(ICommandExecutor commandExecutor, INugetService nugetService)
+        public RubyGemsService(ICommandExecutor commandExecutor, INugetService nugetService)
         {
             _commandExecutor = commandExecutor;
             _nugetService = nugetService;
@@ -64,8 +52,9 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         private void set_list_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "/List", Required = true});
-            args.Add("_list_option_", new ExternalCommandArgument {ArgumentOption = "/ListOption:All", Required = true});
+            args.Add("_cmd_c_", new ExternalCommandArgument { ArgumentOption = "/c", Required = true });
+            args.Add("_gem_", new ExternalCommandArgument { ArgumentOption = "gem", Required = true });
+            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "list", Required = true});
         }
 
         /// <summary>
@@ -73,28 +62,43 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         private void set_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "/Install", Required = true});
-            args.Add("_accept_eula_", new ExternalCommandArgument {ArgumentOption = "/AcceptEula", Required = true});
-            args.Add("_suppress_reboot_", new ExternalCommandArgument {ArgumentOption = "/SuppressReboot", Required = true});
+            args.Add("_cmd_c_", new ExternalCommandArgument {ArgumentOption = "/c", Required = true});
+            args.Add("_gem_", new ExternalCommandArgument {ArgumentOption = "gem", Required = true});
+            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "install", Required = true});
             args.Add("_package_name_", new ExternalCommandArgument
                 {
-                    ArgumentOption = "/Products:",
+                    ArgumentOption = "package name ",
                     ArgumentValue = PACKAGE_NAME_TOKEN,
                     QuoteValue = false,
+                    UseValueOnly = true,
                     Required = true
+                });
+            
+            args.Add("Force", new ExternalCommandArgument
+                {
+                    ArgumentOption = "-f ",
+                    QuoteValue = false,
+                    Required = false
+                });
+            
+            args.Add("Version", new ExternalCommandArgument
+                {
+                    ArgumentOption = "--version ",
+                    QuoteValue = false,
+                    Required = false
                 });
         }
 
         public SourceType SourceType
         {
-            get { return SourceType.webpi; }
+            get { return SourceType.ruby; }
         }
 
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
         {
             var runnerConfig = new ChocolateyConfiguration
                 {
-                    PackageNames = WEB_PI_PACKAGE,
+                    PackageNames = RUBY_PORTABLE_PACKAGE,
                     Sources = ApplicationParameters.PackagesLocation,
                     Debug = config.Debug,
                     Force = config.Force,
@@ -109,7 +113,7 @@ namespace chocolatey.infrastructure.app.services
 
             var localPackages = _nugetService.list_run(runnerConfig, logResults: false);
 
-            if (!localPackages.ContainsKey(WEB_PI_PACKAGE))
+            if (!localPackages.ContainsKey(RUBY_PACKAGE) && !localPackages.ContainsKey(RUBY_PORTABLE_PACKAGE))
             {
                 runnerConfig.Sources = ApplicationParameters.ChocolateyCommunityFeedSource;
 
@@ -130,16 +134,11 @@ namespace chocolatey.infrastructure.app.services
         {
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
             var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
-
-            //var whereToStartRecording = "---";
-            //var whereToStopRecording = "--";
-            //var recordingValues = false;
-
+            
             Environment.ExitCode = _commandExecutor.execute(
                 EXE_PATH,
                 args,
                 config.CommandExecutionTimeoutSeconds,
-                workingDirectory: ApplicationParameters.ShimsLocation,
                 stdOutAction: (s, e) =>
                     {
                         var logMessage = e.Data;
@@ -152,18 +151,6 @@ namespace chocolatey.infrastructure.app.services
                         {
                             this.Log().Debug(() => "[{0}] {1}".format_with(APP_NAME, logMessage));
                         }
-
-                        //if (recordingValues)
-                        //{
-                        //    var lineParts = logMessage.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        //    if (lineParts.Length > 1)
-                        //    {
-                        //        var pkgResult = new PackageResult(lineParts[0], null, null);
-                        //        packageResults.GetOrAdd(lineParts[0], pkgResult);
-                        //    }
-                        //}
-
-                        //if (logMessage.Contains(whereToStartRecording)) recordingValues = true;
                     },
                 stdErrAction: (s, e) =>
                     {
@@ -195,37 +182,44 @@ namespace chocolatey.infrastructure.app.services
                     EXE_PATH,
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
-                    ApplicationParameters.ShimsLocation,
                     (s, e) =>
                         {
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
                             this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage));
-
-                            var packageName = get_value_from_output(logMessage, PackageNameRegex, PACKAGE_NAME_GROUP);
-                            var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                            if (AlreadyInstalledRegex.IsMatch(logMessage))
-                            {
-                                results.Messages.Add(new ResultMessage(ResultType.Inconclusive, packageName));
-                                this.Log().Warn(ChocolateyLoggers.Important, " [{0}] {1} already installed or doesn't exist. --force has no effect.".format_with(APP_NAME, string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
-                                return;
-                            }
-
+                          
                             if (InstallingRegex.IsMatch(logMessage))
                             {
+                                var packageName = get_value_from_output(logMessage, PackageNameFetchingRegex, PACKAGE_NAME_GROUP);
+                                var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                                 this.Log().Info(ChocolateyLoggers.Important, "{0}".format_with(packageName));
                                 return;
                             }
                            
+                            //if (string.IsNullOrWhiteSpace(packageName)) return;
+
                             if (InstalledRegex.IsMatch(logMessage))
                             {
+                                var packageName = get_value_from_output(logMessage, PackageNameInstalledRegex, PACKAGE_NAME_GROUP);
+                                var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+
+                                results.Messages.Add(new ResultMessage(ResultType.Note, packageName));
                                 this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
                             }
                         },
                     (s, e) =>
                         {
-                            if (string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Error(() => "[{0}] {1}".format_with(APP_NAME, e.Data));
+                            var logMessage = e.Data;
+                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage));
+
+                            var packageName = get_value_from_output(logMessage, PackageNameErrorRegex, PACKAGE_NAME_GROUP);
+
+                            if (ErrorNotFoundRegex.IsMatch(logMessage))
+                            {
+                                var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                                results.Messages.Add(new ResultMessage(ResultType.Error, packageName));
+                            }
                         },
                     updateProcessPath: false
                     );

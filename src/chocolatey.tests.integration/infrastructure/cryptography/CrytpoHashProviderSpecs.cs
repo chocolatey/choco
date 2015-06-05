@@ -35,7 +35,7 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
             {
                 FileSystem = new DotNetFileSystem();
                 Provider = new CrytpoHashProvider(FileSystem,CryptoHashProviderType.Md5);
-                ContextDirectory = FileSystem.combine_paths(FileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)), "context");
+                ContextDirectory = FileSystem.combine_paths(FileSystem.get_directory_name(FileSystem.get_current_assembly_path()), "context");
             }
         }
 

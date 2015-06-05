@@ -15,7 +15,8 @@
 
 namespace chocolatey.infrastructure.app.services
 {
-    using domain;
+    using Microsoft.Win32;
+    using Registry = domain.Registry;
 
     public interface IRegistryService
     {
@@ -23,6 +24,7 @@ namespace chocolatey.infrastructure.app.services
         Registry get_differences(Registry before, Registry after);
         void save_to_file(Registry snapshot, string filePath);
         Registry read_from_file(string filePath);
-        bool value_exists(string keyPath, string value);
+        bool installer_value_exists(string keyPath, string value);
+        RegistryKey get_key(RegistryHive hive, string subKeyPath);
     }
 }

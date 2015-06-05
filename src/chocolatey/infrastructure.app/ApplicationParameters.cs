@@ -30,12 +30,12 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyInstallEnvironmentVariableName = "ChocolateyInstall";
         public static readonly string Name = "Chocolatey";
 #if DEBUG
-        public static readonly string InstallLocation = _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
+        public static readonly string InstallLocation = _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path());
 #else
-        public static readonly string InstallLocation = Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) ?? _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
+        public static readonly string InstallLocation = System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) ?? _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path());
 #endif
 
-        public static readonly string CommonAppDataChocolatey = _fileSystem.combine_paths(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), Name);
+        public static readonly string CommonAppDataChocolatey = _fileSystem.combine_paths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonApplicationData), Name);
         public static readonly string LoggingLocation = _fileSystem.combine_paths(InstallLocation, "logs");
         public static readonly string LoggingFile = @"chocolatey.log";
         public static readonly string Log4NetConfigurationAssembly = @"chocolatey";
@@ -54,9 +54,17 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
         public static readonly string ExtensionsLocation = _fileSystem.combine_paths(InstallLocation, "extensions");
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
+        public static readonly string ChocolateyCommunityFeedSource = "https://chocolatey.org/api/v2/";
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
         public static readonly string AllPackages = "all";
+
+        public static class Environment
+        {
+            public static readonly string Path = "Path";
+            public static readonly string PathExtensions = "PATHEXT";
+            public static readonly string PathExtensionsSeparator = ";";
+        }
 
         /// <summary>
         ///   Default is 45 minutes
@@ -84,22 +92,6 @@ namespace chocolatey.infrastructure.app
         {
             public static readonly string ContinueChocolateyAction = "Moving forward with chocolatey actions.";
             public static readonly string NugetEventActionHeader = "Nuget called an event";
-        }
-
-        public static class OutputParser
-        {
-            //todo: This becomes the WebPI parsing stuff instead
-            public static class Nuget
-            {
-                public const string PACKAGE_NAME_GROUP = "PkgName";
-                public const string PACKAGE_VERSION_GROUP = "PkgVersion";
-                public static readonly Regex AlreadyInstalled = new Regex(@"already installed", RegexOptions.Compiled);
-                public static readonly Regex NotInstalled = new Regex(@"not installed", RegexOptions.Compiled);
-                public static readonly Regex Installing = new Regex(@"Installing", RegexOptions.Compiled);
-                public static readonly Regex ResolvingDependency = new Regex(@"Attempting to resolve dependency", RegexOptions.Compiled);
-                public static readonly Regex PackageName = new Regex(@"'(?<{0}>[.\S]+)\s?".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
-                public static readonly Regex PackageVersion = new Regex(@"(?<{0}>[\d\.]+[\-\w]*)[[)]?'".format_with(PACKAGE_VERSION_GROUP), RegexOptions.Compiled);
-            }
         }
 
         private static T try_get_config<T>(Func<T> func, T defaultValue)

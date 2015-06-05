@@ -24,6 +24,13 @@ namespace chocolatey.infrastructure.app.services
     /// </summary>
     public interface IChocolateyPackageService
     {
+
+        /// <summary>
+        ///   Ensures the application that controls a source is installed
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        void ensure_source_app_installed(ChocolateyConfiguration config);
+
         /// <summary>
         ///   Run list in noop mode
         /// </summary>

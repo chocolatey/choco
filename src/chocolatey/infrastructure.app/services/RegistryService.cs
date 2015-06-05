@@ -34,6 +34,7 @@ namespace chocolatey.infrastructure.app.services
     {
         private readonly IXmlService _xmlService;
         private readonly IFileSystem _fileSystem;
+        private readonly bool _logOutput = false;
 
         public RegistryService(IXmlService xmlService, IFileSystem fileSystem)
         {
@@ -69,13 +70,16 @@ namespace chocolatey.infrastructure.app.services
                 registryKey.Dispose();
             }
 
-            //Console.WriteLine("");
-            //Console.WriteLine("A total of {0} unrecognized apps".format_with(snapshot.RegistryKeys.Where((p) => p.InstallerType == InstallerType.Unknown).Count()));
-            //Console.WriteLine("");
+            if (_logOutput)
+            {
+                Console.WriteLine("");
+                Console.WriteLine("A total of {0} unrecognized apps".format_with(snapshot.RegistryKeys.Where((p) => p.InstallerType == InstallerType.Unknown && p.is_in_programs_and_features()).Count()));
+                Console.WriteLine("");
 
-            //Console.WriteLine("");
-            //Console.WriteLine("A total of {0} of {1} are programs and features apps".format_with(snapshot.RegistryKeys.Where((p) => p.is_in_programs_and_features()).Count(), snapshot.RegistryKeys.Count));
-            //Console.WriteLine("");
+                Console.WriteLine("");
+                Console.WriteLine("A total of {0} of {1} are programs and features apps".format_with(snapshot.RegistryKeys.Where((p) => p.is_in_programs_and_features()).Count(), snapshot.RegistryKeys.Count));
+                Console.WriteLine("");
+            }
 
             return snapshot;
         }
@@ -168,21 +172,23 @@ namespace chocolatey.infrastructure.app.services
                     appKey.InstallerType = InstallerType.Custom;
                 }
 
-                //if (appKey.InstallerType == InstallerType.Msi)
-                //{
-                //Console.WriteLine("");
-                //if (!string.IsNullOrWhiteSpace(appKey.UninstallString))
-                //{
-                //    Console.WriteLine(appKey.UninstallString.to_string().Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries)[0]);
-                //    key.UninstallString.to_string().Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries);
-                //}
-                //foreach (var name in key.GetValueNames())
-                //{
-                //    var kind = key.GetValueKind(name);
-                //    var value = key.GetValue(name);
-                //    Console.WriteLine("key - {0}, name - {1}, kind - {2}, value - {3}".format_with(key.Name, name, kind, value.to_string()));
-                //}
-                //}
+                if (_logOutput)
+                {
+                    if (appKey.is_in_programs_and_features() && appKey.InstallerType == InstallerType.Unknown)
+                    {
+                        foreach (var name in key.GetValueNames())
+                        {
+                            //var kind = key.GetValueKind(name);
+                            var value = key.GetValue(name);
+                            if (name.is_equal_to("QuietUninstallString") || name.is_equal_to("UninstallString"))
+                            {
+                                Console.WriteLine("key - {0}|{1}={2}|Type detected={3}".format_with(key.Name, name, value.to_string(), appKey.InstallerType.to_string()));
+                            }
+
+                            //Console.WriteLine("key - {0}, name - {1}, kind - {2}, value - {3}".format_with(key.Name, name, kind, value.to_string()));
+                        }
+                    }
+                }
 
                 snapshot.RegistryKeys.Add(appKey);
             }
@@ -202,12 +208,9 @@ namespace chocolatey.infrastructure.app.services
             _xmlService.serialize(snapshot, filePath);
         }
 
-        public bool value_exists(string keyPath, string value)
+        public bool installer_value_exists(string keyPath, string value)
         {
-            //todo: make this check less crazy...
             return get_installer_keys().RegistryKeys.Any(k => k.KeyPath == keyPath);
-
-            //return Microsoft.Win32.Registry.GetValue(keyPath, value, null) != null;
         }
 
         public Registry read_from_file(string filePath)
@@ -218,6 +221,31 @@ namespace chocolatey.infrastructure.app.services
             }
 
             return _xmlService.deserialize<Registry>(filePath);
+        }
+
+        public RegistryKey get_key(RegistryHive hive, string subKeyPath)
+        {
+            IList<RegistryKey> keyLocations = new List<RegistryKey>();
+            if (Environment.Is64BitOperatingSystem)
+            {
+                keyLocations.Add(RegistryKey.OpenBaseKey(hive, RegistryView.Registry64));
+            }
+
+            keyLocations.Add(RegistryKey.OpenBaseKey(hive, RegistryView.Registry32));
+
+            foreach (var topLevelRegistryKey in keyLocations)
+            {
+                using (topLevelRegistryKey)
+                {
+                    var key = topLevelRegistryKey.OpenSubKey(subKeyPath, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
+                    if (key != null)
+                    {
+                        return key;
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }
