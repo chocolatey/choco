@@ -23,6 +23,7 @@ namespace chocolatey.infrastructure.app.services
     using configuration;
     using domain;
     using filesystem;
+    using infrastructure.commands;
     using infrastructure.services;
     using logging;
     using platforms;
@@ -173,7 +174,8 @@ namespace chocolatey.infrastructure.app.services
                     var powerShellRan = _powershellService.install(config, packageResult);
                     if (powerShellRan)
                     {
-                        //todo: prevent reboots
+                        // we don't care about the exit code
+                        if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false);
                     }
 
                     var difference = _registryService.get_differences(before, _registryService.get_installer_keys());
@@ -493,6 +495,9 @@ Would have determined packages that are out of date based on what is
 
                     _autoUninstallerService.run(packageResult, config);
 
+                    // we don't care about the exit code
+                    if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false);
+
                     if (packageResult.Success)
                     {
                         //todo: v2 clean up package information store for things no longer installed (call it compact?)
@@ -504,7 +509,6 @@ Would have determined packages that are out of date based on what is
                         handle_unsuccessful_operation(config, packageResult, movePackageToFailureLocation: false, attemptRollback: false);
                     }
 
-                    //todo:prevent reboots
                 });
 
             var uninstallFailures = packageUninstalls.Count(p => !p.Value.Success);
