@@ -34,6 +34,7 @@ namespace chocolatey.infrastructure.app.commands
         private readonly IChocolateyPackageInformationService _packageInfoService;
         private readonly ILogger _nugetLogger;
         private readonly INugetService _nugetService;
+        private const string NO_CHANGE_MESSAGE = "Nothing to change. Pin already set or removed.";
 
         public ChocolateyPinCommand(IChocolateyPackageInformationService packageInfoService, ILogger nugetLogger, INugetService nugetService)
         {
@@ -56,7 +57,7 @@ namespace chocolatey.infrastructure.app.commands
 
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
-            configuration.Input = string.Join(" ", unparsedArguments);
+            // don't set configuration.Input or it will be passed to list
 
             if (unparsedArguments.Count > 1)
             {
@@ -67,12 +68,12 @@ namespace chocolatey.infrastructure.app.commands
             string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
             Enum.TryParse(unparsedCommand, true, out command);
 
-            if (command == PinCommandType.unknown) 
+            if (command == PinCommandType.unknown)
             {
                 if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
                 command = PinCommandType.list;
             }
-            
+
             configuration.PinCommand.Command = command;
             configuration.Sources = ApplicationParameters.PackagesLocation;
             configuration.ListCommand.LocalOnly = true;
@@ -115,7 +116,7 @@ Pin a package to suppress upgrades.
 
         public void noop(ChocolateyConfiguration configuration)
         {
-            this.Log().Info("Pin would have called {0} with other options:{1} Name={2}{1} Version={3}".format_with(configuration.PinCommand.Command.to_string(),Environment.NewLine,configuration.PinCommand.Name.to_string(),configuration.Version.to_string()));
+            this.Log().Info("Pin would have called {0} with other options:{1} Name={2}{1} Version={3}".format_with(configuration.PinCommand.Command.to_string(), Environment.NewLine, configuration.PinCommand.Name.to_string(), configuration.Version.to_string()));
         }
 
         public void run(ChocolateyConfiguration configuration)
@@ -124,7 +125,6 @@ Pin a package to suppress upgrades.
                                                                installSuccessAction: null,
                                                                uninstallSuccessAction: null,
                                                                addUninstallHandler: false);
-
             switch (configuration.PinCommand.Command)
             {
                 case PinCommandType.list:
@@ -145,13 +145,15 @@ Pin a package to suppress upgrades.
                 var pkgInfo = _packageInfoService.get_package_information(pkg.Value.Package);
                 if (pkgInfo != null && pkgInfo.IsPinned)
                 {
-                    this.Log().Info(() => "{0}|{1}".format_with(pkgInfo.Package.Id,pkgInfo.Package.Version));
+                    this.Log().Info(() => "{0}|{1}".format_with(pkgInfo.Package.Id, pkgInfo.Package.Version));
                 }
             }
         }
 
         public void set_pin(IPackageManager packageManager, ChocolateyConfiguration config)
         {
+            var addingAPin = config.PinCommand.Command == PinCommandType.add;
+            this.Log().Info("Trying to {0} a pin for {1}".format_with(config.PinCommand.Command.to_string(), config.PinCommand.Name));
             var versionUnspecified = string.IsNullOrWhiteSpace(config.Version);
             SemanticVersion semanticVersion = versionUnspecified ? null : new SemanticVersion(config.Version);
             IPackage installedPackage = packageManager.LocalRepository.FindPackage(config.PinCommand.Name, semanticVersion);
@@ -162,8 +164,19 @@ Pin a package to suppress upgrades.
 
             var pkgInfo = _packageInfoService.get_package_information(installedPackage);
 
-            pkgInfo.IsPinned = config.PinCommand.Command == PinCommandType.add;
+            bool changeMessage = pkgInfo.IsPinned != addingAPin;
+
+            pkgInfo.IsPinned = addingAPin;
             _packageInfoService.save_package_information(pkgInfo);
+
+            if (changeMessage)
+            {
+                this.Log().Warn("Successfully {0} a pin for {1} v{2}.".format_with(addingAPin ? "added" : "removed", pkgInfo.Package.Id, pkgInfo.Package.Version.to_string()));
+            }
+            else
+            {
+                this.Log().Warn(NO_CHANGE_MESSAGE);
+            }
         }
 
         public bool may_require_admin_access()
