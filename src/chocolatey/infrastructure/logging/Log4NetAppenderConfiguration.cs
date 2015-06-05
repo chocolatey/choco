@@ -121,6 +121,15 @@ namespace chocolatey.infrastructure.logging
                     {
                         logger.Level = Level.Debug;
                     }
+                } 
+                foreach (var append in logRepository.GetAppenders())
+                {
+                    var appender = append as AppenderSkeleton;
+                    if (appender != null)
+                    {
+                        // slightly naive implementation
+                        appender.ClearFilters();
+                    }
                 }
             }
         }
@@ -137,14 +146,17 @@ namespace chocolatey.infrastructure.logging
             if (enableVerbose)
             {
                 ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
-                foreach (ILogger log in logRepository.GetCurrentLoggers())
+                foreach (var append in logRepository.GetAppenders())
                 {
-                    var logger = log as Logger;
-                    if (logger != null && logger.Name.is_equal_to(verboseLoggerName))
+
+                    var appender = append as AppenderSkeleton;
+                    if (appender != null && appender.Name.is_equal_to(verboseLoggerName))
                     {
-                        logger.Level = Level.Info;
+                        appender.ClearFilters();
+                        appender.AddFilter( new log4net.Filter.LevelRangeFilter {LevelMin = Level.Info, LevelMax = Level.Fatal});
                     }
                 }
+
             }
         }
     }

@@ -34,6 +34,10 @@ namespace chocolatey.infrastructure.app.templates
             Url64 = "";
             SilentArgs = "";
             AutomaticPackageNotesNuspec = "";
+            Checksum = "";
+            ChecksumType = "md5";
+            Checksum64 = "";
+            ChecksumType64 = "md5";
         }
 
         public void set_auto()
@@ -44,6 +48,8 @@ namespace chocolatey.infrastructure.app.templates
             AutomaticPackageNotesNuspec = NuspecTemplate.AutomaticPackageNotes;
             Url = "{{DownloadUrl}}";
             Url64 = "{{DownloadUrlx64}}";
+            Checksum = "{{Checksum}}";
+            Checksum64 = "{{Checksumx64}}";
         }
 
 
@@ -63,6 +69,10 @@ namespace chocolatey.infrastructure.app.templates
         public string Url { get; set; }
         public string Url64 { get; set; }
         public string SilentArgs { get; set; }
+        public string Checksum { get; set; }
+        public string ChecksumType { get; set; }
+        public string Checksum64 { get; set; }
+        public string ChecksumType64 { get; set; }
 
         public static readonly string NamePropertyName = "PackageName";
         public static readonly string VersionPropertyName = "PackageVersion";

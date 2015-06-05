@@ -19,12 +19,10 @@ namespace chocolatey.infrastructure.app.templates
     {
         public static string Template =
             @"#NOTE: Please remove any commented lines to tidy up prior to releasing the package, including this one
-
-# stop on all errors
-$ErrorActionPreference = 'Stop';
-
 # REMOVE ANYTHING BELOW THAT IS NOT NEEDED
 # Auto Uninstaller should be able to detect and handle registry uninstalls (if it is turned on, it is in preview for 0.9.9).
+
+$ErrorActionPreference = 'Stop'; # stop on all errors
 
 $packageName = '[[PackageName]]'
 # registry uninstaller key name is the key that is found at HKLM:\Software\Windows\CurrentVersion\Uninstall\ THE NAME
