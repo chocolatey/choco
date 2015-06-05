@@ -32,7 +32,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
         private readonly ICommandExecutor _commandExecutor;
-        private const int SLEEP_TIME = 5;
+        private const int SLEEP_TIME = 2;
 
         public AutomaticUninstallerService(IChocolateyPackageInformationService packageInfoService, IFileSystem fileSystem, IRegistryService registryService, ICommandExecutor commandExecutor)
         {
