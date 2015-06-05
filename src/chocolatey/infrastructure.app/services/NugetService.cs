@@ -82,6 +82,7 @@ namespace chocolatey.infrastructure.app.services
 
             var packages = NugetList.GetPackages(config, _nugetLogger).ToList();
 
+            if (config.RegularOutput) this.Log().Debug(() => "--- Start of List ---");
             foreach (var package in packages.or_empty_list_if_null())
             {
                 if (logResults)
@@ -104,6 +105,7 @@ namespace chocolatey.infrastructure.app.services
 
                 packageResults.GetOrAdd(package.Id, new PackageResult(package, null));
             }
+            if (config.RegularOutput) this.Log().Debug(() => "--- End of List ---");
 
             return packageResults;
         }
