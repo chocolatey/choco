@@ -38,7 +38,9 @@ namespace chocolatey.infrastructure.app.domain
         public virtual string build_install_command_arguments(bool customInstallLocation, bool languageRequested)
         {
             var args = new StringBuilder();
-            args.AppendFormat("{0} {1} {2}", SilentInstall, NoReboot, LogFile);
+            args.AppendFormat("{0} {1}", SilentInstall, NoReboot);
+            //MSI may have issues with 1622 - opening a log file location
+            args.AppendFormat(" {0}", LogFile);
             if (languageRequested) args.AppendFormat(" {0}", Language);
             args.AppendFormat(" {0}", OtherInstallOptions);
 
@@ -50,7 +52,8 @@ namespace chocolatey.infrastructure.app.domain
 
         public virtual string build_uninstall_command_arguments()
         {
-            return "{0} {1} {2} {3}".format_with(SilentUninstall, NoReboot, LogFile, OtherUninstallOptions);
+            //MSI has issues with 1622 - opening a log file location
+            return "{0} {1} {2}".format_with(SilentUninstall, NoReboot, OtherUninstallOptions);
         }
     }
 }
