@@ -70,10 +70,10 @@ Install-ChocolateyInstallPackage
 #>
 param(
   [string] $packageName,
-  [string] $fileType = 'exe',
+  [alias("installerType")][string] $fileType = 'exe',
   [string] $silentArgs = '',
   [string] $url,
-  [string] $url64bit = '',
+  [alias("url64")][string] $url64bit = '',
   $validExitCodes = @(0),
   [string] $checksum = '',
   [string] $checksumType = '',

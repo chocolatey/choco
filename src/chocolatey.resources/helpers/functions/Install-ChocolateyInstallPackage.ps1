@@ -53,7 +53,7 @@ Install-ChocolateyPackage
 #>
 param(
   [string] $packageName,
-  [string] $fileType = 'exe',
+  [alias("installerType")][string] $fileType = 'exe',
   [string] $silentArgs = '',
   [string] $file,
   $validExitCodes = @(0)
