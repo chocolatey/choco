@@ -78,6 +78,8 @@ namespace chocolatey.infrastructure.app.services
         {
             var packageResults = new ConcurrentDictionary<string, PackageResult>();
 
+            if (config.RegularOutput) this.Log().Debug(() => "Running list with the following filter = '{0}'".format_with(config.Input));
+
             var packages = NugetList.GetPackages(config, _nugetLogger).ToList();
 
             foreach (var package in packages.or_empty_list_if_null())
