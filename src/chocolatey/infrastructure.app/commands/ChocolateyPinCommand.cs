@@ -159,7 +159,17 @@ Pin a package to suppress upgrades.
             IPackage installedPackage = packageManager.LocalRepository.FindPackage(config.PinCommand.Name, semanticVersion);
             if (installedPackage == null)
             {
-                throw new ApplicationException("Unable to find package named '{0}'{1} to pin. Please check to ensure it is installed.".format_with(config.PinCommand.Name, versionUnspecified ? "" : " (version '{0}')".format_with(config.Version)));
+                var pathResolver = packageManager.PathResolver as ChocolateyPackagePathResolver;
+                if (pathResolver != null)
+                {
+                    pathResolver.UseSideBySidePaths = true;
+                    installedPackage = packageManager.LocalRepository.FindPackage(config.PinCommand.Name, semanticVersion);
+                }
+
+                if (installedPackage == null)
+                {
+                    throw new ApplicationException("Unable to find package named '{0}'{1} to pin. Please check to ensure it is installed.".format_with(config.PinCommand.Name, versionUnspecified ? "" : " (version '{0}')".format_with(config.Version)));
+                }
             }
 
             var pkgInfo = _packageInfoService.get_package_information(installedPackage);
