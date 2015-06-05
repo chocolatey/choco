@@ -133,7 +133,12 @@ No changes made. If you are trying to change an existing source, please
         public void feature_disable(ChocolateyConfiguration configuration)
         {
             var feature = configFileSettings.Features.FirstOrDefault(p => p.Name.is_equal_to(configuration.FeatureCommand.Name));
-            if (feature != null && (feature.Enabled || !feature.SetExplicitly))
+            if (feature == null)
+            {
+                throw new ApplicationException("Feature '{0}' not found".format_with(configuration.FeatureCommand.Name));
+            }
+
+            if (feature.Enabled || !feature.SetExplicitly)
             {
                 if (!feature.Enabled && !feature.SetExplicitly)
                 {
@@ -153,7 +158,13 @@ No changes made. If you are trying to change an existing source, please
         public void feature_enable(ChocolateyConfiguration configuration)
         {
             var feature = configFileSettings.Features.FirstOrDefault(p => p.Name.is_equal_to(configuration.FeatureCommand.Name));
-            if (feature != null && (!feature.Enabled || !feature.SetExplicitly))
+
+            if (feature == null)
+            {
+                throw new ApplicationException("Feature '{0}' not found".format_with(configuration.FeatureCommand.Name));
+            }
+
+            if (!feature.Enabled || !feature.SetExplicitly)
             {
                 if (feature.Enabled && !feature.SetExplicitly)
                 {
