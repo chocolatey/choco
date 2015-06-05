@@ -128,11 +128,11 @@ namespace chocolatey.infrastructure.app.services
                 {
                     //todo: ultimately we should merge keys
                     uninstallArgs += " " + installer.build_uninstall_command_arguments();
-                    var logLocation = _fileSystem.combine_paths(config.CacheLocation, "chocolatey", pkgInfo.Package.Id, pkgInfo.Package.Version.to_string());
-                    _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(logLocation));
-
-                    uninstallArgs = uninstallArgs.Replace(InstallTokens.PACKAGE_LOCATION, logLocation);
                 }
+
+                var logLocation = _fileSystem.combine_paths(_fileSystem.get_full_path(config.CacheLocation), "chocolatey", pkgInfo.Package.Id, pkgInfo.Package.Version.to_string());
+                _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(logLocation));
+                uninstallArgs = uninstallArgs.Replace(InstallTokens.PACKAGE_LOCATION, logLocation);
 
                 this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs));
 
