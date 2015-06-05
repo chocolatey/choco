@@ -85,6 +85,7 @@ namespace chocolatey.infrastructure.app
         {
             public static readonly string CheckSumFiles = "checksumFiles";
             public static readonly string AutoUninstaller = "autoUninstaller";
+            public static readonly string FailOnAutoUninstaller = "failOnAutoUninstaller";
             public static readonly string AllowGlobalConfirmation = "allowGlobalConfirmation";
         }
 

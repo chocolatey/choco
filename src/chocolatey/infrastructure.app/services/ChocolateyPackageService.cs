@@ -23,6 +23,7 @@ namespace chocolatey.infrastructure.app.services
     using configuration;
     using domain;
     using filesystem;
+    using infrastructure.commands;
     using infrastructure.services;
     using logging;
     using platforms;
@@ -223,7 +224,8 @@ namespace chocolatey.infrastructure.app.services
                     var powerShellRan = _powershellService.install(config, packageResult);
                     if (powerShellRan)
                     {
-                        //todo: prevent reboots
+                        // we don't care about the exit code
+                        if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute_static("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false);
                     }
 
                     var difference = _registryService.get_differences(before, _registryService.get_installer_keys());
@@ -595,6 +597,9 @@ Would have determined packages that are out of date based on what is
             }
 
             _autoUninstallerService.run(packageResult, config);
+            
+            // we don't care about the exit code
+            if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute_static("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false);
 
             if (packageResult.Success)
             {
@@ -607,7 +612,11 @@ Would have determined packages that are out of date based on what is
                 handle_unsuccessful_operation(config, packageResult, movePackageToFailureLocation: false, attemptRollback: false);
             }
 
-            //todo:prevent reboots
+            if (!packageResult.Success)
+            {
+                // throw an error so that NuGet Service doesn't attempt to continue with package removal
+                throw new ApplicationException("{0} {1} not successful.".format_with(packageResult.Name, "uninstall"));
+            }
         }
 
         private void uninstall_cleanup(ChocolateyConfiguration config, PackageResult packageResult)

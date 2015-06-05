@@ -32,7 +32,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
         private readonly ICommandExecutor _commandExecutor;
-        private const int SLEEP_TIME = 5;
+        private const int SLEEP_TIME = 2;
 
         public AutomaticUninstallerService(IChocolateyPackageInformationService packageInfoService, IFileSystem fileSystem, IRegistryService registryService, ICommandExecutor commandExecutor)
         {
@@ -159,7 +159,7 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Debug(() => " [AutoUninstaller] {0}".format_with(e.Data));
+                            this.Log().Info(() => " [AutoUninstaller] {0}".format_with(e.Data));
                         },
                     (s, e) =>
                         {
@@ -171,9 +171,9 @@ namespace chocolatey.infrastructure.app.services
                 if (!installer.ValidUninstallExitCodes.Contains(exitCode))
                 {
                     Environment.ExitCode = exitCode;
-                    string logMessage = " Auto uninstaller failed. Please remove machine installation manually.";
+                    string logMessage = " Auto uninstaller failed. Please remove machine installation manually.{0} Exit code was {1}".format_with(Environment.NewLine, exitCode);
                     this.Log().Error(() => logMessage);
-                    packageResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    packageResult.Messages.Add(new ResultMessage(config.Features.FailOnAutoUninstaller ? ResultType.Error : ResultType.Warn, logMessage));
                 }
                 else
                 {
