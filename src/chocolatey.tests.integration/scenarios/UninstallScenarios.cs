@@ -877,11 +877,18 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_remove_package_from_the_lib_directory()
+            public void should_not_remove_package_from_the_lib_directory()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_still_have_the_package_file_in_the_directory()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                File.Exists(packageFile).ShouldBeTrue();
             }
 
             [Fact]
