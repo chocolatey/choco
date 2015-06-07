@@ -2665,5 +2665,177 @@ namespace chocolatey.tests.integration.scenarios
                 errorFound.ShouldBeTrue();
             }
         }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_from_a_nupkg_file : ScenariosBase
+        {
+            private PackageResult packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "{0}\\installpackage.1.0.0.nupkg".format_with(Configuration.Sources);
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+                packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_install_where_install_location_reports()
+            {
+                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_the_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "installpackage");
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_the_expected_version_of_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "installpackage", "installpackage" + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            public void should_create_a_shim_for_console_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_create_a_shim_for_graphical_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_ignored_executable_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "not.installed.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_mismatched_case_ignored_executable_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "casemismatch.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_an_extensions_folder_for_the_package()
+            {
+                var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", "installpackage");
+
+                Directory.Exists(extensionsDirectory).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_have_a_console_shim_that_is_set_for_non_gui_access()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    );
+
+                var messageFound = false;
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains("is gui? False")) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("GUI false message not found");
+            }
+
+            [Fact]
+            public void should_have_a_graphical_shim_that_is_set_for_gui_access()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    );
+
+                var messageFound = false;
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains("is gui? True")) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("GUI true message not found");
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_installed_successfully()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("1/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                packageResult.Name.ShouldEqual("installpackage");
+            }
+
+            [Fact]
+            public void should_have_a_version_of_one_dot_zero_dot_zero()
+            {
+                packageResult.Version.ShouldEqual("1.0.0");
+            }
+        }
     }
 }

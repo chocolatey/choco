@@ -257,21 +257,28 @@ spam/junk folder.");
                 {
                     this.Log().Debug("Updating source and package name to handle *.nupkg or *.nuspec file.");
                     packageNames.Clear();
-                    packageNames.Add(_fileSystem.get_file_name_without_extension(packageName));
+
                     config.Sources = _fileSystem.get_directory_name(_fileSystem.get_full_path(packageName));
 
                     if (packageName.EndsWith(Constants.ManifestExtension))
                     {
+                        packageNames.Add(_fileSystem.get_file_name_without_extension(packageName));
+
                         this.Log().Debug("Building nuspec file prior to install.");
                         config.Input = packageName;
                         // build package
                         pack_run(config);
                     }
+                    else
+                    {
+                        var packageFile = new OptimizedZipPackage(_fileSystem.get_full_path(packageName));
+                        packageNames.Add(packageFile.Id);
+                    }
                 }
             }
 
             // this is when someone points the source directly at a nupkg 
-            // e.g. -s c:\somelocation\somewhere\packagename.nupkg
+            // e.g. -source c:\somelocation\somewhere\packagename.nupkg
             if (config.Sources.to_string().EndsWith(Constants.PackageExtension))
             {
                 config.Sources = _fileSystem.get_directory_name(_fileSystem.get_full_path(config.Sources));

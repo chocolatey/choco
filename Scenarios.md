@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 28 Scenario(s), 229 Observation(s) ]
+### ChocolateyInstallCommand [ 29 Scenario(s), 245 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -110,6 +110,25 @@
  * should have a package installed in the lib directory
  * should have inconclusive package result
  * should still have the package installed with the expected version of the package
+
+#### when installing a package from a nupkg file
+
+ * config should match package result name
+ * should contain a warning message that it installed successfully
+ * should create a shim for console in the bin directory
+ * should create a shim for graphical in the bin directory
+ * should have a console shim that is set for non gui access
+ * should have a graphical shim that is set for gui access
+ * should have a successful package result
+ * should have a version of one dot zero dot zero
+ * should install the expected version of the package
+ * should install the package in the lib directory
+ * should install where install location reports
+ * should not create a shim for ignored executable in the bin directory
+ * should not create a shim for mismatched case ignored executable in the bin directory
+ * should not create an extensions folder for the package
+ * should not have inconclusive package result
+ * should not have warning package result
 
 #### when installing a package happy path
 
@@ -315,7 +334,7 @@
  * should not have inconclusive package result
  * should not have warning package result
 
-### ChocolateyUninstallCommand [ 12 Scenario(s), 83 Observation(s) ]
+### ChocolateyUninstallCommand [ 12 Scenario(s), 84 Observation(s) ]
 
 #### when force uninstalling a package
 
@@ -385,7 +404,8 @@
  * should not have inconclusive package result
  * should not have warning package result
  * should not put the package in the lib bad directory
- * should remove package from the lib directory
+ * should not remove package from the lib directory
+ * should still have the package file in the directory
 
 #### when uninstalling a package with a read and delete share locked file
 
