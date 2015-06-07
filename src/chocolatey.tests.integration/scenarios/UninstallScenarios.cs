@@ -57,7 +57,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_noop_uninstalling_a_package : ScenariosBase
         {
             public override void Context()
@@ -104,7 +104,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_noop_uninstalling_a_package_that_does_not_exist : ScenariosBase
         {
             public override void Context()
@@ -132,7 +132,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_happy_path : ScenariosBase
         {
             private PackageResult packageResult;
@@ -174,15 +174,15 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.Exists(shimfile).ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_delete_any_files_created_during_the_install()
             {
-                var generatedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames,"simplefile.txt");
+                var generatedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "simplefile.txt");
 
                 File.Exists(generatedFile).ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
@@ -220,7 +220,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_force_uninstalling_a_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -268,7 +268,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.Exists(shimfile).ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
@@ -306,7 +306,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_uninstalling_packages_with_packages_config : ScenariosBase
         {
             public override void Context()
@@ -321,14 +321,14 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            [ExpectedException(typeof(ApplicationException))]
+            [ExpectedException(typeof (ApplicationException))]
             public void should_throw_an_error_that_it_is_not_allowed()
             {
                 Results = Service.uninstall_run(Configuration);
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -381,7 +381,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 expectedMessage.ShouldBeTrue();
             }
-            
+
             [Fact]
             public void should_have_a_successful_package_result()
             {
@@ -401,7 +401,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -426,7 +426,7 @@ namespace chocolatey.tests.integration.scenarios
                 Results = Service.uninstall_run(Configuration);
                 _packageResult = Results.FirstOrDefault().Value;
             }
-            
+
             [Fact]
             public void should_not_be_able_to_remove_the_package_from_the_lib_directory()
             {
@@ -482,7 +482,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_added_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -490,8 +490,8 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileAdded = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames,"dude.txt");
-                File.WriteAllText(fileAdded,"hellow");
+                var fileAdded = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "dude.txt");
+                File.WriteAllText(fileAdded, "hellow");
             }
 
             public override void Because()
@@ -507,7 +507,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.Exists(fileAdded).ShouldBeTrue();
             }
-            
+
             [Fact]
             public void should_delete_everything_but_the_added_file_from_the_package_directory()
             {
@@ -515,7 +515,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 foreach (var file in files.or_empty_list_if_null())
                 {
-                    Path.GetFileName(file).ShouldEqual("dude.txt","Expected files were not deleted.");
+                    Path.GetFileName(file).ShouldEqual("dude.txt", "Expected files were not deleted.");
                 }
             }
 
@@ -542,7 +542,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.Exists(shimfile).ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
@@ -580,7 +580,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -588,8 +588,8 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames,"tools","chocolateyInstall.ps1");
-                File.WriteAllText(fileChanged,"hellow");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                File.WriteAllText(fileChanged, "hellow");
             }
 
             public override void Because()
@@ -605,7 +605,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.Exists(fileChanged).ShouldBeTrue();
             }
-            
+
             [Fact]
             public void should_delete_everything_but_the_changed_file_from_the_package_directory()
             {
@@ -640,7 +640,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.Exists(shimfile).ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
@@ -678,7 +678,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_force_uninstalling_a_package_with_added_and_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -686,8 +686,8 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames,"tools","chocolateyInstall.ps1");
-                File.WriteAllText(fileChanged,"hellow");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                File.WriteAllText(fileChanged, "hellow");
                 var fileAdded = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "dude.txt");
                 File.WriteAllText(fileAdded, "hellow");
                 Configuration.Force = true;
@@ -714,7 +714,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.Exists(fileChanged).ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_not_keep_the_changed_file()
             {
@@ -722,7 +722,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.Exists(fileChanged).ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_delete_the_rollback()
             {
@@ -746,7 +746,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.Exists(shimfile).ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
@@ -784,7 +784,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_that_does_not_exist : ScenariosBase
         {
             private PackageResult packageResult;
@@ -812,7 +812,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 expectedMessage.ShouldBeTrue();
             }
-            
+
             [Fact]
             public void should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
@@ -859,20 +859,20 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [Concern(typeof (ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;
 
             public override void Context()
-            {    
+            {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "badpackage";
             }
 
             public override void Because()
             {
-               Results = Service.uninstall_run(Configuration);
+                Results = Service.uninstall_run(Configuration);
                 packageResult = Results.FirstOrDefault().Value;
             }
 
