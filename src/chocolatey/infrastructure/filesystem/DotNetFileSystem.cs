@@ -37,10 +37,10 @@ namespace chocolatey.infrastructure.filesystem
         private void allow_retries(Action action)
         {
             FaultTolerance.retry(
-               TIMES_TO_TRY_OPERATION,
-               action,
-               waitDurationMilliseconds: 200,
-               increaseRetryByMilliseconds: 100);
+                TIMES_TO_TRY_OPERATION,
+                action,
+                waitDurationMilliseconds: 200,
+                increaseRetryByMilliseconds: 100);
         }
 
         #region Path
@@ -89,11 +89,11 @@ namespace chocolatey.infrastructure.filesystem
         {
             return Directory.EnumerateFiles(directoryPath, pattern, option);
         }
-        
+
         public IEnumerable<string> get_files(string directoryPath, string[] extensions, SearchOption option = SearchOption.TopDirectoryOnly)
         {
             return Directory.EnumerateFiles(directoryPath, "*.*", option)
-                .Where(f => extensions.Any(x => f.EndsWith(x,StringComparison.OrdinalIgnoreCase)));
+                            .Where(f => extensions.Any(x => f.EndsWith(x, StringComparison.OrdinalIgnoreCase)));
         }
 
         public bool file_exists(string filePath)
