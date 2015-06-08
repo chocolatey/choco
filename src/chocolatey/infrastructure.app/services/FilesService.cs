@@ -92,7 +92,6 @@ namespace chocolatey.infrastructure.app.services
             return packageFiles;
         }
 
-
         public PackageFile get_package_file(string file)
         {
             var hash = _hashProvider.hash_file(file);

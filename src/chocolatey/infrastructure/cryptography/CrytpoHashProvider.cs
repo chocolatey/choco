@@ -16,19 +16,23 @@
 namespace chocolatey.infrastructure.cryptography
 {
     using System;
+    using System.ComponentModel;
     using System.IO;
+    using System.Runtime.InteropServices;
     using System.Security.Cryptography;
     using adapters;
     using app;
     using filesystem;
+    using platforms;
     using Environment = System.Environment;
     using HashAlgorithm = adapters.HashAlgorithm;
-
 
     public sealed class CrytpoHashProvider : IHashProvider
     {
         private readonly IFileSystem _fileSystem;
         private readonly IHashAlgorithm _hashAlgorithm;
+        private const int ERROR_LOCK_VIOLATION = 33;
+        private const int ERROR_SHARING_VIOLATION = 32;
 
         public CrytpoHashProvider(IFileSystem fileSystem, CryptoHashProviderType providerType)
         {
@@ -69,11 +73,28 @@ namespace chocolatey.infrastructure.cryptography
             }
             catch (IOException ex)
             {
-                this.Log().Warn(() => "Error computing hash for '{0}'{1} Captured error:{1}  {2}".format_with(filePath, Environment.NewLine, ex.Message));
+                this.Log().Warn(() => "Error computing hash for '{0}'{1} Hash will be special code for locked file or file too big instead.{1} Captured error:{1}  {2}".format_with(filePath, Environment.NewLine, ex.Message));
+
+                if (file_is_locked(ex))
+                {
+                    return ApplicationParameters.HashProviderFileLocked;
+                }
+
                 //IO.IO_FileTooLong2GB (over Int32.MaxValue)
                 return ApplicationParameters.HashProviderFileTooBig;
-                return "UnableToDetectChanges_FileTooBig";
             }
         }
+
+        private static bool file_is_locked(Exception exception)
+        {
+            var errorCode = 0;
+
+            var hresult = Marshal.GetHRForException(exception);
+
+            errorCode = hresult & ((1 << 16) - 1);
+
+            return errorCode == ERROR_SHARING_VIOLATION || errorCode == ERROR_LOCK_VIOLATION;
+        }
+
     }
 }

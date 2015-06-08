@@ -256,11 +256,23 @@ namespace chocolatey.infrastructure.filesystem
 
         public bool copy_file_unsafe(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
         {
+            if (Platform.get_platform() != PlatformType.Windows)
+            {
+                copy_file(sourceFilePath, destinationFilePath, overwriteExisting);
+                return true;
+            }
+
             this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFilePath, destinationFilePath));
             create_directory_if_not_exists(get_directory_name(destinationFilePath), ignoreError: true);
+
             //Private Declare Function apiCopyFile Lib "kernel32" Alias "CopyFileA" _
             int success = CopyFileW(sourceFilePath, destinationFilePath, overwriteExisting ? 0 : 1);
-            return success == 0;
+            //if (success == 0)
+            //{
+            //    var error = Marshal.GetLastWin32Error();
+                
+            //}
+            return success != 0;
         }
 
         // ReSharper disable InconsistentNaming
@@ -275,7 +287,7 @@ namespace chocolatey.infrastructure.filesystem
             );
          */
 
-        [DllImport("kernel32")]
+        [DllImport("kernel32", SetLastError = true)]
         private static extern int CopyFileW(string lpExistingFileName, string lpNewFileName, int bFailIfExists);
 
         // ReSharper restore InconsistentNaming

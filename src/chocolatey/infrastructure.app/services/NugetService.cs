@@ -969,11 +969,18 @@ spam/junk folder.");
                 foreach (var file in _fileSystem.get_files(installDir, "*.*", SearchOption.AllDirectories).or_empty_list_if_null())
                 {
                     var fileSnapshot = pkgInfo.FilesSnapshot.Files.FirstOrDefault(f => f.Path.is_equal_to(file));
-                    if (fileSnapshot != null && fileSnapshot.Checksum == _filesService.get_package_file(file).Checksum)
+                    if (fileSnapshot == null) continue;
+
+                    if (fileSnapshot.Checksum == _filesService.get_package_file(file).Checksum)
                     {
                         FaultTolerance.try_catch_with_logging_exception(
                             () => _fileSystem.delete_file(file),
                             "Error deleting file");
+                    } 
+
+                    if (fileSnapshot.Checksum == ApplicationParameters.HashProviderFileLocked)
+                    {
+                        this.Log().Warn(()=> "Snapshot for '{0}' was attempted when file was locked.{1} Please inspect and manually remove file{1} at '{2}'".format_with(_fileSystem.get_file_name(file), Environment.NewLine, _fileSystem.get_directory_name(file)));
                     }
                 }
             }
