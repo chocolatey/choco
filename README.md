@@ -5,6 +5,10 @@ You can just call me choco.
 
 [![](http://img.shields.io/chocolatey/dt/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/chocolatey/v/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/gittip/Chocolatey.svg)](https://www.gittip.com/Chocolatey/)
 
+[![Issue Stats](http://issuestats.com/github/Chocolatey/choco/badge/pr)](http://issuestats.com/github/Chocolatey/choco)
+
+[![Issue Stats](http://issuestats.com/github/Chocolatey/choco/badge/issue)](http://issuestats.com/github/Chocolatey/choco)
+
 ## Build Status
 
 TeamCity  | AppVeyor | Travis
