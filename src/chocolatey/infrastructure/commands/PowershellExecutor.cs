@@ -27,8 +27,8 @@ namespace chocolatey.infrastructure.commands
     {
         private static readonly IList<string> _powershellLocations = new List<string>
             {
-                Environment.ExpandEnvironmentVariables("%windir%\\SysNative\\WindowsPowerShell\\v1.0\\powershell.exe"),
-                Environment.ExpandEnvironmentVariables("%windir%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"),
+                Environment.ExpandEnvironmentVariables("%systemroot%\\SysNative\\WindowsPowerShell\\v1.0\\powershell.exe"),
+                Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"),
                 "powershell.exe"
             };
 
