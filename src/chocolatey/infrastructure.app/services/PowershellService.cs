@@ -234,7 +234,7 @@ namespace chocolatey.infrastructure.app.services
                     if (selection.is_equal_to("no"))
                     {
                         Environment.ExitCode = 1;
-                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, "User cancelled powershell portion of installation for '{0}'.{1} Use skip to install without run.".format_with(powershellScript.FirstOrDefault(), Environment.NewLine)));
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, "User cancelled powershell portion of installation for '{0}'.{1} Specify -n to skip automated script actions.".format_with(powershellScript.FirstOrDefault(), Environment.NewLine)));
                     }
                 }
 
