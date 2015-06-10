@@ -596,7 +596,10 @@ Would have determined packages that are out of date based on what is
                 _powershellService.uninstall(config, packageResult);
             }
 
-            _autoUninstallerService.run(packageResult, config);
+             if (packageResult.Success)
+             {
+                _autoUninstallerService.run(packageResult, config);
+             }
             
             // we don't care about the exit code
             if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute_static("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false);
