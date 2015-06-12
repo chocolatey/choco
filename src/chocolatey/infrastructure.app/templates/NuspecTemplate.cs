@@ -20,7 +20,7 @@ namespace chocolatey.infrastructure.app.templates
         public static string Template =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
-<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+<package xmlns=""http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd"">
   <metadata>
     <!-- Read this before publishing packages to chocolatey.org: https://github.com/chocolatey/chocolatey/wiki/CreatePackages -->
     <id>[[PackageNameLower]]</id>
@@ -32,6 +32,12 @@ namespace chocolatey.infrastructure.app.templates
     <description>__REPLACE__ [[AutomaticPackageNotesNuspec]]
     </description>
     <projectUrl></projectUrl>
+    <packageSourceUrl></packageSourceUrl>
+    <!--<projectSourceUrl></projectSourceUrl>
+    <docsUrl></docsUrl>
+    <wikiUrl></wikiUrl>
+    <mailingListUrl></mailingListUrl>
+    <bugTrackerUrl></bugTrackerUrl>-->
     <tags>[[PackageNameLower]] admin</tags>
     <copyright></copyright>
     <licenseUrl></licenseUrl>
@@ -42,6 +48,7 @@ namespace chocolatey.infrastructure.app.templates
       <dependency id="""" />
     </dependencies>-->
     <releaseNotes></releaseNotes>
+    <!--<provides></provides>-->
   </metadata>
   <files>
     <file src=""tools\**"" target=""tools"" />
