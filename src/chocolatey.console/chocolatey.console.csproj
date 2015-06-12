@@ -85,9 +85,9 @@
     <Reference Include="Microsoft.Web.XmlTransform">
       <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Core">
+    <Reference Include="NuGet.Core, Version=2.8.2.0, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nuget.Core.2.8.2\lib\net40-Client\NuGet.Core.dll</HintPath>
+      <HintPath>..\..\lib\NuGet-Chocolatey\NuGet.Core.dll</HintPath>
     </Reference>
     <Reference Include="SimpleInjector">
       <HintPath>..\packages\SimpleInjector.2.5.0\lib\net40-client\SimpleInjector.dll</HintPath>
