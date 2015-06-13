@@ -31,6 +31,7 @@ namespace chocolatey.infrastructure.app.services
     {
         private readonly IFileSystem _fileSystem;
         private readonly string _customImports;
+        private const string OPERATION_COMPLETED_SUCCESSFULLY = "The operation completed successfully.";
 
         public PowershellService(IFileSystem fileSystem)
             : this(fileSystem, new CustomString(string.Empty))
@@ -269,9 +270,21 @@ namespace chocolatey.infrastructure.app.services
                         (s, e) =>
                             {
                                 if (string.IsNullOrWhiteSpace(e.Data)) return;
-                                failure = true;
-                                this.Log().Error(() => " " + e.Data);
+                                if (e.Data.is_equal_to(OPERATION_COMPLETED_SUCCESSFULLY))
+                                {
+                                    this.Log().Info(() => " " + e.Data);
+                                }
+                                else
+                                {
+                                    failure = true;
+                                    this.Log().Error(() => " " + e.Data);
+                                }
                             });
+
+                    if (exitCode != 0)
+                    {
+                        failure = true;
+                    }
 
                     if (failure)
                     {
