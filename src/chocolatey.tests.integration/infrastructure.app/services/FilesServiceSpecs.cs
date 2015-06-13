@@ -43,7 +43,6 @@
                 _contextPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "infrastructure", "filesystem");
                 _theLockedFile = Path.Combine(_contextPath, "Slipsum.txt");
                 _packageResult = new PackageResult("bob", "1.2.3", FileSystem.get_directory_name(_theLockedFile));
-                MockLogger.LogMessagesToConsole = true;
 
                 _fileStream = new FileStream(_theLockedFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
             }
