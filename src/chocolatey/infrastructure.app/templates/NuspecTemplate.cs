@@ -35,7 +35,6 @@ namespace chocolatey.infrastructure.app.templates
     <packageSourceUrl></packageSourceUrl>
     <!--<projectSourceUrl></projectSourceUrl>
     <docsUrl></docsUrl>
-    <wikiUrl></wikiUrl>
     <mailingListUrl></mailingListUrl>
     <bugTrackerUrl></bugTrackerUrl>-->
     <tags>[[PackageNameLower]] admin</tags>
