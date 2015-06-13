@@ -65,8 +65,8 @@ namespace chocolatey.infrastructure.app
 
         public static readonly string[] ConfigFileExtensions = new string[] {".autoconf",".config",".conf",".cfg",".jsc",".json",".jsonp",".ini",".xml",".yaml"};
        
-        public static string HashProviderFileTooBig = "UnableToDetectChanges_FileTooBig";
-        public static string HashProviderFileLocked = "UnableToDetectChanges_FileLocked";
+        public static readonly string HashProviderFileTooBig = "UnableToDetectChanges_FileTooBig";
+        public static readonly string HashProviderFileLocked = "UnableToDetectChanges_FileLocked";
 
         public static class Tools
         {
