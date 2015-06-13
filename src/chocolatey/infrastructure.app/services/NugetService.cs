@@ -596,6 +596,7 @@ spam/junk folder.");
                             {
                                 rename_legacy_package_version(config, installedPackage, pkgInfo);
                                 backup_existing_version(config, installedPackage, pkgInfo);
+                                remove_shim_directors(config, installedPackage, pkgInfo);
                                 if (config.Force && (installedPackage.Version == availablePackage.Version))
                                 {
                                     FaultTolerance.try_catch_with_logging_exception(
@@ -734,6 +735,43 @@ spam/junk folder.");
                                 "Error backing up changed file");
                         }
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove the shimgen director files from the package.
+        /// These are .gui/.ignore files that may have been created during the installation 
+        /// process and won't be pulled by the nuget package replacement.
+        /// This usually happens when package maintainers haven't been very good about how 
+        /// they create the files in the past (not using force with new-item typically throws 
+        /// an error if the file exists).
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="installedPackage">The installed package.</param>
+        /// <param name="pkgInfo">The package information.</param>
+        private void remove_shim_directors(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
+        {
+            var pathResolver = NugetCommon.GetPathResolver(config, NugetCommon.GetNuGetFileSystem(config, _nugetLogger));
+            var pkgInstallPath = pathResolver.GetInstallPath(installedPackage);
+            if (!_fileSystem.directory_exists(pkgInstallPath))
+            {
+                var chocoPathResolver = pathResolver as ChocolateyPackagePathResolver;
+                if (chocoPathResolver != null)
+                {
+                    chocoPathResolver.UseSideBySidePaths = !chocoPathResolver.UseSideBySidePaths;
+                    pkgInstallPath = chocoPathResolver.GetInstallPath(installedPackage);
+                }
+            }
+
+            if (_fileSystem.directory_exists(pkgInstallPath))
+            {
+                var shimDirectorFiles = _fileSystem.get_files(pkgInstallPath, ApplicationParameters.ShimDirectorFileExtensions, SearchOption.AllDirectories);
+                foreach (var file in shimDirectorFiles.or_empty_list_if_null())
+                {
+                    FaultTolerance.try_catch_with_logging_exception(
+                        () => _fileSystem.delete_file(file),
+                        "Error deleting shim director file");
                 }
             }
         }
