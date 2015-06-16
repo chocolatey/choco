@@ -56,6 +56,7 @@ namespace chocolatey.infrastructure.app.registration
             container.Register<IShimGenerationService, ShimGenerationService>(Lifestyle.Singleton);
             container.Register<IRegistryService, RegistryService>(Lifestyle.Singleton);
             container.Register<IFilesService, FilesService>(Lifestyle.Singleton);
+            container.Register<IConfigTransformService, ConfigTransformService>(Lifestyle.Singleton);
             container.Register<IHashProvider>(() => new CrytpoHashProvider(container.GetInstance<IFileSystem>(), CryptoHashProviderType.Md5), Lifestyle.Singleton);
             container.Register<ITemplateService, TemplateService>(Lifestyle.Singleton);
             container.Register<IChocolateyConfigSettingsService, ChocolateyConfigSettingsService>(Lifestyle.Singleton);
