@@ -21,9 +21,9 @@ namespace chocolatey.infrastructure.app.services
     using System.Linq;
     using Microsoft.Web.XmlTransform;
     using configuration;
+    using filesystem;
     using results;
     using tolerance;
-    using IFileSystem = filesystem.IFileSystem;
 
     public class ConfigTransformService : IConfigTransformService
     {
@@ -56,7 +56,7 @@ namespace chocolatey.infrastructure.app.services
                 var targetFilesTest = targetFiles as IList<string> ?? targetFiles.ToList();
                 if (!targetFilesTest.Any())
                 {
-                    targetFiles = new[] { transformFile.Replace(ApplicationParameters.ConfigFileTransformExtension, string.Empty) };
+                    targetFiles = new[] {transformFile.Replace(ApplicationParameters.ConfigFileTransformExtension, string.Empty)};
                     this.Log().Debug(() => "No matching files found for transform {0}.{1} Creating '{2}'".format_with(_fileSystem.get_file_name(transformFile), Environment.NewLine, targetFiles.FirstOrDefault()));
                 }
 
@@ -64,36 +64,59 @@ namespace chocolatey.infrastructure.app.services
                 {
                     FaultTolerance.try_catch_with_logging_exception(
                         () =>
-                        {
-                            this.Log().Info(() => "Transforming '{0}' with the data from '{1}'".format_with(_fileSystem.get_file_name(targetFile), _fileSystem.get_file_name(transformFile)));
-
-                            using (var transformation = new XmlTransformation(_fileSystem.read_file(transformFile), isTransformAFile: false, logger: null))
                             {
-                                using (var document = new XmlTransformableDocument { PreserveWhitespace = true })
+                                // if there is a backup, we need to put it back in place
+                                // the user has indicated they are using transforms by putting
+                                // the transform file into the folder, so we will override
+                                // the replacement of the file and instead pull from the last 
+                                // backup and let the transform to its thing instead.
+                                var backupTargetFile = targetFile.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
+                                if (_fileSystem.file_exists(backupTargetFile))
                                 {
-                                    using (var inputStream = _fileSystem.open_file_readonly(targetFile))
-                                    {
-                                        document.Load(inputStream);
-                                    }
+                                    this.Log().Debug(()=> "Restoring backup configuration file for '{0}'.".format_with(targetFile));
+                                    _fileSystem.copy_file(backupTargetFile, targetFile, overwriteExisting: true);
+                                }
+                            },
+                        "Error replacing backup config file",
+                        throwError: false,
+                        logWarningInsteadOfError: true);
 
-                                    bool succeeded = transformation.Apply(document);
-                                    if (succeeded)
+                    FaultTolerance.try_catch_with_logging_exception(
+                        () =>
+                            {
+                                this.Log().Info(() => "Transforming '{0}' with the data from '{1}'".format_with(_fileSystem.get_file_name(targetFile), _fileSystem.get_file_name(transformFile)));
+
+                                using (var transformation = new XmlTransformation(_fileSystem.read_file(transformFile), isTransformAFile: false, logger: null))
+                                {
+                                    using (var document = new XmlTransformableDocument {PreserveWhitespace = true})
                                     {
-                                        using (var memoryStream = new MemoryStream())
+                                        using (var inputStream = _fileSystem.open_file_readonly(targetFile))
                                         {
-                                            document.Save(memoryStream);
-                                            memoryStream.Seek(0, SeekOrigin.Begin);
-                                            using (var fileStream = _fileSystem.create_file(targetFile))
+                                            document.Load(inputStream);
+                                        }
+
+                                        bool succeeded = transformation.Apply(document);
+                                        if (succeeded)
+                                        {
+                                            this.Log().Debug(() => "Transform applied successfully for '{0}'".format_with(targetFile));
+                                            using (var memoryStream = new MemoryStream())
                                             {
-                                                memoryStream.CopyTo(fileStream);
+                                                document.Save(memoryStream);
+                                                memoryStream.Seek(0, SeekOrigin.Begin);
+                                                using (var fileStream = _fileSystem.create_file(targetFile))
+                                                {
+                                                    memoryStream.CopyTo(fileStream);
+                                                }
                                             }
+                                        }
+                                        else
+                                        {
+                                            this.Log().Warn(() => "Transform failed for '{0}'".format_with(targetFile));
                                         }
                                     }
                                 }
-                            }
-
-                        },
-                    "Error transforming config file");
+                            },
+                        "Error transforming config file");
                 }
             }
         }
