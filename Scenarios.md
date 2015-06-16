@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 29 Scenario(s), 245 Observation(s) ]
+### ChocolateyInstallCommand [ 30 Scenario(s), 254 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -222,6 +222,18 @@
  * should not have inconclusive package result
  * should not have warning package result
  * should not install a package in the lib directory
+
+#### when installing a package with config transforms
+
+ * should add the insert value in the config due to XDT InsertIfMissing
+ * should change the testReplace value in the config due to XDT Replace
+ * should contain a warning message that it installed successfully
+ * should have a successful package result
+ * should have a version of one dot zero dot zero
+ * should install the expected version of the package
+ * should not change the test value in the config due to XDT InsertIfMissing
+ * should not have inconclusive package result
+ * should not have warning package result
 
 #### when installing a package with dependencies and dependency cannot be found
 
@@ -456,7 +468,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 23 Scenario(s), 183 Observation(s) ]
+### ChocolateyUpgradeCommand [ 25 Scenario(s), 204 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -657,6 +669,33 @@
  * should not have inconclusive package result
  * should not have warning package result
  * should update the changed file
+ * should upgrade the package
+
+#### when upgrading a package with config transforms
+
+ * should add the insertNew value in the config due to XDT InsertIfMissing
+ * should change the testReplace value in the config due to XDT Replace
+ * should contain a warning message that it upgraded successfully
+ * should have a successful package result
+ * should match the upgrade version of one dot one dot zero
+ * should not change the insert value in the config due to upgrade and XDT InsertIfMissing
+ * should not change the test value in the config from original one dot zero dot zero due to upgrade and XDT InsertIfMissing
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should upgrade the package
+
+#### when upgrading a package with config transforms when config was edited
+
+ * should add the insertNew value in the config due to XDT InsertIfMissing
+ * should change the testReplace value in the config due to XDT Replace
+ * should contain a warning message that it upgraded successfully
+ * should have a config with the comment from the original
+ * should have a successful package result
+ * should match the upgrade version of one dot one dot zero
+ * should not change the insert value in the config due to upgrade and XDT InsertIfMissing
+ * should not change the test value in the config from original one dot zero dot zero due to upgrade and XDT InsertIfMissing
+ * should not have inconclusive package result
+ * should not have warning package result
  * should upgrade the package
 
 #### when upgrading a package with dependencies happy

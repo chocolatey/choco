@@ -18,13 +18,10 @@ namespace chocolatey.infrastructure.app.services
     using configuration;
     using results;
 
-    /// <summary>
-    /// The automagic uninstaller service
-    /// </summary>
-    public interface IAutomaticUninstallerService
+    public interface IConfigTransformService
     {
         /// <summary>
-        /// Runs to remove an application from the registry.
+        ///   Runs to change a config file
         /// </summary>
         /// <param name="packageResult">The package result.</param>
         /// <param name="config">The configuration.</param>

@@ -19,6 +19,7 @@ namespace chocolatey.tests.integration.scenarios
     using System.Collections.Concurrent;
     using System.IO;
     using System.Linq;
+    using System.Xml.XPath;
     using NUnit.Framework;
     using NuGet;
     using Should;
@@ -2077,5 +2078,207 @@ namespace chocolatey.tests.integration.scenarios
                 }
             }
         }
+
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_package_with_config_transforms : ScenariosBase
+        {
+            private PackageResult _packageResult;
+            private string _xmlFilePath = string.Empty;
+            private XPathNavigator _xPathNavigator;
+
+            public override void Context()
+            {
+                base.Context();
+                
+                _xmlFilePath = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe.config");
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+
+                var xmlDocument = new XPathDocument(_xmlFilePath);
+                _xPathNavigator = xmlDocument.CreateNavigator();
+            }
+            
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_match_the_upgrade_version_of_one_dot_one_dot_zero()
+            {
+                _packageResult.Version.ShouldEqual("1.1.0");
+            }
+
+            // any file in a nuget package will overwrite an existing file 
+            // on the file system - we subvert that by pulling the backup
+            // if we've determined that there is an xdt file
+
+            [Fact]
+            public void should_not_change_the_test_value_in_the_config_from_original_one_dot_zero_dot_zero_due_to_upgrade_and_XDT_InsertIfMissing()
+            {
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='test']/@value").TypedValue.to_string().ShouldEqual("default 1.0.0");
+            }
+
+            [Fact]
+            public void should_change_the_testReplace_value_in_the_config_due_to_XDT_Replace()
+            {
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='testReplace']/@value").TypedValue.to_string().ShouldEqual("1.1.0");
+            }
+
+            [Fact]
+            public void should_not_change_the_insert_value_in_the_config_due_to_upgrade_and_XDT_InsertIfMissing()
+            {
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insert']/@value").TypedValue.to_string().ShouldEqual("1.0.0");
+            }
+
+            [Fact]
+            public void should_add_the_insertNew_value_in_the_config_due_to_XDT_InsertIfMissing()
+            {
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insertNew']/@value").TypedValue.to_string().ShouldEqual("1.1.0");
+            }
+        } 
+        
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_package_with_config_transforms_when_config_was_edited : ScenariosBase
+        {
+            private PackageResult _packageResult;
+            private string _xmlFilePath = string.Empty;
+            private XPathNavigator _xPathNavigator;
+            private const string COMMENT_ADDED = "<!-- dude -->";
+
+            public override void Context()
+            {
+                base.Context();
+                
+                _xmlFilePath = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe.config");
+                
+                File.WriteAllText(_xmlFilePath, File.ReadAllText(_xmlFilePath) + COMMENT_ADDED);
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+
+                var xmlDocument = new XPathDocument(_xmlFilePath);
+                _xPathNavigator = xmlDocument.CreateNavigator();
+            }
+            
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_match_the_upgrade_version_of_one_dot_one_dot_zero()
+            {
+                _packageResult.Version.ShouldEqual("1.1.0");
+            }
+
+            // any file in a nuget package will overwrite an existing file 
+            // on the file system - we subvert that by pulling the backup
+            // if we've determined that there is an xdt file
+
+            [Fact]
+            public void should_not_change_the_test_value_in_the_config_from_original_one_dot_zero_dot_zero_due_to_upgrade_and_XDT_InsertIfMissing()
+            {
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='test']/@value").TypedValue.to_string().ShouldEqual("default 1.0.0");
+            }
+
+            [Fact]
+            public void should_change_the_testReplace_value_in_the_config_due_to_XDT_Replace()
+            {
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='testReplace']/@value").TypedValue.to_string().ShouldEqual("1.1.0");
+            }
+
+            [Fact]
+            public void should_not_change_the_insert_value_in_the_config_due_to_upgrade_and_XDT_InsertIfMissing()
+            {
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insert']/@value").TypedValue.to_string().ShouldEqual("1.0.0");
+            } 
+            
+            [Fact]
+            public void should_add_the_insertNew_value_in_the_config_due_to_XDT_InsertIfMissing()
+            {
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insertNew']/@value").TypedValue.to_string().ShouldEqual("1.1.0");
+            }
+
+            [Fact]
+            public void should_have_a_config_with_the_comment_from_the_original()
+            {
+                File.ReadAllText(_xmlFilePath).ShouldContain(COMMENT_ADDED);
+            }
+        }
+
     }
 }
