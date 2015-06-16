@@ -26,10 +26,10 @@ namespace chocolatey.infrastructure.app.templates
     <id>[[PackageNameLower]]</id>
     <title>[[PackageName]] (Install)</title>
     <version>[[PackageVersion]]</version>
-    <authors>__REPLACE_AUTHORS_OF_SOFTWARE__</authors>
+    <authors>__REPLACE_AUTHORS_OF_SOFTWARE_COMMA_SEPARATED__</authors>
     <owners>[[MaintainerName]]</owners>
     <summary>__REPLACE__</summary>
-    <description>__REPLACE__ [[AutomaticPackageNotesNuspec]]
+    <description>__REPLACE__MarkDown_Okay [[AutomaticPackageNotesNuspec]]
     </description>
     <projectUrl></projectUrl>
     <packageSourceUrl></packageSourceUrl>
@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.app.templates
     <docsUrl></docsUrl>
     <mailingListUrl></mailingListUrl>
     <bugTrackerUrl></bugTrackerUrl>-->
-    <tags>[[PackageNameLower]] admin</tags>
+    <tags>[[PackageNameLower]] admin SPACE_SEPARATED</tags>
     <copyright></copyright>
     <licenseUrl></licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -46,7 +46,7 @@ namespace chocolatey.infrastructure.app.templates
       <dependency id="""" version=""__VERSION__"" />
       <dependency id="""" />
     </dependencies>-->
-    <releaseNotes></releaseNotes>
+    <releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes>
     <!--<provides></provides>-->
   </metadata>
   <files>

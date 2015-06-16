@@ -153,5 +153,14 @@ namespace chocolatey.tests
         }
     }
 
+    public class ExpectedExceptionAttribute : NUnit.Framework.ExpectedExceptionAttribute
+    {
+        public ExpectedExceptionAttribute(Type exceptionType) : base(exceptionType)
+        {}
+
+        public ExpectedExceptionAttribute(string exceptionName) : base(exceptionName)
+        {}
+    }
+
     // ReSharper restore InconsistentNaming
 }

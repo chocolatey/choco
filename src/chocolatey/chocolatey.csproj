@@ -107,8 +107,10 @@
     <Compile Include="infrastructure.app\runners\GenericRunner.cs" />
     <Compile Include="infrastructure.app\services\AutomaticUninstallerService.cs" />
     <Compile Include="infrastructure.app\services\ChocolateyConfigSettingsService.cs" />
+    <Compile Include="infrastructure.app\services\ConfigTransformService.cs" />
     <Compile Include="infrastructure.app\services\CygwinService.cs" />
     <Compile Include="infrastructure.app\services\FilesService.cs" />
+    <Compile Include="infrastructure.app\services\IConfigTransformService.cs" />
     <Compile Include="infrastructure.app\services\IFilesService.cs" />
     <Compile Include="infrastructure.app\services\ISourceRunner.cs" />
     <Compile Include="infrastructure.app\templates\ChocolateyReadMeTemplate.cs" />
