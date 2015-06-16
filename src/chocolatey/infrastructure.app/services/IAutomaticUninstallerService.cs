@@ -24,7 +24,7 @@ namespace chocolatey.infrastructure.app.services
     public interface IAutomaticUninstallerService
     {
         /// <summary>
-        /// Runs to remove a application from the registry.
+        /// Runs to remove an application from the registry.
         /// </summary>
         /// <param name="packageResult">The package result.</param>
         /// <param name="config">The configuration.</param>
