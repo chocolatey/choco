@@ -19,6 +19,9 @@ namespace chocolatey.tests.integration.scenarios
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Xml;
+    using System.Xml.XPath;
+    using Microsoft.Web.XmlTransform;
     using NuGet;
     using Should;
     using bdddoc.core;
@@ -2835,6 +2838,93 @@ namespace chocolatey.tests.integration.scenarios
             public void should_have_a_version_of_one_dot_zero_dot_zero()
             {
                 packageResult.Version.ShouldEqual("1.0.0");
+            }
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_with_config_transforms : ScenariosBase
+        {
+            private PackageResult packageResult;
+            private string _xmlFilePath = string.Empty;
+            private XPathNavigator _xPathNavigator;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "upgradepackage";    
+                Scenario.add_packages_to_source_location(Configuration, "upgradepackage.1.0.0*" + Constants.PackageExtension);
+
+                _xmlFilePath = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe.config");
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+                packageResult = Results.FirstOrDefault().Value;
+                var xmlDocument = new XPathDocument(_xmlFilePath);
+                _xPathNavigator = xmlDocument.CreateNavigator();
+            }
+
+            [Fact]
+            public void should_install_the_expected_version_of_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_installed_successfully()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("1/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_have_a_version_of_one_dot_zero_dot_zero()
+            {
+                packageResult.Version.ShouldEqual("1.0.0");
+            }
+
+            [Fact]
+            public void should_not_change_the_test_value_in_the_config_due_to_XDT_InsertIfMissing()
+            {
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='test']/@value").TypedValue.to_string().ShouldEqual("default 1.0.0");
+            }
+
+            [Fact]
+            public void should_change_the_testReplace_value_in_the_config_due_to_XDT_Replace()
+            {
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='testReplace']/@value").TypedValue.to_string().ShouldEqual("1.0.0");
+            }
+
+            [Fact]
+            public void should_add_the_insert_value_in_the_config_due_to_XDT_InsertIfMissing()
+            {
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insert']/@value").TypedValue.to_string().ShouldEqual("1.0.0");
             }
         }
     }

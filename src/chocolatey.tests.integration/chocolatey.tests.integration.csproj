@@ -90,7 +90,9 @@
     <Compile Include="TODO.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="context\badpackage\badpackage.1.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

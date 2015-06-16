@@ -5,7 +5,7 @@
     <!-- Read this before publishing packages to chocolatey.org: https://github.com/chocolatey/chocolatey/wiki/CreatePackages -->
     <id>upgradepackage</id>
     <title>upgradepackage</title>
-    <version>1.1.0</version>
+    <version>1.0.0</version>
     <authors>__REPLACE_AUTHORS_OF_SOFTWARE__</authors>
     <owners>__REPLACE_YOUR_NAME__</owners>
     <summary>__REPLACE__</summary>
