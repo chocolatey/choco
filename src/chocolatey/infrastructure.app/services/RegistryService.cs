@@ -25,6 +25,7 @@ namespace chocolatey.infrastructure.app.services
     using domain;
     using filesystem;
     using infrastructure.services;
+    using tolerance;
     using Registry = domain.Registry;
 
     /// <summary>
@@ -41,6 +42,14 @@ namespace chocolatey.infrastructure.app.services
             _fileSystem = fileSystem;
         }
 
+        private void add_key(IList<RegistryKey> keys, RegistryHive hive, RegistryView view)
+        {
+            FaultTolerance.try_catch_with_logging_exception(
+                () => keys.Add(RegistryKey.OpenBaseKey(hive, view)),
+                "Could not open registry hive '{0}' for view '{1}'".format_with(hive.to_string(), view.to_string()),
+                logWarningInsteadOfError: true);
+        }
+
         public Registry get_installer_keys()
         {
             var snapshot = new Registry();
@@ -50,16 +59,20 @@ namespace chocolatey.infrastructure.app.services
             IList<RegistryKey> keys = new List<RegistryKey>();
             if (Environment.Is64BitOperatingSystem)
             {
-                keys.Add(RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64));
-                keys.Add(RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64));
+                add_key(keys, RegistryHive.CurrentUser, RegistryView.Registry64);
+                add_key(keys, RegistryHive.LocalMachine, RegistryView.Registry64);
             }
 
-            keys.Add(RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry32));
-            keys.Add(RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32));
+            add_key(keys, RegistryHive.CurrentUser, RegistryView.Registry32);
+            add_key(keys, RegistryHive.LocalMachine, RegistryView.Registry32);
 
             foreach (var registryKey in keys)
             {
-                var uninstallKey = registryKey.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall", RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
+                var uninstallKey = FaultTolerance.try_catch_with_logging_exception(
+                    () => registryKey.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall", RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
+                    "Could not open uninstall subkey for key '{0}'".format_with(registryKey.Name),
+                    logWarningInsteadOfError: true);
+
                 if (uninstallKey != null)
                 {
                     //Console.WriteLine("Evaluating {0} of {1}".format_with(uninstallKey.View, uninstallKey.Name));
@@ -87,10 +100,21 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="snapshot">The snapshot.</param>
         public void evaluate_keys(RegistryKey key, Registry snapshot)
         {
-            foreach (var subKeyName in key.GetSubKeyNames())
-            {
-                evaluate_keys(key.OpenSubKey(subKeyName), snapshot);
-            }
+            if (key == null) return;
+
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                    {
+                        foreach (var subKeyName in key.GetSubKeyNames())
+                        {
+                            FaultTolerance.try_catch_with_logging_exception(
+                                () =>  evaluate_keys(key.OpenSubKey(subKeyName, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey), snapshot),
+                                "Failed to open subkey named '{0}' for '{1}', likely due to permissions".format_with(subKeyName, key.Name),
+                                logWarningInsteadOfError: true);
+                        }
+                    },
+                "Failed to open subkeys for '{0}', likely due to permissions".format_with(key.Name),
+                logWarningInsteadOfError: true);
 
             var appKey = new RegistryApplicationKey
                 {
