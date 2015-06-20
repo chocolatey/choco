@@ -36,6 +36,7 @@ The second is Xml Document Transformations (XDT), which I think many folks are a
  * Always log debug output to the log file - see [#319](https://github.com/chocolatey/choco/issues/319)
  * Warn when unable to snapshot locked files - see [#313](https://github.com/chocolatey/choco/issues/313)
  * Use %systemroot% in place of %windir%. PATH exceed 2048 breaks choco - see [#252](https://github.com/chocolatey/choco/issues/252)
+ * Add fault tolerance to registry snapshot checks - see [#337](https://github.com/chocolatey/choco/issues/337)
 
 ## [0.9.9.6](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.6+is%3Aclosed) (May 16, 2015)
 
