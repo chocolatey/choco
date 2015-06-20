@@ -131,6 +131,7 @@ namespace chocolatey.infrastructure.app.services
                 }
 
                 var logLocation = _fileSystem.combine_paths(_fileSystem.get_full_path(config.CacheLocation), "chocolatey", pkgInfo.Package.Id, pkgInfo.Package.Version.to_string());
+                this.Log().Debug(()=>" Setting up uninstall logging directory at {0}".format_with(logLocation));
                 _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(logLocation));
                 uninstallArgs = uninstallArgs.Replace(InstallTokens.PACKAGE_LOCATION, logLocation);
 
@@ -142,7 +143,7 @@ namespace chocolatey.infrastructure.app.services
                     if (config.PromptForConfirmation)
                     {
                         var selection = InteractivePrompt.prompt_for_confirmation("Uninstall may not be silent (could not detect). Proceed?", new[] {"yes", "no"}, defaultChoice: null, requireAnswer: true);
-                        if (selection.is_equal_to("no")) skipUninstaller = false;
+                        if (selection.is_equal_to("yes")) skipUninstaller = false;
                     }
 
                     if (skipUninstaller)
