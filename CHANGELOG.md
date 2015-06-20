@@ -1,3 +1,42 @@
+## [0.9.9.7](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.7+is%3Aclosed) (unreleased)
+
+"Fix Everything. Fix All The Things" - There have been some things bugging us for a long time related to limitations with NuGet, so we decided to fix that. Like [nuspec enhancements](https://github.com/chocolatey/choco/issues/205), that crazy [content folder restriction](https://github.com/chocolatey/choco/issues/290) has been removed (I know, right?!), and we're working around [badly](https://github.com/chocolatey/choco/issues/316) [behaved](https://github.com/chocolatey/choco/issues/326) packages quite a bit more to bring you more feature parity.
+
+Let's talk about a couple of big, like really big, BIG features just added with this release. No more packages rebooting Windows. We fixed ([#304](https://github.com/chocolatey/choco/issues/304) / [#323](https://github.com/chocolatey/choco/issues/323)) and [enhanced](https://github.com/chocolatey/choco/issues/305) up the Auto Uninstaller Service quite a bit to ensure things are working like you would expect (It goes on by default in 0.9.10 - we'll start documenting more about it soon). But wait, there's more! I haven't even told you about the big features yet
+
+The first big feature is enhancing the nuspec. I mentioned this I know, but *now* you can use `packageSourceUrl` in the nuspec to tell folks where you are storing the source for the package! We also added `projectSourceUrl`, `docsUrl`, `mailingListUrl`, and `bugTrackerUrl`. What's even better is that the community feed has already been enhanced to look for these values. So have the templates from `choco new`. And it's backwards compatible, meaning you can still install packages that have these added nuspec enhancements without issue (but we will need to provide a fix for Nuget Package Explorer).
+
+The second is Xml Document Transformations (XDT), which I think many folks are aware of but may not realize what it can provide. [NuGet has allowed transformations for quite awhile](https://docs.nuget.org/Create/Configuration-File-and-Source-Code-Transformations) to allow you to make changes to an `app.config`/`web.config` on install/uninstall. We are following in similar footsteps to allow you to do similar when installing/upgrading packages. We will look for `*.install.xdt` files in the package (doesn't matter where) and they will apply to configuration files with the same name in the package. This means that during upgrades we won't overwrite configuration files during upgrades that have opted into this feature. It allows you to give users a better experience during upgrades because they won't need to keep making the same changes to the xml config files each time they upgrade your package.
+
+### FEATURES
+
+ * Allow XDT Configuration Transforms - see [#331](https://github.com/chocolatey/choco/issues/331)
+ * Prevent reboots - see [#316](https://github.com/chocolatey/choco/issues/316)
+ * Enhance the nuspec - first wave - see [#205](https://github.com/chocolatey/choco/issues/205)
+ * Uninstaller Service Enhancements - see [#305](https://github.com/chocolatey/choco/issues/305)
+
+### BUG FIXES
+
+ * When uninstall fails, do not continue removing files - see [#315](https://github.com/chocolatey/choco/issues/315)
+ * Do not run autouninstaller if the package result is already a failure - see [#323](https://github.com/chocolatey/choco/issues/323)
+ * Fix - Auto Uninstaller can fail if chocolateyUninstall.ps1 uninstalls prior to it running - see [#304](https://github.com/chocolatey/choco/issues/304)
+ * Fix - Packages with content folders cannot have a dependency without also having a content folder - see [#290](https://github.com/chocolatey/choco/issues/290)
+ * Remove ShimGen director files on upgrade/uninstall - see [#326](https://github.com/chocolatey/choco/issues/326)
+ * If feature doesn't exist, throw an error - see [#317](https://github.com/chocolatey/choco/issues/317)
+ * Fix - The operation completed successfully on stderr - see [#249](https://github.com/chocolatey/choco/issues/249)
+ * Fix - When specific nuget version is needed by a package it is the chocolatey version that is used - see [#194](https://github.com/chocolatey/choco/issues/194)
+ * When installing with *.nupkg, need to get package name from package, not file name - see [#90](https://github.com/chocolatey/choco/issues/90)
+ * Fix - Choco pin list is not returning a list - see [#302](https://github.com/chocolatey/choco/issues/302)
+ * Fix - A pin is not created for existing installations (prior to new choco) - see [#60](https://github.com/chocolatey/choco/issues/60)
+
+### IMPROVEMENTS
+
+ * Allow upgrade to always install missing packages - see [#300](https://github.com/chocolatey/choco/issues/300)
+ * Enhance Templates - see [#296](https://github.com/chocolatey/choco/issues/296)
+ * Always log debug output to the log file - see [#319](https://github.com/chocolatey/choco/issues/319)
+ * Warn when unable to snapshot locked files - see [#313](https://github.com/chocolatey/choco/issues/313)
+ * Use %systemroot% in place of %windir%. PATH exceed 2048 breaks choco - see [#252](https://github.com/chocolatey/choco/issues/252)
+
 ## [0.9.9.6](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.6+is%3Aclosed) (May 16, 2015)
 
 Some really large fixes this release, especially removing all files that are installed to the package directory if they haven't changed, including ensuring that the nupkg file is always removed on successful uninstalls. The really big add some folks are going to like is the new outdated command. Some more variables that were misused have been brought back, which allows some packages (like Atom) to be installed again without issue. If you can believe some people never read these, we decided to add a note to the installer prompt to let people know about -y.
