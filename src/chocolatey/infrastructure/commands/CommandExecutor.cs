@@ -67,13 +67,14 @@ namespace chocolatey.infrastructure.commands
                            file_system.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)),
                            stdOutAction,
                            stdErrAction,
-                           updateProcessPath
+                           updateProcessPath,
+                           allowUseWindow:false
                 );
         }
 
         public int execute(string process, string arguments, int waitForExitInSeconds, string workingDirectory)
         {
-            return execute(process, arguments, waitForExitInSeconds, workingDirectory, null, null, updateProcessPath: true);
+            return execute(process, arguments, waitForExitInSeconds, workingDirectory, null, null, updateProcessPath: true, allowUseWindow: false);
         }
 
         public static int execute(string process,
@@ -82,7 +83,8 @@ namespace chocolatey.infrastructure.commands
                                   string workingDirectory,
                                   Action<object, DataReceivedEventArgs> stdOutAction,
                                   Action<object, DataReceivedEventArgs> stdErrAction,
-                                  bool updateProcessPath
+                                  bool updateProcessPath,
+                                  bool allowUseWindow
             )
         {
             int exitCode = -1;
@@ -105,8 +107,13 @@ namespace chocolatey.infrastructure.commands
                     WorkingDirectory = workingDirectory,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    CreateNoWindow = true
+                    CreateNoWindow = !allowUseWindow,
                 };
+
+            if (allowUseWindow)
+            {
+                psi.WindowStyle = ProcessWindowStyle.Minimized;
+            }
 
             using (var p = initialize_process())
             {

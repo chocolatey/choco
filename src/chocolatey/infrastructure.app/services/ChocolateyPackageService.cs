@@ -178,7 +178,7 @@ namespace chocolatey.infrastructure.app.services
                     if (powerShellRan)
                     {
                         // we don't care about the exit code
-                        if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false);
+                        if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
                     }
 
                     var difference = _registryService.get_differences(before, _registryService.get_installer_keys());
@@ -503,7 +503,7 @@ Would have determined packages that are out of date based on what is
                     }
 
                     // we don't care about the exit code
-                    if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false);
+                    if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
 
                     if (packageResult.Success)
                     {
