@@ -41,7 +41,7 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Context()
             {
-                Configuration = Scenario.install();
+                Configuration = Scenario.uninstall();
                 Scenario.reset(Configuration);
                 Configuration.PackageNames = Configuration.Input = "installpackage";
                 Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);

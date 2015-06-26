@@ -149,5 +149,13 @@ namespace chocolatey.tests.integration
 
             return config;
         }
+
+        public static ChocolateyConfiguration uninstall()
+        {
+            var config = baseline_configuration();
+            config.CommandName = CommandNameType.uninstall.to_string();
+
+            return config;
+        }
     }
 }
