@@ -24,6 +24,7 @@ namespace chocolatey.tests.integration
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.nuget;
     using chocolatey.infrastructure.app.services;
+    using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
 
     public class Scenario
@@ -67,6 +68,8 @@ namespace chocolatey.tests.integration
             _fileSystem.create_directory(backupPackagesPath);
             _fileSystem.create_directory(_fileSystem.combine_paths(get_top_level(), ".chocolatey"));
             _fileSystem.create_directory(_fileSystem.combine_paths(get_top_level(), "extensions"));
+
+            PowershellExecutor.AllowUseWindow = false;
         }
 
         public static void add_packages_to_source_location(ChocolateyConfiguration config, string pattern)
