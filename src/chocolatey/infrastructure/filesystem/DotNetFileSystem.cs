@@ -50,6 +50,8 @@ namespace chocolatey.infrastructure.filesystem
             var combinedPath = Platform.get_platform() == PlatformType.Windows ? leftItem : leftItem.Replace('\\', '/');
             foreach (var rightItem in rightItems)
             {
+                if (rightItem.Contains(":")) throw new ApplicationException("Cannot combine a path with ':' attempted to combine '{0}' with '{1}'".format_with(rightItem, combinedPath));
+ 
                 var rightSide = Platform.get_platform() == PlatformType.Windows ? rightItem : rightItem.Replace('\\', '/');
                 if (rightSide.StartsWith(Path.DirectorySeparatorChar.to_string()) || rightSide.StartsWith(Path.AltDirectorySeparatorChar.to_string()))
                 {
@@ -336,6 +338,9 @@ namespace chocolatey.infrastructure.filesystem
 
         public void move_directory(string directoryPath, string newDirectoryPath)
         {
+            if (string.IsNullOrWhiteSpace(directoryPath) || string.IsNullOrWhiteSpace(newDirectoryPath)) throw new ApplicationException("You must provide a directory to move from or to.");
+            if (combine_paths(directoryPath,"").is_equal_to(combine_paths(Environment.GetEnvironmentVariable("SystemDrive"),""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
+
             try
             {
                 this.Log().Debug("Moving '{0}'{1} to '{2}'".format_with(directoryPath, Environment.NewLine, newDirectoryPath));
@@ -404,6 +409,9 @@ namespace chocolatey.infrastructure.filesystem
 
         public void delete_directory(string directoryPath, bool recursive)
         {
+            if (string.IsNullOrWhiteSpace(directoryPath)) throw new ApplicationException("You must provide a directory to delete.");
+            if (combine_paths(directoryPath, "").is_equal_to(combine_paths(Environment.GetEnvironmentVariable("SystemDrive"), ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
+           
             this.Log().Debug(() => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directoryPath)));
             allow_retries(() => Directory.Delete(directoryPath, recursive));
         }
