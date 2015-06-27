@@ -216,6 +216,7 @@ namespace chocolatey.infrastructure.app.services
                     get_exe(_rootDirectory),
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
+                    _fileSystem.get_current_directory(),
                     (s, e) =>
                         {
                             var logMessage = e.Data;
@@ -236,7 +237,8 @@ namespace chocolatey.infrastructure.app.services
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
                             this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage));
                         },
-                    updateProcessPath: false
+                    updateProcessPath: false,
+                    allowUseWindow: true
                     );
 
                 if (exitCode != 0)

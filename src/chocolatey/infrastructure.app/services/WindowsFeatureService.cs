@@ -190,6 +190,7 @@ namespace chocolatey.infrastructure.app.services
                 _exePath,
                 args,
                 config.CommandExecutionTimeoutSeconds,
+                _fileSystem.get_current_directory(),
                 stdOutAction: (s, e) =>
                     {
                         var logMessage = e.Data;
@@ -208,7 +209,8 @@ namespace chocolatey.infrastructure.app.services
                         if (string.IsNullOrWhiteSpace(e.Data)) return;
                         this.Log().Error(() => "{0}".format_with(e.Data));
                     },
-                updateProcessPath: false
+                updateProcessPath: false,
+                allowUseWindow: true
                 );
 
             return packageResults;
@@ -270,6 +272,7 @@ namespace chocolatey.infrastructure.app.services
                     _exePath,
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
+                    _fileSystem.get_current_directory(),
                     (s, e) =>
                         {
                             var logMessage = e.Data;
@@ -295,7 +298,8 @@ namespace chocolatey.infrastructure.app.services
 
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         },
-                    updateProcessPath: false
+                    updateProcessPath: false,
+                    allowUseWindow: true
                     );
 
                 if (exitCode != 0)
@@ -352,6 +356,7 @@ namespace chocolatey.infrastructure.app.services
                     _exePath,
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
+                    _fileSystem.get_current_directory(),
                     (s, e) =>
                         {
                             var logMessage = e.Data;
@@ -377,7 +382,8 @@ namespace chocolatey.infrastructure.app.services
 
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         },
-                    updateProcessPath: false
+                    updateProcessPath: false,
+                    allowUseWindow: true
                     );
 
                 if (exitCode != 0)

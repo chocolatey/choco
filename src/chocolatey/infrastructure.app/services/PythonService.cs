@@ -279,6 +279,7 @@
                 _exePath,
                 args,
                 config.CommandExecutionTimeoutSeconds,
+                _fileSystem.get_current_directory(),
                 stdOutAction: (s, e) =>
                     {
                         var logMessage = e.Data;
@@ -297,7 +298,8 @@
                         if (string.IsNullOrWhiteSpace(e.Data)) return;
                         this.Log().Error(() => "{0}".format_with(e.Data));
                     },
-                updateProcessPath: false
+                updateProcessPath: false,
+                allowUseWindow: true
                 );
 
             return packageResults;
@@ -329,6 +331,7 @@
                     _exePath,
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
+                    _fileSystem.get_current_directory(),
                     (s, e) =>
                     {
                         var logMessage = e.Data;
@@ -361,7 +364,8 @@
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         }
                     },
-                    updateProcessPath: false
+                    updateProcessPath: false,
+                    allowUseWindow: true
                     );
 
                 if (exitCode != 0)
@@ -401,6 +405,7 @@
                     _exePath,
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
+                    _fileSystem.get_current_directory(),
                     (s, e) =>
                     {
                         var logMessage = e.Data;
@@ -433,7 +438,8 @@
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         }
                     },
-                    updateProcessPath: false
+                    updateProcessPath: false,
+                    allowUseWindow: true
                     );
 
                 if (exitCode != 0)
@@ -466,6 +472,7 @@
                     _exePath,
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
+                    _fileSystem.get_current_directory(),
                     (s, e) =>
                     {
                         var logMessage = e.Data;
@@ -498,7 +505,8 @@
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         }
                     },
-                    updateProcessPath: false
+                    updateProcessPath: false,
+                    allowUseWindow: true
                     );
 
                 if (exitCode != 0)
