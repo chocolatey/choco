@@ -149,6 +149,7 @@ namespace chocolatey.infrastructure.app.services
                     if (skipUninstaller)
                     {
                         this.Log().Info(" Skipping auto uninstaller - Installer type was not detected and no silent uninstall key exists.");
+                        this.Log().Warn("If the application was not removed with a chocolateyUninstall.ps1,{0} please remove it from Programs and Features manually.".format_with(Environment.NewLine));
                         return;
                     }
                 }

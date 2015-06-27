@@ -170,7 +170,8 @@ namespace chocolatey.infrastructure.app.services
                         if (string.IsNullOrWhiteSpace(e.Data)) return;
                         this.Log().Error(() => "{0}".format_with(e.Data));
                     },
-                updateProcessPath: false
+                updateProcessPath: false,
+                allowUseWindow: true
                 );
 
             return packageResults;
@@ -227,7 +228,8 @@ namespace chocolatey.infrastructure.app.services
                             if (string.IsNullOrWhiteSpace(e.Data)) return;
                             this.Log().Error(() => "[{0}] {1}".format_with(APP_NAME, e.Data));
                         },
-                    updateProcessPath: false
+                    updateProcessPath: false,
+                    allowUseWindow:true
                     );
 
                 if (exitCode != 0)

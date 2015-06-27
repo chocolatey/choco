@@ -97,6 +97,13 @@ namespace chocolatey.infrastructure.app.commands
             {
                 throw new ApplicationException("Package name is required. Please pass at least one package name to install.");
             }
+            // Need a better check on this before releasing. Issue will be covered by other fixes
+            //// investigate https://msdn.microsoft.com/en-us/library/system.io.path.getinvalidpathchars(v=vs.100).aspx
+            //if (configuration.PackageNames.Contains(":"))
+            //{
+            //    throw new ApplicationException("Package name cannot contain invalid characters.");
+            //}
+
             if (configuration.ForceDependencies && !configuration.Force)
             {
                 throw new ApplicationException("Force dependencies can only be used with force also turned on.");

@@ -17,6 +17,7 @@ namespace chocolatey.infrastructure.commands
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
     using adapters;
@@ -25,6 +26,15 @@ namespace chocolatey.infrastructure.commands
 
     public sealed class PowershellExecutor
     {
+        private static bool _allowUseWindow = true;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static bool AllowUseWindow
+        {
+            get { return _allowUseWindow; }
+            set { _allowUseWindow = value; }
+        }
+
         private static readonly IList<string> _powershellLocations = new List<string>
             {
                 Environment.ExpandEnvironmentVariables("%systemroot%\\SysNative\\WindowsPowerShell\\v1.0\\powershell.exe"),
@@ -53,7 +63,8 @@ namespace chocolatey.infrastructure.commands
                 workingDirectory: fileSystem.get_directory_name(fileSystem.get_current_assembly_path()),
                 stdOutAction: stdOutAction,
                 stdErrAction: stdErrAction,
-                updateProcessPath: true
+                updateProcessPath: true,
+                allowUseWindow: _allowUseWindow
                 );
         }
 

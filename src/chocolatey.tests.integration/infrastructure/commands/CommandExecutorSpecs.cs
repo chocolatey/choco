@@ -47,7 +47,7 @@ namespace chocolatey.tests.integration.infrastructure.commands
 
             public override void Because()
             {
-                result = commandExecutor.execute("cmd.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, fileSystem.get_current_directory(), null, (s, e) => { errorOutput += e.Data; }, updateProcessPath: false);
+                result = commandExecutor.execute("cmd.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, fileSystem.get_current_directory(), null, (s, e) => { errorOutput += e.Data; }, updateProcessPath: false, allowUseWindow: false);
             }
 
             [Fact]

@@ -17,6 +17,7 @@ namespace chocolatey.tests.infrastructure.filesystem
 {
     using System;
     using System.IO;
+    using NUnit.Framework;
     using Moq;
     using Should;
     using chocolatey.infrastructure.adapters;
@@ -115,6 +116,13 @@ namespace chocolatey.tests.infrastructure.filesystem
                     Platform.get_platform() == PlatformType.Windows ?
                         "C:\\temp\\yo\\filename.txt"
                         : "C:/temp/yo/filename.txt");
+            }
+
+            [Fact]
+            [ExpectedException(typeof(ApplicationException), MatchType = MessageMatch.StartsWith, ExpectedMessage = "Cannot combine a path with")]
+            public void Combine_should_error_if_any_path_but_the_primary_contains_colon()
+            {
+                FileSystem.combine_paths("C:\\temp", "C:");
             }
         }
 
