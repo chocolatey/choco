@@ -172,8 +172,6 @@ namespace chocolatey.console
             }
         }
 
-        static EventHandler _handler;
-
         private static void trap_exit_scenarios(ChocolateyConfiguration config)
         {
             ExitScenarioHandler.SetHandler();
