@@ -105,10 +105,11 @@ namespace chocolatey.infrastructure.app.services
                     RegularOutput = config.RegularOutput,
                     PromptForConfirmation = false,
                     AcceptLicense = true,
+                    QuietOutput = true,
                 };
             runnerConfig.ListCommand.LocalOnly = true;
 
-            var localPackages = _nugetService.list_run(runnerConfig, logResults: false);
+            var localPackages = _nugetService.list_run(runnerConfig);
 
             if (!localPackages.Any(p => p.Name.is_equal_to(WEB_PI_PACKAGE)))
             {
@@ -127,7 +128,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH, args));
         }
 
-        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
             var packageResults = new List<PackageResult>();
             var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
@@ -145,7 +146,7 @@ namespace chocolatey.infrastructure.app.services
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        if (logResults)
+                        if (!config.QuietOutput)
                         {
                             this.Log().Info(e.Data);
                         }

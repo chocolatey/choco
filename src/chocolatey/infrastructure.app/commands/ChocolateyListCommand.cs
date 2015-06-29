@@ -16,17 +16,19 @@
 namespace chocolatey.infrastructure.app.commands
 {
     using System.Collections.Generic;
+    using System.Linq;
     using attributes;
     using commandline;
     using configuration;
     using domain;
     using infrastructure.commands;
     using logging;
+    using results;
     using services;
 
     [CommandFor(CommandNameType.list)]
     [CommandFor(CommandNameType.search)]
-    public sealed class ChocolateyListCommand : ICommand
+    public sealed class ChocolateyListCommand : IListCommand<PackageResult>
     {
         private readonly IChocolateyPackageService _packageService;
 
@@ -66,12 +68,6 @@ namespace chocolatey.infrastructure.app.commands
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
-
-            if (configuration.ListCommand.LocalOnly)
-            {
-                configuration.Sources = ApplicationParameters.PackagesLocation;
-                configuration.Prerelease = true;
-            }
         }
 
         public void handle_validation(ChocolateyConfiguration configuration)
@@ -115,7 +111,15 @@ Chocolatey will perform a search for a package local or remote. Some
         public void run(ChocolateyConfiguration configuration)
         {
             _packageService.ensure_source_app_installed(configuration);
-            _packageService.list_run(configuration, logResults: true);
+            // note: you must leave the .ToList() here or else the method won't be evaluated!
+            _packageService.list_run(configuration).ToList();
+        }
+
+        public IEnumerable<PackageResult> list(ChocolateyConfiguration configuration)
+        {
+            configuration.QuietOutput = true;
+            // here it's up to the caller to enumerate the results
+            return _packageService.list_run(configuration);
         }
 
         public bool may_require_admin_access()

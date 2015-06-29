@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using configuration;
     using results;
 
@@ -41,9 +42,8 @@ namespace chocolatey.infrastructure.app.services
         ///   Lists/searches for packages that meet a search criteria
         /// </summary>
         /// <param name="config">The configuration.</param>
-        /// <param name="logResults">Should results be logged?</param>
         /// <returns></returns>
-        void list_run(ChocolateyConfiguration config, bool logResults);
+        IEnumerable<PackageResult> list_run(ChocolateyConfiguration config);
 
         /// <summary>
         ///   Run pack in noop mode

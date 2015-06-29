@@ -180,7 +180,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info("Would have run '{0} {1}'".format_with(_exePath, args));
         }
 
-        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
             set_executable_path_if_not_set();
             var args = build_args(config, _listArguments);
@@ -195,7 +195,7 @@ namespace chocolatey.infrastructure.app.services
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        if (logResults)
+                        if (!config.QuietOutput)
                         {
                             this.Log().Info(e.Data);
                         }

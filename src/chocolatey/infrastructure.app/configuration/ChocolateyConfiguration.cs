@@ -153,7 +153,22 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool Force { get; set; }
         public bool Noop { get; set; }
         public bool HelpRequested { get; set; }
+
+        // TODO: Should look into using mutually exclusive output levels - Debug, Info (Regular), Error (Quiet)
+        // Verbose and Important are not part of the levels at all
+        /// <summary>
+        /// Gets or sets a value indicating whether output should be limited.
+        /// This supports the --limit-output parameter.
+        /// </summary>
+        /// <value><c>true</c> for regular output; <c>false</c> for limited output.</value>
         public bool RegularOutput { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether console logging should be supressed. 
+        /// This is for use by API calls which surface results in alternate forms.
+        /// </summary>
+        /// <value><c>true</c> for no output; <c>false</c> for regular or limited output.</value>
+        /// <remarks>This has only been implemented for NuGet List</remarks>
+        public bool QuietOutput { get; set; }
         public bool PromptForConfirmation { get; set; }
         public bool AcceptLicense { get; set; }
         public bool AllowUnofficialBuild { get; set; }

@@ -174,10 +174,11 @@
                     RegularOutput = config.RegularOutput,
                     PromptForConfirmation = false,
                     AcceptLicense = true,
+                    QuietOutput = true,
                 };
                 runnerConfig.ListCommand.LocalOnly = true;
 
-                var localPackages = _nugetService.list_run(runnerConfig, logResults: false);
+                var localPackages = _nugetService.list_run(runnerConfig);
 
                 if (!localPackages.Any(p => p.Name.is_equal_to(PYTHON_PACKAGE)))
                 {
@@ -270,7 +271,7 @@
             this.Log().Info("Would have run '{0} {1}'".format_with(_exePath, args));
         }
 
-        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
             set_executable_path_if_not_set();
             var args = build_args(config, _listArguments);
@@ -285,7 +286,7 @@
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        if (logResults)
+                        if (!config.QuietOutput)
                         {
                             this.Log().Info(e.Data);
                         }

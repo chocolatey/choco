@@ -136,10 +136,11 @@ namespace chocolatey.infrastructure.app.services
                     RegularOutput = config.RegularOutput,
                     PromptForConfirmation = false,
                     AcceptLicense = true,
+                    QuietOutput = true,
                 };
             runnerConfig.ListCommand.LocalOnly = true;
 
-            var localPackages = _nugetService.list_run(runnerConfig, logResults: false);
+            var localPackages = _nugetService.list_run(runnerConfig);
 
             if (!localPackages.Any(p => p.Name.is_equal_to(CYGWIN_PACKAGE)))
             {
@@ -184,7 +185,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement list".format_with(APP_NAME));
         }
 
-        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
             throw new NotImplementedException("{0} does not implement list".format_with(APP_NAME));
         }
