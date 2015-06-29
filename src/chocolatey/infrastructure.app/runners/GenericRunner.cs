@@ -113,11 +113,13 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             return command;
         }
 
-        private static void set_source_type(ChocolateyConfiguration config)
+        private void set_source_type(ChocolateyConfiguration config)
         {
             var sourceType = SourceType.normal;
             Enum.TryParse(config.Sources, true, out sourceType);
             config.SourceType = sourceType;
+
+            this.Log().Debug(()=> "The source '{0}' evaluated to a '{1}' source type".format_with(config.Sources,sourceType.to_string()));
         }
 
         public void run(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
