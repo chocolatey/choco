@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text.RegularExpressions;
     using Microsoft.Win32;
     using configuration;
@@ -140,7 +141,7 @@ namespace chocolatey.infrastructure.app.services
 
             var localPackages = _nugetService.list_run(runnerConfig, logResults: false);
 
-            if (!localPackages.ContainsKey(CYGWIN_PACKAGE))
+            if (!localPackages.Any(p => p.Name.is_equal_to(CYGWIN_PACKAGE)))
             {
                 runnerConfig.PackageNames = CYGWIN_PACKAGE;
                 runnerConfig.Sources = ApplicationParameters.ChocolateyCommunityFeedSource;
@@ -183,7 +184,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement list".format_with(APP_NAME));
         }
 
-        public ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
         {
             throw new NotImplementedException("{0} does not implement list".format_with(APP_NAME));
         }

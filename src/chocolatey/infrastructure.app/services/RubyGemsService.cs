@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text.RegularExpressions;
     using configuration;
     using domain;
@@ -113,7 +114,7 @@
 
             var localPackages = _nugetService.list_run(runnerConfig, logResults: false);
 
-            if (!localPackages.ContainsKey(RUBY_PACKAGE) && !localPackages.ContainsKey(RUBY_PORTABLE_PACKAGE))
+            if (!localPackages.Any(p => p.Name.is_equal_to(RUBY_PACKAGE) || p.Name.is_equal_to(RUBY_PORTABLE_PACKAGE)))
             {
                 runnerConfig.Sources = ApplicationParameters.ChocolateyCommunityFeedSource;
 
@@ -130,9 +131,9 @@
             this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH, args));
         }
 
-        public ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
         {
-            var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
+            var packageResults = new List<PackageResult>();
             var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
             
             Environment.ExitCode = _commandExecutor.execute(

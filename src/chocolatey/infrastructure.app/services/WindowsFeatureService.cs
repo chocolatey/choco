@@ -180,11 +180,11 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info("Would have run '{0} {1}'".format_with(_exePath, args));
         }
 
-        public ConcurrentDictionary<string, PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config, bool logResults)
         {
             set_executable_path_if_not_set();
             var args = build_args(config, _listArguments);
-            var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
+            var packageResults = new List<PackageResult>();
 
             Environment.ExitCode = _commandExecutor.execute(
                 _exePath,
