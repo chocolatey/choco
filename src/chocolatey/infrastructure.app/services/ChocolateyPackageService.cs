@@ -89,7 +89,7 @@ namespace chocolatey.infrastructure.app.services
                 var list = _nugetService.list_run(config, logResults: true);
                 if (config.RegularOutput)
                 {
-                    this.Log().Warn(() => @"{0} packages {1}.".format_with(list.Count, config.ListCommand.LocalOnly ? "installed" : "found"));
+                    this.Log().Warn(() => @"{0} packages {1}.".format_with(list.Count(), config.ListCommand.LocalOnly ? "installed" : "found"));
 
                     if (config.ListCommand.LocalOnly && config.ListCommand.IncludeRegistryPrograms)
                     {
@@ -99,14 +99,14 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
-        private void report_registry_programs(ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> list)
+        private void report_registry_programs(ChocolateyConfiguration config, IEnumerable<PackageResult> list)
         {
             var itemsToRemoveFromMachine = new List<string>();
             foreach (var packageResult in list)
             {
-                if (packageResult.Value != null && packageResult.Value.Package != null)
+                if (packageResult != null && packageResult.Package != null)
                 {
-                    var pkginfo = _packageInfoService.get_package_information(packageResult.Value.Package);
+                    var pkginfo = _packageInfoService.get_package_information(packageResult.Package);
                     if (pkginfo.RegistrySnapshot == null)
                     {
                         continue;
