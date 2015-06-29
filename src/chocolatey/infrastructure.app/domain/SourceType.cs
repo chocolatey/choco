@@ -25,6 +25,7 @@ namespace chocolatey.infrastructure.app.domain
         webpi,
         ruby,
         python,
+        windowsfeature,
         windowsfeatures,
         cygwin,
     }
