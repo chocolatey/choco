@@ -170,6 +170,7 @@
     <Compile Include="infrastructure\commandline\ExitScenarioHandler.cs" />
     <Compile Include="infrastructure\commandline\InteractivePrompt.cs" />
     <Compile Include="infrastructure\commands\ICommandExecutor.cs" />
+    <Compile Include="infrastructure\commands\IListCommand.cs" />
     <Compile Include="infrastructure\commands\PowershellExecutor.cs" />
     <Compile Include="infrastructure\cryptography\CryptoHashProviderType.cs" />
     <Compile Include="infrastructure\adapters\HashAlgorithm.cs" />

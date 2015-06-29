@@ -15,7 +15,9 @@
 
 namespace chocolatey.infrastructure.results
 {
-    using System.Linq;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
     using NuGet;
 
     /// <summary>
@@ -37,17 +39,41 @@ namespace chocolatey.infrastructure.results
         public string Version { get; private set; }
         public IPackage Package { get; private set; }
         public string InstallLocation { get; set; }
+        public string Source { get; set; }
+        public string SourceUri { get; set; }
 
-        public PackageResult(IPackage package, string installLocation) : this(package.Id.to_lower(), package.Version.to_string(), installLocation)
+        public PackageResult(IPackage package, string installLocation, string source = null) : this(package.Id.to_lower(), package.Version.to_string(), installLocation)
         {
             Package = package;
+            Source = source;
+            var sources = new List<Uri>();
+            if (!string.IsNullOrEmpty(source))
+            {
+                sources.AddRange(source.Split(new[] {";", ","}, StringSplitOptions.RemoveEmptyEntries).Select(s => new Uri(s)));
+            }
+
+            var rp = Package as DataServicePackage;
+            if (rp != null)
+            {
+                SourceUri = rp.DownloadUrl.ToString();
+                Source = sources.FirstOrDefault(uri => uri.IsBaseOf(rp.DownloadUrl)).to_string();
+                if (string.IsNullOrEmpty(Source))
+                {
+                    Source = sources.FirstOrDefault(uri => uri.DnsSafeHost == rp.DownloadUrl.DnsSafeHost).to_string();
+                }
+            }
+            else
+            {
+                Source = sources.FirstOrDefault(uri => uri.IsFile || uri.IsUnc).to_string();
+            }
         }
 
-        public PackageResult(string name, string version, string installLocation)
+        public PackageResult(string name, string version, string installLocation, string source = null)
         {
             Name = name;
             Version = version;
             InstallLocation = installLocation;
+            Source = source;
         }
     }
 }
