@@ -103,6 +103,12 @@ namespace chocolatey.tests.integration.scenarios
 
                 expectedMessage.ShouldBeTrue();
             }
+
+            [Fact]
+            public void should_contain_a_message_that_it_would_have_run_powershell_modification_script()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.Contains("chocolateyBeforeModify.ps1")).ShouldBeTrue();
+            }
         }
 
         [Concern(typeof (ChocolateyUninstallCommand))]
@@ -218,6 +224,12 @@ namespace chocolatey.tests.integration.scenarios
             public void config_should_match_package_result_name()
             {
                 packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_have_executed_chocolateyBeforeModify_script()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.Contains("installpackage 1.0.0 Before Modification")).ShouldBeTrue();
             }
 
             [Fact]

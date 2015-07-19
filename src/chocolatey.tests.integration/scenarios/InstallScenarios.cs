@@ -101,6 +101,18 @@ namespace chocolatey.tests.integration.scenarios
 
                 expectedMessage.ShouldBeTrue();
             }
+
+            [Fact]
+            public void should_not_contain_a_message_that_it_would_have_run_powershell_modification_script()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
+                {
+                    if (message.Contains("chocolateyBeforeModify.ps1")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeFalse();
+            }
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
