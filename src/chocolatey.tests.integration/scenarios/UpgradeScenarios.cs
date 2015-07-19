@@ -304,6 +304,21 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.Contains("upgradepackage 1.0.0 Before Modification")).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_executed_chocolateyBeforeModify_before_chocolateyInstall()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null()
+                    .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
+                    .Any(p => p.EndsWith("upgradepackage 1.1.0 Installed"))
+                    .ShouldBeTrue();
+            }
+
+            [Fact]
             public void should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
                 MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.EndsWith("upgradepackage 1.0.0 Uninstalled")).ShouldBeFalse();
