@@ -225,6 +225,9 @@
     <None Include="context\installpackage\1.0.0\tools\Casemismatch.exe.ignore">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\installpackage\1.0.0\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\installpackage\1.0.0\tools\chocolateyinstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -327,6 +330,9 @@
     <None Include="context\testing.packages.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\upgradepackage\1.0.0\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\upgradepackage\1.0.0\tools\chocolateyinstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -343,6 +349,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="context\upgradepackage\1.0.0\upgradepackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.0\tools\chocolateyBeforeModify.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="context\upgradepackage\1.1.0\tools\chocolateyinstall.ps1">
