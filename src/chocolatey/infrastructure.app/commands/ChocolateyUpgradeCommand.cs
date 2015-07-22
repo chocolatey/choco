@@ -94,6 +94,9 @@ namespace chocolatey.infrastructure.app.commands
                       {
                         if (option != null) configuration.Features.CheckSumFiles = false;
                       })
+                 .Add("except=",
+                     "Except - a comma-separated list of package names that should not be upgraded when upgrading 'all'. Defaults to empty.",
+                     option => configuration.UpgradeCommand.PackageNamesToSkip = option.remove_surrounding_quotes())
                 ;
         }
 
@@ -137,6 +140,8 @@ NOTE: `all` is a special package keyword that will allow you to upgrade
     choco upgrade nodejs.install --version 0.10.35
     choco upgrade git -s ""https://somewhere/out/there""
     choco upgrade git -s ""https://somewhere/protected"" -u user -p pass
+    choco upgrade all
+    choco upgrade all --except=""skype,conemu""
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
