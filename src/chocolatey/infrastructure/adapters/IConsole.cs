@@ -70,6 +70,21 @@ namespace chocolatey.infrastructure.adapters
         /// <exception cref="T:System.IO.IOException">An I/O error occurred.</exception>
         /// <filterpriority>1</filterpriority>
         void Write(object value);
+
+        /// <summary>
+        ///   Writes the current line terminator to the standard output stream.
+        /// </summary>
+        /// <exception cref="T:System.IO.IOException">An I/O error occurred.</exception>
+        /// <filterpriority>1</filterpriority>
+        void WriteLine();
+
+        /// <summary>
+        ///  Writes the text representation of the specified object, followed by the current line terminator, to the standard output stream.
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        /// <exception cref="T:System.IO.IOException">An I/O error occurred.</exception>
+        /// <filterpriority>1</filterpriority>
+        void WriteLine(object value);
     }
 
     // ReSharper restore InconsistentNaming

@@ -925,7 +925,14 @@ ATTENTION: You must take manual action to remove {1} from
             var rollback = true;
             if (config.PromptForConfirmation)
             {
-                var selection = InteractivePrompt.prompt_for_confirmation(" Unsuccessful operation for {0}.{1}  Do you want to rollback to previous version (package files only)?".format_with(packageResult.Name, Environment.NewLine), new[] { "yes", "no" }, defaultChoice: null, requireAnswer: true);
+                var selection = InteractivePrompt.prompt_for_confirmation(
+                    " Unsuccessful operation for {0}.{1}  Rollback to previous version (package files only)?".format_with(packageResult.Name, Environment.NewLine),
+                    new[] { "yes", "no" },
+                    defaultChoice: null,
+                    requireAnswer: true,
+                    allowShortAnswer: true,
+                    shortPrompt: true
+                    );
                 if (selection.is_equal_to("no")) rollback = false;
             }
 
