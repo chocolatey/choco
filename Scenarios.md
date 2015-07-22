@@ -623,7 +623,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 27 Scenario(s), 216 Observation(s) ]
+### ChocolateyUpgradeCommand [ 29 Scenario(s), 221 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -902,6 +902,17 @@
  * should not upgrade the exact version dependency
  * should not upgrade the minimum version dependency
  * should upgrade the package
+
+#### when upgrading all packages happy path
+
+ * should report for all installed packages
+ * should skip packages without upgrades
+ * should upgrade packages with upgrades
+
+#### when upgrading all packages with except
+
+ * should report for all non skipped packages
+ * should skip packages in except list
 
 #### when upgrading an existing package happy path
 
