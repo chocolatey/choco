@@ -26,6 +26,7 @@ Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, righ
 
  * API - List --localonly not working by default - see [#223](https://github.com/chocolatey/choco/issues/223)
  * API - Expose package results - see [#132](https://github.com/chocolatey/choco/issues/132)
+ * API - Externalize IPackage and its interfaces - see [#353](https://github.com/chocolatey/choco/issues/353)
 
 ## [0.9.9.8](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.8+is%3Aclosed) (June 26, 2015)
 
