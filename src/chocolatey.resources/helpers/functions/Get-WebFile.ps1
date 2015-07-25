@@ -110,24 +110,34 @@ param(
     [byte[]]$buffer = new-object byte[] 1048576
     [long]$total = [long]$count = [long]$iterLoop =0
 
-    do
-    {
-       $count = $reader.Read($buffer, 0, $buffer.Length);
-       if($fileName) {
+    $originalEAP = $ErrorActionPreference
+    $ErrorActionPreference = 'Stop'
+    try {
+      do
+      {
+        $count = $reader.Read($buffer, 0, $buffer.Length);
+        if($fileName) {
           $writer.Write($buffer, 0, $count);
-       }
-       if($Passthru){
+        }
+        
+        if($Passthru){
           $output += $encoding.GetString($buffer,0,$count)
-       } elseif(!$quiet) {
+        } elseif(!$quiet) {
           $total += $count
           if($goal -gt 0 -and ++$iterLoop%10 -eq 0) {
-             Write-Progress "Downloading $url to $fileName" "Saving $total of $goal" -id 0 -percentComplete (($total/$goal)*100)
+            Write-Progress "Downloading $url to $fileName" "Saving $total of $goal" -id 0 -percentComplete (($total/$goal)*100)
           }
+          
           if ($total -eq $goal) {
             Write-Progress "Completed download of $url." "Completed a total of $total bytes of $fileName" -id 0 -Completed
           }
-       }
-    } while ($count -gt 0)
+        }
+      } while ($count -gt 0)
+    } catch {
+      throw $_.Exception
+    } finally {
+      $ErrorActionPreference = $originalEAP
+    }
 
     $reader.Close()
     if($fileName) {
