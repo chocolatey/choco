@@ -1,3 +1,20 @@
+## [0.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.10+is%3Aclosed) (unreleased)
+
+Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, right?)!
+
+### FEATURES
+
+ * Alternative sources - see [#14](https://github.com/chocolatey/choco/issues/14)
+ * Support for custom headers - see [#332](https://github.com/chocolatey/choco/issues/332)
+
+### BUG FIXES
+
+ * n/a currently
+
+### IMPROVEMENTS
+
+ * AutoUninstaller is on by default - see [#308](https://github.com/chocolatey/choco/issues/308)
+
 ## [0.9.9.9](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.9+is%3Aclosed) (unreleased)
 
 ### BUG FIXES
