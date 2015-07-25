@@ -24,10 +24,10 @@ namespace chocolatey.infrastructure.app.templates
 $ErrorActionPreference = 'Stop'; # stop on all errors
 
 [[AutomaticPackageNotesInstaller]]
-$packageName = '[[PackageName]]' # arbitrary name for the package, used in messages
-$toolsDir = ""$(Split-Path -parent $MyInvocation.MyCommand.Definition)""
-$url = '[[Url]]' # download url
-$url64 = '[[Url64]]' # 64bit URL here or remove - if installer is both, use $url
+$packageName= '[[PackageName]]' # arbitrary name for the package, used in messages
+$toolsDir   = ""$(Split-Path -parent $MyInvocation.MyCommand.Definition)""
+$url        = '[[Url]]' # download url
+$url64      = '[[Url64]]' # 64bit URL here or remove - if installer is both, use $url
 
 $packageArgs = @{
   packageName   = $packageName
@@ -40,11 +40,11 @@ $packageArgs = @{
   silentArgs    = ""/qn /norestart /l*v `""$env:TEMP\chocolatey\$($packageName)\$($packageName).MsiInstall.log`"""" # ALLUSERS=1 DISABLEDESKTOPSHORTCUT=1 ADDDESKTOPICON=0 ADDSTARTMENU=0
   validExitCodes= @(0, 3010, 1641)
   #OTHERS
-  #silentArgs    ='[[SilentArgs]]' # ""/s /S /q /Q /quiet /silent /SILENT /VERYSILENT -s"" # try any of these to get the silent installer
+  #silentArgs   ='[[SilentArgs]]' # /s /S /q /Q /quiet /silent /SILENT /VERYSILENT -s - try any of these to get the silent installer
   #validExitCodes= @(0) #please insert other valid exit codes here
 
-  # optional
-  registryUninstallerKey = '[[PackageName]]' #ensure this is the value in the registry
+  # optional, highly recommended
+  softwareName  = '[[PackageName]]*' #part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
   checksum      = '[[Checksum]]'
   checksumType  = '[[ChecksumType]]' #default is md5, can also be sha1
   checksum64    = '[[Checksum64]]'
@@ -69,22 +69,31 @@ Install-ChocolateyPackage @packageArgs
 #Install-ChocolateyVsixPackage @packageArgs
 
 # see the full list at https://github.com/chocolatey/choco/wiki/HelpersReference
+
 # downloader that the main helpers use to download items
 # if removing $url64, please remove from here
 #Get-ChocolateyWebFile $packageName 'DOWNLOAD_TO_FILE_FULL_PATH' $url $url64
+
 # installer, will assert administrative rights - used by Install-ChocolateyPackage
+# use this for embedding installers in the package when not going to community feed or when you have distribution rights
 #Install-ChocolateyInstallPackage $packageName $fileType $silentArgs '_FULLFILEPATH_' -validExitCodes $validExitCodes
+
 # unzips a file to the specified location - auto overwrites existing content
 #Get-ChocolateyUnzip ""FULL_LOCATION_TO_ZIP.zip"" $toolsDir
+
 # Runs processes asserting UAC, will assert administrative rights - used by Install-ChocolateyInstallPackage
 #Start-ChocolateyProcessAsAdmin 'STATEMENTS_TO_RUN' 'Optional_Application_If_Not_PowerShell' -validExitCodes $validExitCodes
+
 # add specific folders to the path - any executables found in the chocolatey package folder will already be on the path. This is used in addition to that or for cases when a native installer doesn't add things to the path.
 #Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
+
 # add specific files as shortcuts to the desktop
 #$target = Join-Path $toolsDir ""$($packageName).exe""
 # Install-ChocolateyShortcut -shortcutFilePath ""<path>"" -targetPath ""<path>"" [-workDirectory ""C:\"" -arguments ""C:\test.txt"" -iconLocation ""C:\test.ico"" -description ""This is the description""]
+
 # outputs the bitness of the OS (either ""32"" or ""64"")
 #$osBitness = Get-ProcessorBits
+
 #Install-ChocolateyEnvironmentVariable -variableName ""SOMEVAR"" -variableValue ""value"" [-variableType = 'Machine' #Defaults to 'User']
 
 #Install-ChocolateyFileAssociation 
