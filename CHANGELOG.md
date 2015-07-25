@@ -1,9 +1,21 @@
+## [0.9.9.9](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.9+is%3Aclosed) (unreleased)
+
+### BUG FIXES
+
+ * Fix - list / search results blocking until completion instead of streaming output - see [#143](https://github.com/chocolatey/choco/issues/143)
+ * Fix - default template install script for MSI silentArgs are bad - see [#354](https://github.com/chocolatey/choco/issues/354)
+
+### IMPROVEMENTS
+
+ * API - List --localonly not working by default - see [#223](https://github.com/chocolatey/choco/issues/223)
+ * API - Expose package results - see [#132](https://github.com/chocolatey/choco/issues/132)
+
 ## [0.9.9.8](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.8+is%3Aclosed) (June 26, 2015)
 
 ### BUG FIXES
 
- * Fix: choco install -y C: deletes all files - see [#341](https://github.com/chocolatey/choco/issues/341)
- * Fix: Read-Host halts scripts rather than prompt for input - see [#219](https://github.com/chocolatey/choco/issues/219)
+ * Fix - choco install -y C: deletes all files - see [#341](https://github.com/chocolatey/choco/issues/341)
+ * Fix - Read-Host halts scripts rather than prompt for input - see [#219](https://github.com/chocolatey/choco/issues/219)
 
 ### IMPROVEMENTS
 
