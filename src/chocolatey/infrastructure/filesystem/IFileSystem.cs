@@ -153,6 +153,13 @@ namespace chocolatey.infrastructure.filesystem
         bool is_system_file(FileInfo file);
 
         /// <summary>
+        ///   Determines if a file is a read only file
+        /// </summary>
+        /// <param name="file">File to check</param>
+        /// <returns>True if the file has the ReadOnly attribute marked, otherwise false</returns>
+        bool is_readonly_file(FileInfo file);
+
+        /// <summary>
         ///   Determines if a file is encrypted or not
         /// </summary>
         /// <param name="file">File to check</param>
@@ -352,5 +359,11 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="attributes">The attributes.</param>
         void ensure_file_attribute_set(string path, FileAttributes attributes);
 
+        /// <summary>
+        ///   Ensure file attributes are removed from a specified path.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="attributes">The attributes.</param>
+        void ensure_file_attribute_removed(string path, FileAttributes attributes);
     }
 }

@@ -226,6 +226,24 @@ namespace chocolatey.infrastructure.filesystem
             }
 
             return isSystemFile;
+        } 
+        
+        public bool is_readonly_file(FileInfo file)
+        {
+            bool isReadOnlyFile = ((file.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly);
+            if (!isReadOnlyFile)
+            {
+                //check the directory to be sure
+                DirectoryInfo directoryInfo = get_directory_info_for(file.DirectoryName);
+                isReadOnlyFile = ((directoryInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly);
+                this.Log().Debug(() => "Is directory \"{0}\" a readonly directory? {1}".format_with(file.DirectoryName, isReadOnlyFile.to_string()));
+            }
+            else
+            {
+                this.Log().Debug(() => "File \"{0}\" is a readonly file.".format_with(file.FullName));
+            }
+
+            return isReadOnlyFile;
         }
 
         public bool is_encrypted_file(FileInfo file)
@@ -499,17 +517,49 @@ namespace chocolatey.infrastructure.filesystem
             if (directory_exists(path))
             {
                 var directoryInfo = get_directory_info_for(path);
-                if ((directoryInfo.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                if ((directoryInfo.Attributes & attributes) != attributes)
                 {
-                    directoryInfo.Attributes |= FileAttributes.Hidden;
+                    directoryInfo.Attributes |= attributes;
                 }
             }
             if (file_exists(path))
             {
                 var fileInfo = get_file_info_for(path);
-                if ((fileInfo.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                if ((fileInfo.Attributes & attributes) != attributes)
                 {
-                    fileInfo.Attributes |= FileAttributes.Hidden;
+                    fileInfo.Attributes |= attributes;
+                }
+            }
+        }
+
+        public bool remove_read_only_attribute(string filePath)
+        {
+            if (!file_exists(filePath)) return false;
+
+            var fileInfo = get_file_info_for(filePath);
+            if (!fileInfo.IsReadOnly) return true;
+
+            File.SetAttributes(filePath, (fileInfo.Attributes & ~FileAttributes.ReadOnly));
+
+            return (get_file_info_for(filePath).Attributes & FileAttributes.ReadOnly) != FileAttributes.ReadOnly;
+        }
+
+        public void ensure_file_attribute_removed(string path, FileAttributes attributes)
+        {
+            if (directory_exists(path))
+            {
+                var directoryInfo = get_directory_info_for(path);
+                if ((directoryInfo.Attributes & attributes) == attributes)
+                {
+                    directoryInfo.Attributes &= ~attributes;
+                }
+            }
+            if (file_exists(path))
+            {
+                var fileInfo = get_file_info_for(path);
+                if ((fileInfo.Attributes & attributes) == attributes)
+                {
+                    fileInfo.Attributes &= ~attributes;
                 }
             }
         }
