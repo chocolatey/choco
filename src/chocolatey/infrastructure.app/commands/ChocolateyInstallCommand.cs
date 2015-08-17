@@ -62,6 +62,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("params=|parameters=|pkgparameters=|packageparameters=|package-parameters=",
                      "PackageParameters - Parameters to pass to the package. Defaults to unspecified.",
                      option => configuration.PackageParameters = option.remove_surrounding_quotes())
+                .Add("allowdowngrade|allow-downgrade",
+                     "AllowDowngrade - Should an attempt at downgrading be allowed? Defaults to false.",
+                     option => configuration.AllowDowngrade = option != null)
                 .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
                      "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false.",
                      option => configuration.AllowMultipleVersions = option != null)

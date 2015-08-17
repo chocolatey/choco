@@ -308,6 +308,15 @@ spam/junk folder.");
                     version = installedPackage.Version;
                 }
 
+                if (installedPackage != null && version != null && version < installedPackage.Version && !config.AllowMultipleVersions && !config.AllowDowngrade)
+                {
+                    string logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade to attempt to install older versions, or use side by side to allow multiple versions.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
+                    var nullResult = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    continue;
+                }
+
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                 if (availablePackage == null)
                 {
@@ -463,6 +472,15 @@ spam/junk folder.");
                     continue;
                 }
 
+                if (version != null && version < installedPackage.Version && !config.AllowMultipleVersions && !config.AllowDowngrade)
+                {
+                    string logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade to attempt to upgrade to older versions, or use side by side to allow multiple versions.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
+                    var nullResult = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    continue;
+                }
+
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
 
@@ -503,7 +521,7 @@ spam/junk folder.");
 
                 var packageResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
 
-                if ((installedPackage.Version > availablePackage.Version))
+                if (installedPackage.Version > availablePackage.Version && !config.AllowDowngrade)
                 {
                     string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
                     packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
@@ -553,7 +571,7 @@ spam/junk folder.");
                     if (config.RegularOutput) this.Log().Info(logMessage);
                 }
 
-                if ((availablePackage.Version > installedPackage.Version) || config.Force)
+                if ((availablePackage.Version > installedPackage.Version) || config.Force || (availablePackage.Version < installedPackage.Version && config.AllowDowngrade))
                 {
                     if (availablePackage.Version > installedPackage.Version)
                     {
