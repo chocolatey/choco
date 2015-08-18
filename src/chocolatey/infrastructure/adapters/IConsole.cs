@@ -39,6 +39,8 @@ namespace chocolatey.infrastructure.adapters
         /// <filterpriority>1</filterpriority>
         string ReadLine();
 
+        string ReadLine(int timeoutMilliseconds);
+
         /// <summary>
         ///   Gets the standard error output stream.
         /// </summary>
@@ -47,6 +49,14 @@ namespace chocolatey.infrastructure.adapters
         /// </returns>
         /// <filterpriority>1</filterpriority>
         TextWriter Error { get; }
+
+        /// <summary>
+        ///   Writes the specified string value to the standard output stream.
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        /// <exception cref="T:System.IO.IOException">An I/O error occurred.</exception>
+        /// <filterpriority>1</filterpriority>
+        void Write(object value);
     }
 
     // ReSharper restore InconsistentNaming
