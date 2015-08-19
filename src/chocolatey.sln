@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.console", "chocolatey.console\chocolatey.console.csproj", "{E24E3386-244F-4404-9E6E-5B53818EA903}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.tests", "chocolatey.tests\chocolatey.tests.csproj", "{5C4C60F0-47B1-498E-ABF7-D315E1A94BC9}"
