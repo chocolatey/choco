@@ -7,4 +7,4 @@ SET DIR=%~d0%~p0%
 echo Make sure you have webtransform here for the merge. Continue?
 pause
 
-%DIR%..\ILMerge\ILMerge.exe NuGet.Core.dll /keyfile:%DIR%..\..\chocolatey.snk /out:%DIR%NuGet.Core.dll /targetplatform:v4 /log:%DIR%ILMerge.DELETE.log /ndebug /allowDup
+%DIR%..\ILMerge\ILMerge.exe NuGet.Core.dll /keyfile:%DIR%..\..\chocolatey.snk /out:%DIR%NuGet.Core.dll /targetplatform:v4,"%ProgramFiles(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /log:%DIR%ILMerge.DELETE.log /ndebug /allowDup
