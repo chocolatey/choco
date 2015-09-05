@@ -108,6 +108,7 @@ param(
 
   if($res.StatusCode -eq 200) {
     [long]$goal = $res.ContentLength
+    $goalFormatted = Format-FileSize $goal
     $reader = $res.GetResponseStream()
     
     if ($fileName) {
@@ -140,8 +141,9 @@ param(
           $output += $encoding.GetString($buffer,0,$count)
         } elseif(!$quiet) {
           $total += $count
+          $totalFormatted = Format-FileSize $total
           if($goal -gt 0 -and ++$iterLoop%10 -eq 0) {
-            Write-Progress "Downloading $url to $fileName" "Saving $total of $goal" -id 0 -percentComplete (($total/$goal)*100)
+            Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete (($total/$goal)*100)
           }
           
           if ($total -eq $goal) {
