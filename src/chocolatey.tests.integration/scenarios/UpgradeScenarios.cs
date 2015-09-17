@@ -27,6 +27,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
+    using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.results;
 
     public class UpgradeScenarios
@@ -612,6 +613,107 @@ namespace chocolatey.tests.integration.scenarios
             public void should_throw_an_error_that_it_is_not_allowed()
             {
                 Results = Service.upgrade_run(Configuration);
+            }
+        }
+
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_package_with_readonly_files : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+
+            public override void Context()
+            {
+                base.Context();
+                var fileToSetReadOnly = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileSystem = new DotNetFileSystem();
+                fileSystem.ensure_file_attribute_set(fileToSetReadOnly, FileAttributes.ReadOnly);
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_upgrade_where_install_location_reports()
+            {
+                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_upgrade_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_newer_version_in_directory()
+            {
+                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+
+                File.ReadAllText(shimFile).ShouldEqual("1.1.0");
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_with_old_and_new_versions()
+            {
+                bool upgradeMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source")) upgradeMessage = true;
+                }
+
+                upgradeMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
             }
         }
 
