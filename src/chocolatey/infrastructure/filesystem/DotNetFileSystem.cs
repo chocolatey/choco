@@ -150,7 +150,6 @@ namespace chocolatey.infrastructure.filesystem
                 //check the directory to be sure
                 DirectoryInfo directoryInfo = get_directory_info_for(file.DirectoryName);
                 isSystemFile = ((directoryInfo.Attributes & FileAttributes.System) == FileAttributes.System);
-                this.Log().Debug(() => "Is directory \"{0}\" a system directory? {1}".format_with(file.DirectoryName, isSystemFile.to_string()));
             }
             else
             {
