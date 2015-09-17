@@ -430,17 +430,21 @@ namespace chocolatey.infrastructure.filesystem
             if (directory_exists(path))
             {
                 var directoryInfo = get_directory_info_for(path);
-                if ((directoryInfo.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                if ((directoryInfo.Attributes & attributes) != attributes)
                 {
-                    directoryInfo.Attributes |= FileAttributes.Hidden;
+                    this.Log().Debug(() => "Adding '{0}' attribute(s) to '{1}'.".format_with(attributes.to_string(), path));
+                    directoryInfo.Attributes |= attributes;
                 }
             }
             if (file_exists(path))
             {
                 var fileInfo = get_file_info_for(path);
-                if ((fileInfo.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                if ((fileInfo.Attributes & attributes) != attributes)
                 {
-                    fileInfo.Attributes |= FileAttributes.Hidden;
+                    this.Log().Debug(() => "Adding '{0}' attribute(s) to '{1}'.".format_with(attributes.to_string(), path));
+                    fileInfo.Attributes |= attributes;
+                }
+            }
                 }
             }
         }
