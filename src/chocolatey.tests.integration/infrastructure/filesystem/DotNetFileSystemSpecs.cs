@@ -187,6 +187,57 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
         }
 
         [Category("Integration")]
+        public class when_setting_file_attributes_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                SourceFile = Path.Combine(DestinationPath, "attributes.txt");
+                File.SetAttributes(SourceFile, (FileSystem.get_file_info_for(SourceFile).Attributes | FileAttributes.Hidden));
+            }
+
+            public override void Because()
+            {
+                FileSystem.ensure_file_attribute_set(SourceFile,FileAttributes.Hidden);
+            }
+            
+            [Fact]
+            public void visible_file_should_now_be_hidden()
+            {
+                (FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.Hidden).ShouldEqual(FileAttributes.Hidden);
+            }
+
+            public override void AfterObservations()
+            {
+                base.AfterObservations();
+                File.SetAttributes(SourceFile, (FileSystem.get_file_info_for(SourceFile).Attributes | FileAttributes.Hidden));
+            }
+        }  
+            
+        
+        [Category("Integration")]
+        public class when_removing_readonly_attributes_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                SourceFile = Path.Combine(DestinationPath, "attributes.txt");
+                File.SetAttributes(SourceFile, (FileSystem.get_file_info_for(SourceFile).Attributes | FileAttributes.ReadOnly));
+            }
+
+            public override void Because()
+            {
+                FileSystem.ensure_file_attribute_removed(SourceFile,FileAttributes.ReadOnly);
+            }
+            
+            [Fact]
+            public void readonly_file_should_no_longer_be_readonly()
+            {
+                (FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.ReadOnly).ShouldNotEqual(FileAttributes.ReadOnly);
+            }
+        }  
+        
+        [Category("Integration")]
         public class when_running_fileMove_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()

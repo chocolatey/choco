@@ -27,6 +27,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commands;
+    using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.results;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
@@ -325,6 +326,73 @@ namespace chocolatey.tests.integration.scenarios
             public void should_throw_an_error_that_it_is_not_allowed()
             {
                 Results = Service.uninstall_run(Configuration);
+            }
+        }
+
+        [Concern(typeof(ChocolateyUninstallCommand))]
+        public class when_uninstalling_a_package_with_readonly_files : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                var fileToSetReadOnly = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileSystem = new DotNetFileSystem();
+                fileSystem.ensure_file_attribute_set(fileToSetReadOnly, FileAttributes.ReadOnly);
+            }
+
+            public override void Because()
+            {
+                MockLogger.LogMessagesToConsole = true;
+                Results = Service.uninstall_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_uninstall_the_package_from_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_it_uninstalled_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("uninstalled 1/1")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
             }
         }
 

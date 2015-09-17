@@ -153,6 +153,20 @@ namespace chocolatey.infrastructure.filesystem
         bool is_system_file(FileInfo file);
 
         /// <summary>
+        ///   Determines if a file is a read only file
+        /// </summary>
+        /// <param name="file">File to check</param>
+        /// <returns>True if the file has the ReadOnly attribute marked, otherwise false</returns>
+        bool is_readonly_file(FileInfo file);
+        
+        /// <summary>
+        ///   Determines if a file is a hidden file
+        /// </summary>
+        /// <param name="file">File to check</param>
+        /// <returns>True if the file has the Hidden attribute marked, otherwise false</returns>
+        bool is_hidden_file(FileInfo file);
+
+        /// <summary>
         ///   Determines if a file is encrypted or not
         /// </summary>
         /// <param name="file">File to check</param>
@@ -335,13 +349,27 @@ namespace chocolatey.infrastructure.filesystem
         void delete_directory(string directoryPath, bool recursive);
 
         /// <summary>
+        ///  Deletes a directory
+        /// </summary>
+        /// <param name="directoryPath">The directory path.</param>
+        /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
+        /// <param name="overrideAttributes">Override the attributes, e.g. delete readonly and/or system files.</param>
+        void delete_directory(string directoryPath, bool recursive, bool overrideAttributes);
+
+        /// <summary>
         ///   Deletes a directory if it exists
         /// </summary>
         /// <param name="directoryPath">The directory path.</param>
-        /// <param name="recursive">
-        ///   if set to <c>true</c> [recursive].
-        /// </param>
+        /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
         void delete_directory_if_exists(string directoryPath, bool recursive);
+
+        /// <summary>
+        /// Deletes a directory if it exists
+        /// </summary>
+        /// <param name="directoryPath">The directory path.</param>
+        /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
+        /// <param name="overrideAttributes">Override the attributes, e.g. delete readonly and/or system files.</param>
+        void delete_directory_if_exists(string directoryPath, bool recursive, bool overrideAttributes);
 
         #endregion
 
@@ -352,5 +380,11 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="attributes">The attributes.</param>
         void ensure_file_attribute_set(string path, FileAttributes attributes);
 
+        /// <summary>
+        ///   Ensure file attributes are removed from a specified path.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="attributes">The attributes.</param>
+        void ensure_file_attribute_removed(string path, FileAttributes attributes);
     }
 }

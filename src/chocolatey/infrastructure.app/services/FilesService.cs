@@ -39,12 +39,32 @@ namespace chocolatey.infrastructure.app.services
 
         public PackageFiles read_from_file(string filePath)
         {
-            if (!_fileSystem.file_exists(filePath))
-            {
-                return null;
-            }
+            if (!_fileSystem.file_exists(filePath)) return null;
 
             return _xmlService.deserialize<PackageFiles>(filePath);
+        }
+
+        private string get_package_install_directory(PackageResult packageResult)
+        {
+            if (packageResult == null) return null;
+
+            var installDirectory = packageResult.InstallLocation;
+            return package_install_directory_is_correct(installDirectory, logMessage => packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage))) ? installDirectory : null;
+        }
+
+        private bool package_install_directory_is_correct(string directory, Action<string> errorAction = null)
+        {
+            if (directory.to_string().is_equal_to(string.Empty)) return false;
+
+            if (directory.is_equal_to(ApplicationParameters.InstallLocation) || directory.is_equal_to(ApplicationParameters.PackagesLocation))
+            {
+                var logMessage = "Install location is not specific enough:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, directory);
+                if (errorAction != null) errorAction.Invoke(logMessage);
+                this.Log().Error(logMessage);
+                return false;
+            }
+
+            return true;
         }
 
         public void save_to_file(PackageFiles snapshot, string filePath)
@@ -54,18 +74,35 @@ namespace chocolatey.infrastructure.app.services
             _xmlService.serialize(snapshot, filePath);
         }
 
+        public void ensure_compatible_file_attributes(PackageResult packageResult, ChocolateyConfiguration config)
+        {
+            if (packageResult == null) return;
+            var installDirectory = get_package_install_directory(packageResult);
+            if (installDirectory == null) return;
+
+            ensure_compatible_file_attributes(installDirectory, config);
+        }
+
+        public void ensure_compatible_file_attributes(string directory, ChocolateyConfiguration config)
+        {
+            if (!package_install_directory_is_correct(directory)) return;
+
+            foreach (var file in _fileSystem.get_files(directory, "*.*", SearchOption.AllDirectories))
+            {
+                var filePath = _fileSystem.get_full_path(file);
+                var fileInfo = _fileSystem.get_file_info_for(filePath);
+
+                if (_fileSystem.is_system_file(fileInfo)) _fileSystem.ensure_file_attribute_removed(filePath, FileAttributes.System);
+                if (_fileSystem.is_readonly_file(fileInfo)) _fileSystem.ensure_file_attribute_removed(filePath, FileAttributes.ReadOnly);
+                if (_fileSystem.is_hidden_file(fileInfo)) _fileSystem.ensure_file_attribute_removed(filePath, FileAttributes.Hidden);
+            }
+        }
+
         public PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config)
         {
             if (packageResult == null) return new PackageFiles();
-
-            var installDirectory = packageResult.InstallLocation;
-            if (installDirectory.is_equal_to(ApplicationParameters.InstallLocation) || installDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
-            {
-                var logMessage = "Install location is not specific enough, cannot capture files:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, packageResult.InstallLocation);
-                packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                this.Log().Error(logMessage);
-                return null;
-            }
+            var installDirectory = get_package_install_directory(packageResult);
+            if (installDirectory == null) return null;
 
             return capture_package_files(installDirectory, config);
         }
@@ -74,13 +111,8 @@ namespace chocolatey.infrastructure.app.services
         {
             var packageFiles = new PackageFiles();
 
-            if (directory.is_equal_to(ApplicationParameters.InstallLocation) || directory.is_equal_to(ApplicationParameters.PackagesLocation))
-            {
-                var logMessage = "Install location is not specific enough, cannot capture files:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, directory);
-                this.Log().Error(logMessage);
-                return packageFiles;
-            }
-            
+            if (!package_install_directory_is_correct(directory)) return packageFiles;
+
             this.Log().Debug(() => "Capturing package files in '{0}'".format_with(directory));
             //gather all files in the folder 
             var files = _fileSystem.get_files(directory, pattern: "*.*", option: SearchOption.AllDirectories);
@@ -100,4 +132,4 @@ namespace chocolatey.infrastructure.app.services
             return new PackageFile { Path = file, Checksum = hash };
         }
     }
-}
+}

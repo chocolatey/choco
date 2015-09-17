@@ -39,6 +39,20 @@ namespace chocolatey.infrastructure.app.services
         void save_to_file(PackageFiles snapshot, string filePath);
 
         /// <summary>
+        /// Ensure that the package files have compatible file attributes (e.g. no readonly).
+        /// </summary>
+        /// <param name="packageResult">The package result.</param>
+        /// <param name="config">The configuration.</param>
+        void ensure_compatible_file_attributes(PackageResult packageResult, ChocolateyConfiguration config);
+
+        /// <summary>
+        /// Ensure that files in a directory have compatible file attributes (e.g. no readonly).
+        /// </summary>
+        /// <param name="directory">The directory.</param>
+        /// <param name="config">The configuration.</param>
+        void ensure_compatible_file_attributes(string directory, ChocolateyConfiguration config);
+
+        /// <summary>
         /// Captures the snapshot of the package files
         /// </summary>
         /// <param name="packageResult">The package result.</param>
