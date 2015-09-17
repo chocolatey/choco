@@ -113,11 +113,16 @@ namespace chocolatey.infrastructure.app.services
         {
             return "-packageScript '{0}' -installArguments '{1}' -packageParameters '{2}'{3}{4}".format_with(
                 script,
-                config.InstallArguments,
-                config.PackageParameters,
+                prepare_for_powershell_arguments(config.InstallArguments),
+                prepare_for_powershell_arguments(config.PackageParameters),
                 config.ForceX86 ? " -forceX86" : string.Empty,
                 config.OverrideArguments ? " -overrideArgs" : string.Empty
              );
+        }
+
+        private string prepare_for_powershell_arguments(string argument)
+        {
+            return argument.to_string().Replace("\"", "\\\"");
         }
 
         public bool run_action(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command)
