@@ -214,6 +214,7 @@ namespace chocolatey.infrastructure.app.services
                     }
                 }
 
+                _filesService.ensure_compatible_file_attributes(packageResult,config);
                 _configTransformService.run(packageResult, config);
                 pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
 

@@ -51,14 +51,14 @@ namespace chocolatey.tests.integration
             string backupPackagesPath = get_package_install_path() + "-bkp";
             string shimsPath = ApplicationParameters.ShimsLocation;
 
-            _fileSystem.delete_directory_if_exists(config.CacheLocation, recursive: true);
-            _fileSystem.delete_directory_if_exists(config.Sources, recursive: true);
-            _fileSystem.delete_directory_if_exists(packagesInstallPath, recursive: true);
-            _fileSystem.delete_directory_if_exists(shimsPath, recursive: true);
-            _fileSystem.delete_directory_if_exists(badPackagesPath, recursive: true);
-            _fileSystem.delete_directory_if_exists(backupPackagesPath, recursive: true);
-            _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(get_top_level(), ".chocolatey"), recursive: true);
-            _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(get_top_level(), "extensions"), recursive: true);
+            _fileSystem.delete_directory_if_exists(config.CacheLocation, recursive: true, overrideAttributes: true);
+            _fileSystem.delete_directory_if_exists(config.Sources, recursive: true, overrideAttributes: true);
+            _fileSystem.delete_directory_if_exists(packagesInstallPath, recursive: true, overrideAttributes: true);
+            _fileSystem.delete_directory_if_exists(shimsPath, recursive: true, overrideAttributes: true);
+            _fileSystem.delete_directory_if_exists(badPackagesPath, recursive: true, overrideAttributes: true);
+            _fileSystem.delete_directory_if_exists(backupPackagesPath, recursive: true, overrideAttributes: true);
+            _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(get_top_level(), ".chocolatey"), recursive: true, overrideAttributes: true);
+            _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(get_top_level(), "extensions"), recursive: true, overrideAttributes: true);
 
             _fileSystem.create_directory(config.CacheLocation);
             _fileSystem.create_directory(config.Sources);
