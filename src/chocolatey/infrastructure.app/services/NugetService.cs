@@ -607,6 +607,7 @@ spam/junk folder.");
                                 packageName,
                                 version == null ? null : version.ToString()))
                             {
+                                ensure_package_files_have_compatible_attributes(config, installedPackage, pkgInfo);
                                 rename_legacy_package_version(config, installedPackage, pkgInfo);
                                 backup_existing_version(config, installedPackage, pkgInfo);
                                 remove_shim_directors(config, installedPackage, pkgInfo);
@@ -635,6 +636,19 @@ spam/junk folder.");
             }
 
             return packageInstalls;
+        }
+
+        public void ensure_package_files_have_compatible_attributes(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
+        {
+            var installDirectory = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id);
+            if (!_fileSystem.directory_exists(installDirectory))
+            {
+                var pathResolver = new ChocolateyPackagePathResolver(NugetCommon.GetNuGetFileSystem(config, _nugetLogger), useSideBySidePaths: true);
+                installDirectory = pathResolver.GetInstallPath(installedPackage);
+                if (!_fileSystem.directory_exists(installDirectory)) return;
+            }
+
+            _filesService.ensure_compatible_file_attributes(installDirectory, config);
         }
 
         public void rename_legacy_package_version(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
@@ -952,6 +966,7 @@ spam/junk folder.");
                                 packageName,
                                 version == null ? null : version.ToString()))
                             {
+                                ensure_package_files_have_compatible_attributes(config, packageVersion, pkgInfo);
                                 rename_legacy_package_version(config, packageVersion, pkgInfo);
                                 backup_existing_version(config, packageVersion, pkgInfo);
                                 packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
