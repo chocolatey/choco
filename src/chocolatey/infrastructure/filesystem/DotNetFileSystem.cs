@@ -159,6 +159,40 @@ namespace chocolatey.infrastructure.filesystem
             return isSystemFile;
         }
 
+        public bool is_readonly_file(FileInfo file)
+        {
+            bool isReadOnlyFile = ((file.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly);
+            if (!isReadOnlyFile)
+            {
+                //check the directory to be sure
+                DirectoryInfo directoryInfo = get_directory_info_for(file.DirectoryName);
+                isReadOnlyFile = ((directoryInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly);
+            }
+            else
+            {
+                this.Log().Debug(() => "File \"{0}\" is a readonly file.".format_with(file.FullName));
+            }
+
+            return isReadOnlyFile;
+        }
+
+        public bool is_hidden_file(FileInfo file)
+        {
+            bool isHiddenFile = ((file.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden);
+            if (!isHiddenFile)
+            {
+                //check the directory to be sure
+                DirectoryInfo directoryInfo = get_directory_info_for(file.DirectoryName);
+                isHiddenFile = ((directoryInfo.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden);
+            }
+            else
+            {
+                this.Log().Debug(() => "File \"{0}\" is a hidden file.".format_with(file.FullName));
+            }
+
+            return isHiddenFile;
+        }
+
         public bool is_encrypted_file(FileInfo file)
         {
             bool isEncrypted = ((file.Attributes & FileAttributes.Encrypted) == FileAttributes.Encrypted);
@@ -408,18 +442,41 @@ namespace chocolatey.infrastructure.filesystem
 
         public void delete_directory(string directoryPath, bool recursive)
         {
+            delete_directory(directoryPath, recursive, overrideAttributes: false);
+        }
+
+        public void delete_directory(string directoryPath, bool recursive, bool overrideAttributes)
+        {
             if (string.IsNullOrWhiteSpace(directoryPath)) throw new ApplicationException("You must provide a directory to delete.");
             if (combine_paths(directoryPath, "").is_equal_to(combine_paths(Environment.GetEnvironmentVariable("SystemDrive"), ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
-           
+
+            if (overrideAttributes)
+            {
+                foreach (var file in get_files(directoryPath, "*.*", SearchOption.AllDirectories))
+                {
+                    var filePath = get_full_path(file);
+                    var fileInfo = get_file_info_for(filePath);
+
+                    if (is_system_file(fileInfo)) ensure_file_attribute_removed(filePath, FileAttributes.System);
+                    if (is_readonly_file(fileInfo)) ensure_file_attribute_removed(filePath, FileAttributes.ReadOnly);
+                    if (is_hidden_file(fileInfo)) ensure_file_attribute_removed(filePath, FileAttributes.Hidden);
+                }
+            }
+
             this.Log().Debug(() => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directoryPath)));
             allow_retries(() => Directory.Delete(directoryPath, recursive));
         }
 
         public void delete_directory_if_exists(string directoryPath, bool recursive)
         {
+            delete_directory_if_exists(directoryPath, recursive, overrideAttributes: false);
+        }
+
+        public void delete_directory_if_exists(string directoryPath, bool recursive, bool overrideAttributes)
+        {
             if (directory_exists(directoryPath))
             {
-                delete_directory(directoryPath, recursive);
+                delete_directory(directoryPath, recursive, overrideAttributes);
             }
         }
 
@@ -445,6 +502,26 @@ namespace chocolatey.infrastructure.filesystem
                     fileInfo.Attributes |= attributes;
                 }
             }
+        }
+
+        public void ensure_file_attribute_removed(string path, FileAttributes attributes)
+        {
+            if (directory_exists(path))
+            {
+                var directoryInfo = get_directory_info_for(path);
+                if ((directoryInfo.Attributes & attributes) == attributes)
+                {
+                    this.Log().Debug(() => "Removing '{0}' attribute(s) from '{1}'.".format_with(attributes.to_string(), path));
+                    directoryInfo.Attributes &= ~attributes;
+                }
+            }
+            if (file_exists(path))
+            {
+                var fileInfo = get_file_info_for(path);
+                if ((fileInfo.Attributes & attributes) == attributes)
+                {
+                    this.Log().Debug(() => "Removing '{0}' attribute(s) from '{1}'.".format_with(attributes.to_string(), path));
+                    fileInfo.Attributes &= ~attributes;
                 }
             }
         }
