@@ -152,14 +152,21 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
         public void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
         {
+            var shouldWarn = (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator);
+
+            if (shouldWarn)
+            {
+                this.Log().Warn(ChocolateyLoggers.Important, @"Chocolatey detected you are not running from an elevated command shell
+ (cmd/powershell).");
+            }
+
             // NOTE: blended options may not have been fully initialized yet
             if (!config.PromptForConfirmation) return;
 
-            if (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator)
+            if (shouldWarn)
             {
                 var selection = InteractivePrompt.prompt_for_confirmation(@"
-Chocolatey detected you are not running from an elevated command shell
- (cmd/powershell). You may experience errors - many functions/packages
+ You may experience errors - many functions/packages
  require admin rights. Only advanced users should run choco w/out an
  elevated shell. When you open the command shell, you should ensure 
  that you do so with ""Run as Administrator"" selected.
