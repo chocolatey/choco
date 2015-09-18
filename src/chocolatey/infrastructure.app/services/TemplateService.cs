@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
+    using System.IO;
     using System.Reflection;
     using System.Text;
     using configuration;
@@ -44,7 +45,8 @@ namespace chocolatey.infrastructure.app.services
             var packageLocation = _fileSystem.combine_paths(_fileSystem.get_current_directory(), configuration.NewCommand.Name);
             if (_fileSystem.directory_exists(packageLocation) && !configuration.Force)
             {
-                throw new ApplicationException("The location for the template already exists. You can:{0} 1. Remove '{1}'{0} 2. Use --force{0} 3. Specify a different name".format_with(Environment.NewLine, packageLocation));
+                throw new ApplicationException(
+                    "The location for the template already exists. You can:{0} 1. Remove '{1}'{0} 2. Use --force{0} 3. Specify a different name".format_with(Environment.NewLine, packageLocation));
             }
 
             if (configuration.RegularOutput) this.Log().Info(() => "Creating a new package specification at {0}".format_with(packageLocation));
@@ -61,10 +63,7 @@ namespace chocolatey.infrastructure.app.services
             _fileSystem.create_directory_if_not_exists(packageToolsLocation);
 
             var tokens = new TemplateValues();
-            if (configuration.NewCommand.AutomaticPackage)
-            {
-                tokens.set_auto();
-            }
+            if (configuration.NewCommand.AutomaticPackage) tokens.set_auto();
 
             // now override those values
             foreach (var property in configuration.NewCommand.TemplateProperties)
@@ -86,12 +85,34 @@ namespace chocolatey.infrastructure.app.services
                 this.Log().Debug(() => " {0}={1}".format_with(propertyInfo.Name, propertyInfo.GetValue(tokens, null)));
             }
 
-            generate_file_from_template(configuration, tokens, NuspecTemplate.Template, _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower)), Encoding.UTF8);
-            generate_file_from_template(configuration, tokens, ChocolateyInstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyinstall.ps1"), Encoding.UTF8);
-            generate_file_from_template(configuration, tokens, ChocolateyUninstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyuninstall.ps1"), Encoding.UTF8);
-            generate_file_from_template(configuration, tokens, ChocolateyReadMeTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "ReadMe.md"), Encoding.UTF8);
+            var defaultTemplateOverride = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "templates", "default");
+            if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && !_fileSystem.directory_exists(defaultTemplateOverride))
+            {
+                generate_file_from_template(configuration, tokens, NuspecTemplate.Template, _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower)), Encoding.UTF8);
+                generate_file_from_template(configuration, tokens, ChocolateyInstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyinstall.ps1"), Encoding.UTF8);
+                generate_file_from_template(configuration, tokens, ChocolateyUninstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyuninstall.ps1"), Encoding.UTF8);
+                generate_file_from_template(configuration, tokens, ChocolateyReadMeTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "ReadMe.md"), Encoding.UTF8);
+            }
+            else
+            {
+                configuration.NewCommand.TemplateName = string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) ? "default" : configuration.NewCommand.TemplateName;
 
-            this.Log().Info(ChocolateyLoggers.Important, "Successfully generated {0}{1} package specification files{2} at '{3}'".format_with(configuration.NewCommand.Name, configuration.NewCommand.AutomaticPackage ? " (automatic)" : string.Empty, Environment.NewLine, packageLocation));
+                var templatePath = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "templates", configuration.NewCommand.TemplateName);
+                if (!_fileSystem.directory_exists(templatePath)) throw new ApplicationException("Unable to find path to requested template '{0}'. Path should be '{1}'".format_with(configuration.NewCommand.TemplateName, templatePath));
+
+                this.Log().Info(ChocolateyLoggers.Important, "Generating package from custom template at '{0}'.".format_with(templatePath));
+                foreach (var file in _fileSystem.get_files(templatePath, "*.*", SearchOption.AllDirectories))
+                {
+                    var packageFileLocation = file.Replace(templatePath, packageLocation);
+                    if (_fileSystem.get_file_extension(packageFileLocation).is_equal_to(".nuspec")) packageFileLocation = _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower));
+                    generate_file_from_template(configuration, tokens, _fileSystem.read_file(file), packageFileLocation, Encoding.UTF8);
+                }
+            }
+
+            this.Log().Info(
+                ChocolateyLoggers.Important,
+                "Successfully generated {0}{1} package specification files{2} at '{3}'".format_with(
+                    configuration.NewCommand.Name, configuration.NewCommand.AutomaticPackage ? " (automatic)" : string.Empty, Environment.NewLine, packageLocation));
         }
 
         public void generate_file_from_template(ChocolateyConfiguration configuration, TemplateValues tokens, string template, string fileLocation, Encoding encoding)
