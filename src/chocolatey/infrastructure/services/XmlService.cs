@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.services
     using System.Text;
     using System.Xml;
     using System.Xml.Serialization;
+    using cryptography;
     using filesystem;
     using tolerance;
 
@@ -28,10 +29,12 @@ namespace chocolatey.infrastructure.services
     public sealed class XmlService : IXmlService
     {
         private readonly IFileSystem _fileSystem;
+        private readonly IHashProvider _hashProvider;
 
-        public XmlService(IFileSystem fileSystem)
+        public XmlService(IFileSystem fileSystem, IHashProvider hashProvider)
         {
             _fileSystem = fileSystem;
+            _hashProvider = hashProvider;
         }
 
         public XmlType deserialize<XmlType>(string xmlFilePath)
@@ -74,7 +77,11 @@ namespace chocolatey.infrastructure.services
                     textWriter.Close();
                     textWriter.Dispose();
 
-                    _fileSystem.copy_file(xmlUpdateFilePath, xmlFilePath, overwriteExisting: true);
+                    if (!_hashProvider.hash_file(xmlFilePath).is_equal_to(_hashProvider.hash_file(xmlUpdateFilePath)))
+                    {
+                        _fileSystem.copy_file(xmlUpdateFilePath, xmlFilePath, overwriteExisting: true);
+                    }
+
                     _fileSystem.delete_file(xmlUpdateFilePath);
                 },
                 "Error serializing type {0}".format_with(typeof(XmlType)),

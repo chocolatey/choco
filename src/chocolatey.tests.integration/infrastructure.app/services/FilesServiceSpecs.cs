@@ -35,10 +35,12 @@ namespace chocolatey.tests.integration.infrastructure.app.services
         {
             protected FilesService Service;
             protected IFileSystem FileSystem = new DotNetFileSystem();
+            protected IHashProvider HashProvider;
 
             public override void Context()
             {
-                Service = new FilesService(new XmlService(FileSystem), FileSystem, new CrytpoHashProvider(FileSystem, CryptoHashProviderType.Md5));
+                HashProvider = new CrytpoHashProvider(FileSystem, CryptoHashProviderType.Md5);
+                Service = new FilesService(new XmlService(FileSystem, HashProvider), FileSystem, new CrytpoHashProvider(FileSystem, CryptoHashProviderType.Md5));
             }
         }
 
