@@ -376,7 +376,7 @@ spam/junk folder.");
 
         public void remove_rollback_directory_if_exists(string packageName)
         {
-            var rollbackDirectory = _fileSystem.combine_paths(ApplicationParameters.PackageBackupLocation, packageName);
+            var rollbackDirectory = _fileSystem.get_full_path(_fileSystem.combine_paths(ApplicationParameters.PackageBackupLocation, packageName));
             if (!_fileSystem.directory_exists(rollbackDirectory))
             {
                 //search for folder
@@ -385,10 +385,13 @@ spam/junk folder.");
                 {
                     rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
                 }
+
+                rollbackDirectory = _fileSystem.get_full_path(rollbackDirectory);
             }
-
+            
             if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
-
+            if (!rollbackDirectory.StartsWith(ApplicationParameters.PackageBackupLocation) || rollbackDirectory.is_equal_to(ApplicationParameters.PackageBackupLocation)) return;
+              
             FaultTolerance.try_catch_with_logging_exception(
                 () => _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true),
                 "Attempted to remove '{0}' but had an error:".format_with(rollbackDirectory),
