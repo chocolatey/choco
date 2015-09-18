@@ -32,6 +32,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IFileSystem _fileSystem;
         private readonly string _customImports;
         private const string OPERATION_COMPLETED_SUCCESSFULLY = "The operation completed successfully.";
+        private const string INITIALIZE_DEFAULT_DRIVES = "Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.";
 
         public PowershellService(IFileSystem fileSystem)
             : this(fileSystem, new CustomString(string.Empty))
@@ -275,7 +276,7 @@ namespace chocolatey.infrastructure.app.services
                         (s, e) =>
                             {
                                 if (string.IsNullOrWhiteSpace(e.Data)) return;
-                                if (e.Data.is_equal_to(OPERATION_COMPLETED_SUCCESSFULLY))
+                                if (e.Data.is_equal_to(OPERATION_COMPLETED_SUCCESSFULLY) || e.Data.is_equal_to(INITIALIZE_DEFAULT_DRIVES))
                                 {
                                     this.Log().Info(() => " " + e.Data);
                                 }
