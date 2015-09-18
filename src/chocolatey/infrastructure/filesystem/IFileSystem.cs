@@ -97,7 +97,7 @@ namespace chocolatey.infrastructure.filesystem
         string get_file_name_without_extension(string filePath);
 
         /// <summary>
-        ///   Gets the extension.
+        ///   Gets the extension (including the ".").
         /// </summary>
         /// <param name="filePath">The file path.</param>
         /// <returns>he extension of the specified path (including the period "."), or Nothing, or String.Empty. If path is Nothing, get_file_extension returns Nothing. If path does not have extension information, get_file_extension returns String.Empty.</returns>
