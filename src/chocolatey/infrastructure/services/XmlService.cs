@@ -57,11 +57,13 @@ namespace chocolatey.infrastructure.services
         {
             _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(xmlFilePath));
 
+            var xmlUpdateFilePath = xmlFilePath + ".update";
+
             FaultTolerance.try_catch_with_logging_exception(
                 () =>
                 {
                     var xmlSerializer = new XmlSerializer(typeof(XmlType));
-                    var textWriter = new StreamWriter(xmlFilePath, append: false, encoding: Encoding.UTF8)
+                    var textWriter = new StreamWriter(xmlUpdateFilePath, append: false, encoding: Encoding.UTF8)
                     {
                         AutoFlush = true
                     };
@@ -71,6 +73,9 @@ namespace chocolatey.infrastructure.services
 
                     textWriter.Close();
                     textWriter.Dispose();
+
+                    _fileSystem.copy_file(xmlUpdateFilePath, xmlFilePath, overwriteExisting: true);
+                    _fileSystem.delete_file(xmlUpdateFilePath);
                 },
                 "Error serializing type {0}".format_with(typeof(XmlType)),
                 throwError: true);
