@@ -17,6 +17,7 @@ namespace chocolatey.infrastructure.app.nuget
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
     using NuGet;
     using configuration;
     using logging;
@@ -57,6 +58,19 @@ namespace chocolatey.infrastructure.app.nuget
 
             // ensure credentials can be grabbed from configuration
             HttpClient.DefaultCredentialProvider = new ChocolateyNugetCredentialProvider(configuration);
+            if (!string.IsNullOrWhiteSpace(configuration.Proxy.Location))
+            {
+                var proxy = new WebProxy(configuration.Proxy.Location, BypassOnLocal: true);
+
+                 if (!String.IsNullOrWhiteSpace(configuration.Proxy.User) && !String.IsNullOrWhiteSpace(configuration.Proxy.EncryptedPassword))
+                {
+                    proxy.Credentials = new NetworkCredential(configuration.Proxy.User, NugetEncryptionUtility.DecryptString(configuration.Proxy.EncryptedPassword));
+                }
+                
+                ProxyCache.Instance.Add(proxy);
+            }
+
+            
 
             foreach (var source in sources.or_empty_list_if_null())
             {
