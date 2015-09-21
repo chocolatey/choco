@@ -68,7 +68,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
             foreach (var propertyInfo in properties.or_empty_list_if_null())
             {
                 // skip sensitive data info
-                if (propertyInfo.Name == "Password" || propertyInfo.Name == "Key" || propertyInfo.Name == "MachineSources")
+                if (propertyInfo.Name.contains("password") || propertyInfo.Name == "Key" || propertyInfo.Name == "ConfigValue" || propertyInfo.Name == "MachineSources")
                 {
                     continue;
                 }
