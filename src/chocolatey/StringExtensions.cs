@@ -114,6 +114,18 @@ namespace chocolatey
         }
 
         /// <summary>
+        /// Determines whether a string value contains a search value.
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <param name="search">The value to search for.</param>
+        /// <param name="comparison">The comparison.</param>
+        /// <returns>True if the value to search for is in the input string</returns>
+        public static bool contains(this string input, string search, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        {
+            return input.to_string().IndexOf(search, 0, comparison) >= 0;
+        }
+
+        /// <summary>
         ///   Removes quotes or apostrophes surrounding a string
         /// </summary>
         /// <param name="input">The input.</param>
