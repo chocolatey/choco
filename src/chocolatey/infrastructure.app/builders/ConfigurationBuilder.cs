@@ -136,13 +136,13 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
         {
-            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings);
-            config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings);
-            config.Features.FailOnAutoUninstaller = set_feature_flag(ApplicationParameters.Features.FailOnAutoUninstaller, configFileSettings);
-            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings);
+            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings, "Checksum files when pulled in from internet (based on package).");
+            config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings, "Uninstall from programs and features without requiring an explicit uninstall script.");
+            config.Features.FailOnAutoUninstaller = set_feature_flag(ApplicationParameters.Features.FailOnAutoUninstaller, configFileSettings, "Fail if automatic uninstaller fails.");
+            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, "Prompt for confirmation in scripts or bypass.");
         }
 
-        private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings)
+        private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings, string description)
         {
             var enabled = false;
             var feature = configFileSettings.Features.FirstOrDefault(f => f.Name.is_equal_to(featureName));
@@ -150,9 +150,18 @@ namespace chocolatey.infrastructure.app.builders
 
             if (feature == null)
             {
-                configFileSettings.Features.Add(new ConfigFileFeatureSetting {Name = featureName, Enabled = enabled});
-            }
+                feature = new ConfigFileFeatureSetting
+                {
+                    Name = featureName,
+                    Enabled = enabled,
+                    Description = description
+                };
 
+                configFileSettings.Features.Add(feature);
+            }
+            
+            feature.Description = description;
+            
             return enabled;
         }
 
