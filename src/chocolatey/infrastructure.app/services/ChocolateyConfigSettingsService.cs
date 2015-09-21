@@ -77,9 +77,25 @@ namespace chocolatey.infrastructure.app.services
             }
             else
             {
-                this.Log().Warn(@"
-No changes made. If you are trying to change an existing source, please 
- remove it first.");
+                var currentPassword = string.IsNullOrWhiteSpace(source.Password) ? null : NugetEncryptionUtility.DecryptString(source.Password);
+                if (configuration.Sources.is_equal_to(source.Value) &&
+                    configuration.SourceCommand.Priority == source.Priority &&
+                    configuration.SourceCommand.Username.is_equal_to(source.UserName) &&
+                    configuration.SourceCommand.Password.is_equal_to(currentPassword)
+                    )
+                {
+                    this.Log().Warn(NO_CHANGE_MESSAGE);
+                }
+                else
+                {
+                    source.Value = configuration.Sources;
+                    source.Priority = configuration.SourceCommand.Priority;
+                    source.UserName = configuration.SourceCommand.Username;
+                    source.Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password);
+
+                    _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                    this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
+                }
             }
         }
 
