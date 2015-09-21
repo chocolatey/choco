@@ -30,7 +30,6 @@ namespace chocolatey.console
     using infrastructure.filesystem;
     using infrastructure.licensing;
     using infrastructure.logging;
-    using infrastructure.platforms;
     using infrastructure.registration;
     using infrastructure.services;
     using resources;
