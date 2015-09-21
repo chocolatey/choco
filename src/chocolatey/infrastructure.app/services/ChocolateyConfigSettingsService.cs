@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Linq;
     using configuration;
     using infrastructure.services;
+    using logging;
     using nuget;
 
     internal class ChocolateyConfigSettingsService : IChocolateyConfigSettingsService
@@ -47,7 +48,12 @@ namespace chocolatey.infrastructure.app.services
         {
             foreach (var source in configFileSettings.Sources)
             {
-                this.Log().Info(() => "{0}{1} - {2}".format_with(source.Id, source.Disabled ? " [Disabled]" : string.Empty, source.Value));
+                this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}.".format_with(
+                    source.Id, 
+                    source.Disabled ? " [Disabled]" : string.Empty, 
+                    source.Value,
+                    string.IsNullOrWhiteSpace(source.UserName) ? string.Empty : "(Authenticated)", 
+                    source.Priority));
             }
         }
 
@@ -56,17 +62,18 @@ namespace chocolatey.infrastructure.app.services
             var source = configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
             if (source == null)
             {
-                configFileSettings.Sources.Add(new ConfigFileSourceSetting
-                    {
-                        Id = configuration.SourceCommand.Name,
-                        Value = configuration.Sources,
-                        UserName = configuration.SourceCommand.Username,
-                        Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password),
-                    });
+                source = new ConfigFileSourceSetting
+                {
+                    Id = configuration.SourceCommand.Name,
+                    Value = configuration.Sources,
+                    UserName = configuration.SourceCommand.Username,
+                    Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password),
+                    Priority = configuration.SourceCommand.Priority
+                };
+                configFileSettings.Sources.Add(source);
 
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-
-                this.Log().Warn(() => "Added {0} - {1}".format_with(configuration.SourceCommand.Name, configuration.Sources));
+                this.Log().Warn(() => "Added {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
             }
             else
             {

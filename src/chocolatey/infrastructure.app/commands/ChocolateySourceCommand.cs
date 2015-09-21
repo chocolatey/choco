@@ -53,7 +53,10 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())
                 .Add("p=|password=",
                      "Password - the user's password to the source. Encrypted in chocolatey.config file.",
-                     option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
+                     option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())  
+                .Add("priority=",
+                     "Priority - The priority order of this source as compared to other sources, lower is better. Defaults to 0 (no priority). All priorities above 0 will be evaluated first, then zero-based values will be evaluated in config file order.",
+                     option => configuration.SourceCommand.Priority = int.Parse(option.remove_surrounding_quotes()))
                 ;
         }
 

@@ -38,6 +38,9 @@ namespace chocolatey.infrastructure.app.configuration
         public string UserName { get; set; }
 
         [XmlAttribute(AttributeName = "password")]
-        public string Password { get; set; }
+        public string Password { get; set; }   
+        
+        [XmlAttribute(AttributeName = "priority")]
+        public int Priority { get; set; }
     }
 }

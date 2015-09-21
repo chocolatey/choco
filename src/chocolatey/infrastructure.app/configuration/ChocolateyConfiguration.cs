@@ -355,6 +355,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public SourceCommandType Command { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public int Priority { get; set; }
     }
 
     [Serializable]
@@ -364,6 +365,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string Key { get; set; }
         public string Username { get; set; }
         public string EncryptedPassword { get; set; }
+        public int Priority { get; set; }
     }
 
     [Serializable]

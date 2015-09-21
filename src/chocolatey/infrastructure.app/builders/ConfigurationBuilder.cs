@@ -73,7 +73,15 @@ namespace chocolatey.infrastructure.app.builders
 
             var configFileSettings = xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
             var sources = new StringBuilder();
-            foreach (var source in configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null())
+
+            var defaultSourcesInOrder = configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null().ToList();
+            if (configFileSettings.Sources.Any(s => s.Priority > 0))
+            {
+                defaultSourcesInOrder = configFileSettings.Sources.Where(s => !s.Disabled && s.Priority != 0).OrderBy(s => s.Priority).or_empty_list_if_null().ToList();
+                defaultSourcesInOrder.AddRange(configFileSettings.Sources.Where(s => !s.Disabled && s.Priority == 0 ).or_empty_list_if_null().ToList());
+            }
+
+            foreach (var source in defaultSourcesInOrder)
             {
                 sources.AppendFormat("{0};", source.Value);
             }
@@ -120,7 +128,8 @@ namespace chocolatey.infrastructure.app.builders
                         Key = source.Value,
                         Name = source.Id,
                         Username = source.UserName,
-                        EncryptedPassword = source.Password
+                        EncryptedPassword = source.Password,
+                        Priority = source.Priority
                     });
             }
         }
