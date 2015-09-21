@@ -34,7 +34,10 @@ namespace chocolatey.infrastructure.app.configuration
 
         [XmlElement(ElementName = "commandExecutionTimeoutSeconds")]
         public int CommandExecutionTimeoutSeconds { get; set; }
-
+      
+        [XmlArray("config")]
+        public HashSet<ConfigFileConfigSetting> ConfigSettings { get; set; }  
+        
         [XmlArray("sources")]
         public HashSet<ConfigFileSourceSetting> Sources { get; set; }  
         

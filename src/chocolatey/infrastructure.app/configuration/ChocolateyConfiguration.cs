@@ -41,6 +41,7 @@ namespace chocolatey.infrastructure.app.configuration
             SourceCommand = new SourcesCommandConfiguration();
             MachineSources = new List<MachineSourceConfiguration>();
             FeatureCommand = new FeatureCommandConfiguration();
+            ConfigCommand = new ConfigCommandConfiguration();
             ApiKeyCommand = new ApiKeyCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
             PinCommand = new PinCommandConfiguration();
@@ -54,7 +55,7 @@ namespace chocolatey.infrastructure.app.configuration
         {
             var properties = new StringBuilder();
 
-            this.Log().Debug(ChocolateyLoggers.Important,@"
+            this.Log().Debug(ChocolateyLoggers.Important, @"
 NOTE: Hiding sensitive configuration data! Please double and triple 
  check to be sure no sensitive data is shown, especially if copying 
  output to a gist for review.");
@@ -250,6 +251,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </remarks>
         public SourcesCommandConfiguration SourceCommand { get;  set; }        
         
+
         /// <summary>
         ///   Default Machine Sources Configuration
         /// </summary>
@@ -264,7 +266,15 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public FeatureCommandConfiguration FeatureCommand { get;  set; }
+        public FeatureCommandConfiguration FeatureCommand { get; set; }
+
+        /// <summary>
+        /// Configuration related to the configuration file.
+        /// </summary>
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public ConfigCommandConfiguration ConfigCommand { get; set; }
 
         /// <summary>
         ///   Configuration related specifically to ApiKey command
@@ -324,8 +334,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         // list
         public bool LocalOnly { get; set; }
         public bool IncludeRegistryPrograms { get; set; }
-    }  
-    
+    }
+
     [Serializable]
     public sealed class UpgradeCommandConfiguration
     {
@@ -373,6 +383,14 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         public string Name { get; set; }
         public FeatureCommandType Command { get; set; }
+    }    
+    
+    [Serializable]
+    public sealed class ConfigCommandConfiguration
+    {
+        public string Name { get; set; }
+        public string ConfigValue { get; set; }
+        public ConfigCommandType Command { get; set; }
     }
 
     [Serializable]

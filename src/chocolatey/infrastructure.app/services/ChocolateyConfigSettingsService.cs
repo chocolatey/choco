@@ -259,9 +259,88 @@ namespace chocolatey.infrastructure.app.services
                     _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                     this.Log().Info(() => "Updated ApiKey for {0}".format_with(configuration.Sources));
                 }
-                else
+                else this.Log().Warn(NO_CHANGE_MESSAGE);
+            }
+        }
+
+        public void config_list(ChocolateyConfiguration configuration)
+        {
+            this.Log().Info(ChocolateyLoggers.Important, "Settings");
+            foreach (var config in configFileSettings.ConfigSettings)
+            {
+                this.Log().Info(() => "{0} = {1} | {2}".format_with(config.Key, config.Value, config.Description));
+            }
+
+            this.Log().Info("");
+            this.Log().Info(ChocolateyLoggers.Important, "Sources");
+            source_list(configuration);
+            this.Log().Info("");
+            this.Log().Info(@"NOTE: Use choco source to interact with sources.");
+            this.Log().Info("");
+            this.Log().Info(ChocolateyLoggers.Important, "Features");
+            feature_list(configuration);
+            this.Log().Info("");
+            this.Log().Info(@"NOTE: Use choco feature to interact with features.");
+            ;
+            this.Log().Info("");
+            this.Log().Info(ChocolateyLoggers.Important, "API Keys");
+            this.Log().Info(@"NOTE: Api Keys are not shown through this command. 
+ Use choco apikey to interact with API keys.");
+        }
+
+        public void config_get(ChocolateyConfiguration configuration)
+        {
+            var config = config_get(configuration.ConfigCommand.Name);
+            if (config == null) throw new ApplicationException("No configuration value by the name '{0}'".format_with(configuration.ConfigCommand.Name));
+            this.Log().Info("{0}".format_with(config.Value));
+        }
+
+        public ConfigFileConfigSetting config_get(string configKeyName)
+        {
+            var config = configFileSettings.ConfigSettings.FirstOrDefault(p => p.Key.is_equal_to(configKeyName));
+            if (config == null) return null;
+
+            return config;
+        }
+
+        public void config_set(ChocolateyConfiguration configuration)
+        {
+            var encryptValue = configuration.ConfigCommand.Name.contains("password");
+            var config = config_get(configuration.ConfigCommand.Name);
+            var configValue = encryptValue
+                                  ? NugetEncryptionUtility.EncryptString(configuration.ConfigCommand.ConfigValue)
+                                  : configuration.ConfigCommand.ConfigValue;
+
+            if (config == null)
+            {
+                var setting = new ConfigFileConfigSetting
+                {
+                    Key = configuration.ConfigCommand.Name,
+                    Value = configValue,
+                };
+
+                configFileSettings.ConfigSettings.Add(setting);
+
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+
+                this.Log().Warn(() => "Added {0} = {1}".format_with(setting.Key, setting.Value));
+            }
+            else
+            {
+                var currentValue = encryptValue && !string.IsNullOrWhiteSpace(config.Value)
+                                       ? NugetEncryptionUtility.DecryptString(config.Value)
+                                       : config.Value;
+
+                if (configuration.ConfigCommand.ConfigValue.is_equal_to(currentValue.to_string()))
                 {
                     this.Log().Warn(NO_CHANGE_MESSAGE);
+                }
+                else
+                {
+                    config.Value = configValue;
+                    _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+
+                    this.Log().Warn(() => "Updated {0} = {1}".format_with(config.Key, config.Value));
                 }
             }
         }

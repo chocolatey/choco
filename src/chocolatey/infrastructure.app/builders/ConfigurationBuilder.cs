@@ -91,24 +91,13 @@ namespace chocolatey.infrastructure.app.builders
             }
 
             set_machine_sources(config, configFileSettings);
-
-            config.CacheLocation = !string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? configFileSettings.CacheLocation : System.Environment.GetEnvironmentVariable("TEMP");
-            if (string.IsNullOrWhiteSpace(config.CacheLocation))
-            {
-                config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
-            }
+            
+            set_config_items(config, configFileSettings, fileSystem);
 
             FaultTolerance.try_catch_with_logging_exception(
                 () => fileSystem.create_directory_if_not_exists(config.CacheLocation),
                 "Could not create temp directory at '{0}'".format_with(config.CacheLocation),
                 logWarningInsteadOfError: true);
-
-            config.ContainsLegacyPackageInstalls = configFileSettings.ContainsLegacyPackageInstalls;
-            if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
-            {
-                configFileSettings.CommandExecutionTimeoutSeconds = ApplicationParameters.DefaultWaitForExitInSeconds;
-            }
-            config.CommandExecutionTimeoutSeconds = configFileSettings.CommandExecutionTimeoutSeconds;
 
             set_feature_flags(config, configFileSettings);
 
@@ -132,6 +121,60 @@ namespace chocolatey.infrastructure.app.builders
                         Priority = source.Priority
                     });
             }
+        }
+
+        private static void set_config_items(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
+        {
+            var cacheLocation = set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder.");
+            config.CacheLocation = !string.IsNullOrWhiteSpace(cacheLocation) ? cacheLocation : System.Environment.GetEnvironmentVariable("TEMP");
+            if (string.IsNullOrWhiteSpace(config.CacheLocation))
+            {
+                config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
+            }
+
+            var originalCommandTimeout = configFileSettings.CommandExecutionTimeoutSeconds;
+            var commandExecutionTimeoutSeconds = -1;
+            int.TryParse(
+                set_config_item(
+                    ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, 
+                    configFileSettings, 
+                    originalCommandTimeout == 0 ? 
+                        ApplicationParameters.DefaultWaitForExitInSeconds.to_string() 
+                        : originalCommandTimeout.to_string(), 
+                    "Default timeout for command execution."), 
+                out commandExecutionTimeoutSeconds);
+            config.CommandExecutionTimeoutSeconds = commandExecutionTimeoutSeconds;
+            if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
+            {
+                set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, ApplicationParameters.DefaultWaitForExitInSeconds.to_string(), "Default timeout for command execution.", forceSettingValue: true);
+                config.CommandExecutionTimeoutSeconds = ApplicationParameters.DefaultWaitForExitInSeconds;
+            }
+
+            config.ContainsLegacyPackageInstalls = set_config_item(ApplicationParameters.ConfigSettings.ContainsLegacyPackageInstalls, configFileSettings, "true", "Install has packages installed prior to 0.9.9 series.").is_equal_to(bool.TrueString);
+        }
+
+        private static string set_config_item(string configName, ConfigFileSettings configFileSettings, string defaultValue, string description, bool forceSettingValue = false)
+        {
+            var config = configFileSettings.ConfigSettings.FirstOrDefault(f => f.Key.is_equal_to(configName));
+            if (config == null)
+            {
+                config = new ConfigFileConfigSetting
+                {
+                    Key = configName,
+                    Value = defaultValue,
+                    Description = description
+                };
+
+                configFileSettings.ConfigSettings.Add(config);
+            }
+            if (forceSettingValue)
+            {
+                config.Value = defaultValue;
+            }
+
+            config.Description = description;
+
+            return config.Value;
         }
 
         private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
