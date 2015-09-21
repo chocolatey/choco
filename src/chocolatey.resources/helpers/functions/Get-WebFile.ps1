@@ -30,14 +30,29 @@ param(
     $req.Credentials = $defaultCreds
   }
 
-  # check if a proxy is required
   $webclient = new-object System.Net.WebClient
   if ($defaultCreds -ne $null) {
     $webClient.Credentials = $defaultCreds
   }
 
-  if (!$webclient.Proxy.IsBypassed($url))
+  # check if a proxy is required
+  $explicitProxy = $env:chocolateyProxyLocation
+  $explicitProxyUser = $env:chocolateyProxyUser
+  $explicitProxyPassword = $env:chocolateyProxyPassword
+  if ($explicitProxy -ne $null) {
+    # explicit proxy
+	$proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
+	if ($explicitProxyPassword -ne $null) {
+	  $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
+	  $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
+	}
+    
+	Write-Host "Using explicit proxy server '$explicitProxy'."
+    $req.Proxy = $proxy
+  
+  } elseif (!$webclient.Proxy.IsBypassed($url))
   {
+	# system proxy (pass through)
     $creds = [net.CredentialCache]::DefaultCredentials
     if ($creds -eq $null) {
       Write-Debug "Default credentials were null. Attempting backup method"
@@ -45,10 +60,10 @@ param(
       $creds = $cred.GetNetworkCredential();
     }
     $proxyaddress = $webclient.Proxy.GetProxy($url).Authority
-    Write-host "Using this proxyserver: $proxyaddress"
+    Write-Host "Using system proxy server '$proxyaddress'."
     $proxy = New-Object System.Net.WebProxy($proxyaddress)
-    $proxy.credentials = $creds
-    $req.proxy = $proxy
+    $proxy.Credentials = $creds
+    $req.Proxy = $proxy
   }
 
   $req.Accept = "*/*"
