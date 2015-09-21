@@ -58,12 +58,16 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(@"
 Chocolatey will attempt to package a nuspec into a compiled nupkg. Some
  may prefer to use `cpack` as a shortcut for `choco pack`.
+
+NOTE: `cpack` has been deprecated as it has a name collision with CMake. Please 
+ use `choco pack` instead. The shortcut will be removed in v1.
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco pack [<path to nuspec>] [<options/switches>]
-    cpack [<path to nuspec>] [<options/switches>]
+    cpack [<path to nuspec>] [<options/switches>] (DEPRECATED)
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");

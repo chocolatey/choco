@@ -20,6 +20,10 @@ param(
   [string] $checksumType = 'md5'
 )
   Write-Debug "Running 'Get-ChecksumValid' with file:`'$file`', checksum: `'$checksum`', checksumType: `'$checksumType`'";
+  if ($env:chocolateyIgnoreChecksums -eq 'true') { 
+	Write-Warning "Ignoring checksums due to feature checksumFiles = false or config ignoreChecksums = true."
+	return 
+  }
   if ($checksum -eq '' -or $checksum -eq $null) { return }
 
   if (!([System.IO.File]::Exists($file))) { throw "Unable to checksum a file that doesn't exist - Could not find file `'$file`'" }

@@ -83,6 +83,12 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("p=|password=",
                      "Password - the user's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
+                .Add("ignorechecksums|ignore-checksums",
+                      "IgnoreChecksums - Ignore checksums provided by the package",
+                      option =>
+                      {
+                          if (option != null) configuration.Features.CheckSumFiles = false;
+                      })
                 ;
 
             //todo: Checksum / ChecksumType defaults to md5 / package name can be a url / installertype

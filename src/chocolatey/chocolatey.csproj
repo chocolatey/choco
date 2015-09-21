@@ -79,6 +79,7 @@
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="GetChocolatey.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyConfigCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyFeatureCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyNewCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyOutdatedCommand.cs" />
@@ -92,9 +93,11 @@
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyVersionCommand.cs" />
     <Compile Include="infrastructure.app\configuration\ChocolateySource.cs" />
+    <Compile Include="infrastructure.app\configuration\ConfigFileConfigSetting.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigFileFeatureSetting.cs" />
     <Compile Include="infrastructure.app\configuration\PackagesConfigFilePackageSetting.cs" />
     <Compile Include="infrastructure.app\configuration\PackagesConfigFileSettings.cs" />
+    <Compile Include="infrastructure.app\domain\ConfigCommandType.cs" />
     <Compile Include="infrastructure.app\domain\FeatureCommandType.cs" />
     <Compile Include="infrastructure.app\domain\InstallerBase.cs" />
     <Compile Include="infrastructure.app\domain\PackageFile.cs" />

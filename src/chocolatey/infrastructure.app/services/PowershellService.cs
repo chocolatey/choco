@@ -208,6 +208,10 @@ namespace chocolatey.infrastructure.app.services
                 if (configuration.Verbose)
                 {
                     Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
+                } 
+                if (!configuration.Features.CheckSumFiles)
+                {
+                    Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
                 }
                 //todo:if (configuration.NoOutput)
                 //{
