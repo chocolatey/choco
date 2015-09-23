@@ -45,6 +45,7 @@ namespace chocolatey.infrastructure.app.configuration
             ApiKeyCommand = new ApiKeyCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
             PinCommand = new PinCommandConfiguration();
+            Proxy = new ProxyConfiguration();
 #if DEBUG
             AllowUnofficialBuild = true;
 #endif
@@ -298,7 +299,15 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public PinCommandConfiguration PinCommand { get;  set; }
+        public PinCommandConfiguration PinCommand { get; set; }     
+        
+        /// <summary>
+        /// Configuration related specifically to proxies.
+        /// </summary>
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public ProxyConfiguration Proxy { get; set; }
     }
 
     [Serializable]
@@ -412,5 +421,13 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string Key { get; set; }
         public int TimeoutInSeconds { get; set; }
         //DisableBuffering?
+    } 
+    
+    [Serializable]
+    public sealed class ProxyConfiguration
+    {
+        public string Location { get; set; }
+        public string User { get; set; }
+        public string EncryptedPassword { get; set; }
     }
 }
