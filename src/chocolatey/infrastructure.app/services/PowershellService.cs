@@ -24,6 +24,7 @@ namespace chocolatey.infrastructure.app.services
     using filesystem;
     using infrastructure.commands;
     using logging;
+    using nuget;
     using results;
     using Environment = System.Environment;
 
@@ -212,6 +213,23 @@ namespace chocolatey.infrastructure.app.services
                 if (!configuration.Features.CheckSumFiles)
                 {
                     Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
+                }
+                if (!string.IsNullOrWhiteSpace(configuration.Proxy.Location))
+                {
+                    var proxy_creds = string.Empty;
+                    if (!string.IsNullOrWhiteSpace(configuration.Proxy.User) &&
+                        !string.IsNullOrWhiteSpace(configuration.Proxy.EncryptedPassword)
+                       )
+                    {
+                        proxy_creds = "{0}:{1}@".format_with(configuration.Proxy.User, NugetEncryptionUtility.DecryptString(configuration.Proxy.EncryptedPassword));
+
+                        Environment.SetEnvironmentVariable("chocolateyProxyUser", configuration.Proxy.User);
+                        Environment.SetEnvironmentVariable("chocolateyProxyPassword", NugetEncryptionUtility.DecryptString(configuration.Proxy.EncryptedPassword));
+                    }
+
+                    Environment.SetEnvironmentVariable("http_proxy", "{0}{1}".format_with(proxy_creds, configuration.Proxy.Location));
+                    Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxy_creds, configuration.Proxy.Location));
+                    Environment.SetEnvironmentVariable("chocolateyProxyLocation", configuration.Proxy.Location);
                 }
                 //todo:if (configuration.NoOutput)
                 //{

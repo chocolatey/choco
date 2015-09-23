@@ -89,6 +89,9 @@ namespace chocolatey.infrastructure.app
             public static readonly string CacheLocation = "cacheLocation";
             public static readonly string ContainsLegacyPackageInstalls = "containsLegacyPackageInstalls";
             public static readonly string CommandExecutionTimeoutSeconds = "commandExecutionTimeoutSeconds";
+            public static readonly string Proxy = "proxy";
+            public static readonly string ProxyUser = "proxyUser";
+            public static readonly string ProxyPassword = "proxyPassword";
         }
         
         public static class Features
