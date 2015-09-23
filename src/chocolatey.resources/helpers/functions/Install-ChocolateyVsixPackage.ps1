@@ -102,6 +102,9 @@ param(
         $installer = Join-Path $dir "VsixInstaller.exe"
     }
     if($installer) {
+        if ($env:TEMP -eq $null) {
+          $env:TEMP = Join-Path $env:SystemDrive 'temp'
+        }
         $download="$env:TEMP\$($packageName.Replace(' ','')).vsix"
         try{
             Get-ChocolateyWebFile $packageName $download $vsixUrl -checksum $checksum -checksumType $checksumType
