@@ -85,6 +85,7 @@ param(
 
   $chocTempDir = Join-Path $env:TEMP "chocolatey"
   $tempDir = Join-Path $chocTempDir "$packageName"
+  if ($env:packageVersion -ne $null) {$tempDir = Join-Path $tempDir "$env:packageVersion"; }
 
   if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
   $file = Join-Path $tempDir "$($packageName)Install.$fileType"

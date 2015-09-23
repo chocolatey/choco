@@ -22,6 +22,7 @@ $Note = "Green"
 
 $version = $env:packageVersion
 $packageName = $env:packageName
+$packageVersion = $env:packageVersion
 $packageFolder = $env:packageFolder
 
 $helpersPath = (Split-Path -parent $MyInvocation.MyCommand.Definition);
