@@ -39,15 +39,15 @@ param(
   Write-Debug "checksum.exe found at `'$checksumExe`'"
 
   Write-Debug "Calling command [`'$checksumExe`' -c$checksum `"$file`"] to retrieve checksum"
-  $process = Start-Process "$checksumExe" -ArgumentList " -c=`"$checksum`" -t=`"$checksumType`" -f=`"$file`"" -Wait -WindowStyle Hidden -PassThru
-  
-  # this is here for specific cases in Posh v3 where -Wait is not honored
-  $currentPreference = $ErrorActionPreference
-  $ErrorActionPreference = 'SilentlyContinue'
-  if (!($process.HasExited)) { 
-    Wait-Process -Id $process.Id 
-  } 
-  $ErrorActionPreference = $currentPreference
+  $process = New-Object System.Diagnostics.Process
+  $process.StartInfo = new-object System.Diagnostics.ProcessStartInfo($checksumExe, " -c=`"$checksum`" -t=`"$checksumType`" -f=`"$file`"")
+  $process.StartInfo.RedirectStandardOutput = $true
+  $process.StartInfo.RedirectStandardError = $true
+  $process.StartInfo.UseShellExecute = $false
+  $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+
+  $process.Start() | Out-Null
+  $process.WaitForExit()
 
   Write-Debug "`'$checksumExe`' exited with $($process.ExitCode)"
 

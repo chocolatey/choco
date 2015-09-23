@@ -95,16 +95,15 @@ param(
   $unzipOps = {
     param($7zip, $destination, $fileFullPath, [ref]$exitCodeRef)
     Write-Debug "Calling '$7zip x -aoa -o`"$destination`" -y `"$fileFullPath`"'"
-    $process = Start-Process "$7zip" -ArgumentList "x -aoa -o`"$destination`" -y `"$fileFullPath`"" -Wait -WindowStyle Hidden -PassThru
-    #$process = Start-Process $7zip -ArgumentList "x -aoa -o`"$destination`" -y `"$fileFullPath`"" -Wait -NoNewWindow -PassThru
-    
-	# this is here for specific cases in Posh v3 where -Wait is not honored
-	$currentPreference = $ErrorActionPreference
-	$ErrorActionPreference = 'SilentlyContinue'
-    if (!($process.HasExited)) { 
-      Wait-Process -Id $process.Id 
-    } 
-	$ErrorActionPreference = $currentPreference
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = new-object System.Diagnostics.ProcessStartInfo($7zip, "x -aoa -o`"$destination`" -y `"$fileFullPath`"")
+    $process.StartInfo.RedirectStandardOutput = $true
+    $process.StartInfo.RedirectStandardError = $true
+    $process.StartInfo.UseShellExecute = $false
+    $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+
+    $process.Start() | Out-Null
+    $process.WaitForExit()
 
     $exitCodeRef.Value = $process.ExitCode
   }
