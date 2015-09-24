@@ -15,6 +15,7 @@
 
 namespace chocolatey.infrastructure.app.commands
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using attributes;
@@ -61,6 +62,22 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("p=|password=",
                      "Password - the user's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
+                .Add("page=",
+                     "Page - the 'page' of results to return. Defaults to return all results.", option =>
+                         {
+                             int page;
+                             if (int.TryParse(option, out page))
+                             {
+                                 configuration.ListCommand.Page = page;
+                             }
+                             else
+                             {
+                                 configuration.ListCommand.Page = null;
+                             }
+                         })
+                .Add("page-size=",
+                     "Page Size - the amount of package results to return per page. Defaults to 25.",
+                     option => configuration.ListCommand.PageSize = int.Parse(option))
                 ;
             //todo exact name
         }
@@ -94,6 +111,7 @@ Chocolatey will perform a search for a package local or remote. Some
     choco list --local-only
     choco list -li
     choco list -lai
+    choco list --page=0 --page-size=25
     choco search git
     choco search git -s ""https://somewhere/out/there""
     choco search bob -s ""https://somewhere/protected"" -u user -p pass
