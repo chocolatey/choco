@@ -43,6 +43,11 @@ namespace chocolatey.infrastructure.app.nuget
                 results = results.Where(p => p.IsLatestVersion);
             }
 
+            if (configuration.ListCommand.Page.HasValue)
+            {
+                results = results.Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
+            }
+
             return results.OrderBy(p => p.Id)
                         .AsEnumerable()
                         .Where(PackageExtensions.IsListed)

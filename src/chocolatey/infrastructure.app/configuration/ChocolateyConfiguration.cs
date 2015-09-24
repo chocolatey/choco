@@ -342,9 +342,16 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     [Serializable]
     public sealed class ListCommandConfiguration
     {
+        public ListCommandConfiguration()
+        {
+            PageSize = 25;
+        }
+
         // list
         public bool LocalOnly { get; set; }
         public bool IncludeRegistryPrograms { get; set; }
+        public int? Page { get; set; }
+        public int PageSize { get; set; }
     }
 
     [Serializable]
