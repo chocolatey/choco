@@ -18,8 +18,13 @@ namespace chocolatey.infrastructure.app.configuration
     public class ChocolateySource
     {
         public string Id { get; set; }
+
         public string Value { get; set; }
+
         public bool Disabled { get; set; }
+
         public bool Authenticated { get; set; }
+
+        public int Priority { get; set; }
     }
 }
