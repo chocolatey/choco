@@ -61,8 +61,9 @@ namespace chocolatey.infrastructure.app.services
                 list.Add(new ChocolateySource {
                     Id = source.Id,
                     Value = source.Value,
-                    Disabled =  source.Disabled,
-                    Authenticated = string.IsNullOrWhiteSpace(source.Password)
+                    Disabled = source.Disabled,
+                    Authenticated = string.IsNullOrWhiteSpace(source.Password),
+                    Priority = source.Priority
                 });
             }
             return list;
