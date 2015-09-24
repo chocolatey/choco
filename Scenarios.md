@@ -346,7 +346,7 @@
  * should not have inconclusive package result
  * should not have warning package result
 
-### ChocolateyUninstallCommand [ 12 Scenario(s), 84 Observation(s) ]
+### ChocolateyUninstallCommand [ 13 Scenario(s), 90 Observation(s) ]
 
 #### when force uninstalling a package
 
@@ -464,11 +464,20 @@
  * should not have inconclusive package result
  * should not have warning package result
 
+#### when uninstalling a package with readonly files
+
+ * should contain a message that it uninstalled successfully
+ * should delete the rollback
+ * should have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should uninstall the package from the lib directory
+
 #### when uninstalling packages with packages config
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 25 Scenario(s), 204 Observation(s) ]
+### ChocolateyUpgradeCommand [ 26 Scenario(s), 214 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -707,6 +716,19 @@
  * should upgrade the exact version dependency
  * should upgrade the minimum version dependency
  * should upgrade the package
+
+#### when upgrading a package with readonly files
+
+ * should contain a warning message that it upgraded successfully
+ * should contain a warning message with old and new versions
+ * should contain newer version in directory
+ * should delete the rollback
+ * should have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should upgrade a package in the lib directory
+ * should upgrade the package
+ * should upgrade where install location reports
 
 #### when upgrading a package with unavailable dependencies
 

@@ -42,7 +42,10 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("a|auto|automaticpackage",
                      "AutomaticPackage - Generate automatic package instead of normal. Defaults to false",
-                     option => configuration.NewCommand.AutomaticPackage = option != null)
+                     option => configuration.NewCommand.AutomaticPackage = option != null)  
+                .Add("t=|template=|template-name=",
+                     "TemplateName - Use a named template in {0}\templates\templatename instead of built-in template.".format_with(ApplicationParameters.InstallLocation),
+                     option => configuration.NewCommand.TemplateName = option)
                 .Add("name=",
                      "Name [Required]- the name of the package. Can be passed as first parameter without \"--name=\".",
                      option =>
@@ -57,7 +60,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Maintainer - the name of the maintainer. Can also be passed as the property MaintainerName=somevalue",
                      option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.MaintainerPropertyName, option.remove_surrounding_quotes()))
                 ;
-            //todo: template type
+            //todo: more built-in templates
         }
 
         public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)

@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Linq;
     using configuration;
     using infrastructure.services;
+    using logging;
     using nuget;
 
     internal class ChocolateyConfigSettingsService : IChocolateyConfigSettingsService
@@ -49,8 +50,13 @@ namespace chocolatey.infrastructure.app.services
             var list = new List<ChocolateySource>();
             foreach (var source in configFileSettings.Sources)
             {
-                if (configuration.RegularOutput) { 
-                    this.Log().Info(() => "{0}{1} - {2}".format_with(source.Id, source.Disabled ? " [Disabled]" : string.Empty, source.Value));
+                if (configuration.RegularOutput) {
+                    this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}.".format_with(
+                        source.Id,
+                        source.Disabled ? " [Disabled]" : string.Empty,
+                        source.Value,
+                        string.IsNullOrWhiteSpace(source.UserName) ? string.Empty : "(Authenticated)",
+                        source.Priority));
                 }
                 list.Add(new ChocolateySource {
                     Id = source.Id,
@@ -67,23 +73,40 @@ namespace chocolatey.infrastructure.app.services
             var source = configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
             if (source == null)
             {
-                configFileSettings.Sources.Add(new ConfigFileSourceSetting
-                    {
-                        Id = configuration.SourceCommand.Name,
-                        Value = configuration.Sources,
-                        UserName = configuration.SourceCommand.Username,
-                        Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password),
-                    });
+                source = new ConfigFileSourceSetting
+                {
+                    Id = configuration.SourceCommand.Name,
+                    Value = configuration.Sources,
+                    UserName = configuration.SourceCommand.Username,
+                    Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password),
+                    Priority = configuration.SourceCommand.Priority
+                };
+                configFileSettings.Sources.Add(source);
 
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-
-                this.Log().Warn(() => "Added {0} - {1}".format_with(configuration.SourceCommand.Name, configuration.Sources));
+                this.Log().Warn(() => "Added {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
             }
             else
             {
-                this.Log().Warn(@"
-No changes made. If you are trying to change an existing source, please 
- remove it first.");
+                var currentPassword = string.IsNullOrWhiteSpace(source.Password) ? null : NugetEncryptionUtility.DecryptString(source.Password);
+                if (configuration.Sources.is_equal_to(source.Value) &&
+                    configuration.SourceCommand.Priority == source.Priority &&
+                    configuration.SourceCommand.Username.is_equal_to(source.UserName) &&
+                    configuration.SourceCommand.Password.is_equal_to(currentPassword)
+                    )
+                {
+                    this.Log().Warn(NO_CHANGE_MESSAGE);
+                }
+                else
+                {
+                    source.Value = configuration.Sources;
+                    source.Priority = configuration.SourceCommand.Priority;
+                    source.UserName = configuration.SourceCommand.Username;
+                    source.Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password);
+
+                    _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                    this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
+                }
             }
         }
 
@@ -137,7 +160,7 @@ No changes made. If you are trying to change an existing source, please
         {
             foreach (var feature in configFileSettings.Features)
             {
-                this.Log().Info(() => "{0} - {1}".format_with(feature.Name, !feature.Enabled ? "[Disabled]" : "[Enabled]"));
+                this.Log().Info(() => "{0} - {1} | {2}".format_with(feature.Name, !feature.Enabled ? "[Disabled]" : "[Enabled]", feature.Description));
             }
         }
 
@@ -247,9 +270,88 @@ No changes made. If you are trying to change an existing source, please
                     _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                     this.Log().Info(() => "Updated ApiKey for {0}".format_with(configuration.Sources));
                 }
-                else
+                else this.Log().Warn(NO_CHANGE_MESSAGE);
+            }
+        }
+
+        public void config_list(ChocolateyConfiguration configuration)
+        {
+            this.Log().Info(ChocolateyLoggers.Important, "Settings");
+            foreach (var config in configFileSettings.ConfigSettings)
+            {
+                this.Log().Info(() => "{0} = {1} | {2}".format_with(config.Key, config.Value, config.Description));
+            }
+
+            this.Log().Info("");
+            this.Log().Info(ChocolateyLoggers.Important, "Sources");
+            source_list(configuration);
+            this.Log().Info("");
+            this.Log().Info(@"NOTE: Use choco source to interact with sources.");
+            this.Log().Info("");
+            this.Log().Info(ChocolateyLoggers.Important, "Features");
+            feature_list(configuration);
+            this.Log().Info("");
+            this.Log().Info(@"NOTE: Use choco feature to interact with features.");
+            ;
+            this.Log().Info("");
+            this.Log().Info(ChocolateyLoggers.Important, "API Keys");
+            this.Log().Info(@"NOTE: Api Keys are not shown through this command.
+ Use choco apikey to interact with API keys.");
+        }
+
+        public void config_get(ChocolateyConfiguration configuration)
+        {
+            var config = config_get(configuration.ConfigCommand.Name);
+            if (config == null) throw new ApplicationException("No configuration value by the name '{0}'".format_with(configuration.ConfigCommand.Name));
+            this.Log().Info("{0}".format_with(config.Value));
+        }
+
+        public ConfigFileConfigSetting config_get(string configKeyName)
+        {
+            var config = configFileSettings.ConfigSettings.FirstOrDefault(p => p.Key.is_equal_to(configKeyName));
+            if (config == null) return null;
+
+            return config;
+        }
+
+        public void config_set(ChocolateyConfiguration configuration)
+        {
+            var encryptValue = configuration.ConfigCommand.Name.contains("password");
+            var config = config_get(configuration.ConfigCommand.Name);
+            var configValue = encryptValue
+                                  ? NugetEncryptionUtility.EncryptString(configuration.ConfigCommand.ConfigValue)
+                                  : configuration.ConfigCommand.ConfigValue;
+
+            if (config == null)
+            {
+                var setting = new ConfigFileConfigSetting
+                {
+                    Key = configuration.ConfigCommand.Name,
+                    Value = configValue,
+                };
+
+                configFileSettings.ConfigSettings.Add(setting);
+
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+
+                this.Log().Warn(() => "Added {0} = {1}".format_with(setting.Key, setting.Value));
+            }
+            else
+            {
+                var currentValue = encryptValue && !string.IsNullOrWhiteSpace(config.Value)
+                                       ? NugetEncryptionUtility.DecryptString(config.Value)
+                                       : config.Value;
+
+                if (configuration.ConfigCommand.ConfigValue.is_equal_to(currentValue.to_string()))
                 {
                     this.Log().Warn(NO_CHANGE_MESSAGE);
+                }
+                else
+                {
+                    config.Value = configValue;
+                    _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+
+                    this.Log().Warn(() => "Updated {0} = {1}".format_with(config.Key, config.Value));
                 }
             }
         }

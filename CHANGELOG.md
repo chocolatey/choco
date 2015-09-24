@@ -1,9 +1,61 @@
+## [0.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.10+is%3Aclosed) (unreleased)
+
+Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, right?)!
+
+### FEATURES
+
+ * Alternative sources - see [#14](https://github.com/chocolatey/choco/issues/14)
+ * Support for custom headers - see [#332](https://github.com/chocolatey/choco/issues/332)
+
+### BUG FIXES
+
+ * n/a currently
+
+### IMPROVEMENTS
+
+ * AutoUninstaller is on by default - see [#308](https://github.com/chocolatey/choco/issues/308)
+
+## [0.9.9.9](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.9+is%3Aclosed) (unreleased)
+
+### FEATURES
+
+ * Config Command - see [#417](https://github.com/chocolatey/choco/issues/417)
+ * Create Custom Templates - see [#76](https://github.com/chocolatey/choco/issues/76)
+ * Proxy Support - see [#243](https://github.com/chocolatey/choco/issues/243)
+
+### BUG FIXES
+
+ * Fix - [Security] Remove rollback should validate it exists in choco install backup directory - see [#387](https://github.com/chocolatey/choco/issues/387)
+ * Fix - list / search results blocking until completion instead of streaming output - see [#143](https://github.com/chocolatey/choco/issues/143)
+ * Fix - default template install script for MSI silentArgs are bad - see [#354](https://github.com/chocolatey/choco/issues/354)
+ * Fix - Infinite loop downloading files if connection is lost - see [#285](https://github.com/chocolatey/choco/issues/285)
+ * Fix - Deleting read-only files fails - see [#338](https://github.com/chocolatey/choco/issues/338) and [#263](https://github.com/chocolatey/choco/issues/263)
+ * Fix - If the package uses $packageParameters instead of $env:PackageParameters, quotes are removed - see [#406](https://github.com/chocolatey/choco/issues/406)
+ * Fix - Choco upgrade not downloading new installer if current installer is the same size - see [#405](https://github.com/chocolatey/choco/issues/405)
+ * Fix - Exit with non-zero code if install/upgrade version and a newer version is installed - see [#365](https://github.com/chocolatey/choco/issues/365)
+ * Fix - Chocolately can permanently corrupt the config file if an operation is interrupted - see [#355](https://github.com/chocolatey/choco/issues/355)
+ * Fix - Handle PowerShell's `InitializeDefaultDrives` Error (that should just be a warning) - see [#349](https://github.com/chocolatey/choco/issues/349)
+ * Fix - Checksumming can not be turned off by the feature flag - see [#33](https://github.com/chocolatey/choco/issues/33)
+
+### IMPROVEMENTS
+
+ * API - List --localonly not working by default - see [#223](https://github.com/chocolatey/choco/issues/223)
+ * API - Expose package results - see [#132](https://github.com/chocolatey/choco/issues/132)
+ * API - Externalize IPackage and its interfaces - see [#353](https://github.com/chocolatey/choco/issues/353)
+ * Enhance "Access to path is denied" message on no admin rights - see [#177](https://github.com/chocolatey/choco/issues/177)
+ * Only update chocolatey.config if there are changes - see [#364](https://github.com/chocolatey/choco/issues/364)
+ * Sources should have explicit priority order- see [#71](https://github.com/chocolatey/choco/issues/71)
+ * Modify source when attempting to add a source with same name but different URL - see [#88](https://github.com/chocolatey/choco/issues/88)
+ * Features should contain description - see [#416](https://github.com/chocolatey/choco/issues/416)
+ * Unpack the powershell files just before packaging up the nupkg (Installing chocolatey meta) - see [#347](https://github.com/chocolatey/choco/issues/347)
+
+
 ## [0.9.9.8](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.8+is%3Aclosed) (June 26, 2015)
 
 ### BUG FIXES
 
- * Fix: choco install -y C: deletes all files - see [#341](https://github.com/chocolatey/choco/issues/341)
- * Fix: Read-Host halts scripts rather than prompt for input - see [#219](https://github.com/chocolatey/choco/issues/219)
+ * Fix - [Security] choco install -y C: deletes all files - see [#341](https://github.com/chocolatey/choco/issues/341)
+ * Fix - Read-Host halts scripts rather than prompt for input - see [#219](https://github.com/chocolatey/choco/issues/219)
 
 ### IMPROVEMENTS
 

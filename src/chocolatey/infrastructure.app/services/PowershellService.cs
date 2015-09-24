@@ -24,6 +24,7 @@ namespace chocolatey.infrastructure.app.services
     using filesystem;
     using infrastructure.commands;
     using logging;
+    using nuget;
     using results;
     using Environment = System.Environment;
 
@@ -32,6 +33,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IFileSystem _fileSystem;
         private readonly string _customImports;
         private const string OPERATION_COMPLETED_SUCCESSFULLY = "The operation completed successfully.";
+        private const string INITIALIZE_DEFAULT_DRIVES = "Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.";
 
         public PowershellService(IFileSystem fileSystem)
             : this(fileSystem, new CustomString(string.Empty))
@@ -113,11 +115,16 @@ namespace chocolatey.infrastructure.app.services
         {
             return "-packageScript '{0}' -installArguments '{1}' -packageParameters '{2}'{3}{4}".format_with(
                 script,
-                config.InstallArguments,
-                config.PackageParameters,
+                prepare_powershell_arguments(config.InstallArguments),
+                prepare_powershell_arguments(config.PackageParameters),
                 config.ForceX86 ? " -forceX86" : string.Empty,
                 config.OverrideArguments ? " -overrideArgs" : string.Empty
              );
+        }
+
+        private string prepare_powershell_arguments(string argument)
+        {
+            return argument.to_string().Replace("\"", "\\\"");
         }
 
         public bool run_action(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command)
@@ -202,6 +209,27 @@ namespace chocolatey.infrastructure.app.services
                 if (configuration.Verbose)
                 {
                     Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
+                } 
+                if (!configuration.Features.CheckSumFiles)
+                {
+                    Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
+                }
+                if (!string.IsNullOrWhiteSpace(configuration.Proxy.Location))
+                {
+                    var proxy_creds = string.Empty;
+                    if (!string.IsNullOrWhiteSpace(configuration.Proxy.User) &&
+                        !string.IsNullOrWhiteSpace(configuration.Proxy.EncryptedPassword)
+                       )
+                    {
+                        proxy_creds = "{0}:{1}@".format_with(configuration.Proxy.User, NugetEncryptionUtility.DecryptString(configuration.Proxy.EncryptedPassword));
+
+                        Environment.SetEnvironmentVariable("chocolateyProxyUser", configuration.Proxy.User);
+                        Environment.SetEnvironmentVariable("chocolateyProxyPassword", NugetEncryptionUtility.DecryptString(configuration.Proxy.EncryptedPassword));
+                    }
+
+                    Environment.SetEnvironmentVariable("http_proxy", "{0}{1}".format_with(proxy_creds, configuration.Proxy.Location));
+                    Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxy_creds, configuration.Proxy.Location));
+                    Environment.SetEnvironmentVariable("chocolateyProxyLocation", configuration.Proxy.Location);
                 }
                 //todo:if (configuration.NoOutput)
                 //{
@@ -270,7 +298,7 @@ namespace chocolatey.infrastructure.app.services
                         (s, e) =>
                             {
                                 if (string.IsNullOrWhiteSpace(e.Data)) return;
-                                if (e.Data.is_equal_to(OPERATION_COMPLETED_SUCCESSFULLY))
+                                if (e.Data.is_equal_to(OPERATION_COMPLETED_SUCCESSFULLY) || e.Data.is_equal_to(INITIALIZE_DEFAULT_DRIVES))
                                 {
                                     this.Log().Info(() => " " + e.Data);
                                 }

@@ -31,14 +31,29 @@ param(
     $req.Credentials = $defaultCreds
   }
 
-  # check if a proxy is required
   $webclient = new-object System.Net.WebClient
   if ($defaultCreds -ne $null) {
     $webClient.Credentials = $defaultCreds
   }
 
-  if (!$webclient.Proxy.IsBypassed($url))
+  # check if a proxy is required
+  $explicitProxy = $env:chocolateyProxyLocation
+  $explicitProxyUser = $env:chocolateyProxyUser
+  $explicitProxyPassword = $env:chocolateyProxyPassword
+  if ($explicitProxy -ne $null) {
+    # explicit proxy
+	$proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
+	if ($explicitProxyPassword -ne $null) {
+	  $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
+	  $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
+	}
+    
+	Write-Host "Using explicit proxy server '$explicitProxy'."
+    $req.Proxy = $proxy
+  
+  } elseif (!$webclient.Proxy.IsBypassed($url))
   {
+	# system proxy (pass through)
     $creds = [net.CredentialCache]::DefaultCredentials
     if ($creds -eq $null) {
       Write-Debug "Default credentials were null. Attempting backup method"
@@ -46,10 +61,10 @@ param(
       $creds = $cred.GetNetworkCredential();
     }
     $proxyaddress = $webclient.Proxy.GetProxy($url).Authority
-    Write-host "Using this proxyserver: $proxyaddress"
+    Write-Host "Using system proxy server '$proxyaddress'."
     $proxy = New-Object System.Net.WebProxy($proxyaddress)
-    $proxy.credentials = $creds
-    $req.proxy = $proxy
+    $proxy.Credentials = $creds
+    $req.Proxy = $proxy
   }
 
   $req.Accept = "*/*"
@@ -108,39 +123,54 @@ param(
 
   if($res.StatusCode -eq 200) {
     [long]$goal = $res.ContentLength
+    $goalFormatted = Format-FileSize $goal
     $reader = $res.GetResponseStream()
+    
     if ($fileName) {
       $fileDirectory = $([System.IO.Path]::GetDirectoryName($fileName))
       if (!(Test-Path($fileDirectory))) {
-        [System.IO.Directory]::CreateDirectory($fileDirectory) | Out-Null  
+        [System.IO.Directory]::CreateDirectory($fileDirectory) | Out-Null
       }
-	  
-	  try {
-	     $writer = new-object System.IO.FileStream $fileName, "Create"
-	  } catch {
-		throw $_.Exception
-	  }
+
+      try {
+        $writer = new-object System.IO.FileStream $fileName, "Create"
+      } catch {
+        throw $_.Exception
+      }
     }
+    
     [byte[]]$buffer = new-object byte[] 1048576
     [long]$total = [long]$count = [long]$iterLoop =0
-    do
-    {
-       $count = $reader.Read($buffer, 0, $buffer.Length);
-       if($fileName) {
+
+    $originalEAP = $ErrorActionPreference
+    $ErrorActionPreference = 'Stop'
+    try {
+      do
+      {
+        $count = $reader.Read($buffer, 0, $buffer.Length);
+        if($fileName) {
           $writer.Write($buffer, 0, $count);
-       }
-       if($Passthru){
+        }
+        
+        if($Passthru){
           $output += $encoding.GetString($buffer,0,$count)
-       } elseif(!$quiet) {
+        } elseif(!$quiet) {
           $total += $count
+          $totalFormatted = Format-FileSize $total
           if($goal -gt 0 -and ++$iterLoop%10 -eq 0) {
-             Write-Progress "Downloading $url to $fileName" "Saving $total of $goal" -id 0 -percentComplete (($total/$goal)*100)
+            Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete (($total/$goal)*100)
           }
+          
           if ($total -eq $goal) {
             Write-Progress "Completed download of $url." "Completed a total of $total bytes of $fileName" -id 0 -Completed
           }
-       }
-    } while ($count -gt 0)
+        }
+      } while ($count -gt 0)
+    } catch {
+      throw $_.Exception
+    } finally {
+      $ErrorActionPreference = $originalEAP
+    }
 
     $reader.Close()
     if($fileName) {

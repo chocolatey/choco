@@ -3,8 +3,6 @@ $chocInstallVariableName = "ChocolateyInstall"
 $sysDrive = $env:SystemDrive
 $tempDir = $env:TEMP
 $defaultChocolateyPathOld = "$sysDrive\Chocolatey"
-#$ErrorActionPreference = 'Stop'
-$debugModeParams = $null
 
 function Initialize-Chocolatey {
 <#
@@ -32,15 +30,6 @@ param(
   [Parameter(Mandatory=$false)][string]$chocolateyPath = ''
 )
   Write-Debug "Initialize-Chocolatey"
-
-  if ($env:ChocolateyEnvironmentDebug -eq 'true') {
-    $debugModeParams = '-dv'
-  }
-
-  Install-DotNet4IfMissing
-
-  $chocoNew = Join-Path $thisScriptFolder 'chocolateyInstall\choco.exe'
-  & $chocoNew unpackself -fy $debugModeParams
 
   $installModule = Join-Path $thisScriptFolder 'chocolateyInstall\helpers\chocolateyInstaller.psm1'
   Import-Module $installModule -Force
@@ -109,6 +98,8 @@ Creating Chocolatey folders if they do not already exist.
     Upgrade-OldChocolateyInstall $defaultChocolateyPathOld $chocolateyPath
     Install-ChocolateyBinFiles $chocolateyPath $chocolateyExePath
   }
+
+  Install-DotNet4IfMissing
 
 @"
 Chocolatey (choco.exe) is now ready.
@@ -309,7 +300,8 @@ param(
   $chocoExeDest = Join-Path $chocolateyPath 'choco.exe'
   Copy-Item $chocoExe $chocoExeDest -force
 
-  & $chocoExeDest unpackself -fy $debugModeParams
+  Write-Debug "Copying the contents of `'$chocInstallFolder`' to `'$chocolateyPath`'."
+  Copy-Item $chocInstallFolder\* $chocolateyPath -recurse -force
 }
 
 function Ensure-ChocolateyLibFiles {

@@ -38,7 +38,7 @@ namespace chocolatey.tests.infrastructure.commands
         public class when_powershellExecutor_is_searching_for_powershell_locations_and_all_locations_exist : PowerShellExecutorSpecsBase
         {
             private string result = string.Empty;
-            private readonly string expected = Environment.ExpandEnvironmentVariables("%windir%\\SysNative\\WindowsPowerShell\\v1.0\\powershell.exe");
+            private readonly string expected = Environment.ExpandEnvironmentVariables("%systemroot%\\SysNative\\WindowsPowerShell\\v1.0\\powershell.exe");
 
             public override void Context()
             {
@@ -73,7 +73,7 @@ namespace chocolatey.tests.infrastructure.commands
         public class when_powershellExecutor_is_searching_for_powershell_locations_there_is_no_sysnative : PowerShellExecutorSpecsBase
         {
             private string result = string.Empty;
-            private readonly string expected = Environment.ExpandEnvironmentVariables("%windir%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe");
+            private readonly string expected = Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe");
 
             public override void Context()
             {

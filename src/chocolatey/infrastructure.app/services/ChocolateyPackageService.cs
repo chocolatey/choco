@@ -260,6 +260,7 @@ namespace chocolatey.infrastructure.app.services
                     }
                 }
 
+                _filesService.ensure_compatible_file_attributes(packageResult,config);
                 _configTransformService.run(packageResult, config);
                 pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
 
@@ -774,7 +775,10 @@ ATTENTION: You must take manual action to remove {1} from
                 }
             }
 
+            rollbackDirectory = _fileSystem.get_full_path(rollbackDirectory);
+            
             if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
+            if (!rollbackDirectory.StartsWith(ApplicationParameters.PackageBackupLocation) || rollbackDirectory.is_equal_to(ApplicationParameters.PackageBackupLocation)) return;
 
             this.Log().Debug("Attempting rollback");
 

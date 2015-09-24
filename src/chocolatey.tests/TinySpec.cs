@@ -145,6 +145,19 @@ namespace chocolatey.tests
         }
     }
 
+#if __MonoCS__
+     public class WindowsOnlyAttribute : IgnoreAttribute
+    {
+        public WindowsOnlyAttribute() : base("This is a Windows only test")
+        {
+        }
+    }
+#else
+    public class WindowsOnlyAttribute : Attribute
+    {
+    }
+#endif
+
     public class IntegrationAttribute : CategoryAttribute
     {
         public IntegrationAttribute()

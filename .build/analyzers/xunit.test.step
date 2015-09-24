@@ -45,6 +45,7 @@
       <in>
         <items>
           <exclude name="${dirs.build.code}${path.separator}lib${path.separator}**" />
+          <exclude name="${dirs.build.code}/_PublishedApplications/**" />
           <exclude name="${dirs.build.code}/**/*Database*dll" if="${not tests.run_all}" />
           <exclude name="${dirs.build.code}/**/*database*dll" if="${not tests.run_all}" />
           <exclude name="${dirs.build.code}/**/*.Integration*dll" if="${not tests.run_all}" />

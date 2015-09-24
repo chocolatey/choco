@@ -324,6 +324,15 @@ spam/junk folder.");
                     version = installedPackage.Version;
                 }
 
+                if (installedPackage != null && version != null && version < installedPackage.Version && !config.AllowMultipleVersions && !config.AllowDowngrade)
+                {
+                    string logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade to attempt to install older versions, or use side by side to allow multiple versions.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
+                    var nullResult = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    continue;
+                }
+
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                 if (availablePackage == null)
                 {
@@ -383,7 +392,7 @@ spam/junk folder.");
 
         public void remove_rollback_directory_if_exists(string packageName)
         {
-            var rollbackDirectory = _fileSystem.combine_paths(ApplicationParameters.PackageBackupLocation, packageName);
+            var rollbackDirectory = _fileSystem.get_full_path(_fileSystem.combine_paths(ApplicationParameters.PackageBackupLocation, packageName));
             if (!_fileSystem.directory_exists(rollbackDirectory))
             {
                 //search for folder
@@ -392,10 +401,13 @@ spam/junk folder.");
                 {
                     rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
                 }
+
+                rollbackDirectory = _fileSystem.get_full_path(rollbackDirectory);
             }
-
+            
             if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
-
+            if (!rollbackDirectory.StartsWith(ApplicationParameters.PackageBackupLocation) || rollbackDirectory.is_equal_to(ApplicationParameters.PackageBackupLocation)) return;
+              
             FaultTolerance.try_catch_with_logging_exception(
                 () => _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true),
                 "Attempted to remove '{0}' but had an error:".format_with(rollbackDirectory),
@@ -479,6 +491,15 @@ spam/junk folder.");
                     continue;
                 }
 
+                if (version != null && version < installedPackage.Version && !config.AllowMultipleVersions && !config.AllowDowngrade)
+                {
+                    string logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade to attempt to upgrade to older versions, or use side by side to allow multiple versions.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
+                    var nullResult = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    continue;
+                }
+
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
 
@@ -519,7 +540,7 @@ spam/junk folder.");
 
                 var packageResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
 
-                if ((installedPackage.Version > availablePackage.Version))
+                if (installedPackage.Version > availablePackage.Version && !config.AllowDowngrade)
                 {
                     string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
                     packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
@@ -569,7 +590,7 @@ spam/junk folder.");
                     if (config.RegularOutput) this.Log().Info(logMessage);
                 }
 
-                if ((availablePackage.Version > installedPackage.Version) || config.Force)
+                if ((availablePackage.Version > installedPackage.Version) || config.Force || (availablePackage.Version < installedPackage.Version && config.AllowDowngrade))
                 {
                     if (availablePackage.Version > installedPackage.Version)
                     {
@@ -605,6 +626,7 @@ spam/junk folder.");
                                 packageName,
                                 version == null ? null : version.ToString()))
                             {
+                                ensure_package_files_have_compatible_attributes(config, installedPackage, pkgInfo);
                                 rename_legacy_package_version(config, installedPackage, pkgInfo);
                                 backup_existing_version(config, installedPackage, pkgInfo);
                                 remove_shim_directors(config, installedPackage, pkgInfo);
@@ -633,6 +655,19 @@ spam/junk folder.");
             }
 
             return packageInstalls;
+        }
+
+        public void ensure_package_files_have_compatible_attributes(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
+        {
+            var installDirectory = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id);
+            if (!_fileSystem.directory_exists(installDirectory))
+            {
+                var pathResolver = new ChocolateyPackagePathResolver(NugetCommon.GetNuGetFileSystem(config, _nugetLogger), useSideBySidePaths: true);
+                installDirectory = pathResolver.GetInstallPath(installedPackage);
+                if (!_fileSystem.directory_exists(installDirectory)) return;
+            }
+
+            _filesService.ensure_compatible_file_attributes(installDirectory, config);
         }
 
         public void rename_legacy_package_version(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
@@ -950,6 +985,7 @@ spam/junk folder.");
                                 packageName,
                                 version == null ? null : version.ToString()))
                             {
+                                ensure_package_files_have_compatible_attributes(config, packageVersion, pkgInfo);
                                 rename_legacy_package_version(config, packageVersion, pkgInfo);
                                 backup_existing_version(config, packageVersion, pkgInfo);
                                 packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);

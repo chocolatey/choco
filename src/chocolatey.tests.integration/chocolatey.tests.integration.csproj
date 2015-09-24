@@ -227,6 +227,9 @@
     <Content Include="infrastructure\filesystem\MoveMe.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="infrastructure\filesystem\context\attributes.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="infrastructure\filesystem\Slipsum.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

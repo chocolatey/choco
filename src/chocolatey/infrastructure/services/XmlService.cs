@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.services
     using System.Text;
     using System.Xml;
     using System.Xml.Serialization;
+    using cryptography;
     using filesystem;
     using tolerance;
 
@@ -28,28 +29,30 @@ namespace chocolatey.infrastructure.services
     public sealed class XmlService : IXmlService
     {
         private readonly IFileSystem _fileSystem;
+        private readonly IHashProvider _hashProvider;
 
-        public XmlService(IFileSystem fileSystem)
+        public XmlService(IFileSystem fileSystem, IHashProvider hashProvider)
         {
             _fileSystem = fileSystem;
+            _hashProvider = hashProvider;
         }
 
         public XmlType deserialize<XmlType>(string xmlFilePath)
         {
             return FaultTolerance.try_catch_with_logging_exception(
                 () =>
+                {
+                    var xmlSerializer = new XmlSerializer(typeof(XmlType));
+                    var xmlReader = XmlReader.Create(new StringReader(_fileSystem.read_file(xmlFilePath)));
+                    if (!xmlSerializer.CanDeserialize(xmlReader))
                     {
-                        var xmlSerializer = new XmlSerializer(typeof (XmlType));
-                        var xmlReader = XmlReader.Create(new StringReader(_fileSystem.read_file(xmlFilePath)));
-                        if (!xmlSerializer.CanDeserialize(xmlReader))
-                        {
-                            this.Log().Warn("Cannot deserialize response of type {0}", typeof (XmlType));
-                            return default(XmlType);
-                        }
+                        this.Log().Warn("Cannot deserialize response of type {0}", typeof(XmlType));
+                        return default(XmlType);
+                    }
 
-                        return (XmlType) xmlSerializer.Deserialize(xmlReader);
-                    },
-                "Error deserializing response of type {0}".format_with(typeof (XmlType)),
+                    return (XmlType)xmlSerializer.Deserialize(xmlReader);
+                },
+                "Error deserializing response of type {0}".format_with(typeof(XmlType)),
                 throwError: true);
         }
 
@@ -57,22 +60,31 @@ namespace chocolatey.infrastructure.services
         {
             _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(xmlFilePath));
 
+            var xmlUpdateFilePath = xmlFilePath + ".update";
+
             FaultTolerance.try_catch_with_logging_exception(
                 () =>
+                {
+                    var xmlSerializer = new XmlSerializer(typeof(XmlType));
+                    var textWriter = new StreamWriter(xmlUpdateFilePath, append: false, encoding: Encoding.UTF8)
                     {
-                        var xmlSerializer = new XmlSerializer(typeof (XmlType));
-                        var textWriter = new StreamWriter(xmlFilePath, append: false, encoding: Encoding.UTF8)
-                            {
-                                AutoFlush = true
-                            };
+                        AutoFlush = true
+                    };
 
-                        xmlSerializer.Serialize(textWriter, xmlType);
-                        textWriter.Flush();
+                    xmlSerializer.Serialize(textWriter, xmlType);
+                    textWriter.Flush();
 
-                        textWriter.Close();
-                        textWriter.Dispose();
-                    },
-                "Error serializing type {0}".format_with(typeof (XmlType)),
+                    textWriter.Close();
+                    textWriter.Dispose();
+
+                    if (!_hashProvider.hash_file(xmlFilePath).is_equal_to(_hashProvider.hash_file(xmlUpdateFilePath)))
+                    {
+                        _fileSystem.copy_file(xmlUpdateFilePath, xmlFilePath, overwriteExisting: true);
+                    }
+
+                    _fileSystem.delete_file(xmlUpdateFilePath);
+                },
+                "Error serializing type {0}".format_with(typeof(XmlType)),
                 throwError: true);
         }
     }
