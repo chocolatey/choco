@@ -311,16 +311,29 @@ param(
   Write-Debug "Ensure-ChocolateyLibFiles"
   $chocoPkgDirectory = Join-Path $chocolateyLibPath 'chocolatey'
 
-  if ( -not (Test-Path("$chocoPkgDirectory\chocolatey.nupkg")) ) {
-    Write-Output "Ensuring '$chocoPkgDirectory' exists."
-    Create-DirectoryIfNotExists $chocoPkgDirectory
+  Create-DirectoryIfNotExists $chocoPkgDirectory
 
-    $chocoPkg = Get-ChildItem "$thisScriptFolder/../../" | ?{$_.name -match "^chocolatey.*nupkg"} | Sort name -Descending | Select -First 1
-    if ($chocoPkg -ne '') { $chocoPkg = $chocoPkg.FullName }
-    "$tempDir\chocolatey.zip", "$chocoPkg" | % {
-      if ($_ -ne $null -and $_ -ne '') {
-        if (Test-Path $_) {
-          Copy-Item $_ "$chocoPkgDirectory\chocolatey.nupkg" -force -ErrorAction SilentlyContinue
+  if (!(Test-Path("$chocoPkgDirectory\chocolatey.nupkg"))) {
+    Write-Output "chocolatey.nupkg file not installed in lib.`n Attempting to locate it from bootstrapper."
+    $chocoZipFile = Join-Path $tempDir "chocolatey\chocInstall\chocolatey.zip"
+
+    Write-Debug "First the zip file at '$chocoZipFile'."
+    Write-Debug "Then from a neighboring chocolatey.*nupkg file '$thisScriptFolder/../../'."
+
+    if (Test-Path("$chocoZipFile")) {
+      Write-Debug "Copying '$chocoZipFile' to '$chocoPkgDirectory\chocolatey.nupkg'."
+      Copy-Item "$chocoZipFile" "$chocoPkgDirectory\chocolatey.nupkg" -Force -ErrorAction SilentlyContinue
+    }
+
+    if (!(Test-Path("$chocoPkgDirectory\chocolatey.nupkg"))) {
+      $chocoPkg = Get-ChildItem "$thisScriptFolder/../../" | ?{$_.name -match "^chocolatey.*nupkg" } | Sort name -Descending | Select -First 1
+      if ($chocoPkg -ne '') { $chocoPkg = $chocoPkg.FullName }
+      "$chocoZipFile", "$chocoPkg" | % {
+        if ($_ -ne $null -and $_ -ne '') {
+          if (Test-Path $_) {
+            Write-Debug "Copying '$_' to '$chocoPkgDirectory\chocolatey.nupkg'."
+            Copy-Item $_ "$chocoPkgDirectory\chocolatey.nupkg" -Force -ErrorAction SilentlyContinue
+          }
         }
       }
     }
