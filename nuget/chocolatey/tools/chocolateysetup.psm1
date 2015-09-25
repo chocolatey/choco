@@ -8,20 +8,20 @@ function Initialize-Chocolatey {
 <#
   .DESCRIPTION
     This will initialize the Chocolatey tool by
-      a) setting up the "nugetPath" (the location where all chocolatey nuget packages will be installed)
-      b) Installs chocolatey into the "nugetPath"
+      a) setting up the "chocolateyPath" (the location where all chocolatey nuget packages will be installed)
+      b) Installs chocolatey into the "chocolateyPath"
             c) Instals .net 4.0 if needed
-      d) Adds chocolaty to the PATH environment variable so you have access to the chocolatey|cinst commands.
-  .PARAMETER  NuGetPath
-    Allows you to override the default path of (C:\Chocolatey\) by specifying a directory chocolaty will install nuget packages.
+      d) Adds Chocolatey to the PATH environment variable so you have access to the choco commands.
+  .PARAMETER  ChocolateyPath
+    Allows you to override the default path of (C:\ProgramData\chocolatey\) by specifying a directory chocolatey will install nuget packages.
 
   .EXAMPLE
     C:\PS> Initialize-Chocolatey
 
-    Installs chocolatey into the default C:\Chocolatey\ directory.
+    Installs chocolatey into the default C:\ProgramData\Chocolatey\ directory.
 
   .EXAMPLE
-    C:\PS> Initialize-Chocolatey -nugetPath "D:\ChocolateyInstalledNuGets\"
+    C:\PS> Initialize-Chocolatey -chocolateyPath "D:\ChocolateyInstalledNuGets\"
 
     Installs chocolatey into the custom directory D:\ChocolateyInstalledNuGets\
 
