@@ -222,6 +222,15 @@ namespace chocolatey
             var runner = new GenericRunner();
             return runner.list<T>(configuration, _container, isConsole: false, parseArgs: null);
         }
+
+        public int Count()
+        {
+            extract_resources();
+            var configuration = create_configuration(new List<string>());
+            configuration.RegularOutput = true;
+            var runner = new GenericRunner();
+            return runner.count(configuration, _container, isConsole: false, parseArgs: null);
+        }
     }
 
     // ReSharper restore InconsistentNaming

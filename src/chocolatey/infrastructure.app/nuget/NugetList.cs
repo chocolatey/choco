@@ -30,6 +30,11 @@ namespace chocolatey.infrastructure.app.nuget
             return execute_package_search(configuration, nugetLogger);
         }
 
+        public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger)
+        {
+            return execute_package_search(configuration, nugetLogger).Count();
+        }
+
         private static IQueryable<IPackage> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
             var packageRepository = NugetCommon.GetRemoteRepository(configuration, nugetLogger);

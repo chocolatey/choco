@@ -70,6 +70,11 @@ namespace chocolatey.infrastructure.app.services
             perform_source_runner_action(config, r => r.ensure_source_app_installed(config, (packageResult) => handle_package_result(packageResult, config, CommandNameType.install)));
         }
 
+        public int count_run(ChocolateyConfiguration config)
+        {
+            return perform_source_runner_function(config, r => r.count_run(config));
+        }
+
         private void perform_source_runner_action(ChocolateyConfiguration config, Action<ISourceRunner> action)
         {
             var runner = _sourceRunners.FirstOrDefault(r => r.SourceType == config.SourceType);

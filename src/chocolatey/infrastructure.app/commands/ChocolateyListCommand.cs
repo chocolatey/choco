@@ -140,6 +140,12 @@ Chocolatey will perform a search for a package local or remote. Some
             return _packageService.list_run(configuration);
         }
 
+        public int count(ChocolateyConfiguration config)
+        {
+            config.QuietOutput = true;
+            return _packageService.count_run(config);
+        }
+
         public bool may_require_admin_access()
         {
             return false;

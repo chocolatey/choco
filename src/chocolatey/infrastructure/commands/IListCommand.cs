@@ -18,7 +18,12 @@ namespace chocolatey.infrastructure.commands
     using System.Collections.Generic;
     using app.configuration;
 
-    public interface IListCommand<out T> : ICommand
+    public interface IListCommand : ICommand
+    {
+        int count(ChocolateyConfiguration config);
+    }
+
+    public interface IListCommand<out T> : IListCommand
     {
         IEnumerable<T> list(ChocolateyConfiguration config);
     }

@@ -156,6 +156,11 @@ namespace chocolatey.infrastructure.app.services
             set_root_dir_if_not_set();
         }
 
+        public int count_run(ChocolateyConfiguration config)
+        {
+            throw new NotImplementedException("Count is not supported for this source runner.");
+        }
+
         public void set_root_dir_if_not_set()
         {
             if (!string.IsNullOrWhiteSpace(_rootDirectory)) return;

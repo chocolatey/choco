@@ -150,6 +150,24 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             }
         }
 
+        public int count(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
+        {
+            var command = find_command(config, container, isConsole, parseArgs) as IListCommand;
+            if (command == null)
+            {
+                if (!string.IsNullOrWhiteSpace(config.CommandName))
+                {
+                    throw new Exception("The implementation of '{0}' does not support listing.".format_with(config.CommandName));
+                }
+                return 0;
+            }
+            else
+            {
+                this.Log().Debug("_ {0}:{1} - Normal Count Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                return command.count(config);
+            }
+        }
+
         public void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
         {
             var shouldWarn = (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator);

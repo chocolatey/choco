@@ -157,6 +157,11 @@ namespace chocolatey.infrastructure.app.services
             set_executable_path_if_not_set();
         }
 
+        public int count_run(ChocolateyConfiguration config)
+        {
+            throw new NotImplementedException("Count is not supported for this source runner.");
+        }
+
         public void set_executable_path_if_not_set()
         {
             if (!string.IsNullOrWhiteSpace(_exePath)) return;
