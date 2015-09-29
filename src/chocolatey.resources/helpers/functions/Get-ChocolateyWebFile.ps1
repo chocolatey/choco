@@ -1,11 +1,11 @@
 ﻿# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,27 +41,27 @@ OPTIONAL (Right now) - This allows a checksum to be validated for files that are
 OPTIONAL (Right now) - This allows a checksum to be validated for files that are not local
 
 .PARAMETER ChecksumType
-OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to 'md5'
+OPTIONAL (Right now) - 'md5', 'sha1', 'sha256' or 'sha512' - defaults to 'md5'
 
 .PARAMETER ChecksumType64
-OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to ChecksumType
+OPTIONAL (Right now) - 'md5', 'sha1', 'sha256' or 'sha512' - defaults to ChecksumType
 
 .PARAMETER options
 OPTIONAL - Specify custom headers
 
 Example:
--------- 
-	$options = 
+--------
+	$options =
 	@{
 		Headers = @{
-			Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'; 
+			Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
 			'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
 			'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
 			Cookie = 'products.download.email=ewilde@gmail.com';
 			Referer = 'http://submain.com/download/ghostdoc/';
 		}
 	}
-	
+
 	Get-ChocolateyWebFile 'ghostdoc' 'http://submain.com/download/GhostDoc_v4.0.zip' -options $options
 
 .EXAMPLE
@@ -113,7 +113,7 @@ param(
   try {
     $fileDirectory = $([System.IO.Path]::GetDirectoryName($fileFullPath))
     if (!(Test-Path($fileDirectory))) {
-      [System.IO.Directory]::CreateDirectory($fileDirectory) | Out-Null  
+      [System.IO.Directory]::CreateDirectory($fileDirectory) | Out-Null
     }
   } catch {
     Write-Host "Attempt to create directory failed for '$fileFullPath'."
