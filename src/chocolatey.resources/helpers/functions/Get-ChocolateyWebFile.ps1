@@ -41,10 +41,10 @@ OPTIONAL (Right now) - This allows a checksum to be validated for files that are
 OPTIONAL (Right now) - This allows a checksum to be validated for files that are not local
 
 .PARAMETER ChecksumType
-OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to 'md5'
+OPTIONAL (Right now) - 'md5', 'sha1', 'sha256' or 'sha512' - defaults to 'md5'
 
 .PARAMETER ChecksumType64
-OPTIONAL (Right now) - 'md5' or 'sha1' - defaults to ChecksumType
+OPTIONAL (Right now) - 'md5', 'sha1', 'sha256' or 'sha512' - defaults to ChecksumType
 
 .EXAMPLE
 Get-ChocolateyWebFile '__NAME__' 'C:\somepath\somename.exe' 'URL' '64BIT_URL_DELETE_IF_NO_64BIT'
