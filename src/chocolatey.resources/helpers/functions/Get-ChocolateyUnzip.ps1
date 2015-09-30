@@ -1,11 +1,11 @@
 # Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -94,19 +94,22 @@ param(
   $exitCode = -1
   $unzipOps = {
     param($7zip, $destination, $fileFullPath, [ref]$exitCodeRef)
-    Write-Debug "Calling '$7zip x -aoa -o`"$destination`" -y `"$fileFullPath`"'"
-    $process = Start-Process "$7zip" -ArgumentList "x -aoa -o`"$destination`" -y `"$fileFullPath`"" -Wait -WindowStyle Hidden -PassThru
-    #$process = Start-Process $7zip -ArgumentList "x -aoa -o`"$destination`" -y `"$fileFullPath`"" -Wait -NoNewWindow -PassThru
-    
-	# this is here for specific cases in Posh v3 where -Wait is not honored
-	$currentPreference = $ErrorActionPreference
-	$ErrorActionPreference = 'SilentlyContinue'
-    if (!($process.HasExited)) { 
-      Wait-Process -Id $process.Id 
-    } 
-	$ErrorActionPreference = $currentPreference
+    $params = "x -aoa -o`"$destination`" -y `"$fileFullPath`""
+    Write-Debug "Executing command ['$7zip' $params]"
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = new-object System.Diagnostics.ProcessStartInfo($7zip, $params)
+    $process.StartInfo.RedirectStandardOutput = $true
+    $process.StartInfo.RedirectStandardError = $true
+    $process.StartInfo.UseShellExecute = $false
+    $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
 
-    $exitCodeRef.Value = $process.ExitCode
+    $process.Start() | Out-Null
+    $process.WaitForExit()
+    $processExitCode = $process.ExitCode
+    $process.Dispose()
+    Write-Debug "Command ['$7zip' $params] exited with `'$processExitCode`'."
+
+    $exitCodeRef.Value = $processExitCode
   }
 
   if ($zipExtractLogFullPath) {
