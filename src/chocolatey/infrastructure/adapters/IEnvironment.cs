@@ -62,6 +62,36 @@ namespace chocolatey.infrastructure.adapters
         /// </returns>
         /// <filterpriority>1</filterpriority>
         string NewLine { get; }
+
+        /// <summary>
+        ///   Creates, modifies, or deletes an environment variable stored in the current process.
+        /// </summary>
+        /// <param name="variable">
+        ///   The name of an environment variable.
+        /// </param>
+        /// <param name="value">
+        ///   A value to assign to <paramref name="variable" />.
+        /// </param>
+        /// <exception cref="T:System.ArgumentNullException">
+        ///   <paramref name="variable" /> is null.
+        /// </exception>
+        /// <exception cref="T:System.ArgumentException">
+        ///   <paramref name="variable" /> contains a zero-length string, an initial hexadecimal zero character (0x00), or an equal sign ("=").
+        ///   -or-
+        ///   The length of <paramref name="variable" /> or <paramref name="value" /> is greater than or equal to 32,767 characters.
+        ///   -or-
+        ///   An error occurred during the execution of this operation.
+        /// </exception>
+        /// <exception cref="T:System.Security.SecurityException">
+        ///   The caller does not have the required permission to perform this operation.
+        /// </exception>
+        /// <filterpriority>1</filterpriority>
+        /// <PermissionSet>
+        ///   <IPermission
+        ///     class="System.Security.Permissions.EnvironmentPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        ///     version="1" Unrestricted="true" />
+        /// </PermissionSet>
+        void SetEnvironmentVariable(string variable, string value);
     }
 
     // ReSharper restore InconsistentNaming
