@@ -344,7 +344,6 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.LogMessagesToConsole = true;
                 Results = Service.uninstall_run(Configuration);
                 _packageResult = Results.FirstOrDefault().Value;
             }
