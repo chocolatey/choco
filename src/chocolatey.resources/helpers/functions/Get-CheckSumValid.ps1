@@ -21,8 +21,8 @@ param(
 )
   Write-Debug "Running 'Get-ChecksumValid' with file:`'$file`', checksum: `'$checksum`', checksumType: `'$checksumType`'";
   if ($env:chocolateyIgnoreChecksums -eq 'true') {
-	Write-Warning "Ignoring checksums due to feature checksumFiles = false or config ignoreChecksums = true."
-	return
+    Write-Warning "Ignoring checksums due to feature checksumFiles = false or config ignoreChecksums = true."
+    return
   }
   if ($checksum -eq '' -or $checksum -eq $null) { return }
 
@@ -35,8 +35,8 @@ param(
 
   $checksumExe = Join-Path "$helpersPath" '..\tools\checksum.exe'
   if (!([System.IO.File]::Exists($checksumExe))) {
-	Update-SessionEnvironment
-	$checksumExe = Join-Path "$env:ChocolateyInstall" 'tools\checksum.exe'
+    Update-SessionEnvironment
+    $checksumExe = Join-Path "$env:ChocolateyInstall" 'tools\checksum.exe'
   }
   Write-Debug "checksum.exe found at `'$checksumExe`'"
 

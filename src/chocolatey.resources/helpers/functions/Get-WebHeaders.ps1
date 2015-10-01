@@ -38,11 +38,11 @@ param(
   $explicitProxyPassword = $env:chocolateyProxyPassword
   if ($explicitProxy -ne $null) {
     # explicit proxy
-	$proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
-	if ($explicitProxyPassword -ne $null) {
-	  $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
-	  $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
-	}
+  $proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
+  if ($explicitProxyPassword -ne $null) {
+    $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
+    $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
+  }
 
     Write-Host "Using explicit proxy server '$explicitProxy'."
     $request.Proxy = $proxy
