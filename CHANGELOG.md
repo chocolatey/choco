@@ -15,20 +15,23 @@ Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, righ
 
  * AutoUninstaller is on by default - see [#308](https://github.com/chocolatey/choco/issues/308)
 
-## [0.9.9.9](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.9+is%3Aclosed) (unreleased)
+## [0.9.9.9](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.9+is%3Aclosed) (October 2, 2015)
+
+With this release you can completely configure choco from the command line (including the priority of sources). Choco now allows you to create [custom package templates](https://github.com/chocolatey/choco/issues/76). Choco has [proper proxy support](https://github.com/chocolatey/choco/issues/243) now. We also squashed up some bugs, like the infinite download loop that happens if the connection is lost. We've also improved the installation experience of Chocolatey itself, [unpacking all of the required setup files in the chocolatey package](https://github.com/chocolatey/choco/issues/347) and improving the messaging output during the bootstrapping process. Chocolatey also [doesn't try to write config updates every command](https://github.com/chocolatey/choco/issues/364), unless something actually changes in the config file. And last but not least for mentions, the issue of [choco not recognizing itself as needing upgraded after being installed by the bootstrapper](https://github.com/chocolatey/choco/issues/414) is now fixed.
 
 ### FEATURES
 
  * Config Command - see [#417](https://github.com/chocolatey/choco/issues/417)
- * Create Custom Templates - see [#76](https://github.com/chocolatey/choco/issues/76)
+ * Create Custom Package Templates - see [#76](https://github.com/chocolatey/choco/issues/76)
  * Proxy Support - see [#243](https://github.com/chocolatey/choco/issues/243)
 
 ### BUG FIXES
 
  * Fix - [Security] Remove rollback should validate it exists in choco install backup directory - see [#387](https://github.com/chocolatey/choco/issues/387)
+ * Fix - Ensure chocolatey is installed into the lib folder during initial install - see [#414](https://github.com/chocolatey/choco/issues/414)
+ * Fix - Infinite loop downloading files if connection is lost - see [#285](https://github.com/chocolatey/choco/issues/285)
  * Fix - list / search results blocking until completion instead of streaming output - see [#143](https://github.com/chocolatey/choco/issues/143)
  * Fix - default template install script for MSI silentArgs are bad - see [#354](https://github.com/chocolatey/choco/issues/354)
- * Fix - Infinite loop downloading files if connection is lost - see [#285](https://github.com/chocolatey/choco/issues/285)
  * Fix - Deleting read-only files fails - see [#338](https://github.com/chocolatey/choco/issues/338) and [#263](https://github.com/chocolatey/choco/issues/263)
  * Fix - If the package uses $packageParameters instead of $env:PackageParameters, quotes are removed - see [#406](https://github.com/chocolatey/choco/issues/406)
  * Fix - Choco upgrade not downloading new installer if current installer is the same size - see [#405](https://github.com/chocolatey/choco/issues/405)
@@ -36,19 +39,25 @@ Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, righ
  * Fix - Chocolately can permanently corrupt the config file if an operation is interrupted - see [#355](https://github.com/chocolatey/choco/issues/355)
  * Fix - Handle PowerShell's `InitializeDefaultDrives` Error (that should just be a warning) - see [#349](https://github.com/chocolatey/choco/issues/349)
  * Fix - Checksumming can not be turned off by the feature flag - see [#33](https://github.com/chocolatey/choco/issues/33)
+ * Fix - Process with an id of is not running errors on 0.9.9.8 - see [#346](https://github.com/chocolatey/choco/issues/346)
+ * Fix - Export cmdlets for automation scripts - see [#422](https://github.com/chocolatey/choco/issues/422)
 
 ### IMPROVEMENTS
 
+ * [Security] Add SHA-2 (sha256 / sha512) to checksum - see [#113](https://github.com/chocolatey/choco/issues/113)
+ * Sources should have explicit priority order- see [#71](https://github.com/chocolatey/choco/issues/71)
+ * Unpack the powershell files just before packaging up the nupkg (Installing chocolatey meta) - see [#347](https://github.com/chocolatey/choco/issues/347)
  * API - List --localonly not working by default - see [#223](https://github.com/chocolatey/choco/issues/223)
  * API - Expose package results - see [#132](https://github.com/chocolatey/choco/issues/132)
  * API - Externalize IPackage and its interfaces - see [#353](https://github.com/chocolatey/choco/issues/353)
  * Enhance "Access to path is denied" message on no admin rights - see [#177](https://github.com/chocolatey/choco/issues/177)
  * Only update chocolatey.config if there are changes - see [#364](https://github.com/chocolatey/choco/issues/364)
- * Sources should have explicit priority order- see [#71](https://github.com/chocolatey/choco/issues/71)
  * Modify source when attempting to add a source with same name but different URL - see [#88](https://github.com/chocolatey/choco/issues/88)
  * Features should contain description - see [#416](https://github.com/chocolatey/choco/issues/416)
- * Unpack the powershell files just before packaging up the nupkg (Installing chocolatey meta) - see [#347](https://github.com/chocolatey/choco/issues/347)
-
+ * Chocolatey Installer - removing modules not loaded - see [#442](https://github.com/chocolatey/choco/issues/442)
+ * Chocolatey Installer - Don't use Write-Host - see [#444](https://github.com/chocolatey/choco/issues/444)
+ * Set environment variables once configuration is complete - see [#420](https://github.com/chocolatey/choco/issues/420)
+ * Enhance Package Template for 0.9.9.9 - see [#366](https://github.com/chocolatey/choco/issues/366)
 
 ## [0.9.9.8](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.8+is%3Aclosed) (June 26, 2015)
 
