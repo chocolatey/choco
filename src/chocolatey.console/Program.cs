@@ -74,13 +74,14 @@ namespace chocolatey.console
                 if (config.RegularOutput)
                 {
                     "logfile".Log().Info(() => "".PadRight(60, '='));
+
 #if DEBUG
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1} (DEBUG BUILD)".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
 #else
-                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
+                    var versionLog = config.Information.ChocolateyVersion == config.Information.ChocolateyProductVersion ? "logfile" : "chocolatey";
+                    versionLog.Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
 #endif
                 }
-
                 
                 if (warnings.Count != 0 && config.RegularOutput)
                 {
