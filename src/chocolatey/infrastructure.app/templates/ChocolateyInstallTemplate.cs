@@ -18,8 +18,9 @@ namespace chocolatey.infrastructure.app.templates
     public class ChocolateyInstallTemplate
     {
         public static string Template =
-            @"#NOTE: Please remove any commented lines to tidy up prior to releasing the package, including this one
-# REMOVE ANYTHING BELOW THAT IS NOT NEEDED
+            @"# IMPORTANT: Before releasing this package, copy/paste the next 2 lines into PowerShell to remove all comments from this file:
+#   $f='c:\path\to\thisFile.ps1'
+#   gc $f | ? {$_ -notmatch ""^\s*#""} | % {$_ -replace '(^.*?)\s*?[^``]#.*','$1'} | Out-File $f+"".~"" -en utf8; mv -fo $f+"".~"" $f
 
 $ErrorActionPreference = 'Stop'; # stop on all errors
 
@@ -28,6 +29,8 @@ $packageName= '[[PackageName]]' # arbitrary name for the package, used in messag
 $toolsDir   = ""$(Split-Path -parent $MyInvocation.MyCommand.Definition)""
 $url        = '[[Url]]' # download url
 $url64      = '[[Url64]]' # 64bit URL here or remove - if installer is both, use $url
+#$fileLocation = Join-Path $toolsDir 'NAME_OF_EMBEDDED_INSTALLER_FILE'
+#$fileLocation = Join-Path $toolsDir 'SHARE_LOCATION_OF_INSTALLER_FILE'
 
 $packageArgs = @{
   packageName   = $packageName
@@ -35,12 +38,24 @@ $packageArgs = @{
   fileType      = '[[InstallerType]]' #only one of these: exe, msi, msu
   url           = $url
   url64bit      = $url64
+  #file         = $fileLocation
 
   #MSI
   silentArgs    = ""/qn /norestart /l*v `""$env:TEMP\chocolatey\$($packageName)\$($packageName).MsiInstall.log`"""" # ALLUSERS=1 DISABLEDESKTOPSHORTCUT=1 ADDDESKTOPICON=0 ADDSTARTMENU=0
   validExitCodes= @(0, 3010, 1641)
   #OTHERS
-  #silentArgs   ='[[SilentArgs]]' # /s /S /q /Q /quiet /silent /SILENT /VERYSILENT -s - try any of these to get the silent installer
+  # Uncomment matching EXE type (sorted by most to least common)
+  #silentArgs   = '/S'           # NSIS
+  #silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
+  #silentArgs   = '/s'           # InstallShield
+  #silentArgs   = '/s /v""/qn""' # InstallShield with MSI
+  #silentArgs   = '/s'           # Wise InstallMaster
+  #silentArgs   = '-s'           # Squirrel
+  #silentArgs   = '-q'           # Install4j
+  #silentArgs   = '-s -u'        # Ghost
+  # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
+  #silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
+                                 #       https://chocolatey.org/packages/autohotkey.portable
   #validExitCodes= @(0) #please insert other valid exit codes here
 
   # optional, highly recommended
@@ -53,6 +68,9 @@ $packageArgs = @{
 
 Install-ChocolateyPackage @packageArgs
 #Install-ChocolateyZipPackage @packageArgs
+# if you are making your own internal packages (organizations), you can embed the installer or 
+# put on internal file share and use the following instead (you'll need to add $file to the above)
+#Install-ChocolateyInstallPackage @packageArgs 
 
 ## Main helper functions - these have error handling tucked into them already
 ## see https://github.com/chocolatey/choco/wiki/HelpersReference
