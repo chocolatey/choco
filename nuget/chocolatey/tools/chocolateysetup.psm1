@@ -193,7 +193,8 @@ param(
     Write-Output "Attempting to upgrade `'$chocolateyPathOld`' to `'$chocolateyPath`'."
     Write-Warning "Copying the contents of `'$chocolateyPathOld`' to `'$chocolateyPath`'. `n This step may fail if you have anything in this folder running or locked."
     Write-Output 'If it fails, just manually copy the rest of the items out and then delete the folder.'
-    Write-Host "!!!! ATTN: YOU WILL NEED TO CLOSE AND REOPEN YOUR SHELL !!!!" -ForegroundColor Magenta -BackgroundColor Black
+    Write-Warning "!!!! ATTN: YOU WILL NEED TO CLOSE AND REOPEN YOUR SHELL !!!!"
+    #-ForegroundColor Magenta -BackgroundColor Black
 
     $chocolateyExePathOld = Join-Path $chocolateyPathOld 'bin'
     'Machine', 'User' |
@@ -463,14 +464,14 @@ param(
 
   if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319") -or $forceFxInstall) {
     if (!(Test-Path $NetFx4Path)) {
-      Write-Host "Creating folder `'$NetFx4Path`'"
+      Write-Output "Creating folder `'$NetFx4Path`'"
       $null = New-Item -Path "$NetFx4Path" -ItemType Directory
     }
 
     $netFx4InstallTries += 1
 
     if (!(Test-Path $NetFx4Installer)) {
-      Write-Host "Downloading `'$NetFx4Url`' to `'$NetFx4Installer`' - the installer is 40+ MBs, so this could take a while on a slow connection."
+      Write-Output "Downloading `'$NetFx4Url`' to `'$NetFx4Installer`' - the installer is 40+ MBs, so this could take a while on a slow connection."
       (New-Object Net.WebClient).DownloadFile("$NetFx4Url","$NetFx4Installer")
     }
 
@@ -482,7 +483,7 @@ param(
     # For the actual setup.exe (if you want to unpack first) - /repair /x86 /x64 /ia64 /parameterfolder Client /q /norestart
     $psi.Arguments = "/q /norestart /repair"
 
-    Write-Host "Installing `'$NetFx4Installer`' - this may take awhile with no output."
+    Write-Output "Installing `'$NetFx4Installer`' - this may take awhile with no output."
     $s = [System.Diagnostics.Process]::Start($psi);
     $s.WaitForExit();
     if ($s.ExitCode -ne 0 -and $s.ExitCode -ne 3010) {
