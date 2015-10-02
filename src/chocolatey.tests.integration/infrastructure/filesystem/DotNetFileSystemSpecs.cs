@@ -145,7 +145,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             {
                 base.Context();
                 SourceFile = Path.Combine(DestinationPath, "attributes.txt");
-                File.SetAttributes(SourceFile, (FileSystem.get_file_info_for(SourceFile).Attributes | FileAttributes.Hidden));
+                File.SetAttributes(SourceFile, (FileSystem.get_file_info_for(SourceFile).Attributes & ~FileAttributes.Hidden));
             }
 
             public override void Because()
@@ -162,7 +162,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             public override void AfterObservations()
             {
                 base.AfterObservations();
-                File.SetAttributes(SourceFile, (FileSystem.get_file_info_for(SourceFile).Attributes | FileAttributes.Hidden));
+                File.SetAttributes(SourceFile, (FileSystem.get_file_info_for(SourceFile).Attributes & ~FileAttributes.Hidden));
             }
         }  
             
