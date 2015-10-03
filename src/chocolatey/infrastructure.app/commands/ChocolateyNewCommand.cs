@@ -44,7 +44,7 @@ namespace chocolatey.infrastructure.app.commands
                      "AutomaticPackage - Generate automatic package instead of normal. Defaults to false",
                      option => configuration.NewCommand.AutomaticPackage = option != null)  
                 .Add("t=|template=|template-name=",
-                     "TemplateName - Use a named template in {0}\templates\templatename instead of built-in template.".format_with(ApplicationParameters.InstallLocation),
+                     "TemplateName - Use a named template in {0}\\templates\\templatename instead of built-in template.".format_with(ApplicationParameters.InstallLocation),
                      option => configuration.NewCommand.TemplateName = option)
                 .Add("name=",
                      "Name [Required]- the name of the package. Can be passed as first parameter without \"--name=\".",
