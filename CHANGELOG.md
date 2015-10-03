@@ -1,3 +1,12 @@
+## [0.9.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.10+is%3Aclosed) (October 3, 2015)
+
+Not to be confused with 0.9.10 (this is not that version). This fixes a small but extremely significant issue with relation to configuration managers and other tools that use choco.
+
+### BUG FIXES
+
+ * Fix - List output for other tools messed up in 0.9.9.9 (pipe separator missing) - see [#450](https://github.com/chocolatey/choco/issues/450)
+ * Fix - accidentally escaped characters in "new" -help - see [#447](https://github.com/chocolatey/choco/issues/447)
+
 ## [0.9.9.9](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.9+is%3Aclosed) (October 2, 2015)
 
 With this release you can completely configure choco from the command line (including the priority of sources). Choco now allows you to create [custom package templates](https://github.com/chocolatey/choco/issues/76). Choco has [proper proxy support](https://github.com/chocolatey/choco/issues/243) now. We also squashed up some bugs, like the infinite download loop that happens if the connection is lost. We've also improved the installation experience of Chocolatey itself, [unpacking all of the required setup files in the chocolatey package](https://github.com/chocolatey/choco/issues/347) and improving the messaging output during the bootstrapping process. Chocolatey also [doesn't try to write config updates every command](https://github.com/chocolatey/choco/issues/364), unless something actually changes in the config file. And last but not least for mentions, the issue of [choco not recognizing itself as needing upgraded after being installed by the bootstrapper](https://github.com/chocolatey/choco/issues/414) is now fixed.
