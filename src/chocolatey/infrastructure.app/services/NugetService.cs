@@ -86,8 +86,22 @@ namespace chocolatey.infrastructure.app.services
                 var package = pkg; // for lamda access
                 if (!config.QuietOutput)
                 {
-                    this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0} {1}".format_with(package.Id, package.Version.to_string()));
-                    if (config.RegularOutput && config.Verbose) this.Log().Info(() => " {0}{1} Description: {2}{1} Tags: {3}{1} Number of Downloads: {4}{1}".format_with(package.Title.escape_curly_braces(), Environment.NewLine, package.Description.escape_curly_braces(), package.Tags.escape_curly_braces(), package.DownloadCount <= 0 ? "n/a" : package.DownloadCount.to_string()));
+                    if (config.RegularOutput)
+                    {
+                        this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0} {1}".format_with(package.Id, package.Version.to_string()));
+                        if (config.Verbose) this.Log().Info(() => 
+                            " {0}{1} Description: {2}{1} Tags: {3}{1} Number of Downloads: {4}{1}".format_with(
+                                package.Title.escape_curly_braces(),
+                                Environment.NewLine,
+                                package.Description.escape_curly_braces(),
+                                package.Tags.escape_curly_braces(),
+                                package.DownloadCount <= 0 ? "n/a" : package.DownloadCount.to_string()
+                        ));
+                    }
+                    else
+                    {
+                        this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0}|{1}".format_with(package.Id, package.Version.to_string()));
+                    }
                 }
                 else
                 {
