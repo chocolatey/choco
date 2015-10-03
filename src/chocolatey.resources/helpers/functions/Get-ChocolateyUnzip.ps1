@@ -98,8 +98,6 @@ param(
     Write-Debug "Executing command ['$7zip' $params]"
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = new-object System.Diagnostics.ProcessStartInfo($7zip, $params)
-    $process.StartInfo.RedirectStandardOutput = $true
-    $process.StartInfo.RedirectStandardError = $true
     $process.StartInfo.UseShellExecute = $false
     $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
 

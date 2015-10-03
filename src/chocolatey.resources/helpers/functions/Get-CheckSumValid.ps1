@@ -45,8 +45,6 @@ param(
   Write-Debug "Executing command ['$checksumExe' $params]"
   $process = New-Object System.Diagnostics.Process
   $process.StartInfo = New-Object System.Diagnostics.ProcessStartInfo($checksumExe, $params)
-  $process.StartInfo.RedirectStandardOutput = $true
-  $process.StartInfo.RedirectStandardError = $true
   $process.StartInfo.UseShellExecute = $false
   $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
 
@@ -57,7 +55,7 @@ param(
 
   Write-Debug "Command [`'$checksumExe`' $params] exited with `'$exitCode`'."
 
-  if ($process.ExitCode -ne 0) {
+  if ($exitCode -ne 0) {
     throw "Checksum for `'$file'` did not meet `'$checksum`' for checksum type `'$checksumType`'."
   }
 
