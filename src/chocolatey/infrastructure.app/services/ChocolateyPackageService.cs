@@ -102,7 +102,7 @@ namespace chocolatey.infrastructure.app.services
 
         public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
-            this.Log().Debug(() => "Searching for package information");
+            if (config.RegularOutput) this.Log().Debug(() => "Searching for package information");
 
             var packages = new List<IPackage>();
 

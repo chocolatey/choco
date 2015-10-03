@@ -160,5 +160,15 @@ namespace chocolatey.tests.integration
 
             return config;
         }
+
+        public static ChocolateyConfiguration list()
+        {
+            var config = baseline_configuration();
+            config.CommandName = CommandNameType.list.to_string();
+            config.ListCommand.LocalOnly = true;
+            config.Sources = ApplicationParameters.PackagesLocation;
+
+            return config;
+        }
     }
 }
