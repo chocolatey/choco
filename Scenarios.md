@@ -396,6 +396,47 @@
  * should contain tags
  * should not contain packages and versions with a pipe between them
 
+### ChocolateyPinCommand [ 9 Scenario(s), 12 Observation(s) ]
+
+#### when listing pins with an existing pin
+
+ * should contain existing pin messages
+ * should not contain list results
+
+#### when listing pins with existing pins
+
+ * should contain a pin message for each existing pin
+ * should not contain list results
+
+#### when listing pins with no pins
+
+ * should not contain any pins by default
+ * should not contain list results
+
+#### when removing a pin for a non installed package
+
+ * should throw an error about not finding the package
+
+#### when removing a pin for a pinned package
+
+ * should contain success message
+
+#### when removing a pin for an unpinned package
+
+ * should contain nothing to do message
+
+#### when setting a pin for a non installed package
+
+ * should throw an error about not finding the package
+
+#### when setting a pin for an already pinned package
+
+ * should contain nothing to do message
+
+#### when setting a pin for an installed package
+
+ * should contain success message
+
 ### ChocolateyUninstallCommand [ 13 Scenario(s), 90 Observation(s) ]
 
 #### when force uninstalling a package

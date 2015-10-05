@@ -174,5 +174,13 @@ namespace chocolatey.tests.integration
 
             return config;
         }
+
+        public static ChocolateyConfiguration pin()
+        {
+            var config = baseline_configuration();
+            config.CommandName = CommandNameType.pin.to_string();
+
+            return config;
+        }
     }
 }
