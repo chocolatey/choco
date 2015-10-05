@@ -346,9 +346,9 @@
  * should not have inconclusive package result
  * should not have warning package result
 
-### ChocolateyListCommand [ 2 Scenario(s), 9 Observation(s) ]
+### ChocolateyListCommand [ 6 Scenario(s), 30 Observation(s) ]
 
-#### when listing local packages happy path
+#### when listing local packages
 
  * should contain a summary
  * should contain debugging messages
@@ -362,6 +362,39 @@
  * should not contain debugging messages
  * should not contain packages and versions with a space between them
  * should only have messages related to package information
+
+#### when searching all available packages
+
+ * should contain a summary
+ * should contain debugging messages
+ * should contain packages and versions with a space between them
+ * should list available packages as many times as they show on the feed
+ * should not contain packages and versions with a pipe between them
+
+#### when searching for a particular package
+
+ * should contain a summary
+ * should contain debugging messages
+ * should contain packages and versions with a space between them
+ * should not contain packages that do not match
+
+#### when searching packages with no filter happy path
+
+ * should contain a summary
+ * should contain debugging messages
+ * should contain packages and versions with a space between them
+ * should list available packages only once
+ * should not contain packages and versions with a pipe between them
+
+#### when searching packages with verbose
+
+ * should contain a summary
+ * should contain debugging messages
+ * should contain description
+ * should contain download counts
+ * should contain packages and versions with a space between them
+ * should contain tags
+ * should not contain packages and versions with a pipe between them
 
 ### ChocolateyUninstallCommand [ 13 Scenario(s), 90 Observation(s) ]
 

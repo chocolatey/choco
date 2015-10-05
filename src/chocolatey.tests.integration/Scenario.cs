@@ -110,6 +110,8 @@ namespace chocolatey.tests.integration
 
         private static ChocolateyConfiguration baseline_configuration()
         {
+            // note that this does not mean an empty configuration. It does get influenced by
+            // prior commands, so ensure that all items go back to the default values here
             var config = NUnitSetup.Container.GetInstance<ChocolateyConfiguration>();
 
             config.AcceptLicense = true;
@@ -133,6 +135,10 @@ namespace chocolatey.tests.integration
             config.Sources = _fileSystem.get_full_path(_fileSystem.combine_paths(get_top_level(), "packages"));
             config.Version = null;
             config.Debug = true;
+            config.AllVersions = false;
+            config.Verbose = false;
+            config.Input = config.PackageNames = string.Empty;
+            config.ListCommand.LocalOnly = false;
 
             return config;
         }
@@ -165,8 +171,6 @@ namespace chocolatey.tests.integration
         {
             var config = baseline_configuration();
             config.CommandName = CommandNameType.list.to_string();
-            config.ListCommand.LocalOnly = true;
-            config.Sources = ApplicationParameters.PackagesLocation;
 
             return config;
         }
