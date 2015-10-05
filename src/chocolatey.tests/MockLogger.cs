@@ -43,6 +43,41 @@ namespace chocolatey.tests
             LogMessagesToConsole = false;
         }
 
+        public bool contains_message(string expectedMessage)
+        {
+            return contains_message_count(expectedMessage) != 0;
+        }
+
+        public bool contains_message(string expectedMessage, LogLevel level)
+        {
+            return contains_message_count(expectedMessage, level) != 0;
+        }
+        
+        public int contains_message_count(string expectedMessage)
+        {
+            int messageCount = 0;
+            foreach (var messageLevel in Messages)
+            {
+                foreach (var message in messageLevel.Value.or_empty_list_if_null())
+                {
+                    if (message.Contains(expectedMessage)) messageCount++;
+                }
+            }
+
+            return messageCount;
+        }
+
+        public int contains_message_count(string expectedMessage, LogLevel level)
+        {
+            int messageCount = 0;
+            foreach (var message in MessagesFor(level).or_empty_list_if_null())
+            {
+                if (message.Contains(expectedMessage)) messageCount++;
+            }
+
+            return messageCount;
+        }
+
         public bool LogMessagesToConsole { get; set; }
 
         private readonly Lazy<ConcurrentDictionary<string, IList<string>>> _messages = new Lazy<ConcurrentDictionary<string, IList<string>>>();
