@@ -1,4 +1,10 @@
-## [0.9.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.10+is%3Aclosed) (October 3, 2015)
+## [0.9.9.11](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.11+is%3Aclosed) (October 6, 2015)
+
+### BUG FIXES
+
+ * Fix - Pin list is broken - see [#452](https://github.com/chocolatey/choco/issues/452)
+
+## [0.9.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.10+is%3Aclosed) (October 3, 2015)
 
 Not to be confused with 0.9.10 (this is not that version). This fixes a small but extremely significant issue with relation to configuration managers and other tools that use choco.
 

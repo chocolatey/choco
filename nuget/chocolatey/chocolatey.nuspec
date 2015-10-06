@@ -40,6 +40,12 @@ In that mess there is a link to the [Helper Reference](https://github.com/chocol
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/master/CHANGELOG.md
 
+## 0.9.9.11
+
+### BUG FIXES
+
+ * Fix - Pin list is broken - see [#452](https://github.com/chocolatey/choco/issues/452)
+
 ## 0.9.9.10
 
 Not to be confused with 0.9.10 (this is not that version). This fixes a small but extremely significant issue with relation to configuration managers and other tools that use choco.
