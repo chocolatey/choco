@@ -40,9 +40,6 @@ namespace chocolatey.tests.integration
          *  - uninstall as a dependency
          *  - uninstall as a dependency with force
          *  
-         * List scenarios:
-         *  - list local
-         *  - list lp
          * 
          */
     }

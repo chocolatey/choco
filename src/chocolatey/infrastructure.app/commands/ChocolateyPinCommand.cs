@@ -139,7 +139,15 @@ Pin a package to suppress upgrades.
 
         public void list_pins(IPackageManager packageManager, ChocolateyConfiguration config)
         {
-            foreach (var pkg in _nugetService.list_run(config))
+            var input = config.Input;
+            config.Input = string.Empty;
+            var quiet = config.QuietOutput;
+            config.QuietOutput = true;
+            var packages = _nugetService.list_run(config).ToList();
+            config.QuietOutput = quiet;
+            config.Input = input;
+
+            foreach (var pkg in packages.or_empty_list_if_null())
             {
                 var pkgInfo = _packageInfoService.get_package_information(pkg.Package);
                 if (pkgInfo != null && pkgInfo.IsPinned)

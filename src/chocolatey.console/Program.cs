@@ -77,7 +77,7 @@ namespace chocolatey.console
 #if DEBUG
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1} (DEBUG BUILD)".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
 #else          
-                    if (config.Information.ChocolateyVersion == config.Information.ChocolateyProductVersion)
+                    if (config.Information.ChocolateyVersion == config.Information.ChocolateyProductVersion && args.Any())
                     {
                         "logfile".Log().Info(() => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
                     }
