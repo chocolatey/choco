@@ -9,11 +9,16 @@ Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, righ
 
 ### BUG FIXES
 
- * n/a currently
+ * Fix - Merging assemblies on a machine running .net 4.5 or higher produces binaries incompatible with .net 4 - see [#392](https://github.com/chocolatey/choco/issues/392)
+ * Fix - API - Incorrect log4net version in chocolatey.lib dependencies - see [#390](https://github.com/chocolatey/choco/issues/390)
 
 ### IMPROVEMENTS
 
  * AutoUninstaller is on by default - see [#308](https://github.com/chocolatey/choco/issues/308)
+ * Show human-readable file sizes when downloading - see [#363](https://github.com/chocolatey/choco/issues/363)
+ * API - Add the ability to retrieve package count for a Source  - see [#431](https://github.com/chocolatey/choco/issues/431)
+ * API - Chocolatey Lib still marks vital package information as internal - see [#433](https://github.com/chocolatey/choco/issues/433)
+ * API - Add paging to list command - see [#427](https://github.com/chocolatey/choco/issues/427)
 
 ## [0.9.9.11](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.11+is%3Aclosed) (October 6, 2015)
 
