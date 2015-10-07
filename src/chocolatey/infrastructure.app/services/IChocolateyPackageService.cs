@@ -33,6 +33,13 @@ namespace chocolatey.infrastructure.app.services
         void ensure_source_app_installed(ChocolateyConfiguration config);
 
         /// <summary>
+        ///   Retrieves the count of items that meet the search criteria.
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        int count_run(ChocolateyConfiguration config);
+
+        /// <summary>
         ///   Run list in noop mode
         /// </summary>
         /// <param name="config">The configuration.</param>

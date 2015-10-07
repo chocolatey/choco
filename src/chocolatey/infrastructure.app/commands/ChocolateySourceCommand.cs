@@ -148,6 +148,11 @@ Chocolatey will allow you to interact with sources.
             return _configSettingsService.source_list(configuration);
         }
 
+        public int count(ChocolateyConfiguration config)
+        {
+            return list(config).Count();
+        }
+
         public bool may_require_admin_access()
         {
             return true;

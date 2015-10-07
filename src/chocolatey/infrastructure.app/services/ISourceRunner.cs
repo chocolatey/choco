@@ -40,6 +40,13 @@ namespace chocolatey.infrastructure.app.services
         void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction);
 
         /// <summary>
+        ///     Retrieve the listed packages from the source feed cout
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <returns>Packages count</returns>
+        int count_run(ChocolateyConfiguration config);
+
+        /// <summary>
         ///   Run list in noop mode
         /// </summary>
         /// <param name="config">The configuration.</param>

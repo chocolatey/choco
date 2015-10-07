@@ -75,6 +75,27 @@ namespace chocolatey.infrastructure.app.services
             // nothing to do. Nuget.Core is already part of Chocolatey
         }
 
+        public int count_run(ChocolateyConfiguration config)
+        {
+            int count = 0;
+
+            if (config.ListCommand.LocalOnly)
+            {
+                config.Sources = ApplicationParameters.PackagesLocation;
+                config.Prerelease = true;
+            }
+
+            int? pageValue = config.ListCommand.Page;
+            try
+            {
+                return NugetList.GetCount(config, _nugetLogger);
+            }
+            finally
+            {
+                config.ListCommand.Page = pageValue;
+            }
+        }
+
         public void list_noop(ChocolateyConfiguration config)
         {
             this.Log().Info("{0} would have searched for '{1}' against the following source(s) :\"{2}\"".format_with(

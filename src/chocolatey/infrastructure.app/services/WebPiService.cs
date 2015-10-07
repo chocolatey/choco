@@ -122,6 +122,11 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
+        public int count_run(ChocolateyConfiguration config)
+        {
+            throw new NotImplementedException("Count is not supported for this source runner.");
+        }
+
         public void list_noop(ChocolateyConfiguration config)
         {
             var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
