@@ -1,4 +1,4 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// Copyright © 2011 - Present RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,13 @@ namespace chocolatey.infrastructure.commands
     using System.Collections.Generic;
     using app.configuration;
 
-    public interface IListCommand<T> : ICommand
+    public interface IListCommand : ICommand
     {
-        IEnumerable<T> list(ChocolateyConfiguration configuration);
+        int count(ChocolateyConfiguration config);
+    }
+
+    public interface IListCommand<out T> : IListCommand
+    {
+        IEnumerable<T> list(ChocolateyConfiguration config);
     }
 }

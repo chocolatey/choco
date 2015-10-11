@@ -355,7 +355,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
                 configSettingsService.Verify(c => c.source_add(configuration), Times.Once);
             }
-
+		
             [Fact]
             public void should_call_service_source_remove_when_command_is_remove()
             {
@@ -378,6 +378,24 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.SourceCommand.Command = SourceCommandType.enable;
                 because();
                 configSettingsService.Verify(c => c.source_enable(configuration), Times.Once);
+            }
+        }
+
+        public class when_list_is_called : ChocolateySourceCommandSpecsBase
+        {
+            private Action because;
+
+            public override void Because()
+            {
+                because = () => command.list(configuration);
+            }
+
+            [Fact]
+            public void should_call_service_source_list_when_command_is_list()
+            {
+                configuration.SourceCommand.Command = SourceCommandType.list;
+                because();
+                configSettingsService.Verify(c => c.source_list(configuration), Times.Once);
             }
         }
     }

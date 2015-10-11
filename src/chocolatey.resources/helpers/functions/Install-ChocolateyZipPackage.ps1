@@ -45,6 +45,24 @@ OPTIONAL (Right now) - 'md5', 'sha1', 'sha256' or 'sha512' - defaults to 'md5'
 .PARAMETER ChecksumType64
 OPTIONAL (Right now) - 'md5', 'sha1', 'sha256' or 'sha512' - defaults to ChecksumType
 
+.PARAMETER options
+OPTIONAL - Specify custom headers
+
+Example:
+-------- 
+  $options =
+  @{
+    Headers = @{
+      Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+      'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
+      'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
+      Cookie = 'products.download.email=ewilde@gmail.com';
+      Referer = 'http://submain.com/download/ghostdoc/';
+    }
+  }
+
+  Get-ChocolateyWebFile 'ghostdoc' 'http://submain.com/download/GhostDoc_v4.0.zip' -options $options
+
 .EXAMPLE
 Install-ChocolateyZipPackage '__NAME__' 'URL' "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 
@@ -68,7 +86,8 @@ param(
   [string] $checksum = '',
   [string] $checksumType = '',
   [string] $checksum64 = '',
-  [string] $checksumType64 = ''
+  [string] $checksumType64 = '',
+  [hashtable] $options = @{Headers=@{}}
 )
   Write-Debug "Running 'Install-ChocolateyZipPackage' for $packageName with url:`'$url`', unzipLocation: `'$unzipLocation`', url64bit: `'$url64bit`', specificFolder: `'$specificFolder`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`' ";
 
@@ -81,6 +100,6 @@ param(
   if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir) | Out-Null}
   $file = Join-Path $tempDir "$($packageName)Install.$fileType"
   
-  Get-ChocolateyWebFile $packageName $file $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64
+  Get-ChocolateyWebFile $packageName $file $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -options $options
   Get-ChocolateyUnzip "$file" $unzipLocation $specificFolder $packageName
 }

@@ -13,15 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 namespace chocolatey.infrastructure.app.runners
 {
     using System;
     using System.Linq;
+    using System.Collections.Generic;
     using SimpleInjector;
     using adapters;
     using attributes;
     using commandline;
     using configuration;
+    using domain;
     using infrastructure.commands;
     using logging;
     using Console = System.Console;
@@ -29,7 +32,7 @@ namespace chocolatey.infrastructure.app.runners
 
     public sealed class GenericRunner
     {
-        public void run(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
+        private ICommand find_command(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
         {
             var commands = container.GetAllInstances<ICommand>();
             var command = commands.Where((c) =>
@@ -60,6 +63,8 @@ namespace chocolatey.infrastructure.app.runners
                     parseArgs.Invoke(command);
                 }
 
+                set_source_type(config);
+
                 this.Log().Debug(() => "Configuration: {0}".format_with(config.ToString()));
 
 
@@ -89,7 +94,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
  If you are seeing this message and it is not expected, your system may 
  now be in a bad state. Only official builds are to be trusted.
 "
-                         );
+                        );
 
                     }
                 }
@@ -102,12 +107,64 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                     }
 
                     command.noop(config);
+                    return null;
                 }
-                else
+            }
+            return command;
+        }
+
+        private void set_source_type(ChocolateyConfiguration config)
+        {
+            var sourceType = SourceType.normal;
+            Enum.TryParse(config.Sources, true, out sourceType);
+            config.SourceType = sourceType;
+
+            this.Log().Debug(()=> "The source '{0}' evaluated to a '{1}' source type".format_with(config.Sources,sourceType.to_string()));
+        }
+
+        public void run(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
+        {
+            var command = find_command(config, container, isConsole, parseArgs);
+            if(command != null)
+            {
+                this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                command.run(config);
+            }
+        }
+
+        public IEnumerable<T> list<T>(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
+        {
+            var command = find_command(config, container, isConsole, parseArgs) as IListCommand<T>;
+            if (command == null)
+            {
+                if (!string.IsNullOrWhiteSpace(config.CommandName))
                 {
-                    this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
-                    command.run(config);
+                    throw new Exception("The implementation of '{0}' does not support listing '{1}'".format_with(config.CommandName, typeof(T).Name));
                 }
+                return new List<T>();
+            }
+            else
+            {
+                this.Log().Debug("_ {0}:{1} - Normal List Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                return command.list(config);
+            }
+        }
+
+        public int count(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
+        {
+            var command = find_command(config, container, isConsole, parseArgs) as IListCommand;
+            if (command == null)
+            {
+                if (!string.IsNullOrWhiteSpace(config.CommandName))
+                {
+                    throw new Exception("The implementation of '{0}' does not support listing.".format_with(config.CommandName));
+                }
+                return 0;
+            }
+            else
+            {
+                this.Log().Debug("_ {0}:{1} - Normal Count Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                return command.count(config);
             }
         }
 
@@ -143,3 +200,4 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
     }
 }
+

@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using configuration;
     using infrastructure.services;
@@ -44,17 +45,28 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info("Would have made a change to the configuration.");
         }
 
-        public void source_list(ChocolateyConfiguration configuration)
+        public IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration)
         {
+            var list = new List<ChocolateySource>();
             foreach (var source in configFileSettings.Sources)
             {
-                this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}.".format_with(
-                    source.Id, 
-                    source.Disabled ? " [Disabled]" : string.Empty, 
-                    source.Value,
-                    string.IsNullOrWhiteSpace(source.UserName) ? string.Empty : "(Authenticated)", 
-                    source.Priority));
+                if (configuration.RegularOutput) {
+                    this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}.".format_with(
+                        source.Id,
+                        source.Disabled ? " [Disabled]" : string.Empty,
+                        source.Value,
+                        string.IsNullOrWhiteSpace(source.UserName) ? string.Empty : "(Authenticated)",
+                        source.Priority));
+                }
+                list.Add(new ChocolateySource {
+                    Id = source.Id,
+                    Value = source.Value,
+                    Disabled = source.Disabled,
+                    Authenticated = string.IsNullOrWhiteSpace(source.Password),
+                    Priority = source.Priority
+                });
             }
+            return list;
         }
 
         public void source_add(ChocolateyConfiguration configuration)
@@ -284,7 +296,7 @@ namespace chocolatey.infrastructure.app.services
             ;
             this.Log().Info("");
             this.Log().Info(ChocolateyLoggers.Important, "API Keys");
-            this.Log().Info(@"NOTE: Api Keys are not shown through this command. 
+            this.Log().Info(@"NOTE: Api Keys are not shown through this command.
  Use choco apikey to interact with API keys.");
         }
 

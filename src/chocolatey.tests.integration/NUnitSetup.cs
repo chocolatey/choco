@@ -57,7 +57,7 @@ namespace chocolatey.tests.integration
         {
             var fileSystem = container.GetInstance<IFileSystem>();
 
-            var applicationLocation = fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty));
+            var applicationLocation = fileSystem.get_directory_name(fileSystem.get_current_assembly_path());
 
             var field = typeof (ApplicationParameters).GetField("InstallLocation");
             field.SetValue(null, applicationLocation);

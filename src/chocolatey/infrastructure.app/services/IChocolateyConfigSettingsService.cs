@@ -16,12 +16,13 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
+    using System.Collections.Generic;
     using configuration;
 
     public interface IChocolateyConfigSettingsService
     {
         void noop(ChocolateyConfiguration configuration);
-        void source_list(ChocolateyConfiguration configuration);
+        IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration);
         void source_add(ChocolateyConfiguration configuration);
         void source_remove(ChocolateyConfiguration configuration);
         void source_disable(ChocolateyConfiguration configuration);

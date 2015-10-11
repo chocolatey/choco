@@ -20,7 +20,8 @@ param(
   $fileName = $null,
   $userAgent = 'chocolatey command line',
   [switch]$Passthru,
-  [switch]$quiet
+  [switch]$quiet,
+  [hashtable] $options = @{Headers=@{}}
 )
   Write-Debug "Running 'Get-WebFile' for $fileName with url:`'$url`', userAgent: `'$userAgent`' ";
   #if ($url -eq '' return)
@@ -78,6 +79,21 @@ param(
     $req.UserAgent = $userAgent
   }
 
+  if ($options.Headers.Count -gt 0) {
+    Write-Debug "Setting custom headers"
+    foreach ($item in $options.Headers.GetEnumerator()) {
+      $uri = (new-object system.uri $url)
+      Write-Debug($item.Key + ':' + $item.Value)
+      switch ($item.Key) {
+        'Accept' {$req.Accept = $item.Value}
+        'Cookie' {$req.CookieContainer.SetCookies($uri, $item.Value)}
+        'Referer' {$req.Referer = $item.Value}
+        'User-Agent' {$req.UserAgent = $item.Value}
+        Default {$req.Headers.Add($item.Key, $item.Value)}
+      }
+    }
+  }
+
   $res = $req.GetResponse();
 
   if($fileName -and !(Split-Path $fileName)) {
@@ -107,6 +123,7 @@ param(
 
   if($res.StatusCode -eq 200) {
     [long]$goal = $res.ContentLength
+    $goalFormatted = Format-FileSize $goal
     $reader = $res.GetResponseStream()
     
     if ($fileName) {
@@ -139,8 +156,9 @@ param(
           $output += $encoding.GetString($buffer,0,$count)
         } elseif(!$quiet) {
           $total += $count
+          $totalFormatted = Format-FileSize $total
           if($goal -gt 0 -and ++$iterLoop%10 -eq 0) {
-            Write-Progress "Downloading $url to $fileName" "Saving $total of $goal" -id 0 -percentComplete (($total/$goal)*100)
+            Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete (($total/$goal)*100)
           }
           
           if ($total -eq $goal) {

@@ -53,6 +53,20 @@ namespace chocolatey.infrastructure.filesystem
         /// <returns></returns>
         char get_path_directory_separator_char();
 
+        /// <summary>
+        /// Gets the path to an executable based on looking in current directory, next to the running process, then among the derivatives of Path and Pathext variables
+        /// </summary>
+        /// <param name="executableName">Name of the executable.</param>
+        /// <remarks>Based loosely on http://stackoverflow.com/a/5471032/18475</remarks>
+        /// <returns></returns>
+        string get_executable_path(string executableName);
+
+        /// <summary>
+        /// Gets the location of the executing assembly
+        /// </summary>
+        /// <returns>The path to the executing assembly</returns>
+        string get_current_assembly_path();
+
         #endregion
 
         #region File
@@ -253,7 +267,7 @@ namespace chocolatey.infrastructure.filesystem
         /// <summary>
         ///   Gets the current working directory of the application.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The path to the directory</returns>
         string get_current_directory();
 
         /// <summary>

@@ -28,7 +28,7 @@ namespace chocolatey.infrastructure.app.commands
 
     [CommandFor(CommandNameType.sources)]
     [CommandFor(CommandNameType.source)]
-    public sealed class ChocolateySourceCommand : ICommand
+    public sealed class ChocolateySourceCommand : IListCommand<ChocolateySource>
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
 
@@ -141,6 +141,16 @@ Chocolatey will allow you to interact with sources.
                     _configSettingsService.source_enable(configuration);
                     break;
             }
+        }
+
+        public IEnumerable<ChocolateySource> list(ChocolateyConfiguration configuration)
+        {
+            return _configSettingsService.source_list(configuration);
+        }
+
+        public int count(ChocolateyConfiguration config)
+        {
+            return list(config).Count();
         }
 
         public bool may_require_admin_access()

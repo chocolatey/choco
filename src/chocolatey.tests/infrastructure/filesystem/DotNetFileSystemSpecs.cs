@@ -18,7 +18,10 @@ namespace chocolatey.tests.infrastructure.filesystem
     using System;
     using System.IO;
     using NUnit.Framework;
+    using Moq;
     using Should;
+    using chocolatey.infrastructure.adapters;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.platforms;
 
@@ -74,8 +77,8 @@ namespace chocolatey.tests.infrastructure.filesystem
             public void GetDirectoryName_should_return_the_directory_of_the_path_to_the_file()
             {
                 FileSystem.get_directory_name("C:\\temp\\test.txt").ShouldEqual(
-                    Platform.get_platform() == PlatformType.Windows ? 
-                        "C:\\temp" 
+                    Platform.get_platform() == PlatformType.Windows ?
+                        "C:\\temp"
                         : "C:/temp");
             }
 
@@ -83,8 +86,8 @@ namespace chocolatey.tests.infrastructure.filesystem
             public void Combine_should_combine_the_file_paths_of_all_the_included_items_together()
             {
                 FileSystem.combine_paths("C:\\temp", "yo", "filename.txt").ShouldEqual(
-                    Platform.get_platform() == PlatformType.Windows ? 
-                        "C:\\temp\\yo\\filename.txt" 
+                    Platform.get_platform() == PlatformType.Windows ?
+                        "C:\\temp\\yo\\filename.txt"
                         : "C:/temp/yo/filename.txt");
             }
 
@@ -92,8 +95,8 @@ namespace chocolatey.tests.infrastructure.filesystem
             public void Combine_should_combine_when_paths_have_backslashes_in_subpaths()
             {
                 FileSystem.combine_paths("C:\\temp", "yo\\timmy", "filename.txt").ShouldEqual(
-                    Platform.get_platform() == PlatformType.Windows ? 
-                        "C:\\temp\\yo\\timmy\\filename.txt" 
+                    Platform.get_platform() == PlatformType.Windows ?
+                        "C:\\temp\\yo\\timmy\\filename.txt"
                         : "C:/temp/yo/timmy/filename.txt");
             }
 
@@ -101,17 +104,17 @@ namespace chocolatey.tests.infrastructure.filesystem
             public void Combine_should_combine_when_paths_start_with_backslashes_in_subpaths()
             {
                 FileSystem.combine_paths("C:\\temp", "\\yo", "filename.txt").ShouldEqual(
-                    Platform.get_platform() == PlatformType.Windows ? 
-                        "C:\\temp\\yo\\filename.txt" 
+                    Platform.get_platform() == PlatformType.Windows ?
+                        "C:\\temp\\yo\\filename.txt"
                         : "C:/temp/yo/filename.txt");
             }
-            
+
             [Fact]
             public void Combine_should_combine_when_paths_start_with_forwardslashes_in_subpaths()
             {
                 FileSystem.combine_paths("C:\\temp", "/yo", "filename.txt").ShouldEqual(
-                    Platform.get_platform() == PlatformType.Windows ? 
-                        "C:\\temp\\yo\\filename.txt" 
+                    Platform.get_platform() == PlatformType.Windows ?
+                        "C:\\temp\\yo\\filename.txt"
                         : "C:/temp/yo/filename.txt");
             }
 
@@ -120,6 +123,116 @@ namespace chocolatey.tests.infrastructure.filesystem
             public void Combine_should_error_if_any_path_but_the_primary_contains_colon()
             {
                 FileSystem.combine_paths("C:\\temp", "C:");
+            }
+        }
+
+        public class when_finding_paths_to_executables_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        {
+            public Mock<IEnvironment> _environment = new Mock<IEnvironment>();
+
+            public override void Context()
+            {
+                base.Context();
+                _environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions)).Returns(".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL");
+                _environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.Path)).Returns(
+                    @"C:\ProgramData\Chocolatey\bin{0}C:\Program Files\Microsoft\Web Platform Installer\{0}C:\Users\yes\AppData\Roaming\Boxstarter{0}C:\tools\ChocolateyPackageUpdater{0}C:\Windows\system32{0}C:\Windows{0}C:\Windows\System32\Wbem{0}C:\Windows\System32\WindowsPowerShell\v1.0\{0}"
+                    .format_with(Path.PathSeparator)
+                    );
+                FileSystem.initialize_with(new Lazy<IEnvironment>(() => _environment.Object));
+            }
+
+            public override void Because()
+            {
+            }
+
+            private void reset()
+            {
+                _environment.ResetCalls();
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_find_existing_executable()
+            {
+                FileSystem.get_executable_path("cmd").ShouldEqual(
+                    Platform.get_platform() == PlatformType.Windows ?
+                        "C:\\Windows\\system32\\cmd.exe"
+                        : "cmd"
+                    );
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_find_existing_executable_with_extension()
+            {
+                FileSystem.get_executable_path("cmd.exe").ShouldEqual(
+                    Platform.get_platform() == PlatformType.Windows ?
+                        "C:\\Windows\\system32\\cmd.exe"
+                        : "cmd.exe"
+                    );
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_return_same_value_when_executable_is_not_found()
+            {
+                FileSystem.get_executable_path("daslakjsfdasdfwea").ShouldEqual("daslakjsfdasdfwea");
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_return_empty_string_when_value_is_null()
+            {
+                FileSystem.get_executable_path(null).ShouldEqual(string.Empty);
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_return_empty_string_when_value_is_empty_string()
+            {
+                FileSystem.get_executable_path(string.Empty).ShouldEqual(string.Empty);
+            }
+        }
+
+        public class when_finding_paths_to_executables_with_dotNetFileSystem_with_empty_path_extensions : DotNetFileSystemSpecsBase
+        {
+            public Mock<IEnvironment> _environment = new Mock<IEnvironment>();
+
+            public override void Context()
+            {
+                base.Context();
+                _environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions)).Returns(string.Empty);
+                _environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.Path)).Returns(
+                    "/usr/local/bin{0}/usr/bin/{0}/bin{0}/usr/sbin{0}/sbin"
+                    .format_with(Path.PathSeparator)
+                    );
+                FileSystem.initialize_with(new Lazy<IEnvironment>(() => _environment.Object));
+            }
+
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_find_existing_executable()
+            {
+                FileSystem.get_executable_path("ls").ShouldEqual(
+                    Platform.get_platform() != PlatformType.Windows ?
+                        "/bin/ls"
+                        : "ls");
+            }
+            
+            [Fact]
+            public void GetExecutablePath_should_return_same_value_when_executable_is_not_found()
+            {
+                FileSystem.get_executable_path("daslakjsfdasdfwea").ShouldEqual("daslakjsfdasdfwea");
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_return_empty_string_when_value_is_null()
+            {
+                FileSystem.get_executable_path(null).ShouldEqual(string.Empty);
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_return_empty_string_when_value_is_empty_string()
+            {
+                FileSystem.get_executable_path(string.Empty).ShouldEqual(string.Empty);
             }
         }
     }

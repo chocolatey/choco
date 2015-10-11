@@ -17,14 +17,19 @@ namespace chocolatey.infrastructure.filesystem
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading;
+    using adapters;
+    using app;
     using platforms;
     using tolerance;
+    using Assembly = adapters.Assembly;
+    using Environment = adapters.Environment;
 
     /// <summary>
     ///   Implementation of IFileSystem for Dot Net
@@ -33,6 +38,7 @@ namespace chocolatey.infrastructure.filesystem
     public sealed class DotNetFileSystem : IFileSystem
     {
         private readonly int TIMES_TO_TRY_OPERATION = 3;
+        private static Lazy<IEnvironment> environment_initializer = new Lazy<IEnvironment>(() => new Environment());
 
         private void allow_retries(Action action)
         {
@@ -41,6 +47,17 @@ namespace chocolatey.infrastructure.filesystem
                 action,
                 waitDurationMilliseconds: 200,
                 increaseRetryByMilliseconds: 100);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void initialize_with(Lazy<IEnvironment> environment)
+        {
+            environment_initializer = environment;
+        }
+        
+        private static IEnvironment Environment
+        {
+            get { return environment_initializer.Value; }
         }
 
         #region Path
@@ -83,6 +100,57 @@ namespace chocolatey.infrastructure.filesystem
             return Path.DirectorySeparatorChar;
         }
 
+        public char get_path_separator()
+        {
+            return Path.PathSeparator;
+        }
+
+        public string get_executable_path(string executableName)
+        {
+            if (string.IsNullOrWhiteSpace(executableName)) return string.Empty;
+
+            var isWindows = Platform.get_platform() == PlatformType.Windows;
+            IList<string> extensions = new List<string>();
+
+            if (get_file_name_without_extension(executableName).is_equal_to(executableName) && isWindows)
+            {
+                var pathExtensions = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions).to_string().Split(new[] {ApplicationParameters.Environment.PathExtensionsSeparator}, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var extension in pathExtensions.or_empty_list_if_null())
+                {
+                    extensions.Add(extension.StartsWith(".") ? extension : ".{0}".format_with(extension));
+                }
+            }
+
+            // Always add empty, for when the executable name is enough.
+            extensions.Add(string.Empty);
+
+            // Gets the path to an executable based on looking in current 
+            // working directory, next to the running process, then among the
+            // derivatives of Path and Pathext variables, applied in order.
+            var searchPaths = new List<string>();
+            searchPaths.Add(get_current_directory());
+            searchPaths.Add(get_directory_name(get_current_assembly_path()));
+            searchPaths.AddRange(Environment.GetEnvironmentVariable(ApplicationParameters.Environment.Path).to_string().Split(new[] { get_path_separator() }, StringSplitOptions.RemoveEmptyEntries));
+
+            foreach (var path in searchPaths.or_empty_list_if_null())
+            {
+                foreach (var extension in extensions.or_empty_list_if_null())
+                {
+                    var possiblePath = combine_paths(path, "{0}{1}".format_with(executableName, extension.to_lower()));
+                    if (file_exists(possiblePath)) return possiblePath;
+                }
+            }
+
+            // If not found, return the same as passed in - it may work, 
+            // but possibly not.
+            return executableName;
+        }
+
+        public string get_current_assembly_path()
+        {
+            return Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty);
+        }
+    
         #endregion
 
         #region File
@@ -127,7 +195,7 @@ namespace chocolatey.infrastructure.filesystem
             return new FileInfo(filePath);
         }
 
-        public DateTime get_file_modified_date(string filePath)
+        public System.DateTime get_file_modified_date(string filePath)
         {
             return new FileInfo(filePath).LastWriteTime;
         }

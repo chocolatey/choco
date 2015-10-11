@@ -53,6 +53,23 @@ OPTIONAL (Right now) - 'md5', 'sha1', 'sha256' or 'sha512' - defaults to 'md5'
 .PARAMETER ChecksumType64
 OPTIONAL (Right now) - 'md5', 'sha1', 'sha256' or 'sha512' - defaults to ChecksumType
 
+.PARAMETER options
+OPTIONAL - Specify custom headers
+
+Example:
+-------- 
+  $options =
+  @{
+    Headers = @{
+      Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+      'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
+      'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
+      Cookie = 'products.download.email=ewilde@gmail.com';
+      Referer = 'http://submain.com/download/ghostdoc/';
+    }
+  }
+
+  Get-ChocolateyWebFile 'ghostdoc' 'http://submain.com/download/GhostDoc_v4.0.zip' -options $options
 
 .EXAMPLE
 Install-ChocolateyPackage '__NAME__' 'EXE_OR_MSI' 'SILENT_ARGS' 'URL' '64BIT_URL_DELETE_IF_NO_64BIT'
@@ -78,7 +95,8 @@ param(
   [string] $checksum = '',
   [string] $checksumType = '',
   [string] $checksum64 = '',
-  [string] $checksumType64 = ''
+  [string] $checksumType64 = '',
+  [hashtable] $options = @{Headers=@{}}
 )
 
   Write-Debug "Running 'Install-ChocolateyPackage' for $packageName with url:`'$url`', args: `'$silentArgs`', fileType: `'$fileType`', url64bit: `'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`', validExitCodes: `'$validExitCodes`' ";
@@ -90,6 +108,6 @@ param(
   if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
   $file = Join-Path $tempDir "$($packageName)Install.$fileType"
 
-  Get-ChocolateyWebFile $packageName $file $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64
+  Get-ChocolateyWebFile $packageName $file $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -options $options
   Install-ChocolateyInstallPackage $packageName $fileType $silentArgs $file -validExitCodes $validExitCodes
 }

@@ -30,6 +30,17 @@ namespace chocolatey.infrastructure.commands
             Action<object, DataReceivedEventArgs> stdOutAction,
             Action<object, DataReceivedEventArgs> stdErrAction,
             bool updateProcessPath
+            );
+
+        int execute(
+            string process,
+            string arguments,
+            int waitForExitInSeconds,
+            string workingDirectory,
+            Action<object, DataReceivedEventArgs> stdOutAction,
+            Action<object, DataReceivedEventArgs> stdErrAction,
+            bool updateProcessPath,
+            bool allowUseWindow
             ); 
     }
 }

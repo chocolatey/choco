@@ -21,6 +21,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
     using NUnit.Framework;
     using Should;
     using chocolatey.infrastructure.filesystem;
+    using chocolatey.infrastructure.platforms;
 
     public class DotNetFileSystemSpecs
     {
@@ -46,6 +47,53 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
                 TheTestFile = Path.Combine(ContextPath, "Slipsum.txt");
                 TestDirectory = Path.Combine(DestinationPath, "TestDirectory");
             }
+        }
+
+        [Category("Integration")]
+        public class when_finding_paths_to_executables_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        {
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_find_existing_executable()
+            {
+                FileSystem.get_executable_path("cmd").ShouldEqual(
+                    Platform.get_platform() == PlatformType.Windows ?
+                        "C:\\Windows\\system32\\cmd.exe"
+                        : "cmd"
+                    );
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_find_existing_executable_with_extension()
+            {
+                FileSystem.get_executable_path("cmd.exe").ShouldEqual(
+                    Platform.get_platform() == PlatformType.Windows ?
+                        "C:\\Windows\\system32\\cmd.exe"
+                        : "cmd"
+                    );
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_return_same_value_when_executable_is_not_found()
+            {
+                FileSystem.get_executable_path("daslakjsfdasdfwea").ShouldEqual("daslakjsfdasdfwea");
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_return_empty_string_when_value_is_null()
+            {
+                FileSystem.get_executable_path(null).ShouldEqual(string.Empty);
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_return_empty_string_when_value_is_empty_string()
+            {
+                FileSystem.get_executable_path(string.Empty).ShouldEqual(string.Empty);
+            }
+
         }
 
         [Category("Integration")]

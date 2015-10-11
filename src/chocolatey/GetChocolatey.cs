@@ -185,6 +185,36 @@ namespace chocolatey
             runner.run(args, configuration, _container);
         }
 
+        /// <summary>
+        ///    Run chocolatey after setting the options, and list the results.
+        /// </summary>
+        /// <typeparam name="T">The typer of results you're expecting back.</typeparam>
+        public IEnumerable<T> List<T>()
+        {
+            extract_resources();
+            var configuration = create_configuration(new List<string>());
+            configuration.RegularOutput = true;
+            var runner = new GenericRunner();
+            return runner.list<T>(configuration, _container, isConsole: false, parseArgs: null);
+        }
+
+        /// <summary>
+        ///    Run chocolatey after setting the options,
+        ///    and get the count of items that would be returned if you listed the results.
+        /// </summary>
+        /// <remarks>
+        ///    Is intended to be more efficient then simply calling <see cref="List{T}">List</see> and then Count() on the returned list.
+        ///    It also returns the full count as is ignores paging.
+        /// </remarks>
+        public int ListCount()
+        {
+            extract_resources();
+            var configuration = create_configuration(new List<string>());
+            configuration.RegularOutput = true;
+            var runner = new GenericRunner();
+            return runner.count(configuration, _container, isConsole: false, parseArgs: null);
+        }
+
         private ChocolateyConfiguration create_configuration(IList<string> args)
         {
             var configuration = new ChocolateyConfiguration();

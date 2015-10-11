@@ -33,6 +33,7 @@ namespace chocolatey.infrastructure.app.configuration
         {
             RegularOutput = true;
             PromptForConfirmation = true;
+            SourceType = SourceType.normal;
             Information = new InformationCommandConfiguration();
             Features = new FeaturesConfiguration();
             NewCommand = new NewCommandConfiguration();
@@ -145,6 +146,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         ///   One or more source locations set by configuration or by command line. Separated by semi-colon
         /// </summary>
         public string Sources { get; set; }
+        public SourceType SourceType { get; set; }
 
         // top level commands
 
@@ -340,9 +342,16 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     [Serializable]
     public sealed class ListCommandConfiguration
     {
+        public ListCommandConfiguration()
+        {
+            PageSize = 25;
+        }
+
         // list
         public bool LocalOnly { get; set; }
         public bool IncludeRegistryPrograms { get; set; }
+        public int? Page { get; set; }
+        public int PageSize { get; set; }
     }
 
     [Serializable]

@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -93,7 +93,7 @@ namespace chocolatey.infrastructure.app.builders
             }
 
             set_machine_sources(config, configFileSettings);
-            
+
             set_config_items(config, configFileSettings, fileSystem);
 
             FaultTolerance.try_catch_with_logging_exception(
@@ -138,12 +138,12 @@ namespace chocolatey.infrastructure.app.builders
             var commandExecutionTimeoutSeconds = -1;
             int.TryParse(
                 set_config_item(
-                    ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, 
-                    configFileSettings, 
-                    originalCommandTimeout == 0 ? 
-                        ApplicationParameters.DefaultWaitForExitInSeconds.to_string() 
-                        : originalCommandTimeout.to_string(), 
-                    "Default timeout for command execution."), 
+                    ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds,
+                    configFileSettings,
+                    originalCommandTimeout == 0 ?
+                        ApplicationParameters.DefaultWaitForExitInSeconds.to_string()
+                        : originalCommandTimeout.to_string(),
+                    "Default timeout for command execution."),
                 out commandExecutionTimeoutSeconds);
             config.CommandExecutionTimeoutSeconds = commandExecutionTimeoutSeconds;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
@@ -184,33 +184,38 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
         {
-            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings, "Checksum files when pulled in from internet (based on package).");
-            config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings, "Uninstall from programs and features without requiring an explicit uninstall script.");
-            config.Features.FailOnAutoUninstaller = set_feature_flag(ApplicationParameters.Features.FailOnAutoUninstaller, configFileSettings, "Fail if automatic uninstaller fails.");
-            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, "Prompt for confirmation in scripts or bypass.");
+            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings, defaultEnabled: true, description: "Checksum files when pulled in from internet (based on package).");
+            config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings, defaultEnabled: true, description: "Uninstall from programs and features without requiring an explicit uninstall script.");
+            config.Features.FailOnAutoUninstaller = set_feature_flag(ApplicationParameters.Features.FailOnAutoUninstaller, configFileSettings, defaultEnabled: false, description: "Fail if automatic uninstaller fails.");
+            config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
         }
 
-        private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings, string description)
+        private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings, bool defaultEnabled, string description)
         {
-            var enabled = false;
             var feature = configFileSettings.Features.FirstOrDefault(f => f.Name.is_equal_to(featureName));
-            if (feature != null && feature.Enabled) enabled = true;
 
             if (feature == null)
             {
                 feature = new ConfigFileFeatureSetting
                 {
                     Name = featureName,
-                    Enabled = enabled,
+                    Enabled = defaultEnabled,
                     Description = description
                 };
 
                 configFileSettings.Features.Add(feature);
             }
-            
+            else
+            {
+                if (!feature.SetExplicitly && feature.Enabled != defaultEnabled)
+                {
+                    feature.Enabled = defaultEnabled;
+                }
+            }
+
             feature.Description = description;
-            
-            return enabled;
+
+            return feature != null ? feature.Enabled : defaultEnabled;
         }
 
         private static void set_global_options(IList<string> args, ChocolateyConfiguration config)
@@ -280,7 +285,7 @@ namespace chocolatey.infrastructure.app.builders
                         "chocolatey".Log().Info(@"
 {0}
 
-Please run chocolatey with `choco command -help` for specific help on 
+Please run chocolatey with `choco command -help` for specific help on
  each command.
 ".format_with(commandsLog.ToString()));
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, @"How To Pass Options / Switches");
@@ -289,24 +294,24 @@ You can pass options and switches in the following ways:
 
  * `-`, `/`, or `--` (one character switches should not use `--`)
  * **Option Bundling / Bundled Options**: One character switches can be
-   bundled. e.g. `-d` (debug), `-f` (force), `-v` (verbose), and `-y` 
+   bundled. e.g. `-d` (debug), `-f` (force), `-v` (verbose), and `-y`
    (confirm yes) can be bundled as `-dfvy`.
- * ***Note:*** If `debug` or `verbose` are bundled with local options 
+ * ***Note:*** If `debug` or `verbose` are bundled with local options
    (not the global ones above), some logging may not show up until after
    the local options are parsed.
- * **Use Equals**: You can also include or not include an equals sign 
+ * **Use Equals**: You can also include or not include an equals sign
    `=` between options and values.
- * **Quote Values**: When you need to quote things, such as when using 
-   spaces, please use apostrophes (`'value'`). In cmd.exe you may be 
-   able to use just double quotes (`""value""`) but in powershell.exe 
-   you may need to either escape the quotes with backticks 
-   (`` `""value`"" ``) or use a combination of double quotes and 
-   apostrophes (`""'value'""`). This is due to the hand off to 
+ * **Quote Values**: When you need to quote things, such as when using
+   spaces, please use apostrophes (`'value'`). In cmd.exe you may be
+   able to use just double quotes (`""value""`) but in powershell.exe
+   you may need to either escape the quotes with backticks
+   (`` `""value`"" ``) or use a combination of double quotes and
+   apostrophes (`""'value'""`). This is due to the hand off to
    PowerShell - it seems to strip off the outer set of quotes.
- * Options and switches apply to all items passed, so if you are 
-   installing multiple packages, and you use `--version=1.0.0`, choco 
-   is going to look for and try to install version 1.0.0 of every 
-   package passed. So please split out multiple package calls when 
+ * Options and switches apply to all items passed, so if you are
+   installing multiple packages, and you use `--version=1.0.0`, choco
+   is going to look for and try to install version 1.0.0 of every
+   package passed. So please split out multiple package calls when
    wanting to pass specific options.
 ");
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, "Default Options and Switches");
