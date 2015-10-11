@@ -35,6 +35,7 @@ namespace chocolatey.infrastructure.registration
         {
             Log.InitializeWith<Log4NetLog>();
             _logger.Debug("XmlConfiguration is now operational");
+            SecurityProtocol.set_protocol();
         }
 
         /// <summary>

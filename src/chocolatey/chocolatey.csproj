@@ -213,6 +213,7 @@
     <Compile Include="infrastructure.app\domain\CommandNameType.cs" />
     <Compile Include="infrastructure\events\EventManager.cs" />
     <Compile Include="infrastructure\events\IEvent.cs" />
+    <Compile Include="infrastructure\registration\SecurityProtocol.cs" />
     <Compile Include="infrastructure\registration\SimpleInjectorContainer.cs" />
     <Compile Include="infrastructure\results\IResult.cs" />
     <Compile Include="infrastructure\results\PackageResult.cs" />
