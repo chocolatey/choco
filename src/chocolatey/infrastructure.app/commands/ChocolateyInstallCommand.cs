@@ -83,6 +83,12 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("p=|password=",
                      "Password - the user's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
+                .Add("cert=",
+                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty.",
+                     option => configuration.SourceCommand.Certificate = option.remove_surrounding_quotes())
+                .Add("cp=|certpassword=",
+                     "Password - the client certificate's password to the source. Defaults to empty.",
+                     option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
                 .Add("ignorechecksums|ignore-checksums",
                       "IgnoreChecksums - Ignore checksums provided by the package",
                       option =>

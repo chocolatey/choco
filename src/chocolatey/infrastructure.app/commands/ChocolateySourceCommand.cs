@@ -53,7 +53,13 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())
                 .Add("p=|password=",
                      "Password - the user's password to the source. Encrypted in chocolatey.config file.",
-                     option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())  
+                     option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
+                .Add("cert=",
+                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty.",
+                     option => configuration.SourceCommand.Certificate = option.remove_surrounding_quotes())
+                .Add("cp=|certpassword=",
+                     "Password - the client certificate's password to the source. Defaults to empty.",
+                     option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
                 .Add("priority=",
                      "Priority - The priority order of this source as compared to other sources, lower is better. Defaults to 0 (no priority). All priorities above 0 will be evaluated first, then zero-based values will be evaluated in config file order.",
                      option => configuration.SourceCommand.Priority = int.Parse(option.remove_surrounding_quotes()))
@@ -107,6 +113,7 @@ Chocolatey will allow you to interact with sources.
     choco source
     choco source list
     choco source add -n=bob -s""https://somewhere/out/there/api/v2/""
+    choco source add -n=bob -s""https://somewhere/out/there/api/v2/"" -cert=\Users\bob\bob.pfx
     choco source add -n=bob -s""https://somewhere/out/there/api/v2/"" -u=bob -p=12345
     choco source disable -n=bob
     choco source enable -n=bob

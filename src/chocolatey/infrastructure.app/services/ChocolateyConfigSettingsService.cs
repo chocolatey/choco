@@ -55,14 +55,14 @@ namespace chocolatey.infrastructure.app.services
                         source.Id,
                         source.Disabled ? " [Disabled]" : string.Empty,
                         source.Value,
-                        string.IsNullOrWhiteSpace(source.UserName) ? string.Empty : "(Authenticated)",
+                        string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate) ? string.Empty : "(Authenticated)",
                         source.Priority));
                 }
                 list.Add(new ChocolateySource {
                     Id = source.Id,
                     Value = source.Value,
                     Disabled = source.Disabled,
-                    Authenticated = string.IsNullOrWhiteSpace(source.Password),
+                    Authenticated = !(string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)), // I believe there was a bug here
                     Priority = source.Priority
                 });
             }
@@ -80,6 +80,8 @@ namespace chocolatey.infrastructure.app.services
                     Value = configuration.Sources,
                     UserName = configuration.SourceCommand.Username,
                     Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password),
+                    Certificate = configuration.SourceCommand.Certificate,
+                    CertificatePassword = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.CertificatePassword),
                     Priority = configuration.SourceCommand.Priority
                 };
                 configFileSettings.Sources.Add(source);
@@ -90,10 +92,13 @@ namespace chocolatey.infrastructure.app.services
             else
             {
                 var currentPassword = string.IsNullOrWhiteSpace(source.Password) ? null : NugetEncryptionUtility.DecryptString(source.Password);
+                var currentCertificatePassword = string.IsNullOrWhiteSpace(source.CertificatePassword) ? null : NugetEncryptionUtility.DecryptString(source.CertificatePassword);
                 if (configuration.Sources.is_equal_to(source.Value) &&
                     configuration.SourceCommand.Priority == source.Priority &&
                     configuration.SourceCommand.Username.is_equal_to(source.UserName) &&
-                    configuration.SourceCommand.Password.is_equal_to(currentPassword)
+                    configuration.SourceCommand.Password.is_equal_to(currentPassword) &&
+                    configuration.SourceCommand.CertificatePassword.is_equal_to(currentCertificatePassword) &&
+                    configuration.SourceCommand.Certificate.is_equal_to(source.Certificate)
                     )
                 {
                     this.Log().Warn(NO_CHANGE_MESSAGE);
@@ -104,6 +109,8 @@ namespace chocolatey.infrastructure.app.services
                     source.Priority = configuration.SourceCommand.Priority;
                     source.UserName = configuration.SourceCommand.Username;
                     source.Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password);
+                    source.CertificatePassword = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.CertificatePassword);
+                    source.Certificate = configuration.SourceCommand.Certificate;
 
                     _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                     this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
