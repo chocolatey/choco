@@ -173,6 +173,8 @@ namespace chocolatey.infrastructure.app.builders
                         Name = source.Id,
                         Username = source.UserName,
                         EncryptedPassword = source.Password,
+                        Certificate = source.Certificate,
+                        EncryptedCertificatePassword = source.CertificatePassword,
                         Priority = source.Priority
                     });
             }
