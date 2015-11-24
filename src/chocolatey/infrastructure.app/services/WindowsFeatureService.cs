@@ -101,7 +101,6 @@ namespace chocolatey.infrastructure.app.services
         {
             set_common_args(args);
 
-            args.Add("_all_", new ExternalCommandArgument {ArgumentOption = ALL_TOKEN, Required = true});
             args.Add("_feature_", new ExternalCommandArgument {ArgumentOption = "/Enable-Feature", Required = true});
             args.Add("_package_name_", new ExternalCommandArgument
                 {
@@ -110,6 +109,8 @@ namespace chocolatey.infrastructure.app.services
                     QuoteValue = false,
                     Required = true
                 });
+            // /All should be the final argument.
+            args.Add("_all_", new ExternalCommandArgument {ArgumentOption = ALL_TOKEN, Required = true});
         }
 
         /// <summary>
