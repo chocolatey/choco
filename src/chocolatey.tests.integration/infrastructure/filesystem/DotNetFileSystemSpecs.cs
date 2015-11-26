@@ -62,7 +62,8 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
                 FileSystem.get_executable_path("cmd").ShouldEqual(
                     Platform.get_platform() == PlatformType.Windows ?
                         "C:\\Windows\\system32\\cmd.exe"
-                        : "cmd"
+                        : "cmd",
+                    StringComparer.OrdinalIgnoreCase
                     );
             }
 
@@ -71,8 +72,9 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             {
                 FileSystem.get_executable_path("cmd.exe").ShouldEqual(
                     Platform.get_platform() == PlatformType.Windows ?
-                        "C:\\Windows\\system32\\cmd.exe"
-                        : "cmd"
+                        "c:\\windows\\system32\\cmd.exe"
+                        : "cmd",
+                    StringComparer.OrdinalIgnoreCase
                     );
             }
 
