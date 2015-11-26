@@ -21,7 +21,7 @@ The process for contributions is roughly as follows:
  * Through GitHub, or through the [mailing list](https://groups.google.com/forum/#!forum/chocolatey) (preferred), you talk about a feature you would like to see (or a bug), and why it should be in Chocolatey.
    * If approved through the mailing list, ensure the accompanying GitHub issue is created with information and a link back to the mailing list discussion.
  * Once you get a nod from one of the [Chocolatey Team](https://github.com/chocolatey?tab=members), you can start on the feature.
- * Alternatively, if a feature is on the issues list with the [community tag](https://github.com/chocolatey/choco/labels/Community), it is open for a patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
+ * Alternatively, if a feature is on the issues list with the [Up For Grabs tag](https://github.com/chocolatey/choco/labels/Up%20For%20Grabs), it is open for a patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
 
 ### Set Up Your Environment
 
