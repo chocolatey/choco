@@ -75,7 +75,7 @@ namespace chocolatey.tests.infrastructure.app.services
         {
             private RegistryKey _result;
             private RegistryHive _hive = RegistryHive.CurrentUser;
-            private string _subkeyPath = "Console";
+            private string _subkeyPath = "Identities";
 
             public override void Context()
             {
