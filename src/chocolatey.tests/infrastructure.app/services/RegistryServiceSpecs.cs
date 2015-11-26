@@ -75,7 +75,7 @@ namespace chocolatey.tests.infrastructure.app.services
         {
             private RegistryKey _result;
             private RegistryHive _hive = RegistryHive.CurrentUser;
-            private string _subkeyPath = "Identities";
+            private string _subkeyPath = "Software";
 
             public override void Context()
             {
@@ -108,7 +108,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_contain_values()
             {
-                _result.GetValueNames().ShouldNotBeEmpty();
+                Service.get_key(_hive, "Environment").GetValueNames().ShouldNotBeEmpty();
             }
         } 
         
