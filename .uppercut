@@ -25,6 +25,8 @@
   <property name="assembly.copyright" value="Copyright © 2011 - Present, ${company.name} - All Rights Reserved." overwrite="false" />
   <property name="sign.project_with_key" value="true" overwrite="false" />
 
+  <property name="microsoft.framework" value="net-4.5" overwrite="false" />
+
   <!-- Build Features Overrides -->
   <property name="test.framework" value="nunit" overwrite="false" />
   <property name="cover.framework" value="opencover" overwrite="false" />
