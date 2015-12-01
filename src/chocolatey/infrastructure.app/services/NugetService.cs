@@ -77,8 +77,6 @@ namespace chocolatey.infrastructure.app.services
 
         public int count_run(ChocolateyConfiguration config)
         {
-            int count = 0;
-
             if (config.ListCommand.LocalOnly)
             {
                 config.Sources = ApplicationParameters.PackagesLocation;
