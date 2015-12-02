@@ -35,7 +35,8 @@
   <property name="run.metrics" value="false" overwrite="false" />
   <property name="run.nitriq" value="false" overwrite="false" />
   <property name="run.moma" value="false" overwrite="false" />
-  <property name="run.fxcop" value="false" overwrite="false" />
+  <property name="run.fxcop" value="true" overwrite="false" />
+  <property name="run.stylecop" value="true" overwrite="false" />
   <property name="run.obfuscator" value="false" overwrite="false" />
   <property name="run.ilmerge" value="true" overwrite="false" />
 

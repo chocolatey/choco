@@ -1,0 +1,34 @@
+<Project DefaultTargets="Full" xmlns= "http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+
+    <UsingTask AssemblyFile="StyleCop.dll" TaskName="StyleCopTask"/>
+
+    <PropertyGroup>
+        <FolderToAnalyse>..\..\src</FolderToAnalyse>
+        <ProjectPath>..\..\src\chocolatey.csproj</ProjectPath>
+        <StyleCopForceFullAnalysis>true</StyleCopForceFullAnalysis>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
+        <StyleCopCacheResults>true</StyleCopCacheResults>
+        <StyleCopOverrideSettingsFile>src\Settings.StyleCop</StyleCopOverrideSettingsFile>
+        <StyleCopOutputFile>..\..\build_output\build_artifacts\StyleCop\StyleCopViolations.xml</StyleCopOutputFile>
+        <StyleCopMaxViolationCount>1000</StyleCopMaxViolationCount>
+    </PropertyGroup>
+    
+    <Target Name="Full">
+		<CreateItem Include="$(FolderToAnalyse)\**\*.cs">
+		  <Output TaskParameter="Include" ItemName="StyleCopFiles"/>
+		</CreateItem>
+
+		<StyleCopTask
+		  ProjectFullPath="$(ProjectPath)"
+		  SourceFiles="@(StyleCopFiles)"
+		  AdditionalAddinPaths="@(StyleCopAdditionalAddinPaths)"
+		  ForceFullAnalysis="$(StyleCopForceFullAnalysis)"
+		  DefineConstants="$(DefineConstants)"
+		  TreatErrorsAsWarnings="$(StyleCopTreatErrorsAsWarnings)"
+		  CacheResults="$(StyleCopCacheResults)"
+		  OverrideSettingsFile="$(StyleCopOverrideSettingsFile)"
+		  OutputFile="$(StyleCopOutputFile)"
+		  MaxViolationCount="$(StyleCopMaxViolationCount)" />
+    </Target>
+</Project>

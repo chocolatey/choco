@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project name="CUSTOM POST ANALYZE" default="go">
+  <!-- Project UppercuT - http://projectuppercut.org -->
+  <property name="build.config.settings" value="__NONE__" overwrite="false" />
+  <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
+  <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
+  <property name="dirs.current" value="${directory::get-current-directory()}" />
+  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <property name="folder.build_scripts" value="build" overwrite="false" />
+  <include buildfile="${dirs.current}${path.separator}${folder.build_scripts}${path.separator}default.build.settings" />
+  <property name="build.step.name" value="${project::get-name()}" />
+  <property name="build.step.path" value="${project::get-buildfile-path()}" />
+  <!-- build step customizations below this -->
+  
+  <property name="folder.stylecop_results" value="stylecop" overwrite="false" />
+  <property name="dirs.stylecop_results" value="${path::combine(dirs.build_artifacts, folder.stylecop_results)}" overwrite="false" />
+
+  <property name="file.stylecop_results" value="${project.name}-results.xml" />
+  
+  <target name="prepare">
+    <echo message="Removing and adding ${dirs.stylecop_results}."/>
+    <delete dir="${dirs.stylecop_results}" failonerror="false" />
+    <mkdir dir="${dirs.stylecop_results}" />
+  </target>
+  
+  <target name="go" depends="run_normal_tasks" />
+  <target name="run_normal_tasks"
+          depends="prepare, analysis"
+          description="Using StyleCop Analysis to report on the complexity and maintainability of your project(s)."
+          if="${run.stylecop}" />
+  <target name="analysis" if="${run.stylecop}" >
+    <echo level="Warning" message="Attempting to run StyleCop Analysis. Creating file at ${file.stylecop_results}." />
+	<loadtasks assembly="${dirs.lib}${path.separator}NAnt${path.separator}NAnt.Contrib.Tasks.dll" />
+	<msbuild project="${dirs.lib}${path.separator}StyleCop${path.separator}StyleCopCheck.proj">
+		<arg value="/p:Configuration=${msbuild.configuration}" />
+		<arg value="/p:Platform=${msbuild.platform}" />
+		<arg value="/p:StyleCopOutputFile=${dirs.stylecop_results}${path.separator}${file.stylecop_results}" />
+	</msbuild>
+  </target>
+</project>
