@@ -15,6 +15,7 @@
 
 namespace chocolatey.tests.integration.scenarios
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
@@ -313,6 +314,12 @@ namespace chocolatey.tests.integration.scenarios
             public void should_have_a_version_of_one_dot_zero_dot_zero()
             {
                 packageResult.Version.ShouldEqual("1.0.0");
+            }
+
+            [Fact]
+            public void should_have_executed_chocolateyInstall_script()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.Contains("installpackage v1.0.0 has been installed")).ShouldBeTrue("Installpackage info message not seen. Info messages that were seen: {0}".format_with(string.Join(Environment.NewLine, MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())));
             }
         }
 

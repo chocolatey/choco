@@ -302,6 +302,18 @@ namespace chocolatey.tests.integration.scenarios
             {
                 _packageResult.Version.ShouldEqual("1.1.0");
             }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyUninstall_script_for_original_package()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.EndsWith("upgradepackage 1.0.0 Uninstalled")).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_have_executed_chocolateyInstall_script_for_new_package()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.EndsWith("upgradepackage 1.1.0 Installed")).ShouldBeTrue();
+            }
         }
 
         [Concern(typeof (ChocolateyUpgradeCommand))]
