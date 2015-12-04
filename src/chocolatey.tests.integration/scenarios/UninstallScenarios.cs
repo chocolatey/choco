@@ -219,6 +219,12 @@ namespace chocolatey.tests.integration.scenarios
             {
                 packageResult.Name.ShouldEqual(Configuration.PackageNames);
             }
+
+            [Fact]
+            public void should_have_executed_chocolateyUninstall_script()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.EndsWith("installpackage 1.0.0 Uninstalled")).ShouldBeTrue();
+            }
         }
 
         [Concern(typeof (ChocolateyUninstallCommand))]
