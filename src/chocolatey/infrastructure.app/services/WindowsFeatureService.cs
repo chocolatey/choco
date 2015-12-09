@@ -324,7 +324,7 @@ namespace chocolatey.infrastructure.app.services
             return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction)
         {
             set_executable_path_if_not_set();
             throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
