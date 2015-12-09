@@ -744,15 +744,29 @@ spam/junk folder.");
             return packageInstalls;
         }
 
-        public void ensure_package_files_have_compatible_attributes(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
+        private string get_install_directory(ChocolateyConfiguration config, IPackage installedPackage)
         {
-            var installDirectory = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id);
+            var pathResolver = NugetCommon.GetPathResolver(config, NugetCommon.GetNuGetFileSystem(config, _nugetLogger));
+            var installDirectory = pathResolver.GetInstallPath(installedPackage);
             if (!_fileSystem.directory_exists(installDirectory))
             {
-                var pathResolver = new ChocolateyPackagePathResolver(NugetCommon.GetNuGetFileSystem(config, _nugetLogger), useSideBySidePaths: true);
-                installDirectory = pathResolver.GetInstallPath(installedPackage);
-                if (!_fileSystem.directory_exists(installDirectory)) return;
+                var chocoPathResolver = pathResolver as ChocolateyPackagePathResolver;
+                if (chocoPathResolver != null)
+                {
+                    chocoPathResolver.UseSideBySidePaths = !chocoPathResolver.UseSideBySidePaths;
+                    installDirectory = chocoPathResolver.GetInstallPath(installedPackage);
+                }
+
+                if (!_fileSystem.directory_exists(installDirectory)) return null;
             }
+
+            return installDirectory;
+        }
+
+        public void ensure_package_files_have_compatible_attributes(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
+        {
+            var installDirectory = get_install_directory(config, installedPackage);
+            if (!_fileSystem.directory_exists(installDirectory)) return;
 
             _filesService.ensure_compatible_file_attributes(installDirectory, config);
         }
@@ -780,17 +794,7 @@ spam/junk folder.");
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageBackupLocation);
 
-            var pathResolver = NugetCommon.GetPathResolver(config, NugetCommon.GetNuGetFileSystem(config, _nugetLogger));
-            var pkgInstallPath = pathResolver.GetInstallPath(installedPackage);
-            if (!_fileSystem.directory_exists(pkgInstallPath))
-            {
-                var chocoPathResolver = pathResolver as ChocolateyPackagePathResolver;
-                if (chocoPathResolver != null)
-                {
-                    chocoPathResolver.UseSideBySidePaths = !chocoPathResolver.UseSideBySidePaths;
-                    pkgInstallPath = chocoPathResolver.GetInstallPath(installedPackage);
-                }
-            }
+            var pkgInstallPath = get_install_directory(config, installedPackage);
 
             if (_fileSystem.directory_exists(pkgInstallPath))
             {
@@ -885,17 +889,7 @@ spam/junk folder.");
         /// <param name="pkgInfo">The package information.</param>
         private void remove_shim_directors(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
         {
-            var pathResolver = NugetCommon.GetPathResolver(config, NugetCommon.GetNuGetFileSystem(config, _nugetLogger));
-            var pkgInstallPath = pathResolver.GetInstallPath(installedPackage);
-            if (!_fileSystem.directory_exists(pkgInstallPath))
-            {
-                var chocoPathResolver = pathResolver as ChocolateyPackagePathResolver;
-                if (chocoPathResolver != null)
-                {
-                    chocoPathResolver.UseSideBySidePaths = !chocoPathResolver.UseSideBySidePaths;
-                    pkgInstallPath = chocoPathResolver.GetInstallPath(installedPackage);
-                }
-            }
+            var pkgInstallPath = get_install_directory(config, installedPackage);
 
             if (_fileSystem.directory_exists(pkgInstallPath))
             {
