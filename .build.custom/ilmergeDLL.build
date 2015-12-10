@@ -26,8 +26,8 @@
   <!-- exe winexe dll -->
   <!-- overwrite this property -->
   <property name="merge.target.type" value="dll" />
-  <property name="args.ilmerge" value="/internalize /targetplatform:v4,&quot;${environment::get-variable('ProgramFiles(x86)')}\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " />
-  <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:v4,&quot;${environment::get-variable('ProgramFiles(x86)')}\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
+  <property name="args.ilmerge" value="/internalize /targetplatform:&quot;v4,${environment::get-variable('ProgramFiles(x86)')}\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " />
+  <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:&quot;v4,${environment::get-variable('ProgramFiles(x86)')}\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
 
   <target name="go"
           depends="prepare, get_regular_dlls, run_ilmerge, copy_configs, remove_unneeded_assemblies, copy_from_merge, delete_merge_folder"
