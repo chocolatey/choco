@@ -83,16 +83,12 @@ namespace chocolatey.infrastructure.platforms
             {
                 case PlatformType.Linux:
                     return "Linux";
-                    break;
                 case PlatformType.Mac:
                     return "OS X";
-                    break;
                 case PlatformType.Windows:
                     return get_windows_name(get_version());
-                    break;
                 default:
                     return "";
-                    break;
             }
         }
 
