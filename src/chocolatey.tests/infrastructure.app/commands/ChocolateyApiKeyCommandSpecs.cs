@@ -66,7 +66,6 @@ namespace chocolatey.tests.infrastructure.app.commands
 
         public class when_configuring_the_argument_parser : ChocolateyApiKeyCommandSpecsBase
         {
-            private string result;
             private OptionSet optionSet;
 
             public override void Context()
