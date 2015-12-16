@@ -16,6 +16,8 @@
 namespace chocolatey.tests.integration
 {
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using System.Reflection;
     using NUnit.Framework;
     using SimpleInjector;
@@ -24,6 +26,7 @@ namespace chocolatey.tests.integration
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.filesystem;
+    using chocolatey.infrastructure.platforms;
     using chocolatey.infrastructure.registration;
     using chocolatey.infrastructure.services;
 
@@ -39,8 +42,13 @@ namespace chocolatey.tests.integration
             Container = SimpleInjectorContainer.Container;
             fix_application_parameter_variables(Container);
             var config = Container.GetInstance<ChocolateyConfiguration>();
+            config.Information.PlatformType = PlatformType.Windows;
+            //config.Information.IsInteractive = false; 
+            //config.PromptForConfirmation = false;
+
             var force = config.Force;
             config.Force = true;
+            build_packages(Container, config);
             unpack_self(Container,config);
             config.Force = force;
 
@@ -98,6 +106,42 @@ namespace chocolatey.tests.integration
         {
            var unpackCommand = container.GetInstance<ChocolateyUnpackSelfCommand>();
             unpackCommand.run(config);
+        }
+
+        private void build_packages(Container container, ChocolateyConfiguration config)
+        {
+            var input = config.Input;
+
+            var fileSystem = container.GetInstance<IFileSystem>();
+            var contextDir = fileSystem.combine_paths(fileSystem.get_directory_name(fileSystem.get_current_assembly_path()), "context");
+            
+            // short-circuit building packages if they are already there.
+            if (fileSystem.get_files(contextDir, "*.nupkg").Any())
+            {
+                System.Console.WriteLine("Packages have already been built. Skipping... - If you need to rebuild packages, delete all nupkg files in {0}.".format_with(contextDir));
+                return;
+            }
+
+            var files = fileSystem.get_files(contextDir, "*.nuspec", SearchOption.AllDirectories);
+            
+            var command = container.GetInstance<ChocolateyPackCommand>();   
+            foreach (var file in files.or_empty_list_if_null())
+            {
+                config.Input = file;
+                System.Console.WriteLine("Building {0}".format_with(file));
+                command.run(config);
+            }
+
+            System.Console.WriteLine("Moving all nupkgs in {0} to context directory.".format_with(fileSystem.get_current_directory()));
+            var nupkgs = fileSystem.get_files(fileSystem.get_current_directory(), "*.nupkg");
+
+            foreach (var nupkg in nupkgs.or_empty_list_if_null())
+            {
+                fileSystem.copy_file(nupkg,fileSystem.combine_paths(contextDir,fileSystem.get_file_name(nupkg)),overwriteExisting:true);
+                fileSystem.delete_file(nupkg);
+            }
+            
+            config.Input = input;
         }
     }
 
