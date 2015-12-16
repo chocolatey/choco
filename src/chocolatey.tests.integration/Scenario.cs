@@ -112,7 +112,6 @@ namespace chocolatey.tests.integration
 
             config.Information.PlatformType = PlatformType.Windows;
             config.Information.IsInteractive = false;
-
             config.AcceptLicense = true;
             config.AllowMultipleVersions = false;
             config.AllowUnofficialBuild = true;

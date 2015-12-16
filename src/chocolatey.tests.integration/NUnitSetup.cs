@@ -43,8 +43,8 @@ namespace chocolatey.tests.integration
             fix_application_parameter_variables(Container);
             var config = Container.GetInstance<ChocolateyConfiguration>();
             config.Information.PlatformType = PlatformType.Windows;
-            config.Information.IsInteractive = false; 
-            config.PromptForConfirmation = false;
+            //config.Information.IsInteractive = false; 
+            //config.PromptForConfirmation = false;
 
             var force = config.Force;
             config.Force = true;
@@ -110,6 +110,8 @@ namespace chocolatey.tests.integration
 
         private void build_packages(Container container, ChocolateyConfiguration config)
         {
+            var input = config.Input;
+
             var fileSystem = container.GetInstance<IFileSystem>();
             var contextDir = fileSystem.combine_paths(fileSystem.get_directory_name(fileSystem.get_current_assembly_path()), "context");
             
@@ -122,8 +124,7 @@ namespace chocolatey.tests.integration
 
             var files = fileSystem.get_files(contextDir, "*.nuspec", SearchOption.AllDirectories);
             
-            var command = container.GetInstance<ChocolateyPackCommand>();
-            var input = config.Input;
+            var command = container.GetInstance<ChocolateyPackCommand>();   
             foreach (var file in files.or_empty_list_if_null())
             {
                 config.Input = file;
