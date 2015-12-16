@@ -207,6 +207,10 @@
     <None Include="context\hasdependency\2.1.0\tools\chocolateyuninstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\hasdependency\3.0.0\hasdependency.3.0.0.nupkg" />
+    <None Include="context\hasdependency\3.0.0\hasdependency.nuspec" />
+    <None Include="context\hasdependency\3.0.0\tools\chocolateyinstall.ps1" />
+    <None Include="context\hasdependency\3.0.0\tools\chocolateyuninstall.ps1" />
     <None Include="context\installpackage\1.0.0\installpackage.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -270,6 +274,10 @@
     <None Include="context\isdependency\2.1.0\tools\chocolateyuninstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\isdependency\3.0.0\isdependency.3.0.0.nupkg" />
+    <None Include="context\isdependency\3.0.0\isdependency.nuspec" />
+    <None Include="context\isdependency\3.0.0\tools\chocolateyinstall.ps1" />
+    <None Include="context\isdependency\3.0.0\tools\chocolateyuninstall.ps1" />
     <None Include="context\isexactversiondependency\1.0.0\isexactversiondependency.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
