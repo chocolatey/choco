@@ -2667,6 +2667,229 @@ namespace chocolatey.tests.integration.scenarios
 
                 errorFound.ShouldBeTrue();
             }
+        }  
+        
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_with_dependencies_on_an_older_version_of_a_package_than_is_already_installed : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "hasdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "conflictingdependency.2.1.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "conflictingdependency", "2.1.0");
+            }
+
+            /*
+             Setup should have the following installed:
+             * conflictingdependency 2.1.0
+             * isexactversiondependency 2.0.0
+             * isdependency at least 2.0.0
+             */
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_install_the_conflicting_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_upgrade_the_exact_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            } 
+      
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_contain_a_message_that_it_was_unable_to_install_any_packages()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("installed 0/3")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            [Pending("NuGet does not deal with version conflicts - GH-116")]
+            public void should_have_an_error_package_result()
+            {
+                bool errorFound = false;
+
+                foreach (var packageResult in Results)
+                {
+                    foreach (var message in packageResult.Value.Messages)
+                    {
+                        if (message.MessageType == ResultType.Error)
+                        {
+                            errorFound = true;
+                        }
+                    }
+                }
+
+                errorFound.ShouldBeTrue();
+            }
+        }  
+        
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_with_a_dependent_package_that_also_depdends_on_a_less_constrained_but_still_valid_dependency_of_the_same_package : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "toplevelhasexactversiondependency";
+                Scenario.add_packages_to_source_location(Configuration, "toplevelhasexactversiondependency*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "childdependencywithlooserversiondependency*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
+            }
+
+            public override void Because()
+            {
+                //MockLogger.LogMessagesToConsole = true;
+                Results = Service.install_run(Configuration);
+            }
+
+            /*
+             Because should result in the following installed:
+             * toplevelhasexactversiondependency 1.0.0
+             * childdependencywithlooserversiondependency 1.0.0
+             * isexactversiondependency 1.0.0
+             */
+
+            [Fact]
+            [Pending("NuGet does not handle version conflicts with highestversion dependency resolution - GH-507")]
+            public void should_install_where_install_location_reports()
+            {
+                foreach (var packageResult in Results)
+                {
+                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            [Pending("NuGet does not handle version conflicts with highestversion dependency resolution - GH-507")]
+            public void should_install_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            [Pending("NuGet does not handle version conflicts with highestversion dependency resolution - GH-507")]
+            public void should_install_the_dependency_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "childdependencywithlooserversiondependency");
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            [Pending("NuGet does not handle version conflicts with highestversion dependency resolution - GH-507")]
+            public void should_install_the_expected_version_of_the_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "childdependencywithlooserversiondependency", "childdependencywithlooserversiondependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }  
+            
+            [Fact]
+            [Pending("NuGet does not handle version conflicts with highestversion dependency resolution - GH-507")]
+            public void should_install_the_expected_version_of_the_constrained_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            [Pending("NuGet does not handle version conflicts with highestversion dependency resolution - GH-507")]
+            public void should_contain_a_message_that_everything_installed_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("3/3")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            [Pending("NuGet does not handle version conflicts with highestversion dependency resolution - GH-507")]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            [Pending("NuGet does not handle version conflicts with highestversion dependency resolution - GH-507")]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            [Pending("NuGet does not handle version conflicts with highestversion dependency resolution - GH-507")]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }  
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]

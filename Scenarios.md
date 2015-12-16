@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 30 Scenario(s), 254 Observation(s) ]
+### ChocolateyInstallCommand [ 32 Scenario(s), 270 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -223,6 +223,18 @@
  * should not have warning package result
  * should not install a package in the lib directory
 
+#### when installing a package with a dependent package that also depdends on a less constrained but still valid dependency of the same package
+
+ * [PENDING] should contain a message that everything installed successfully
+ * [PENDING] should have a successful package result
+ * [PENDING] should install a package in the lib directory
+ * [PENDING] should install the dependency in the lib directory
+ * [PENDING] should install the expected version of the constrained dependency
+ * [PENDING] should install the expected version of the dependency
+ * [PENDING] should install where install location reports
+ * [PENDING] should not have inconclusive package result
+ * [PENDING] should not have warning package result
+
 #### when installing a package with config transforms
 
  * should add the insert value in the config due to XDT InsertIfMissing
@@ -279,6 +291,16 @@
  * [PENDING] should not install the conflicting package in the lib directory
  * [PENDING] should not upgrade the exact version dependency
  * [PENDING] should not upgrade the minimum version dependency
+
+#### when installing a package with dependencies on an older version of a package than is already installed
+
+ * [PENDING] should contain a message that it was unable to install any packages
+ * [PENDING] should have an error package result
+ * [PENDING] should not have a successful package result
+ * [PENDING] should not have inconclusive package result
+ * [PENDING] should not have warning package result
+ * [PENDING] should not install the conflicting package in the lib directory
+ * [PENDING] should not upgrade the exact version dependency
 
 #### when installing a side by side package
 
