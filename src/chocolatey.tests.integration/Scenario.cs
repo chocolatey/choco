@@ -16,20 +16,16 @@
 namespace chocolatey.tests.integration
 {
     using System.IO;
-    using System.Reflection;
-    using System.Threading;
-    using NuGet;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.nuget;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
+    using chocolatey.infrastructure.platforms;
 
     public class Scenario
     {
-
         private static IChocolateyPackageService _service;
 
         private static readonly DotNetFileSystem _fileSystem = new DotNetFileSystem();
@@ -88,7 +84,7 @@ namespace chocolatey.tests.integration
         {
             if (_service == null)
             {
-                _service= NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+                _service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
             }
 
             var originalPackageName = config.PackageNames;
@@ -113,6 +109,9 @@ namespace chocolatey.tests.integration
             // note that this does not mean an empty configuration. It does get influenced by
             // prior commands, so ensure that all items go back to the default values here
             var config = NUnitSetup.Container.GetInstance<ChocolateyConfiguration>();
+
+            config.Information.PlatformType = PlatformType.Windows;
+            config.Information.IsInteractive = false;
 
             config.AcceptLicense = true;
             config.AllowMultipleVersions = false;
