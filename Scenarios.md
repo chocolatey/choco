@@ -223,7 +223,7 @@
  * should not have warning package result
  * should not install a package in the lib directory
 
-#### when installing a package with a dependent package that also depdends on a less constrained but still valid dependency of the same package
+#### when installing a package with a dependent package that also depends on a less constrained but still valid dependency of the same package
 
  * [PENDING] should contain a message that everything installed successfully
  * [PENDING] should have a successful package result

@@ -2778,7 +2778,7 @@ namespace chocolatey.tests.integration.scenarios
         }  
         
         [Concern(typeof(ChocolateyInstallCommand))]
-        public class when_installing_a_package_with_a_dependent_package_that_also_depdends_on_a_less_constrained_but_still_valid_dependency_of_the_same_package : ScenariosBase
+        public class when_installing_a_package_with_a_dependent_package_that_also_depends_on_a_less_constrained_but_still_valid_dependency_of_the_same_package : ScenariosBase
         {
             public override void Context()
             {
