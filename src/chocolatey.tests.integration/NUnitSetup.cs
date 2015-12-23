@@ -44,6 +44,8 @@ namespace chocolatey.tests.integration
             Container = SimpleInjectorContainer.Container;
             fix_application_parameter_variables(Container);
 
+            base.BeforeEverything();
+
             // deep copy so we don't have the same configuration and 
             // don't have to worry about issues using it
             var config = Container.GetInstance<ChocolateyConfiguration>().deep_copy();
@@ -54,9 +56,9 @@ namespace chocolatey.tests.integration
             unpack_self(Container, config);
             build_packages(Container, config);
 
-            base.BeforeEverything();
-
             ConfigurationBuilder.set_up_configuration(new List<string>(), config, Container.GetInstance<IFileSystem>(), Container.GetInstance<IXmlService>(), null);
+
+            MockLogger.reset();
         }
 
         /// <summary>
