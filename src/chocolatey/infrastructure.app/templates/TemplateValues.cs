@@ -32,7 +32,7 @@ namespace chocolatey.infrastructure.app.templates
             InstallerType = "EXE_MSI_OR_MSU";
             Url = "";
             Url64 = "";
-            SilentArgs = "";
+            SilentArgs = @"/qn /norestart /l*v `""$env:TEMP\chocolatey\$($packageName)\$($packageName).MsiInstall.log`""";
             AutomaticPackageNotesNuspec = "";
             Checksum = "";
             ChecksumType = "md5";
