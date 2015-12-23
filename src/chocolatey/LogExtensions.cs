@@ -43,6 +43,14 @@ namespace chocolatey
         //}
 
         /// <summary>
+        /// Resets the loggers. This allows switching to a new logger and not reusing old loggers that may be already cached.
+        /// </summary>
+        public static void ResetLoggers()
+        {
+            _dictionary.Value.Clear();
+        }
+
+        /// <summary>
         ///   Gets the logger for <see cref="T" />.
         /// </summary>
         /// <typeparam name="T"></typeparam>
