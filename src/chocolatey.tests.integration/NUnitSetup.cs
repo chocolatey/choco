@@ -20,6 +20,7 @@ namespace chocolatey.tests.integration
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
     using NUnit.Framework;
     using SimpleInjector;
     using chocolatey.infrastructure.app;
@@ -139,6 +140,10 @@ namespace chocolatey.tests.integration
                 fileSystem.copy_file(nupkg, fileSystem.combine_paths(contextDir, fileSystem.get_file_name(nupkg)), overwriteExisting: true);
                 fileSystem.delete_file(nupkg);
             }
+
+            //concurrency issues when packages are first built out during testing
+            Thread.Sleep(2000);
+            Console.WriteLine("Continuing with tests now after waiting for files to finish moving.");
         }
     }
 
