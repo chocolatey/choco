@@ -86,22 +86,13 @@ namespace chocolatey.tests.integration
             {
                 _service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
             }
-
-            var originalPackageName = config.PackageNames;
-            var originalPackageVersion = config.Version;
-
-            config.PackageNames = packageId;
-            config.Version = version;
-            _service.install_run(config);
-            config.PackageNames = originalPackageName;
-            config.Version = originalPackageVersion;
-            //var pattern = "{0}.{1}{2}".format_with(packageId, string.IsNullOrWhiteSpace(version) ? "*" : version, Constants.PackageExtension);
-            //var files = _fileSystem.get_files(config.Sources, pattern);
-            //foreach (var file in files)
-            //{
-            //    var packageManager = NugetCommon.GetPackageManager(config, new ChocolateyNugetLogger(), null, null, false);
-            //    packageManager.InstallPackage(new OptimizedZipPackage(file), false,false);
-            //}
+            var installConfig = config.deep_copy();
+          
+            installConfig.PackageNames = packageId;
+            installConfig.Version = version;
+            _service.install_run(installConfig);
+          
+            NUnitSetup.MockLogger.Messages.Clear();
         }
 
         private static ChocolateyConfiguration baseline_configuration()

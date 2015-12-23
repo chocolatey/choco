@@ -187,6 +187,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings, defaultEnabled: true, description: "Checksum files when pulled in from internet (based on package).");
             config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings, defaultEnabled: true, description: "Uninstall from programs and features without requiring an explicit uninstall script.");
             config.Features.FailOnAutoUninstaller = set_feature_flag(ApplicationParameters.Features.FailOnAutoUninstaller, configFileSettings, defaultEnabled: false, description: "Fail if automatic uninstaller fails.");
+            config.Features.FailOnStandardError = set_feature_flag(ApplicationParameters.Features.FailOnStandardError, configFileSettings, defaultEnabled: false, description: "Fail if install provider writes to stderr.");
             config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
         }
 
@@ -259,7 +260,10 @@ namespace chocolatey.infrastructure.app.builders
                                  option => config.CacheLocation = option.remove_surrounding_quotes())
                             .Add("allowunofficial|allow-unofficial|allowunofficialbuild|allow-unofficial-build",
                                  "AllowUnofficialBuild - When not using the official build you must set this flag for choco to continue.",
-                                 option => config.AllowUnofficialBuild = option != null)
+                                 option => config.AllowUnofficialBuild = option != null) 
+                            .Add("failstderr|failonstderr|fail-on-stderr|fail-on-standard-error|fail-on-error-output",
+                                 "FailOnStandardError - Fail on standard error output (stderr), typically received when running external commands during install providers. This overrides the feature failOnStandardError.",
+                                 option => config.Features.FailOnStandardError = option != null)
                             ;
                     },
                 (unparsedArgs) =>

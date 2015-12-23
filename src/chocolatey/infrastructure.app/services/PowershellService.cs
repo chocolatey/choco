@@ -234,6 +234,7 @@ namespace chocolatey.infrastructure.app.services
                 if (shouldRun)
                 {
                     installerRun = true;
+                    var errorMessagesLogged = false;
                     var exitCode = PowershellExecutor.execute(
                         wrap_script_with_module(chocoPowerShellScript, configuration),
                         _fileSystem,
@@ -268,7 +269,8 @@ namespace chocolatey.infrastructure.app.services
                                 }
                                 else
                                 {
-                                    failure = true;
+                                    errorMessagesLogged = true;
+                                    if (configuration.Features.FailOnStandardError) failure = true;
                                     this.Log().Error(() => " " + e.Data);
                                 }
                             });
@@ -276,6 +278,14 @@ namespace chocolatey.infrastructure.app.services
                     if (exitCode != 0)
                     {
                         failure = true;
+                    }
+
+                    if (!configuration.Features.FailOnStandardError && errorMessagesLogged)
+                    {
+                        this.Log().Warn(() =>
+@"Only an exit code of non-zero will fail the package by default. Set 
+ `--failonstderr` if you want error messages to also fail a script. See 
+ `choco -h` for details.");
                     }
 
                     if (failure)
