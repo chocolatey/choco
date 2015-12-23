@@ -136,8 +136,10 @@ Creates a new notepad shortcut on the root of c: that starts notepad as administ
 		Write-Debug "Shortcut created."
 
     [System.IO.FileInfo]$Path = $shortcutFilePath
-
     If ($RunAsAdmin) {
+      #In order to enable the "Run as Admin" checkbox, this code reads the .LNK as a stream
+      #  and flips a specific bit while writing a new copy.  It then replaces the original
+      #  .LNK with the copy, similar to this example: http://poshcode.org/2513
       $TempFileName = [IO.Path]::GetRandomFileName()
       $TempFile = [IO.FileInfo][IO.Path]::Combine($Path.Directory, $TempFileName)
       $Writer = New-Object System.IO.FileStream $TempFile, ([System.IO.FileMode]::Create)
