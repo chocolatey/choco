@@ -336,6 +336,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool CheckSumFiles { get; set; }
         public bool FailOnAutoUninstaller { get; set; }
         public bool FailOnStandardError { get; set; }
+        public bool UsePowerShellHost { get; set; }
     }
 
     //todo: retrofit other command configs this way
