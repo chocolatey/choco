@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 32 Scenario(s), 270 Observation(s) ]
+### ChocolateyInstallCommand [ 34 Scenario(s), 287 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -222,6 +222,29 @@
  * should not have inconclusive package result
  * should not have warning package result
  * should not install a package in the lib directory
+
+#### when installing a package that has nonterminating errors
+
+ * config should match package result name
+ * should contain a message that it installed successfully
+ * should have a successful package result
+ * should have a version of one dot zero
+ * should install the expected version of the package
+ * should install the package in the lib directory
+ * should install where install location reports
+ * should not have inconclusive package result
+ * should not have warning package result
+
+#### when installing a package that has nonterminating errors with fail on stderr
+
+ * should contain a warning message that it was unable to install a package
+ * should have an error package result
+ * should have expected error in package result
+ * should not have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should not install a package in the lib directory
+ * should put a package in the lib bad directory
 
 #### when installing a package with a dependent package that also depends on a less constrained but still valid dependency of the same package
 

@@ -1,14 +1,22 @@
 ## [0.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.10+is%3Aclosed) (unreleased)
 
-Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, right?)!
+Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, right?)! Use an internal PowerShell host to take advantage of quite a few improvements!
+
+### BREAKING CHANGES
+
+ * Only fail automation scripts (chocolateyInstall.ps1) if the script returns non-zero exit code - see [#445](https://github.com/chocolatey/choco/issues/445)
 
 ### FEATURES
 
- * Alternative sources - see [#14](https://github.com/chocolatey/choco/issues/14)
+ * Alternative Sources - see [#14](https://github.com/chocolatey/choco/issues/14)
+ * Use Internal PowerShell Host - see [#8](https://github.com/chocolatey/choco/issues/8)
  * Support for custom headers - see [#332](https://github.com/chocolatey/choco/issues/332)
 
 ### BUG FIXES
 
+ * Fix - Debug/Verbose messages not logged in install scripts (chocolateyInstall.ps1) - see [#520](https://github.com/chocolatey/choco/issues/520)
+ * Fix - Logger doesn't clear cached NullLoggers - see [#516](https://github.com/chocolatey/choco/issues/516)
+ * Fix - DISM "/All" argument in the wrong position - see [#480](https://github.com/chocolatey/choco/issues/480)
  * Fix - Merging assemblies on a machine running .net 4.5 or higher produces binaries incompatible with .net 4 - see [#392](https://github.com/chocolatey/choco/issues/392)
  * Fix - API - Incorrect log4net version in chocolatey.lib dependencies - see [#390](https://github.com/chocolatey/choco/issues/390)
 

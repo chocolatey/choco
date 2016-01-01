@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.adapters
 {
     using System.IO;
+    using commandline;
 
     public sealed class Console : IConsole
     {
@@ -24,9 +25,26 @@ namespace chocolatey.infrastructure.adapters
             return System.Console.ReadLine();
         }
 
-        public TextWriter Error
+        public string ReadLine(int timeoutMilliseconds)
         {
-            get { return System.Console.Error; }
+            return ReadLineTimeout.read(timeoutMilliseconds);
+        }
+
+        public System.ConsoleKeyInfo ReadKey(bool intercept)
+        {
+            return System.Console.ReadKey(intercept);
+        }
+
+        public System.ConsoleKeyInfo ReadKey(int timeoutMilliseconds)
+        {
+            return ReadKeyTimeout.read_key(timeoutMilliseconds);
+        }
+
+        public TextWriter Error { get { return System.Console.Error; } }
+
+        public void Write(object value)
+        {
+            System.Console.Write(value.to_string());
         }
     }
 }
