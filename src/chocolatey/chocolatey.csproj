@@ -122,6 +122,9 @@
     <Compile Include="infrastructure.app\services\IConfigTransformService.cs" />
     <Compile Include="infrastructure.app\services\IFilesService.cs" />
     <Compile Include="infrastructure.app\services\ISourceRunner.cs" />
+    <Compile Include="infrastructure\powershell\PoshHost.cs" />
+    <Compile Include="infrastructure\powershell\PoshHostRawUserInterface.cs" />
+    <Compile Include="infrastructure\powershell\PoshHostUserInterface.cs" />
     <Compile Include="infrastructure.app\templates\ChocolateyReadMeTemplate.cs" />
     <Compile Include="infrastructure.app\services\PythonService.cs" />
     <Compile Include="infrastructure.app\services\RubyGemsService.cs" />
