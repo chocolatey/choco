@@ -101,6 +101,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string FailOnAutoUninstaller = "failOnAutoUninstaller";
             public static readonly string AllowGlobalConfirmation = "allowGlobalConfirmation";
             public static readonly string FailOnStandardError = "failOnStandardError";
+            public static readonly string UsePowerShellHost = "powershellHost";
         }
 
         public static class Messages
