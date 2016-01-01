@@ -15,8 +15,12 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using System.IO;
     using System.Linq;
+    using System.Management.Automation;
+    using System.Management.Automation.Runspaces;
+    using System.Reflection;
     using adapters;
     using builders;
     using commandline;
@@ -25,16 +29,16 @@ namespace chocolatey.infrastructure.app.services
     using filesystem;
     using infrastructure.commands;
     using logging;
-    using nuget;
+    using powershell;
     using results;
+    using Assembly = adapters.Assembly;
+    using Console = System.Console;
     using Environment = System.Environment;
 
     public class PowershellService : IPowershellService
     {
         private readonly IFileSystem _fileSystem;
         private readonly string _customImports;
-        private const string OPERATION_COMPLETED_SUCCESSFULLY = "The operation completed successfully.";
-        private const string INITIALIZE_DEFAULT_DRIVES = "Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.";
 
         public PowershellService(IFileSystem fileSystem)
             : this(fileSystem, new CustomString(string.Empty))
@@ -234,63 +238,55 @@ namespace chocolatey.infrastructure.app.services
                 if (shouldRun)
                 {
                     installerRun = true;
-                    var errorMessagesLogged = false;
-                    var exitCode = PowershellExecutor.execute(
-                        wrap_script_with_module(chocoPowerShellScript, configuration),
-                        _fileSystem,
-                        configuration.CommandExecutionTimeoutSeconds,
-                        (s, e) =>
-                            {
-                                if (string.IsNullOrWhiteSpace(e.Data)) return;
-                                //inspect for different streams
-                                if (e.Data.StartsWith("DEBUG:"))
-                                {
-                                    this.Log().Debug(() => " " + e.Data);
-                                }
-                                else if (e.Data.StartsWith("WARNING:"))
-                                {
-                                    this.Log().Warn(() => " " + e.Data);
-                                }
-                                else if (e.Data.StartsWith("VERBOSE:"))
-                                {
-                                    this.Log().Info(ChocolateyLoggers.Verbose, () => " " + e.Data);
-                                }
-                                else
-                                {
-                                    this.Log().Info(() => " " + e.Data);
-                                }
-                            },
-                        (s, e) =>
-                            {
-                                if (string.IsNullOrWhiteSpace(e.Data)) return;
-                                if (e.Data.is_equal_to(OPERATION_COMPLETED_SUCCESSFULLY) || e.Data.is_equal_to(INITIALIZE_DEFAULT_DRIVES))
-                                {
-                                    this.Log().Info(() => " " + e.Data);
-                                }
-                                else
-                                {
-                                    errorMessagesLogged = true;
-                                    if (configuration.Features.FailOnStandardError) failure = true;
-                                    this.Log().Error(() => " " + e.Data);
-                                }
-                            });
 
-                    if (exitCode != 0)
+                    if (configuration.Features.UsePowerShellHost)
+                    {
+                        add_assembly_resolver();
+                    }
+
+                    var result = new PowerShellExecutionResults
+                    {
+                        ExitCode = -1
+                    };
+
+                    try
+                    {
+                        result = configuration.Features.UsePowerShellHost
+                                    ? Execute.with_timeout(configuration.CommandExecutionTimeoutSeconds).command(() => run_host(configuration, chocoPowerShellScript), result)
+                                    : run_external_powershell(configuration, chocoPowerShellScript);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Log().Error(ex.Message);
+                        result.ExitCode = -1;
+                    }
+
+                    if (configuration.Features.UsePowerShellHost)
+                    {
+                        remove_assembly_resolver();
+                    }
+
+                    if (result.StandardErrorWritten && configuration.Features.FailOnStandardError)
                     {
                         failure = true;
                     }
-
-                    if (!configuration.Features.FailOnStandardError && errorMessagesLogged)
+                    else if (result.StandardErrorWritten && result.ExitCode == 0)
                     {
-                        this.Log().Warn(() =>
-@"Only an exit code of non-zero will fail the package by default. Set 
+                        this.Log().Warn(
+                            () =>
+                            @"Only an exit code of non-zero will fail the package by default. Set 
  `--failonstderr` if you want error messages to also fail a script. See 
  `choco -h` for details.");
                     }
 
+                    if (result.ExitCode != 0)
+                    {
+                        failure = true;
+                    }
+
                     if (failure)
                     {
-                        Environment.ExitCode = exitCode;
+                        Environment.ExitCode = result.ExitCode;
                         packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Error while running '{0}'.{1} See log for details.".format_with(powershellScript.FirstOrDefault(), Environment.NewLine)));
                     }
                     packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Ran '{0}'".format_with(chocoPowerShellScript)));
@@ -298,6 +294,197 @@ namespace chocolatey.infrastructure.app.services
             }
 
             return installerRun;
+        }
+
+        private class PowerShellExecutionResults
+        {
+            public int ExitCode { get; set; }
+            public bool StandardErrorWritten { get; set; }
+        }
+
+        private PowerShellExecutionResults run_external_powershell(ChocolateyConfiguration configuration, string chocoPowerShellScript)
+        {
+            var result = new PowerShellExecutionResults();
+            result.ExitCode = PowershellExecutor.execute(
+                wrap_script_with_module(chocoPowerShellScript, configuration),
+                _fileSystem,
+                configuration.CommandExecutionTimeoutSeconds,
+                (s, e) =>
+                {
+                    if (string.IsNullOrWhiteSpace(e.Data)) return;
+                    //inspect for different streams
+                    if (e.Data.StartsWith("DEBUG:"))
+                    {
+                        this.Log().Debug(() => " " + e.Data);
+                    }
+                    else if (e.Data.StartsWith("WARNING:"))
+                    {
+                        this.Log().Warn(() => " " + e.Data);
+                    }
+                    else if (e.Data.StartsWith("VERBOSE:"))
+                    {
+                        this.Log().Info(ChocolateyLoggers.Verbose, () => " " + e.Data);
+                    }
+                    else
+                    {
+                        this.Log().Info(() => " " + e.Data);
+                    }
+                },
+                (s, e) =>
+                {
+                    if (string.IsNullOrWhiteSpace(e.Data)) return;
+                    result.StandardErrorWritten = true;
+                    this.Log().Error(() => " " + e.Data);
+                });
+
+            return result;
+        }
+
+        private ResolveEventHandler _handler = null;
+
+        private void add_assembly_resolver()
+        {
+            _handler = (sender, args) =>
+            {
+                var requestedAssembly = new AssemblyName(args.Name);
+
+                this.Log().Debug(ChocolateyLoggers.Verbose, "Redirecting {0}, requested by '{1}'".format_with(args.Name, args.RequestingAssembly == null ? string.Empty : args.RequestingAssembly.FullName));
+
+                AppDomain.CurrentDomain.AssemblyResolve -= _handler;
+
+                // we build against v1 - everything should update in a kosher manner to the newest, but it may not.
+                var assembly = attempt_version_load(requestedAssembly, new Version(5, 0, 0, 0)) ?? attempt_version_load(requestedAssembly, new Version(4, 0, 0, 0));
+                if (assembly == null) assembly = attempt_version_load(requestedAssembly, new Version(3, 0, 0, 0));
+                if (assembly == null) assembly = attempt_version_load(requestedAssembly, new Version(1, 0, 0, 0));
+
+                return assembly;
+            };
+
+            AppDomain.CurrentDomain.AssemblyResolve += _handler;
+        }
+
+        private System.Reflection.Assembly attempt_version_load(AssemblyName requestedAssembly, Version version)
+        {
+            if (requestedAssembly == null) return null;
+
+            requestedAssembly.Version = version;
+
+            try
+            {
+                return System.Reflection.Assembly.Load(requestedAssembly);
+            }
+            catch (Exception ex)
+            {
+                this.Log().Debug(ChocolateyLoggers.Verbose, "Attempting to load assembly {0} failed:{1} {2}".format_with(requestedAssembly.Name, Environment.NewLine, ex.Message));
+                return null;
+            }
+        }
+
+        private void remove_assembly_resolver()
+        {
+            if (_handler != null)
+            {
+                AppDomain.CurrentDomain.AssemblyResolve -= _handler;
+            }
+        }
+
+        private PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript)
+        {
+            var result = new PowerShellExecutionResults();
+            string commandToRun = wrap_script_with_module(chocoPowerShellScript, config);
+            var host = new PoshHost(config);
+            this.Log().Debug(() => "Calling built-in PowerShell host with ['{0}']".format_with(commandToRun.escape_curly_braces()));
+
+            var initialSessionState = InitialSessionState.CreateDefault();
+            // override system execution policy without accidentally setting it
+            initialSessionState.AuthorizationManager = new AuthorizationManager("choco");
+            using (var runspace = RunspaceFactory.CreateRunspace(host, initialSessionState))
+            {
+                runspace.Open();
+
+                // this will affect actual execution policy
+                //RunspaceInvoke invoker = new RunspaceInvoke(runspace);
+                //invoker.Invoke("Set-ExecutionPolicy ByPass");
+
+                using (var pipeline = runspace.CreatePipeline())
+                {
+                    // The powershell host itself handles the following items:
+                    // * Write-Debug
+                    // * Write-Host
+                    // * Write-Verbose
+                    // * Write-Warning
+                    //
+                    // the two methods below will pick up Write-Output and Write-Error
+
+                    // Write-Output
+                    pipeline.Output.DataReady += (sender, args) =>
+                    {
+                        PipelineReader<PSObject> reader = sender as PipelineReader<PSObject>;
+
+                        if (reader != null)
+                        {
+                            while (reader.Count > 0)
+                            {
+                                host.UI.WriteLine(reader.Read().to_string());
+                            }
+                        }
+                    };
+
+                    // Write-Error
+                    pipeline.Error.DataReady += (sender, args) =>
+                    {
+                        PipelineReader<object> reader = sender as PipelineReader<object>;
+
+                        if (reader != null)
+                        {
+                            while (reader.Count > 0)
+                            {
+                                host.UI.WriteErrorLine(reader.Read().to_string());
+                            }
+                        }
+                    };
+
+                    pipeline.Commands.Add(new Command(commandToRun, isScript: true, useLocalScope: false));
+
+                    try
+                    {
+                        pipeline.Invoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Unfortunately this doesn't print line number and character. It might be nice to get back to those items unless it involves tons of work.
+                        this.Log().Error("ERROR: {0}".format_with(ex.Message)); //, !config.Debug ? string.Empty : "{0} {1}".format_with(Environment.NewLine,ex.StackTrace)));
+                    }
+
+                    if (pipeline.PipelineStateInfo != null)
+                    {
+                        switch (pipeline.PipelineStateInfo.State)
+                        {
+                            // disconnected is not available unless the assembly version is at least v3
+                            //case PipelineState.Disconnected:
+                            case PipelineState.Running:
+                            case PipelineState.NotStarted:
+                            case PipelineState.Failed:
+                            case PipelineState.Stopping:
+                            case PipelineState.Stopped:
+                                host.SetShouldExit(1);
+                                host.HostException = pipeline.PipelineStateInfo.Reason;
+                                break;
+                            case PipelineState.Completed:
+                                host.SetShouldExit(0);
+                                break;
+                        }
+
+                    }
+                }
+            }
+
+            this.Log().Debug("Built-in PowerShell host called with ['{0}'] exited with '{1}'.".format_with(commandToRun.escape_curly_braces(), host.ExitCode));
+
+            result.ExitCode = host.ExitCode;
+            result.StandardErrorWritten = host.StandardErrorWritten;
+
+            return result;
         }
     }
 }
