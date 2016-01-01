@@ -30,6 +30,16 @@ namespace chocolatey.infrastructure.adapters
             return ReadLineTimeout.read(timeoutMilliseconds);
         }
 
+        public System.ConsoleKeyInfo ReadKey(bool intercept)
+        {
+            return System.Console.ReadKey(intercept);
+        }
+
+        public System.ConsoleKeyInfo ReadKey(int timeoutMilliseconds)
+        {
+            return ReadKeyTimeout.read_key(timeoutMilliseconds);
+        }
+
         public TextWriter Error { get { return System.Console.Error; } }
 
         public void Write(object value)

@@ -41,6 +41,10 @@ namespace chocolatey.infrastructure.adapters
 
         string ReadLine(int timeoutMilliseconds);
 
+        System.ConsoleKeyInfo ReadKey(bool intercept);
+
+        System.ConsoleKeyInfo ReadKey(int timeoutMilliseconds);
+
         /// <summary>
         ///   Gets the standard error output stream.
         /// </summary>

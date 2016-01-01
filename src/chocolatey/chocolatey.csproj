@@ -78,6 +78,7 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="infrastructure\commandline\ReadKeyTimeout.cs" />
     <Compile Include="infrastructure\commands\Execute.cs" />
     <Compile Include="GetChocolatey.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyConfigCommand.cs" />
