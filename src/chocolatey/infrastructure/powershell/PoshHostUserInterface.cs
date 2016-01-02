@@ -136,8 +136,8 @@ namespace chocolatey.infrastructure.powershell
             if (record.PercentComplete == 100 && !hasLoggedFinalProgress)
             {
                 hasLoggedFinalProgress = true;
-                this.Log().Info("");
-                this.Log().Info(record.StatusDescription.Replace("Saving","Finished downloading. Saved"));
+                //this.Log().Info("");
+                //this.Log().Info(record.StatusDescription.Replace("Saving","Finished downloading. Saved"));
             }
         }
 

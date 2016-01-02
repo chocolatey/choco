@@ -162,10 +162,12 @@ param(
           }
           
           if ($total -eq $goal) {
-            Write-Progress "Completed download of $url." "Completed a total of $total bytes of $fileName" -id 0 -Completed
+            Write-Progress "Completed download of $url." "Completed download of $fileName ($goalFormatted)." -id 0 -Completed
           }
         }
       } while ($count -gt 0)
+	  Write-Host ""
+	  Write-Host "Download of $([System.IO.Path]::GetFileName($fileName)) ($goalFormatted) completed."
     } catch {
       throw $_.Exception
     } finally {
