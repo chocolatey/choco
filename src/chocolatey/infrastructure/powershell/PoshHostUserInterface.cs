@@ -84,7 +84,7 @@ namespace chocolatey.infrastructure.powershell
 
         public override void WriteLine()
         {
-            base.WriteLine();
+            this.Log().Info("");
         }
 
         public override void WriteLine(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value)

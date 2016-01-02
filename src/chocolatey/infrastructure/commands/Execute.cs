@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.commands
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -61,10 +62,15 @@ namespace chocolatey.infrastructure.commands
         {
             if (function == null) return timeoutDefaultValue;
 
-            var task = Task<T>.Factory.StartNew(function);
+            var cancelToken = new CancellationTokenSource();
+            cancelToken.Token.ThrowIfCancellationRequested();
+            var task = Task<T>.Factory.StartNew(function, cancelToken.Token); //,TaskCreationOptions.LongRunning| TaskCreationOptions.AttachedToParent);
+           
             task.Wait(_timespan);
-
             if (task.IsCompleted) return task.Result;
+
+            cancelToken.Cancel();
+            
             return timeoutDefaultValue;
 
             //T result = timeoutDefaultValue;
