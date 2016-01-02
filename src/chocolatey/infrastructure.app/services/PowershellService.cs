@@ -450,10 +450,27 @@ namespace chocolatey.infrastructure.app.services
                     {
                         pipeline.Invoke();
                     }
+                    catch (RuntimeException ex)
+                    {
+                        var errorStackTrace = ex.StackTrace;
+                        var record = ex.ErrorRecord;
+                        if (record != null)
+                        {
+                            // not available in v1
+                            //errorStackTrace = record.ScriptStackTrace;
+                            var scriptStackTrace = record.GetType().GetProperty("ScriptStackTrace");
+                            if (scriptStackTrace != null)
+                            {
+                                var scriptError = scriptStackTrace.GetValue(record, null).to_string();
+                                if (!string.IsNullOrWhiteSpace(scriptError)) errorStackTrace = scriptError;
+                            }
+                        }
+                        this.Log().Error("ERROR: {0}{1}".format_with(ex.Message, !config.Debug ? string.Empty : "{0} {1}".format_with(Environment.NewLine,errorStackTrace)));
+                    }
                     catch (Exception ex)
                     {
                         // Unfortunately this doesn't print line number and character. It might be nice to get back to those items unless it involves tons of work.
-                        this.Log().Error("ERROR: {0}".format_with(ex.Message)); //, !config.Debug ? string.Empty : "{0} {1}".format_with(Environment.NewLine,ex.StackTrace)));
+                        this.Log().Error("ERROR: {0}{1}".format_with(ex.Message, !config.Debug ? string.Empty : "{0} {1}".format_with(Environment.NewLine,ex.StackTrace)));
                     }
 
                     if (pipeline.PipelineStateInfo != null)
