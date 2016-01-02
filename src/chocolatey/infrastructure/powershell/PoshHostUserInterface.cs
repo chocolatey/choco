@@ -118,14 +118,27 @@ namespace chocolatey.infrastructure.powershell
             this.Log().Debug(message);
         }
 
+        private bool hasLoggedStartProgress = false;
+        private bool hasLoggedFinalProgress = false;
         public override void WriteProgress(long sourceId, ProgressRecord record)
-        {
+        {  
             if (record.PercentComplete == -1) return;
-
-            if (record.PercentComplete == 100) this.Log().Debug(() => "Progress: 100%{0}".format_with(" ".PadRight(20)));
+            if (hasLoggedFinalProgress) return;
+            if (!hasLoggedStartProgress)
+            {
+                hasLoggedStartProgress = true;
+                this.Log().Debug(record.Activity);
+            }
 
             // http://stackoverflow.com/a/888569/18475
-            Console.Write("\rProgress: {0}%{1}".format_with(record.PercentComplete, " ".PadRight(20)));
+            Console.Write("\rProgress: {0}% - {1}".format_with(record.PercentComplete.to_string(), record.StatusDescription.PadRight(50, ' ')));
+
+            if (record.PercentComplete == 100 && !hasLoggedFinalProgress)
+            {
+                hasLoggedFinalProgress = true;
+                this.Log().Info("");
+                this.Log().Info(record.StatusDescription.Replace("Saving","Finished downloading. Saved"));
+            }
         }
 
         public override void WriteVerboseLine(string message)
