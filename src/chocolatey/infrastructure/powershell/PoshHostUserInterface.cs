@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.powershell
         
         public override void Write(string value)
         {
-            this.Log().Info(value);
+            this.Log().Info(value.escape_curly_braces());
             //Console.Write(value);
         }
 
@@ -74,9 +74,7 @@ namespace chocolatey.infrastructure.powershell
             System.Console.ForegroundColor = foregroundColor;
             System.Console.BackgroundColor = backgroundColor;
 
-            this.Log().Info(value);
-
-            //Console.Write(value);
+            this.Log().Info(value.escape_curly_braces());
 
             System.Console.ForegroundColor = originalForegroundColor;
             System.Console.BackgroundColor = originalBackgroundColor;
@@ -94,9 +92,7 @@ namespace chocolatey.infrastructure.powershell
             System.Console.ForegroundColor = foregroundColor;
             System.Console.BackgroundColor = backgroundColor;
 
-            this.Log().Info(value);
-
-            //Console.Write(value);
+            this.Log().Info(value.escape_curly_braces());
 
             System.Console.ForegroundColor = originalForegroundColor;
             System.Console.BackgroundColor = originalBackgroundColor;
@@ -104,13 +100,13 @@ namespace chocolatey.infrastructure.powershell
 
         public override void WriteLine(string value)
         {
-            this.Log().Info(value);
+            this.Log().Info(value.escape_curly_braces());
         }
 
         public override void WriteErrorLine(string value)
         {
             StandardErrorWritten = true;
-            this.Log().Error(value);
+            this.Log().Error(value.escape_curly_braces());
         }
 
         public override void WriteDebugLine(string message)
@@ -127,7 +123,7 @@ namespace chocolatey.infrastructure.powershell
             if (!hasLoggedStartProgress)
             {
                 hasLoggedStartProgress = true;
-                this.Log().Debug(record.Activity);
+                this.Log().Debug(record.Activity.escape_curly_braces());
             }
 
             // http://stackoverflow.com/a/888569/18475
@@ -143,12 +139,12 @@ namespace chocolatey.infrastructure.powershell
 
         public override void WriteVerboseLine(string message)
         {
-            this.Log().Info(ChocolateyLoggers.Verbose, "VERBOSE: " + message);
+            this.Log().Info(ChocolateyLoggers.Verbose, "VERBOSE: " + message.escape_curly_braces());
         }
 
         public override void WriteWarningLine(string message)
         {
-            this.Log().Warn("WARNING: " + message);
+            this.Log().Warn("WARNING: " + message.escape_curly_braces());
         }
 
         public override Dictionary<string, PSObject> Prompt(string caption, string message, Collection<FieldDescription> descriptions)
@@ -201,7 +197,7 @@ namespace chocolatey.infrastructure.powershell
 
         public override int PromptForChoice(string caption, string message, Collection<ChoiceDescription> choices, int defaultChoice)
         {
-            this.Log().Warn(caption);
+            this.Log().Warn(caption.escape_curly_braces());
 
             string[,] promptData = build_hotkeys_and_plain_labels(choices);
 
