@@ -709,6 +709,11 @@ spam/junk folder.");
                                 version == null ? null : version.ToString()))
                             {
                                 ensure_package_files_have_compatible_attributes(config, installedPackage, pkgInfo);
+                                if (beforeUpgradeAction != null)
+                                {
+                                    var currentPackageResult = new PackageResult(installedPackage, get_install_directory(config, installedPackage));
+                                    beforeUpgradeAction(currentPackageResult);
+                                }
                                 rename_legacy_package_version(config, installedPackage, pkgInfo);
                                 backup_existing_version(config, installedPackage, pkgInfo);
                                 remove_shim_directors(config, installedPackage, pkgInfo);
