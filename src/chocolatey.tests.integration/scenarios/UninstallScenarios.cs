@@ -95,19 +95,13 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_contain_a_message_that_it_would_have_run_a_powershell_script()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
-                {
-                    if (message.Contains("chocolateyuninstall.ps1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.contains_message("chocolateyuninstall.ps1").ShouldBeTrue();
             }
 
             [Fact]
             public void should_contain_a_message_that_it_would_have_run_powershell_modification_script()
             {
-                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.Contains("chocolateyBeforeModify.ps1")).ShouldBeTrue();
+                MockLogger.contains_message("chocolateyBeforeModify.ps1").ShouldBeTrue();
             }
         }
 
@@ -229,13 +223,13 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_have_executed_chocolateyBeforeModify_script()
             {
-                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.Contains("installpackage 1.0.0 Before Modification")).ShouldBeTrue();
+                MockLogger.contains_message("installpackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
             }
 
             [Fact]
             public void should_have_executed_chocolateyUninstall_script()
             {
-                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.EndsWith("installpackage 1.0.0 Uninstalled")).ShouldBeTrue();
+                MockLogger.contains_message("installpackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
             }
         }
 

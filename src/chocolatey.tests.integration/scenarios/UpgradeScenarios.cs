@@ -306,7 +306,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.Contains("upgradepackage 1.0.0 Before Modification")).ShouldBeTrue();
+                MockLogger.contains_message("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
             }
 
             [Fact]
@@ -321,13 +321,19 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.EndsWith("upgradepackage 1.0.0 Uninstalled")).ShouldBeFalse();
+                MockLogger.contains_message("upgradepackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.0 Before Modification", LogLevel.Info).ShouldBeFalse();
             }
 
             [Fact]
             public void should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null().Any(p => p.EndsWith("upgradepackage 1.1.0 Installed")).ShouldBeTrue();
+                MockLogger.contains_message("upgradepackage 1.1.0 Installed", LogLevel.Info).ShouldBeTrue();
             }
         }
 
