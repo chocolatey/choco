@@ -26,7 +26,8 @@ Or, you can find us in IRC at #chocolatey on freenode. IRC is not as often check
 Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
 
-## Etiquette Regarding Communication
+## Etiquette Regarding Communication
+
 When requesting support, try to remember that we are all volunteers that have lives outside of open source and none of us are paid to ensure things work for you, so please be considerate of others' time when you are asking for things. Many of us have families that also need time as well and only have so much time to give on a daily basis. In the future we hope that some of us are paid to do this full time and can provide better support when folks are running into issues, but until then a little consideration and patience can go a long way. After all, you are using a pretty good tool without cost. It may not be perfect (yet), and we know that.
 
 ## Information
@@ -45,6 +46,7 @@ Give `choco.exe /?` a shot (or `choco.exe -h`). For specific commands, add the c
 ### Requirements
 * .NET Framework 4.0
 * PowerShell 2.0+
+* Windows Server 2003+ / Windows 7+
 
 ### License / Credits
 Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICENSE) and [NOTICE](https://github.com/chocolatey/choco/blob/master/NOTICE) files.
