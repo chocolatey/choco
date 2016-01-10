@@ -191,6 +191,12 @@ namespace chocolatey.infrastructure.app.services
                     appKey.InstallerType = InstallerType.ServicePack;
                 }
 
+                // assume NSIS if we still don't know and we find uninst.exe
+                if (appKey.InstallerType == InstallerType.Unknown && appKey.UninstallString.to_lower().Contains("uninst.exe"))
+                {
+                    appKey.InstallerType = InstallerType.Nsis;
+                }
+
                 if (appKey.InstallerType == InstallerType.Unknown && appKey.HasQuietUninstall)
                 {
                     appKey.InstallerType = InstallerType.Custom;

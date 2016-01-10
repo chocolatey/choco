@@ -425,7 +425,7 @@ namespace chocolatey.infrastructure.app.services
                         {
                             while (reader.Count > 0)
                             {
-                                host.UI.WriteLine(reader.Read().to_string());
+                                host.UI.WriteLine(reader.Read().to_string().escape_curly_braces());
                             }
                         }
                     };
@@ -439,7 +439,7 @@ namespace chocolatey.infrastructure.app.services
                         {
                             while (reader.Count > 0)
                             {
-                                host.UI.WriteErrorLine(reader.Read().to_string());
+                                host.UI.WriteErrorLine(reader.Read().to_string().escape_curly_braces());
                             }
                         }
                     };
