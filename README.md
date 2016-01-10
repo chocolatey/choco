@@ -21,7 +21,13 @@ Come join in the conversation about Chocolatey in our Gitter Chat Room
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chocolatey/choco?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Or, you can find us in IRC at #chocolatey.
+Or, you can find us in IRC at #chocolatey on freenode. IRC is not as often checked by committers, so it is recommended you stick to Gitter if you need more timely assistance.
+
+Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
+
+
+## Etiquette Regarding Communication
+When requesting support, try to remember that we are all volunteers that have lives outside of open source and none of us are paid to ensure things work for you, so please be considerate of others' time when you are asking for things. Many of us have families that also need time as well and only have so much time to give on a daily basis. In the future we hope that some of us are paid to do this full time and can provide better support when folks are running into issues, but until then a little consideration and patience can go a long way. After all, you are using a pretty good tool without cost. It may not be perfect (yet), and we know that.
 
 ## Information
 
@@ -53,7 +59,9 @@ Prerequisites:
 
  * The issue has to do with choco itself and is not a package or website issue.
  * Please check to see if your issue already exists with a quick search of the issues. Start with one relevant term and then add if you get too many results.
- * You are not submitting an Enhancement. Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) guidlines.
+ * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) guidlines.
+ * You are not submitting a question - questions are better served as emails or gitter chat questions.
+ * Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
 Submitting a ticket:
 
@@ -62,7 +70,7 @@ Submitting a ticket:
  * choco.exe logs to a file in `$env:ChocolateyInstall\log\`. You can grab the specific log output from there so you don't have to capture or redirect screen output. Please limit the amount included to just the command run (the log is appended to with every command).
  * Please save the log output in a [gist](https://gist.github.com) (save the file as `log.sh`) and link to the gist from the issue. Feel free to create it as secret so it doesn't fill up against your public gists. Anyone with a direct link can still get to secret gists. If you accidentally include secret information in your gist, please delete it and create a new one (gist history can be seen by anyone) and update the link in the ticket (issue history is not retained except by email - deleting the gist ensures that no one can get to it). Using gists this way also keeps accidental secrets from being shared in the ticket in the first place as well.
  * We'll need the entire log output from the run, so please don't limit it down to areas you feel are relevant. You may miss some important details we'll need to know. This will help expedite issue triage.
- * It's helpful to include the version of choco, the version of the OS, and the version of PowerShell (Posh), but the debug script should capture all of those pieces of information.
+ * It's helpful to include the version of choco, the version of the OS, and the version of PowerShell (Posh) - the debug script should capture all of those pieces of information.
  * Include screenshots and/or animated gifs whenever possible, they help show us exactly what the problem is.
 
 ## Contributing

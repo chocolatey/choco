@@ -13,6 +13,21 @@ The process for contributions is roughly as follows:
   * [Sign the Contributor License Agreement](https://www.clahub.com/agreements/chocolatey/choco).
   * You must do this for each Chocolatey project that requires it.
   * If you are curious why we would require a CLA, we agree with Julien Ponge - take a look at his [post](https://julien.ponge.org/blog/in-defense-of-contributor-license-agreements/).
+ * You agree to follow the [etiquette regarding communication](https://github.com/chocolatey/choco#etiquette-regarding-communication).
+
+### Definition of Trivial Contributions
+
+It's hard to define what is a trivial contribution. Sometimes even a 1 character change can be considered significant. Unfortunately because it can be subjective, the decision on what is trivial comes from the committers of the project and not from folks contributing to the project. It is generally safe to assume that you may be subject to signing the [CLA](https://www.clahub.com/agreements/chocolatey/choco) and be prepared to do so. Ask in advance if you are not sure and for reasons are not able to sign the [CLA](https://www.clahub.com/agreements/chocolatey/choco).
+
+What is generally considered trivial:
+
+* Fixing a typo
+* Documentation changes
+* Fixes to non-production code - like fixing something small in the build code.
+
+What is generally not considered trivial:
+
+ * Changes to any code that would be delivered as part of the final product. This includes any scripts that are delivered, such as PowerShell scripts. Yes, even 1 character changes could be considered non-trivial.
 
 ## Contributing Process
 
@@ -21,7 +36,7 @@ The process for contributions is roughly as follows:
  * Through GitHub, or through the [mailing list](https://groups.google.com/forum/#!forum/chocolatey) (preferred), you talk about a feature you would like to see (or a bug), and why it should be in Chocolatey.
    * If approved through the mailing list, ensure the accompanying GitHub issue is created with information and a link back to the mailing list discussion.
  * Once you get a nod from one of the [Chocolatey Team](https://github.com/chocolatey?tab=members), you can start on the feature.
- * Alternatively, if a feature is on the issues list with the [community tag](https://github.com/chocolatey/choco/labels/Community), it is open for a patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
+ * Alternatively, if a feature is on the issues list with the [Up For Grabs](https://github.com/chocolatey/choco/issues?q=is%3Aopen+is%3Aissue+label%3A%22Up+For+Grabs%22) label, it is open for a community member to patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
 
 ### Set Up Your Environment
 
@@ -46,16 +61,18 @@ A commit should observe the following:
  * No unnecessary whitespace. Check for whitespace with `git diff --check` and `git diff --cached --check` before commit.
  * You can stage parts of a file for commit.
 
-A commit message should observe the following:
+A commit message should observe the following (based on ["A Note About Git Commit Messages"](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)):
 
   * The first line of the commit message should be a short description around 50 characters in length and be prefixed with the GitHub issue it refers to with parentheses surrounding that. If the GitHub issue is #25, you should have `(GH-25)` prefixed to the message.
   * If the commit is about documentation, the message should be prefixed with `(doc)`.
   * If it is a trivial commit or one of formatting/spaces fixes, it should be prefixed with `(maint)`.
   * After the subject, skip one line and fill out a body if the subject line is not informative enough.
+  * Sometimes you will find that even a tiny code change has a commit body that needs to be very detailed and make take more time to do than the actual change itself!
   * The body:
     * Should indent at `72` characters.
     * Explains more fully the reason(s) for the change and contrasts with previous behavior.
     * Uses present tense. "Fix" versus "Fixed".
+
 
 A good example of a commit message is as follows:
 
@@ -80,7 +97,8 @@ Prerequisites:
 
 Submitting PR:
 
- * Once you feel it is ready, submit the pull request to the `chocolatey/choco` repository against the ````master```` branch ([more information on this can be found here](https://help.github.com/articles/creating-a-pull-request)).
+ * Once you feel it is ready, submit the pull request to the `chocolatey/choco` repository against the `master` branch ([more information on this can be found here](https://help.github.com/articles/creating-a-pull-request)) unless specifically requested to submit it against another branch (usually `stable` in these instances).
+  * In the case of a larger change that is going to require more discussion, please submit a PR sooner. Waiting until you are ready may mean more changes than you are interested in if the changes are taking things in a direction the committers do not want to go.
  * In the pull request, outline what you did and point to specific conversations (as in URLs) and issues that you are are resolving. This is a tremendous help for us in evaluation and acceptance.
  * Once the pull request is in, please do not delete the branch or close the pull request (unless something is wrong with it).
  * One of the Chocolatey Team members, or one of the committers, will evaluate it within a reasonable time period (which is to say usually within 2-4 weeks). Some things get evaluated faster or fast tracked. We are human and we have active lives outside of open source so don't fret if you haven't seen any activity on your pull request within a month or two. We don't have a Service Level Agreement (SLA) for pull requests. Just know that we will evaluate your pull request.
