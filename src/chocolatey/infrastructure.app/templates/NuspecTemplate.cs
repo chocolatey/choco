@@ -31,15 +31,15 @@ namespace chocolatey.infrastructure.app.templates
     <summary>__REPLACE__</summary>
     <description>__REPLACE__MarkDown_Okay [[AutomaticPackageNotesNuspec]]
     </description>
-    <projectUrl></projectUrl>
-    <packageSourceUrl></packageSourceUrl>
+    <projectUrl>__REMOVE_OR_FILL_OUT__</projectUrl>
+    <packageSourceUrl>__REMOVE_OR_FILL_OUT__</packageSourceUrl>
     <!--<projectSourceUrl></projectSourceUrl>
     <docsUrl></docsUrl>
     <mailingListUrl></mailingListUrl>
     <bugTrackerUrl></bugTrackerUrl>-->
     <tags>[[PackageNameLower]] admin SPACE_SEPARATED</tags>
     <copyright></copyright>
-    <licenseUrl></licenseUrl>
+    <licenseUrl>__REMOVE_OR_FILL_OUT__</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <!--<iconUrl>http://cdn.rawgit.com/[[MaintainerRepo]]/master/icons/[[PackageNameLower]].png</iconUrl>-->
     <!--<dependencies>
