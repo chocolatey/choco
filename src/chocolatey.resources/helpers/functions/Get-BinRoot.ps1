@@ -15,7 +15,7 @@
 function Get-BinRoot {
 
   Write-Debug "Running 'Get-BinRoot'";
-  Write-Host "Get-BinRoot is going to be deprecated by v1. Many packages no longer require it since the folders no longer have versions on them."
+  Write-Host "Get-BinRoot is going to be deprecated in v1.0.0 and removed in v2.0.0 (replacing with a new function that will be announced nearing that time). However many packages no longer require Get-BinRoot since the folders no longer have versions on them. Some do though and should continue to use it."
 
   # Since CamelCase was decided upon when $env:ChocolateyInstall was first invented, whe should stick to this convention and use $env:ChocolateyBinRoot.
   # I propose:
