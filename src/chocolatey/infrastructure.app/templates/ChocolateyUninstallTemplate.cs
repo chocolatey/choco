@@ -96,7 +96,7 @@ if ($key.Count -eq 1) {
 
 ## OTHER HELPERS
 ## https://github.com/chocolatey/choco/wiki/HelpersReference
-#Uninstall-ChocolateyZipPackage
+#Uninstall-ChocolateyZipPackage $packageName
 #Uninstall-BinFile # Only needed if you added one in the installer script, choco will remove the ones it added automatically.
 #remove any shortcuts you added
 
