@@ -23,6 +23,8 @@ param(
   Write-Debug "Running 'Start-ChocolateyProcessAsAdmin' with exeToRun:`'$exeToRun`', statements: `'$statements`' ";
 
   $wrappedStatements = $statements
+  if ($wrappedStatements -eq $null) { $wrappedStatements = ''}
+
   if ($exeToRun -eq 'powershell') {
     $exeToRun = "$($env:windir)\System32\WindowsPowerShell\v1.0\powershell.exe"
     $importChocolateyHelpers = ""
@@ -48,49 +50,83 @@ $block
 This may take a while, depending on the statements.
 "@
   }
-  else {
+  else 
+  {
     $dbgMessage = @"
-Elevating Permissions and running $exeToRun $wrappedStatements. This may take a while, depending on the statements.
+Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on the statements.
 "@
   }
-  $dbgMessage | Write-Debug
+  
+  Write-Debug $dbgMessage
 
-  $psi = new-object System.Diagnostics.ProcessStartInfo
-  $psi.RedirectStandardError = $true
-  $psi.UseShellExecute = $false
+  # Redirecting output slows things down a bit.
+  $writeOutput = {
+    if ($EventArgs.Data -ne $null) {
+      Write-Host "$($EventArgs.Data)"
+    }
+		
+    #foreach ($line in $EventArgs.Data) {
+      #Write-Host "$line"
+    #}
+  }
+
+  $writeError = {
+    if ($EventArgs.Data -ne $null) {
+      Write-Host "[ERROR] $($EventArgs.Data)" -ForegroundColor $ErrorColor -BackgroundColor Black
+    }
+    #foreach ($line in $EventArgs.Data) {
+      #if (!$line.IsNullOrEmpty) {
+        # do not stop execution, but pass the output back to the user.
+      #  Write-Host "[ERROR] $line" -ForegroundColor $ErrorColor -BackgroundColor Black
+      #}
+    #}
+  }
+
+  $process = New-Object System.Diagnostics.Process
+  $process.EnableRaisingEvents = $true
+  Register-ObjectEvent  -InputObject $process -SourceIdentifier "LogOutput_ChocolateyProc" -EventName OutputDataReceived -Action $writeOutput | Out-Null
+  Register-ObjectEvent -InputObject $process -SourceIdentifier "LogErrors_ChocolateyProc" -EventName ErrorDataReceived -Action  $writeError | Out-Null
+
+  #$process.StartInfo = New-Object System.Diagnostics.ProcessStartInfo($exeToRun, $wrappedStatements)
+  # in case empty args makes a difference, try to be compatible with the older
+  # version
+  $psi = New-Object System.Diagnostics.ProcessStartInfo
   $psi.FileName = $exeToRun
   if ($wrappedStatements -ne '') {
     $psi.Arguments = "$wrappedStatements"
   }
+  $process.StartInfo =  $psi
 
-  if ([Environment]::OSVersion.Version -ge (new-object 'Version' 6,0)){
-    $psi.Verb = "runas"
+  # process start info
+  $process.StartInfo.RedirectStandardOutput = $true
+  $process.StartInfo.RedirectStandardError = $true
+  $process.StartInfo.UseShellExecute = $false
+  $process.StartInfo.WorkingDirectory = Get-Location
+  if ([Environment]::OSVersion.Version -ge (New-Object 'Version' 6,0)){
+    Write-Debug "Setting RunAs for elevation"
+    $process.StartInfo.Verb = "RunAs"
   }
-
-  $psi.WorkingDirectory = get-location
-
   if ($minimized) {
-    $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Minimized
+    $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Minimized
   }
 
-  $s = [System.Diagnostics.Process]::Start($psi)
+  $process.Start() | Out-Null
+  if ($process.StartInfo.RedirectStandardOutput) { $process.BeginOutputReadLine() }
+  if ($process.StartInfo.RedirectStandardError) { $process.BeginErrorReadLine() }
+  $process.WaitForExit()  
 
-  $chocTempDir = Join-Path $env:TEMP "chocolatey"
-  if (![System.IO.Directory]::Exists($chocTempDir)) { [System.IO.Directory]::CreateDirectory($chocTempDir) | Out-Null }
-  $errorFile = Join-Path $chocTempDir "$($s.Id)-error.stream"
-  $s.StandardError.ReadToEnd() | Out-File $errorFile
-  $s.WaitForExit()
-  if ($validExitCodes -notcontains $s.ExitCode) {
-    try {
-      $innerError = Import-CLIXML $errorFile | ? { $_.GetType() -eq [String] } | Out-String
-    }
-    catch{
-      $innerError = Get-Content $errorFile | Out-String
-    }
-    $errorMessage = "[ERROR] Running $exeToRun with $statements was not successful. Exit code was `'$($s.ExitCode)`' Error Message: $innerError."
-    Remove-Item $errorFile -Force -ErrorAction SilentlyContinue
-    throw $errorMessage
+  # For some reason this forces the jobs to finish and waits for
+  # them to do so. Without this it never finishes.
+  Unregister-Event -SourceIdentifier "LogOutput_ChocolateyProc"
+  Unregister-Event -SourceIdentifier "LogErrors_ChocolateyProc"
+
+  $exitCode = $process.ExitCode
+  $process.Dispose()
+
+  Write-Debug "Command [`"$exeToRun`" $wrappedStatements] exited with `'$exitCode`'."
+  if ($validExitCodes -notcontains $exitCode) {
+    throw "Running [`"$exeToRun`" $statements] was not successful. Exit code was '$exitCode'. See log for possible error messages."
   }
-
+ 
   Write-Debug "Finishing 'Start-ChocolateyProcessAsAdmin'"
 }
