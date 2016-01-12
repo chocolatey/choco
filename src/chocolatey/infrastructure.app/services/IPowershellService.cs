@@ -47,5 +47,19 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="packageResult">The package result.</param>
         /// <returns>true if the chocolateyUninstall.ps1 was found, even if it has failures</returns>
         bool uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
+
+        /// <summary>
+        ///   Noops the specified package before modify operation.
+        /// </summary>
+        /// <param name="packageResult">The package result.</param>
+        void before_modify_noop(PackageResult packageResult);
+
+        /// <summary>
+        ///   Runs any before modification script on the specified package.
+        /// </summary>
+        /// <param name="configuration">The configuration</param>
+        /// <param name="packageResult">The package result.</param>
+        /// <returns>true if the chocolateyBeforeModify.ps1 was found, even if it has failures</returns>
+        bool before_modify(ChocolateyConfiguration configuration, PackageResult packageResult);
     }
 }
