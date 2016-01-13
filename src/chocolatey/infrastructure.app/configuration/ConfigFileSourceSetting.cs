@@ -42,5 +42,11 @@ namespace chocolatey.infrastructure.app.configuration
         
         [XmlAttribute(AttributeName = "priority")]
         public int Priority { get; set; }
+
+        [XmlAttribute(AttributeName = "certificate")]
+        public string Certificate { get; set; }
+
+        [XmlAttribute(AttributeName = "certificatePassword")]
+        public string CertificatePassword { get; set; }
     }
 }

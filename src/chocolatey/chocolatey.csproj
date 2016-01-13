@@ -112,6 +112,7 @@
     <Compile Include="infrastructure.app\domain\SourceCommandType.cs" />
     <Compile Include="infrastructure.app\messages\PostRunEvent.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyNugetCredentialProvider.cs" />
+    <Compile Include="infrastructure.app\nuget\ChocolateyClientCertificateProvider.cs" />
     <Compile Include="infrastructure.app\nuget\NugetPush.cs" />
     <Compile Include="infrastructure.app\runners\GenericRunner.cs" />
     <Compile Include="infrastructure.app\services\AutomaticUninstallerService.cs" />
