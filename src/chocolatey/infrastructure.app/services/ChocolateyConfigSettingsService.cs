@@ -356,5 +356,21 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
         }
+
+        public void config_unset(ChocolateyConfiguration configuration)
+        {
+            var config = config_get(configuration.ConfigCommand.Name);
+            if (config == null || string.IsNullOrEmpty(config.Value))
+            {
+                this.Log().Warn(NO_CHANGE_MESSAGE);
+            }
+            else
+            {
+                config.Value = "";
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+
+                this.Log().Warn(() => "Unset {0}".format_with(config.Key));
+            }
+        }
     }
 }
