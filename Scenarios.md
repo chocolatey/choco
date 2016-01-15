@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 34 Scenario(s), 287 Observation(s) ]
+### ChocolateyInstallCommand [ 35 Scenario(s), 288 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -325,6 +325,10 @@
  * [PENDING] should not install the conflicting package in the lib directory
  * [PENDING] should not upgrade the exact version dependency
 
+#### when installing a package with no sources enabled
+
+ * should have no sources enabled result
+
 #### when installing a side by side package
 
  * config should match package result name
@@ -391,7 +395,7 @@
  * should not have inconclusive package result
  * should not have warning package result
 
-### ChocolateyListCommand [ 6 Scenario(s), 30 Observation(s) ]
+### ChocolateyListCommand [ 7 Scenario(s), 31 Observation(s) ]
 
 #### when listing local packages
 
@@ -407,6 +411,10 @@
  * should not contain debugging messages
  * should not contain packages and versions with a space between them
  * should only have messages related to package information
+
+#### when listing packages with no sources enabled
+
+ * should have no sources enabled result
 
 #### when searching all available packages
 
@@ -613,7 +621,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 26 Scenario(s), 214 Observation(s) ]
+### ChocolateyUpgradeCommand [ 27 Scenario(s), 215 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -852,6 +860,10 @@
  * should upgrade the exact version dependency
  * should upgrade the minimum version dependency
  * should upgrade the package
+
+#### when upgrading a package with no sources enabled
+
+ * should have no sources enabled result
 
 #### when upgrading a package with readonly files
 

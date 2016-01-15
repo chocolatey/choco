@@ -340,5 +340,35 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("End of List", LogLevel.Debug).ShouldBeFalse();
             }
         }
+
+        [Concern(typeof(ChocolateyListCommand))]
+        public class when_listing_packages_with_no_sources_enabled : ScenariosBase
+        {
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Sources = null;
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+            [Fact]
+            public void should_have_no_sources_enabled_result()
+            {
+                MockLogger.contains_message("Unable to search for packages when there are no sources enabled for", LogLevel.Error).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_list_any_packages()
+            {
+                Results.Count().ShouldEqual(0);
+            }  
+
+        }
     }
 }
