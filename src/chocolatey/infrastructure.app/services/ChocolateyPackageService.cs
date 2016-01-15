@@ -304,9 +304,17 @@ namespace chocolatey.infrastructure.app.services
         {
             this.Log().Info(@"Installing the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
-            this.Log().Info(@"By installing you accept licenses for the packages.");
 
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
+
+            if (config.Sources == null)
+            {
+                this.Log().Error(ChocolateyLoggers.Important, @"Installation was NOT successful. There are no sources enabled for packages.");
+                Environment.ExitCode = 1;
+                return packageInstalls;
+            }
+
+            this.Log().Info(@"By installing you accept licenses for the packages.");
 
             foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, packageInstalls).or_empty_list_if_null())
             {
