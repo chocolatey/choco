@@ -107,6 +107,13 @@ namespace chocolatey.infrastructure.app.services
 
         public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
+            if (config.Sources == null)
+            {
+                this.Log().Error(ChocolateyLoggers.Important, @"Unable to search for packages when there are no sources enabled for packages.");
+                Environment.ExitCode = 1;
+                yield break;
+            }
+
             if (config.RegularOutput) this.Log().Debug(() => "Searching for package information");
 
             var packages = new List<IPackage>();
@@ -505,6 +512,14 @@ Would have determined packages that are out of date based on what is
         {
             this.Log().Info(@"Upgrading the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
+
+            if (config.Sources == null)
+            {
+                this.Log().Error(ChocolateyLoggers.Important, @"Upgrading was NOT successful. There are no sources enabled for packages.");
+                Environment.ExitCode = 1;
+                return new ConcurrentDictionary<string, PackageResult>();
+            }
+
             this.Log().Info(@"By upgrading you accept licenses for the packages.");
 
             foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.EndsWith(".config")).ToList())
