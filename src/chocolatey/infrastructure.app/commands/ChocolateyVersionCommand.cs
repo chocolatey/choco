@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.app.commands
 {
     using System.Collections.Generic;
+    using System.Linq;
     using attributes;
     using commandline;
     using configuration;
@@ -115,7 +116,8 @@ Version has been deprecated and will be removed in version 1.0.0.
         {
             if (configuration.ListCommand.LocalOnly)
             {
-                _packageService.list_run(configuration);
+                // note: you must leave the .ToList() here or else the method may not be evaluated!
+                _packageService.list_run(configuration).ToList();
             }
             else
             {

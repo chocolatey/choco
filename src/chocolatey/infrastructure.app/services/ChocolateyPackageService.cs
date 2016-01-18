@@ -107,6 +107,14 @@ namespace chocolatey.infrastructure.app.services
 
         public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
+            if (string.IsNullOrWhiteSpace(config.Sources))
+            {
+                this.Log().Error(ChocolateyLoggers.Important, @"Unable to search for packages when there are no sources enabled for 
+ packages and none were passed as arguments.");
+                Environment.ExitCode = 1;
+                yield break;
+            }
+
             if (config.RegularOutput) this.Log().Debug(() => "Searching for package information");
 
             var packages = new List<IPackage>();
@@ -304,9 +312,18 @@ namespace chocolatey.infrastructure.app.services
         {
             this.Log().Info(@"Installing the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
-            this.Log().Info(@"By installing you accept licenses for the packages.");
 
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
+
+            if (string.IsNullOrWhiteSpace(config.Sources))
+            {
+                this.Log().Error(ChocolateyLoggers.Important, @"Installation was NOT successful. There are no sources enabled for 
+ packages and none were passed as arguments.");
+                Environment.ExitCode = 1;
+                return packageInstalls;
+            }
+
+            this.Log().Info(@"By installing you accept licenses for the packages.");
 
             foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, packageInstalls).or_empty_list_if_null())
             {
@@ -497,6 +514,15 @@ Would have determined packages that are out of date based on what is
         {
             this.Log().Info(@"Upgrading the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
+
+            if (string.IsNullOrWhiteSpace(config.Sources))
+            {
+                this.Log().Error(ChocolateyLoggers.Important, @"Upgrading was NOT successful. There are no sources enabled for 
+ packages and none were passed as arguments.");
+                Environment.ExitCode = 1;
+                return new ConcurrentDictionary<string, PackageResult>();
+            }
+
             this.Log().Info(@"By upgrading you accept licenses for the packages.");
 
             foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.EndsWith(".config")).ToList())
