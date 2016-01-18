@@ -2382,5 +2382,29 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_package_with_no_sources_enabled : ScenariosBase
+        {
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Sources = null;
+                //Configuration.PackageNames = Configuration.Input = "installpackage";
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_no_sources_enabled_result()
+            {
+                MockLogger.contains_message("Upgrading was NOT successful. There are no sources enabled for packages.", LogLevel.Error).ShouldBeTrue();
+                Results.Count().ShouldEqual(0);
+            }
+        }
     }
 }
