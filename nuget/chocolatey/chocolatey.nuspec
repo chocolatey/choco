@@ -10,7 +10,7 @@
     <description>
 Chocolatey is a package manager for Windows (like apt-get but for Windows). It was designed to be a decentralized framework for quickly installing applications and tools that you need. It is built on the NuGet infrastructure currently using PowerShell as its focus for delivering packages from the distros to your door, err computer.
 
-Chocolatey is brought to you by the work and inspiration of the community, the work and thankless nights of the [Chocolatey Team](https://github.com/orgs/chocolatey/members), with Rob heading up the direction.
+Chocolatey is brought to you by the work and inspiration of the community, the work and thankless nights of the [Chocolatey Team](https://github.com/orgs/chocolatey/people), with Rob heading up the direction.
 
 You can host your own sources and add them to Chocolatey, you can extend Chocolatey's capabilities, and folks, it's only going to get better.
 
