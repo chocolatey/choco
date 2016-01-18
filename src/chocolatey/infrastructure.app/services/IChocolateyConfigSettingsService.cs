@@ -35,5 +35,6 @@ namespace chocolatey.infrastructure.app.services
         void config_list(ChocolateyConfiguration configuration);
         void config_get(ChocolateyConfiguration configuration);
         void config_set(ChocolateyConfiguration configuration);
+        void config_unset(ChocolateyConfiguration configuration);
     }
 }
