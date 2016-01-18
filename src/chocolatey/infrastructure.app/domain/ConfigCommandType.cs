@@ -21,5 +21,6 @@ namespace chocolatey.infrastructure.app.domain
         list,
         get,
         set,
+        unset,
     }
 }

@@ -96,7 +96,7 @@ Chocolatey will allow you to interact with the configuration file settings.
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco config [list]|get|set [<options/switches>]
+    choco config [list]|get|set|unset [<options/switches>]
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
@@ -107,6 +107,8 @@ Chocolatey will allow you to interact with the configuration file settings.
     choco config get --name cacheLocation
     choco config set cacheLocation c:\temp\choco
     choco config set --name cacheLocation --value c:\temp\choco
+    choco config unset proxy
+    choco config unset --name proxy
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
@@ -129,6 +131,9 @@ Chocolatey will allow you to interact with the configuration file settings.
                     break;
                 case ConfigCommandType.set:
                     _configSettingsService.config_set(configuration);
+                    break;
+                case ConfigCommandType.unset:
+                    _configSettingsService.config_unset(configuration);
                     break;
             }
         }

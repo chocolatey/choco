@@ -131,6 +131,14 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
                 configSettingsService.Verify(c => c.config_set(configuration), Times.Once);
             }
+
+            [Fact]
+            public void should_call_service_source_unset_when_command_is_unset()
+            {
+                configuration.ConfigCommand.Command = ConfigCommandType.unset;
+                because();
+                configSettingsService.Verify(c => c.config_unset(configuration), Times.Once);
+            }
         }
     }
 }
