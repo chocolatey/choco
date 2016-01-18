@@ -3333,5 +3333,33 @@ namespace chocolatey.tests.integration.scenarios
                 _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insert']/@value").TypedValue.to_string().ShouldEqual("1.0.0");
             }
         }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_with_no_sources_enabled : ScenariosBase
+        {
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Sources = null;
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_no_sources_enabled_result()
+            {
+                MockLogger.contains_message("Installation was NOT successful. There are no sources enabled for", LogLevel.Error).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_install_any_packages()
+            {
+                Results.Count().ShouldEqual(0);
+            }  
+        }
     }
 }
