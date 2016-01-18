@@ -39,13 +39,15 @@ namespace chocolatey.tests.infrastructure.app.configuration
 
             protected Mock<IConsole> console = new Mock<IConsole>();
             protected static StringBuilder helpMessageContents = new StringBuilder();
-            protected TextWriter writer = new StringWriter(helpMessageContents);
+            protected TextWriter errorWriter = new StringWriter(helpMessageContents);
+            protected TextWriter outputWriter = new StringWriter(helpMessageContents);
 
             public override void Context()
             {
                 ConfigurationOptions.initialize_with(new Lazy<IConsole>(() => console.Object));
                 ConfigurationOptions.reset_options();
-                console.Setup((c) => c.Error).Returns(writer);
+                console.Setup((c) => c.Error).Returns(errorWriter);
+                console.Setup((c) => c.Out).Returns(outputWriter);
             }
 
             protected Action because;

@@ -42,6 +42,8 @@ namespace chocolatey.infrastructure.adapters
 
         public TextWriter Error { get { return System.Console.Error; } }
 
+        public TextWriter Out { get { return System.Console.Out; } }
+
         public void Write(object value)
         {
             System.Console.Write(value.to_string());

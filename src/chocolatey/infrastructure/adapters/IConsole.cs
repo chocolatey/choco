@@ -55,6 +55,15 @@ namespace chocolatey.infrastructure.adapters
         TextWriter Error { get; }
 
         /// <summary>
+        ///   Gets the standard output stream.
+        /// </summary>
+        /// <returns>
+        ///   A <see cref="T:System.IO.TextWriter" /> that represents the standard output stream.
+        /// </returns>
+        /// <filterpriority>1</filterpriority>
+        TextWriter Out { get; }
+
+        /// <summary>
         ///   Writes the specified string value to the standard output stream.
         /// </summary>
         /// <param name="value">The value to write.</param>

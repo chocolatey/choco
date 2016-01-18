@@ -134,7 +134,7 @@ namespace chocolatey.infrastructure.app.configuration
                 helpMessage.Invoke();
             }
 
-            optionSet.WriteOptionDescriptions(Console.Error);
+            optionSet.WriteOptionDescriptions(Console.Out);
         }
     }
 }
