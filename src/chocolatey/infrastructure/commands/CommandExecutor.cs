@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.commands
     using System.IO;
     using adapters;
     using filesystem;
+    using logging;
     using platforms;
     using Process = adapters.Process;
 
@@ -163,6 +164,12 @@ namespace chocolatey.infrastructure.commands
                     if (exited)
                     {
                         exitCode = p.ExitCode;
+                    }
+                    else
+                    {
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, () => @"Chocolatey timed out waiting for the command to finish. The timeout 
+ specified (or the default value) was '{0}' seconds. Perhaps try a 
+ higher `--execution-timeout`? See `choco -h` for details.".format_with(waitForExitInSeconds));
                     }
                 }
             }
