@@ -77,7 +77,7 @@ namespace chocolatey.infrastructure.app.services
             
             foreach (var key in registryKeys.or_empty_list_if_null())
             {
-                this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString));
+                this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString.escape_curly_braces()));
 
                 if ((!string.IsNullOrWhiteSpace(key.InstallLocation) && !_fileSystem.directory_exists(key.InstallLocation)) || !_registryService.installer_value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation))
                 {
@@ -131,11 +131,11 @@ namespace chocolatey.infrastructure.app.services
                 }
 
                 var logLocation = _fileSystem.combine_paths(_fileSystem.get_full_path(config.CacheLocation), "chocolatey", pkgInfo.Package.Id, pkgInfo.Package.Version.to_string());
-                this.Log().Debug(()=>" Setting up uninstall logging directory at {0}".format_with(logLocation));
+                this.Log().Debug(() => " Setting up uninstall logging directory at {0}".format_with(logLocation.escape_curly_braces()));
                 _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(logLocation));
                 uninstallArgs = uninstallArgs.Replace(InstallTokens.PACKAGE_LOCATION, logLocation);
 
-                this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs));
+                this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs.escape_curly_braces()));
 
                 if (!key.HasQuietUninstall &&  installer.GetType() == typeof(CustomInstaller))
                 {
@@ -161,12 +161,12 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Info(() => " [AutoUninstaller] {0}".format_with(e.Data));
+                            this.Log().Info(() => " [AutoUninstaller] {0}".format_with(e.Data.escape_curly_braces()));
                         },
                     (s, e) =>
                         {
                             if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Error(() => " [AutoUninstaller] {0}".format_with(e.Data));
+                            this.Log().Error(() => " [AutoUninstaller] {0}".format_with(e.Data.escape_curly_braces()));
                         },
                     updateProcessPath: false);
 
@@ -174,7 +174,7 @@ namespace chocolatey.infrastructure.app.services
                 {
                     Environment.ExitCode = exitCode;
                     string logMessage = " Auto uninstaller failed. Please remove machine installation manually.{0} Exit code was {1}".format_with(Environment.NewLine, exitCode);
-                    this.Log().Error(() => logMessage);
+                    this.Log().Error(() => logMessage.escape_curly_braces());
                     packageResult.Messages.Add(new ResultMessage(config.Features.FailOnAutoUninstaller ? ResultType.Error : ResultType.Warn, logMessage));
                 }
                 else

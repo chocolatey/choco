@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
@@ -37,18 +38,28 @@ namespace chocolatey.infrastructure.app.services
         private readonly IFileSystem _fileSystem;
         private readonly bool _logOutput = false;
 
+        private const string UNINSTALLER_KEY_NAME = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+        private const string USER_ENVIRONMENT_REGISTRY_KEY_NAME = "Environment";
+        private const string MACHINE_ENVIRONMENT_REGISTRY_KEY_NAME = "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment";
+
         public RegistryService(IXmlService xmlService, IFileSystem fileSystem)
         {
             _xmlService = xmlService;
             _fileSystem = fileSystem;
         }
 
-        private void add_key(IList<RegistryKey> keys, RegistryHive hive, RegistryView view)
+        private RegistryKey open_key(RegistryHive hive, RegistryView view)
         {
-            FaultTolerance.try_catch_with_logging_exception(
-                () => keys.Add(RegistryKey.OpenBaseKey(hive, view)),
+           return FaultTolerance.try_catch_with_logging_exception(
+                () => RegistryKey.OpenBaseKey(hive, view),
                 "Could not open registry hive '{0}' for view '{1}'".format_with(hive.to_string(), view.to_string()),
                 logWarningInsteadOfError: true);
+        }
+
+        private void add_key(IList<RegistryKey> keys, RegistryHive hive, RegistryView view)
+        {
+            var key = open_key(hive, view);
+            if (key != null) keys.Add(key);
         }
 
         public Registry get_installer_keys()
@@ -70,7 +81,7 @@ namespace chocolatey.infrastructure.app.services
             foreach (var registryKey in keys)
             {
                 var uninstallKey = FaultTolerance.try_catch_with_logging_exception(
-                    () => registryKey.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall", RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
+                    () => registryKey.OpenSubKey(UNINSTALLER_KEY_NAME, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
                     "Could not open uninstall subkey for key '{0}'".format_with(registryKey.Name),
                     logWarningInsteadOfError: true);
 
@@ -108,15 +119,15 @@ namespace chocolatey.infrastructure.app.services
 
             FaultTolerance.try_catch_with_logging_exception(
                 () =>
+                {
+                    foreach (var subKeyName in key.GetSubKeyNames())
                     {
-                        foreach (var subKeyName in key.GetSubKeyNames())
-                        {
-                            FaultTolerance.try_catch_with_logging_exception(
-                                () =>  evaluate_keys(key.OpenSubKey(subKeyName, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey), snapshot),
-                                "Failed to open subkey named '{0}' for '{1}', likely due to permissions".format_with(subKeyName, key.Name),
-                                logWarningInsteadOfError: true);
-                        }
-                    },
+                        FaultTolerance.try_catch_with_logging_exception(
+                            () => evaluate_keys(key.OpenSubKey(subKeyName, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey), snapshot),
+                            "Failed to open subkey named '{0}' for '{1}', likely due to permissions".format_with(subKeyName, key.Name),
+                            logWarningInsteadOfError: true);
+                    }
+                },
                 "Failed to open subkeys for '{0}', likely due to permissions".format_with(key.Name),
                 logWarningInsteadOfError: true);
 
@@ -227,7 +238,7 @@ namespace chocolatey.infrastructure.app.services
             key.Dispose();
         }
 
-        public Registry get_differences(Registry before, Registry after)
+        public Registry get_installer_key_differences(Registry before, Registry after)
         {
             //var difference = after.RegistryKeys.Where(r => !before.RegistryKeys.Contains(r)).ToList();
             return new Registry(after.User, after.RegistryKeys.Except(before.RegistryKeys).ToList());
@@ -251,6 +262,62 @@ namespace chocolatey.infrastructure.app.services
             }
 
             return _xmlService.deserialize<Registry>(filePath);
+        }
+
+        private void get_values(RegistryKey key, string subKeyName, IList<GenericRegistryValue> values, bool expandValues)
+        {
+            if (key != null)
+            {
+                var subKey = FaultTolerance.try_catch_with_logging_exception(
+                   () => key.OpenSubKey(subKeyName, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
+                   "Could not open uninstall subkey for key '{0}'".format_with(key.Name),
+                   logWarningInsteadOfError: true);
+
+                if (subKey != null)
+                {
+                    foreach (var valueName in subKey.GetValueNames())
+                    {
+                        values.Add(new GenericRegistryValue
+                        {
+                            Name = valueName,
+                            ParentKeyName = subKey.Name,
+                            Type = (RegistryValueKindType)Enum.Parse(typeof(RegistryValueKindType), subKey.GetValueKind(valueName).to_string(), ignoreCase:true),
+                            Value = subKey.GetValue(valueName, expandValues ? RegistryValueOptions.None : RegistryValueOptions.DoNotExpandEnvironmentNames).to_string(),
+                        });
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<GenericRegistryValue> get_environment_values()
+        {
+            IList<GenericRegistryValue> environmentValues = new List<GenericRegistryValue>();
+
+            get_values(open_key(RegistryHive.CurrentUser, RegistryView.Default), USER_ENVIRONMENT_REGISTRY_KEY_NAME, environmentValues, expandValues: false);
+            get_values(open_key(RegistryHive.LocalMachine, RegistryView.Default), MACHINE_ENVIRONMENT_REGISTRY_KEY_NAME, environmentValues, expandValues: false);
+
+            return environmentValues;
+        }
+
+        public IEnumerable<GenericRegistryValue> get_added_changed_environment_differences(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after)
+        {
+            return after.Except(before).ToList();
+        }
+
+        public IEnumerable<GenericRegistryValue> get_removed_environment_differences(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after)
+        {
+            var removals = new List<GenericRegistryValue>();
+
+            foreach (var beforeValue in before.or_empty_list_if_null())
+            {
+                var afterValue = after.FirstOrDefault(a => a.Name.is_equal_to(beforeValue.Name) && a.ParentKeyName.is_equal_to(beforeValue.ParentKeyName));
+                if (afterValue == null)
+                {
+                    removals.Add(beforeValue);
+                }
+            }
+
+            return removals;
         }
 
         public RegistryKey get_key(RegistryHive hive, string subKeyPath)
@@ -278,4 +345,5 @@ namespace chocolatey.infrastructure.app.services
             return null;
         }
     }
+
 }

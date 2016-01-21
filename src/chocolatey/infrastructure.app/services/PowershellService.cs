@@ -274,7 +274,7 @@ namespace chocolatey.infrastructure.app.services
                     }
                     catch (Exception ex)
                     {
-                        this.Log().Error(ex.Message);
+                        this.Log().Error(ex.Message.escape_curly_braces());
                         result.ExitCode = -1;
                     }
 
@@ -332,26 +332,26 @@ namespace chocolatey.infrastructure.app.services
                     //inspect for different streams
                     if (e.Data.StartsWith("DEBUG:"))
                     {
-                        this.Log().Debug(() => " " + e.Data);
+                        this.Log().Debug(() => " " + e.Data.escape_curly_braces());
                     }
                     else if (e.Data.StartsWith("WARNING:"))
                     {
-                        this.Log().Warn(() => " " + e.Data);
+                        this.Log().Warn(() => " " + e.Data.escape_curly_braces());
                     }
                     else if (e.Data.StartsWith("VERBOSE:"))
                     {
-                        this.Log().Info(ChocolateyLoggers.Verbose, () => " " + e.Data);
+                        this.Log().Info(ChocolateyLoggers.Verbose, () => " " + e.Data.escape_curly_braces());
                     }
                     else
                     {
-                        this.Log().Info(() => " " + e.Data);
+                        this.Log().Info(() => " " + e.Data.escape_curly_braces());
                     }
                 },
                 (s, e) =>
                 {
                     if (string.IsNullOrWhiteSpace(e.Data)) return;
                     result.StandardErrorWritten = true;
-                    this.Log().Error(() => " " + e.Data);
+                    this.Log().Error(() => " " + e.Data.escape_curly_braces());
                 });
 
             return result;
@@ -392,7 +392,7 @@ namespace chocolatey.infrastructure.app.services
             }
             catch (Exception ex)
             {
-                this.Log().Debug(ChocolateyLoggers.Verbose, "Attempting to load assembly {0} failed:{1} {2}".format_with(requestedAssembly.Name, Environment.NewLine, ex.Message));
+                this.Log().Debug(ChocolateyLoggers.Verbose, "Attempting to load assembly {0} failed:{1} {2}".format_with(requestedAssembly.Name, Environment.NewLine, ex.Message.escape_curly_braces()));
                 return null;
             }
         }
@@ -482,12 +482,12 @@ namespace chocolatey.infrastructure.app.services
                                 if (!string.IsNullOrWhiteSpace(scriptError)) errorStackTrace = scriptError;
                             }
                         }
-                        this.Log().Error("ERROR: {0}{1}".format_with(ex.Message, !config.Debug ? string.Empty : "{0} {1}".format_with(Environment.NewLine,errorStackTrace)));
+                        this.Log().Error("ERROR: {0}{1}".format_with(ex.Message.escape_curly_braces(), !config.Debug ? string.Empty : "{0} {1}".format_with(Environment.NewLine, errorStackTrace.escape_curly_braces())));
                     }
                     catch (Exception ex)
                     {
                         // Unfortunately this doesn't print line number and character. It might be nice to get back to those items unless it involves tons of work.
-                        this.Log().Error("ERROR: {0}{1}".format_with(ex.Message, !config.Debug ? string.Empty : "{0} {1}".format_with(Environment.NewLine,ex.StackTrace)));
+                        this.Log().Error("ERROR: {0}{1}".format_with(ex.Message.escape_curly_braces(), !config.Debug ? string.Empty : "{0} {1}".format_with(Environment.NewLine, ex.StackTrace.escape_curly_braces())));
                     }
 
                     if (pipeline.PipelineStateInfo != null)

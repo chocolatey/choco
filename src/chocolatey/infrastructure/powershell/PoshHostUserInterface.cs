@@ -111,7 +111,7 @@ namespace chocolatey.infrastructure.powershell
 
         public override void WriteDebugLine(string message)
         {
-            this.Log().Debug(message);
+            this.Log().Debug(message.escape_curly_braces());
         }
 
         private bool hasLoggedStartProgress = false;
@@ -149,15 +149,15 @@ namespace chocolatey.infrastructure.powershell
 
         public override Dictionary<string, PSObject> Prompt(string caption, string message, Collection<FieldDescription> descriptions)
         {
-            this.Log().Info(ChocolateyLoggers.Important, caption);
+            this.Log().Info(ChocolateyLoggers.Important, caption.escape_curly_braces());
             var results = new Dictionary<string, PSObject>();
             foreach (FieldDescription field in descriptions)
             {
-                if (string.IsNullOrWhiteSpace(field.Label)) this.Log().Warn(field.Name);
+                if (string.IsNullOrWhiteSpace(field.Label)) this.Log().Warn(field.Name.escape_curly_braces());
                 else
                 {
                     string[] label = get_hotkey_and_label(field.Label);
-                    this.Log().Warn(label[1]);
+                    this.Log().Warn(label[1].escape_curly_braces());
                 }
 
                 string selection = ReadLine();
@@ -219,7 +219,7 @@ namespace chocolatey.infrastructure.powershell
 
             while (true)
             {
-                this.Log().Warn(choicePrompt.ToString());
+                this.Log().Warn(choicePrompt.ToString().escape_curly_braces());
                 string selection = ReadLine().trim_safe().ToUpper(CultureInfo.CurrentCulture);
 
                 if (selection.Length == 0) return defaultChoice;
@@ -229,7 +229,7 @@ namespace chocolatey.infrastructure.powershell
                     if (promptData[0, i] == selection) return i;
                 }
 
-                this.Log().Warn(ChocolateyLoggers.Important, "Invalid choice: " + selection);
+                this.Log().Warn(ChocolateyLoggers.Important, "Invalid choice: " + selection.escape_curly_braces());
             }
         }
 
@@ -254,7 +254,7 @@ namespace chocolatey.infrastructure.powershell
 
         public override PSCredential PromptForCredential(string caption, string message, string userName, string targetName, PSCredentialTypes allowedCredentialTypes, PSCredentialUIOptions options)
         {
-            this.Log().Warn(caption);
+            this.Log().Warn(caption.escape_curly_braces());
             if (string.IsNullOrWhiteSpace(userName))
             {
                 this.Log().Warn("Please provide username:");

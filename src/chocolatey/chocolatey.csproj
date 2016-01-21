@@ -82,6 +82,9 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="infrastructure.app\domain\GenericRegistryKey.cs" />
+    <Compile Include="infrastructure.app\domain\GenericRegistryValue.cs" />
+    <Compile Include="infrastructure.app\domain\RegistryValueKindType.cs" />
     <Compile Include="infrastructure\commandline\ReadKeyTimeout.cs" />
     <Compile Include="infrastructure\commands\Execute.cs" />
     <Compile Include="GetChocolatey.cs" />

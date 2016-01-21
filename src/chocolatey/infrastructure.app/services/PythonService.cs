@@ -273,7 +273,7 @@
         {
             set_executable_path_if_not_set();
             var args = build_args(config, _listArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath, args));
+            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath.escape_curly_braces(), args.escape_curly_braces()));
         }
 
         public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
@@ -293,17 +293,17 @@
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
                         if (!config.QuietOutput)
                         {
-                            this.Log().Info(e.Data);
+                            this.Log().Info(logMessage.escape_curly_braces());
                         }
                         else
                         {
-                            this.Log().Debug(() => "[{0}] {1}".format_with(APP_NAME, logMessage));
+                            this.Log().Debug(() => "[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
                         }
                     },
                 stdErrAction: (s, e) =>
                     {
                         if (string.IsNullOrWhiteSpace(e.Data)) return;
-                        this.Log().Error(() => "{0}".format_with(e.Data));
+                        this.Log().Error(() => "{0}".format_with(e.Data.escape_curly_braces()));
                     },
                 updateProcessPath: false,
                 allowUseWindow: true
@@ -316,7 +316,7 @@
         {
             set_executable_path_if_not_set();
             var args = build_args(config, _installArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath, args));
+            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath.escape_curly_braces(), args.escape_curly_braces()));
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
@@ -343,7 +343,7 @@
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage));
+                        this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
 
                         if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
                         {
@@ -363,7 +363,7 @@
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage));
+                        this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
 
                         if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
                         {
@@ -388,7 +388,7 @@
         {
             set_executable_path_if_not_set();
             var args = build_args(config, _upgradeArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath, args));
+            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath.escape_curly_braces(), args.escape_curly_braces()));
             return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
         }
 
@@ -417,7 +417,7 @@
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage));
+                        this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
 
                         if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
                         {
@@ -437,7 +437,7 @@
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage));
+                        this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
 
                         if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
                         {
@@ -462,7 +462,7 @@
         {
             set_executable_path_if_not_set();
             var args = build_args(config, _uninstallArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath, args));
+            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath.escape_curly_braces(), args.escape_curly_braces()));
         }
 
         public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
@@ -484,7 +484,7 @@
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage));
+                        this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
 
                         if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
                         {
@@ -504,7 +504,7 @@
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage));
+                        this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
 
                         if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
                         {

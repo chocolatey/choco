@@ -82,7 +82,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 var logMessage = "Install location is not specific enough, cannot run shimgen:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, packageResult.InstallLocation);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                this.Log().Error(logMessage);
+                this.Log().Error(logMessage.escape_curly_braces());
                 return;
             }
 
@@ -107,12 +107,12 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             if (string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Debug(() => " [ShimGen] {0}".format_with(e.Data));
+                            this.Log().Debug(() => " [ShimGen] {0}".format_with(e.Data.escape_curly_braces()));
                         },
                     (s, e) =>
                         {
                             if (string.IsNullOrWhiteSpace(e.Data)) return;
-                            this.Log().Error(() => " [ShimGen] {0}".format_with(e.Data));
+                            this.Log().Error(() => " [ShimGen] {0}".format_with(e.Data.escape_curly_braces()));
                         },
                     updateProcessPath: true
                     );
