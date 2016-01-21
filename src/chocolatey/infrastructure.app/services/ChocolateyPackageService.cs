@@ -249,7 +249,8 @@ namespace chocolatey.infrastructure.app.services
             {
                 if (!config.SkipPackageInstallProvider)
                 {
-                    var before = _registryService.get_installer_keys();
+                    var installersBefore = _registryService.get_installer_keys();
+                    var environmentBefore = get_environment_before(config, allowLogging: false);
 
                     var powerShellRan = _powershellService.install(config, packageResult);
                     if (powerShellRan)
@@ -258,22 +259,27 @@ namespace chocolatey.infrastructure.app.services
                         if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute_static("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
                     }
 
-                    var difference = _registryService.get_differences(before, _registryService.get_installer_keys());
-                    if (difference.RegistryKeys.Count != 0)
+                    var installersDifferences = _registryService.get_installer_key_differences(installersBefore, _registryService.get_installer_keys());
+                    if (installersDifferences.RegistryKeys.Count != 0)
                     {
                         //todo v1 - determine the installer type and write it to the snapshot
                         //todo v1 - note keys passed in 
-                        pkgInfo.RegistrySnapshot = difference;
+                        pkgInfo.RegistrySnapshot = installersDifferences;
 
-                        var key = difference.RegistryKeys.FirstOrDefault();
+                        var key = installersDifferences.RegistryKeys.FirstOrDefault();
                         if (key != null && key.HasQuietUninstall)
                         {
                             pkgInfo.HasSilentUninstall = true;
                         }
                     }
+
+                    IEnumerable<GenericRegistryValue> environmentChanges;
+                    IEnumerable<GenericRegistryValue> environmentRemovals;
+                    get_environment_after(config, environmentBefore, out environmentChanges, out environmentRemovals);
+                    //todo: record this with package info
                 }
 
-                _filesService.ensure_compatible_file_attributes(packageResult,config);
+                _filesService.ensure_compatible_file_attributes(packageResult, config);
                 _configTransformService.run(packageResult, config);
                 pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
 
@@ -322,8 +328,10 @@ namespace chocolatey.infrastructure.app.services
                 Environment.ExitCode = 1;
                 return packageInstalls;
             }
-
+            
             this.Log().Info(@"By installing you accept licenses for the packages.");
+
+            get_environment_before(config, allowLogging: true);
 
             foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, packageInstalls).or_empty_list_if_null())
             {
@@ -536,6 +544,8 @@ Would have determined packages that are out of date based on what is
                 action = (packageResult) => handle_package_result(packageResult, config, CommandNameType.upgrade);
             }
 
+            get_environment_before(config, allowLogging: true);
+
             var packageUpgrades = perform_source_runner_function(config, r => r.upgrade_run(config, action));
 
             var upgradeFailures = packageUpgrades.Count(p => !p.Value.Success);
@@ -603,7 +613,13 @@ Would have determined packages that are out of date based on what is
                 action = (packageResult) => handle_package_uninstall(packageResult, config);
             }
 
+            var environmentBefore = get_environment_before(config);
+
             var packageUninstalls = perform_source_runner_function(config, r => r.uninstall_run(config, action));
+
+            IEnumerable<GenericRegistryValue> environmentChanges;
+            IEnumerable<GenericRegistryValue> environmentRemovals;
+            get_environment_after(config, environmentBefore, out environmentChanges, out environmentRemovals);
 
             var uninstallFailures = packageUninstalls.Count(p => !p.Value.Success);
             this.Log().Warn(() => @"{0}{1} uninstalled {2}/{3} packages. {4} packages failed.{0} See the log for details ({5}).".format_with(
@@ -807,7 +823,7 @@ ATTENTION: You must take manual action to remove {1} from
             }
 
             rollbackDirectory = _fileSystem.get_full_path(rollbackDirectory);
-            
+
             if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
             if (!rollbackDirectory.StartsWith(ApplicationParameters.PackageBackupLocation) || rollbackDirectory.is_equal_to(ApplicationParameters.PackageBackupLocation)) return;
 
@@ -831,6 +847,80 @@ ATTENTION: You must take manual action to remove {1} from
         private void remove_rollback_if_exists(PackageResult packageResult)
         {
             _nugetService.remove_rollback_directory_if_exists(packageResult.Name);
+        }
+
+        private IEnumerable<GenericRegistryValue> get_environment_before(ChocolateyConfiguration config, bool allowLogging = true)
+        {
+            if (config.Information.PlatformType != PlatformType.Windows) return Enumerable.Empty<GenericRegistryValue>();
+            var environmentBefore = _registryService.get_environment_values();
+
+            if (allowLogging && config.Features.LogEnvironmentValues)
+            {
+                this.Log().Debug("Current environment values (may contain sensitive data):");
+                foreach (var environmentValue in environmentBefore.or_empty_list_if_null())
+                {
+                    this.Log().Debug(@"  * '{0}'='{1}' ('{2}')".format_with(
+                        environmentValue.Name.escape_curly_braces(), 
+                        environmentValue.Value.escape_curly_braces(), 
+                        environmentValue.ParentKeyName.to_lower().Contains("hkey_current_user") ? "User" : "Machine"));
+                }
+            }
+            return environmentBefore;
+        }
+
+        private void get_environment_after(ChocolateyConfiguration config, IEnumerable<GenericRegistryValue> environmentBefore, out IEnumerable<GenericRegistryValue> environmentChanges, out IEnumerable<GenericRegistryValue> environmentRemovals)
+        {
+            if (config.Information.PlatformType != PlatformType.Windows)
+            {
+                environmentChanges = Enumerable.Empty<GenericRegistryValue>();
+                environmentRemovals = Enumerable.Empty<GenericRegistryValue>();
+
+                return;
+            }
+
+            var environmentAfer = _registryService.get_environment_values();
+            environmentChanges = _registryService.get_added_changed_environment_differences(environmentBefore, environmentAfer);
+            environmentRemovals = _registryService.get_removed_environment_differences(environmentBefore, environmentAfer);
+            var hasEnvironmentChanges = environmentChanges.Count() != 0;
+            var hasEnvironmentRemovals = environmentRemovals.Count() != 0;
+            if (hasEnvironmentChanges || hasEnvironmentRemovals)
+            {
+                this.Log().Info(ChocolateyLoggers.Important,@"Environment Vars (like PATH) have changed. Close/reopen your shell to
+ see the changes (or in cmd.exe just type `refreshenv`).");
+
+                if (!config.Features.LogEnvironmentValues)
+                {
+                    this.Log().Debug(@"Logging of values is not turned on by default because it 
+ could potentially expose sensitive data. If you understand the risk,
+ please see `choco feature -h` for information to turn it on.");
+                }
+
+                if (hasEnvironmentChanges)
+                {
+                    this.Log().Debug(@"The following values have been added/changed (may contain sensitive data):");
+                    foreach (var difference in environmentChanges.or_empty_list_if_null())
+                    {
+                        this.Log().Debug(@"  * {0}='{1}' ({2})".format_with(
+                            difference.Name.escape_curly_braces(),
+                            config.Features.LogEnvironmentValues ? difference.Value.escape_curly_braces() : "[REDACTED]",
+                             difference.ParentKeyName.to_lower().Contains("hkey_current_user") ? "User" : "Machine"
+                            ));
+                    }
+                }
+
+                if (hasEnvironmentRemovals)
+                {
+                    this.Log().Debug(@"The following values have been removed:");
+                    foreach (var difference in environmentRemovals.or_empty_list_if_null())
+                    {
+                        this.Log().Debug(@"  * {0}='{1}' ({2})".format_with(
+                            difference.Name.escape_curly_braces(),
+                            config.Features.LogEnvironmentValues ? difference.Value.escape_curly_braces() : "[REDACTED]",
+                            difference.ParentKeyName.to_lower().Contains("hkey_current_user") ? "User": "Machine"
+                            ));
+                    }
+                }
+            }
         }
     }
 }

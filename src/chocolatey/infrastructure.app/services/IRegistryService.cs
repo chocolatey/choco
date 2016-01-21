@@ -15,13 +15,18 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System.Collections.Generic;
     using Microsoft.Win32;
+    using domain;
     using Registry = domain.Registry;
 
     public interface IRegistryService
     {
         Registry get_installer_keys();
-        Registry get_differences(Registry before, Registry after);
+        Registry get_installer_key_differences(Registry before, Registry after);
+        IEnumerable<GenericRegistryValue> get_environment_values();
+        IEnumerable<GenericRegistryValue> get_added_changed_environment_differences(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after);
+        IEnumerable<GenericRegistryValue> get_removed_environment_differences(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after);
         void save_to_file(Registry snapshot, string filePath);
         Registry read_from_file(string filePath);
         bool installer_value_exists(string keyPath, string value);
