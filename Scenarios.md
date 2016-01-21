@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 35 Scenario(s), 288 Observation(s) ]
+### ChocolateyInstallCommand [ 35 Scenario(s), 289 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -328,6 +328,7 @@
 #### when installing a package with no sources enabled
 
  * should have no sources enabled result
+ * should not install any packages
 
 #### when installing a side by side package
 
@@ -395,7 +396,7 @@
  * should not have inconclusive package result
  * should not have warning package result
 
-### ChocolateyListCommand [ 7 Scenario(s), 31 Observation(s) ]
+### ChocolateyListCommand [ 7 Scenario(s), 32 Observation(s) ]
 
 #### when listing local packages
 
@@ -415,6 +416,7 @@
 #### when listing packages with no sources enabled
 
  * should have no sources enabled result
+ * should not list any packages
 
 #### when searching all available packages
 
@@ -621,7 +623,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 27 Scenario(s), 215 Observation(s) ]
+### ChocolateyUpgradeCommand [ 27 Scenario(s), 216 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -864,6 +866,7 @@
 #### when upgrading a package with no sources enabled
 
  * should have no sources enabled result
+ * should not have any packages upgraded
 
 #### when upgrading a package with readonly files
 

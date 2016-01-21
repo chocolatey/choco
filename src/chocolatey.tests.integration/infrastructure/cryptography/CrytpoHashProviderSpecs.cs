@@ -27,14 +27,14 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
     {
         public abstract class CrytpoHashProviderSpecsBase : TinySpec
         {
-            protected CrytpoHashProvider Provider;
+            protected CryptoHashProvider Provider;
             protected DotNetFileSystem FileSystem;
             protected string ContextDirectory;
 
             public override void Context()
             {
                 FileSystem = new DotNetFileSystem();
-                Provider = new CrytpoHashProvider(FileSystem,CryptoHashProviderType.Md5);
+                Provider = new CryptoHashProvider(FileSystem,CryptoHashProviderType.Md5);
                 ContextDirectory = FileSystem.combine_paths(FileSystem.get_directory_name(FileSystem.get_current_assembly_path()), "context");
             }
         }

@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.cryptography
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Security.Cryptography;
+    using System.Text;
     using adapters;
     using app;
     using filesystem;
@@ -27,14 +28,14 @@ namespace chocolatey.infrastructure.cryptography
     using Environment = System.Environment;
     using HashAlgorithm = adapters.HashAlgorithm;
 
-    public sealed class CrytpoHashProvider : IHashProvider
+    public sealed class CryptoHashProvider : IHashProvider
     {
         private readonly IFileSystem _fileSystem;
         private readonly IHashAlgorithm _hashAlgorithm;
         private const int ERROR_LOCK_VIOLATION = 33;
         private const int ERROR_SHARING_VIOLATION = 32;
 
-        public CrytpoHashProvider(IFileSystem fileSystem, CryptoHashProviderType providerType)
+        public CryptoHashProvider(IFileSystem fileSystem, CryptoHashProviderType providerType)
         {
             _fileSystem = fileSystem;
 
@@ -55,7 +56,7 @@ namespace chocolatey.infrastructure.cryptography
             }
         }
 
-        public CrytpoHashProvider(IFileSystem fileSystem, IHashAlgorithm hashAlgorithm)
+        public CryptoHashProvider(IFileSystem fileSystem, IHashAlgorithm hashAlgorithm)
         {
             _fileSystem = fileSystem;
             _hashAlgorithm = hashAlgorithm;
@@ -94,6 +95,32 @@ namespace chocolatey.infrastructure.cryptography
             errorCode = hresult & ((1 << 16) - 1);
 
             return errorCode == ERROR_SHARING_VIOLATION || errorCode == ERROR_LOCK_VIOLATION;
+        }
+
+
+        public static string hash_value(string originalText, CryptoHashProviderType providerType)
+        {
+            HashAlgorithm hashAlgorithm = null;
+            switch (providerType)
+            {
+                case CryptoHashProviderType.Md5:
+                    hashAlgorithm = new HashAlgorithm(MD5.Create());
+                    break;
+                case CryptoHashProviderType.Sha1:
+                    hashAlgorithm = new HashAlgorithm(SHA1.Create());
+                    break;
+                case CryptoHashProviderType.Sha256:
+                    hashAlgorithm = new HashAlgorithm(SHA256.Create());
+                    break;
+                case CryptoHashProviderType.Sha512:
+                    hashAlgorithm = new HashAlgorithm(SHA512.Create());
+                    break;
+            }
+
+            if (hashAlgorithm == null) return string.Empty;
+
+             var hash = hashAlgorithm.ComputeHash(Encoding.ASCII.GetBytes(originalText));
+             return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
 
     }

@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.commands
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using logging;
 
     /// <summary>
     /// Execute a method or function
@@ -70,7 +71,10 @@ namespace chocolatey.infrastructure.commands
             if (task.IsCompleted) return task.Result;
 
             cancelToken.Cancel();
-            
+            this.Log().Warn(ChocolateyLoggers.Important,() => @"Chocolatey timed out waiting for the command to finish. The timeout 
+ specified (or the default value) was '{0}' seconds. Perhaps try a 
+ higher `--execution-timeout`? See `choco -h` for details.".format_with(_timespan.TotalSeconds));
+           
             return timeoutDefaultValue;
 
             //T result = timeoutDefaultValue;
@@ -92,10 +96,24 @@ namespace chocolatey.infrastructure.commands
         {
             if (action == null) return false;
 
-            var task = Task.Factory.StartNew(action);
-            task.Wait(_timespan);
+            var completed = false;
 
-            return task.IsCompleted;
+            var cancelToken = new CancellationTokenSource();
+            cancelToken.Token.ThrowIfCancellationRequested();
+            var task = Task.Factory.StartNew(action, cancelToken.Token);
+            task.Wait(_timespan);
+            completed = task.IsCompleted;
+
+            if (!completed)
+            {
+                cancelToken.Cancel();
+                this.Log().Warn(ChocolateyLoggers.Important, () => @"Chocolatey timed out waiting for the command to finish. The timeout 
+ specified (or the default value) was '{0}' seconds. Perhaps try a 
+ higher `--execution-timeout`? See `choco -h` for details.".format_with(_timespan.TotalSeconds));
+           
+            }
+
+            return completed;
         }
     }
 }

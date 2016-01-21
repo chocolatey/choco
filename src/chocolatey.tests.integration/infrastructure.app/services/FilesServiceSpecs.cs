@@ -39,8 +39,8 @@ namespace chocolatey.tests.integration.infrastructure.app.services
 
             public override void Context()
             {
-                HashProvider = new CrytpoHashProvider(FileSystem, CryptoHashProviderType.Md5);
-                Service = new FilesService(new XmlService(FileSystem, HashProvider), FileSystem, new CrytpoHashProvider(FileSystem, CryptoHashProviderType.Md5));
+                HashProvider = new CryptoHashProvider(FileSystem, CryptoHashProviderType.Md5);
+                Service = new FilesService(new XmlService(FileSystem, HashProvider), FileSystem, new CryptoHashProvider(FileSystem, CryptoHashProviderType.Md5));
             }
         }
 

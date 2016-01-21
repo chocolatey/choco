@@ -28,6 +28,7 @@ namespace chocolatey.infrastructure.app.registration
     using infrastructure.services;
     using nuget;
     using services;
+    using CryptoHashProvider = cryptography.CryptoHashProvider;
     using IFileSystem = filesystem.IFileSystem;
     using IHashProvider = cryptography.IHashProvider;
 
@@ -57,7 +58,7 @@ namespace chocolatey.infrastructure.app.registration
             container.Register<IRegistryService, RegistryService>(Lifestyle.Singleton);
             container.Register<IFilesService, FilesService>(Lifestyle.Singleton);
             container.Register<IConfigTransformService, ConfigTransformService>(Lifestyle.Singleton);
-            container.Register<IHashProvider>(() => new CrytpoHashProvider(container.GetInstance<IFileSystem>(), CryptoHashProviderType.Md5), Lifestyle.Singleton);
+            container.Register<IHashProvider>(() => new CryptoHashProvider(container.GetInstance<IFileSystem>(), CryptoHashProviderType.Md5), Lifestyle.Singleton);
             container.Register<ITemplateService, TemplateService>(Lifestyle.Singleton);
             container.Register<IChocolateyConfigSettingsService, ChocolateyConfigSettingsService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);

@@ -21,10 +21,13 @@ namespace chocolatey.infrastructure.app.services
     using System.Management.Automation;
     using System.Management.Automation.Runspaces;
     using System.Reflection;
+    using System.Security.Cryptography;
+    using System.Text;
     using adapters;
     using builders;
     using commandline;
     using configuration;
+    using cryptography;
     using domain;
     using filesystem;
     using infrastructure.commands;
@@ -97,12 +100,15 @@ namespace chocolatey.infrastructure.app.services
             return run_action(configuration, packageResult, CommandNameType.uninstall);
         }
 
+        private string get_helpers_folder()
+        {
+            return _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "helpers");
+        }
+
         public string wrap_script_with_module(string script, ChocolateyConfiguration config)
         {
-            var installerModules = _fileSystem.get_files(ApplicationParameters.InstallLocation, "chocolateyInstaller.psm1", SearchOption.AllDirectories);
-            var installerModule = installerModules.FirstOrDefault();
-            var scriptRunners = _fileSystem.get_files(ApplicationParameters.InstallLocation, "chocolateyScriptRunner.ps1", SearchOption.AllDirectories);
-            var scriptRunner = scriptRunners.FirstOrDefault();
+            var installerModule = _fileSystem.combine_paths(get_helpers_folder(), "chocolateyInstaller.psm1");
+            var scriptRunner = _fileSystem.combine_paths(get_helpers_folder(), "chocolateyScriptRunner.ps1");
             // removed setting all errors to terminating. Will cause too
             // many issues in existing packages, including upgrading
             // Chocolatey from older POSH client due to log errors
@@ -203,6 +209,17 @@ namespace chocolatey.infrastructure.app.services
                 //{
                 //    Environment.SetEnvironmentVariable("ChocolateyEnvironmentQuiet","true");
                 //}
+
+                if (package.IsDownloadCacheAvailable)
+                {
+                    foreach (var downloadCache in package.DownloadCache.or_empty_list_if_null())
+                    {
+                        var urlKey = CryptoHashProvider.hash_value(downloadCache.OriginalUrl, CryptoHashProviderType.Sha256).Replace("=",string.Empty);
+                        Environment.SetEnvironmentVariable("CacheFile_{0}".format_with(urlKey), downloadCache.FileName);
+                        Environment.SetEnvironmentVariable("CacheChecksum_{0}".format_with(urlKey), downloadCache.Checksum);
+                        //Environment.SetEnvironmentVariable("CacheChecksumType_{0}".format_with(urlKey), "md5");
+                    }
+                }
 
                 this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".format_with(chocoPowerShellScript));
                 string chocoPowerShellScriptContents = _fileSystem.read_file(chocoPowerShellScript);
