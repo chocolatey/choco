@@ -21,10 +21,13 @@ namespace chocolatey.infrastructure.app.services
     using System.Management.Automation;
     using System.Management.Automation.Runspaces;
     using System.Reflection;
+    using System.Security.Cryptography;
+    using System.Text;
     using adapters;
     using builders;
     using commandline;
     using configuration;
+    using cryptography;
     using domain;
     using filesystem;
     using infrastructure.commands;
@@ -206,6 +209,17 @@ namespace chocolatey.infrastructure.app.services
                 //{
                 //    Environment.SetEnvironmentVariable("ChocolateyEnvironmentQuiet","true");
                 //}
+
+                if (package.IsDownloadCacheAvailable)
+                {
+                    foreach (var downloadCache in package.DownloadCache.or_empty_list_if_null())
+                    {
+                        var urlKey = CryptoHashProvider.hash_value(downloadCache.OriginalUrl, CryptoHashProviderType.Sha256).Replace("=",string.Empty);
+                        Environment.SetEnvironmentVariable("CacheFile_{0}".format_with(urlKey), downloadCache.FileName);
+                        Environment.SetEnvironmentVariable("CacheChecksum_{0}".format_with(urlKey), downloadCache.Checksum);
+                        //Environment.SetEnvironmentVariable("CacheChecksumType_{0}".format_with(urlKey), "md5");
+                    }
+                }
 
                 this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".format_with(chocoPowerShellScript));
                 string chocoPowerShellScriptContents = _fileSystem.read_file(chocoPowerShellScript);
