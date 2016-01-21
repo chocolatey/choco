@@ -207,7 +207,7 @@ namespace chocolatey.infrastructure.app.services
         public void install_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
             var args = build_args(config, _installArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(get_exe(_rootDirectory), args));
+            this.Log().Info("Would have run '{0} {1}'".format_with(get_exe(_rootDirectory).escape_curly_braces(), args.escape_curly_braces()));
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
@@ -228,7 +228,7 @@ namespace chocolatey.infrastructure.app.services
                         {
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage));
+                            this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
 
                             if (InstalledRegex.IsMatch(logMessage))
                             {
@@ -242,7 +242,7 @@ namespace chocolatey.infrastructure.app.services
                         {
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage));
+                            this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
                         },
                     updateProcessPath: false,
                     allowUseWindow: true
