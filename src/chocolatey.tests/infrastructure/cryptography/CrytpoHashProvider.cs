@@ -29,12 +29,12 @@ namespace chocolatey.tests.infrastructure.cryptography
     {
         public abstract class CrytpoHashProviderSpecsBase : TinySpec
         {
-            protected CrytpoHashProvider Provider;
+            protected CryptoHashProvider Provider;
             protected Mock<IFileSystem> FileSystem = new Mock<IFileSystem>();
 
             public override void Context()
             {
-                Provider = new CrytpoHashProvider(FileSystem.Object, CryptoHashProviderType.Md5);
+                Provider = new CryptoHashProvider(FileSystem.Object, CryptoHashProviderType.Md5);
             }
         }
 
@@ -75,7 +75,7 @@ namespace chocolatey.tests.infrastructure.cryptography
             public override void Context()
             {
                 base.Context();
-                Provider = new CrytpoHashProvider(FileSystem.Object, _hashAlgorithm.Object);
+                Provider = new CryptoHashProvider(FileSystem.Object, _hashAlgorithm.Object);
 
                 FileSystem.Setup(x => x.file_exists(It.IsAny<string>())).Returns(true);
                 FileSystem.Setup(x => x.read_file_bytes(filePath)).Returns(byteArray);
