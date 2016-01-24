@@ -1,10 +1,14 @@
-Contributors
-============
+# Reporting an Issue?
+![submitting isseus](https://cloud.githubusercontent.com/assets/63502/12534440/fc223b74-c21e-11e5-9a41-1ffc1c9af48f.png)
 
-Submitting an Issue? See the [Submitting Issues](https://github.com/chocolatey/choco#submitting-issues) section in the [README](https://github.com/chocolatey/choco/blob/master/README.md#submitting-issues).
+Submitting an Issue? See the **[Submitting Issues](https://github.com/chocolatey/choco#submitting-issues) section** in the [README](https://github.com/chocolatey/choco/blob/master/README.md#submitting-issues).
 
 **NOTE**: Do not submit issues for missing `SolutionVersion.cs`. Please see [Compiling / Building Source](https://github.com/chocolatey/choco#compiling--building-source).
 
+## Package Issue?
+Please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://github.com/chocolatey/choco/wiki/PackageTriageProcess).
+
+# Contributors
 The process for contributions is roughly as follows:
 
 ## Prerequisites
@@ -15,8 +19,7 @@ The process for contributions is roughly as follows:
   * If you are curious why we would require a CLA, we agree with Julien Ponge - take a look at his [post](https://julien.ponge.org/blog/in-defense-of-contributor-license-agreements/).
  * You agree to follow the [etiquette regarding communication](https://github.com/chocolatey/choco#etiquette-regarding-communication).
 
-### Definition of Trivial Contributions
-
+### Definition of Trivial Contributions
 It's hard to define what is a trivial contribution. Sometimes even a 1 character change can be considered significant. Unfortunately because it can be subjective, the decision on what is trivial comes from the committers of the project and not from folks contributing to the project. It is generally safe to assume that you may be subject to signing the [CLA](https://www.clahub.com/agreements/chocolatey/choco) and be prepared to do so. Ask in advance if you are not sure and for reasons are not able to sign the [CLA](https://www.clahub.com/agreements/chocolatey/choco).
 
 What is generally considered trivial:
@@ -30,7 +33,6 @@ What is generally not considered trivial:
  * Changes to any code that would be delivered as part of the final product. This includes any scripts that are delivered, such as PowerShell scripts. Yes, even 1 character changes could be considered non-trivial.
 
 ## Contributing Process
-
 ### Get Buyoff Or Find Open Community Issues/Features
 
  * Through GitHub, or through the [mailing list](https://groups.google.com/forum/#!forum/chocolatey) (preferred), you talk about a feature you would like to see (or a bug), and why it should be in Chocolatey.
@@ -51,7 +53,6 @@ What is generally not considered trivial:
  * Please do not update your branch from the master unless we ask you to. See the responding to feedback section below.
 
 ### Prepare Commits
-
 This section serves to help you understand what makes a good commit.
 
 A commit should observe the following:
@@ -73,7 +74,6 @@ A commit message should observe the following (based on ["A Note About Git Commi
     * Explains more fully the reason(s) for the change and contrasts with previous behavior.
     * Uses present tense. "Fix" versus "Fixed".
 
-
 A good example of a commit message is as follows:
 
 ```
@@ -89,7 +89,6 @@ choco client properly.
 ```
 
 ### Submit Pull Request (PR)
-
 Prerequisites:
 
  * You are making commits in a feature branch.
@@ -125,7 +124,6 @@ The only reasons a pull request should be closed and resubmitted are as follows:
   * When there are updates made to the original by someone other than the original contributor. Then the old branch is closed with a note on the newer branch this supersedes #github_number.
 
 ## Other General Information
-
 The helpers/utility functions that are available to the packages are what we consider the API. If you are working in the API, please note that you will need to maintain backwards compatibility. If you plan to rename a function or make it more generic, you must provide an alias in the [chocolateyInstaller.psm1](https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/chocolateyInstaller.psm1) as part of what gets exported. You should not remove or reorder parameters, only add optional parameters to the end. They should be named and not positional (we are moving away from positional parameters as much as possible).
 
 If you reformat code or hit core functionality without an approval from a person on the Chocolatey Team, it's likely that no matter how awesome it looks afterwards, it will probably not get accepted. Reformatting code makes it harder for us to evaluate exactly what was changed.
