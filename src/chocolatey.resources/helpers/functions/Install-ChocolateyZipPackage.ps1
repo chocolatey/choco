@@ -56,12 +56,12 @@ Example:
       Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
       'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
       'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
-      Cookie = 'products.download.email=ewilde@gmail.com';
-      Referer = 'http://submain.com/download/ghostdoc/';
+      Cookie = 'requiredinfo=info';
+      Referer = 'https://somelocation.com/';
     }
   }
-
-  Get-ChocolateyWebFile 'ghostdoc' 'http://submain.com/download/GhostDoc_v4.0.zip' -options $options
+  
+  Get-ChocolateyWebFile 'package' 'https://somelocation.com/thefile.exe' -options $options
 
 .EXAMPLE
 Install-ChocolateyZipPackage '__NAME__' 'URL' "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
