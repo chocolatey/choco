@@ -55,6 +55,7 @@ Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICEN
 ![submitting issues](https://cloud.githubusercontent.com/assets/63502/12534554/6ea7cc04-c224-11e5-82ad-3805d0b5c724.png)
 
  * If you are having issue with a package, please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://github.com/chocolatey/choco/wiki/PackageTriageProcess).
+ * If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://github.com/chocolatey/choco/wiki/PackageTriageProcess#package-request-package-missing).
  * If it is an issue with the website (the community feed aka https://chocolatey.org), please submit the issue to the [Chocolatey.org repo](https://github.com/chocolatey/chocolatey.org).
  * If you have found an issue with the GUI (Chocolatey GUI), please see [the ChocolateyGUI repository](https://github.com/chocolatey/ChocolateyGUI#submitting-issues).
  * If you have found an issue with the client (choco.exe), you are in the right place. Keep reading below.
