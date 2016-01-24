@@ -8,6 +8,9 @@ Submitting an Issue? See the **[Submitting Issues](https://github.com/chocolatey
 ## Package Issue?
 Please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://github.com/chocolatey/choco/wiki/PackageTriageProcess).
 
+## Package Request? Package Missing?
+If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://github.com/chocolatey/choco/wiki/PackageTriageProcess#package-request-package-missing).
+
 # Contributors
 The process for contributions is roughly as follows:
 
