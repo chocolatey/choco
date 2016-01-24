@@ -26,6 +26,7 @@ namespace chocolatey.infrastructure.filesystem
     using System.Threading;
     using adapters;
     using app;
+    using logging;
     using platforms;
     using tolerance;
     using Assembly = adapters.Assembly;
@@ -221,7 +222,7 @@ namespace chocolatey.infrastructure.filesystem
             }
             else
             {
-                this.Log().Debug(() => "File \"{0}\" is a system file.".format_with(file.FullName));
+                this.Log().Debug(ChocolateyLoggers.Verbose, () => "File \"{0}\" is a system file.".format_with(file.FullName));
             }
 
             return isSystemFile;
@@ -238,7 +239,7 @@ namespace chocolatey.infrastructure.filesystem
             }
             else
             {
-                this.Log().Debug(() => "File \"{0}\" is a readonly file.".format_with(file.FullName));
+                this.Log().Debug(ChocolateyLoggers.Verbose, () => "File \"{0}\" is a readonly file.".format_with(file.FullName));
             }
 
             return isReadOnlyFile;
@@ -255,7 +256,7 @@ namespace chocolatey.infrastructure.filesystem
             }
             else
             {
-                this.Log().Debug(() => "File \"{0}\" is a hidden file.".format_with(file.FullName));
+                this.Log().Debug(ChocolateyLoggers.Verbose, () => "File \"{0}\" is a hidden file.".format_with(file.FullName));
             }
 
             return isHiddenFile;
@@ -264,7 +265,7 @@ namespace chocolatey.infrastructure.filesystem
         public bool is_encrypted_file(FileInfo file)
         {
             bool isEncrypted = ((file.Attributes & FileAttributes.Encrypted) == FileAttributes.Encrypted);
-            this.Log().Debug(() => "Is file \"{0}\" an encrypted file? {1}".format_with(file.FullName, isEncrypted.to_string()));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Is file \"{0}\" an encrypted file? {1}".format_with(file.FullName, isEncrypted.to_string()));
             return isEncrypted;
         }
 
@@ -283,7 +284,7 @@ namespace chocolatey.infrastructure.filesystem
 
         public void copy_file(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
         {
-            this.Log().Debug(() => "Attempting to copy \"{0}\"{1} to \"{2}\".".format_with(sourceFilePath, Environment.NewLine, destinationFilePath));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to copy \"{0}\"{1} to \"{2}\".".format_with(sourceFilePath, Environment.NewLine, destinationFilePath));
             create_directory_if_not_exists(get_directory_name(destinationFilePath), ignoreError: true);
 
             allow_retries(() => File.Copy(sourceFilePath, destinationFilePath, overwriteExisting));
@@ -297,7 +298,7 @@ namespace chocolatey.infrastructure.filesystem
                 return true;
             }
 
-            this.Log().Debug(() => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFilePath, destinationFilePath));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to copy from \"{0}\" to \"{1}\".".format_with(sourceFilePath, destinationFilePath));
             create_directory_if_not_exists(get_directory_name(destinationFilePath), ignoreError: true);
 
             //Private Declare Function apiCopyFile Lib "kernel32" Alias "CopyFileA" _
@@ -329,7 +330,7 @@ namespace chocolatey.infrastructure.filesystem
 
         public void delete_file(string filePath)
         {
-            this.Log().Debug(() => "Attempting to delete file \"{0}\".".format_with(filePath));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to delete file \"{0}\".".format_with(filePath));
             if (file_exists(filePath))
             {
                 allow_retries(() => File.Delete(filePath));
@@ -433,7 +434,7 @@ namespace chocolatey.infrastructure.filesystem
 
         public void create_directory(string directoryPath)
         {
-            this.Log().Debug(() => "Attempting to create directory \"{0}\".".format_with(get_full_path(directoryPath)));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to create directory \"{0}\".".format_with(get_full_path(directoryPath)));
             allow_retries(() => Directory.CreateDirectory(directoryPath));
         }
 
@@ -444,12 +445,12 @@ namespace chocolatey.infrastructure.filesystem
 
             try
             {
-                this.Log().Debug("Moving '{0}'{1} to '{2}'".format_with(directoryPath, Environment.NewLine, newDirectoryPath));
+                this.Log().Debug(ChocolateyLoggers.Verbose, "Moving '{0}'{1} to '{2}'".format_with(directoryPath, Environment.NewLine, newDirectoryPath));
                 allow_retries(() => Directory.Move(directoryPath, newDirectoryPath));
             }
             catch (Exception ex)
             {
-                this.Log().Warn("Move failed with message:{0} {1}{0} Attempting backup move method.".format_with(Environment.NewLine, ex.Message));
+                this.Log().Warn(ChocolateyLoggers.Verbose, "Move failed with message:{0} {1}{0} Attempting backup move method.".format_with(Environment.NewLine, ex.Message));
 
                 create_directory_if_not_exists(newDirectoryPath, ignoreError: true);
                 foreach (var file in get_files(directoryPath, "*.*", SearchOption.AllDirectories).or_empty_list_if_null())
@@ -458,7 +459,7 @@ namespace chocolatey.infrastructure.filesystem
                     if (file_exists(destinationFile)) delete_file(destinationFile);
 
                     create_directory_if_not_exists(get_directory_name(destinationFile), ignoreError: true);
-                    this.Log().Debug("Moving '{0}'{1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
+                    this.Log().Debug(ChocolateyLoggers.Verbose, "Moving '{0}'{1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
                     move_file(file, destinationFile);
                 }
 
@@ -477,7 +478,7 @@ namespace chocolatey.infrastructure.filesystem
             {
                 var destinationFile = file.Replace(sourceDirectoryPath, destinationDirectoryPath);
                 create_directory_if_not_exists(get_directory_name(destinationFile), ignoreError: true);
-                //this.Log().Debug("Copying '{0}' {1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
+                //this.Log().Debug(ChocolateyLoggers.Verbose, "Copying '{0}' {1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
                 copy_file(file, destinationFile, overwriteExisting);
             }
 
@@ -531,7 +532,7 @@ namespace chocolatey.infrastructure.filesystem
                 }
             }
 
-            this.Log().Debug(() => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directoryPath)));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directoryPath)));
             allow_retries(() => Directory.Delete(directoryPath, recursive));
         }
 
@@ -557,7 +558,7 @@ namespace chocolatey.infrastructure.filesystem
                 var directoryInfo = get_directory_info_for(path);
                 if ((directoryInfo.Attributes & attributes) != attributes)
                 {
-                    this.Log().Debug(() => "Adding '{0}' attribute(s) to '{1}'.".format_with(attributes.to_string(), path));
+                    this.Log().Debug(ChocolateyLoggers.Verbose, () => "Adding '{0}' attribute(s) to '{1}'.".format_with(attributes.to_string(), path));
                     directoryInfo.Attributes |= attributes;
                 }
             }
@@ -566,7 +567,7 @@ namespace chocolatey.infrastructure.filesystem
                 var fileInfo = get_file_info_for(path);
                 if ((fileInfo.Attributes & attributes) != attributes)
                 {
-                    this.Log().Debug(() => "Adding '{0}' attribute(s) to '{1}'.".format_with(attributes.to_string(), path));
+                    this.Log().Debug(ChocolateyLoggers.Verbose, () => "Adding '{0}' attribute(s) to '{1}'.".format_with(attributes.to_string(), path));
                     fileInfo.Attributes |= attributes;
                 }
             }
@@ -579,7 +580,7 @@ namespace chocolatey.infrastructure.filesystem
                 var directoryInfo = get_directory_info_for(path);
                 if ((directoryInfo.Attributes & attributes) == attributes)
                 {
-                    this.Log().Debug(() => "Removing '{0}' attribute(s) from '{1}'.".format_with(attributes.to_string(), path));
+                    this.Log().Debug(ChocolateyLoggers.Verbose, () => "Removing '{0}' attribute(s) from '{1}'.".format_with(attributes.to_string(), path));
                     directoryInfo.Attributes &= ~attributes;
                 }
             }
@@ -588,7 +589,7 @@ namespace chocolatey.infrastructure.filesystem
                 var fileInfo = get_file_info_for(path);
                 if ((fileInfo.Attributes & attributes) == attributes)
                 {
-                    this.Log().Debug(() => "Removing '{0}' attribute(s) from '{1}'.".format_with(attributes.to_string(), path));
+                    this.Log().Debug(ChocolateyLoggers.Verbose, () => "Removing '{0}' attribute(s) from '{1}'.".format_with(attributes.to_string(), path));
                     fileInfo.Attributes &= ~attributes;
                 }
             }
