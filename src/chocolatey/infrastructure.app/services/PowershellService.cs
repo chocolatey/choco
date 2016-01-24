@@ -217,7 +217,7 @@ namespace chocolatey.infrastructure.app.services
                         var urlKey = CryptoHashProvider.hash_value(downloadCache.OriginalUrl, CryptoHashProviderType.Sha256).Replace("=",string.Empty);
                         Environment.SetEnvironmentVariable("CacheFile_{0}".format_with(urlKey), downloadCache.FileName);
                         Environment.SetEnvironmentVariable("CacheChecksum_{0}".format_with(urlKey), downloadCache.Checksum);
-                        //Environment.SetEnvironmentVariable("CacheChecksumType_{0}".format_with(urlKey), "md5");
+                        Environment.SetEnvironmentVariable("CacheChecksumType_{0}".format_with(urlKey), "sha512");
                     }
                 }
 
