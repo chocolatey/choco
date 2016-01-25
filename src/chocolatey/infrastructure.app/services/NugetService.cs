@@ -127,48 +127,49 @@ namespace chocolatey.infrastructure.app.services
                         this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0} {1}{2}{3}{4}".format_with(
                             package.Id, 
                             package.Version.to_string(),
-                            package.IsApproved ? " [APPROVED]" : string.Empty,
-                            package.IsDownloadCacheAvailable ? " - Private distribution for pro" : string.Empty,
-                            package.PackageTestResultStatus == "Failing" && package.IsDownloadCacheAvailable ? " - Broken for FOSS users due to download location changes" : package.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
+                            package.IsApproved ? " [Approved]" : string.Empty,
+                            package.IsDownloadCacheAvailable ? " Downloads cached for licensed users" : string.Empty,
+                            package.PackageTestResultStatus == "Failing" && package.IsDownloadCacheAvailable ? " - Possibly broken for FOSS users (due to original download location changes by vendor)" : package.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
                             )
                         );
                         if (config.Verbose) this.Log().Info(() =>
-                            @" Title: {0} | Published: {1}
- Software Site: {2} 
- Software License: {3}{4} 
- Description: {5}{6}{7}{8} 
- Tags: {9} 
- Chocolatey Package Source: {10} 
- Number of Downloads: {11} | Downloads for this version: {12}{13}{14}{15}
+                            @" Title: {0} | Published: {1}{2}{3}
+ Number of Downloads: {4} | Downloads for this version: {5}
+ Package url
+ Chocolatey Package Source: {6}{7}
+ Tags: {8}
+ Software Site: {9}
+ Software License: {10}{11}{12}{13}{14}
+ Description: {15} 
 ".format_with(
                                 package.Title.escape_curly_braces(),
                                 package.Published.GetValueOrDefault().UtcDateTime.ToShortDateString(),
-                                package.ProjectUrl != null ? package.ProjectUrl.to_string() : "n/a",
-                                package.LicenseUrl != null && !string.IsNullOrWhiteSpace(package.LicenseUrl.to_string()) ? package.LicenseUrl.to_string() : "n/a",
-                                package.ProjectSourceUrl != null && !string.IsNullOrWhiteSpace(package.ProjectSourceUrl.to_string()) ? "{0} Software Source: {1}".format_with(Environment.NewLine, package.ProjectSourceUrl.to_string()) : string.Empty,
-                                package.Description.escape_curly_braces().Replace("\n    ","\n").Replace("\n","\n  "),
-                                package.DocsUrl != null && !string.IsNullOrWhiteSpace(package.DocsUrl.to_string()) ? "{0} Documentation: {1}".format_with(Environment.NewLine, package.DocsUrl.to_string()) : string.Empty,
-                                package.MailingListUrl != null && !string.IsNullOrWhiteSpace(package.MailingListUrl.to_string()) ? "{0} Mailing List: {1}".format_with(Environment.NewLine, package.MailingListUrl.to_string()) : string.Empty,
-                                package.BugTrackerUrl != null && !string.IsNullOrWhiteSpace(package.BugTrackerUrl.to_string()) ? "{0} Issues: {1}".format_with(Environment.NewLine, package.BugTrackerUrl.to_string()) : string.Empty,
-                                package.Tags.escape_curly_braces(),
-                                package.PackageSourceUrl != null && !string.IsNullOrWhiteSpace(package.PackageSourceUrl.to_string()) ? package.PackageSourceUrl.to_string() : "n/a",
-                                package.DownloadCount <= 0 ? "n/a" : package.DownloadCount.to_string(),
-                                package.VersionDownloadCount <= 0 ? "n/a" : package.VersionDownloadCount.to_string(),
                                 package.IsApproved ? "{0} Package approved {1} on {2}.".format_with(
                                         Environment.NewLine,
                                         string.IsNullOrWhiteSpace(package.PackageReviewer) ? "as a trusted package" : "by " + package.PackageReviewer,
                                         package.PackageApprovedDate.GetValueOrDefault().ToString("MMM dd yyyy HH:mm:ss")
                                     ) : string.Empty,
                                 string.IsNullOrWhiteSpace(package.PackageTestResultStatus) || package.PackageTestResultStatus.is_equal_to("unknown") ? string.Empty : "{0} Package testing status: {1} on {2}.".format_with(
-                                        Environment.NewLine, 
+                                        Environment.NewLine,
                                         package.PackageTestResultStatus,
                                         package.PackageValidationResultDate.GetValueOrDefault().ToString("MMM dd yyyy HH:mm:ss")
                                     ),
+                                package.DownloadCount <= 0 ? "n/a" : package.DownloadCount.to_string(),
+                                package.VersionDownloadCount <= 0 ? "n/a" : package.VersionDownloadCount.to_string(),
+                                package.PackageSourceUrl != null && !string.IsNullOrWhiteSpace(package.PackageSourceUrl.to_string()) ? package.PackageSourceUrl.to_string() : "n/a",
                                 string.IsNullOrWhiteSpace(package.PackageHash) ? string.Empty : "{0} Package Checksum: '{1}' ({2})".format_with(
                                         Environment.NewLine,
                                         package.PackageHash,
                                         package.PackageHashAlgorithm
-                                        )
+                                        ),
+                                package.Tags.trim_safe().escape_curly_braces(),
+                                package.ProjectUrl != null ? package.ProjectUrl.to_string() : "n/a",
+                                package.LicenseUrl != null && !string.IsNullOrWhiteSpace(package.LicenseUrl.to_string()) ? package.LicenseUrl.to_string() : "n/a",
+                                package.ProjectSourceUrl != null && !string.IsNullOrWhiteSpace(package.ProjectSourceUrl.to_string()) ? "{0} Software Source: {1}".format_with(Environment.NewLine, package.ProjectSourceUrl.to_string()) : string.Empty,
+                                package.DocsUrl != null && !string.IsNullOrWhiteSpace(package.DocsUrl.to_string()) ? "{0} Documentation: {1}".format_with(Environment.NewLine, package.DocsUrl.to_string()) : string.Empty,
+                                package.MailingListUrl != null && !string.IsNullOrWhiteSpace(package.MailingListUrl.to_string()) ? "{0} Mailing List: {1}".format_with(Environment.NewLine, package.MailingListUrl.to_string()) : string.Empty,
+                                package.BugTrackerUrl != null && !string.IsNullOrWhiteSpace(package.BugTrackerUrl.to_string()) ? "{0} Issues: {1}".format_with(Environment.NewLine, package.BugTrackerUrl.to_string()) : string.Empty,
+                                package.Description.escape_curly_braces().Replace("\n    ","\n").Replace("\n","\n  ")
                         ));
                     }
                     else
