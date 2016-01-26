@@ -20,12 +20,11 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.uninstall)]
+    [CommandFor("uninstall", "uninstalls a package")]
     public sealed class ChocolateyUninstallCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;

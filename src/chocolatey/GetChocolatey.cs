@@ -218,7 +218,7 @@ namespace chocolatey
         private ChocolateyConfiguration create_configuration(IList<string> args)
         {
             var configuration = new ChocolateyConfiguration();
-            ConfigurationBuilder.set_up_configuration(args, configuration, _container.GetInstance<IFileSystem>(), _container.GetInstance<IXmlService>(), null);
+            ConfigurationBuilder.set_up_configuration(args, configuration, _container, null);
             Config.initialize_with(configuration);
 
             configuration.PromptForConfirmation = false;

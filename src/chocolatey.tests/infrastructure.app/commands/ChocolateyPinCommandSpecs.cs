@@ -80,7 +80,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_implement_source()
             {
-                results.ShouldContain(CommandNameType.pin.to_string());
+                results.ShouldContain("pin");
             }
         }
 

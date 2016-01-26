@@ -20,12 +20,11 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.upgrade)]
+    [CommandFor("upgrade", "upgrades packages from various sources")]
     public class ChocolateyUpgradeCommand : ICommand
     {
         //todo v1 Deprecation reseal this class and remove virtuals

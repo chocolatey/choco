@@ -20,12 +20,11 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.push)]
+    [CommandFor("push", "pushes a compiled nupkg")]
     public sealed class ChocolateyPushCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;

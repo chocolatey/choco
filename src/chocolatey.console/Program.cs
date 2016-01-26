@@ -61,8 +61,7 @@ namespace chocolatey.console
                ConfigurationBuilder.set_up_configuration(
                     args,
                     config,
-                    fileSystem,
-                    container.GetInstance<IXmlService>(),
+                    container,
                     warning => { warnings.Add(warning); }
                     );
                 Config.initialize_with(config);

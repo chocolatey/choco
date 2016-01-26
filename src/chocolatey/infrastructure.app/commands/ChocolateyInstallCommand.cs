@@ -20,12 +20,11 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.install)]
+    [CommandFor("install", "installs packages from various sources")]
     public sealed class ChocolateyInstallCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;

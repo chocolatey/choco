@@ -21,13 +21,12 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using services;
     using templates;
 
-    [CommandFor(CommandNameType.@new)]
+    [CommandFor("new", "generates files necessary for a chocolatey package from a template")]
     public sealed class ChocolateyNewCommand : ICommand
     {
         private readonly ITemplateService _templateService;

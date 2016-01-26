@@ -162,7 +162,7 @@ namespace chocolatey.tests.integration
         public static ChocolateyConfiguration list()
         {
             var config = baseline_configuration();
-            config.CommandName = CommandNameType.list.to_string();
+            config.CommandName = "list";
 
             return config;
         }
@@ -170,7 +170,7 @@ namespace chocolatey.tests.integration
         public static ChocolateyConfiguration pin()
         {
             var config = baseline_configuration();
-            config.CommandName = CommandNameType.pin.to_string();
+            config.CommandName = "pin";
 
             return config;
         }

@@ -19,12 +19,11 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.outdated)]
+    [CommandFor("outdated", "retrieves packages that are outdated. Similar to upgrade all --noop")]
     public sealed class ChocolateyOutdatedCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;

@@ -26,7 +26,7 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.config)]
+    [CommandFor("config", "Retrieve and configure config file settings")]
     public sealed class ChocolateyConfigCommand : ICommand
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;

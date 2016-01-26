@@ -19,12 +19,11 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.pack)]
+    [CommandFor("pack", "packages up a nuspec to a compiled nupkg")]
     public sealed class ChocolateyPackCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;

@@ -52,7 +52,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_implement_pack()
             {
-                results.ShouldContain(CommandNameType.pack.to_string());
+                results.ShouldContain("pack");
             }
         }
 

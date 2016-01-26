@@ -26,8 +26,8 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.feature)]
-    [CommandFor(CommandNameType.features)]
+    [CommandFor("feature", "view and configure choco features")]
+    [CommandFor("features", "view and configure choco features (alias for feature)")]
     public sealed class ChocolateyFeatureCommand : ICommand
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;

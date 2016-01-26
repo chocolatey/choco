@@ -21,16 +21,18 @@ namespace chocolatey.infrastructure.app.builders
     using System.Linq;
     using System.Text;
     using adapters;
+    using attributes;
     using configuration;
-    using domain;
     using extractors;
     using filesystem;
     using information;
+    using infrastructure.commands;
     using infrastructure.services;
     using logging;
     using nuget;
     using platforms;
     using tolerance;
+    using Container = SimpleInjector.Container;
     using Environment = adapters.Environment;
 
     /// <summary>
@@ -56,14 +58,15 @@ namespace chocolatey.infrastructure.app.builders
         /// </summary>
         /// <param name="args">The arguments.</param>
         /// <param name="config">The configuration.</param>
-        /// <param name="fileSystem">The file system.</param>
-        /// <param name="xmlService">The XML service.</param>
+        /// <param name="container">The container.</param>
         /// <param name="notifyWarnLoggingAction">Notify warn logging action</param>
-        public static void set_up_configuration(IList<string> args, ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService, Action<string> notifyWarnLoggingAction)
+        public static void set_up_configuration(IList<string> args, ChocolateyConfiguration config, Container container, Action<string> notifyWarnLoggingAction)
         {
+            var fileSystem = container.GetInstance<IFileSystem>();
+            var xmlService = container.GetInstance<IXmlService>();
             set_file_configuration(config, fileSystem, xmlService, notifyWarnLoggingAction);
             ConfigurationOptions.reset_options();
-            set_global_options(args, config);
+            set_global_options(args, config, container);
             set_environment_options(config);
             set_environment_variables(config);
         }
@@ -221,7 +224,7 @@ namespace chocolatey.infrastructure.app.builders
             return feature != null ? feature.Enabled : defaultEnabled;
         }
 
-        private static void set_global_options(IList<string> args, ChocolateyConfiguration config)
+        private static void set_global_options(IList<string> args, ChocolateyConfiguration config, Container container)
         {
             ConfigurationOptions.parse_arguments_and_update_configuration(
                 args,
@@ -283,9 +286,14 @@ namespace chocolatey.infrastructure.app.builders
                 () =>
                     {
                         var commandsLog = new StringBuilder();
-                        foreach (var command in Enum.GetValues(typeof (CommandNameType)).Cast<CommandNameType>())
+                        IEnumerable<ICommand> commands = container.GetAllInstances<ICommand>();
+                        foreach (var command in commands.or_empty_list_if_null())
                         {
-                            commandsLog.AppendFormat(" * {0}\n", command.get_description_or_value());
+                            var attributes = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>();
+                            foreach (var attribute in attributes.or_empty_list_if_null())
+                            {
+                                commandsLog.AppendFormat(" * {0} - {1}\n", attribute.CommandName, attribute.Description);
+                            }
                         }
 
                         "chocolatey".Log().Info(@"This is a listing of all of the different things you can pass to choco.

@@ -54,7 +54,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_implement_new()
             {
-                results.ShouldContain(CommandNameType.@new.to_string());
                 results.ShouldContain("new");
             }
         }
