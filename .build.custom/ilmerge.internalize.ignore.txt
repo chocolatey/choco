@@ -1,6 +1,2 @@
 chocolatey.*
-NuGet.Manifest
-NuGet.IPackage
-NuGet.PackageDependency
-NuGet.IServerPackageMetadata
-NuGet.SemanticVersion
+NuGet.*
