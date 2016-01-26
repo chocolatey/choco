@@ -28,6 +28,7 @@ namespace chocolatey.infrastructure.app.builders
     using information;
     using infrastructure.commands;
     using infrastructure.services;
+    using licensing;
     using logging;
     using nuget;
     using platforms;
@@ -59,8 +60,9 @@ namespace chocolatey.infrastructure.app.builders
         /// <param name="args">The arguments.</param>
         /// <param name="config">The configuration.</param>
         /// <param name="container">The container.</param>
+        /// <param name="license">The license.</param>
         /// <param name="notifyWarnLoggingAction">Notify warn logging action</param>
-        public static void set_up_configuration(IList<string> args, ChocolateyConfiguration config, Container container, Action<string> notifyWarnLoggingAction)
+        public static void set_up_configuration(IList<string> args, ChocolateyConfiguration config, Container container, ChocolateyLicense license, Action<string> notifyWarnLoggingAction)
         {
             var fileSystem = container.GetInstance<IFileSystem>();
             var xmlService = container.GetInstance<IXmlService>();
@@ -68,6 +70,7 @@ namespace chocolatey.infrastructure.app.builders
             ConfigurationOptions.reset_options();
             set_global_options(args, config, container);
             set_environment_options(config);
+            set_license_options(config, license);
             set_environment_variables(config);
         }
 
@@ -347,6 +350,15 @@ You can pass options and switches in the following ways:
             config.Information.IsInteractive = Environment.UserInteractive;
             config.Information.IsUserAdministrator = ProcessInformation.user_is_administrator();
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
+        }
+
+        private static void set_license_options(ChocolateyConfiguration config, ChocolateyLicense license)
+        {
+            config.Information.LicenseExpirationDate = license.ExpirationDate;
+            config.Information.LicenseIsValid = license.IsValid;
+            config.Information.LicenseUserName = license.Name ?? string.Empty;
+            config.Information.LicenseVersion = license.Version ?? string.Empty;
+            config.Information.LicenseType = license.is_licensed_version() ? license.LicenseType.get_description_or_value() : string.Empty;
         }
 
         public static void set_environment_variables(ChocolateyConfiguration config)

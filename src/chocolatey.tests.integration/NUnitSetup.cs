@@ -21,6 +21,7 @@ namespace chocolatey.tests.integration
     using System.Linq;
     using System.Reflection;
     using System.Threading;
+    using chocolatey.infrastructure.licensing;
     using NUnit.Framework;
     using SimpleInjector;
     using chocolatey.infrastructure.app;
@@ -56,7 +57,7 @@ namespace chocolatey.tests.integration
             unpack_self(Container, config);
             build_packages(Container, config);
 
-            ConfigurationBuilder.set_up_configuration(new List<string>(), config, Container.GetInstance<IFileSystem>(), Container.GetInstance<IXmlService>(), null);
+            ConfigurationBuilder.set_up_configuration(new List<string>(), config, Container, new ChocolateyLicense(),  null);
 
             MockLogger.reset();
         }

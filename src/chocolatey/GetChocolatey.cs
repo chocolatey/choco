@@ -17,6 +17,7 @@ namespace chocolatey
 {
     using System;
     using System.Collections.Generic;
+    using infrastructure.licensing;
     using SimpleInjector;
     using infrastructure.adapters;
     using infrastructure.app;
@@ -51,6 +52,7 @@ namespace chocolatey
     {
         private readonly Container _container;
         private Action<ChocolateyConfiguration> _propConfig;
+        private ChocolateyLicense _license;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GetChocolatey"/> class.
@@ -59,6 +61,7 @@ namespace chocolatey
         {
             Log4NetAppenderConfiguration.configure();
             Bootstrap.initialize();
+            _license = LicenseValidation.validate();
             _container = SimpleInjectorContainer.Container;
         }
 
@@ -218,7 +221,7 @@ namespace chocolatey
         private ChocolateyConfiguration create_configuration(IList<string> args)
         {
             var configuration = new ChocolateyConfiguration();
-            ConfigurationBuilder.set_up_configuration(args, configuration, _container, null);
+            ConfigurationBuilder.set_up_configuration(args, configuration, _container, _license, null);
             Config.initialize_with(configuration);
 
             configuration.PromptForConfirmation = false;

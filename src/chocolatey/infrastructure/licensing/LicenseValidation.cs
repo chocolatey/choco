@@ -15,26 +15,68 @@
 
 namespace chocolatey.infrastructure.licensing
 {
-    using Rhino.Licensing;
+    using System;
+    using System.IO;
     using app;
-    using filesystem;
+    using Rhino.Licensing;
 
     public sealed class LicenseValidation
     {
-        private const string PUBLIC_KEY = @"";
+        private const string PUBLIC_KEY =
+            @"<RSAKeyValue><Modulus>rznyhs3OslLqL7A7qav9bSHYGQmgWVsP/L47dWU7yF3EHsiYZuJNLlq8tQkPql/LB1FfLihiGsOKKUF1tmxihcRUrDaYkK1IYY3A+uJWkBglDUOUjnoDboI1FgF3wmXSb07JC8JCVYWjchq+h6MV9aDZaigA5MqMKNj9FE14f68=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
 
-        public static void validate(IFileSystem fileSystem)
+        public static ChocolateyLicense validate()
         {
-            string licenseFile = ApplicationParameters.LicenseFileLocation;
-
-            if (fileSystem.file_exists(licenseFile))
+            var chocolateyLicense = new ChocolateyLicense
             {
-                new LicenseValidator(PUBLIC_KEY, licenseFile).AssertValidLicense();
+                LicenseType = ChocolateyLicenseType.Unknown
+            };
+
+            string licenseFile = ApplicationParameters.LicenseFileLocation;
+            //no file system at this point
+            if (File.Exists(licenseFile))
+            {
+                var license = new LicenseValidator(PUBLIC_KEY, licenseFile);
+
+                try
+                {
+                    license.AssertValidLicense();
+                    chocolateyLicense.IsValid = true;
+                }
+                catch (Exception e)
+                {
+                    //license may be invalid
+                    chocolateyLicense.IsValid = false;
+                    chocolateyLicense.InvalidReason = e.Message;
+                    "chocolatey".Log().Error("A license was found for a licensed version of Chocolatey, but is invalid:{0} {1}".format_with(Environment.NewLine, e.Message));
+                }
+
+                switch (license.LicenseType)
+                {
+                    case LicenseType.Professional :
+                        chocolateyLicense.LicenseType = ChocolateyLicenseType.Professional;
+                        break;
+                    case LicenseType.Business :
+                        chocolateyLicense.LicenseType = ChocolateyLicenseType.Business;
+                        break;
+                    case LicenseType.Enterprise :
+                        chocolateyLicense.LicenseType = ChocolateyLicenseType.Enterprise;
+                        break;
+                }
+
+                chocolateyLicense.ExpirationDate = license.ExpirationDate;
+                chocolateyLicense.Name = license.Name;
+                
+                //todo: if it is expired, provide a warning. 
+                // one month after it should stop working
             }
             else
             {
                 //free version
+                chocolateyLicense.LicenseType = ChocolateyLicenseType.Foss;
             }
+
+            return chocolateyLicense;
         }
     }
 }

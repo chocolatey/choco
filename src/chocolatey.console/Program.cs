@@ -52,7 +52,9 @@ namespace chocolatey.console
                 Bootstrap.initialize();
                 Bootstrap.startup();
 
+                var license = LicenseValidation.validate();
                 var container = SimpleInjectorContainer.Container;
+                
                 var config = container.GetInstance<ChocolateyConfiguration>();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
@@ -62,6 +64,7 @@ namespace chocolatey.console
                     args,
                     config,
                     container,
+                    license,
                     warning => { warnings.Add(warning); }
                     );
                 Config.initialize_with(config);
@@ -74,18 +77,17 @@ namespace chocolatey.console
                 {
                     "logfile".Log().Info(() => "".PadRight(60, '='));
 #if DEBUG
-                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1} (DEBUG BUILD)".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
-#else          
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2} (DEBUG BUILD)".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.is_licensed_version() ? " {0}".format_with(config.Information.LicenseType) : string.Empty));
+#else
                     if (config.Information.ChocolateyVersion == config.Information.ChocolateyProductVersion && args.Any())
                     {
-                        "logfile".Log().Info(() => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
+                        "logfile".Log().Info(() => "{0} v{1}{2}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.is_licensed_version() ? " {0}".format_with(config.Information.LicenseType) : string.Empty));
                     }
                     else
                     {
-                        "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
+                        "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.is_licensed_version() ? " {0}".format_with(config.Information.LicenseType) : string.Empty));
                     }
 #endif
-
                 }
                 
                 if (warnings.Count != 0 && config.RegularOutput)
@@ -108,8 +110,6 @@ namespace chocolatey.console
                 //"chocolatey".Log().Debug(() => "Command Line: {0}".format_with(Environment.CommandLine));
 
                 remove_old_chocolatey_exe(fileSystem);
-
-                LicenseValidation.validate(fileSystem);
 
                 //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
                 IList<string> folders = new List<string>
