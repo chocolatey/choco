@@ -724,9 +724,11 @@ Would have determined packages that are out of date based on what is
             if (packageResult == null) return;
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.ExtensionsLocation);
 
-            if (!packageResult.Name.to_lower().EndsWith(".extension")) return;
+            if (!packageResult.Name.to_lower().EndsWith(".extension") && !packageResult.Name.to_lower().EndsWith(".extensions")) return;
 
-            var pkgExtensions = _fileSystem.combine_paths(ApplicationParameters.ExtensionsLocation, packageResult.Name);
+            var extensionsFolderName = packageResult.Name.to_lower().Replace(".extensions", string.Empty).Replace(".extension", string.Empty);
+            var pkgExtensions = _fileSystem.combine_paths(ApplicationParameters.ExtensionsLocation, extensionsFolderName);
+
             FaultTolerance.try_catch_with_logging_exception(
                 () => _fileSystem.delete_directory_if_exists(pkgExtensions, recursive: true),
                 "Attempted to remove '{0}' but had an error".format_with(pkgExtensions));
@@ -736,11 +738,22 @@ Would have determined packages that are out of date based on what is
                 if (packageResult.InstallLocation == null) return;
 
                 _fileSystem.create_directory_if_not_exists(pkgExtensions);
-                FaultTolerance.try_catch_with_logging_exception(
-                    () => _fileSystem.copy_directory(packageResult.InstallLocation, pkgExtensions, overwriteExisting: true),
-                    "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".format_with(Environment.NewLine, packageResult.InstallLocation, pkgExtensions));
 
-                string logMessage = "Installed/updated extension for {0}. You will be able to use it on next run.".format_with(packageResult.Name);
+                var extensionsFolder = _fileSystem.combine_paths(packageResult.InstallLocation, "extensions");
+
+                var extensionFolderToCopy = _fileSystem.directory_exists(extensionsFolder) ? extensionsFolder : packageResult.InstallLocation;
+
+                FaultTolerance.try_catch_with_logging_exception(
+                    () => _fileSystem.copy_directory(extensionFolderToCopy, pkgExtensions, overwriteExisting: true),
+                    "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".format_with(Environment.NewLine, extensionFolderToCopy, pkgExtensions));
+
+                string logMessage = " Installed/updated {0} extensions.".format_with(extensionsFolderName);
+                this.Log().Warn(logMessage);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+            }
+            else
+            {
+                string logMessage = " Uninstalled {0} extensions.".format_with(extensionsFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
             }
