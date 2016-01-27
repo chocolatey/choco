@@ -28,10 +28,10 @@ namespace chocolatey.console
     using infrastructure.configuration;
     using infrastructure.extractors;
     using infrastructure.filesystem;
+    using infrastructure.information;
     using infrastructure.licensing;
     using infrastructure.logging;
     using infrastructure.registration;
-    using infrastructure.services;
     using resources;
     using Console = System.Console;
     using Environment = System.Environment;
@@ -53,6 +53,29 @@ namespace chocolatey.console
                 Bootstrap.startup();
 
                 var license = LicenseValidation.validate();
+                if (license.is_licensed_version())
+                {
+                    try
+                    {
+                        var licensedAssembly = Assembly.LoadFile(ApplicationParameters.LicensedAssemblyLocation);
+                        license.AssemblyLoaded = true;
+                        license.Version = VersionInformation.get_current_informational_version(licensedAssembly);
+                        Type licensedComponent = licensedAssembly.GetType(ApplicationParameters.LicensedComponentRegistry, throwOnError: true, ignoreCase: true);
+                        SimpleInjectorContainer.add_component_registry_class(licensedComponent);
+                    }
+                    catch (Exception ex)
+                    {
+                        "chocolatey".Log().Error(
+@"Error when attempting to load chocolatey licensed assembly. Ensure
+ that chocolatey.licensed.dll exists at 
+ '{0}'.
+ The error message itself may be helpful as well:{1} {2}".format_with(
+                        ApplicationParameters.LicensedAssemblyLocation,
+                        Environment.NewLine,
+                        ex.Message
+                        ));
+                    }
+                }
                 var container = SimpleInjectorContainer.Container;
                 
                 var config = container.GetInstance<ChocolateyConfiguration>();
