@@ -20,11 +20,11 @@ namespace chocolatey.infrastructure.information
 
     public sealed class VersionInformation
     {
-        public static string get_current_assembly_version()
+        public static string get_current_assembly_version(IAssembly assembly = null)
         {
             string version = null;
-            var executingAssembly = Assembly.GetExecutingAssembly();
-            string location = executingAssembly != null ? executingAssembly.Location : string.Empty;
+            if (assembly == null) assembly = Assembly.GetExecutingAssembly();
+            string location = assembly != null ? assembly.Location : string.Empty;
 
             if (!string.IsNullOrEmpty(location))
             {
@@ -34,11 +34,11 @@ namespace chocolatey.infrastructure.information
             return version;
         } 
         
-        public static string get_current_informational_version()
+        public static string get_current_informational_version(IAssembly assembly = null)
         {
             string version = null;
-            var executingAssembly = Assembly.GetExecutingAssembly();
-            string location = executingAssembly != null ? executingAssembly.Location : string.Empty;
+            if (assembly == null) assembly = Assembly.GetExecutingAssembly();
+            string location = assembly != null ? assembly.Location : string.Empty;
 
             if (!string.IsNullOrEmpty(location))
             {
