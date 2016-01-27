@@ -67,14 +67,35 @@ namespace chocolatey.infrastructure.adapters
             return _assembly.GetManifestResourceStream(type, name);
         }
 
+        public AssemblyName GetName()
+        {
+            return _assembly.GetName();
+        }
+
+        public Type GetType(String name)
+        {
+            return _assembly.GetType(name);
+        }   
+        
+        public Type GetType(String name, bool throwOnError)
+        {
+            return _assembly.GetType(name,throwOnError);
+        }    
+        
+        public Type GetType(String name, bool throwOnError, bool ignoreCase)
+        {
+            return _assembly.GetType(name,throwOnError, ignoreCase);
+        }
+
+        public static IAssembly LoadFile(string path)
+        {
+           return new Assembly(System.Reflection.Assembly.LoadFile(path));
+        }
+
         public static IAssembly GetAssembly(Type type)
         {
             return new Assembly(System.Reflection.Assembly.GetAssembly(type));
             //return System.Reflection.Assembly.GetAssembly(type);
-        }
-        public AssemblyName GetName()
-        {
-            return _assembly.GetName();
         }
 
         public static IAssembly GetExecutingAssembly()
