@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.commands
     using services;
 
     [CommandFor("install", "installs packages from various sources")]
-    public sealed class ChocolateyInstallCommand : ICommand
+    public class ChocolateyInstallCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;
 

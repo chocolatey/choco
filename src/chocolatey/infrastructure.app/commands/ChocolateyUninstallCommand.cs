@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.commands
     using services;
 
     [CommandFor("uninstall", "uninstalls a package")]
-    public sealed class ChocolateyUninstallCommand : ICommand
+    public class ChocolateyUninstallCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;
 

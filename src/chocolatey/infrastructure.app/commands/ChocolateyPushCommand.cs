@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.commands
     using services;
 
     [CommandFor("push", "pushes a compiled nupkg")]
-    public sealed class ChocolateyPushCommand : ICommand
+    public class ChocolateyPushCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;
         private readonly IChocolateyConfigSettingsService _configSettingsService;

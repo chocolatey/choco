@@ -27,7 +27,7 @@ namespace chocolatey.infrastructure.app.commands
 
     [CommandFor("apikey", "retrieves or saves an apikey for a particular source")]
     [CommandFor("setapikey", "retrieves or saves an apikey for a particular source (alias for apikey)")]
-    public sealed class ChocolateyApiKeyCommand : ICommand
+    public class ChocolateyApiKeyCommand : ICommand
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
 

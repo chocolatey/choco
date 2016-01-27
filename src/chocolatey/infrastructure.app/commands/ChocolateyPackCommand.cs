@@ -24,7 +24,7 @@ namespace chocolatey.infrastructure.app.commands
     using services;
 
     [CommandFor("pack", "packages up a nuspec to a compiled nupkg")]
-    public sealed class ChocolateyPackCommand : ICommand
+    public class ChocolateyPackCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;
 

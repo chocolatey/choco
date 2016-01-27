@@ -29,7 +29,7 @@ namespace chocolatey.infrastructure.app.commands
 
     [CommandFor("list", "lists remote or local packages")]
     [CommandFor("search", "searches remote or local packages (alias for list)")]
-    public sealed class ChocolateyListCommand : IListCommand<PackageResult>
+    public class ChocolateyListCommand : IListCommand<PackageResult>
     {
         private readonly IChocolateyPackageService _packageService;
 

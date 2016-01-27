@@ -29,7 +29,7 @@ namespace chocolatey.infrastructure.app.commands
     using services;
 
     [CommandFor("pin", "suppress upgrades for a package")]
-    public sealed class ChocolateyPinCommand : ICommand
+    public class ChocolateyPinCommand : ICommand
     {
         private readonly IChocolateyPackageInformationService _packageInfoService;
         private readonly ILogger _nugetLogger;

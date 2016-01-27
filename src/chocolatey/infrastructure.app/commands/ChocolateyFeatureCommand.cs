@@ -28,7 +28,7 @@ namespace chocolatey.infrastructure.app.commands
 
     [CommandFor("feature", "view and configure choco features")]
     [CommandFor("features", "view and configure choco features (alias for feature)")]
-    public sealed class ChocolateyFeatureCommand : ICommand
+    public class ChocolateyFeatureCommand : ICommand
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
 

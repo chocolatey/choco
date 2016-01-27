@@ -28,7 +28,7 @@ namespace chocolatey.infrastructure.app.commands
 
     [CommandFor("source", "view and configure default sources")]
     [CommandFor("sources", "view and configure default sources (alias for source)")]
-    public sealed class ChocolateySourceCommand : IListCommand<ChocolateySource>
+    public class ChocolateySourceCommand : IListCommand<ChocolateySource>
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
 

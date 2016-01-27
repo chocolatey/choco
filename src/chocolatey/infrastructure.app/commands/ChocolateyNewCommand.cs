@@ -27,7 +27,7 @@ namespace chocolatey.infrastructure.app.commands
     using templates;
 
     [CommandFor("new", "generates files necessary for a chocolatey package from a template")]
-    public sealed class ChocolateyNewCommand : ICommand
+    public class ChocolateyNewCommand : ICommand
     {
         private readonly ITemplateService _templateService;
 

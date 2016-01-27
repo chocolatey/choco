@@ -22,7 +22,6 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using extractors;
     using filesystem;
     using infrastructure.commands;
@@ -30,7 +29,7 @@ namespace chocolatey.infrastructure.app.commands
     using resources;
 
     [CommandFor("unpackself", "have chocolatey set it self up")]
-    public sealed class ChocolateyUnpackSelfCommand : ICommand
+    public class ChocolateyUnpackSelfCommand : ICommand
     {
         private readonly IFileSystem _fileSystem;
         private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)));
