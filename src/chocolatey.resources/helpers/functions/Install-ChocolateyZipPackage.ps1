@@ -100,6 +100,6 @@ param(
   if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir) | Out-Null}
   $file = Join-Path $tempDir "$($packageName)Install.$fileType"
   
-  Get-ChocolateyWebFile $packageName $file $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -options $options
-  Get-ChocolateyUnzip "$file" $unzipLocation $specificFolder $packageName
+  $filePath = Get-ChocolateyWebFile $packageName $file $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
+  Get-ChocolateyUnzip "$filePath" $unzipLocation $specificFolder $packageName
 }
