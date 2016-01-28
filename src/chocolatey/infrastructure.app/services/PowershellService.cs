@@ -70,7 +70,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             var packageDirectory = packageResult.InstallLocation;
-            var installScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories);
+            var installScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories).Where(p => !p.to_lower().contains("\\templates\\"));
             if (installScript.Count() != 0)
             {
                 var chocoInstall = installScript.FirstOrDefault();
@@ -169,7 +169,7 @@ namespace chocolatey.infrastructure.app.services
                 return installerRun;
             }
 
-            var powershellScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories);
+            var powershellScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories).Where(p => !p.to_lower().contains("\\templates\\"));
             if (powershellScript.Count() != 0)
             {
                 var chocoPowerShellScript = powershellScript.FirstOrDefault();
