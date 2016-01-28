@@ -64,12 +64,12 @@ Example:
       Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
       'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
       'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
-      Cookie = 'products.download.email=ewilde@gmail.com';
-      Referer = 'http://submain.com/download/ghostdoc/';
+      Cookie = 'requiredinfo=info';
+      Referer = 'https://somelocation.com/';
     }
   }
-
-  Get-ChocolateyWebFile 'ghostdoc' 'http://submain.com/download/GhostDoc_v4.0.zip' -options $options
+  
+  Get-ChocolateyWebFile 'package' 'https://somelocation.com/thefile.exe' -options $options
 
 .EXAMPLE
 Install-ChocolateyPackage '__NAME__' 'EXE_OR_MSI' 'SILENT_ARGS' 'URL' '64BIT_URL_DELETE_IF_NO_64BIT'
@@ -108,6 +108,6 @@ param(
   if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
   $file = Join-Path $tempDir "$($packageName)Install.$fileType"
 
-  Get-ChocolateyWebFile $packageName $file $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -options $options
-  Install-ChocolateyInstallPackage $packageName $fileType $silentArgs $file -validExitCodes $validExitCodes
+  $filePath = Get-ChocolateyWebFile $packageName $file $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
+  Install-ChocolateyInstallPackage $packageName $fileType $silentArgs $filePath -validExitCodes $validExitCodes
 }

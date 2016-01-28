@@ -51,19 +51,22 @@ OPTIONAL - Specify custom headers
 
 Example:
 --------
-	$options =
-	@{
-		Headers = @{
-			Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
-			'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
-			'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
-			Cookie = 'products.download.email=ewilde@gmail.com';
-			Referer = 'http://submain.com/download/ghostdoc/';
-		}
-	}
+  $options =
+  @{
+    Headers = @{
+      Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+      'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
+      'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
+      Cookie = 'requiredinfo=info';
+      Referer = 'https://somelocation.com/';
+    }
+  }
+  
+  Get-ChocolateyWebFile 'package' 'https://somelocation.com/thefile.exe' -options $options
 
-	Get-ChocolateyWebFile 'ghostdoc' 'http://submain.com/download/GhostDoc_v4.0.zip' -options $options
-
+.PARAMETER GetOriginalFileName
+OPTIONAL switch to allow Chocolatey to determine the original file name from the url
+  
 .EXAMPLE
 Get-ChocolateyWebFile '__NAME__' 'C:\somepath\somename.exe' 'URL' '64BIT_URL_DELETE_IF_NO_64BIT'
 
@@ -83,7 +86,8 @@ param(
   [string] $checksumType = '',
   [string] $checksum64 = '',
   [string] $checksumType64 = $checksumType,
-  [hashtable] $options = @{Headers=@{}}
+  [hashtable] $options = @{Headers=@{}},
+  [switch]$getOriginalFileName
 )
   Write-Debug "Running 'Get-ChocolateyWebFile' for $packageName with url:`'$url`', fileFullPath:`'$fileFullPath`', url64bit:`'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`'";
 
@@ -104,9 +108,30 @@ param(
     # only set if urls are different
     if ($url32bit -ne $url64bit) {
       $checksum = $checksum64
-	  if ($checkSumType64 -ne '') {
+      if ($checkSumType64 -ne '') {
         $checksumType = $checksumType64
-	  }
+      }
+    }
+  }
+
+  $forceX86 = $env:chocolateyForceX86;
+  if ($forceX86) {
+    Write-Debug "User specified -x86 so forcing 32 bit"
+    $bitPackage = 32
+    $url = $url32bit
+    $checksum =  $checksum32
+    $checksumType = $checksumType32
+  }
+
+  if ($getOriginalFileName) {
+    try {
+      $fileDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
+      $originalFileName = [System.IO.Path]::GetFileName($fileFullPath)
+      $fileFullPath = Get-FileName -url $url -defaultName $originalFileName
+      $fileFullPath = Join-Path $fileDirectory $fileFullPath
+      $fileFullPath = [System.IO.Path]::GetFullPath($fileFullPath)
+    } catch {
+      Write-Host "Attempt to use original download file name failed for '$url'."
     }
   }
 
@@ -117,15 +142,6 @@ param(
     }
   } catch {
     Write-Host "Attempt to create directory failed for '$fileFullPath'."
-  }
-
-  $forceX86 = $env:chocolateyForceX86;
-  if ($forceX86) {
-    Write-Debug "User specified -x86 so forcing 32 bit"
-    $bitPackage = 32
-    $url = $url32bit
-    $checksum =  $checksum32
-    $checksumType = $checksumType32
   }
 
   $headers = @{}
@@ -194,4 +210,6 @@ param(
   # $url is already set properly to the used location.
   #Write-Debug "Verifying downloaded file is not known to contain viruses. FilePath: `'$fileFullPath`'."
   #Get-VirusCheckValid -location $url -file $fileFullPath
+
+  return $fileFullPath
 }
