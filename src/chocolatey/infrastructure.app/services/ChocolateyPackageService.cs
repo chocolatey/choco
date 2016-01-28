@@ -780,7 +780,14 @@ Would have determined packages that are out of date based on what is
                 var templatesFolderToCopy = _fileSystem.directory_exists(templatesPath) ? templatesPath : packageResult.InstallLocation;
 
                 FaultTolerance.try_catch_with_logging_exception(
-                    () => _fileSystem.copy_directory(templatesFolderToCopy, installTemplatePath, overwriteExisting: true),
+                    () =>
+                    {
+                        _fileSystem.copy_directory(templatesFolderToCopy, installTemplatePath, overwriteExisting: true);
+                        foreach (var nuspecFile in  _fileSystem.get_files(installTemplatePath, "*.nuspec.template").or_empty_list_if_null())
+                        {
+                           _fileSystem.move_file(nuspecFile,nuspecFile.Replace(".nuspec.template",".nuspec")); 
+                        }
+                    },
                     "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".format_with(Environment.NewLine, templatesFolderToCopy, installTemplatePath));
 
                 string logMessage = " Installed/updated {0} template.".format_with(templateFolderName);
