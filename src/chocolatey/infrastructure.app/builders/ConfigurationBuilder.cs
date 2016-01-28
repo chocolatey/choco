@@ -410,6 +410,11 @@ You can pass options and switches in the following ways:
                 Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
                 Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
             }
+
+            if (config.Information.LicenseIsValid)
+            {
+                Environment.SetEnvironmentVariable("ChocolateyLicenseValid", "true");
+            }
         }
     }
 }
