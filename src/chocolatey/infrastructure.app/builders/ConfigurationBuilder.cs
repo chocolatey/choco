@@ -356,9 +356,15 @@ You can pass options and switches in the following ways:
         {
             config.Information.LicenseExpirationDate = license.ExpirationDate;
             config.Information.LicenseIsValid = license.IsValid;
-            config.Information.LicenseUserName = license.Name ?? string.Empty;
             config.Information.LicenseVersion = license.Version ?? string.Empty;
             config.Information.LicenseType = license.is_licensed_version() ? license.LicenseType.get_description_or_value() : string.Empty;
+
+            var licenseName = license.Name.to_string();
+            if (licenseName.Contains("@"))
+            {
+                licenseName = licenseName.Remove(licenseName.IndexOf("@", StringComparison.InvariantCulture)) + "[at REDACTED])";
+            }
+            config.Information.LicenseUserName = licenseName;
         }
 
         public static void set_environment_variables(ChocolateyConfiguration config)
