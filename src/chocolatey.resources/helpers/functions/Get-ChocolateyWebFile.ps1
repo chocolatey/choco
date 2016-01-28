@@ -51,18 +51,18 @@ OPTIONAL - Specify custom headers
 
 Example:
 --------
-	$options =
-	@{
-		Headers = @{
-			Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
-			'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
-			'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
-			Cookie = 'products.download.email=ewilde@gmail.com';
-			Referer = 'http://submain.com/download/ghostdoc/';
-		}
-	}
-
-	Get-ChocolateyWebFile 'ghostdoc' 'http://submain.com/download/GhostDoc_v4.0.zip' -options $options
+  $options =
+  @{
+    Headers = @{
+      Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+      'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
+      'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
+      Cookie = 'requiredinfo=info';
+      Referer = 'https://somelocation.com/';
+    }
+  }
+  
+  Get-ChocolateyWebFile 'package' 'https://somelocation.com/thefile.exe' -options $options
 
 .EXAMPLE
 Get-ChocolateyWebFile '__NAME__' 'C:\somepath\somename.exe' 'URL' '64BIT_URL_DELETE_IF_NO_64BIT'
