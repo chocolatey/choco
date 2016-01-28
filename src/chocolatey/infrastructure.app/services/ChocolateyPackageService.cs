@@ -296,6 +296,7 @@ namespace chocolatey.infrastructure.app.services
             if (packageResult.Success)
             {
                 handle_extension_packages(config, packageResult);
+                handle_template_packages(config, packageResult);
             }
 
             _packageInfoService.save_package_information(pkgInfo);
@@ -694,6 +695,7 @@ Would have determined packages that are out of date based on what is
             ensure_bad_package_path_is_clean(config, packageResult);
             remove_rollback_if_exists(packageResult);
             handle_extension_packages(config, packageResult);
+            handle_template_packages(config, packageResult);
 
             if (config.Force)
             {
@@ -722,10 +724,9 @@ Would have determined packages that are out of date based on what is
         private void handle_extension_packages(ChocolateyConfiguration config, PackageResult packageResult)
         {
             if (packageResult == null) return;
-            _fileSystem.create_directory_if_not_exists(ApplicationParameters.ExtensionsLocation);
-
             if (!packageResult.Name.to_lower().EndsWith(".extension") && !packageResult.Name.to_lower().EndsWith(".extensions")) return;
 
+            _fileSystem.create_directory_if_not_exists(ApplicationParameters.ExtensionsLocation);
             var extensionsFolderName = packageResult.Name.to_lower().Replace(".extensions", string.Empty).Replace(".extension", string.Empty);
             var pkgExtensions = _fileSystem.combine_paths(ApplicationParameters.ExtensionsLocation, extensionsFolderName);
 
@@ -738,9 +739,7 @@ Would have determined packages that are out of date based on what is
                 if (packageResult.InstallLocation == null) return;
 
                 _fileSystem.create_directory_if_not_exists(pkgExtensions);
-
                 var extensionsFolder = _fileSystem.combine_paths(packageResult.InstallLocation, "extensions");
-
                 var extensionFolderToCopy = _fileSystem.directory_exists(extensionsFolder) ? extensionsFolder : packageResult.InstallLocation;
 
                 FaultTolerance.try_catch_with_logging_exception(
@@ -754,6 +753,50 @@ Would have determined packages that are out of date based on what is
             else
             {
                 string logMessage = " Uninstalled {0} extensions.".format_with(extensionsFolderName);
+                this.Log().Warn(logMessage);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+            }
+        }
+
+        private void handle_template_packages(ChocolateyConfiguration config, PackageResult packageResult)
+        {
+            if (packageResult == null) return;
+            if (!packageResult.Name.to_lower().EndsWith(".template")) return;
+
+            _fileSystem.create_directory_if_not_exists(ApplicationParameters.TemplatesLocation);
+            var templateFolderName = packageResult.Name.to_lower().Replace(".template", string.Empty);
+            var installTemplatePath = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, templateFolderName);
+
+            FaultTolerance.try_catch_with_logging_exception(
+                () => _fileSystem.delete_directory_if_exists(installTemplatePath, recursive: true),
+                "Attempted to remove '{0}' but had an error".format_with(installTemplatePath));
+
+            if (!config.CommandName.is_equal_to(CommandNameType.uninstall.to_string()))
+            {
+                if (packageResult.InstallLocation == null) return;
+
+                _fileSystem.create_directory_if_not_exists(installTemplatePath);
+                var templatesPath = _fileSystem.combine_paths(packageResult.InstallLocation, "templates");
+                var templatesFolderToCopy = _fileSystem.directory_exists(templatesPath) ? templatesPath : packageResult.InstallLocation;
+
+                FaultTolerance.try_catch_with_logging_exception(
+                    () =>
+                    {
+                        _fileSystem.copy_directory(templatesFolderToCopy, installTemplatePath, overwriteExisting: true);
+                        foreach (var nuspecFile in  _fileSystem.get_files(installTemplatePath, "*.nuspec.template").or_empty_list_if_null())
+                        {
+                           _fileSystem.move_file(nuspecFile,nuspecFile.Replace(".nuspec.template",".nuspec")); 
+                        }
+                    },
+                    "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".format_with(Environment.NewLine, templatesFolderToCopy, installTemplatePath));
+
+                string logMessage = " Installed/updated {0} template.".format_with(templateFolderName);
+                this.Log().Warn(logMessage);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+            }
+            else
+            {
+                string logMessage = " Uninstalled {0} template.".format_with(templateFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
             }

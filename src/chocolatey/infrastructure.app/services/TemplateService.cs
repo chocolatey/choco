@@ -85,7 +85,7 @@ namespace chocolatey.infrastructure.app.services
                 this.Log().Debug(() => " {0}={1}".format_with(propertyInfo.Name, propertyInfo.GetValue(tokens, null)));
             }
 
-            var defaultTemplateOverride = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "templates", "default");
+            var defaultTemplateOverride = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, "default");
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && !_fileSystem.directory_exists(defaultTemplateOverride))
             {
                 generate_file_from_template(configuration, tokens, NuspecTemplate.Template, _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower)), Encoding.UTF8);
@@ -97,7 +97,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 configuration.NewCommand.TemplateName = string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) ? "default" : configuration.NewCommand.TemplateName;
 
-                var templatePath = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "templates", configuration.NewCommand.TemplateName);
+                var templatePath = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.NewCommand.TemplateName);
                 if (!_fileSystem.directory_exists(templatePath)) throw new ApplicationException("Unable to find path to requested template '{0}'. Path should be '{1}'".format_with(configuration.NewCommand.TemplateName, templatePath));
 
                 this.Log().Info(ChocolateyLoggers.Important, "Generating package from custom template at '{0}'.".format_with(templatePath));
