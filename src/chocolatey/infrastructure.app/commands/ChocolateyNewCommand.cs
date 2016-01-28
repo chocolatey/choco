@@ -79,7 +79,7 @@ namespace chocolatey.infrastructure.app.commands
 
             foreach (var unparsedArgument in unparsedArguments.or_empty_list_if_null())
             {
-                var property = unparsedArgument.Split(new[] {'='}, StringSplitOptions.RemoveEmptyEntries);
+                var property = unparsedArgument.Split(new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries);
                 if (property.Count() == 2)
                 {
                     var propName = property[0].trim_safe();
