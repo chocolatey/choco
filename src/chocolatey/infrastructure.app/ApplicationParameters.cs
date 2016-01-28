@@ -53,6 +53,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string ShimsLocation = _fileSystem.combine_paths(InstallLocation, "bin");
         public static readonly string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
         public static readonly string ExtensionsLocation = _fileSystem.combine_paths(InstallLocation, "extensions");
+        public static readonly string TemplatesLocation = _fileSystem.combine_paths(InstallLocation, "templates");
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
         public static readonly string ChocolateyCommunityFeedSource = "https://chocolatey.org/api/v2/";
         public static readonly string UserAgent = "Chocolatey Command Line";
