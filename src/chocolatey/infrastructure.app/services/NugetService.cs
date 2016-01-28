@@ -1155,13 +1155,45 @@ spam/junk folder.");
                 var quiet = config.QuietOutput;
                 config.QuietOutput = true;
 
-                config.PackageNames = list_run(config).Select(p => p.Name).@join(ApplicationParameters.PackageNamesSeparator);
+                var packagesToUpdate = list_run(config).Select(p => p.Name).ToList();
+
+                if (!string.IsNullOrWhiteSpace(config.UpgradeCommand.PackageNamesToSkip))
+                {
+                    var packagesToSkip = config.UpgradeCommand.PackageNamesToSkip
+                        .Split(',')
+                        .Where(item => !string.IsNullOrWhiteSpace(item))
+                        .Select(p => p.trim_safe())
+                        .ToList();
+
+                    var unknownPackagesToSkip = packagesToSkip
+                        .Where(p => !packagesToUpdate.Contains(p, StringComparer.OrdinalIgnoreCase))
+                        .ToList();
+
+                    if (unknownPackagesToSkip.Any())
+                    {
+                        this.Log().Warn(() => "Some packages specified in the 'except' list were not found in the local packages: '{0}'".format_with(string.Join(",", unknownPackagesToSkip)));
+
+                        packagesToSkip = packagesToSkip
+                            .Where(p => !unknownPackagesToSkip.Contains(p, StringComparer.OrdinalIgnoreCase))
+                            .ToList();
+                    }
+
+                    if (packagesToSkip.Any())
+                    {
+                        packagesToUpdate = packagesToUpdate
+                            .Where(p => !packagesToSkip.Contains(p, StringComparer.OrdinalIgnoreCase))
+                            .ToList();
+
+                        this.Log().Info(() => "These packages will not be upgraded because they were specified in the 'except' list: {0}".format_with(string.Join(",", packagesToSkip)));
+                    }
+                }
 
                 config.QuietOutput = quiet;
                 config.Input = input;
                 config.Noop = noop;
                 config.Prerelease = pre;
                 config.Sources = sources;
+                config.PackageNames = packagesToUpdate.@join(ApplicationParameters.PackageNamesSeparator);
 
                 if (customAction != null) customAction.Invoke();
             }

@@ -2409,5 +2409,72 @@ namespace chocolatey.tests.integration.scenarios
                 Results.Count().ShouldEqual(0);
             }  
         }
+
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_all_packages_happy_path : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "all";
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_report_for_all_installed_packages()
+            {
+                Results.Count().ShouldEqual(3);
+            }
+
+            [Fact]
+            public void should_upgrade_packages_with_upgrades()
+            {
+                var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
+                upgradePackageResult.Count.ShouldEqual(1, "upgradepackage must be there once");
+                upgradePackageResult.First().Value.Version.ShouldEqual("1.1.0");
+            }
+
+            [Fact]
+            public void should_skip_packages_without_upgrades()
+            {
+                var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
+                installPackageResult.Count.ShouldEqual(1, "installpackage must be there once");
+                installPackageResult.First().Value.Version.ShouldEqual("1.0.0");
+            }
+        }
+
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_all_packages_with_except : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "all";
+                Configuration.UpgradeCommand.PackageNamesToSkip = "upgradepackage,badpackage";
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_report_for_all_non_skipped_packages()
+            {
+                Results.Count().ShouldEqual(1);
+                Results.First().Key.ShouldEqual("installpackage");
+            }
+
+            [Fact]
+            public void should_skip_packages_in_except_list()
+            {
+                var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
+                upgradePackageResult.Count.ShouldEqual(0, "upgradepackage should not be in the results list");
+            }
+        }
     }
 }
