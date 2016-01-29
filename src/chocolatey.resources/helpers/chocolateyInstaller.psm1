@@ -44,7 +44,7 @@ Get-Item $helpersPath\functions\*.ps1 |
 
 # load extensions if they exist
 $extensionsPath = Join-Path "$helpersPath" '..\extensions'
-if(Test-Path($extensionsPath)) {
+if (Test-Path($extensionsPath)) {
   Write-Debug 'Loading community extensions'
   #Resolve-Path $extensionsPath\**\*\*.psm1 | % { Write-Debug "Importing `'$_`'"; Import-Module $_.ProviderPath }
   Get-ChildItem $extensionsPath -recurse -filter "*.psm1" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }

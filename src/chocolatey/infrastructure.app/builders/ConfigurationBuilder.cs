@@ -134,7 +134,7 @@ namespace chocolatey.infrastructure.app.builders
         private static void set_config_items(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
             var cacheLocation = set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder.");
-          config.CacheLocation = !string.IsNullOrWhiteSpace(cacheLocation) ? cacheLocation : fileSystem.get_temp_path(); // System.Environment.GetEnvironmentVariable("TEMP");
+            config.CacheLocation = !string.IsNullOrWhiteSpace(cacheLocation) ? cacheLocation : fileSystem.get_temp_path(); // System.Environment.GetEnvironmentVariable("TEMP");
             if (string.IsNullOrWhiteSpace(config.CacheLocation))
             {
                 config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
@@ -379,20 +379,23 @@ You can pass options and switches in the following ways:
             Environment.SetEnvironmentVariable("OS_IS64BIT", config.Information.Is64Bit ? "true" : "false");
             Environment.SetEnvironmentVariable("IS_ADMIN", config.Information.IsUserAdministrator ? "true" : "false");
             Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", config.Information.IsProcessElevated ? "true" : "false");
-
             Environment.SetEnvironmentVariable("TEMP", config.CacheLocation);
+
             if (config.Debug)
             {
                 Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
             }
+
             if (config.Verbose)
             {
                 Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
             }
+
             if (!config.Features.CheckSumFiles)
             {
                 Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
             }
+
             if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
                 var proxyCreds = string.Empty;
