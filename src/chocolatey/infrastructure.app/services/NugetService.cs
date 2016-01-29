@@ -430,6 +430,7 @@ spam/junk folder.");
                         {
                             _fileSystem.delete_directory_if_exists(forcedResult.InstallLocation, recursive: true);
                         }
+                        remove_cache_for_package(config, installedPackage);
                     }
                     catch (Exception ex)
                     {
@@ -708,7 +709,11 @@ spam/junk folder.");
                                 if (config.Force && (installedPackage.Version == availablePackage.Version))
                                 {
                                     FaultTolerance.try_catch_with_logging_exception(
-                                        () => _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id), recursive: true),
+                                        () =>
+                                        {
+                                            _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id), recursive: true);
+                                            remove_cache_for_package(config, installedPackage);
+                                        },
                                         "Error during force upgrade");
                                     packageManager.InstallPackage(availablePackage, config.IgnoreDependencies, config.Prerelease);
                                 }
@@ -897,6 +902,15 @@ spam/junk folder.");
             }
         }
 
+        private void remove_cache_for_package( ChocolateyConfiguration config, IPackage installedPackage)
+        {
+            var cacheDirectory = _fileSystem.combine_paths(config.CacheLocation, installedPackage.Id, installedPackage.Version.to_string());
+            
+            FaultTolerance.try_catch_with_logging_exception(
+                                       () => _fileSystem.delete_directory_if_exists(cacheDirectory, recursive: true),
+                                       "Unable to removed cached files");
+        }
+
         public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
             var results = uninstall_run(config, continueAction, performAction: false);
@@ -1066,6 +1080,7 @@ spam/junk folder.");
                                 packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
                                 ensure_nupkg_is_removed(packageVersion, pkgInfo);
                                 remove_installation_files(packageVersion, pkgInfo);
+                                remove_cache_for_package(config, packageVersion);
                             }
                         }
                         catch (Exception ex)
