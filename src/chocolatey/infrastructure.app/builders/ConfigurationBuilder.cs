@@ -414,6 +414,11 @@ You can pass options and switches in the following ways:
                 Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
             }
 
+            if (config.Features.UsePowerShellHost)
+            {
+                Environment.SetEnvironmentVariable("ChocolateyPowerShellHost", "true");
+            }
+
             if (config.Information.LicenseIsValid)
             {
                 Environment.SetEnvironmentVariable("ChocolateyLicenseValid", "true");

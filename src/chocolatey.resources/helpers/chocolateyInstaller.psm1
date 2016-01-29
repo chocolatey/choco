@@ -48,7 +48,19 @@ if (Test-Path($extensionsPath)) {
   Write-Debug 'Loading community extensions'
   #Resolve-Path $extensionsPath\**\*\*.psm1 | % { Write-Debug "Importing `'$_`'"; Import-Module $_.ProviderPath }
   Get-ChildItem $extensionsPath -recurse -filter "*.psm1" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }
-  Get-ChildItem $extensionsPath -recurse -filter "*.dll" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }
+  Get-ChildItem $extensionsPath -recurse -filter "*.dll" | Select -ExpandProperty FullName | % { 
+    $path = $_;
+    try {
+      Write-Debug "Importing '$path'"; 
+      Import-Module $path; 
+    } catch {
+      if ($env:ChocolateyPowerShellHost -eq 'true') {
+        Write-Warning "Import failed for '$path'.  Error: '$_'"
+      } else {
+        Write-Warning "Import failed for '$path'. If it depends on a newer version of the .NET framework, please make sure you are using the built-in PowerShell Host. Error: '$_'"
+      }
+    }
+  }
 }
 
 Export-ModuleMember -Function * -Alias * -Cmdlet *
