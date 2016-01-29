@@ -67,8 +67,8 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <!--<docsUrl>At what url are the software docs located?</docsUrl>-->
     <!--<mailingListUrl></mailingListUrl>-->
     <!--<bugTrackerUrl></bugTrackerUrl>-->
-    <summary>__REPLACE__</summary>
     <tags>[[PackageNameLower]] admin SPACE_SEPARATED</tags>
+    <summary>__REPLACE__</summary>
     <description>__REPLACE__MarkDown_Okay [[AutomaticPackageNotesNuspec]]</description>
     <!-- <releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes> -->
     <!-- =============================== -->      
