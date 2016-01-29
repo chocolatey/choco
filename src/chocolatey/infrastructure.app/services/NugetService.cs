@@ -418,7 +418,7 @@ spam/junk folder.");
 
                 if (installedPackage != null && (installedPackage.Version == availablePackage.Version) && config.Force)
                 {
-                    var forcedResult = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    var forcedResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
                     forcedResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
 
                     backup_existing_version(config, installedPackage, _packageInfoService.get_package_information(installedPackage));
