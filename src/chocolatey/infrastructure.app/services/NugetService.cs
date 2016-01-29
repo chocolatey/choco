@@ -449,6 +449,7 @@ spam/junk folder.");
                     {
                         packageManager.InstallPackage(availablePackage, ignoreDependencies: config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
                         //packageManager.InstallPackage(packageName, version, configuration.IgnoreDependencies, configuration.Prerelease);
+                        remove_nuget_cache_for_package(availablePackage);
                     }
                 }
                 catch (Exception ex)
@@ -721,6 +722,7 @@ spam/junk folder.");
                                 {
                                     packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
                                 }
+                                remove_nuget_cache_for_package(availablePackage);
                             }
                         }
                         catch (Exception ex)
@@ -909,6 +911,25 @@ spam/junk folder.");
             FaultTolerance.try_catch_with_logging_exception(
                                        () => _fileSystem.delete_directory_if_exists(cacheDirectory, recursive: true),
                                        "Unable to removed cached files");
+        }
+
+        /// <summary>
+        /// Remove NuGet cache of the package. 
+        /// Whether we use the cached file or not, NuGet always caches the package.
+        /// This is annoying with choco, but if you use both choco and NuGet, it can 
+        /// cause hard to detect issues in NuGet when there is a NuGet package of the 
+        /// same name with different contents.
+        /// </summary>
+        /// <param name="installedPackage">The installed package.</param>
+        private void remove_nuget_cache_for_package(IPackage installedPackage)
+        {
+            var nugetCachedFile = _fileSystem.combine_paths(Environment.GetEnvironmentVariable("LocalAppData"), "NuGet", "Cache", "{0}.{1}.nupkg".format_with(installedPackage.Id, installedPackage.Version.to_string()));
+            if (_fileSystem.file_exists(nugetCachedFile))
+            {
+                FaultTolerance.try_catch_with_logging_exception(
+                                       () =>  _fileSystem.delete_file(nugetCachedFile),
+                                       "Unable to removed cached NuGet package file");
+            }
         }
 
         public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
