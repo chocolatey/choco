@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using commandline;
     using configuration;
@@ -730,9 +731,42 @@ Would have determined packages that are out of date based on what is
             var extensionsFolderName = packageResult.Name.to_lower().Replace(".extensions", string.Empty).Replace(".extension", string.Empty);
             var pkgExtensions = _fileSystem.combine_paths(ApplicationParameters.ExtensionsLocation, extensionsFolderName);
 
+            if (_fileSystem.directory_exists(pkgExtensions))
+            {
+                // remove old dll files files
+                foreach (var oldDllFile in _fileSystem.get_files(pkgExtensions, "*.dll.old", SearchOption.AllDirectories).or_empty_list_if_null())
+                {
+                    FaultTolerance.try_catch_with_logging_exception(
+                    () => _fileSystem.delete_file(oldDllFile),
+                    "Attempted to remove '{0}' but had an error".format_with(oldDllFile),
+                    throwError: false,
+                    logWarningInsteadOfError: true);
+                }
+
+                // rename possibly locked dll files
+                foreach (var dllFile in _fileSystem.get_files(pkgExtensions, "*.dll", SearchOption.AllDirectories).or_empty_list_if_null())
+                {
+                    FaultTolerance.try_catch_with_logging_exception(
+                   () => _fileSystem.move_file(dllFile, dllFile + ".old"),
+                   "Attempted to rename '{0}' but had an error".format_with(dllFile));
+                }
+            }
+            
             FaultTolerance.try_catch_with_logging_exception(
-                () => _fileSystem.delete_directory_if_exists(pkgExtensions, recursive: true),
-                "Attempted to remove '{0}' but had an error".format_with(pkgExtensions));
+                () =>
+                {
+                    foreach (var file in _fileSystem.get_files(pkgExtensions, "*.*", SearchOption.AllDirectories).or_empty_list_if_null().Where(f=> !f.EndsWith(".dll.old")))
+                    {
+                        FaultTolerance.try_catch_with_logging_exception(
+                        () => _fileSystem.delete_file(file),
+                        "Attempted to remove '{0}' but had an error".format_with(file),
+                        throwError: false,
+                        logWarningInsteadOfError: true);
+                    }
+                },
+                "Attempted to remove '{0}' but had an error".format_with(pkgExtensions),
+                throwError: false,
+                logWarningInsteadOfError: true);
 
             if (!config.CommandName.is_equal_to(CommandNameType.uninstall.to_string()))
             {
