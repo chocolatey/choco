@@ -187,10 +187,13 @@ param(
   }
 
   Start-Sleep 2 #give it a sec or two to finish up copying
-
+  
   $fi = new-object System.IO.FileInfo($fileFullPath)
   # validate file exists
   if (!($fi.Exists)) { throw "Chocolatey expected a file to be downloaded to `'$fileFullPath`' but nothing exists at that location." }
+
+  Get-VirusCheckValid -location $url -file $fileFullPath
+
   if ($headers.Count -ne 0) {
     # validate length is what we expected
     Write-Debug "Checking that `'$fileFullPath`' is the size we expect it to be."
@@ -203,13 +206,8 @@ param(
     }
   }
 
-  Write-Debug "Verifying package provided checksum of `'$checksum`' for `'$fileFullPath`'."
+  Write-Debug "Verifying package provided checksum of '$checksum' for '$fileFullPath'."
   Get-CheckSumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType
-
-  # Virus check is not able to be performed, must note that.
-  # $url is already set properly to the used location.
-  #Write-Debug "Verifying downloaded file is not known to contain viruses. FilePath: `'$fileFullPath`'."
-  #Get-VirusCheckValid -location $url -file $fileFullPath
 
   return $fileFullPath
 }
