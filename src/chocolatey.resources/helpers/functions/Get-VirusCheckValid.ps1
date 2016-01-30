@@ -14,15 +14,9 @@
 
 function Get-VirusCheckValid {
 param(
-  [string] $location,
+  [string] $url,
   [string] $file = ''
 )
-  Write-Debug "Running 'Get-VirusCheckValid' with location:`'$location`', file: `'$file`'";
-
-  Write-Debug "Right now there is no virus checking built in."
-  #if ($settings:virusCheck) {
-
-  #}
-
-  #if virus check is invalid, throw here
+  Write-Debug "No virus checking built into FOSS Chocolatey."
+  #Write-Debug "Running 'Get-VirusCheckValid' with url:`'$url`', file: `'$file`'";
 }

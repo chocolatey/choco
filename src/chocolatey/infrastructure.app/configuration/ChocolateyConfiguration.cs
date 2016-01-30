@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System.Reflection;
     using System.Text;
     using domain;
+    using licensing;
     using logging;
     using platforms;
 
@@ -206,6 +207,9 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool AllowDowngrade { get; set; }
         public bool ForceDependencies { get; set; }
 
+        //licensed versions only
+        public int VirusCheckMinimumPositives { get; set; }
+
         /// <summary>
         ///   Configuration values provided by choco.
         /// </summary>
@@ -326,6 +330,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IsInteractive { get; set; }
         public bool IsUserAdministrator { get; set; }
         public bool IsProcessElevated { get; set; }
+        public string LicenseType { get; set; }
+        public bool LicenseIsValid { get; set; }
+        public string LicenseVersion { get; set; }
+        public string LicenseUserName { get; set; }
+        public DateTime? LicenseExpirationDate { get; set; }
 
     }
 
@@ -338,6 +347,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool FailOnStandardError { get; set; }
         public bool UsePowerShellHost { get; set; }
         public bool LogEnvironmentValues { get; set; }
+        public bool VirusCheck { get; set; }
     }
 
     //todo: retrofit other command configs this way

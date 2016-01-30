@@ -27,9 +27,9 @@ namespace chocolatey.infrastructure.app.commands
     using results;
     using services;
 
-    [CommandFor(CommandNameType.list)]
-    [CommandFor(CommandNameType.search)]
-    public sealed class ChocolateyListCommand : IListCommand<PackageResult>
+    [CommandFor("list", "lists remote or local packages")]
+    [CommandFor("search", "searches remote or local packages (alias for list)")]
+    public class ChocolateyListCommand : IListCommand<PackageResult>
     {
         private readonly IChocolateyPackageService _packageService;
 
@@ -38,7 +38,7 @@ namespace chocolatey.infrastructure.app.commands
             _packageService = packageService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("s=|source=",
@@ -82,16 +82,16 @@ namespace chocolatey.infrastructure.app.commands
             //todo exact name
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "List/Search Command");
             this.Log().Info(@"
@@ -121,32 +121,32 @@ Chocolatey will perform a search for a package local or remote. Some
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             _packageService.list_noop(configuration);
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             _packageService.ensure_source_app_installed(configuration);
             // note: you must leave the .ToList() here or else the method won't be evaluated!
             _packageService.list_run(configuration).ToList();
         }
 
-        public IEnumerable<PackageResult> list(ChocolateyConfiguration configuration)
+        public virtual IEnumerable<PackageResult> list(ChocolateyConfiguration configuration)
         {
             configuration.QuietOutput = true;
             // here it's up to the caller to enumerate the results
             return _packageService.list_run(configuration);
         }
 
-        public int count(ChocolateyConfiguration config)
+        public virtual int count(ChocolateyConfiguration config)
         {
             config.QuietOutput = true;
             return _packageService.count_run(config);
         }
 
-        public bool may_require_admin_access()
+        public virtual bool may_require_admin_access()
         {
             return false;
         }

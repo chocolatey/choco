@@ -55,7 +55,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_implement_unpackself()
             {
-                results.ShouldContain(CommandNameType.unpackself.to_string());
+                results.ShouldContain("unpackself");
             }
         }
 

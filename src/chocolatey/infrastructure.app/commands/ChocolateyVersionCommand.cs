@@ -20,12 +20,11 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.version)]
-    public sealed class ChocolateyVersionCommand : ChocolateyUpgradeCommand
+    [CommandFor("version", "[DEPRECATED] will be removed in v1 - use `choco outdated` or `cup <pkg|all> -whatif` instead")]
+    public class ChocolateyVersionCommand : ChocolateyUpgradeCommand
     {
         private readonly IChocolateyPackageService _packageService;
 

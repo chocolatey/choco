@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.app.domain
+namespace chocolatey.infrastructure.licensing
 {
-
-    public enum CommandNameType
+    public enum ChocolateyLicenseType
     {
-        list,
-        install,
-        upgrade,
-        uninstall,
+        Unknown,
+        Foss,
+        Professional,
+        Business,
+        Enterprise,
     }
 }

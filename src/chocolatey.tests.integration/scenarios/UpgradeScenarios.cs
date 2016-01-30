@@ -19,6 +19,7 @@ namespace chocolatey.tests.integration.scenarios
     using System.Collections.Concurrent;
     using System.IO;
     using System.Linq;
+    using System.Threading;
     using System.Xml.XPath;
     using NUnit.Framework;
     using NuGet;
@@ -1848,7 +1849,15 @@ namespace chocolatey.tests.integration.scenarios
                 string dotChocolatey = Path.Combine(Scenario.get_top_level(), ".chocolatey");
                 if (Directory.Exists(dotChocolatey))
                 {
-                    Directory.Delete(dotChocolatey, recursive: true);
+                    try
+                    {
+                        Directory.Delete(dotChocolatey, recursive: true);
+                    }
+                    catch (Exception)
+                    {
+                        Thread.Sleep(2000);
+                        Directory.Delete(dotChocolatey, recursive: true);
+                    }
                 }
             }
 

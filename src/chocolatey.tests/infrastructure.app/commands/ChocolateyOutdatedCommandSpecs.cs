@@ -54,7 +54,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_implement_outdated()
             {
-                results.ShouldContain(CommandNameType.outdated.to_string());
+                results.ShouldContain("outdated");
             }
         }
 

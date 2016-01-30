@@ -93,7 +93,7 @@ param(
 
   $fileType = 'zip'
 
-  $chocTempDir = Join-Path $env:TEMP "chocolatey"
+  $chocTempDir = $env:TEMP
   $tempDir = Join-Path $chocTempDir "$packageName"
   if ($env:packageVersion -ne $null) {$tempDir = Join-Path $tempDir "$env:packageVersion"; }
 

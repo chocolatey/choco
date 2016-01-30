@@ -20,13 +20,12 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.install)]
-    public sealed class ChocolateyInstallCommand : ICommand
+    [CommandFor("install", "installs packages from various sources")]
+    public class ChocolateyInstallCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;
 
@@ -35,7 +34,7 @@ namespace chocolatey.infrastructure.app.commands
             _packageService = packageService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("s=|source=",
@@ -94,13 +93,13 @@ namespace chocolatey.infrastructure.app.commands
             //todo: Checksum / ChecksumType defaults to md5 / package name can be a url / installertype
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
             configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments);
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
             if (string.IsNullOrWhiteSpace(configuration.PackageNames))
             {
@@ -119,7 +118,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Install Command");
             this.Log().Info(@"
@@ -180,18 +179,18 @@ NOTE: Options and switches apply to all items passed, so if you are
 ");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             _packageService.install_noop(configuration);
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             _packageService.ensure_source_app_installed(configuration);
             _packageService.install_run(configuration);
         }
 
-        public bool may_require_admin_access()
+        public virtual bool may_require_admin_access()
         {
             return true;
         }

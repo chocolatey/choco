@@ -13,21 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.app.attributes
+namespace chocolatey.infrastructure.licensing
 {
     using System;
-    using domain;
 
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class CommandForAttribute : Attribute
+    public sealed class ChocolateyLicense
     {
-        public string CommandName { get; private set; }
-        public string Description { get; private set; }
+        public string Name { get; set; }
+        public ChocolateyLicenseType LicenseType { get; set; }
+        public bool IsValid { get; set; }
+        public bool AssemblyLoaded { get; set; }
+        //todo: get version
+        public string Version { get; set; }
+        public string InvalidReason { get; set; }
+        public DateTime? ExpirationDate { get; set; }
 
-        public CommandForAttribute(string commandName, string description)
+        public bool is_licensed_version()
         {
-            CommandName = commandName;
-            Description = description;
+            return IsValid
+                   && LicenseType != ChocolateyLicenseType.Unknown
+                   && LicenseType != ChocolateyLicenseType.Foss
+                ;
         }
     }
 }

@@ -53,7 +53,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_implement_config()
             {
-                results.ShouldContain(CommandNameType.config.to_string());
+                results.ShouldContain("config");
             }
         }
 

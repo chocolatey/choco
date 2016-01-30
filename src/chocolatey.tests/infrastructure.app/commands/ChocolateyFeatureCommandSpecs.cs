@@ -39,13 +39,13 @@
             [Fact]
             public void should_implement_feature()
             {
-                results.ShouldContain(CommandNameType.feature.to_string());
+                results.ShouldContain("feature");
             } 
             
             [Fact]
             public void should_implement_features()
             {
-                results.ShouldContain(CommandNameType.features.to_string());
+                results.ShouldContain("features");
             } 
         }
 

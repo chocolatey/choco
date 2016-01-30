@@ -101,7 +101,7 @@ param(
 
   Write-Debug "Running 'Install-ChocolateyPackage' for $packageName with url:`'$url`', args: `'$silentArgs`', fileType: `'$fileType`', url64bit: `'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`', validExitCodes: `'$validExitCodes`' ";
 
-  $chocTempDir = Join-Path $env:TEMP "chocolatey"
+  $chocTempDir = $env:TEMP
   $tempDir = Join-Path $chocTempDir "$packageName"
   if ($env:packageVersion -ne $null) {$tempDir = Join-Path $tempDir "$env:packageVersion"; }
 

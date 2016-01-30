@@ -55,13 +55,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_implement_list()
             {
-                results.ShouldContain(CommandNameType.list.to_string());
+                results.ShouldContain("list");
             }
 
             [Fact]
             public void should_implement_search()
             {
-                results.ShouldContain(CommandNameType.search.to_string());
+                results.ShouldContain("search");
             }
         }
 

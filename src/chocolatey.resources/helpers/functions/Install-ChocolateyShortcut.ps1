@@ -75,11 +75,11 @@ directoy, an icon to be used for the shortcut, along with a description and argu
     }
 
 	if(!$targetPath) {
-	  throw "Install-ChocolateyShortcut - `$targetFilePath can not be null."
+	  throw "Install-ChocolateyShortcut - `$targetPath can not be null."
 	}
 		
 	if(!(Test-Path($targetPath))) {
-	  Write-Warning "'$targetFilePath' does not exist. If it is not created the shortcut will not be valid."
+	  Write-Warning "'$targetPath' does not exist. If it is not created the shortcut will not be valid."
 	}
 	
 	if($iconLocation) {

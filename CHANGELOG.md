@@ -1,30 +1,70 @@
 ## [0.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.10+is%3Aclosed) (unreleased)
 
-Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, right?)! Use an internal PowerShell host to take advantage of quite a few improvements!
+What will be highlighted:
+
+* Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, right?)!
+* Use an internal PowerShell host to take advantage of quite a few improvements!
+* Introduce managing package templates, reintroduce extensions.
+* Talk about using original download file name
+* Talk about the improvements in search information
+* Talk a little about what's coming with pro
 
 ### BREAKING CHANGES
 
  * Only fail automation scripts (chocolateyInstall.ps1) if the script returns non-zero exit code - see [#445](https://github.com/chocolatey/choco/issues/445)
+ * Fix - Force reinstall, force upgrade, and uninstall should delete the download cache - see [#590](https://github.com/chocolatey/choco/issues/590)
+
+For 445 - the 0.9.8 series would only fail a package with terminating errors. The 0.9.9 series took that a bit further and started failing packages if anything wrote to stderr. It turns out that is a bad idea. Only when PowerShell exits with non-zero (which comes with terminating errors) should the package fail due to this. If you need the old behavior of the 0.9.9 series, you can get it back with a switch (`--fail-on-standard-error` and its aliases) and/or a feature flip (`failOnStandardError`).
+
+For 590 - if you set a custom cache directory for downloads, it will no longer use a "chocolatey" subdirectory under that. You may need to make any adjustments if this is going to affect you.
+
+### KNOWN ISSUES
+
+ * [Known Issues](https://github.com/chocolatey/choco/labels/Bug)
+ * [POSH Host] The handle is invalid - when output is being redirected and a package attempts to write to a filestream - see [#572](https://github.com/chocolatey/choco/issues/572)
 
 ### FEATURES
 
  * Alternative Sources - see [#14](https://github.com/chocolatey/choco/issues/14)
- * Use Internal PowerShell Host - see [#8](https://github.com/chocolatey/choco/issues/8)
+ * [POSH Host] Use Internal PowerShell Host - see [#8](https://github.com/chocolatey/choco/issues/8)
+ * Manage package templates with a specially named package and special package folder - see [#542](https://github.com/chocolatey/choco/issues/542)
+ * Use the actual download file name instead of providing one - see [#435](https://github.com/chocolatey/choco/issues/435)
  * Support for custom headers - see [#332](https://github.com/chocolatey/choco/issues/332)
+* [Security] Show moderation-related information in search results - see [#493](https://github.com/chocolatey/choco/issues/493)
 
 ### BUG FIXES
 
- * Fix - Debug/Verbose messages not logged in install scripts (chocolateyInstall.ps1) - see [#520](https://github.com/chocolatey/choco/issues/520)
+ * [Security] Fix - Only load the Chocolatey PowerShell module from a known location - see [#560](https://github.com/chocolatey/choco/issues/560)
+ * Fix - Force should set allow-downgrade to true - see [#585](https://github.com/chocolatey/choco/issues/585)
+ * Fix - Do not use NuGet package cache - see [#479](https://github.com/chocolatey/choco/issues/479)
+ * Fix - TEMP environment variable is 8.3 Path on some systems - see [#532](https://github.com/chocolatey/choco/issues/532)
+ * Fix - `$packageName` should be present for zip uninstalls in uninstall script template - see [#534](https://github.com/chocolatey/choco/issues/534)
+ * Fix - Debug/Verbose messages not logged in automation scripts (chocolateyInstall.ps1) - see [#520](https://github.com/chocolatey/choco/issues/520)
+ * Fix - Escape log output for variables that have data from external sources - see [#565](https://github.com/chocolatey/choco/issues/565)
+ * Fix - Choco new silentargs can't pass in args in the param=value format - see [#510](https://github.com/chocolatey/choco/issues/510)
+ * Fix - Exception if no source is enabled - see [#490](https://github.com/chocolatey/choco/issues/490)
+ * Fix - Chocolatey command help output written to standard error instead of standard out - see [#468](https://github.com/chocolatey/choco/issues/468)
  * Fix - Logger doesn't clear cached NullLoggers - see [#516](https://github.com/chocolatey/choco/issues/516)
  * Fix - DISM "/All" argument in the wrong position - see [#480](https://github.com/chocolatey/choco/issues/480)
- * Fix - Merging assemblies on a machine running .net 4.5 or higher produces binaries incompatible with .net 4 - see [#392](https://github.com/chocolatey/choco/issues/392)
+ * Fix - Merging assemblies on a machine running .Net 4.5 or higher produces binaries incompatible with .Net 4 - see [#392](https://github.com/chocolatey/choco/issues/392)
  * Fix - API - Incorrect log4net version in chocolatey.lib dependencies - see [#390](https://github.com/chocolatey/choco/issues/390)
+ * [POSH Host] Fix - Message after Download progress is on the same line sometimes - see [#525](https://github.com/chocolatey/choco/issues/525)
+ * [POSH Host] Fix - PowerShell internal process - "The handle is invalid." - see [#526](https://github.com/chocolatey/choco/issues/526)
 
 ### IMPROVEMENTS
 
  * AutoUninstaller is on by default - see [#308](https://github.com/chocolatey/choco/issues/308)
+ * Unset Configuration Values - see [#551](https://github.com/chocolatey/choco/issues/551)
+ * Ability to run "choco upgrade all" ignoring specific packages - see [#293](https://github.com/chocolatey/choco/issues/293)
+ * Extensions enhancements - see [#588](https://github.com/chocolatey/choco/issues/588)
  * Show human-readable file sizes when downloading - see [#363](https://github.com/chocolatey/choco/issues/363)
- * API - Add the ability to retrieve package count for a Source  - see [#431](https://github.com/chocolatey/choco/issues/431)
+ * [Security] Warn about environment changes - see [#563](https://github.com/chocolatey/choco/issues/563)
+ * Warn when execution timeout has elapsed - see [#561](https://github.com/chocolatey/choco/issues/561)
+ * Update nuspec to make it easier to get started - see [#535](https://github.com/chocolatey/choco/issues/535)
+ * Pro - Set download cache information if available - see [#562](https://github.com/chocolatey/choco/issues/562)
+ * Pro - Allow commands to be added - see [#583](https://github.com/chocolatey/choco/issues/583)
+ * Pro -Load/Provide hooks for licensed version - see [#584](https://github.com/chocolatey/choco/issues/584)
+ * API - Add the ability to retrieve package count for a Source - see [#431](https://github.com/chocolatey/choco/issues/431)
  * API - Chocolatey Lib still marks vital package information as internal - see [#433](https://github.com/chocolatey/choco/issues/433)
  * API - Add paging to list command - see [#427](https://github.com/chocolatey/choco/issues/427)
 

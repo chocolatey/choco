@@ -19,7 +19,7 @@
   <property name="dirs.merge.from" value="${dirs.drop}${path.separator}${folder.app.drop}${path.separator}lib" />
   <property name="dirs.merge.to" value="${dirs.drop}${path.separator}merge" overwrite="false" />
 
-  <property name="file.internalize.ignore" value="ilmerge.internalize.ignore.txt" />
+  <property name="file.internalize.ignore" value="ilmerge.internalize.ignore.dll.txt" />
   <property name="path.file.internalize.ignore" value="${dirs.build_scripts_custom}${path.separator}${file.internalize.ignore}" />
   <!-- overwrite this property -->
   <property name="file.merge.name" value="chocolatey.dll" />
