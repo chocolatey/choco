@@ -36,7 +36,7 @@ namespace chocolatey.infrastructure.app.commands
             _configSettingsService = configSettingsService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             configuration.Sources = null;
             configuration.PushCommand.TimeoutInSeconds = 300;
@@ -66,7 +66,7 @@ namespace chocolatey.infrastructure.app.commands
             //todo: push command - allow disable buffering?
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments); // path to .nupkg - assume relative
 
@@ -86,7 +86,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
             if (string.IsNullOrWhiteSpace(configuration.Sources))
             {
@@ -120,7 +120,7 @@ NOTE: For chocolatey.org, you must update the source to be secure.".format_with(
             }
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Push Command");
             this.Log().Info(@"
@@ -167,17 +167,17 @@ A common error is `Failed to process request. 'The specified API key
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             _packageService.push_noop(configuration);
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             _packageService.push_run(configuration);
         }
 
-        public bool may_require_admin_access()
+        public virtual bool may_require_admin_access()
         {
             return false;
         }

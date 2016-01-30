@@ -36,7 +36,7 @@ namespace chocolatey.infrastructure.app.commands
             _configSettingsService = configSettingsService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             configuration.Sources = null;
 
@@ -50,12 +50,12 @@ namespace chocolatey.infrastructure.app.commands
                 ;
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
             if (!string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key) && string.IsNullOrWhiteSpace(configuration.Sources))
             {
@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "ApiKey Command");
             this.Log().Info(@"
@@ -101,12 +101,12 @@ In order to save your API key for {0},
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             _configSettingsService.noop(configuration);
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             if (string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key))
             {
@@ -128,7 +128,7 @@ In order to save your API key for {0},
             }
         }
 
-        public bool may_require_admin_access()
+        public virtual bool may_require_admin_access()
         {
             return true;
         }

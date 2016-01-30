@@ -43,7 +43,7 @@ namespace chocolatey.infrastructure.app.commands
             _nugetService = nugetService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("n=|name=",
@@ -55,7 +55,7 @@ namespace chocolatey.infrastructure.app.commands
                 ;
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             // don't set configuration.Input or it will be passed to list
 
@@ -81,7 +81,7 @@ namespace chocolatey.infrastructure.app.commands
             configuration.Prerelease = true;
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
             if (configuration.PinCommand.Command != PinCommandType.list && string.IsNullOrWhiteSpace(configuration.PinCommand.Name))
             {
@@ -89,7 +89,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Pin Command");
             this.Log().Info(@"
@@ -114,12 +114,12 @@ Pin a package to suppress upgrades.
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             this.Log().Info("Pin would have called {0} with other options:{1} Name={2}{1} Version={3}".format_with(configuration.PinCommand.Command.to_string(), Environment.NewLine, configuration.PinCommand.Name.to_string(), configuration.Version.to_string()));
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
                                                                installSuccessAction: null,
@@ -137,7 +137,7 @@ Pin a package to suppress upgrades.
             }
         }
 
-        public void list_pins(IPackageManager packageManager, ChocolateyConfiguration config)
+        public virtual void list_pins(IPackageManager packageManager, ChocolateyConfiguration config)
         {
             var input = config.Input;
             config.Input = string.Empty;
@@ -157,7 +157,7 @@ Pin a package to suppress upgrades.
             }
         }
 
-        public void set_pin(IPackageManager packageManager, ChocolateyConfiguration config)
+        public virtual void set_pin(IPackageManager packageManager, ChocolateyConfiguration config)
         {
             var addingAPin = config.PinCommand.Command == PinCommandType.add;
             this.Log().Info("Trying to {0} a pin for {1}".format_with(config.PinCommand.Command.to_string(), config.PinCommand.Name));
@@ -196,7 +196,7 @@ Pin a package to suppress upgrades.
             }
         }
 
-        public bool may_require_admin_access()
+        public virtual bool may_require_admin_access()
         {
             return true;
         }
