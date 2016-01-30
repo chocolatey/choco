@@ -18,12 +18,11 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.update)]
-    public sealed class ChocolateyUpdateCommand : ChocolateyUpgradeCommand
+    [CommandFor("update", "[DEPRECATED] RESERVED for future use (you are looking for upgrade, these are not the droids you are looking for)")]
+    public class ChocolateyUpdateCommand : ChocolateyUpgradeCommand
     {
         //todo: v1 Deprecation - update is removed or becomes package indexes
         public ChocolateyUpdateCommand(IChocolateyPackageService packageService) : base(packageService)

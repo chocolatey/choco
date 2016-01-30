@@ -79,6 +79,12 @@ namespace chocolatey.infrastructure.adapters
 
         AssemblyName GetName();
 
+        Type GetType(String name);
+
+        Type GetType(String name, bool throwOnError);
+
+        Type GetType(String name, bool throwOnError, bool ignoreCase);
+
         /// <summary>
         ///   Loads the specified manifest resource from this assembly.
         /// </summary>

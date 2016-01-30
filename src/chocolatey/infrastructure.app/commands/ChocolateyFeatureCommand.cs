@@ -26,9 +26,9 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.feature)]
-    [CommandFor(CommandNameType.features)]
-    public sealed class ChocolateyFeatureCommand : ICommand
+    [CommandFor("feature", "view and configure choco features")]
+    [CommandFor("features", "view and configure choco features (alias for feature)")]
+    public class ChocolateyFeatureCommand : ICommand
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
 
@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.app.commands
             _configSettingsService = configSettingsService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             configuration.Sources = string.Empty;
 
@@ -48,7 +48,7 @@ namespace chocolatey.infrastructure.app.commands
                 ;
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
 
@@ -69,7 +69,7 @@ namespace chocolatey.infrastructure.app.commands
             configuration.FeatureCommand.Command = command;
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
             if (configuration.FeatureCommand.Command != FeatureCommandType.list && string.IsNullOrWhiteSpace(configuration.FeatureCommand.Name))
             {
@@ -77,7 +77,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Feature Command");
             this.Log().Info(@"
@@ -100,12 +100,12 @@ Chocolatey will allow you to interact with features.
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             _configSettingsService.noop(configuration);
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             switch (configuration.FeatureCommand.Command)
             {
@@ -121,7 +121,7 @@ Chocolatey will allow you to interact with features.
             }
         }
 
-        public bool may_require_admin_access()
+        public virtual bool may_require_admin_access()
         {
             return true;
         }

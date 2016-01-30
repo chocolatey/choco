@@ -56,7 +56,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_implement_push()
             {
-                results.ShouldContain(CommandNameType.push.to_string());
+                results.ShouldContain("push");
             }
         }
 

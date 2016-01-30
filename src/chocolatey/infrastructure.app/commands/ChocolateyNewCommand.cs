@@ -21,14 +21,13 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using services;
     using templates;
 
-    [CommandFor(CommandNameType.@new)]
-    public sealed class ChocolateyNewCommand : ICommand
+    [CommandFor("new", "generates files necessary for a chocolatey package from a template")]
+    public class ChocolateyNewCommand : ICommand
     {
         private readonly ITemplateService _templateService;
 
@@ -37,7 +36,7 @@ namespace chocolatey.infrastructure.app.commands
             _templateService = templateService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("a|auto|automaticpackage",
@@ -63,7 +62,7 @@ namespace chocolatey.infrastructure.app.commands
             //todo: more built-in templates
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
 
@@ -97,7 +96,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.Name))
             {
@@ -105,7 +104,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "New Command");
             this.Log().Info(@"
@@ -137,17 +136,17 @@ Possible properties to pass:
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             _templateService.noop(configuration);
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             _templateService.generate(configuration);
         }
 
-        public bool may_require_admin_access()
+        public virtual bool may_require_admin_access()
         {
             return false;
         }

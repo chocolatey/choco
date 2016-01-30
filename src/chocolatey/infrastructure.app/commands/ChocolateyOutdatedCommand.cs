@@ -19,13 +19,12 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.outdated)]
-    public sealed class ChocolateyOutdatedCommand : ICommand
+    [CommandFor("outdated", "retrieves packages that are outdated. Similar to upgrade all --noop")]
+    public class ChocolateyOutdatedCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;
 
@@ -34,7 +33,7 @@ namespace chocolatey.infrastructure.app.commands
             _packageService = packageService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("s=|source=",
@@ -49,17 +48,17 @@ namespace chocolatey.infrastructure.app.commands
                 ;
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
             configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments);
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Outdated Command");
             this.Log().Info(@"
@@ -84,17 +83,17 @@ If you use `--source=https://somewhere/out/there`, it is
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             _packageService.outdated_noop(configuration);
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             _packageService.outdated_run(configuration);
         }
 
-        public bool may_require_admin_access()
+        public virtual bool may_require_admin_access()
         {
             return false;
         }

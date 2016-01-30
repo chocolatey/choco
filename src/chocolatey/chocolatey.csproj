@@ -125,6 +125,8 @@
     <Compile Include="infrastructure.app\services\IConfigTransformService.cs" />
     <Compile Include="infrastructure.app\services\IFilesService.cs" />
     <Compile Include="infrastructure.app\services\ISourceRunner.cs" />
+    <Compile Include="infrastructure\licensing\ChocolateyLicense.cs" />
+    <Compile Include="infrastructure\licensing\ChocolateyLicenseType.cs" />
     <Compile Include="infrastructure\powershell\PoshHost.cs" />
     <Compile Include="infrastructure\powershell\PoshHostRawUserInterface.cs" />
     <Compile Include="infrastructure\powershell\PoshHostUserInterface.cs" />
