@@ -162,6 +162,10 @@ namespace chocolatey.infrastructure.app.builders
             config.Proxy.Location = set_config_item(ApplicationParameters.ConfigSettings.Proxy, configFileSettings, string.Empty, "Explicit proxy location.");
             config.Proxy.User = set_config_item(ApplicationParameters.ConfigSettings.ProxyUser, configFileSettings, string.Empty, "Optional proxy user.");
             config.Proxy.EncryptedPassword = set_config_item(ApplicationParameters.ConfigSettings.ProxyPassword, configFileSettings, string.Empty, "Optional proxy password. Encrypted.");
+
+            int minPositives=0;
+            int.TryParse(set_config_item(ApplicationParameters.ConfigSettings.VirusCheckMinimumPositives, configFileSettings, "5", "Optional proxy password. Encrypted."), out minPositives);
+            config.VirusCheckMinimumPositives = minPositives == 0 ? 5 : minPositives;
         }
 
         private static string set_config_item(string configName, ConfigFileSettings configFileSettings, string defaultValue, string description, bool forceSettingValue = false)
@@ -196,6 +200,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.FailOnStandardError = set_feature_flag(ApplicationParameters.Features.FailOnStandardError, configFileSettings, defaultEnabled: false, description: "Fail if install provider writes to stderr.");
             config.Features.UsePowerShellHost = set_feature_flag(ApplicationParameters.Features.UsePowerShellHost, configFileSettings, defaultEnabled: true, description: "Use Chocolatey's built-in PowerShell host.");
             config.Features.LogEnvironmentValues = set_feature_flag(ApplicationParameters.Features.LogEnvironmentValues, configFileSettings, defaultEnabled: false, description: "Log Environment Values - will log values of environment before and after install (could disclose sensitive data).");
+            config.Features.VirusCheck = set_feature_flag(ApplicationParameters.Features.VirusCheck, configFileSettings, defaultEnabled: false, description: "Virus Check [licensed versions only] - perform virus checking on downloaded files.");
             config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
         }
 
@@ -381,20 +386,9 @@ You can pass options and switches in the following ways:
             Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", config.Information.IsProcessElevated ? "true" : "false");
             Environment.SetEnvironmentVariable("TEMP", config.CacheLocation);
 
-            if (config.Debug)
-            {
-                Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
-            }
-
-            if (config.Verbose)
-            {
-                Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
-            }
-
-            if (!config.Features.CheckSumFiles)
-            {
-                Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
-            }
+            if (config.Debug) Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
+            if (config.Verbose) Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
+            if (!config.Features.CheckSumFiles) Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
 
             if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
@@ -414,14 +408,13 @@ You can pass options and switches in the following ways:
                 Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
             }
 
-            if (config.Features.UsePowerShellHost)
+            if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable("ChocolateyPowerShellHost", "true");
+            if (config.Information.LicenseIsValid) Environment.SetEnvironmentVariable("ChocolateyLicenseValid", "true");
+            if (config.Force) Environment.SetEnvironmentVariable("ChocolateyForce", "true");
+            if (config.Features.VirusCheck)
             {
-                Environment.SetEnvironmentVariable("ChocolateyPowerShellHost", "true");
-            }
-
-            if (config.Information.LicenseIsValid)
-            {
-                Environment.SetEnvironmentVariable("ChocolateyLicenseValid", "true");
+                Environment.SetEnvironmentVariable("ChocolateyVirusCheckFiles", "true");
+                Environment.SetEnvironmentVariable("ChocolateyVirusCheckMinimumPositives", config.VirusCheckMinimumPositives.to_string());
             }
         }
     }

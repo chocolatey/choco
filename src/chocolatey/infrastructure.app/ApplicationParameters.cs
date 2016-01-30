@@ -95,6 +95,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string Proxy = "proxy";
             public static readonly string ProxyUser = "proxyUser";
             public static readonly string ProxyPassword = "proxyPassword";
+            public static readonly string VirusCheckMinimumPositives = "virusCheckMinimumPositives";
         }
         
         public static class Features
@@ -106,6 +107,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string FailOnStandardError = "failOnStandardError";
             public static readonly string UsePowerShellHost = "powershellHost";
             public static readonly string LogEnvironmentValues = "logEnvironmentValues";
+            public static readonly string VirusCheck = "virusCheck";
         }
 
         public static class Messages
