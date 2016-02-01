@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-EnvironmentVariable([string] $Name, [System.EnvironmentVariableTarget] $Scope, [bool] $PreserveVariables = $False) {
+function Get-EnvironmentVariable([string] $Name, [System.EnvironmentVariableTarget] $Scope, [switch] $PreserveVariables = $False) {
     if ($pathType -eq [System.EnvironmentVariableTarget]::Machine) {
         $reg = [Microsoft.Win32.Registry]::Machine.OpenSubKey("Environment", $true)
     } else {
         $reg = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey("Environment", $true)
     }
 
-    if ($PreserveVariables -eq $True) {
+    if ($PreserveVariables) {
         $option = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
     } else {
         $option = [Microsoft.Win32.RegistryValueOptions]::None
