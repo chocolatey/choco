@@ -87,7 +87,7 @@ namespace chocolatey.infrastructure.app.nuget
             Console.Write("User name: ");
             string username = Console.ReadLine();
             Console.Write("Password: ");
-            var password = Console.ReadLine();
+            var password = InteractivePrompt.get_password(_config.PromptForConfirmation);
 
             //todo: set this up as secure
             //using (var securePassword = new SecureString())
