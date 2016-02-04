@@ -228,6 +228,7 @@ namespace chocolatey.console
             var addOrUpdate = license.IsValid;
             var config = new ChocolateyConfiguration {
                     RegularOutput = false,
+                    QuietOutput = true,
                 };
 
             var sourceService = container.GetInstance<IChocolateyConfigSettingsService>();

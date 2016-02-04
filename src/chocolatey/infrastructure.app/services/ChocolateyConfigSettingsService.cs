@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.Linq;
     using configuration;
+    using infrastructure.configuration;
     using infrastructure.services;
     using logging;
     using nuget;
@@ -50,7 +51,7 @@ namespace chocolatey.infrastructure.app.services
             var list = new List<ChocolateySource>();
             foreach (var source in configFileSettings.Sources)
             {
-                if (configuration.RegularOutput) {
+                if (!configuration.QuietOutput) {
                     this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}.".format_with(
                         source.Id,
                         source.Disabled ? " [Disabled]" : string.Empty,
@@ -85,7 +86,7 @@ namespace chocolatey.infrastructure.app.services
                 configFileSettings.Sources.Add(source);
 
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                this.Log().Warn(() => "Added {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Added {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
             }
             else
             {
@@ -96,7 +97,7 @@ namespace chocolatey.infrastructure.app.services
                     configuration.SourceCommand.Password.is_equal_to(currentPassword)
                     )
                 {
-                    this.Log().Warn(NO_CHANGE_MESSAGE);
+                    if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
                 }
                 else
                 {
@@ -106,7 +107,7 @@ namespace chocolatey.infrastructure.app.services
                     source.Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password);
 
                     _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                    this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
+                    if (!configuration.QuietOutput) this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
                 }
             }
         }
@@ -119,11 +120,11 @@ namespace chocolatey.infrastructure.app.services
                 configFileSettings.Sources.Remove(source);
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                this.Log().Warn(() => "Removed {0}".format_with(source.Id));
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Removed {0}".format_with(source.Id));
             }
             else
             {
-                this.Log().Warn(NO_CHANGE_MESSAGE);
+                if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
             }
         }
 
@@ -134,11 +135,11 @@ namespace chocolatey.infrastructure.app.services
             {
                 source.Disabled = true;
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                this.Log().Warn(() => "Disabled {0}".format_with(source.Id));
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Disabled {0}".format_with(source.Id));
             }
             else
             {
-                this.Log().Warn(NO_CHANGE_MESSAGE);
+                if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
             }
         }
 
@@ -149,11 +150,11 @@ namespace chocolatey.infrastructure.app.services
             {
                 source.Disabled = false;
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                this.Log().Warn(() => "Enabled {0}".format_with(source.Id));
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Enabled {0}".format_with(source.Id));
             }
             else
             {
-                this.Log().Warn(NO_CHANGE_MESSAGE);
+                if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
             }
         }
 
