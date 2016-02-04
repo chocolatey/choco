@@ -85,7 +85,7 @@ param(
   
   try
   {
-    [HttpWebResponse]$response = $request.GetResponse()
+    [System.Net.HttpWebResponse]$response = $request.GetResponse()
     if ($response -eq $null) { 
       $response.Close() 
       return $originalFileName 
@@ -134,7 +134,7 @@ param(
   {
     $request.ServicePoint.MaxIdleTime = 0
     $request.Abort();
-    Write-Debug "Url request/response failed - file name will be '$originalFileName'"
+    Write-Debug "Url request/response failed - file name will be '$originalFileName':  $($_)"
     
     return $originalFileName
   }
