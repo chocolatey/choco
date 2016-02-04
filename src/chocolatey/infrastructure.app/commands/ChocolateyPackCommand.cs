@@ -39,6 +39,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("version=",
                      "Version - The version you would like to insert into the package.",
                      option => configuration.Version = option.remove_surrounding_quotes())
+                .Add("outputdirectory=",
+                     "OutputDirectory - Specifies the directory for the created Chocolatey package file. If not specified, uses the current directory.",
+                     option => configuration.OutputDirectory = option)
                 ;
         }
 
@@ -74,6 +77,7 @@ NOTE: `cpack` has been deprecated as it has a name collision with CMake. Please
     choco pack
     choco pack --version 1.2.3
     choco pack path/to/nuspec
+    choco pack --outputdirectory build
 
 ");
 

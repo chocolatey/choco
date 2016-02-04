@@ -25,6 +25,7 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+    using Should;
 
     public class NugetServiceSpecs
     {
@@ -215,6 +216,113 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 fileSystem.Verify(x => x.delete_file(filePath),Times.Never);
             }
+        }
+
+        public class when_NugetService_pack_noop : NugetServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+
+            public override void Context()
+            {
+                base.Context();
+                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\projects\\chocolatey");
+            }
+
+            public override void Because()
+            {
+                because = () => service.pack_noop(config);
+            }
+
+            public override void AfterEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            public void generated_package_should_be_in_current_directory()
+            {
+                Context();
+                
+                because();
+                
+                var infos = MockLogger.MessagesFor(LogLevel.Info);
+                infos.Count.ShouldEqual(1);
+                infos[0].ShouldEqual("Chocolatey would have searched for a nuspec file in \"c:\\projects\\chocolatey\" and attempted to compile it.");
+            }
+
+            [Fact]
+            public void generated_package_should_be_in_specified_directory()
+            {
+                Context();
+
+                config.OutputDirectory = "c:\\packages";
+
+                because();
+
+                var infos = MockLogger.MessagesFor(LogLevel.Info);
+                infos.Count.ShouldEqual(1);
+                infos[0].ShouldEqual("Chocolatey would have searched for a nuspec file in \"c:\\packages\" and attempted to compile it.");
+            }
+        }
+
+        public class when_NugetService_pack_run : NugetServiceSpecsBase
+        {
+            private const string nuspecPath = "c:\\projects\\chocolatey\\Package.nuspec";
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+
+            public override void Context()
+            {
+                base.Context();
+                fileSystem.Setup(x => x.get_files(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { nuspecPath });
+                fileSystem.Setup(x => x.file_exists(nuspecPath)).Returns(true);
+                fileSystem.Setup(x => x.get_file_extension(nuspecPath)).Returns(".nuspec");
+                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\projects\\chocolatey");
+            }
+
+            public override void Because()
+            {
+                because = () => service.pack_run(config);
+            }
+
+            public override void AfterEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            // Can't be tested because PackageBuilder isn't mocked and not used mocked filesystem
+            //[Fact]
+            //public void generated_package_should_be_in_current_directory()
+            //{
+            //    Context();
+
+            //    because();
+
+            //    var infos = MockLogger.MessagesFor(LogLevel.Info);
+            //    infos.Count.ShouldEqual(2);
+            //    infos[0].ShouldEqual("Attempting to build package from 'Package.nuspec'.");
+            //    infos[1].ShouldEqual("Successfully created package 'c:\\projects\\chocolatey\\Package.nupkg'.");
+
+            //    fileSystem.Verify(x => x.create_file("c:\\projects\\chocolatey\\Package.nupkg"), Times.Once);
+            //}
+
+            //[Fact]
+            //public void generated_package_should_be_in_specified_directory()
+            //{
+            //    Context();
+
+            //    config.OutputDirectory = "c:\\packages";
+
+            //    because();
+
+            //    var infos = MockLogger.MessagesFor(LogLevel.Info);
+            //    infos.Count.ShouldEqual(2);
+            //    infos[0].ShouldEqual("Attempting to build package from 'Package.nuspec'.");
+            //    infos[1].ShouldEqual("Successfully created package 'c:\\packages\\Package.nupkg'.");
+
+            //    fileSystem.Verify(x => x.create_file("c:\\packages\\Package.nupkg"), Times.Once);
+            //}
         }
     }
 }
