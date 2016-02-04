@@ -66,7 +66,8 @@ namespace chocolatey.infrastructure.licensing
 
                 chocolateyLicense.ExpirationDate = license.ExpirationDate;
                 chocolateyLicense.Name = license.Name;
-                
+                chocolateyLicense.Id = license.UserId.to_string();
+
                 //todo: if it is expired, provide a warning. 
                 // one month after it should stop working
             }
