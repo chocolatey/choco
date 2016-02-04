@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.logging
 {
     using System.IO;
+    using System.Linq;
     using adapters;
     using app;
     using log4net;
@@ -108,7 +109,8 @@ namespace chocolatey.infrastructure.logging
         /// <param name="enableDebug">
         ///   if set to <c>true</c> [enable debug].
         /// </param>
-        public static void set_logging_level_debug_when_debug(bool enableDebug)
+        /// <param name="excludeLoggerName">Logger, such as a verbose logger, to exclude from this.</param>
+        public static void set_logging_level_debug_when_debug(bool enableDebug, string excludeLoggerName)
         {
             if (enableDebug)
             {
@@ -121,8 +123,9 @@ namespace chocolatey.infrastructure.logging
                     {
                         logger.Level = Level.Debug;
                     }
-                } 
-                foreach (var append in logRepository.GetAppenders())
+                }
+
+                foreach (var append in logRepository.GetAppenders().Where(a => !a.Name.is_equal_to(excludeLoggerName.to_string())).or_empty_list_if_null())
                 {
                     var appender = append as AppenderSkeleton;
                     if (appender != null)
@@ -140,8 +143,9 @@ namespace chocolatey.infrastructure.logging
         /// <param name="enableVerbose">
         ///   if set to <c>true</c> [enable verbose].
         /// </param>
+        /// <param name="enableDebug">If debug is also enabled</param>
         /// <param name="verboseLoggerName">Name of the verbose logger.</param>
-        public static void set_verbose_logger_when_verbose(bool enableVerbose, string verboseLoggerName)
+        public static void set_verbose_logger_when_verbose(bool enableVerbose,bool enableDebug, string verboseLoggerName)
         {
             if (enableVerbose)
             {
@@ -153,7 +157,8 @@ namespace chocolatey.infrastructure.logging
                     if (appender != null && appender.Name.is_equal_to(verboseLoggerName))
                     {
                         appender.ClearFilters();
-                        appender.AddFilter( new log4net.Filter.LevelRangeFilter {LevelMin = Level.Info, LevelMax = Level.Fatal});
+                        var minLevel = enableDebug ? Level.Debug : Level.Info;
+                        appender.AddFilter(new log4net.Filter.LevelRangeFilter { LevelMin = minLevel, LevelMax = Level.Fatal });
                     }
                 }
 
