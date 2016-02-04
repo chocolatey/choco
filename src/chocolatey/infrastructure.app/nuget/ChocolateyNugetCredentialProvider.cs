@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.nuget
     using System;
     using System.Linq;
     using System.Net;
+    using commandline;
     using NuGet;
     using configuration;
     using logging;
@@ -56,10 +57,27 @@ namespace chocolatey.infrastructure.app.nuget
 
             var source = _config.MachineSources.FirstOrDefault(s =>
                 {
-                    var sourceUri = s.Key.TrimEnd('/');
-                    return sourceUri.is_equal_to(uri.OriginalString.TrimEnd('/')) 
-                        && !string.IsNullOrWhiteSpace(s.Username)
-                        && !string.IsNullOrWhiteSpace(s.EncryptedPassword);
+                    var sourceUrl = s.Key.TrimEnd('/');
+
+                    var equalAtFullUri = sourceUrl.is_equal_to(uri.OriginalString.TrimEnd('/'))
+                       && !string.IsNullOrWhiteSpace(s.Username)
+                       && !string.IsNullOrWhiteSpace(s.EncryptedPassword);
+
+                    if (equalAtFullUri) return true;
+
+                    try
+                    {
+                        var sourceUri = new Uri(sourceUrl);
+                        return sourceUri.Host.is_equal_to(uri.Host.TrimEnd('/'))
+                            && !string.IsNullOrWhiteSpace(s.Username)
+                            && !string.IsNullOrWhiteSpace(s.EncryptedPassword);
+                    }
+                    catch (Exception)
+                    {
+                        this.Log().Error("Source '{0}' is not a valid Uri".format_with(sourceUrl));
+                    }
+
+                    return false;
                 });
 
             if (source == null)
@@ -87,7 +105,7 @@ namespace chocolatey.infrastructure.app.nuget
             Console.Write("User name: ");
             string username = Console.ReadLine();
             Console.Write("Password: ");
-            var password = Console.ReadLine();
+            var password = InteractivePrompt.get_password(_config.PromptForConfirmation);
 
             //todo: set this up as secure
             //using (var securePassword = new SecureString())

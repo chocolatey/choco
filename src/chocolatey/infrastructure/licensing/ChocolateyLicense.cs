@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.licensing
 
     public sealed class ChocolateyLicense
     {
+        public string Id { get; set; }
         public string Name { get; set; }
         public ChocolateyLicenseType LicenseType { get; set; }
         public bool IsValid { get; set; }

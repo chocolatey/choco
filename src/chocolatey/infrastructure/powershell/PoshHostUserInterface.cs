@@ -24,6 +24,7 @@ namespace chocolatey.infrastructure.powershell
     using System.Security;
     using System.Text;
     using app.configuration;
+    using commandline;
     using logging;
     using Console = adapters.Console;
 
@@ -267,35 +268,7 @@ namespace chocolatey.infrastructure.powershell
 
             var password = string.Empty;
             this.Log().Warn("Please provide password:");
-            var possibleNonInteractive = !_configuration.PromptForConfirmation;
-            ConsoleKeyInfo info = possibleNonInteractive ? Console.ReadKey(TIMEOUT_IN_SECONDS * 1000) : Console.ReadKey(true);
-            while (info.Key != ConsoleKey.Enter)
-            {
-                if (info.Key != ConsoleKey.Backspace)
-                {
-                    Console.Write("*");
-                    password += info.KeyChar;
-                    info = possibleNonInteractive ? Console.ReadKey(TIMEOUT_IN_SECONDS * 1000) : Console.ReadKey(true);
-                }
-                else if (info.Key == ConsoleKey.Backspace)
-                {
-                    if (!string.IsNullOrEmpty(password))
-                    {
-                        password = password.Substring(0, password.Length - 1);
-                        // get the location of the cursor
-                        int pos = System.Console.CursorLeft;
-                        // move the cursor to the left by one character
-                        System.Console.SetCursorPosition(pos - 1, System.Console.CursorTop);
-                        // replace it with space
-                        Console.Write(" ");
-                        // move the cursor to the left by one character again
-                        System.Console.SetCursorPosition(pos - 1, System.Console.CursorTop);
-                    }
-                    info = possibleNonInteractive ? Console.ReadKey(TIMEOUT_IN_SECONDS * 1000) : Console.ReadKey(true);
-                }
-            }
-            for (int i = 0; i < password.Length; i++) Console.Write("*");
-            System.Console.WriteLine("");
+            password = InteractivePrompt.get_password(_configuration.PromptForConfirmation);
 
             if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
             {
