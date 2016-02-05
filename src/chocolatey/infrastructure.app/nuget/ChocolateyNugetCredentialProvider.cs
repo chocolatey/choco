@@ -29,6 +29,8 @@ namespace chocolatey.infrastructure.app.nuget
     {
         private readonly ChocolateyConfiguration _config;
 
+        private const string INVALID_URL = "http://somewhere123zzaafasd.invalid";
+
         public ChocolateyNugetCredentialProvider(ChocolateyConfiguration config)
         {
             _config = config;
@@ -44,8 +46,22 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 this.Log().Warn("Invalid credentials specified.");
             }
-            
-            if (_config.Sources.TrimEnd('/').is_equal_to(uri.OriginalString.TrimEnd('/')))
+
+            var configSourceUri = new Uri(INVALID_URL);
+            try
+            {
+                var firstSpecifiedSource = _config.Sources.to_string().Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault().to_string();
+                if (!string.IsNullOrWhiteSpace(firstSpecifiedSource))
+                {
+                    configSourceUri = new Uri(firstSpecifiedSource);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.Log().Warn("Cannot determine uri from specified source:{0} {1}".format_with(Environment.NewLine, ex.Message));
+            }
+
+            if (_config.Sources.TrimEnd('/').is_equal_to(uri.OriginalString.TrimEnd('/')) || configSourceUri.Host.is_equal_to(uri.Host))
             {
                 if (!string.IsNullOrWhiteSpace(_config.SourceCommand.Username) && !string.IsNullOrWhiteSpace(_config.SourceCommand.Password))
                 {
@@ -68,7 +84,7 @@ namespace chocolatey.infrastructure.app.nuget
                     try
                     {
                         var sourceUri = new Uri(sourceUrl);
-                        return sourceUri.Host.is_equal_to(uri.Host.TrimEnd('/'))
+                        return sourceUri.Host.is_equal_to(uri.Host)
                             && !string.IsNullOrWhiteSpace(s.Username)
                             && !string.IsNullOrWhiteSpace(s.EncryptedPassword);
                     }
