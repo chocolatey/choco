@@ -110,6 +110,8 @@ namespace chocolatey.infrastructure.app.nuget
         {
             if (!_config.Information.IsInteractive)
             {
+                // https://blogs.msdn.microsoft.com/buckh/2004/07/28/authentication-in-web-services-with-httpwebrequest/
+                //return credentialType == CredentialType.ProxyCredentials ? CredentialCache.DefaultCredentials : CredentialCache.DefaultNetworkCredentials;
                 return CredentialCache.DefaultCredentials;
             }
 
@@ -123,25 +125,22 @@ namespace chocolatey.infrastructure.app.nuget
             Console.Write("Password: ");
             var password = InteractivePrompt.get_password(_config.PromptForConfirmation);
 
-            //todo: set this up as secure
-            //using (var securePassword = new SecureString())
-            //{
-            //    foreach (var letter in password.to_string())
-            //    {
-            //        securePassword.AppendChar(letter);
-            //    }
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                this.Log().Warn("No password specified, this will probably error.");
+                //return CredentialCache.DefaultNetworkCredentials;
+            }
 
             var credentials = new NetworkCredential
                 {
                     UserName = username,
                     Password = password,
-                    //SecurePassword = securePassword
+                    //SecurePassword = password.to_secure_string(),
                 };
+
             return credentials;
-            // }
         }
     }
-
 
     // ReSharper restore InconsistentNaming
 }
