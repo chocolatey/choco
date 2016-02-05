@@ -105,11 +105,13 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Fix - Chocolatey command help output written to standard error instead of standard out - see [#468](https://github.com/chocolatey/choco/issues/468)
  * Fix - Logger doesn't clear cached NullLoggers - see [#516](https://github.com/chocolatey/choco/issues/516)
  * Fix - DISM "/All" argument in the wrong position - see [#480](https://github.com/chocolatey/choco/issues/480)
- * Fix - Installing/uninstalling extensions should rename files in use - see [#594](https://github.com/chocolatey/choco/issues/594)
+ * Fix - Pro - Installing/uninstalling extensions should rename files in use - see [#594](https://github.com/chocolatey/choco/issues/594)
+ * Fix - Running Get-FileName in PowerShell 5 fails and sometimes causes package errors - see [#603](https://github.com/chocolatey/choco/issues/603)
  * Fix - Merging assemblies on a machine running .Net 4.5 or higher produces binaries incompatible with .Net 4 - see [#392](https://github.com/chocolatey/choco/issues/392)
  * Fix - API - Incorrect log4net version in chocolatey.lib dependencies - see [#390](https://github.com/chocolatey/choco/issues/390)
  * [POSH Host] Fix - Message after Download progress is on the same line sometimes - see [#525](https://github.com/chocolatey/choco/issues/525)
  * [POSH Host] Fix - PowerShell internal process - "The handle is invalid." - see [#526](https://github.com/chocolatey/choco/issues/526)
+ * Fix - Verbose shows in output on debug switch - see [#611](https://github.com/chocolatey/choco/issues/611)
 
 ### IMPROVEMENTS
 
