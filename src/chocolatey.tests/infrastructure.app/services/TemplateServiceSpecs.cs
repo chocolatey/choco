@@ -242,7 +242,7 @@ namespace chocolatey.tests.infrastructure.app.services
                        }
                        return a + "\\" + b[0];
                    });
-                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith(Path.Combine("templates", "default")));
+                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\default"));
                 fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
                 fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
