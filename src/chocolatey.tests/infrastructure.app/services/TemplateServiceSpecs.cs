@@ -271,11 +271,11 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 because();
 
-                directoryCreated.Count.ShouldEqual(2);
+                directoryCreated.Count.ShouldEqual(2, "There should be only 2 directories, but there was: " + string.Join(", ", directoryCreated));
                 directoryCreated[0].ShouldEqual("c:\\chocolatey\\Bob");
                 directoryCreated[1].ShouldEqual("c:\\chocolatey\\Bob\\tools");
 
-                files.Count.ShouldEqual(2);
+                files.Count.ShouldEqual(2, "There should be only 2 files, but there was: " + string.Join(", ", files));
                 files[0].ShouldEqual("c:\\chocolatey\\Bob\\__name_replace__.nuspec");
                 files[1].ShouldEqual("c:\\chocolatey\\Bob\\random.txt");
 
@@ -289,11 +289,11 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 because();
 
-                directoryCreated.Count.ShouldEqual(2);
+                directoryCreated.Count.ShouldEqual(2, "There should be only 2 directories, but there was: " + string.Join(", ", directoryCreated));
                 directoryCreated[0].ShouldEqual("c:\\packages\\Bob");
                 directoryCreated[1].ShouldEqual("c:\\packages\\Bob\\tools");
 
-                files.Count.ShouldEqual(2);
+                files.Count.ShouldEqual(2, "There should be only 2 files, but there was: " + string.Join(", ", files));
                 files[0].ShouldEqual("c:\\packages\\Bob\\__name_replace__.nuspec");
                 files[1].ShouldEqual("c:\\packages\\Bob\\random.txt");
 
