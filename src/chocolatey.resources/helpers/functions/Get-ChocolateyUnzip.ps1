@@ -105,23 +105,52 @@ param(
   if ($zipExtractLogFullPath) {
     # Redirect stdout for processing by choco
     $process.StartInfo.RedirectStandardOutput = $true
-    $process.Start() | Out-Null
-
+    [void] $process.Start()
+    
+    # Capture 7z's output into a StringBuilder and write it out in blocks, to improve I/O performance.
+    $sb = New-Object -TypeName "System.Text.StringBuilder";
+    
+    # Remember whether anything was written to the file
+    $written = $false
+    # Open the file once
+    $wStream = new-object IO.FileStream($zipExtractLogFullPath, [IO.FileAccess]::Write)
+    $sWriter = new-object IO.StreamWriter($wStream)
+    
     # Read each line from 7z's stdout synchroneously (ReadLine blocks).
     # Since stderr is not redirected, it gets automatically printed to the console, avoiding deadlocks.
     while(($process.StandardOutput -ne $null) -and (($line = $process.StandardOutput.ReadLine()) -ne $null)) {
       if($line.StartsWith("Extracting")) {
         # This is a line indicating an extracted file
         $file = $destination + "\" + $line.Substring(12)
-        # Save the filename
-        Add-Content $zipExtractLogFullPath $file
+        # Save the filename into the StringBuffer
+        [void] $sb.Append($file + "`r`n")
+        
+        $written = $true;
+        # Write out every 1MiB blocks, to save memory
+        if ($sb.Length -ge 1048576) {
+          $sWriter.Write($sb)
+          [void] $sb.Clear();
+        }
       }
       # Print the line, such that it looks as if stdout was not redirected
-      Write-Debug $line
+      Write-Verbose $line
+    }
+    # Write remaining buffered lines
+    if ($sb.Length -gt 0) {
+      $sWriter.Write($sb)
+      [void] $sb.Clear();
+    }
+    # Close file
+    $sWriter.Close();
+    $wStream.Close();
+    
+    # If nothing was written at all, we don't need the file - remove it
+    if (!$written) {
+      Remove-Item -Force $zipExtractLogFullPath
     }
   } else {
     # If we don't want to capture the file list, just execute 7z without stdout redirection
-    $process.Start() | Out-Null
+    [void] $process.Start()
   }
   
   # Wait for 7z to finish. Even if 7z has closed its stdout, and all lines have been read, the process might not have quit yet.
