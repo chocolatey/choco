@@ -91,32 +91,44 @@ param(
     $destination32 = $destination
   }
 
-  $exitCode = -1
-  $unzipOps = {
-    param($7zip, $destination, $fileFullPath, [ref]$exitCodeRef)
-    $params = "x -aoa -o`"$destination`" -y `"$fileFullPath`""
-    Write-Debug "Executing command ['$7zip' $params]"
-    $process = New-Object System.Diagnostics.Process
-    $process.StartInfo = new-object System.Diagnostics.ProcessStartInfo($7zip, $params)
-    $process.StartInfo.UseShellExecute = $false
-    $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+  # Make structures used by .NET for starting the 7z process
+  
+  # 7z command line
+  $params = "x -aoa -o`"$destination`" -y `"$fileFullPath`""
+  $process = New-Object System.Diagnostics.Process
+  $process.StartInfo = new-object System.Diagnostics.ProcessStartInfo($7zip, $params)
+  # Required for stdout redirect
+  $process.StartInfo.UseShellExecute = $false
+  $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
 
-    $process.Start() | Out-Null
-    $process.WaitForExit()
-    $processExitCode = $process.ExitCode
-    $process.Dispose()
-    Write-Debug "Command ['$7zip' $params] exited with `'$processExitCode`'."
-
-    $exitCodeRef.Value = $processExitCode
-  }
-
+  Write-Debug "Executing command ['$7zip' $params]"
   if ($zipExtractLogFullPath) {
-    Write-Debug "wrapping 7za invocation with Write-FileUpdateLog"
-    Write-FileUpdateLog -logFilePath $zipExtractLogFullPath -locationToMonitor $destination -scriptToRun $unzipOps -argumentList $7zip,$destination32,$fileFullPath32,([ref]$exitCode)
+    # Redirect stdout for processing by choco
+    $process.StartInfo.RedirectStandardOutput = $true
+    $process.Start() | Out-Null
+
+    # Read each line from 7z's stdout synchroneously (ReadLine blocks).
+    # Since stderr is not redirected, it gets automatically printed to the console, avoiding deadlocks.
+    while(($process.StandardOutput -ne $null) -and (($line = $process.StandardOutput.ReadLine()) -ne $null)) {
+      if($line.StartsWith("Extracting")) {
+        # This is a line indicating an extracted file
+        $file = $destination + "\" + $line.Substring(12)
+        # Save the filename
+        Add-Content $zipExtractLogFullPath $file
+      }
+      # Print the line, such that it looks as if stdout was not redirected
+      Write-Debug $line
+    }
   } else {
-    Write-Debug "calling 7za directly"
-    Invoke-Command $unzipOps -ArgumentList $7zip,$destination32,$fileFullPath32,([ref]$exitCode)
+    # If we don't want to capture the file list, just execute 7z without stdout redirection
+    $process.Start() | Out-Null
   }
+  
+  # Wait for 7z to finish. Even if 7z has closed its stdout, and all lines have been read, the process might not have quit yet.
+  $process.WaitForExit()
+  $exitCode = $process.ExitCode
+  $process.Dispose()
+  Write-Debug "Command ['$7zip' $params] exited with `'$exitCode`'."
 
   Write-Debug "7za exit code: $exitCode"
   switch ($exitCode) {
