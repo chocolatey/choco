@@ -278,7 +278,11 @@ namespace chocolatey.infrastructure.app.services
 
             NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath));
 
-            if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, () => @"
+
+            if (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) && config.RegularOutput)
+            {
+
+            this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
 Your package may be subject to moderation. A moderator will review the
 package prior to acceptance. You should have received an email. If you
@@ -289,6 +293,7 @@ package page to contact moderators.
 Please ensure your registered email address is correct and emails from
 chocolateywebadmin at googlegroups dot com are not being sent to your
 spam/junk folder.");
+            }
         }
 
         public void install_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
