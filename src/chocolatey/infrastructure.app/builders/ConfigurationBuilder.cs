@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.builders
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using adapters;
     using attributes;
@@ -33,6 +34,7 @@ namespace chocolatey.infrastructure.app.builders
     using nuget;
     using platforms;
     using tolerance;
+    using Assembly = adapters.Assembly;
     using Container = SimpleInjector.Container;
     using Environment = adapters.Environment;
 
@@ -41,6 +43,7 @@ namespace chocolatey.infrastructure.app.builders
     /// </summary>
     public static class ConfigurationBuilder
     {
+        private const string SET_CONFIGURATION_METHOD = "SetConfiguration";
         private static Lazy<IEnvironment> _environmentInitializer = new Lazy<IEnvironment>(() => new Environment());
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -71,8 +74,9 @@ namespace chocolatey.infrastructure.app.builders
             ConfigurationOptions.reset_options();
             set_global_options(args, config, container);
             set_environment_options(config);
-            set_license_options(config, license);
             set_environment_variables(config);
+            // must be done last for overrides
+            set_licensed_options(config, license, configFileSettings);
             set_config_file_settings(configFileSettings, xmlService);
         }
 
@@ -172,10 +176,6 @@ namespace chocolatey.infrastructure.app.builders
             config.Proxy.Location = set_config_item(ApplicationParameters.ConfigSettings.Proxy, configFileSettings, string.Empty, "Explicit proxy location.");
             config.Proxy.User = set_config_item(ApplicationParameters.ConfigSettings.ProxyUser, configFileSettings, string.Empty, "Optional proxy user.");
             config.Proxy.EncryptedPassword = set_config_item(ApplicationParameters.ConfigSettings.ProxyPassword, configFileSettings, string.Empty, "Optional proxy password. Encrypted.");
-
-            int minPositives=0;
-            int.TryParse(set_config_item(ApplicationParameters.ConfigSettings.VirusCheckMinimumPositives, configFileSettings, "5", "Optional proxy password. Encrypted."), out minPositives);
-            config.VirusCheckMinimumPositives = minPositives == 0 ? 5 : minPositives;
         }
 
         private static string set_config_item(string configName, ConfigFileSettings configFileSettings, string defaultValue, string description, bool forceSettingValue = false)
@@ -367,21 +367,6 @@ You can pass options and switches in the following ways:
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
         }
 
-        private static void set_license_options(ChocolateyConfiguration config, ChocolateyLicense license)
-        {
-            config.Information.LicenseExpirationDate = license.ExpirationDate;
-            config.Information.LicenseIsValid = license.IsValid;
-            config.Information.LicenseVersion = license.Version ?? string.Empty;
-            config.Information.LicenseType = license.is_licensed_version() ? license.LicenseType.get_description_or_value() : string.Empty;
-
-            var licenseName = license.Name.to_string();
-            if (licenseName.Contains("@"))
-            {
-                licenseName = licenseName.Remove(licenseName.IndexOf("@", StringComparison.InvariantCulture)) + "[at REDACTED])";
-            }
-            config.Information.LicenseUserName = licenseName;
-        }
-
         public static void set_environment_variables(ChocolateyConfiguration config)
         {
             Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, ApplicationParameters.InstallLocation);
@@ -419,13 +404,46 @@ You can pass options and switches in the following ways:
             }
 
             if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable("ChocolateyPowerShellHost", "true");
-            if (config.Information.LicenseIsValid) Environment.SetEnvironmentVariable("ChocolateyLicenseValid", "true");
             if (config.Force) Environment.SetEnvironmentVariable("ChocolateyForce", "true");
-            if (config.Features.VirusCheck)
+        }
+
+        private static void set_licensed_options(ChocolateyConfiguration config, ChocolateyLicense license, ConfigFileSettings configFileSettings)
+        {
+            if (license.AssemblyLoaded)
             {
-                Environment.SetEnvironmentVariable("ChocolateyVirusCheckFiles", "true");
-                Environment.SetEnvironmentVariable("ChocolateyVirusCheckMinimumPositives", config.VirusCheckMinimumPositives.to_string());
+                Type licensedConfigBuilder = license.Assembly.GetType(ApplicationParameters.LicensedConfigurationBuilder, throwOnError: true, ignoreCase: true);
+
+                if (licensedConfigBuilder == null)
+                {
+                    "chocolatey".Log().Error(
+                        @"Type expected for registering components was null. Unable to provide 
+ name due to it being null.");
+                    return;
+                }
+                try
+                {
+                    object componentClass = Activator.CreateInstance(licensedConfigBuilder);
+
+                    licensedConfigBuilder.InvokeMember(
+                        SET_CONFIGURATION_METHOD,
+                        BindingFlags.InvokeMethod,
+                        null,
+                        componentClass,
+                        new Object[] { config, configFileSettings }
+                        );
+                }
+                catch (Exception ex)
+                {
+                    "chocolatey".Log().Error(
+                        ChocolateyLoggers.Important,
+                        @"Error when setting configuration for '{0}':{1} {2}".format_with(
+                            licensedConfigBuilder.FullName,
+                            Environment.NewLine,
+                            ex.Message
+                            ));
+                }
             }
+
         }
     }
 }
