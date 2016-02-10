@@ -66,20 +66,36 @@ namespace chocolatey.infrastructure.app.builders
         {
             var fileSystem = container.GetInstance<IFileSystem>();
             var xmlService = container.GetInstance<IXmlService>();
-            set_file_configuration(config, fileSystem, xmlService, notifyWarnLoggingAction);
+            var configFileSettings = get_config_file_settings(fileSystem, xmlService);
+            set_file_configuration(config, configFileSettings, fileSystem, notifyWarnLoggingAction);
             ConfigurationOptions.reset_options();
             set_global_options(args, config, container);
             set_environment_options(config);
             set_license_options(config, license);
             set_environment_variables(config);
+            set_config_file_settings(configFileSettings, xmlService);
         }
 
-        private static void set_file_configuration(ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService, Action<string> notifyWarnLoggingAction)
+        private static ConfigFileSettings get_config_file_settings(IFileSystem fileSystem, IXmlService xmlService)
         {
             var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
             AssemblyFileExtractor.extract_text_file_from_assembly(fileSystem, Assembly.GetExecutingAssembly(), ApplicationParameters.ChocolateyConfigFileResource, globalConfigPath);
 
-            var configFileSettings = xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
+            return xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
+        }
+
+        private static void set_config_file_settings(ConfigFileSettings configFileSettings, IXmlService xmlService)
+        {
+            var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
+            // save so all updated configuration items get set to existing config
+            FaultTolerance.try_catch_with_logging_exception(
+                () => xmlService.serialize(configFileSettings, globalConfigPath),
+                "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
+                logWarningInsteadOfError: true);
+        }
+
+        private static void set_file_configuration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem, Action<string> notifyWarnLoggingAction)
+        {
             var sources = new StringBuilder();
 
             var defaultSourcesInOrder = configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null().ToList();
@@ -108,12 +124,6 @@ namespace chocolatey.infrastructure.app.builders
                 logWarningInsteadOfError: true);
 
             set_feature_flags(config, configFileSettings);
-
-            // save so all updated configuration items get set to existing config
-            FaultTolerance.try_catch_with_logging_exception(
-                () => xmlService.serialize(configFileSettings, globalConfigPath),
-                "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
-                logWarningInsteadOfError: true);
         }
 
         private static void set_machine_sources(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
