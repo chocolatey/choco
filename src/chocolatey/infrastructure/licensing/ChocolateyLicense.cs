@@ -15,7 +15,8 @@
 
 namespace chocolatey.infrastructure.licensing
 {
-    using System;
+    using adapters;
+    using DateTime = System.DateTime;
 
     public sealed class ChocolateyLicense
     {
@@ -24,6 +25,7 @@ namespace chocolatey.infrastructure.licensing
         public ChocolateyLicenseType LicenseType { get; set; }
         public bool IsValid { get; set; }
         public bool AssemblyLoaded { get; set; }
+        public IAssembly Assembly { get; set; }
         //todo: get version
         public string Version { get; set; }
         public string InvalidReason { get; set; }

@@ -62,6 +62,7 @@ namespace chocolatey.console
                     {
                         var licensedAssembly = Assembly.LoadFile(ApplicationParameters.LicensedAssemblyLocation);
                         license.AssemblyLoaded = true;
+                        license.Assembly = licensedAssembly;
                         license.Version = VersionInformation.get_current_informational_version(licensedAssembly);
                         Type licensedComponent = licensedAssembly.GetType(ApplicationParameters.LicensedComponentRegistry, throwOnError: true, ignoreCase: true);
                         SimpleInjectorContainer.add_component_registry_class(licensedComponent);
@@ -105,7 +106,7 @@ namespace chocolatey.console
                 {
                     "logfile".Log().Info(() => "".PadRight(60, '='));
 #if DEBUG
-                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2} (DEBUG BUILD)".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.is_licensed_version() ? " {0}".format_with(config.Information.LicenseType) : string.Empty));
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2} (DEBUG BUILD)".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.is_licensed_version() ? " {0}".format_with(license.LicenseType) : string.Empty));
 #else
                     if (config.Information.ChocolateyVersion == config.Information.ChocolateyProductVersion && args.Any())
                     {
