@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.builders
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using adapters;
     using attributes;
@@ -33,6 +34,7 @@ namespace chocolatey.infrastructure.app.builders
     using nuget;
     using platforms;
     using tolerance;
+    using Assembly = adapters.Assembly;
     using Container = SimpleInjector.Container;
     using Environment = adapters.Environment;
 
@@ -41,6 +43,7 @@ namespace chocolatey.infrastructure.app.builders
     /// </summary>
     public static class ConfigurationBuilder
     {
+        private const string SET_CONFIGURATION_METHOD = "SetConfiguration";
         private static Lazy<IEnvironment> _environmentInitializer = new Lazy<IEnvironment>(() => new Environment());
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -66,20 +69,37 @@ namespace chocolatey.infrastructure.app.builders
         {
             var fileSystem = container.GetInstance<IFileSystem>();
             var xmlService = container.GetInstance<IXmlService>();
-            set_file_configuration(config, fileSystem, xmlService, notifyWarnLoggingAction);
+            var configFileSettings = get_config_file_settings(fileSystem, xmlService);
+            set_file_configuration(config, configFileSettings, fileSystem, notifyWarnLoggingAction);
             ConfigurationOptions.reset_options();
             set_global_options(args, config, container);
             set_environment_options(config);
-            set_license_options(config, license);
             set_environment_variables(config);
+            // must be done last for overrides
+            set_licensed_options(config, license, configFileSettings);
+            set_config_file_settings(configFileSettings, xmlService);
         }
 
-        private static void set_file_configuration(ChocolateyConfiguration config, IFileSystem fileSystem, IXmlService xmlService, Action<string> notifyWarnLoggingAction)
+        private static ConfigFileSettings get_config_file_settings(IFileSystem fileSystem, IXmlService xmlService)
         {
             var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
             AssemblyFileExtractor.extract_text_file_from_assembly(fileSystem, Assembly.GetExecutingAssembly(), ApplicationParameters.ChocolateyConfigFileResource, globalConfigPath);
 
-            var configFileSettings = xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
+            return xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
+        }
+
+        private static void set_config_file_settings(ConfigFileSettings configFileSettings, IXmlService xmlService)
+        {
+            var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
+            // save so all updated configuration items get set to existing config
+            FaultTolerance.try_catch_with_logging_exception(
+                () => xmlService.serialize(configFileSettings, globalConfigPath),
+                "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
+                logWarningInsteadOfError: true);
+        }
+
+        private static void set_file_configuration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem, Action<string> notifyWarnLoggingAction)
+        {
             var sources = new StringBuilder();
 
             var defaultSourcesInOrder = configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null().ToList();
@@ -108,12 +128,6 @@ namespace chocolatey.infrastructure.app.builders
                 logWarningInsteadOfError: true);
 
             set_feature_flags(config, configFileSettings);
-
-            // save so all updated configuration items get set to existing config
-            FaultTolerance.try_catch_with_logging_exception(
-                () => xmlService.serialize(configFileSettings, globalConfigPath),
-                "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
-                logWarningInsteadOfError: true);
         }
 
         private static void set_machine_sources(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
@@ -162,10 +176,6 @@ namespace chocolatey.infrastructure.app.builders
             config.Proxy.Location = set_config_item(ApplicationParameters.ConfigSettings.Proxy, configFileSettings, string.Empty, "Explicit proxy location.");
             config.Proxy.User = set_config_item(ApplicationParameters.ConfigSettings.ProxyUser, configFileSettings, string.Empty, "Optional proxy user.");
             config.Proxy.EncryptedPassword = set_config_item(ApplicationParameters.ConfigSettings.ProxyPassword, configFileSettings, string.Empty, "Optional proxy password. Encrypted.");
-
-            int minPositives=0;
-            int.TryParse(set_config_item(ApplicationParameters.ConfigSettings.VirusCheckMinimumPositives, configFileSettings, "5", "Optional proxy password. Encrypted."), out minPositives);
-            config.VirusCheckMinimumPositives = minPositives == 0 ? 5 : minPositives;
         }
 
         private static string set_config_item(string configName, ConfigFileSettings configFileSettings, string defaultValue, string description, bool forceSettingValue = false)
@@ -357,21 +367,6 @@ You can pass options and switches in the following ways:
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
         }
 
-        private static void set_license_options(ChocolateyConfiguration config, ChocolateyLicense license)
-        {
-            config.Information.LicenseExpirationDate = license.ExpirationDate;
-            config.Information.LicenseIsValid = license.IsValid;
-            config.Information.LicenseVersion = license.Version ?? string.Empty;
-            config.Information.LicenseType = license.is_licensed_version() ? license.LicenseType.get_description_or_value() : string.Empty;
-
-            var licenseName = license.Name.to_string();
-            if (licenseName.Contains("@"))
-            {
-                licenseName = licenseName.Remove(licenseName.IndexOf("@", StringComparison.InvariantCulture)) + "[at REDACTED])";
-            }
-            config.Information.LicenseUserName = licenseName;
-        }
-
         public static void set_environment_variables(ChocolateyConfiguration config)
         {
             Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, ApplicationParameters.InstallLocation);
@@ -409,13 +404,46 @@ You can pass options and switches in the following ways:
             }
 
             if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable("ChocolateyPowerShellHost", "true");
-            if (config.Information.LicenseIsValid) Environment.SetEnvironmentVariable("ChocolateyLicenseValid", "true");
             if (config.Force) Environment.SetEnvironmentVariable("ChocolateyForce", "true");
-            if (config.Features.VirusCheck)
+        }
+
+        private static void set_licensed_options(ChocolateyConfiguration config, ChocolateyLicense license, ConfigFileSettings configFileSettings)
+        {
+            if (license.AssemblyLoaded)
             {
-                Environment.SetEnvironmentVariable("ChocolateyVirusCheckFiles", "true");
-                Environment.SetEnvironmentVariable("ChocolateyVirusCheckMinimumPositives", config.VirusCheckMinimumPositives.to_string());
+                Type licensedConfigBuilder = license.Assembly.GetType(ApplicationParameters.LicensedConfigurationBuilder, throwOnError: true, ignoreCase: true);
+
+                if (licensedConfigBuilder == null)
+                {
+                    "chocolatey".Log().Error(
+                        @"Type expected for registering components was null. Unable to provide 
+ name due to it being null.");
+                    return;
+                }
+                try
+                {
+                    object componentClass = Activator.CreateInstance(licensedConfigBuilder);
+
+                    licensedConfigBuilder.InvokeMember(
+                        SET_CONFIGURATION_METHOD,
+                        BindingFlags.InvokeMethod,
+                        null,
+                        componentClass,
+                        new Object[] { config, configFileSettings }
+                        );
+                }
+                catch (Exception ex)
+                {
+                    "chocolatey".Log().Error(
+                        ChocolateyLoggers.Important,
+                        @"Error when setting configuration for '{0}':{1} {2}".format_with(
+                            licensedConfigBuilder.FullName,
+                            Environment.NewLine,
+                            ex.Message
+                            ));
+                }
             }
+
         }
     }
 }
