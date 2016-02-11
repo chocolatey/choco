@@ -128,7 +128,7 @@ namespace chocolatey.infrastructure.app.services
         public PackageFile get_package_file(string file)
         {
             var hash = _hashProvider.hash_file(file);
-            this.Log().Debug(ChocolateyLoggers.Verbose,() => " Found '{0}'{1}  with checksum '{2}'".format_with(file, Environment.NewLine, hash));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => " Found '{0}'{1}  with checksum '{2}'".format_with(file, Environment.NewLine, hash));
             
             return new PackageFile { Path = file, Checksum = hash };
         }
