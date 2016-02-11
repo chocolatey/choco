@@ -145,7 +145,7 @@ namespace chocolatey.infrastructure.logging
         /// </param>
         /// <param name="enableDebug">If debug is also enabled</param>
         /// <param name="verboseLoggerName">Name of the verbose logger.</param>
-        public static void set_verbose_logger_when_verbose(bool enableVerbose,bool enableDebug, string verboseLoggerName)
+        public static void set_verbose_logger_when_verbose(bool enableVerbose, bool enableDebug, string verboseLoggerName)
         {
             if (enableVerbose)
             {

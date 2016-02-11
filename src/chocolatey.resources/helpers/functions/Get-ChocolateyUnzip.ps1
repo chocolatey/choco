@@ -74,8 +74,8 @@ param(
 
   $7zip = Join-Path "$helpersPath" '..\tools\7za.exe'
   if (!([System.IO.File]::Exists($7zip))) {
-	Update-SessionEnvironment
-	$7zip = Join-Path "$env:ChocolateyInstall" 'tools\7za.exe'
+    Update-SessionEnvironment
+    $7zip = Join-Path "$env:ChocolateyInstall" 'tools\7za.exe'
   }
   $7zip = [System.IO.Path]::GetFullPath($7zip)
   Write-Debug "7zip found at `'$7zip`'"
@@ -91,31 +91,58 @@ param(
     $destination32 = $destination
   }
 
-  $exitCode = -1
-  $unzipOps = {
-    param($7zip, $destination, $fileFullPath, [ref]$exitCodeRef)
-    $params = "x -aoa -o`"$destination`" -y `"$fileFullPath`""
-    Write-Debug "Executing command ['$7zip' $params]"
-    $process = New-Object System.Diagnostics.Process
-    $process.StartInfo = new-object System.Diagnostics.ProcessStartInfo($7zip, $params)
-    $process.StartInfo.UseShellExecute = $false
-    $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+  $params = "x -aoa -o`"$destination`" -y `"$fileFullPath`""
+  Write-Debug "Executing command ['$7zip' $params]"
 
-    $process.Start() | Out-Null
-    $process.WaitForExit()
-    $processExitCode = $process.ExitCode
-    $process.Dispose()
-    Write-Debug "Command ['$7zip' $params] exited with `'$processExitCode`'."
+  # Capture 7z's output into a StringBuilder and write it out in blocks, to improve I/O performance.
+  $global:zipFileList = New-Object System.Text.StringBuilder
+  $global:zipDestinationFolder = $destination
 
-    $exitCodeRef.Value = $processExitCode
+  # Redirecting output slows things down a bit.
+  $writeOutput = {
+    if ($EventArgs.Data -ne $null) {
+      $line = $EventArgs.Data
+      Write-Verbose "$line"
+      if ($line.StartsWith("Extracting")) {
+        $global:zipFileList.AppendLine($global:zipDestinationFolder + "\" + $line.Substring(12))
+      }
+    }
   }
 
+  $writeError = {
+    if ($EventArgs.Data -ne $null) {
+      Write-Error "$($EventArgs.Data)"
+    }
+  }
+
+  $process = New-Object System.Diagnostics.Process
+  $process.EnableRaisingEvents = $true
+  Register-ObjectEvent  -InputObject $process -SourceIdentifier "LogOutput_ChocolateyZipProc" -EventName OutputDataReceived -Action $writeOutput | Out-Null
+  Register-ObjectEvent -InputObject $process -SourceIdentifier "LogErrors_ChocolateyZipProc" -EventName ErrorDataReceived -Action  $writeError | Out-Null
+
+  $process.StartInfo = new-object System.Diagnostics.ProcessStartInfo($7zip, $params)
+  $process.StartInfo.RedirectStandardOutput = $true
+  $process.StartInfo.RedirectStandardError = $true
+  $process.StartInfo.UseShellExecute = $false
+  $process.StartInfo.WorkingDirectory = Get-Location
+  $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+
+  [void] $process.Start()
+  if ($process.StartInfo.RedirectStandardOutput) { $process.BeginOutputReadLine() }
+  if ($process.StartInfo.RedirectStandardError) { $process.BeginErrorReadLine() }
+  $process.WaitForExit()
+
+  # For some reason this forces the jobs to finish and waits for
+  # them to do so. Without this it never finishes.
+  Unregister-Event -SourceIdentifier "LogOutput_ChocolateyZipProc"
+  Unregister-Event -SourceIdentifier "LogErrors_ChocolateyZipProc"
+
+  $exitCode = $process.ExitCode
+  $process.Dispose()
+  Write-Debug "Command ['$7zip' $params] exited with `'$exitCode`'."
+
   if ($zipExtractLogFullPath) {
-    Write-Debug "wrapping 7za invocation with Write-FileUpdateLog"
-    Write-FileUpdateLog -logFilePath $zipExtractLogFullPath -locationToMonitor $destination -scriptToRun $unzipOps -argumentList $7zip,$destination32,$fileFullPath32,([ref]$exitCode)
-  } else {
-    Write-Debug "calling 7za directly"
-    Invoke-Command $unzipOps -ArgumentList $7zip,$destination32,$fileFullPath32,([ref]$exitCode)
+    Set-Content $zipExtractLogFullPath $global:zipFileList.ToString() -Encoding UTF8 -Force
   }
 
   Write-Debug "7za exit code: $exitCode"

@@ -14,10 +14,10 @@
 
 $helpersPath = (Split-Path -parent $MyInvocation.MyCommand.Definition);
 
-$DebugPreference = "SilentlyContinue"
-if ($env:ChocolateyEnvironmentDebug -eq 'true') { $DebugPreference = "Continue"; }
-$VerbosePreference = "SilentlyContinue"
-if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $VerbosePreference = "Continue"; $verbosity = $true }
+$global:DebugPreference = "SilentlyContinue"
+if ($env:ChocolateyEnvironmentDebug -eq 'true') { $global:DebugPreference = "Continue"; }
+$global:VerbosePreference = "SilentlyContinue"
+if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $global:VerbosePreference = "Continue"; $verbosity = $true }
 
 $installArguments = $env:chocolateyInstallArguments
 
