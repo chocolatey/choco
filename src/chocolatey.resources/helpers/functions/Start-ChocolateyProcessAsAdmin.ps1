@@ -72,7 +72,7 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
 
   $writeError = {
     if ($EventArgs.Data -ne $null) {
-      Write-Host "[ERROR] $($EventArgs.Data)" -ForegroundColor $ErrorColor -BackgroundColor Black
+      Write-Error "$($EventArgs.Data)"
     }
     #foreach ($line in $EventArgs.Data) {
       #if (!$line.IsNullOrEmpty) {
