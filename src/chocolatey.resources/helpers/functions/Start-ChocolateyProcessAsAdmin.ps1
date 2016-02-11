@@ -64,22 +64,12 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
     if ($EventArgs.Data -ne $null) {
       Write-Host "$($EventArgs.Data)"
     }
-		
-    #foreach ($line in $EventArgs.Data) {
-      #Write-Host "$line"
-    #}
   }
 
   $writeError = {
     if ($EventArgs.Data -ne $null) {
-      Write-Host "[ERROR] $($EventArgs.Data)" -ForegroundColor $ErrorColor -BackgroundColor Black
+      Write-Error "$($EventArgs.Data)"
     }
-    #foreach ($line in $EventArgs.Data) {
-      #if (!$line.IsNullOrEmpty) {
-        # do not stop execution, but pass the output back to the user.
-      #  Write-Host "[ERROR] $line" -ForegroundColor $ErrorColor -BackgroundColor Black
-      #}
-    #}
   }
 
   $process = New-Object System.Diagnostics.Process

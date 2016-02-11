@@ -7,10 +7,10 @@
   [string]$packageScript
 )
 
-$DebugPreference = "SilentlyContinue"
-if ($env:ChocolateyEnvironmentDebug -eq 'true') { $DebugPreference = "Continue"; }
-$VerbosePreference = "SilentlyContinue"
-if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $VerbosePreference = "Continue"; $verbosity = $true }
+$global:DebugPreference = "SilentlyContinue"
+if ($env:ChocolateyEnvironmentDebug -eq 'true') { $global:DebugPreference = "Continue"; }
+$global:VerbosePreference = "SilentlyContinue"
+if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $global:VerbosePreference = "Continue"; $verbosity = $true }
 
 Write-Debug "Running 'ChocolateyScriptRunner' for $($env:packageName) v$($env:packageVersion) with packageScript `'$packageScript`', packageFolder:`'$($env:packageFolder)`', installArguments: `'$installArguments`', packageParameters: `'$packageParameters`',"
 
