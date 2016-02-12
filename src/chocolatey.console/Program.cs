@@ -64,7 +64,7 @@ namespace chocolatey.console
                         license.AssemblyLoaded = true;
                         license.Assembly = licensedAssembly;
                         license.Version = VersionInformation.get_current_informational_version(licensedAssembly);
-                        Type licensedComponent = licensedAssembly.GetType(ApplicationParameters.LicensedComponentRegistry, throwOnError: true, ignoreCase: true);
+                        Type licensedComponent = licensedAssembly.GetType(ApplicationParameters.LicensedComponentRegistry, throwOnError: false, ignoreCase: true);
                         SimpleInjectorContainer.add_component_registry_class(licensedComponent);
                     }
                     catch (Exception ex)

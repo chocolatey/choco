@@ -411,7 +411,7 @@ You can pass options and switches in the following ways:
         {
             if (license.AssemblyLoaded)
             {
-                Type licensedConfigBuilder = license.Assembly.GetType(ApplicationParameters.LicensedConfigurationBuilder, throwOnError: true, ignoreCase: true);
+                Type licensedConfigBuilder = license.Assembly.GetType(ApplicationParameters.LicensedConfigurationBuilder, throwOnError: false, ignoreCase: true);
 
                 if (licensedConfigBuilder == null)
                 {
