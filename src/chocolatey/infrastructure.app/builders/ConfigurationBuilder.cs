@@ -415,9 +415,9 @@ You can pass options and switches in the following ways:
 
                 if (licensedConfigBuilder == null)
                 {
-                    "chocolatey".Log().Error(
-                        @"Type expected for registering components was null. Unable to provide 
- name due to it being null.");
+                    "chocolatey".Log().Warn(ChocolateyLoggers.Important,
+@"Unable to set licensed configuration. This is likely related to a 
+ missing or outdated licensed DLL.");
                     return;
                 }
                 try

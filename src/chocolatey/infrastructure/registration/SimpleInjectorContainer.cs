@@ -81,9 +81,9 @@ namespace chocolatey.infrastructure.registration
         {
             if (componentRegistry == null)
             {
-                "chocolatey".Log().Error(
-                    @"Type expected for registering components was null. Unable to provide 
- name due to it being null.");
+                "chocolatey".Log().Warn(ChocolateyLoggers.Important,
+@"Unable to register licensed components. This is likely related to a 
+ missing or outdated licensed DLL.");
                 return;
             }
             try
