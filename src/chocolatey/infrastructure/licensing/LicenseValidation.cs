@@ -33,7 +33,10 @@ namespace chocolatey.infrastructure.licensing
             };
 
             string licenseFile = ApplicationParameters.LicenseFileLocation;
-            //no file system at this point
+            var userLicenseFile = ApplicationParameters.UserLicenseFileLocation;
+            if (File.Exists(userLicenseFile)) licenseFile = userLicenseFile;
+
+            //no IFileSystem at this point
             if (File.Exists(licenseFile))
             {
                 var license = new LicenseValidator(PUBLIC_KEY, licenseFile);
@@ -42,6 +45,13 @@ namespace chocolatey.infrastructure.licensing
                 {
                     license.AssertValidLicense();
                     chocolateyLicense.IsValid = true;
+                }
+                catch (LicenseFileNotFoundException e)
+                {
+                    chocolateyLicense.IsValid = false;
+                    chocolateyLicense.InvalidReason = e.Message;
+                    "chocolatey".Log().Error("A license was not found for a licensed version of Chocolatey:{0} {1}{0} {2}".format_with(Environment.NewLine, e.Message,
+                        "A license was also not found in the user profile: '{0}'.".format_with(ApplicationParameters.UserLicenseFileLocation)));
                 }
                 catch (Exception e)
                 {

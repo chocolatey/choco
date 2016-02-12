@@ -60,7 +60,19 @@ param(
 )
   Write-Debug "Running 'Install-ChocolateyInstallPackage' for $packageName with file:`'$file`', args: `'$silentArgs`', fileType: `'$fileType`', validExitCodes: `'$validExitCodes`' ";
   $installMessage = "Installing $packageName..."
-  write-host $installMessage
+  Write-Host $installMessage
+
+  if ($file -eq '' -or $file -eq $null) {
+    throw 'Package parameters incorrect, File cannot be empty.'
+  }
+  if ($fileType -eq '' -or $fileType -eq $null) {
+    throw 'Package parameters incorrect, FileType cannot be empty.'
+  }
+  $installerTypeLower = $fileType.ToLower()
+  if ($installerTypeLower -ne 'msi' -and $installerTypeLower -ne 'exe' -and $installerTypeLower -ne 'msu') {
+    Write-Warning "FileType '$fileType' is unrecognized, using 'exe' instead."
+    $fileType = 'exe'
+  } 
 
   $ignoreFile = $file + '.ignore'
   try {
@@ -72,12 +84,12 @@ param(
   $additionalInstallArgs = $env:chocolateyInstallArguments;
   if ($additionalInstallArgs -eq $null) { $additionalInstallArgs = ''; }
   $overrideArguments = $env:chocolateyInstallOverride;
-
+  
   if ($fileType -like 'msi') {
     $msiArgs = "/i `"$file`""
     if ($overrideArguments) {
       $msiArgs = "$msiArgs $additionalInstallArgs";
-      write-host "Overriding package arguments with `'$additionalInstallArgs`'";
+      Write-Host "Overriding package arguments with `'$additionalInstallArgs`'";
     } else {
       $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
     }
@@ -85,6 +97,7 @@ param(
     Start-ChocolateyProcessAsAdmin "$msiArgs" 'msiexec' -validExitCodes $validExitCodes
     #Start-Process -FilePath msiexec -ArgumentList $msiArgs -Wait
   }
+
   if ($fileType -like 'exe') {
     if ($overrideArguments) {
       Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes
