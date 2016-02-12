@@ -411,13 +411,13 @@ You can pass options and switches in the following ways:
         {
             if (license.AssemblyLoaded)
             {
-                Type licensedConfigBuilder = license.Assembly.GetType(ApplicationParameters.LicensedConfigurationBuilder, throwOnError: true, ignoreCase: true);
+                Type licensedConfigBuilder = license.Assembly.GetType(ApplicationParameters.LicensedConfigurationBuilder, throwOnError: false, ignoreCase: true);
 
                 if (licensedConfigBuilder == null)
                 {
-                    "chocolatey".Log().Error(
-                        @"Type expected for registering components was null. Unable to provide 
- name due to it being null.");
+                    "chocolatey".Log().Warn(ChocolateyLoggers.Important,
+@"Unable to set licensed configuration. This is likely related to a 
+ missing or outdated licensed DLL.");
                     return;
                 }
                 try
