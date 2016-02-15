@@ -82,8 +82,6 @@ namespace chocolatey.console
                 }
                 var container = SimpleInjectorContainer.Container;
 
-                add_or_remove_licensed_source(license, container);
-
                 var config = container.GetInstance<ChocolateyConfiguration>();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
@@ -221,37 +219,6 @@ namespace chocolatey.console
             catch (Exception ex)
             {
                 "chocolatey".Log().Warn("Attempting to delete choco.exe.old ran into an issue:{0} {1}".format_with(Environment.NewLine, ex.Message));
-            }
-        }
-
-        private static void add_or_remove_licensed_source(ChocolateyLicense license, Container container)
-        {
-            var addOrUpdate = license.IsValid;
-            var config = new ChocolateyConfiguration {
-                    RegularOutput = false,
-                    QuietOutput = true,
-                };
-
-            var sourceService = container.GetInstance<IChocolateyConfigSettingsService>();
-            var sources = sourceService.source_list(config);
-
-            config.SourceCommand.Name = ApplicationParameters.ChocolateyLicensedFeedSourceName;
-            config.Sources = ApplicationParameters.ChocolateyLicensedFeedSource;
-            config.SourceCommand.Username = "customer";
-            config.SourceCommand.Password = license.Id;
-            config.SourceCommand.Priority = 10;
-
-            if (addOrUpdate && !sources.Any(s => 
-                    s.Id.is_equal_to(ApplicationParameters.ChocolateyLicensedFeedSourceName)
-                    && s.Authenticated)
-                )
-            {
-                sourceService.source_add(config);
-            }
-
-            if (!addOrUpdate)
-            {
-                sourceService.source_remove(config);
             }
         }
 
