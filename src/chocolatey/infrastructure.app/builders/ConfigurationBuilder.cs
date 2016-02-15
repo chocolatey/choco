@@ -70,6 +70,8 @@ namespace chocolatey.infrastructure.app.builders
             var fileSystem = container.GetInstance<IFileSystem>();
             var xmlService = container.GetInstance<IXmlService>();
             var configFileSettings = get_config_file_settings(fileSystem, xmlService);
+            // must be done prior to setting the file configuration
+            add_or_remove_licensed_source(license, configFileSettings);
             set_file_configuration(config, configFileSettings, fileSystem, notifyWarnLoggingAction);
             ConfigurationOptions.reset_options();
             set_global_options(args, config, container);
@@ -77,6 +79,7 @@ namespace chocolatey.infrastructure.app.builders
             set_environment_variables(config);
             // must be done last for overrides
             set_licensed_options(config, license, configFileSettings);
+            // save all changes if there are any
             set_config_file_settings(configFileSettings, xmlService);
         }
 
@@ -96,6 +99,36 @@ namespace chocolatey.infrastructure.app.builders
                 () => xmlService.serialize(configFileSettings, globalConfigPath),
                 "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
                 logWarningInsteadOfError: true);
+        }
+
+        private static void add_or_remove_licensed_source(ChocolateyLicense license, ConfigFileSettings configFileSettings)
+        {
+            // do not enable or disable the source, in case the user has disabled it
+            var addOrUpdate = license.IsValid;
+            var sources = configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null().ToList();
+
+            var configSource = new ConfigFileSourceSetting
+            {
+                Id = ApplicationParameters.ChocolateyLicensedFeedSourceName,
+                Value = ApplicationParameters.ChocolateyLicensedFeedSource,
+                UserName = "customer",
+                Password = NugetEncryptionUtility.EncryptString(license.Id),
+                Priority = 10
+            };
+
+            if (addOrUpdate && !sources.Any(s =>
+                    s.Id.is_equal_to(ApplicationParameters.ChocolateyLicensedFeedSourceName)
+                    && NugetEncryptionUtility.DecryptString(s.Password).is_equal_to(license.Id)
+                    )
+                )
+            {
+                configFileSettings.Sources.Add(configSource);
+            }
+
+            if (!addOrUpdate)
+            {
+                configFileSettings.Sources.RemoveWhere(s => s.Id.is_equal_to(configSource.Id));
+            }
         }
 
         private static void set_file_configuration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem, Action<string> notifyWarnLoggingAction)
