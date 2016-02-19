@@ -67,7 +67,7 @@ Prerequisites:
  * The issue has to do with choco itself and is not a package or website issue.
  * Please check to see if your issue already exists with a quick search of the issues. Start with one relevant term and then add if you get too many results.
  * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) guidlines.
- * You are not submitting a question - questions are better served as emails or gitter chat questions.
+ * You are not submitting a question - questions are better served as [emails](http://groups.google.com/group/chocolatey) or [gitter chat questions](https://gitter.im/chocolatey/choco).
  * Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
 Submitting a ticket:
