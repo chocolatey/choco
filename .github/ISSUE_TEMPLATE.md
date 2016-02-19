@@ -23,7 +23,7 @@ DELETE EVERYTHING IN THIS COMMENT BLOCK
 
 ### Output Log
 <!--
-When including the log information, please ensure you have run the command with --debug --verbose. It provides important information for determining your issue
+When including the log information, please ensure you have run the command with --debug --verbose. It provides important information for determining an issue
 
 - Make sure there is no sensitive data shared.
 - We need ALL output, not just what you may believe is relevant.
@@ -35,7 +35,5 @@ GIST LINK - Please create a gist and link to that gist here
 OR
 
 ~~~sh
-
 PLACE LOG CONTENT HERE
-
 ~~~
