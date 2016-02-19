@@ -20,6 +20,10 @@ ___
 
 ### Your Log With All Ouptput
 
+GIST LINK - Please create a gist and link to that gist here
+
+OR
+
 ~~~sh
 
 PLACE LOG CONTENT HERE
