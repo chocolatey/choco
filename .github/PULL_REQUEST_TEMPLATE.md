@@ -1,3 +1,4 @@
+<!--
 You have read over CONTRIBUTING - https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md. We provide VERY defined guidance (as such, we strongly adhere to it).
 
 A summary of our expectations:
@@ -11,4 +12,4 @@ YOUR GIT COMMIT MESSAGE FORMAT IS EXTREMELY IMPORTANT. We have a very defined ex
 THANKS! We appreciate you reading the entire document and not just scanning over it.
 
 DELETE EVERYTHING ABOVE THIS LINE AND THE LINE
-___
+___ -->
