@@ -4,15 +4,13 @@ BEFORE YOU SUBMIT AN ISSUE, PLEASE READ https://github.com/chocolatey/choco#subm
 DO NOT CREATE ISSUES FOR PACKAGES. Read https://github.com/chocolatey/choco#submitting-issues
 
 DO NOT CREATE AN ISSUE FOR A QUESTION - questions are better served as email or chat.
+- email - http://groups.google.com/group/chocolatey
+-  chat - https://gitter.im/chocolatey/choco
 
-* email - http://groups.google.com/group/chocolatey
-*  chat - https://gitter.im/chocolatey/choco
+DELETE EVERYTHING IN THIS COMMENT BLOCK
 
 ## Template for Bug Reports
-
-DELETE EVERYTHING ABOVE THIS LINE AND THE LINE
-___ -->
-
+-->
 
 ### What You Are Seeing?
 
