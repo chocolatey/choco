@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.app.domain
+namespace chocolatey.infrastructure.app.domain.installers
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -30,16 +29,16 @@ namespace chocolatey.infrastructure.app.domain
         {
             InstallExecutable = "\"{0}\" ".format_with(InstallTokens.INSTALLER_LOCATION);
             SilentInstall = "/VERYSILENT";
-            NoReboot = "/NORESTART";
+            NoReboot = "/NORESTART /RESTARTEXITCODE=3010";
             LogFile = "/LOG=\"{0}\\InnoSetup.Install.log\"".format_with(InstallTokens.PACKAGE_LOCATION);
             CustomInstallLocation = "/DIR=\"{0}\"".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
             Language = "/LANG={0}".format_with(InstallTokens.LANGUAGE);
-            OtherInstallOptions = "/SP- /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /NOICONS";
+            OtherInstallOptions = "/SP- /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /FORCECLOSEAPPLICATIONS /NOICONS";
             UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
             SilentUninstall = "/VERYSILENT";
             OtherUninstallOptions = "/SUPPRESSMSGBOXES";
             // http://www.jrsoftware.org/ishelp/index.php?topic=setupexitcodes
-            ValidInstallExitCodes = new List<int> { 0 };
+            ValidInstallExitCodes = new List<int> { 0, 3010 };
             ValidUninstallExitCodes = new List<int> { 0 };
         }
 

@@ -1,4 +1,4 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// Copyright © 2011 - Present RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.app.domain
+namespace chocolatey.infrastructure.app.domain.installers
 {
     using System.Collections.Generic;
 
@@ -33,8 +33,8 @@ namespace chocolatey.infrastructure.app.domain
             SilentInstall = "/S";
             NoReboot = "";
             LogFile = "";
-            // must come last and contain no quotes, even if there are spaces
-            CustomInstallLocation = "/D={0}".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION); //must be last thing specified and no quotes
+            // must be last thing specified and contain no quotes, even if there are spaces
+            CustomInstallLocation = "/D={0}".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION); 
             Language = "";
             OtherInstallOptions = "";
             UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
