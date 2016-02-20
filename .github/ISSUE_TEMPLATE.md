@@ -12,7 +12,7 @@ DO NOT CREATE AN ISSUE FOR A QUESTION - questions are better served as email or 
 
 DELETE EVERYTHING IN THIS COMMENT BLOCK
 
-## Template for Bug Reports
+TEMPLATE FOR BUG REPORTS:
 -->
 
 ### What You Are Seeing?
@@ -37,3 +37,9 @@ OR
 ~~~sh
 PLACE LOG CONTENT HERE
 ~~~
+
+<!--
+TEMPLATE FOR FEATURE REQUESTS:
+
+It's a blank slate, have fun!
+-->
