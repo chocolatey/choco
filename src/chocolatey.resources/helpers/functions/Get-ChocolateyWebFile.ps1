@@ -100,10 +100,12 @@ param(
   }
   Write-Debug "CPU is $bitWidth bit"
 
-  $bitPackage = 32
+  $bitPackage = ''
+  if ($url32bit -ne $url64bit -and $url64bit -ne $null -and $url64bit -ne '') { $bitPackage = '32 bit' }
+
   if ($bitWidth -eq 64 -and $url64bit -ne $null -and $url64bit -ne '') {
     Write-Debug "Setting url to '$url64bit' and bitPackage to $bitWidth"
-    $bitPackage = $bitWidth
+    $bitPackage = '64 bit'
     $url = $url64bit;
     # only set if urls are different
     if ($url32bit -ne $url64bit) {
@@ -117,7 +119,7 @@ param(
   $forceX86 = $env:chocolateyForceX86;
   if ($forceX86) {
     Write-Debug "User specified -x86 so forcing 32 bit"
-    $bitPackage = 32
+    if ($url32bit -ne $url64bit) { $bitPackage = '32 bit' }
     $url = $url32bit
     $checksum =  $checksum32
     $checksumType = $checksumType32
@@ -171,7 +173,7 @@ param(
     }
 
     if ($needsDownload) {
-      Write-Host "Downloading $packageName $bitPackage bit
+      Write-Host "Downloading $packageName $bitPackage
   from `'$url`'"
       Get-WebFile $url $fileFullPath -options $options
     }
