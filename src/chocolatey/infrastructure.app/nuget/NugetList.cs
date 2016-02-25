@@ -93,6 +93,11 @@ namespace chocolatey.infrastructure.app.nuget
                 results = results.Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
             }
 
+            if (configuration.ListCommand.Exact)
+            {
+                results = results.Where(p => p.Id == configuration.Input);
+            }
+
             return results.OrderBy(p => p.Id);
         } 
 

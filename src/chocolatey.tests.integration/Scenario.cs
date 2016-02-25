@@ -128,6 +128,7 @@ namespace chocolatey.tests.integration
             config.Verbose = false;
             config.Input = config.PackageNames = string.Empty;
             config.ListCommand.LocalOnly = false;
+            config.ListCommand.Exact = false;
             //config.Features.UsePowerShellHost = true;
             //config.Features.AutoUninstaller = true;
             //config.Features.CheckSumFiles = true;
