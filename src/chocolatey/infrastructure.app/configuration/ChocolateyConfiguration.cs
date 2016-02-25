@@ -355,6 +355,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IncludeRegistryPrograms { get; set; }
         public int? Page { get; set; }
         public int PageSize { get; set; }
+        public bool Exact { get; set; }
     }
 
     [Serializable]
