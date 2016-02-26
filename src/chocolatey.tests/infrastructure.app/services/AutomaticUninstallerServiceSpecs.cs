@@ -20,6 +20,7 @@ namespace chocolatey.tests.infrastructure.app.services
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using chocolatey.infrastructure.app.domain.installers;
     using Moq;
     using NuGet;
     using chocolatey.infrastructure.adapters;

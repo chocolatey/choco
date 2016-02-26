@@ -78,8 +78,10 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("page-size=",
                      "Page Size - the amount of package results to return per page. Defaults to 25.",
                      option => configuration.ListCommand.PageSize = int.Parse(option))
+                .Add("e|exact",
+                     "Exact - Only return packages with this exact name.",
+                     option => configuration.ListCommand.Exact = option != null)
                 ;
-            //todo exact name
         }
 
         public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)

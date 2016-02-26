@@ -22,6 +22,7 @@ namespace chocolatey.infrastructure.app.services
     using commandline;
     using configuration;
     using domain;
+    using domain.installers;
     using filesystem;
     using infrastructure.commands;
     using results;

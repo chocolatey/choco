@@ -1,4 +1,4 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// Copyright � 2011 - Present RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,40 +13,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.app.domain
+namespace chocolatey.infrastructure.app.domain.installers
 {
     using System.Collections.Generic;
 
     /// <summary>
-    ///   NSIS Installer Options
+    ///   Ghost Installer Options
     /// </summary>
     /// <remarks>
-    ///   http://nsis.sourceforge.net/Docs/Chapter3.html#installerusage
-    ///   It is impossible to look at registry and determine a NSIS installer
-    ///   NSIS has no logging or language options. The command line usage is very little.
+    ///   http://www.ethalone.com/products.html /
+    ///   https://web.archive.org/web/20070812133050/http://www.ethalone.com/cgi-bin/ib/ikonboard.cgi?act=ST;f=2;t=195
+    ///   Ghost has no logging or language options. The command line usage is very little.
     /// </remarks>
-    public class NsisInstaller : InstallerBase
+    public class GhostInstaller : InstallerBase
     {
-        public NsisInstaller()
+        public GhostInstaller()
         {
             InstallExecutable = "\"{0}\"".format_with(InstallTokens.INSTALLER_LOCATION);
-            SilentInstall = "/S";
+            SilentInstall = "-s";
             NoReboot = "";
             LogFile = "";
-            // must come last and contain no quotes, even if there are spaces
-            CustomInstallLocation = "/D={0}".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION); //must be last thing specified and no quotes
+            CustomInstallLocation = "";
             Language = "";
             OtherInstallOptions = "";
             UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
-            SilentUninstall = "/S";
+            SilentUninstall = "-u -s";
             OtherUninstallOptions = "";
-            ValidInstallExitCodes = new List<int> { 0 };
-            ValidUninstallExitCodes = new List<int> { 0 };
+            ValidInstallExitCodes = new List<int>
+            {
+                0
+            };
+            ValidUninstallExitCodes = new List<int>
+            {
+                0
+            };
         }
 
-        public override InstallerType InstallerType
-        {
-            get { return InstallerType.Nsis; }
-        }
+        public override InstallerType InstallerType { get { return InstallerType.Ghost; } }
     }
 }

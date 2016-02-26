@@ -13,39 +13,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.app.domain
+namespace chocolatey.infrastructure.app.domain.installers
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
-    ///   InnoSetup Installer Options
+    ///   NSIS Installer Options
     /// </summary>
     /// <remarks>
-    ///   http://www.jrsoftware.org/ishelp/index.php?topic=setupcmdline
+    ///   http://nsis.sourceforge.net/Docs/Chapter3.html#installerusage
+    ///   It is impossible to look at registry and determine a NSIS installer
+    ///   NSIS has no logging or language options. The command line usage is very little.
     /// </remarks>
-    public class InnoSetupInstaller : InstallerBase
+    public class NsisInstaller : InstallerBase
     {
-        public InnoSetupInstaller()
+        public NsisInstaller()
         {
-            InstallExecutable = "\"{0}\" ".format_with(InstallTokens.INSTALLER_LOCATION);
-            SilentInstall = "/VERYSILENT";
-            NoReboot = "/NORESTART";
-            LogFile = "/LOG=\"{0}\\InnoSetup.Install.log\"".format_with(InstallTokens.PACKAGE_LOCATION);
-            CustomInstallLocation = "/DIR=\"{0}\"".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
-            Language = "/LANG={0}".format_with(InstallTokens.LANGUAGE);
-            OtherInstallOptions = "/SP- /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /NOICONS";
+            InstallExecutable = "\"{0}\"".format_with(InstallTokens.INSTALLER_LOCATION);
+            SilentInstall = "/S";
+            NoReboot = "";
+            LogFile = "";
+            // must be last thing specified and contain no quotes, even if there are spaces
+            CustomInstallLocation = "/D={0}".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION); 
+            Language = "";
+            OtherInstallOptions = "";
             UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
-            SilentUninstall = "/VERYSILENT";
-            OtherUninstallOptions = "/SUPPRESSMSGBOXES";
-            // http://www.jrsoftware.org/ishelp/index.php?topic=setupexitcodes
+            SilentUninstall = "/S";
+            OtherUninstallOptions = "";
             ValidInstallExitCodes = new List<int> { 0 };
             ValidUninstallExitCodes = new List<int> { 0 };
         }
 
         public override InstallerType InstallerType
         {
-            get { return InstallerType.InnoSetup; }
+            get { return InstallerType.Nsis; }
         }
     }
 }
