@@ -213,6 +213,12 @@
     <None Include="context\dependencies\hasdependency\2.1.0\tools\chocolateyuninstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\exactpackage\exactpackage.dontfind\1.0.0\exactpackage.dontfind.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\exactpackage\exactpackage\1.0.0\exactpackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\installpackage\1.0.0\installpackage.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -400,6 +406,12 @@
     <None Include="context\upgradepackage\1.1.0\tools\graphical.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="context\exactpackage\exactpackage.dontfind\1.0.0\tools\purpose.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="context\exactpackage\exactpackage\1.0.0\tools\purpose.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="infrastructure\filesystem\CopyMe.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
