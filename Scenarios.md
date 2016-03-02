@@ -396,7 +396,7 @@
  * should not have inconclusive package result
  * should not have warning package result
 
-### ChocolateyListCommand [ 7 Scenario(s), 32 Observation(s) ]
+### ChocolateyListCommand [ 8 Scenario(s), 36 Observation(s) ]
 
 #### when listing local packages
 
@@ -427,6 +427,13 @@
  * should not contain packages and versions with a pipe between them
 
 #### when searching for a particular package
+
+ * should contain a summary
+ * should contain debugging messages
+ * should contain packages and versions with a space between them
+ * should not contain packages that do not match
+
+#### when searching for an exact package
 
  * should contain a summary
  * should contain debugging messages
