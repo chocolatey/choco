@@ -96,6 +96,29 @@ param(
 
   $res = $req.GetResponse();
 
+  try {
+    $headers = @{}
+    foreach ($key in $res.Headers) {
+      $value = $res.Headers[$key];
+      if ($value) {
+        $headers.Add("$key","$value")
+      }
+    }
+
+    if ($headers.ContainsKey("Content-Type")) {
+      $contentType = $headers['Content-Type']
+      if ($contentType -ne $null) {
+        if ($contentType.ToLower().Contains("text/html") -or $contentType.ToLower().Contains("text/plain")) {
+          Write-Warning "$fileName is of content type $contentType"
+          Set-Content -Path "$fileName.istext" -Value "$fileName has content type $contentType" -Encoding UTF8 -Force
+        }
+      }
+    } 
+  } catch {
+    # not able to get content-type header
+    Write-Debug "Error getting content type - $($_.Exception.Message)"
+  }
+
   if($fileName -and !(Split-Path $fileName)) {
     $fileName = Join-Path (Get-Location -PSProvider "FileSystem") $fileName
   }
