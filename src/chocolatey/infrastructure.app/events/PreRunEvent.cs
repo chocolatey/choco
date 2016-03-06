@@ -13,12 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.events
+namespace chocolatey.infrastructure.app.events
 {
-    /// <summary>
-    ///   Interface for Event messages
-    /// </summary>
-    public interface IEvent
+    using infrastructure.commands;
+    using infrastructure.events;
+
+    public class PreRunEvent<TCommand> : IMessage where TCommand : ICommand
     {
+        public TCommand Command { get; private set; }
+        public object[] State { get; private set; }
+
+        public PreRunEvent(TCommand command, object[] state)
+        {
+            Command = command;
+            State = state;
+        }
     }
 }

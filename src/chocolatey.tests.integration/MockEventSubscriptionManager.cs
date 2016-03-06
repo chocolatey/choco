@@ -32,14 +32,14 @@ namespace chocolatey.tests.integration
             get { return _messages.Value; }
         }
 
-        public void publish<Event>(Event eventMessage) where Event : class, IEvent
+        public void publish<Event>(Event eventMessage) where Event : class, IMessage
         {
             var list = _messages.Value.GetOrAdd(typeof (Event), new List<object>());
             list.Add(eventMessage);
             Object.publish(eventMessage);
         }
 
-        public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IEvent
+        public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
         {
             return new Subject<Event>();
         }

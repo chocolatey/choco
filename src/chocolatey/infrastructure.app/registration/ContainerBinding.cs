@@ -16,12 +16,12 @@
 namespace chocolatey.infrastructure.app.registration
 {
     using System.Collections.Generic;
+    using infrastructure.events;
     using NuGet;
     using SimpleInjector;
     using adapters;
     using commands;
     using cryptography;
-    using events;
     using filesystem;
     using infrastructure.commands;
     using infrastructure.configuration;
@@ -104,6 +104,7 @@ namespace chocolatey.infrastructure.app.registration
                         };
                     return list.AsReadOnly();
                 }, Lifestyle.Singleton);
+
 
             container.Register<IEventSubscriptionManagerService, EventSubscriptionManagerService>(Lifestyle.Singleton);
             EventManager.initialize_with(container.GetInstance<IEventSubscriptionManagerService>);
