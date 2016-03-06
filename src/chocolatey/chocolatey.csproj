@@ -88,6 +88,7 @@
     <Compile Include="infrastructure.app\domain\installers\InstallForJInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\IzPackInstaller.cs" />
     <Compile Include="infrastructure.app\domain\RegistryValueKindType.cs" />
+    <Compile Include="infrastructure.app\events\HandlePackageResultCompletedMessage.cs" />
     <Compile Include="infrastructure\commandline\ReadKeyTimeout.cs" />
     <Compile Include="infrastructure\commands\Execute.cs" />
     <Compile Include="GetChocolatey.cs" />
