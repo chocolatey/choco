@@ -88,6 +88,7 @@
     <Compile Include="infrastructure.app\domain\installers\InstallForJInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\IzPackInstaller.cs" />
     <Compile Include="infrastructure.app\domain\RegistryValueKindType.cs" />
+    <Compile Include="infrastructure.app\events\HandlePackageResultCompletedMessage.cs" />
     <Compile Include="infrastructure\commandline\ReadKeyTimeout.cs" />
     <Compile Include="infrastructure\commands\Execute.cs" />
     <Compile Include="GetChocolatey.cs" />
@@ -116,7 +117,7 @@
     <Compile Include="infrastructure.app\domain\PackageFiles.cs" />
     <Compile Include="infrastructure.app\domain\PinCommandType.cs" />
     <Compile Include="infrastructure.app\domain\SourceCommandType.cs" />
-    <Compile Include="infrastructure.app\messages\PostRunEvent.cs" />
+    <Compile Include="infrastructure.app\events\PostRunEvent.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyNugetCredentialProvider.cs" />
     <Compile Include="infrastructure.app\nuget\NugetPush.cs" />
     <Compile Include="infrastructure.app\runners\GenericRunner.cs" />
@@ -154,7 +155,7 @@
     <Compile Include="infrastructure.app\domain\RegistryApplicationKey.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyLocalPackageRepository.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyNugetLogger.cs" />
-    <Compile Include="infrastructure.app\messages\PreRunEvent.cs" />
+    <Compile Include="infrastructure.app\events\PreRunEvent.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyPackagePathResolver.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyPhysicalFileSystem.cs" />
     <Compile Include="infrastructure.app\nuget\DictionaryPropertyProvider.cs" />
@@ -219,7 +220,7 @@
     <Compile Include="infrastructure.app\attributes\CommandForAttribute.cs" />
     <Compile Include="infrastructure.app\domain\CommandNameType.cs" />
     <Compile Include="infrastructure\events\EventManager.cs" />
-    <Compile Include="infrastructure\events\IEvent.cs" />
+    <Compile Include="infrastructure\events\IMessage.cs" />
     <Compile Include="infrastructure\commandline\ReadLineTimeout.cs" />
     <Compile Include="infrastructure\registration\SimpleInjectorContainer.cs" />
     <Compile Include="infrastructure\results\IResult.cs" />

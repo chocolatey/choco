@@ -23,7 +23,9 @@ namespace chocolatey.infrastructure.app.services
     using commandline;
     using configuration;
     using domain;
+    using events;
     using infrastructure.commands;
+    using infrastructure.events;
     using infrastructure.services;
     using logging;
     using NuGet;
@@ -302,6 +304,7 @@ namespace chocolatey.infrastructure.app.services
 
             _packageInfoService.save_package_information(pkgInfo);
             ensure_bad_package_path_is_clean(config, packageResult);
+            EventManager.publish(new HandlePackageResultCompletedMessage(packageResult, config, commandName));
 
             if (!packageResult.Success)
             {
@@ -310,7 +313,7 @@ namespace chocolatey.infrastructure.app.services
 
                 return;
             }
-
+          
             remove_rollback_if_exists(packageResult);
 
             this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".format_with(commandName.to_string(), packageResult.Name));

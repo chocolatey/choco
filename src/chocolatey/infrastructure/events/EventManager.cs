@@ -49,7 +49,7 @@ namespace chocolatey.infrastructure.events
         /// </summary>
         /// <typeparam name="Event">The type of the event.</typeparam>
         /// <param name="message">The message.</param>
-        public static void publish<Event>(Event message) where Event : class, IEvent
+        public static void publish<Event>(Event message) where Event : class, IMessage
         {
             if (_messageSubscriptionManager != null)
             {
@@ -65,7 +65,7 @@ namespace chocolatey.infrastructure.events
         /// <param name="handleError">The handle error.</param>
         /// <param name="filter">The filter.</param>
         /// <returns>The subscription so that a service could unsubscribe</returns>
-        public static IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IEvent
+        public static IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
         {
             if (_messageSubscriptionManager != null)
             {
