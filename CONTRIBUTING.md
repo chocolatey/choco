@@ -1,9 +1,13 @@
-# Reporting an Issue?
+# Reporting an Issue/Bug?
 ![submitting isseus](https://cloud.githubusercontent.com/assets/63502/12534440/fc223b74-c21e-11e5-9a41-1ffc1c9af48f.png)
 
-Submitting an Issue? See the **[Submitting Issues](https://github.com/chocolatey/choco#submitting-issues) section** in the [README](https://github.com/chocolatey/choco/blob/master/README.md#submitting-issues).
+Submitting an Issue (or a Bug)? See the **[Submitting Issues](https://github.com/chocolatey/choco#submitting-issues) section** in the [README](https://github.com/chocolatey/choco/blob/master/README.md#submitting-issues).
 
 **NOTE**: Do not submit issues for missing `SolutionVersion.cs`. Please see [Compiling / Building Source](https://github.com/chocolatey/choco#compiling--building-source).
+
+# Submitting an Enhancement / Feature Request?
+
+This is the right place. See below.
 
 ## Package Issue?
 Please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://github.com/chocolatey/choco/wiki/PackageTriageProcess).
@@ -11,11 +15,16 @@ Please see [Request Package Fixes or Updates / Become a maintainer of an existin
 ## Package Request? Package Missing?
 If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://github.com/chocolatey/choco/wiki/PackageTriageProcess#package-request-package-missing).
 
+# Submitting an Enhancement
+
+Log a github issue. There are less constraints on this versus reporting issues.
+
 # Contributors
 The process for contributions is roughly as follows:
 
 ## Prerequisites
 
+ * Submit the Enhancement ticket. You will need the issue id for your commits.
  * Ensure you have signed the Contributor License Agreement (CLA) - without this we are not able to take contributions that are not trivial.
   * [Sign the Contributor License Agreement](https://www.clahub.com/agreements/chocolatey/choco).
   * You must do this for each Chocolatey project that requires it.
