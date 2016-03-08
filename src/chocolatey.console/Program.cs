@@ -17,7 +17,6 @@ namespace chocolatey.console
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using infrastructure.adapters;
@@ -25,7 +24,6 @@ namespace chocolatey.console
     using infrastructure.app.builders;
     using infrastructure.app.configuration;
     using infrastructure.app.runners;
-    using infrastructure.app.services;
     using infrastructure.commandline;
     using infrastructure.configuration;
     using infrastructure.extractors;
