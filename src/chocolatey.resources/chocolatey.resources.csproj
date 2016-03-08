@@ -128,6 +128,9 @@
   <ItemGroup>
     <EmbeddedResource Include="helpers\functions\Get-ToolsLocation.ps1" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="tools\die.zip" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
