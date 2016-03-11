@@ -35,15 +35,13 @@ namespace chocolatey.infrastructure.app.domain.installers
         public IEnumerable<int> ValidInstallExitCodes { get; protected set; }
         public IEnumerable<int> ValidUninstallExitCodes { get; protected set; }
 
-        public virtual string build_install_command_arguments(bool customInstallLocation, bool languageRequested)
+        public virtual string build_install_command_arguments(bool logFile, bool customInstallLocation, bool languageRequested)
         {
             var args = new StringBuilder();
-            args.AppendFormat("{0} {1}", SilentInstall, NoReboot);
-            //MSI may have issues with 1622 - opening a log file location
-            args.AppendFormat(" {0}", LogFile);
+            args.Append("{0} {1} {2}".format_with(SilentInstall, NoReboot, OtherInstallOptions).trim_safe());
             if (languageRequested) args.AppendFormat(" {0}", Language);
-            args.AppendFormat(" {0}", OtherInstallOptions);
-
+            //MSI may have issues with 1622 - opening a log file location
+            if (logFile) args.AppendFormat(" {0}", LogFile);
             // custom install location must be last for NSIS
             if (customInstallLocation) args.AppendFormat(" {0}", CustomInstallLocation);
 
@@ -53,7 +51,7 @@ namespace chocolatey.infrastructure.app.domain.installers
         public virtual string build_uninstall_command_arguments()
         {
             //MSI has issues with 1622 - opening a log file location
-            return "{0} {1} {2}".format_with(SilentUninstall, NoReboot, OtherUninstallOptions);
+            return "{0} {1} {2}".format_with(SilentUninstall, NoReboot, OtherUninstallOptions).trim_safe();
         }
     }
 }

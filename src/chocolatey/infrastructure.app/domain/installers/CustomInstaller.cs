@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             get { return InstallerType.Custom; }
         }
 
-        public override string build_install_command_arguments(bool customInstallLocation, bool languageRequested)
+        public override string build_install_command_arguments(bool logFile, bool customInstallLocation, bool languageRequested)
         {
             if (customInstallLocation) this.Log().Warn("CustomInstaller doesn't support custom install locations.");
             if (languageRequested) this.Log().Warn("CustomInstaller doesn't support custom language options.");
