@@ -15,6 +15,7 @@
 
 namespace chocolatey.tests.infrastructure.tokens
 {
+    using System.Collections.Generic;
     using Should;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.tokens;
@@ -66,10 +67,16 @@ namespace chocolatey.tests.infrastructure.tokens
             public void when_given_brace_brace_COMMANDNAME_brace_brace_should_replace_with_the_Name_from_the_configuration()
             {
                 TokenReplacer.replace_tokens(configuration, "Hi! My name is [[COMMANDNAME]]").ShouldEqual("Hi! My name is " + name);
+            }          
+            
+            [Fact]
+            public void when_given_brace_brace_cOMmAnDnAMe_brace_brace_should_replace_with_the_Name_from_the_configuration()
+            {
+                TokenReplacer.replace_tokens(configuration, "Hi! My name is [[cOMmAnDnAMe]]").ShouldEqual("Hi! My name is " + name);
             }
 
             [Fact]
-            public void if_given_brace_brace_ServerName_brace_brace_should_NOT_replace_with_the_Name_from_the_configuration()
+            public void if_given_brace_brace_Version_brace_brace_should_NOT_replace_with_the_Name_from_the_configuration()
             {
                 TokenReplacer.replace_tokens(configuration, "Go to [[Version]]").ShouldNotContain(name);
             }
@@ -97,6 +104,25 @@ namespace chocolatey.tests.infrastructure.tokens
             {
                 TokenReplacer.replace_tokens(configuration, null).ShouldEqual("");
             }
+        }
+
+        public class when_using_TokenReplacer_with_a_Dictionary : TokenReplacerSpecsBase
+        {
+            public Dictionary<string, string> tokens = new Dictionary<string, string>();
+            private string value = "sweet";
+
+
+            public override void Because()
+            {
+                tokens.Add("dude", value);
+            }
+
+            [Fact]
+            public void when_given_a_proper_token_it_should_replace_with_the_dictionary_value()
+            {
+                TokenReplacer.replace_tokens(tokens, "Hi! My name is [[dude]]").ShouldEqual("Hi! My name is " + value);
+            }
+
         }
     }
 }

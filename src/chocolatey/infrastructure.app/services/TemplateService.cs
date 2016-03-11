@@ -17,6 +17,7 @@ namespace chocolatey.infrastructure.app.services
 {
     using System;
     using System.IO;
+    using System.Management.Automation;
     using System.Reflection;
     using System.Text;
     using configuration;
@@ -75,7 +76,8 @@ namespace chocolatey.infrastructure.app.services
                 }
                 catch (Exception)
                 {
-                    if (configuration.RegularOutput) this.Log().Warn("Property {0} was not found for replacement in the Template Values.".format_with(property.Key));
+                    if (configuration.RegularOutput) this.Log().Debug("Property {0} will be added to additional properties.".format_with(property.Key));
+                    tokens.AdditionalProperties.Add(property.Key, property.Value);
                 }
             }
 
@@ -83,6 +85,10 @@ namespace chocolatey.infrastructure.app.services
             foreach (var propertyInfo in tokens.GetType().GetProperties())
             {
                 this.Log().Debug(() => " {0}={1}".format_with(propertyInfo.Name, propertyInfo.GetValue(tokens, null)));
+            }
+            foreach (var additionalProperty in tokens.AdditionalProperties.or_empty_list_if_null())
+            {
+                this.Log().Debug(() => " {0}={1}".format_with(additionalProperty.Key, additionalProperty.Value));
             }
 
             var defaultTemplateOverride = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, "default");
@@ -118,6 +124,7 @@ namespace chocolatey.infrastructure.app.services
         public void generate_file_from_template(ChocolateyConfiguration configuration, TemplateValues tokens, string template, string fileLocation, Encoding encoding)
         {
             template = TokenReplacer.replace_tokens(tokens, template);
+            template = TokenReplacer.replace_tokens(tokens.AdditionalProperties, template);
 
             if (configuration.RegularOutput) this.Log().Info(() => "Generating template to a file{0} at '{1}'".format_with(Environment.NewLine, fileLocation));
             this.Log().Debug(() => "{0}".format_with(template));

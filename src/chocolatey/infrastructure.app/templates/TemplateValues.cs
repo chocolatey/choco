@@ -15,11 +15,15 @@
 
 namespace chocolatey.infrastructure.app.templates
 {
+    using System;
+    using System.Collections.Generic;
+
     public class TemplateValues
     {
         public TemplateValues()
         {
             set_normal();
+            AdditionalProperties = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
         public void set_normal()
@@ -73,9 +77,11 @@ namespace chocolatey.infrastructure.app.templates
         public string ChecksumType { get; set; }
         public string Checksum64 { get; set; }
         public string ChecksumType64 { get; set; }
+        public IDictionary<string, string> AdditionalProperties { get; private set; }
 
         public static readonly string NamePropertyName = "PackageName";
         public static readonly string VersionPropertyName = "PackageVersion";
         public static readonly string MaintainerPropertyName = "MaintainerName";
+
     }
 }
