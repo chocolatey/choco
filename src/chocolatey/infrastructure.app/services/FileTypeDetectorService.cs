@@ -42,35 +42,83 @@ namespace chocolatey.infrastructure.app.services
             _configuration = configuration;
         }
 
-        //http://stackoverflow.com/a/8861895/18475
-        //http://stackoverflow.com/a/2864714/18475
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool SetDllDirectory(string lpPathName);
+        //// http://stackoverflow.com/a/8861895/18475
+        //// http://stackoverflow.com/a/2864714/18475
+        //[DllImport("kernel32.dll", SetLastError = true)]
+        //private static extern bool SetDllDirectory(string lpPathName);
 
-        public struct DieInternal
-        {
-            [SuppressUnmanagedCodeSecurity]
-            [DllImport("diedll", CallingConvention = CallingConvention.StdCall, EntryPoint = "_DIE_scanExW@20", SetLastError = true)]
-            internal static extern int scanExW_0([MarshalAs(UnmanagedType.LPWStr)] string pwszFileName, sbyte[] pszOutBuffer, int nOutBufferSize, uint nFlags, [MarshalAs(UnmanagedType.LPWStr)] string pwszDataBase);
-        }
+        //public struct DieInternal
+        //{
+        //    [SuppressUnmanagedCodeSecurity]
+        //    [DllImport("diedll", CallingConvention = CallingConvention.StdCall, EntryPoint = "_DIE_scanExW@20", SetLastError = true)]
+        //    internal static extern int scanExW_0([MarshalAs(UnmanagedType.LPWStr)] string pwszFileName, sbyte[] pszOutBuffer, int nOutBufferSize, uint nFlags, [MarshalAs(UnmanagedType.LPWStr)] string pwszDataBase);
+        //}
+
+
+        //public string scan_file(string filePath)
+        //{
+        //    if (Platform.get_platform() != PlatformType.Windows)
+        //    {
+        //        this.Log().Debug("Unable to detect file types when not on Windows");
+        //        return string.Empty;
+        //    }
+        //    try
+        //    {
+        //        var successPath = SetDllDirectory(dieDllLocation);
+        //        if (!successPath)
+        //        {
+        //            "chocolatey".Log().Warn("Error during native SetDllDirectory call - {0}".format_with(Marshal.GetLastWin32Error()));
+        //        }
+        //        var outputBuffer = new sbyte[1024];
+        //        int outputBufferSize = outputBuffer.Length;
+        //        const uint flags = DIE_SINGLELINEOUTPUT;
+
+        //        var success = DieInternal.scanExW_0(filePath, outputBuffer, outputBufferSize, flags, databaseLocation);
+        //        if (success != 0)
+        //        {
+        //            "chocolatey".Log().Warn("Error during native _DIE_scanExW call - {0}".format_with(Marshal.GetLastWin32Error()));
+        //        }
+
+        //        byte[] outputBytes = Array.ConvertAll(outputBuffer, (a) => (byte)a);
+
+        //        var output = Encoding.UTF8.GetString(outputBytes).to_string().Trim('\0');
+
+        //        return output;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        this.Log().Warn("Unable to detect type for '{0}':{1} {2}".format_with(_fileSystem.get_file_name(filePath), Environment.NewLine, ex.Message));
+        //        return string.Empty;
+        //    }
+        //}
+
 
         public string scan_file(string filePath)
         {
-            var dieDllLocation = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "detector");
-            var databaseLocation = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "detector", "db");
-            if (!_fileSystem.directory_exists(databaseLocation))
-            {
-                var dieZipLocation = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "die.zip");
-                unzip_die_files(dieZipLocation, dieDllLocation);
-            }
-
-            filePath = _fileSystem.get_full_path(filePath);
-
             if (Platform.get_platform() != PlatformType.Windows)
             {
                 this.Log().Debug("Unable to detect file types when not on Windows");
                 return string.Empty;
             }
+
+            // http://stackoverflow.com/q/5503951/18475
+            // http://stackoverflow.com/a/10852827/18475
+            // http://scottbilas.com/blog/automatically-choose-32-or-64-bit-mixed-mode-dlls/
+            //todo: convert this to call the exe assembly instead. The dll is 32bit and won't work with AnyCPU
+
+            filePath = _fileSystem.get_full_path(filePath);
+            var dieDllLocation = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "detector");
+            var diecPath = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "detector","diec.exe");
+            var databaseLocation = _fileSystem.get_full_path(_fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "detector", "db"));
+            
+            this.Log().Debug("Attempting to detect type for '{0}' with db '{1}'".format_with(_fileSystem.get_file_name(filePath), databaseLocation));
+
+            if (!_fileSystem.directory_exists(diecPath) || !_fileSystem.directory_exists(databaseLocation))
+            {
+                var dieZipLocation = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "die.zip");
+                unzip_die_files(dieZipLocation, dieDllLocation);
+            }
+           
             if (!_fileSystem.file_exists(filePath))
             {
                 this.Log().Warn("File not found at '{0}'. Unable to detect type for inexistent file.".format_with(filePath));
@@ -79,18 +127,24 @@ namespace chocolatey.infrastructure.app.services
 
             try
             {
-                var successPath = SetDllDirectory(dieDllLocation);
-                var outputBuffer = new sbyte[1024];
-                int outputBufferSize = outputBuffer.Length;
-                const uint flags = DIE_SINGLELINEOUTPUT;
-
-                var success = DieInternal.scanExW_0(filePath, outputBuffer, outputBufferSize, flags, databaseLocation);
-                byte[] outputBytes = Array.ConvertAll(outputBuffer, (a) => (byte)a);
-
-                //http://stackoverflow.com/a/2581397/18475
-                // var output = Encoding.UTF8.GetString(outputBytes).Replace("\0", string.Empty).trim_safe();
-                var output = Encoding.UTF8.GetString(outputBytes).to_string().Trim('\0');
-
+                //todo: detector databaselocation fails now - it's based on the current directory relative path
+                //C:\\ProgramData\\chocolatey\\tools\\detector\\db
+                var output = string.Empty;
+               // var success = CommandExecutor.execute_static(diecPath, "\"{0}\" -singlelineoutput:yes -showoptions:no -showversion:no -database:\"{1}\"".format_with(filePath, databaseLocation), 
+                var success = CommandExecutor.execute_static(diecPath, "\"{0}\"".format_with(filePath), 
+                    60, 
+                    _fileSystem.get_current_directory(), 
+                    (s, e) =>
+                    {
+                        if (!string.IsNullOrWhiteSpace(e.Data)) output = e.Data;
+                    },
+                    (s, e) =>
+                    {
+                        this.Log().Warn("{0}".format_with(e.Data));
+                    }, 
+                    false, 
+                    false);
+               
                 return output;
             }
             catch (Exception ex)

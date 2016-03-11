@@ -32,7 +32,8 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Support for custom headers - see [#332](https://github.com/chocolatey/choco/issues/332)
  * [Security] Show moderation-related information in search results - see [#493](https://github.com/chocolatey/choco/issues/493)
  * New Helper - Get-ToolsLocation helper (replacement for Get-BinRoot) - see [#631](https://github.com/chocolatey/choco/issues/631)
- 
+ * Choco list/search should have exact filter search - see [#453](https://github.com/chocolatey/choco/issues/453)
+
 ### BUG FIXES
 
  * [Security] Fix - Only load the Chocolatey PowerShell module from a known location - see [#560](https://github.com/chocolatey/choco/issues/560)
@@ -59,6 +60,7 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Fix - Verbose shows in output on debug switch - see [#611](https://github.com/chocolatey/choco/issues/611)
  * Fix: Get-ChocolateyUnzip captures files that don't belong to the package - see [#616](https://github.com/chocolatey/choco/issues/616)
  * Fix: Package succeeds but software install silently fails when Install-ChocolateyInstallPackage has the wrong arguments - see [#629](https://github.com/chocolatey/choco/issues/629)
+ * Fix - ShimGen handling of spaces and arguments that have shimgen in them - see [#647](https://github.com/chocolatey/choco/issues/647)
 
 ### IMPROVEMENTS
 
@@ -73,6 +75,9 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Suppress verbose output to verbose - like with 7-zip - see [#476](https://github.com/chocolatey/choco/issues/476)
  * Choco push moderation message only on push to dot org - see [#601](https://github.com/chocolatey/choco/issues/601)
  * Allow tools/bin root to be root of the drive again - see [#628](https://github.com/chocolatey/choco/issues/628)
+ * File description of ShimGen shims should match original as closely as possible - see [#374](https://github.com/chocolatey/choco/issues/374)
+ * Shim Generation should automatically detect GUI - see [#634](https://github.com/chocolatey/choco/issues/634)
+ * Don't show 32 bit wording unless there is explicitly both versions available - see [#642](https://github.com/chocolatey/choco/issues/642)
  * Pro - Also check for license in User Profile location - see [#606](https://github.com/chocolatey/choco/issues/606)
  * Pro - Set download cache information if available - see [#562](https://github.com/chocolatey/choco/issues/562)
  * Pro - Allow commands to be added - see [#583](https://github.com/chocolatey/choco/issues/583)

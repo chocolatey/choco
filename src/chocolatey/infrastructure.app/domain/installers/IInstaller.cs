@@ -33,7 +33,7 @@ namespace chocolatey.infrastructure.app.domain.installers
         IEnumerable<int> ValidInstallExitCodes { get; }
         IEnumerable<int> ValidUninstallExitCodes { get; }
 
-        string build_install_command_arguments(bool customInstallLocation, bool languageRequested);
+        string build_install_command_arguments(bool logFile, bool customInstallLocation, bool languageRequested);
         string build_uninstall_command_arguments();
     }
 }
