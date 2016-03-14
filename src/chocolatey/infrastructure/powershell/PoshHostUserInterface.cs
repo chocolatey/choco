@@ -198,7 +198,8 @@ namespace chocolatey.infrastructure.powershell
 
         public override int PromptForChoice(string caption, string message, Collection<ChoiceDescription> choices, int defaultChoice)
         {
-            this.Log().Warn(caption.escape_curly_braces());
+            if (!string.IsNullOrWhiteSpace(caption)) this.Log().Warn(caption.escape_curly_braces());
+            if (!string.IsNullOrWhiteSpace(message)) this.Log().Warn(ChocolateyLoggers.Important, message.escape_curly_braces());
 
             string[,] promptData = build_hotkeys_and_plain_labels(choices);
 
@@ -208,14 +209,14 @@ namespace chocolatey.infrastructure.powershell
             {
                 choicePrompt.Append(String.Format(
                     CultureInfo.CurrentCulture,
-                    "|{0}> {1} ",
+                    "[{0}] {1} ",
                     promptData[0, element],
                     promptData[1, element]));
             }
 
             choicePrompt.Append(String.Format(
                 CultureInfo.CurrentCulture,
-                "[Default is ({0}]",
+                "(default is \"{0}\")",
                 promptData[0, defaultChoice]));
 
             while (true)
@@ -255,7 +256,9 @@ namespace chocolatey.infrastructure.powershell
 
         public override PSCredential PromptForCredential(string caption, string message, string userName, string targetName, PSCredentialTypes allowedCredentialTypes, PSCredentialUIOptions options)
         {
-            this.Log().Warn(caption.escape_curly_braces());
+            if (!string.IsNullOrWhiteSpace(caption)) this.Log().Warn(caption.escape_curly_braces());
+            if (!string.IsNullOrWhiteSpace(message)) this.Log().Warn(ChocolateyLoggers.Important, message.escape_curly_braces());
+
             if (string.IsNullOrWhiteSpace(userName))
             {
                 this.Log().Warn("Please provide username:");
