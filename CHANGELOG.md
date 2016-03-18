@@ -87,6 +87,12 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * API - Chocolatey Lib still marks vital package information as internal - see [#433](https://github.com/chocolatey/choco/issues/433)
  * API - Add paging to list command - see [#427](https://github.com/chocolatey/choco/issues/427)
 
+## [0.9.9.12](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.12+is%3Aclosed) (March 18, 2016)
+
+### BUG FIXES
+
+ * Fix - PowerShell "Collection is read-only" - see [#659](https://github.com/chocolatey/choco/issues/659)
+
 ## [0.9.9.11](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.11+is%3Aclosed) (October 6, 2015)
 
 ### BUG FIXES
