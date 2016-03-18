@@ -3,7 +3,7 @@
   [alias("o","override","overrideArguments","notSilent")]
   [switch] $overrideArgs = $false,
   [alias("x86")][switch] $forceX86 = $false,
-  [alias("params,"parameters","pkgParams")][string]$packageParameters = '',
+  [alias("params","parameters","pkgParams")][string]$packageParameters = '',
   [string]$packageScript
 )
 
