@@ -40,7 +40,13 @@ In that mess there is a link to the [Helper Reference](https://github.com/chocol
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/master/CHANGELOG.md
 
-## 0.9.9.11
+## 0.9.9.12
+
+### BUG FIXES
+
+ * Fix - PowerShell "Collection is read-only" - see [#659](https://github.com/chocolatey/choco/issues/659)
+
+## 0.9.9.11
 
 ### BUG FIXES
 
