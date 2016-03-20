@@ -32,10 +32,21 @@ powershell session with all environment settings possibly performed by
 chocolatey package installs.
 
 #>
-  Write-Debug "Running 'Update-SessionEnvironment' - Updating the environment variables for the session."
+  Write-Debug "Running 'Update-SessionEnvironment'"
+  $refreshEnv = $false
+  $invocation = $MyInvocation
+  if ($invocation.InvocationName -eq 'refreshenv') {
+    $refreshEnv = $true
+  }
+  
+  if ($refreshEnv) {
+    Write-Output "Refreshing environment variables from the registry..."
+  } else {
+    Write-Verbose "Refreshing environment variables from the registry."
+  }
 
   #ordering is important here, $user comes after so we can override $machine
-  'Machine', 'User' |
+  'Process', 'Machine', 'User' |
     % {
       $scope = $_
       Get-EnvironmentVariableNames -Scope $scope |
@@ -51,4 +62,10 @@ chocolatey package installs.
     } |
     Select -Unique
   $Env:PATH = $paths -join ';'
+  
+  if ($refreshEnv) {
+    Write-Output "Finished"
+  }
 }
+
+Set-Alias refreshenv Update-SessionEnvironment
