@@ -81,6 +81,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("e|exact",
                      "Exact - Only return packages with this exact name.",
                      option => configuration.ListCommand.Exact = option != null)
+                 .Add("id|idonly|id-only",
+                     "ByIdOnly - Only return packages with the filter being part of the id.",
+                     option => configuration.ListCommand.ByIdOnly = option != null)
                 ;
         }
 
