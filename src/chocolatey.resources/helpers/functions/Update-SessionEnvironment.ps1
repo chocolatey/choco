@@ -44,6 +44,8 @@ chocolatey package installs.
   } else {
     Write-Verbose "Refreshing environment variables from the registry."
   }
+  
+  $psModulePath = $env:PSModulePath
 
   #ordering is important here, $user comes after so we can override $machine
   'Process', 'Machine', 'User' |
@@ -62,6 +64,9 @@ chocolatey package installs.
     } |
     Select -Unique
   $Env:PATH = $paths -join ';'
+  
+  # PSModulePath is almost always updated by process, so we want to preserve it.
+  $env:PSModulePath = $psModulePath
   
   if ($refreshEnv) {
     Write-Output "Finished"
