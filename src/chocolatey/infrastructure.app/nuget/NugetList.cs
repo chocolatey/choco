@@ -98,6 +98,11 @@ namespace chocolatey.infrastructure.app.nuget
                 results = results.Where(p => p.Id == configuration.Input);
             }
 
+            if (configuration.ListCommand.ByIdOnly)
+            {
+                results = results.Where(p => p.Id.Contains(configuration.Input));
+            }
+
             return results.OrderBy(p => p.Id);
         } 
 

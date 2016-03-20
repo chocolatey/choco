@@ -61,7 +61,7 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("x|forcedependencies|force-dependencies|removedependencies|remove-dependencies",
                      "RemoveDependencies - Uninstall dependencies when uninstalling package(s). Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
-                .Add("n|skippowershell|skip-powershell",
+                .Add("n|skippowershell|skip-powershell|skipscripts|skip-scripts|skip-automation-scripts",
                      "Skip Powershell - Do not run chocolateyUninstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 ;

@@ -360,6 +360,8 @@ Please run chocolatey with `choco command -help` for specific help on
                         "chocolatey".Log().Info(@"
 You can pass options and switches in the following ways:
 
+ * Unless stated otherwise, an option/switch should only be passed one
+   time. Otherwise you may find weird/non-supported behavior.
  * `-`, `/`, or `--` (one character switches should not use `--`)
  * **Option Bundling / Bundled Options**: One character switches can be
    bundled. e.g. `-d` (debug), `-f` (force), `-v` (verbose), and `-y`
@@ -369,13 +371,20 @@ You can pass options and switches in the following ways:
    the local options are parsed.
  * **Use Equals**: You can also include or not include an equals sign
    `=` between options and values.
- * **Quote Values**: When you need to quote things, such as when using
-   spaces, please use apostrophes (`'value'`). In cmd.exe you may be
-   able to use just double quotes (`""value""`) but in powershell.exe
-   you may need to either escape the quotes with backticks
-   (`` `""value`"" ``) or use a combination of double quotes and
-   apostrophes (`""'value'""`). This is due to the hand off to
-   PowerShell - it seems to strip off the outer set of quotes.
+ * **Quote Values**: When you need to quote an entire argument, such as
+   when using spaces, please use a combination of double quotes and
+   apostrophes (`""'value'""`). In cmd.exe you can just use double quotes
+   (`""value""`) but in powershell.exe you should use backticks
+   (`` `""value`"" ``) or apostrophes (`'value'`). Using the combination
+   allows for both shells to work without issue, except for when the next
+   section applies.
+ * **Pass quotes in arguments**: When you need to pass quoted values to
+   to something like a native installer, you are in for a world of fun. In
+   cmd.exe you must pass it like this: `-ia ""/yo=""""Spaces spaces""""""`. In
+   PowerShell.exe, you must pass it like this: `-ia '/yo=""""Spaces spaces""""'`.
+   No other combination will work. In PowerShell.exe if you are on version
+   v3+, you can try `--%` before `-ia` to just pass the args through as is,
+   which means it should not require any special workarounds.
  * Options and switches apply to all items passed, so if you are
    installing multiple packages, and you use `--version=1.0.0`, choco
    is going to look for and try to install version 1.0.0 of every

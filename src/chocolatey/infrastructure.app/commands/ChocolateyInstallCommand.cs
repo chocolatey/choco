@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("x|forcedependencies|force-dependencies",
                      "ForceDependencies - Force dependencies to be reinstalled when force installing package(s). Must be used in conjunction with --force. Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
-                .Add("n|skippowershell|skip-powershell",
+                .Add("n|skippowershell|skip-powershell|skipscripts|skip-scripts|skip-automation-scripts",
                      "Skip Powershell - Do not run chocolateyInstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 .Add("u=|user=",
