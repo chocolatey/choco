@@ -27,6 +27,7 @@ When including the log information, please ensure you have run the command with 
 
 - Make sure there is no sensitive data shared.
 - We need ALL output, not just what you may believe is relevant.
+- We need ALL OUTPUT (including the configuration information), see https://gist.github.com/ferventcoder/b1300b91c167c8ac8205#file-error-txt-L1-L41 for what we need.
 - If it is hard to reproduce with debug/verbose, the log file already logs with those parameters, just grab the relevant section from the log file (in the logs directory of your Chocolatey install).
 -->
 
