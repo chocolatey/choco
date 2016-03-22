@@ -1,33 +1,43 @@
-﻿$Global:ChocolateyTabSettings = New-Object PSObject -Property @{
+# Ideas from the Awesome Posh-Git - https://github.com/dahlbyk/posh-git
+# Posh-Git License - https://github.com/dahlbyk/posh-git/blob/1941da2472eb668cde2d6a5fc921d5043a024386/LICENSE.txt
+# http://www.jeremyskinner.co.uk/2010/03/07/using-git-with-windows-powershell/
+
+$Global:ChocolateyTabSettings = New-Object PSObject -Property @{
     AllCommands = $false
 }
 
-function script:chocoCmdOperations($commands, $command, $filter) {
-    $commands.$command -split ' ' |
-        where { $_ -like "$filter*" }
+$script:choco = "$env:ChocolateyInstall\choco.exe"
+
+function script:chocoCmdOperations($commands, $command, $filter, $currentArguments) {
+    $currentOptions = @('zzzz')
+    if ($currentArguments -ne $null -and $currentArguments.Trim() -ne '') { $currentOptions = $currentArguments.Trim() -split ' ' }
+
+    $commands.$command.Replace("  "," ") -split ' ' |
+      where { $_ -notmatch "^(?:$($currentOptions -join '|' -replace "=", "\="))(?:\S*)\s?$" } |
+      where { $_ -like "$filter*" }
 }
 
-$script:someCommands = @('-?', '-h', '--help','search','list','install','pin','outdated','upgrade','uninstall','pack','push','new','source','config','feature','apikey')
+$script:someCommands = @('-?','search','list','install','outdated','upgrade','uninstall','new','pack','push','-h','--help','pin','source','config','feature','apikey')
 
-$allcommands = " -? --help --debug --verbose --accept-license -y --confirm --force --noop -whatif --limit-output --execution-timeout= --cache-location='' --fail-on-error-output --use-system-powershell"
+$allcommands = " --debug --verbose --force --noop --help --accept-license --confirm --limit-output --execution-timeout= --cache-location='' --fail-on-error-output --use-system-powershell"
 
 $proInstallUpgradeOptions = " --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum="
 
-$subcommands = @{
-  search = '--source= --lo --local-only--pre --prerelease --include-programs --all-versions --user= --password= --page= --page-size= --exact --id-only' + $allcommands
-  list = '--source= --lo --local-only--pre --prerelease --include-programs --all-versions --user= --password= --page= --page-size= --exact --id-only' + $allcommands
-  install = "--source='' --version= --pre --prerelease --forcex86 --install-arguments='' --override-arguments --not-silent --params='' --package-parameters='' --allow-downgrade --allow-multiple-versions --ignore-dependencies --force-dependencies --skip-automation-scripts --user= --password= --ignore-checksums" + $allcommands + $proInstallUpgradeOptions
-  upgrade = "--source='' --version= --pre --prerelease --forcex86 --install-arguments='' --override-arguments --not-silent --params='' --package-parameters='' --allow-downgrade --allow-multiple-versions --ignore-dependencies --skip-automation-scripts --fail-on-unfound --fail-on-not-installed --user= --password= --ignore-checksums --except=''" + $allcommands + $proInstallUpgradeOptions
-  uninstall = "--source='' --version= --all-versions --uninstall-arguments='' --override-arguments --not-silent --params=''  --package-parameters='' --force-dependencies --remove-dependencies --skip-automation-scripts" + $allcommands
-  pin = "list add remove --name= --version=" + $allcommands
-  outdated = "--source='' --user= --password=" + $allcommands
-  pack = "<PathtoNuspec> --version=" + $allcommands
-  push = "<PathToNupkg> --source='' --api-key= --timeout=" + $allcommands
-  new = "<name> --automaticpackage --template-name= --name= --version= --maintainer='' packageversion= maintainername='' maintainerrepo='' installertype= url='' url64='' silentargs=''" + $allcommands
-  source = "list add remove disable enable --name= --source='' --user= --password= --priority=" + $allcommands
-  config = 'list get set unset --name= --value=' + $allcommands
-  feature = 'list disable enable --name=' + $allcommands
-  apikey = "--source='' --api-key=" + $allcommands
+$commandOptions = @{
+  list = "--lo --pre --exact --by-id-only --id-starts-with --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity" + $allcommands
+  search = "--pre --exact --by-id-only --id-starts-with --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity" + $allcommands
+  install = "-y -whatif -? --pre --version= --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user= --password= --prerelease --forcex86 --not-silent --package-parameters='' --allow-downgrade --force-dependencies --skip-automation-scripts --allow-multiple-versions --ignore-checksums" + $allcommands + $proInstallUpgradeOptions
+  pin = "--name= --version= -?" + $allcommands
+  outdated = "-? --source='' --user= --password=" + $allcommands
+  upgrade = "-y -whatif -? --pre --version= --except='' --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user= --password= --prerelease --forcex86 --not-silent --package-parameters='' --allow-downgrade --allow-multiple-versions --skip-automation-scripts --fail-on-unfound --fail-on-not-installed --ignore-checksums" + $allcommands + $proInstallUpgradeOptions
+  uninstall = "-y -whatif -? --force-dependencies --remove-dependencies --all-versions --source='windowsfeatures' --source='webpi' --version= --uninstall-arguments='' --override-arguments --not-silent --params='' --package-parameters='' --skip-automation-scripts" + $allcommands
+  new = "--template-name= --automaticpackage --version= --maintainer='' packageversion= maintainername='' maintainerrepo='' installertype= url='' url64='' silentargs='' -?" + $allcommands
+  pack = "--version= -?" + $allcommands
+  push = "--source='' --api-key= --timeout= -?" + $allcommands
+  source = "--name= --source='' --user= --password= --priority= -?" + $allcommands
+  config = "--name= --value= -?" + $allcommands
+  feature = "--name= -?" + $allcommands
+  apikey = "--source='' --api-key= -?" + $allcommands
 }
 
 try {
@@ -42,50 +52,98 @@ function script:chocoCommands($filter) {
     if (-not $global:ChocolateyTabSettings.AllCommands) {
         $cmdList += $someCommands -like "$filter*"
     } else {
-        $cmdList += choco -h |
+        $cmdList += (& $script:choco -h) |
             where { $_ -match '^  \S.*' } |
             foreach { $_.Split(' ', [StringSplitOptions]::RemoveEmptyEntries) } |
             where { $_ -like "$filter*" }
     }
 
-    $cmdList | sort
+    $cmdList #| sort
 }
 
 function script:chocoLocalPackages($filter) {
-    @('all|') + (choco list -lo -r) | where { $_.Split('|')[0] -like "$filter*" } | %{ $_.Split('|')[0] }
+    @(& $script:choco list $filter -lo -r --id-starts-with) | %{ $_.Split('|')[0] }
+}
+
+function script:chocoLocalPackagesUpgrade($filter) {
+    @('all|') + @(& $script:choco list $filter -lo -r --id-starts-with) | where { $_ -like "$filter*" } | %{ $_.Split('|')[0] }
 }
 
 function script:chocoRemotePackages($filter) {
-    @('packages.config|') + (choco search $filter --page=0 --page-size=5 -r --id-only) | where { $_.Split('|')[0] -like "$filter*" } | %{ $_.Split('|')[0] }
+    @('packages.config|') + @(& $script:choco search $filter --page=0 --page-size=30 -r --id-starts-with --order-by-popularity) | where { $_ -like "$filter*" } | %{ $_.Split('|')[0] }
 }
 
 function Get-AliasPattern($exe) {
   $aliases = @($exe) + @(Get-Alias | where { $_.Definition -eq $exe } | select -Exp Name)
-  
+
   "($($aliases -join '|'))"
 }
 
 function ChocolateyTabExpansion($lastBlock) {
   switch -regex ($lastBlock -replace "^$(Get-AliasPattern choco) ","") {
 
+    # Handles uninstall package names
+    "^uninstall\s+(?<package>[^-\s]*)$" {
+      chocoLocalPackages $matches['package']
+    }
+
     # Handles install package names
     "^(install)\s+(?<package>[^-\s]*)$" {
       chocoRemotePackages $matches['package']
     }
-  
+
     # Handles upgrade / uninstall package names
-    "^(upgrade|uninstall)\s+(?<package>[^-\s]*)$" {
-      chocoLocalPackages $matches['package']
+    "^upgrade\s+(?<package>[^-\s]*)$" {
+      chocoLocalPackagesUpgrade $matches['package']
     }
-  
+
+    # Handles list/search first tab
+    "^(list|search)\s+$" {
+      @('<filter>','-?')
+    }
+
+    # Handles new first tab
+    "^(new)\s+$" {
+      @('<name>','-?')
+    }
+
+    # Handles pack first tab
+    "^(pack)\s+$" {
+      @('<PathtoNuspec>','-?')
+    }
+
+    # Handles push first tab
+    "^(push)\s+$" {
+      @('<PathtoNupkg>','-?')
+    }
+
+    # Handles source first tab
+    "^(source)\s+$" {
+      @('list','add','remove','disable','enable','-?')
+    }
+
+    # Handles pin first tab
+    "^(pin)\s+$" {
+      @('list','add','remove','-?')
+    }
+
+    # Handles feature first tab
+    "^(feature)\s+$" {
+      @('list','disable','enable','-?')
+    }
+    # Handles config first tab
+    "^(config)\s+$" {
+      @('list','get','set','unset','-?')
+    }
+
     # Handles more options after others
-    "^(?<cmd>$($subcommands.Keys -join '|'))(.*)\s+(?<op>\S*)$" {
-      chocoCmdOperations $subcommands $matches['cmd'] $matches['op']
+    "^(?<cmd>$($commandOptions.Keys -join '|'))(?<currentArguments>.*)\s+(?<op>\S*)$" {
+      chocoCmdOperations $commandOptions $matches['cmd'] $matches['op'] $matches['currentArguments']
     }
-    
+
     # Handles choco <cmd> <op>
-    "^(?<cmd>$($subcommands.Keys -join '|'))\s+(?<op>\S*)$" {
-      chocoCmdOperations $subcommands $matches['cmd'] $matches['op']
+    "^(?<cmd>$($commandOptions.Keys -join '|'))\s+(?<op>\S*)$" {
+      chocoCmdOperations $commandOptions $matches['cmd'] $matches['op']
     }
 
     # Handles choco <cmd>
@@ -120,8 +178,6 @@ function TabExpansion($line, $lastWord) {
     switch -regex ($lastBlock) {
         # Execute Chocolatey tab completion for all choco-related commands
         "^$(Get-AliasPattern choco) (.*)" { ChocolateyTabExpansion $lastBlock }
-        "^$(Get-AliasPattern choco.exe) (.*)" { ChocolateyTabExpansion $lastBlock }
-        "^$(Get-AliasPattern chocolatey) (.*)" { ChocolateyTabExpansion $lastBlock }
 
         # Fall back on existing tab expansion
         default { if (Test-Path Function:\TabExpansionBackup) { TabExpansionBackup $line $lastWord } }
