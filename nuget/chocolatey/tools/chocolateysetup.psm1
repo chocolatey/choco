@@ -125,6 +125,7 @@ Creating Chocolatey folders if they do not already exist.
     Install-ChocolateyBinFiles $chocolateyPath $chocolateyExePath
   }
 
+  Add-ChocolateyProfile
   Install-DotNet4IfMissing
 
 @"
@@ -466,6 +467,65 @@ param(
     }
 
     Set-Content $processedMarkerFile -Value "$([System.DateTime]::Now.Date)" -Encoding Ascii
+  }
+}
+
+# Adapted from http://www.west-wind.com/Weblog/posts/197245.aspx
+function Get-FileEncoding($Path) {
+    $bytes = [byte[]](Get-Content $Path -Encoding byte -ReadCount 4 -TotalCount 4)
+
+    if(!$bytes) { return 'utf8' }
+
+    switch -regex ('{0:x2}{1:x2}{2:x2}{3:x2}' -f $bytes[0],$bytes[1],$bytes[2],$bytes[3]) {
+        '^efbbbf'   { return 'utf8' }
+        '^2b2f76'   { return 'utf7' }
+        '^fffe'     { return 'unicode' }
+        '^feff'     { return 'bigendianunicode' }
+        '^0000feff' { return 'utf32' }
+        default     { return 'ascii' }
+    }
+}
+
+function Add-ChocolateyProfile {
+  try {
+    $profileFile = "$profile"
+    $profileDirectory = (Split-Path -Parent $profileFile)
+
+    if (!(Test-Path($profileDirectory))) {
+      New-Item "$profileDirectory" -Type Directory -Force -ErrorAction SilentlyContinue | Out-Null
+    }
+
+    if (!(Test-Path($profileFile))) {
+      "" | Out-File $profileFile -Encoding UTF8
+
+    }
+
+    $profileInstall = @'
+
+# Chocolatey profile
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+  Import-Module "$ChocolateyProfile"
+}
+'@
+
+    $chocoProfileSearch = '$ChocolateyProfile'
+    if(Select-String -Path $profileFile -Pattern $chocoProfileSearch -Quiet -SimpleMatch) {
+      Write-Debug "Chocolatey profile is already installed."
+      return
+    }
+
+    Write-Output 'Adding Chocolatey to the profile. This will provide tab completion, refreshenv, etc.'
+    $profileInstall | Out-File $profileFile -Append -Encoding (Get-FileEncoding $profileFile)
+    Write-ChocolateyWarning 'Chocolatey profile installed. Reload your profile - type . $profile'
+    
+    if ($PSVersionTable.PSVersion.Major -lt 3) {
+      Write-ChocolateyWarning "Tab completion does not currently work in PowerShell v2. `n Please upgrade to a more recent version of PowerShell to take advantage of tab completion."
+      #Write-ChocolateyWarning "To load tab expansion, you need to install PowerTab. `n See https://powertab.codeplex.com/ for details."
+    }
+    
+  } catch {
+    Write-ChocolateyWarning "Unable to add Chocolatey to the profile. You will need to do it manually. Error was '$_'"
   }
 }
 
