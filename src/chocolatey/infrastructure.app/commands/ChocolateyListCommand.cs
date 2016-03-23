@@ -87,6 +87,9 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("id-starts-with",
                      "IdStartsWith - Only return packages where the id starts with the search filter.",
                      option => configuration.ListCommand.IdStartsWith = option != null)
+                 .Add("order-by-popularity",
+                     "OrderByPopularity - Sort by package results by popularity.",
+                     option => configuration.ListCommand.OrderByPopularity = option != null)
                 ;
         }
 

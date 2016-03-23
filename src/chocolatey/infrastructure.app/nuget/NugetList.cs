@@ -114,7 +114,11 @@ namespace chocolatey.infrastructure.app.nuget
                         .AsQueryable();
             }
 
-            return results.OrderBy(p => p.Id);
+            results = configuration.ListCommand.OrderByPopularity ? 
+                 results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Id)
+                 : results.OrderBy(p => p.Id) ;
+
+            return results;
         } 
 
 
