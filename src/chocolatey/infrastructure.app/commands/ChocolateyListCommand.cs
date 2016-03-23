@@ -81,9 +81,15 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("e|exact",
                      "Exact - Only return packages with this exact name.",
                      option => configuration.ListCommand.Exact = option != null)
-                 .Add("id|idonly|id-only",
-                     "ByIdOnly - Only return packages with the filter being part of the id.",
+                 .Add("by-id-only",
+                     "ByIdOnly - Only return packages where the id contains the search filter.",
                      option => configuration.ListCommand.ByIdOnly = option != null)
+                 .Add("id-starts-with",
+                     "IdStartsWith - Only return packages where the id starts with the search filter.",
+                     option => configuration.ListCommand.IdStartsWith = option != null)
+                 .Add("order-by-popularity",
+                     "OrderByPopularity - Sort by package results by popularity.",
+                     option => configuration.ListCommand.OrderByPopularity = option != null)
                 ;
         }
 

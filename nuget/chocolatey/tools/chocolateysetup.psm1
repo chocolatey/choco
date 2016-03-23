@@ -4,6 +4,32 @@ $sysDrive = $env:SystemDrive
 $tempDir = $env:TEMP
 $defaultChocolateyPathOld = "$sysDrive\Chocolatey"
 
+$originalForegroundColor = $host.ui.RawUI.ForegroundColor
+
+function Write-ChocolateyWarning {
+param (
+  [string]$message = ''
+)
+
+  try {
+    $host.ui.RawUI.ForegroundColor = "Yellow"
+    Write-Output "WARNING: $message"
+    $host.ui.RawUI.ForegroundColor = $originalForegroundColor
+  } catch {
+    Write-Output "WARNING: $message"
+  }
+}
+
+function  Write-ChocolateyError {
+  try {
+    $host.ui.RawUI.ForegroundColor = "Red"
+    Write-Output "ERROR: $message"
+    $host.ui.RawUI.ForegroundColor = $originalForegroundColor
+  } catch {
+    Write-Output "ERROR: $message"
+  }
+}
+
 function Initialize-Chocolatey {
 <#
   .DESCRIPTION
@@ -76,7 +102,7 @@ Creating Chocolatey folders if they do not already exist.
 
 "@ | Write-Output
 
-  Write-Warning "You can safely ignore errors related to missing log files when `n  upgrading from a version of Chocolatey less than 0.9.9. `n  'Batch file could not be found' is also safe to ignore. `n  'The system cannot find the file specified' - also safe."
+  Write-ChocolateyWarning "You can safely ignore errors related to missing log files when `n  upgrading from a version of Chocolatey less than 0.9.9. `n  'Batch file could not be found' is also safe to ignore. `n  'The system cannot find the file specified' - also safe."
 
   #create the base structure if it doesn't exist
   Create-DirectoryIfNotExists $chocolateyExePath
@@ -99,6 +125,7 @@ Creating Chocolatey folders if they do not already exist.
     Install-ChocolateyBinFiles $chocolateyPath $chocolateyExePath
   }
 
+  Add-ChocolateyProfile
   Install-DotNet4IfMissing
 
 @"
@@ -129,11 +156,11 @@ param(
     # removing old variable
     Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue $null -variableType $environmentTarget
   } else {
-    Write-Warning "Setting ChocolateyInstall Environment Variable on USER and not SYSTEM variables.`n  This is due to either non-administrator install OR the process you are running is not being run as an Administrator."
+    Write-ChocolateyWarning "Setting ChocolateyInstall Environment Variable on USER and not SYSTEM variables.`n  This is due to either non-administrator install OR the process you are running is not being run as an Administrator."
   }
 
   Write-Output "Creating $chocInstallVariableName as an environment variable (targeting `'$environmentTarget`') `n  Setting $chocInstallVariableName to `'$folder`'"
-  Write-Warning "It's very likely you will need to close and reopen your shell `n  before you can use choco."
+  Write-ChocolateyWarning "It's very likely you will need to close and reopen your shell `n  before you can use choco."
   Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue "$folder" -variableType $environmentTarget
 }
 
@@ -154,7 +181,7 @@ param(
   Write-Debug "Ensure-UserPermissions"
 
   if (!(Test-ProcessAdminRights)) {
-    Write-Warning "User is not running elevated, cannot set user permissions."
+    Write-ChocolateyWarning "User is not running elevated, cannot set user permissions."
     return
   }
 
@@ -176,7 +203,7 @@ param(
     $acl.SetAccessRule($userAccessRule)
     Set-Acl $folder $acl
   } catch {
-    Write-Warning "Not able to set permissions for user."
+    Write-ChocolateyWarning "Not able to set permissions for user."
   }
   $ErrorActionPreference = $currentEA
 }
@@ -191,9 +218,9 @@ param(
 
   if (Test-Path $chocolateyPathOld) {
     Write-Output "Attempting to upgrade `'$chocolateyPathOld`' to `'$chocolateyPath`'."
-    Write-Warning "Copying the contents of `'$chocolateyPathOld`' to `'$chocolateyPath`'. `n This step may fail if you have anything in this folder running or locked."
+    Write-ChocolateyWarning "Copying the contents of `'$chocolateyPathOld`' to `'$chocolateyPath`'. `n This step may fail if you have anything in this folder running or locked."
     Write-Output 'If it fails, just manually copy the rest of the items out and then delete the folder.'
-    Write-Warning "!!!! ATTN: YOU WILL NEED TO CLOSE AND REOPEN YOUR SHELL !!!!"
+    Write-ChocolateyWarning "!!!! ATTN: YOU WILL NEED TO CLOSE AND REOPEN YOUR SHELL !!!!"
     #-ForegroundColor Magenta -BackgroundColor Black
 
     $chocolateyExePathOld = Join-Path $chocolateyPathOld 'bin'
@@ -206,7 +233,7 @@ param(
         try {
           Set-EnvironmentVariable -Name 'Path' -Value $updatedPath -Scope $_ -ErrorAction Stop
         } catch {
-          Write-Warning "Was not able to remove the old environment variable from PATH. You will need to do this manually"
+          Write-ChocolateyWarning "Was not able to remove the old environment variable from PATH. You will need to do this manually"
         }
 
       }
@@ -228,7 +255,7 @@ param(
            Copy-Item $_ -Destination $fileToMove -Exclude $exclude -Force -ErrorAction Stop
           }
           catch {
-            Write-Warning "Was not able to move `'$fileToMove`'. You may need to reinstall the shim"
+            Write-ChocolateyWarning "Was not able to move `'$fileToMove`'. You may need to reinstall the shim"
           }
         }
       }
@@ -242,7 +269,7 @@ param(
   Write-Debug "Remove-OldChocolateyInstall"
 
   if (Test-Path $chocolateyPathOld) {
-    Write-Warning "This action will result in Log Errors, you can safely ignore those. `n You may need to finish removing '$chocolateyPathOld' manually."
+    Write-ChocolateyWarning "This action will result in Log Errors, you can safely ignore those. `n You may need to finish removing '$chocolateyPathOld' manually."
     try {
       Get-ChildItem -Path "$chocolateyPathOld" | % {
         if (Test-Path $_.FullName) {
@@ -255,7 +282,7 @@ param(
       Remove-Item "$($chocolateyPathOld)" -force -recurse -ErrorAction Stop
     }
     catch {
-      Write-Warning "Was not able to remove `'$chocolateyPathOld`'. You will need to manually remove it."
+      Write-ChocolateyWarning "Was not able to remove `'$chocolateyPathOld`'. You will need to manually remove it."
     }
   }
 }
@@ -291,7 +318,7 @@ param(
       Move-Item $chocoExe "$chocoExe.old" -force -ErrorAction SilentlyContinue
     }
     catch {
-      Write-Warning "Was not able to rename `'$chocoExe`' to `'$chocoExe.old`'."
+      Write-ChocolateyWarning "Was not able to rename `'$chocoExe`' to `'$chocoExe.old`'."
     }
   }
 
@@ -350,7 +377,7 @@ param(
   Write-Debug "Installing the bin file redirects"
   $redirectsPath = Join-Path $chocolateyPath 'redirects'
   if (!(Test-Path "$redirectsPath")) {
-    Write-Warning "$redirectsPath does not exist"
+    Write-ChocolateyWarning "$redirectsPath does not exist"
     return
   }
 
@@ -370,7 +397,7 @@ param(
         Remove-Item $binFilePathRename -force -ErrorAction Stop
       }
       catch {
-        Write-Warning "Was not able to remove `'$binFilePathRename`'. This may cause errors."
+        Write-ChocolateyWarning "Was not able to remove `'$binFilePathRename`'. This may cause errors."
       }
     }
     if (Test-Path ($binFilePath)) {
@@ -379,7 +406,7 @@ param(
         Move-Item -path $binFilePath -destination $binFilePathRename -force -ErrorAction Stop
       }
       catch {
-        Write-Warning "Was not able to rename `'$binFilePath`' to `'$binFilePathRename`'."
+        Write-ChocolateyWarning "Was not able to rename `'$binFilePath`' to `'$binFilePathRename`'."
       }
     }
 
@@ -388,7 +415,7 @@ param(
       Copy-Item -path $exeFilePath -destination $binFilePath -force -ErrorAction Stop
     }
     catch {
-      Write-Warning "Was not able to replace `'$binFilePath`' with `'$exeFilePath`'. You may need to do this manually."
+      Write-ChocolateyWarning "Was not able to replace `'$binFilePath`' with `'$exeFilePath`'. You may need to do this manually."
     }
 
     $commandShortcut = [System.IO.Path]::GetFileNameWithoutExtension("$exeFilePath")
@@ -408,7 +435,7 @@ param(
     Write-Debug "Administrator installing so using Machine environment variable target instead of User."
     $environmentTarget = [System.EnvironmentVariableTarget]::Machine
   } else {
-    Write-Warning "Setting ChocolateyInstall Path on USER PATH and not SYSTEM Path.`n  This is due to either non-administrator install OR the process you are running is not being run as an Administrator."
+    Write-ChocolateyWarning "Setting ChocolateyInstall Path on USER PATH and not SYSTEM Path.`n  This is due to either non-administrator install OR the process you are running is not being run as an Administrator."
   }
 
   Install-ChocolateyPath -pathToInstall "$chocolateyExePath" -pathType $environmentTarget
@@ -440,6 +467,65 @@ param(
     }
 
     Set-Content $processedMarkerFile -Value "$([System.DateTime]::Now.Date)" -Encoding Ascii
+  }
+}
+
+# Adapted from http://www.west-wind.com/Weblog/posts/197245.aspx
+function Get-FileEncoding($Path) {
+    $bytes = [byte[]](Get-Content $Path -Encoding byte -ReadCount 4 -TotalCount 4)
+
+    if(!$bytes) { return 'utf8' }
+
+    switch -regex ('{0:x2}{1:x2}{2:x2}{3:x2}' -f $bytes[0],$bytes[1],$bytes[2],$bytes[3]) {
+        '^efbbbf'   { return 'utf8' }
+        '^2b2f76'   { return 'utf7' }
+        '^fffe'     { return 'unicode' }
+        '^feff'     { return 'bigendianunicode' }
+        '^0000feff' { return 'utf32' }
+        default     { return 'ascii' }
+    }
+}
+
+function Add-ChocolateyProfile {
+  try {
+    $profileFile = "$profile"
+    $profileDirectory = (Split-Path -Parent $profileFile)
+
+    if (!(Test-Path($profileDirectory))) {
+      New-Item "$profileDirectory" -Type Directory -Force -ErrorAction SilentlyContinue | Out-Null
+    }
+
+    if (!(Test-Path($profileFile))) {
+      "" | Out-File $profileFile -Encoding UTF8
+
+    }
+
+    $profileInstall = @'
+
+# Chocolatey profile
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+  Import-Module "$ChocolateyProfile"
+}
+'@
+
+    $chocoProfileSearch = '$ChocolateyProfile'
+    if(Select-String -Path $profileFile -Pattern $chocoProfileSearch -Quiet -SimpleMatch) {
+      Write-Debug "Chocolatey profile is already installed."
+      return
+    }
+
+    Write-Output 'Adding Chocolatey to the profile. This will provide tab completion, refreshenv, etc.'
+    $profileInstall | Out-File $profileFile -Append -Encoding (Get-FileEncoding $profileFile)
+    Write-ChocolateyWarning 'Chocolatey profile installed. Reload your profile - type . $profile'
+    
+    if ($PSVersionTable.PSVersion.Major -lt 3) {
+      Write-ChocolateyWarning "Tab completion does not currently work in PowerShell v2. `n Please upgrade to a more recent version of PowerShell to take advantage of tab completion."
+      #Write-ChocolateyWarning "To load tab expansion, you need to install PowerTab. `n See https://powertab.codeplex.com/ for details."
+    }
+    
+  } catch {
+    Write-ChocolateyWarning "Unable to add Chocolatey to the profile. You will need to do it manually. Error was '$_'"
   }
 }
 
@@ -488,10 +574,10 @@ param(
     $s.WaitForExit();
     if ($s.ExitCode -ne 0 -and $s.ExitCode -ne 3010) {
       if ($netFx4InstallTries -eq 2) {
-        Write-Error ".NET Framework install failed with exit code `'$($s.ExitCode)`'. `n This will cause the rest of the install to fail."
+        Write-ChocolateyError ".NET Framework install failed with exit code `'$($s.ExitCode)`'. `n This will cause the rest of the install to fail."
         throw "Error installing .NET Framework 4.0 (exit code $($s.ExitCode)). `n Please install the .NET Framework 4.0 manually and then try to install Chocolatey again. `n Download at `'$NetFx4Url`'"
       } else {
-        Write-Warning "First try of .NET framework install failed with exit code `'$($s.ExitCode)`'. Trying again."
+        Write-ChocolateyWarning "First try of .NET framework install failed with exit code `'$($s.ExitCode)`'. Trying again."
         Install-DotNet4IfMissing $true
       }
     }

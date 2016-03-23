@@ -357,6 +357,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public int PageSize { get; set; }
         public bool Exact { get; set; }
         public bool ByIdOnly { get; set; }
+        public bool IdStartsWith { get; set; }
+        public bool OrderByPopularity { get; set; }
     }
 
     [Serializable]

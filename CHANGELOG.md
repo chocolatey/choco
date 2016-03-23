@@ -7,6 +7,7 @@ What will be highlighted:
 * Introduce managing package templates, reintroduce extensions.
 * Talk about using original download file name
 * Talk about the improvements in search information
+* Talk about tab completion and refreshenv!
 * Talk a little about what's coming with pro
 
 ### BREAKING CHANGES
@@ -33,6 +34,8 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * [Security] Show moderation-related information in search results - see [#493](https://github.com/chocolatey/choco/issues/493)
  * New Helper - Get-ToolsLocation helper (replacement for Get-BinRoot) - see [#631](https://github.com/chocolatey/choco/issues/631)
  * Choco list/search should have exact filter search - see [#453](https://github.com/chocolatey/choco/issues/453)
+ * RefreshEnv (Refresh Environment Variables) Should also work in PowerShell - see [#664](https://github.com/chocolatey/choco/issues/664)
+ * Provide PowerShell tab completion for Chocolatey - see [#412](https://github.com/chocolatey/choco/issues/412)
 
 ### BUG FIXES
 
@@ -61,6 +64,8 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Fix: Get-ChocolateyUnzip captures files that don't belong to the package - see [#616](https://github.com/chocolatey/choco/issues/616)
  * Fix: Package succeeds but software install silently fails when Install-ChocolateyInstallPackage has the wrong arguments - see [#629](https://github.com/chocolatey/choco/issues/629)
  * Fix - ShimGen handling of spaces and arguments that have shimgen in them - see [#647](https://github.com/chocolatey/choco/issues/647)
+ * Fix - PowerShell v2 - Choco installer messages can't actually be warnings (causes FileStream errors) - see [#666](https://github.com/chocolatey/choco/issues/666)
+ * Fix - Installing chocolatey removes $env:PSModulePath changes for current PowerShell session - see [#295](https://github.com/chocolatey/choco/issues/295)
 
 ### IMPROVEMENTS
 
@@ -78,6 +83,8 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * File description of ShimGen shims should match original as closely as possible - see [#374](https://github.com/chocolatey/choco/issues/374)
  * Shim Generation should automatically detect GUI - see [#634](https://github.com/chocolatey/choco/issues/634)
  * Don't show 32 bit wording unless there is explicitly both versions available - see [#642](https://github.com/chocolatey/choco/issues/642)
+ * Allow passing arbitrary key/value arguments to new command when generating packages from templates - see [#658](https://github.com/chocolatey/choco/issues/658)
+ * Choco search/list should be able to search just by Id - see [#663](https://github.com/chocolatey/choco/issues/663)
  * Pro - Also check for license in User Profile location - see [#606](https://github.com/chocolatey/choco/issues/606)
  * Pro - Set download cache information if available - see [#562](https://github.com/chocolatey/choco/issues/562)
  * Pro - Allow commands to be added - see [#583](https://github.com/chocolatey/choco/issues/583)

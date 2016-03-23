@@ -15,6 +15,7 @@
 
 namespace chocolatey.infrastructure.app.nuget
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -57,6 +58,31 @@ namespace chocolatey.infrastructure.app.nuget
 
             IQueryable<IPackage> results = packageRepository.Search(configuration.Input, configuration.Prerelease);
 
+
+            if (configuration.ListCommand.Page.HasValue)
+            {
+                results = results.Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
+            }
+
+            if (configuration.ListCommand.Exact)
+            {
+                results = results.Where(p => p.Id == configuration.Input);
+            }
+
+            if (configuration.ListCommand.ByIdOnly)
+            {
+                results = isRemote ?
+                    results.Where(p => p.Id.Contains(configuration.Input))
+                  : results.Where(p => p.Id.contains(configuration.Input, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (configuration.ListCommand.IdStartsWith)
+            {
+                results = isRemote ?
+                    results.Where(p => p.Id.StartsWith(configuration.Input))
+                  : results.Where(p => p.Id.StartsWith(configuration.Input, StringComparison.OrdinalIgnoreCase));
+            }
+
             if (configuration.AllVersions)
             {
                 if (isRemote)
@@ -88,22 +114,11 @@ namespace chocolatey.infrastructure.app.nuget
                         .AsQueryable();
             }
 
-            if (configuration.ListCommand.Page.HasValue)
-            {
-                results = results.Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
-            }
+            results = configuration.ListCommand.OrderByPopularity ? 
+                 results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Id)
+                 : results.OrderBy(p => p.Id) ;
 
-            if (configuration.ListCommand.Exact)
-            {
-                results = results.Where(p => p.Id == configuration.Input);
-            }
-
-            if (configuration.ListCommand.ByIdOnly)
-            {
-                results = results.Where(p => p.Id.Contains(configuration.Input));
-            }
-
-            return results.OrderBy(p => p.Id);
+            return results;
         } 
 
 
