@@ -87,11 +87,11 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 if (isRemote)
                 {
-                    return results.OrderBy(p => p.Id);
+                    return results.OrderBy(p => p.Id).ThenByDescending(p => p.Version);
                 }
                 else
                 {
-                    return results.Where(PackageExtensions.IsListed).OrderBy(p => p.Id).AsQueryable();
+                    return results.Where(PackageExtensions.IsListed).OrderBy(p => p.Id).ThenByDescending(p => p.Version).AsQueryable();
                 }
             }
 
