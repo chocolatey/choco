@@ -113,42 +113,42 @@ function ChocolateyTabExpansion($lastBlock) {
     }
 
     # Handles list/search first tab
-    "^(list|search)\s+$" {
-      @('<filter>','-?')
+    "^(list|search)\s+(?<subcommand>[^-\s]*)$" {
+      @('<filter>','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles new first tab
-    "^(new)\s+$" {
-      @('<name>','-?')
+    "^(new)\s+(?<subcommand>[^-\s]*)$" {
+      @('<name>','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles pack first tab
-    "^(pack)\s+$" {
-      @('<PathtoNuspec>','-?')
+    "^(pack)\s+(?<subcommand>[^-\s]*)$" {
+      @('<PathtoNuspec>','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles push first tab
-    "^(push)\s+$" {
-      @('<PathtoNupkg>','-?')
+    "^(push)\s+(?<subcommand>[^-\s]*)$" {
+      @('<PathtoNupkg>','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles source first tab
-    "^(source)\s+$" {
-      @('list','add','remove','disable','enable','-?')
+    "^(source)\s+(?<subcommand>[^-\s]*)$" {
+      @('list','add','remove','disable','enable','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles pin first tab
-    "^(pin)\s+$" {
-      @('list','add','remove','-?')
+    "^(pin)\s+(?<subcommand>[^-\s]*)$" {
+      @('list','add','remove','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles feature first tab
-    "^(feature)\s+$" {
-      @('list','disable','enable','-?')
+    "^(feature)\s+(?<subcommand>[^-\s]*)$" {
+      @('list','disable','enable','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
     # Handles config first tab
-    "^(config)\s+$" {
-      @('list','get','set','unset','-?')
+    "^(config)\s+(?<subcommand>[^-\s]*)$" {
+      @('list','get','set','unset','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles more options after others
