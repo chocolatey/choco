@@ -25,7 +25,7 @@
     <echo level="Warning" message="Signing the assemblies and powershell files if the system is set up correctly." />
   </target>
 
-  <target name="get_password">
+  <target name="get_password" if="${property::exists('path.code.cert.password')}">
     <loadfile file="${path.code.cert.password}" property="code.cert.password" if="${file::exists(path.code.cert.password)}" />
     <property name="code.cert.password" value="${string::trim(code.cert.password)}" />
   </target>
