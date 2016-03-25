@@ -33,12 +33,11 @@
   </target>
 
   <target name="unpack_files">
-	<echo level="Warning" message="Unpacking Choco files." />
-	<property name="app.choco" value="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}choco.exe" />
-	<property name="args.choco" value="unpackself -f" />
-	<exec program="${app.choco}"
+    <echo level="Warning" message="Unpacking Choco files." />
+    <property name="app.choco" value="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}choco.exe" />
+    <property name="args.choco" value="unpackself -f" />
+    <exec program="${app.choco}"
           workingdir="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall"
           commandline="${args.choco}" if="${platform::is-windows()}" />
-    </target>
-  
+  </target>
 </project>
