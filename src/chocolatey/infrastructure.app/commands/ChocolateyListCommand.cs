@@ -89,7 +89,16 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.ListCommand.IdStartsWith = option != null)
                  .Add("order-by-popularity",
                      "OrderByPopularity - Sort by package results by popularity.",
-                     option => configuration.ListCommand.OrderByPopularity = option != null)
+                     option => configuration.ListCommand.OrderByPopularity = option != null)    
+                 .Add("approved-only",
+                     "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository.",
+                     option => configuration.ListCommand.ApprovedOnly = option != null)   
+                 .Add("download-cache|download-cache-only",
+                     "DownloadCacheAvailable - Only return packages that have a download cache available - this option will filter out results not from the community repository.",
+                     option => configuration.ListCommand.DownloadCacheAvailable = option != null) 
+                 .Add("not-broken",
+                     "NotBroken - Only return packages that are not failing testing - this option only filters out failing results from the community feed. It will not filter against other sources. ",
+                     option => configuration.ListCommand.NotBroken = option != null)
                 ;
         }
 

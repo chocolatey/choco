@@ -225,7 +225,9 @@
   <property name="run.nuget" value="${directory::exists(dirs.nuget) and file::exists(app.nuget)}" overwrite="false" />
 
   <property name="app.ruby" value="ruby" overwrite="false" />
-  <property name="app.powershell" value="%WINDIR%${path.separator}System32${path.separator}WindowsPowerShell${path.separator}v1.0${path.separator}powershell.exe" overwrite="false" />
+  <property name="windows.dir" value="" />
+  <property name="windows.dir" value="${environment::get-variable('SystemRoot')}" if="${environment::variable-exists('SystemRoot')}" />
+  <property name="app.powershell" value="${windows.dir}${path.separator}System32${path.separator}WindowsPowerShell${path.separator}v1.0${path.separator}powershell.exe" overwrite="false" />
 
   <target name="load_uppercut_assemblies">
     <loadtasks assembly="${path.uppercut.assembly}" if="${file::exists(path.uppercut.assembly)}" />

@@ -36,6 +36,7 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Choco list/search should have exact filter search - see [#453](https://github.com/chocolatey/choco/issues/453)
  * RefreshEnv (Refresh Environment Variables) Should also work in PowerShell - see [#664](https://github.com/chocolatey/choco/issues/664)
  * Provide PowerShell tab completion for Chocolatey - see [#412](https://github.com/chocolatey/choco/issues/412)
+ * [Security] Sign the powershell scripts and assemblies - see [#501](https://github.com/chocolatey/choco/issues/501)
 
 ### BUG FIXES
 
@@ -61,11 +62,12 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * [POSH Host] Fix - Message after Download progress is on the same line sometimes - see [#525](https://github.com/chocolatey/choco/issues/525)
  * [POSH Host] Fix - PowerShell internal process - "The handle is invalid." - see [#526](https://github.com/chocolatey/choco/issues/526)
  * Fix - Verbose shows in output on debug switch - see [#611](https://github.com/chocolatey/choco/issues/611)
- * Fix: Get-ChocolateyUnzip captures files that don't belong to the package - see [#616](https://github.com/chocolatey/choco/issues/616)
+ * Fix: Get-ChocolateyUnzip captures files that don't belong to the package / Unzip should not do a full disk scan - see [#616](https://github.com/chocolatey/choco/issues/616) and [#155](https://github.com/chocolatey/choco/issues/155)
  * Fix: Package succeeds but software install silently fails when Install-ChocolateyInstallPackage has the wrong arguments - see [#629](https://github.com/chocolatey/choco/issues/629)
  * Fix - ShimGen handling of spaces and arguments that have shimgen in them - see [#647](https://github.com/chocolatey/choco/issues/647)
  * Fix - PowerShell v2 - Choco installer messages can't actually be warnings (causes FileStream errors) - see [#666](https://github.com/chocolatey/choco/issues/666)
  * Fix - Installing chocolatey removes $env:PSModulePath changes for current PowerShell session - see [#295](https://github.com/chocolatey/choco/issues/295)
+ * Fix: PowerShell v2 - Choco installer messages can't actually be warnings (can cause FileStream errors) - see [#666](https://github.com/chocolatey/choco/issues/666)
 
 ### IMPROVEMENTS
 
@@ -85,6 +87,7 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Don't show 32 bit wording unless there is explicitly both versions available - see [#642](https://github.com/chocolatey/choco/issues/642)
  * Allow passing arbitrary key/value arguments to new command when generating packages from templates - see [#658](https://github.com/chocolatey/choco/issues/658)
  * Choco search/list should be able to search just by Id - see [#663](https://github.com/chocolatey/choco/issues/663)
+ * Search by approved, by not broken, by download cache - see [#670](https://github.com/chocolatey/choco/issues/670)
  * Pro - Also check for license in User Profile location - see [#606](https://github.com/chocolatey/choco/issues/606)
  * Pro - Set download cache information if available - see [#562](https://github.com/chocolatey/choco/issues/562)
  * Pro - Allow commands to be added - see [#583](https://github.com/chocolatey/choco/issues/583)
@@ -93,6 +96,7 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * API - Add the ability to retrieve package count for a Source - see [#431](https://github.com/chocolatey/choco/issues/431)
  * API - Chocolatey Lib still marks vital package information as internal - see [#433](https://github.com/chocolatey/choco/issues/433)
  * API - Add paging to list command - see [#427](https://github.com/chocolatey/choco/issues/427)
+ * API - Choco search should sort by version - see [#668](https://github.com/chocolatey/choco/issues/668)
 
 ## [0.9.9.12](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.12+is%3Aclosed) (March 18, 2016)
 

@@ -28,5 +28,4 @@
   <target name="merge_the_dll">
     <nant buildfile="${dirs.build_scripts_custom}${path.separator}ilmergeDLL.build" inheritall="true" />
   </target>
-
 </project>

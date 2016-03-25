@@ -39,8 +39,8 @@ $allcommands = " --debug --verbose --force --noop --help --accept-license --conf
 $proInstallUpgradeOptions = " --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum="
 
 $commandOptions = @{
-  list = "--lo --pre --exact --by-id-only --id-starts-with --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity" + $allcommands
-  search = "--pre --exact --by-id-only --id-starts-with --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity" + $allcommands
+  list = "--lo --pre --exact --by-id-only --id-starts-with --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
+  search = "--pre --exact --by-id-only --id-starts-with --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
   install = "-y -whatif -? --pre --version= --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user= --password= --prerelease --forcex86 --not-silent --package-parameters='' --allow-downgrade --force-dependencies --skip-automation-scripts --allow-multiple-versions --ignore-checksums" + $allcommands + $proInstallUpgradeOptions
   pin = "--name= --version= -?" + $allcommands
   outdated = "-? --source='' --user= --password=" + $allcommands
@@ -113,42 +113,42 @@ function ChocolateyTabExpansion($lastBlock) {
     }
 
     # Handles list/search first tab
-    "^(list|search)\s+$" {
-      @('<filter>','-?')
+    "^(list|search)\s+(?<subcommand>[^-\s]*)$" {
+      @('<filter>','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles new first tab
-    "^(new)\s+$" {
-      @('<name>','-?')
+    "^(new)\s+(?<subcommand>[^-\s]*)$" {
+      @('<name>','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles pack first tab
-    "^(pack)\s+$" {
-      @('<PathtoNuspec>','-?')
+    "^(pack)\s+(?<subcommand>[^-\s]*)$" {
+      @('<PathtoNuspec>','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles push first tab
-    "^(push)\s+$" {
-      @('<PathtoNupkg>','-?')
+    "^(push)\s+(?<subcommand>[^-\s]*)$" {
+      @('<PathtoNupkg>','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles source first tab
-    "^(source)\s+$" {
-      @('list','add','remove','disable','enable','-?')
+    "^(source)\s+(?<subcommand>[^-\s]*)$" {
+      @('list','add','remove','disable','enable','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles pin first tab
-    "^(pin)\s+$" {
-      @('list','add','remove','-?')
+    "^(pin)\s+(?<subcommand>[^-\s]*)$" {
+      @('list','add','remove','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles feature first tab
-    "^(feature)\s+$" {
-      @('list','disable','enable','-?')
+    "^(feature)\s+(?<subcommand>[^-\s]*)$" {
+      @('list','disable','enable','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
     # Handles config first tab
-    "^(config)\s+$" {
-      @('list','get','set','unset','-?')
+    "^(config)\s+(?<subcommand>[^-\s]*)$" {
+      @('list','get','set','unset','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles more options after others
