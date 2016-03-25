@@ -54,9 +54,7 @@
 
   <property name="app.signtool" value="C:${path.separator}Program Files${path.separator}Microsoft SDKs${path.separator}Windows${path.separator}v7.0A${path.separator}Bin${path.separator}signtool.exe" />
   <property name="app.signtool" value="C:${path.separator}Program Files (x86)${path.separator}Microsoft SDKs${path.separator}Windows${path.separator}v7.0A${path.separator}Bin${path.separator}signtool.exe" if="${not file::exists(app.signtool)}" />
-  <property name="path.code.cert" value="" />
   <property name="path.code.cert" value="${environment::get-variable('CHOCOLATEY_OFFICIAL_CERT')}" if="${environment::variable-exists('CHOCOLATEY_OFFICIAL_CERT')}" />
-  <property name="path.code.cert.password" value="" />
   <property name="path.code.cert.password" value="${environment::get-variable('CHOCOLATEY_OFFICIAL_CERT_PASSWORD')}" if="${environment::variable-exists('CHOCOLATEY_OFFICIAL_CERT_PASSWORD')}" />
   <property name="code.cert.timestampserver" value="http://timestamp.digicert.com" />
   <!-- When Windows 2003 is no longer supported, switch to SHA256 -->
