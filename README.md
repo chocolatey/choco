@@ -25,6 +25,15 @@ Or, you can find us in IRC at #chocolatey on freenode. IRC is not as often check
 
 Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
+## See Chocolatey In Action
+
+Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update environment variables without restarting your shell):
+
+![install](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_install.gif "Wat? Tab completion and updating environment variables!")
+
+Chocolatey Professional showing private download cache and virus scan protection:
+
+![install pro](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/chocopro_install_stopped.gif "Get ready! Chocolatey Professional availability is May 2nd, 2016")
 
 ## Etiquette Regarding Communication
 
@@ -36,7 +45,6 @@ When requesting support, try to remember that we are all volunteers that have li
  * [Mailing List/Forum](http://groups.google.com/group/chocolatey)
  * [Twitter](https://twitter.com/chocolateynuget)
  * [Build Status Email List](http://groups.google.com/group/chocolatey-build-status)
-
 
 ### Documentation
 Please see the [wiki](https://github.com/chocolatey/choco/wiki)
