@@ -83,6 +83,21 @@ namespace chocolatey.infrastructure.app.nuget
                   : results.Where(p => p.Id.StartsWith(configuration.Input, StringComparison.OrdinalIgnoreCase));
             }
 
+            if (configuration.ListCommand.ApprovedOnly)
+            {
+                results = results.Where(p => p.IsApproved);
+            }
+
+            if (configuration.ListCommand.DownloadCacheAvailable)
+            {
+                results = results.Where(p => p.IsDownloadCacheAvailable);
+            }
+
+            if (configuration.ListCommand.NotBroken)
+            {
+                results = results.Where(p => (p.IsDownloadCacheAvailable && configuration.Information.IsLicensedVersion) || p.PackageTestResultStatus != "Failing");
+            }
+
             if (configuration.AllVersions)
             {
                 if (isRemote)

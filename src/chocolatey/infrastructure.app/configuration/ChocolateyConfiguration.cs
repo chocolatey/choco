@@ -326,6 +326,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IsInteractive { get; set; }
         public bool IsUserAdministrator { get; set; }
         public bool IsProcessElevated { get; set; }
+        public bool IsLicensedVersion { get; set; }
     }
 
     [Serializable]
@@ -359,6 +360,9 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ByIdOnly { get; set; }
         public bool IdStartsWith { get; set; }
         public bool OrderByPopularity { get; set; }
+        public bool ApprovedOnly { get; set; }
+        public bool DownloadCacheAvailable { get; set; }
+        public bool NotBroken { get; set; }
     }
 
     [Serializable]

@@ -39,8 +39,8 @@ $allcommands = " --debug --verbose --force --noop --help --accept-license --conf
 $proInstallUpgradeOptions = " --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum="
 
 $commandOptions = @{
-  list = "--lo --pre --exact --by-id-only --id-starts-with --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity" + $allcommands
-  search = "--pre --exact --by-id-only --id-starts-with --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity" + $allcommands
+  list = "--lo --pre --exact --by-id-only --id-starts-with --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
+  search = "--pre --exact --by-id-only --id-starts-with --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
   install = "-y -whatif -? --pre --version= --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user= --password= --prerelease --forcex86 --not-silent --package-parameters='' --allow-downgrade --force-dependencies --skip-automation-scripts --allow-multiple-versions --ignore-checksums" + $allcommands + $proInstallUpgradeOptions
   pin = "--name= --version= -?" + $allcommands
   outdated = "-? --source='' --user= --password=" + $allcommands
