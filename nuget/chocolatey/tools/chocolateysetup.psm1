@@ -19,6 +19,10 @@ param (
 }
 
 function  Write-ChocolateyError {
+param (
+  [string]$message = ''
+)
+
   try {
     Write-Host "ERROR: $message" -ForegroundColor "Red" -ErrorAction "Stop"
   } catch {
