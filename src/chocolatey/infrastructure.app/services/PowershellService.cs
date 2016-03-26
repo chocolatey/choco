@@ -465,6 +465,17 @@ namespace chocolatey.infrastructure.app.services
                         }
                     };
 
+
+                    var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, Environment.SpecialFolderOption.DoNotVerify);
+                    var currentUserCurrentHostProfile = _fileSystem.combine_paths(documentsFolder, "WindowsPowerShell\\Microsoft.PowerShell_profile.ps1");
+
+                    var profileFix = @"
+if ((Test-Path(""{0}"")) -and ($profile -eq $null -or $profile -eq '')) {{
+  $global:profile = ""{1}""
+}}
+".format_with(documentsFolder, currentUserCurrentHostProfile);
+
+                    pipeline.Commands.Add(new Command(profileFix, isScript: true, useLocalScope: false));
                     pipeline.Commands.Add(new Command(commandToRun, isScript: true, useLocalScope: false));
 
                     try
