@@ -526,6 +526,15 @@ if (Test-Path($ChocolateyProfile)) {
 
   } catch {
     Write-ChocolateyWarning "Unable to add Chocolatey to the profile. You will need to do it manually. Error was '$_'"
+@'
+This is how add the Chocolatey Profile manually.
+Find your $profile. Then add the following lines to it:
+
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+  Import-Module "$ChocolateyProfile"
+}
+'@ | Write-Output
   }
 }
 
