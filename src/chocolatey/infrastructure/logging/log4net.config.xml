@@ -122,6 +122,10 @@
     <appender-ref ref="VerboseLoggingColoredConsoleAppender" />
   </logger>
 
+  <logger name="LogFileOnly">
+    <level value="INFO" />
+  </logger>
+  
   <logger name="chocolatey">
     <level value="DEBUG"/>
     <appender-ref ref="NormalLoggingColoredConsoleAppender" />

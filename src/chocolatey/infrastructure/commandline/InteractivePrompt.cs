@@ -40,6 +40,48 @@ namespace chocolatey.infrastructure.commandline
             get { return _console.Value; }
         }
 
+        public static string prompt_for_confirmation_short(string prompt, IEnumerable<string> choices, int repeat = 10)
+        {
+            if (repeat < 0) throw new ApplicationException("Too many bad attempts. Stopping before application crash.");
+            Ensure.that(() => prompt).is_not_null();
+            Ensure.that(() => choices).is_not_null();
+            Ensure
+                .that(() => choices)
+                .meets(
+                    c => c.Any(),
+                    (name, value) => { throw new ApplicationException("No choices passed in. Please ensure you pass choices."); });
+            Ensure
+                .that(() => choices)
+                .meets(
+                    c => !c.Any(String.IsNullOrWhiteSpace),
+                    (name, value) => { throw new ApplicationException("Some choices are empty. Please ensure you provide no empty choices."); });
+            Ensure
+                .that(() => choices)
+                .meets(
+                    c => c.Select(entry => entry.FirstOrDefault()).Distinct().Count() == c.Count(),
+                    (name, value) => { throw new ApplicationException("Multiple choices have the same first letter. Please ensure you pass choices with different first letters."); });
+
+            var promptWithChoices = "{0} ({1}): ".format_with(prompt, String.Join("/", choices));
+            
+            Console.Write(promptWithChoices);
+            var selection = Console.ReadLine();
+
+            "chocolatey".Log().Info(ChocolateyLoggers.LogFileOnly, "{0}{1}".format_with(promptWithChoices, selection));
+
+            // check to see if value was passed
+            foreach (var choice in choices)
+            {
+                if (choice.is_equal_to(selection) || choice.Substring(0, 1).is_equal_to(selection))
+                {
+                    selection = choice;
+                    return selection;
+                }
+            }
+
+            "chocolatey".Log().Error(ChocolateyLoggers.Important, "Your choice of '{0}' is not a valid selection.".format_with(selection));
+            return prompt_for_confirmation_short(prompt, choices, repeat - 1);
+        }
+
         public static string prompt_for_confirmation(string prompt, IEnumerable<string> choices, string defaultChoice, bool requireAnswer, int repeat = 10)
         {
             if (repeat < 0) throw new ApplicationException("Too many bad attempts. Stopping before application crash.");
@@ -70,6 +112,7 @@ namespace chocolatey.infrastructure.commandline
                 counter++;
             }
 
+            Console.Write("> ");
             var selection = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(selection) && defaultChoice != null)
