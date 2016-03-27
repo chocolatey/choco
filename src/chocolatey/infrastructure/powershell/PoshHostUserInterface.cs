@@ -75,6 +75,7 @@ namespace chocolatey.infrastructure.powershell
             System.Console.ForegroundColor = foregroundColor;
             System.Console.BackgroundColor = backgroundColor;
 
+            //todo: this should console out and then log to the file without showing it
             this.Log().Info(value.escape_curly_braces());
 
             System.Console.ForegroundColor = originalForegroundColor;
@@ -93,6 +94,7 @@ namespace chocolatey.infrastructure.powershell
             System.Console.ForegroundColor = foregroundColor;
             System.Console.BackgroundColor = backgroundColor;
 
+            //todo: this should console out and then log to the file without showing it
             this.Log().Info(value.escape_curly_braces());
 
             System.Console.ForegroundColor = originalForegroundColor;
