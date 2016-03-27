@@ -234,15 +234,16 @@ namespace chocolatey.infrastructure.app.services
                     this.Log().Info(ChocolateyLoggers.Important, () => @"Note: To confirm automatically next time, use '-y' or consider setting 
  'allowGlobalConfirmation'. Run 'choco feature -h' for more details.");
                     
-                    var selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run the script?", new[] {"yes", "no", "print"}, defaultChoice: null, requireAnswer: true);
+                    var selection = InteractivePrompt.prompt_for_confirmation_short(@"Do you want to run the script?", new[] {"yes", "no", "print"});
 
                     if (selection.is_equal_to("print"))
                     {
                         this.Log().Info(ChocolateyLoggers.Important, "------ BEGIN SCRIPT ------");
                         this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents.escape_curly_braces()));
                         this.Log().Info(ChocolateyLoggers.Important, "------- END SCRIPT -------");
-                        selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run this script?", new[] { "yes", "no" }, defaultChoice: null, requireAnswer: true);
+                        selection = InteractivePrompt.prompt_for_confirmation_short(@"Do you want to run this script?", new[] { "yes", "no" });
                     }
+
 
                     if (selection.is_equal_to("yes")) shouldRun = true;
                     if (selection.is_equal_to("no"))
