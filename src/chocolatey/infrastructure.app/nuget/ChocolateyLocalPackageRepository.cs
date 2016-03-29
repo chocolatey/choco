@@ -15,6 +15,11 @@
 
 namespace chocolatey.infrastructure.app.nuget
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.Versioning;
     using NuGet;
 
     // ReSharper disable InconsistentNaming
@@ -44,7 +49,29 @@ namespace chocolatey.infrastructure.app.nuget
         public override void AddPackage(IPackage package)
         {
             string packageFilePath = GetPackageFilePath(package);
+            if (PackageSaveMode.HasFlag(PackageSaveModes.Nuspec))
+            {
+                string manifestFilePath = GetManifestFilePath(package.Id, package.Version);
+                Manifest manifest = Manifest.Create(package);
+                manifest.Metadata.ReferenceSets = Enumerable.ToList<ManifestReferenceSet>(Enumerable.Select<IGrouping<FrameworkName, IPackageAssemblyReference>, ManifestReferenceSet>(Enumerable.GroupBy<IPackageAssemblyReference, FrameworkName>(package.AssemblyReferences, (Func<IPackageAssemblyReference, FrameworkName>)(f => f.TargetFramework)), (Func<IGrouping<FrameworkName, IPackageAssemblyReference>, ManifestReferenceSet>)(g => new ManifestReferenceSet()
+                {
+                    TargetFramework = g.Key == (FrameworkName)null ? (string)null : VersionUtility.GetFrameworkString(g.Key),
+                    References = Enumerable.ToList<ManifestReference>(Enumerable.Select<IPackageAssemblyReference, ManifestReference>((IEnumerable<IPackageAssemblyReference>)g, (Func<IPackageAssemblyReference, ManifestReference>)(p => new ManifestReference()
+                    {
+                        File = p.Name
+                    })))
+                })));
+                FileSystem.AddFileWithCheck(manifestFilePath, manifest.Save);
+            }
+
             FileSystem.AddFileWithCheck(packageFilePath, package.GetStream);
+        }
+
+        private string GetManifestFilePath(string packageId, SemanticVersion version)
+        {
+            string packageDirectory = PathResolver.GetPackageDirectory(packageId, version);
+            string path2 = packageDirectory + Constants.ManifestExtension;
+            return Path.Combine(packageDirectory, path2);
         }
     }
 

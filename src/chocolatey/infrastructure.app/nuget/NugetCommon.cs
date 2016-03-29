@@ -45,7 +45,7 @@ namespace chocolatey.infrastructure.app.nuget
         public static IPackageRepository GetLocalRepository(IPackagePathResolver pathResolver, IFileSystem nugetPackagesFileSystem)
         {
             IPackageRepository localRepository = new ChocolateyLocalPackageRepository(pathResolver, nugetPackagesFileSystem);
-            localRepository.PackageSaveMode = PackageSaveModes.Nupkg;
+            localRepository.PackageSaveMode = PackageSaveModes.Nupkg | PackageSaveModes.Nuspec;
 
             return localRepository;
         }
