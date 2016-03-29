@@ -114,6 +114,7 @@ namespace chocolatey.infrastructure.commandline
 
             if (string.IsNullOrWhiteSpace(selection) && defaultChoice != null)
             {
+                "chocolatey".Log().Info(ChocolateyLoggers.LogFileOnly, "Choosing default choice of '{0}'".format_with(defaultChoice.escape_curly_braces()));
                 return defaultChoice;
             }
 
@@ -128,13 +129,14 @@ namespace chocolatey.infrastructure.commandline
                     {
                         selected = pair.Key;
                         selectionFound = true;
+                        "chocolatey".Log().Info(ChocolateyLoggers.LogFileOnly, "Choice selected: '{0}'".format_with(pair.Value.escape_curly_braces()));
                         break;
                     }
                 }
 
                 if (!selectionFound)
                 {
-                    "chocolatey".Log().Error(ChocolateyLoggers.Important, "Your choice of '{0}' is not a valid selection.".format_with(selection));
+                    "chocolatey".Log().Error(ChocolateyLoggers.Important, "Your choice of '{0}' is not a valid selection.".format_with(selection.escape_curly_braces()));
                     if (requireAnswer)
                     {
                         "chocolatey".Log().Warn(ChocolateyLoggers.Important, "You must select an answer");
