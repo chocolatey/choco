@@ -127,7 +127,7 @@
     <appender-ref ref="NormalLoggingColoredConsoleAppender" />
   </logger>  
   
-  <logger name="logfile">
+  <logger name="LogFileOnly">
     <level value="DEBUG"/>
   </logger>
 

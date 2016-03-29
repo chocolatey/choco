@@ -115,7 +115,7 @@ namespace chocolatey.infrastructure.app.services
 
             if (!_fileSystem.directory_exists(diecPath) || !_fileSystem.directory_exists(databaseLocation))
             {
-                var dieZipLocation = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "die.zip");
+                var dieZipLocation = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "detector.zip");
                 unzip_die_files(dieZipLocation, dieDllLocation);
             }
            

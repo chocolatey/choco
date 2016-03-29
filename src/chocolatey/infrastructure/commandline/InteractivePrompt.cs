@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.commandline
             get { return _console.Value; }
         }
 
-        public static string prompt_for_confirmation(string prompt, IEnumerable<string> choices, string defaultChoice, bool requireAnswer, int repeat = 10)
+        public static string prompt_for_confirmation(string prompt, IEnumerable<string> choices, string defaultChoice, bool requireAnswer, bool allowShortAnswer = true, bool shortPrompt = false, int repeat = 10)
         {
             if (repeat < 0) throw new ApplicationException("Too many bad attempts. Stopping before application crash.");
             Ensure.that(() => prompt).is_not_null();
@@ -50,6 +50,7 @@ namespace chocolatey.infrastructure.commandline
                 .meets(
                     c => c.Count() > 0,
                     (name, value) => { throw new ApplicationException("No choices passed in. Please ensure you pass choices"); });
+
             if (defaultChoice != null)
             {
                 Ensure
@@ -59,47 +60,87 @@ namespace chocolatey.infrastructure.commandline
                         (name, value) => { throw new ApplicationException("Default choice value must be one of the given choices."); });
             }
 
-            "chocolatey".Log().Info(ChocolateyLoggers.Important, prompt);
+            if (allowShortAnswer)
+            {
+                Ensure
+                    .that(() => choices)
+                    .meets(
+                        c => !c.Any(String.IsNullOrWhiteSpace),
+                        (name, value) => { throw new ApplicationException("Some choices are empty. Please ensure you provide no empty choices."); });
+                
+                Ensure
+                 .that(() => choices)
+                 .meets(
+                     c => c.Select(entry => entry.FirstOrDefault()).Distinct().Count() == c.Count(),
+                     (name, value) => { throw new ApplicationException("Multiple choices have the same first letter. Please ensure you pass choices with different first letters."); });
+            }
+
+            if (shortPrompt)
+            {
+                Console.Write(prompt + "(");
+
+            } 
+            
+            "chocolatey".Log().Info(shortPrompt ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, prompt);
 
             int counter = 1;
             IDictionary<int, string> choiceDictionary = new Dictionary<int, string>();
             foreach (var choice in choices.or_empty_list_if_null())
             {
                 choiceDictionary.Add(counter, choice);
-                "chocolatey".Log().Info(" {0}) {1}{2}".format_with(counter, choice.to_string(), choice == defaultChoice ? " [Default - Press Enter]" : ""));
+                "chocolatey".Log().Info(shortPrompt ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Normal," {0}) {1}{2}".format_with(counter, choice.to_string(), choice.is_equal_to(defaultChoice) ? " [Default - Press Enter]" : ""));
+                if (shortPrompt)
+                {
+                    var choicePrompt = choice.is_equal_to(defaultChoice) ?
+                            shortPrompt ?
+                                "[[{0}]{1}]".format_with(choice.Substring(0, 1).ToUpperInvariant(), choice.Substring(1, choice.Length - 1)) : 
+                                "[{0}]".format_with(choice.ToUpperInvariant())
+                        : 
+                            shortPrompt ? 
+                                "[{0}]{1}".format_with(choice.Substring(0,1).ToUpperInvariant(), choice.Substring(1, choice.Length - 1)) :
+                                choice;
+
+                    if (counter != 1) Console.Write("/");
+                    Console.Write(choicePrompt);
+                }
+                
                 counter++;
             }
 
+            Console.Write(shortPrompt ? "): " : "> ");
+
             var selection = Console.ReadLine();
+            if (shortPrompt) Console.WriteLine();
 
             if (string.IsNullOrWhiteSpace(selection) && defaultChoice != null)
             {
+                "chocolatey".Log().Info(ChocolateyLoggers.LogFileOnly, "Choosing default choice of '{0}'".format_with(defaultChoice.escape_curly_braces()));
                 return defaultChoice;
             }
 
             int selected = -1;
-
             if (!int.TryParse(selection, out selected) || selected <= 0 || selected > (counter - 1))
             {
                 // check to see if value was passed
                 var selectionFound = false;
                 foreach (var pair in choiceDictionary)
                 {
-                    if (pair.Value.is_equal_to(selection))
+                    if (pair.Value.is_equal_to(selection) || (allowShortAnswer && pair.Value.Substring(0, 1).is_equal_to(selection)))
                     {
                         selected = pair.Key;
-                        selectionFound = true;   
+                        selectionFound = true;
+                        "chocolatey".Log().Info(ChocolateyLoggers.LogFileOnly, "Choice selected: '{0}'".format_with(pair.Value.escape_curly_braces()));
                         break;
                     }
                 }
 
                 if (!selectionFound)
                 {
-                    "chocolatey".Log().Error(ChocolateyLoggers.Important, "Your choice of '{0}' is not a valid selection.".format_with(selection));
+                    "chocolatey".Log().Error(ChocolateyLoggers.Important, "Your choice of '{0}' is not a valid selection.".format_with(selection.escape_curly_braces()));
                     if (requireAnswer)
                     {
                         "chocolatey".Log().Warn(ChocolateyLoggers.Important, "You must select an answer");
-                        return prompt_for_confirmation(prompt, choices, defaultChoice, requireAnswer, repeat - 1);
+                        return prompt_for_confirmation(prompt, choices, defaultChoice, requireAnswer, allowShortAnswer, shortPrompt, repeat - 1);
                     }
                     return null;
                 }

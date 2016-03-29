@@ -15,7 +15,7 @@
 function Get-ToolsLocation {
   Write-Debug "Running 'Get-ToolsLocation'";
   $invocation = $MyInvocation
-  if ($invocation -ne $null -and $invocation.InvocationName -ne $null -and $invocation.InvocationName.ToLower() -eq 'Get-BinRoot') {
+  if ($invocation -ne $null -and $invocation.InvocationName -ne $null -and $invocation.InvocationName.ToLower() -eq 'get-binroot') {
     Write-Host "Get-BinRoot is going to be deprecated in v1 and removed in v2. It is being replaced with Get-ToolsLocation, however many packages no longer require a special separate directory since package folders no longer have versions on them. Some do though and should continue to use Get-ToolsLocation."
   } 
 

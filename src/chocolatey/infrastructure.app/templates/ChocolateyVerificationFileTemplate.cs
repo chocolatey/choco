@@ -1,4 +1,4 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// Copyright � 2011 - Present RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.logging
+namespace chocolatey.infrastructure.app.templates
 {
-    public enum ChocolateyLoggers
+    public class ChocolateyVerificationFileTemplate
     {
-        Normal,
-        Verbose,
-        Important,
-        // Used to output prompt results in log file, but not in the console
-        LogFileOnly,
+        public static string Template = @"
+Note: Include this file if including binaries you have the right to distribute. 
+Otherwise delete. this file.
+
+===DELETE ABOVE THIS LINE AND THIS LINE===
+
+VERIFICATION
+Verification is intended to assist the Chocolatey moderators and community
+in verifying that this package's contents are trustworthy.
+ 
+<Include details of how to verify checksum contents>";
     }
 }

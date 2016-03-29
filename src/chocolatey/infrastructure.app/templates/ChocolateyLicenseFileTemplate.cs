@@ -13,14 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.logging
+namespace chocolatey.infrastructure.app.templates
 {
-    public enum ChocolateyLoggers
+    public class ChocolateyLicenseFileTemplate
     {
-        Normal,
-        Verbose,
-        Important,
-        // Used to output prompt results in log file, but not in the console
-        LogFileOnly,
+        public static string Template =
+            @"
+Note: Include this file if including binaries you have the right to distribute. 
+Otherwise delete. this file.
+
+===DELETE ABOVE THIS LINE AND THIS LINE===
+
+From: <insert applicable license url here>
+
+LICENSE
+
+<Insert License Here>
+";
     }
 }

@@ -143,7 +143,14 @@ namespace chocolatey.infrastructure.app.services
                     var skipUninstaller = true;
                     if (config.PromptForConfirmation)
                     {
-                        var selection = InteractivePrompt.prompt_for_confirmation("Uninstall may not be silent (could not detect). Proceed?", new[] {"yes", "no"}, defaultChoice: null, requireAnswer: true);
+                        var selection = InteractivePrompt.prompt_for_confirmation(
+                            "Uninstall may not be silent (could not detect). Proceed?",
+                            new[] { "yes", "no" },
+                            defaultChoice: null,
+                            requireAnswer: true,
+                            allowShortAnswer: true,
+                            shortPrompt: true
+                            );
                         if (selection.is_equal_to("yes")) skipUninstaller = false;
                     }
 

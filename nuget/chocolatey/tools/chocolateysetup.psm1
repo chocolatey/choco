@@ -12,19 +12,19 @@ param (
 )
 
   try {
-    $host.ui.RawUI.ForegroundColor = "Yellow"
-    Write-Output "WARNING: $message"
-    $host.ui.RawUI.ForegroundColor = $originalForegroundColor
+    Write-Host "WARNING: $message" -ForegroundColor "Yellow" -ErrorAction "Stop"
   } catch {
     Write-Output "WARNING: $message"
   }
 }
 
 function  Write-ChocolateyError {
+param (
+  [string]$message = ''
+)
+
   try {
-    $host.ui.RawUI.ForegroundColor = "Red"
-    Write-Output "ERROR: $message"
-    $host.ui.RawUI.ForegroundColor = $originalForegroundColor
+    Write-Host "ERROR: $message" -ForegroundColor "Red" -ErrorAction "Stop"
   } catch {
     Write-Output "ERROR: $message"
   }
@@ -518,14 +518,23 @@ if (Test-Path($ChocolateyProfile)) {
     Write-Output 'Adding Chocolatey to the profile. This will provide tab completion, refreshenv, etc.'
     $profileInstall | Out-File $profileFile -Append -Encoding (Get-FileEncoding $profileFile)
     Write-ChocolateyWarning 'Chocolatey profile installed. Reload your profile - type . $profile'
-    
+
     if ($PSVersionTable.PSVersion.Major -lt 3) {
       Write-ChocolateyWarning "Tab completion does not currently work in PowerShell v2. `n Please upgrade to a more recent version of PowerShell to take advantage of tab completion."
       #Write-ChocolateyWarning "To load tab expansion, you need to install PowerTab. `n See https://powertab.codeplex.com/ for details."
     }
-    
+
   } catch {
     Write-ChocolateyWarning "Unable to add Chocolatey to the profile. You will need to do it manually. Error was '$_'"
+@'
+This is how add the Chocolatey Profile manually.
+Find your $profile. Then add the following lines to it:
+
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+  Import-Module "$ChocolateyProfile"
+}
+'@ | Write-Output
   }
 }
 

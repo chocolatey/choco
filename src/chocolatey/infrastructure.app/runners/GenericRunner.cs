@@ -189,7 +189,12 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
  elevated shell. When you open the command shell, you should ensure 
  that you do so with ""Run as Administrator"" selected.
 
- Do you want to continue?", new[] { "yes", "no" }, defaultChoice: null, requireAnswer: true);
+ Do you want to continue?", new[] { "yes", "no" },
+                        defaultChoice: null,
+                        requireAnswer: true,
+                        allowShortAnswer: true,
+                        shortPrompt: true
+                        );
 
                 if (selection.is_equal_to("no"))
                 {

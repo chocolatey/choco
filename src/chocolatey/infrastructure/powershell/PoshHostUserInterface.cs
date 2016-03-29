@@ -75,7 +75,8 @@ namespace chocolatey.infrastructure.powershell
             System.Console.ForegroundColor = foregroundColor;
             System.Console.BackgroundColor = backgroundColor;
 
-            this.Log().Info(value.escape_curly_braces());
+            Console.Write(value);
+            this.Log().Info(ChocolateyLoggers.LogFileOnly, value.escape_curly_braces());
 
             System.Console.ForegroundColor = originalForegroundColor;
             System.Console.BackgroundColor = originalBackgroundColor;
@@ -93,7 +94,8 @@ namespace chocolatey.infrastructure.powershell
             System.Console.ForegroundColor = foregroundColor;
             System.Console.BackgroundColor = backgroundColor;
 
-            this.Log().Info(value.escape_curly_braces());
+            Console.WriteLine(value);
+            this.Log().Info(ChocolateyLoggers.LogFileOnly, value.escape_curly_braces());
 
             System.Console.ForegroundColor = originalForegroundColor;
             System.Console.BackgroundColor = originalBackgroundColor;

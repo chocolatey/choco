@@ -234,14 +234,26 @@ namespace chocolatey.infrastructure.app.services
                     this.Log().Info(ChocolateyLoggers.Important, () => @"Note: To confirm automatically next time, use '-y' or consider setting 
  'allowGlobalConfirmation'. Run 'choco feature -h' for more details.");
                     
-                    var selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run the script?", new[] {"yes", "no", "print"}, defaultChoice: null, requireAnswer: true);
+                    var selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run the script?", 
+                        new[] {"yes", "no", "print"}, 
+                        defaultChoice : null,
+                        requireAnswer : true,
+                        allowShortAnswer : true, 
+                        shortPrompt: true
+                        );
 
                     if (selection.is_equal_to("print"))
                     {
                         this.Log().Info(ChocolateyLoggers.Important, "------ BEGIN SCRIPT ------");
                         this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents.escape_curly_braces()));
                         this.Log().Info(ChocolateyLoggers.Important, "------- END SCRIPT -------");
-                        selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run this script?", new[] { "yes", "no" }, defaultChoice: null, requireAnswer: true);
+                        selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run this script?", 
+                            new[] { "yes", "no" },
+                            defaultChoice : null,
+                            requireAnswer : true,
+                            allowShortAnswer : true, 
+                            shortPrompt: true
+                            );
                     }
 
                     if (selection.is_equal_to("yes")) shouldRun = true;
@@ -464,7 +476,39 @@ namespace chocolatey.infrastructure.app.services
                             }
                         }
                     };
+                    
+                    var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, Environment.SpecialFolderOption.DoNotVerify);
+                    var currentUserCurrentHostProfile = _fileSystem.combine_paths(documentsFolder, "WindowsPowerShell\\Microsoft.PowerShell_profile.ps1");
+                    var recreateProfileScript = @"
+if ((Test-Path(""{0}"")) -and ($profile -eq $null -or $profile -eq '')) {{
+  $global:profile = ""{1}""
+}}
+".format_with(documentsFolder, currentUserCurrentHostProfile);
 
+                    pipeline.Commands.Add(new Command(recreateProfileScript, isScript: true, useLocalScope: false));
+
+                    // The PowerShell Output Redirection bug affects System.Management.Automation 
+                    // it appears with v3 more than others. It is already known to affect v2
+                    // this implements the redirection fix from the post below, fixed up with some comments
+                    // http://www.leeholmes.com/blog/2008/07/30/workaround-the-os-handles-position-is-not-what-filestream-expected/
+                    const string outputRedirectionFixScript = @"
+try {
+  $bindingFlags = [Reflection.BindingFlags] ""Instance,NonPublic,GetField""
+  $objectRef = $host.GetType().GetField(""externalHostRef"", $bindingFlags).GetValue($host)
+  $bindingFlags = [Reflection.BindingFlags] ""Instance,NonPublic,GetProperty""
+  $consoleHost = $objectRef.GetType().GetProperty(""Value"", $bindingFlags).GetValue($objectRef, @())
+  [void] $consoleHost.GetType().GetProperty(""IsStandardOutputRedirected"", $bindingFlags).GetValue($consoleHost, @())
+  $bindingFlags = [Reflection.BindingFlags] ""Instance,NonPublic,GetField""
+  $field = $consoleHost.GetType().GetField(""standardOutputWriter"", $bindingFlags)
+  $field.SetValue($consoleHost, [Console]::Out)
+  [void] $consoleHost.GetType().GetProperty(""IsStandardErrorRedirected"", $bindingFlags).GetValue($consoleHost, @())
+  $field2 = $consoleHost.GetType().GetField(""standardErrorWriter"", $bindingFlags)
+  $field2.SetValue($consoleHost, [Console]::Error)
+} catch {
+  Write-Output ""Unable to apply redirection fix""
+}
+";
+                    pipeline.Commands.Add(new Command(outputRedirectionFixScript, isScript: true, useLocalScope: false));
                     pipeline.Commands.Add(new Command(commandToRun, isScript: true, useLocalScope: false));
 
                     try

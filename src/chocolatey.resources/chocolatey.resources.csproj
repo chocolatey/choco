@@ -129,7 +129,7 @@
     <EmbeddedResource Include="helpers\functions\Get-ToolsLocation.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="tools\die.zip" />
+    <EmbeddedResource Include="tools\detector.zip" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="helpers\chocolateyProfile.psm1" />
