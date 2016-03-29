@@ -20,5 +20,7 @@ namespace chocolatey.infrastructure.logging
         Normal,
         Verbose,
         Important,
+        // Used to output prompt results in log file, but not in the console
+        LogFileOnly,
     }
 }

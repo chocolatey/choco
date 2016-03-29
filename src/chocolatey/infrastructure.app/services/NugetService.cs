@@ -1060,7 +1060,11 @@ spam/junk folder.");
                             choices.Add(allVersionsChoice);
                         }
 
-                        var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), choices, defaultChoice: null, requireAnswer: true);
+                        var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), 
+                            choices, 
+                            defaultChoice: null, 
+                            requireAnswer: true, 
+                            allowShortAnswer: false);
 
                         if (string.IsNullOrWhiteSpace(selection)) continue;
                         if (selection.is_equal_to(abortChoice)) continue;

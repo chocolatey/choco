@@ -48,5 +48,15 @@ namespace chocolatey.infrastructure.adapters
         {
             System.Console.Write(value.to_string());
         }
+
+        public void WriteLine()
+        {
+            System.Console.WriteLine();
+        }
+
+        public void WriteLine(object value)
+        {
+            System.Console.WriteLine(value);
+        }
     }
 }
