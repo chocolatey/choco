@@ -1,13 +1,24 @@
 ## [0.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.10+is%3Aclosed) (unreleased)
 
+The "I got 99 problems, but a package manager ain't one" release. With the release of 0.9.10 (or if you prefer 0.9.10.0), we're about to make everything 100% better in your Windows package management world. We've addressed over 100 features and bugs in this release. We looked at how we could improve PowerShell and we've come out with a [competely internal host](https://github.com/chocolatey/choco/issues/8) that can Prompt and Read-Host in a way that times out and selects default values after a period of time. Speaking of PowerShell, how about some tab completion `choco &lt;tab&gt;` to `choco install node&lt;tab&gt;`? How about never having to [close and reopen your shell again](https://github.com/chocolatey/choco/issues/664)?
+
+Alternative sources (`-source webpi`, `-s windowsfeature`, etc) are back! I mean, am I right?! Have you heard of auto uninstaller? If Chocolatey has installed something that works with Programs and Features, Chocolatey knows how to uninstall it without an uninstall script about 90+% of the time. This feature was in beta for the 0.9.9 series, it is on by default in 0.9.10 (unless you disabled it after trying it, you will need to reenable it, see `choco feature` for more details).
+
+Here's one you probably never knew existed - extensions. Chocolatey has had the ability to extend itself by adding PowerShell modules for years, and most folks either didn't know it existed or have never used them. We've enhanced them a bit in preparation for the licensed version of Chocolatey.
+
+We redesigned our `choco new` default packaging template and we've made managing templates as easy as managing packages.
+
+`choco search`/`choco list` got so many enhancements, you may not need to visit dot org again. [See it in action](https://github.com/chocolatey/choco/wiki/CommandsList#see-it-in-action).
+* [search -v provides moderation related information and a world of nuspec information](https://github.com/chocolatey/choco/issues/493)
+* [search by id only](https://github.com/chocolatey/choco/issues/663)
+* [search by id exact](https://github.com/chocolatey/choco/issues/453)
+* [search by approved only, not broken, and/or by download cache](https://github.com/chocolatey/choco/issues/670)
+* [sort by version](https://github.com/chocolatey/choco/issues/668)
+* [search with paging](https://github.com/chocolatey/choco/issues/427)
+
 What will be highlighted:
 
-* Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, right?)!
-* Use an internal PowerShell host to take advantage of quite a few improvements!
 * Introduce managing package templates, reintroduce extensions.
-* Talk about using original download file name
-* Talk about the improvements in search information
-* Talk about tab completion and refreshenv!
 * Talk a little about what's coming with pro
 
 ### BREAKING CHANGES
@@ -28,7 +39,6 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Alternative Sources - see [#14](https://github.com/chocolatey/choco/issues/14)
  * [POSH Host] Use Internal PowerShell Host - see [#8](https://github.com/chocolatey/choco/issues/8)
  * Manage package templates with a specially named package and special package folder - see [#542](https://github.com/chocolatey/choco/issues/542)
- * Use the actual download file name instead of providing one - see [#435](https://github.com/chocolatey/choco/issues/435)
  * Support for custom headers - see [#332](https://github.com/chocolatey/choco/issues/332)
  * [Security] Show moderation-related information in search results - see [#493](https://github.com/chocolatey/choco/issues/493)
  * New Helper - Get-ToolsLocation helper (replacement for Get-BinRoot) - see [#631](https://github.com/chocolatey/choco/issues/631)
@@ -36,7 +46,7 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * RefreshEnv (Refresh Environment Variables) Should also work in PowerShell - see [#664](https://github.com/chocolatey/choco/issues/664)
  * Provide PowerShell tab completion for Chocolatey - see [#412](https://github.com/chocolatey/choco/issues/412)
  * [Security] Sign the powershell scripts and assemblies - see [#501](https://github.com/chocolatey/choco/issues/501)
- 
+
 ### BUG FIXES
 
  * [Security] Fix - Only load the Chocolatey PowerShell module from a known location - see [#560](https://github.com/chocolatey/choco/issues/560)
@@ -60,7 +70,7 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Fix - API - Incorrect log4net version in chocolatey.lib dependencies - see [#390](https://github.com/chocolatey/choco/issues/390)
  * [POSH Host] Fix - Message after Download progress is on the same line sometimes - see [#525](https://github.com/chocolatey/choco/issues/525)
  * [POSH Host] Fix - PowerShell internal process - "The handle is invalid." - see [#526](https://github.com/chocolatey/choco/issues/526)
- * [POSH Host] Fix - The handle is invalid - when output is being redirected and a package attempts to write to a filestream - see [#572](https://github.com/chocolatey/choco/issues/572) 
+ * [POSH Host] Fix - The handle is invalid - when output is being redirected and a package attempts to write to a filestream - see [#572](https://github.com/chocolatey/choco/issues/572)
  * [POSH Host] Fix - Write-Host adding multiple line breaks - see [#672](https://github.com/chocolatey/choco/issues/672)
  * [POSH Host] Fix - PowerShell Host doesn't show colorization overrides - see [#674](https://github.com/chocolatey/choco/issues/674)
  * [POSH Host] Fix - $profile is empty string when installing packages - does not automatically install the ChocolateyProfile - see [#667](https://github.com/chocolatey/choco/issues/667)
@@ -70,13 +80,14 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Fix - ShimGen handling of spaces and arguments that have shimgen in them - see [#647](https://github.com/chocolatey/choco/issues/647)
  * Fix - PowerShell v2 - Choco installer messages can't actually be warnings (causes FileStream errors) - see [#666](https://github.com/chocolatey/choco/issues/666)
  * Fix - Installing chocolatey removes $env:PSModulePath changes for current PowerShell session - see [#295](https://github.com/chocolatey/choco/issues/295)
- * Fix: PowerShell v2 - Choco installer messages can't actually be warnings (can cause FileStream errors) - see [#666](https://github.com/chocolatey/choco/issues/666)
  * Fix - Notice for Get-BinRoot deprecation won't be displayed - see [#673](https://github.com/chocolatey/choco/issues/673)
  * Fix - choco new creates a bad ChocolateyUninstall.ps1 script which does not work.  - see [#460](https://github.com/chocolatey/choco/issues/460)
+ * Fix - ShimGen fails when file metadata has strings that need literals - see [#677](https://github.com/chocolatey/choco/issues/677)
 
 ### IMPROVEMENTS
 
  * AutoUninstaller is on by default - see [#308](https://github.com/chocolatey/choco/issues/308)
+ * Use the actual download file name instead of providing one - see [#435](https://github.com/chocolatey/choco/issues/435)
  * Unset Configuration Values - see [#551](https://github.com/chocolatey/choco/issues/551)
  * Ability to run "choco upgrade all" ignoring specific packages - see [#293](https://github.com/chocolatey/choco/issues/293)
  * Extensions enhancements - see [#588](https://github.com/chocolatey/choco/issues/588)
