@@ -82,6 +82,7 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Fix - Installing chocolatey removes $env:PSModulePath changes for current PowerShell session - see [#295](https://github.com/chocolatey/choco/issues/295)
  * Fix - Notice for Get-BinRoot deprecation won't be displayed - see [#673](https://github.com/chocolatey/choco/issues/673)
  * Fix - choco new creates a bad ChocolateyUninstall.ps1 script which does not work.  - see [#460](https://github.com/chocolatey/choco/issues/460)
+ * Fix - ShimGen fails when file metadata has strings that need literals - see [#677](https://github.com/chocolatey/choco/issues/677)
 
 ### IMPROVEMENTS
 
