@@ -15,6 +15,7 @@
 
 namespace chocolatey.tests.integration
 {
+    using System;
     using System.IO;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
@@ -103,6 +104,17 @@ namespace chocolatey.tests.integration
 
             config.Information.PlatformType = PlatformType.Windows;
             config.Information.IsInteractive = false;
+            config.Information.ChocolateyVersion = "1.2.3";
+            config.Information.PlatformVersion = new Version(6,1,0,0);
+            config.Information.PlatformName = "Windows 7 SP1";
+            config.Information.ChocolateyVersion = "1.2.3";
+            config.Information.ChocolateyProductVersion = "1.2.3";
+            config.Information.FullName = "choco something something";
+            config.Information.Is64Bit = true;
+            config.Information.IsInteractive = false;
+            config.Information.IsUserAdministrator = true;
+            config.Information.IsProcessElevated = true;
+            config.Information.IsLicensedVersion = false;
             config.AcceptLicense = true;
             config.AllowMultipleVersions = false;
             config.AllowUnofficialBuild = true;
@@ -129,9 +141,9 @@ namespace chocolatey.tests.integration
             config.Input = config.PackageNames = string.Empty;
             config.ListCommand.LocalOnly = false;
             config.ListCommand.Exact = false;
-            //config.Features.UsePowerShellHost = true;
-            //config.Features.AutoUninstaller = true;
-            //config.Features.CheckSumFiles = true;
+            config.Features.UsePowerShellHost = true;
+            config.Features.AutoUninstaller = true;
+            config.Features.CheckSumFiles = true;
 
             return config;
         }
