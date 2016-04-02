@@ -68,7 +68,8 @@ namespace chocolatey.infrastructure.powershell
 
         public override Coordinates WindowPosition {
             get { return new Coordinates(Console.WindowLeft, Console.WindowTop); } 
-            set { Console.SetWindowPosition(value.X, value.Y); } }
+            set { Console.SetWindowPosition(value.X, value.Y); }
+        }
 
         public override Size WindowSize
         {
