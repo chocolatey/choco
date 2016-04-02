@@ -85,6 +85,43 @@ namespace chocolatey.infrastructure.adapters
         /// <exception cref="T:System.IO.IOException">An I/O error occurred.</exception>
         /// <filterpriority>1</filterpriority>
         void WriteLine(object value);
+
+        /// <summary>
+        /// Indicates whether output has been redirected from the standard output stream.
+        /// </summary>
+        bool IsOutputRedirected { get; }
+
+        /// <summary>
+        /// Indicates whether the error output stream has been redirected from the standard error stream.
+        /// </summary>
+        bool IsErrorRedirected { get; }
+        
+        /// <summary>
+        /// Indicates whether input has been redirected from the standard input stream.
+        /// </summary>
+        bool IsInputRedirected { get; }
+
+        System.ConsoleColor BackgroundColor { get; set; }
+        System.ConsoleColor ForegroundColor { get; set; }
+        
+        int BufferWidth { get; set; }
+        int BufferHeight { get; set; }
+        void SetBufferSize(int width, int height);
+
+        string Title { get; set; }
+        bool KeyAvailable { get; }
+        int CursorSize { get; set; }
+
+        int LargestWindowWidth { get; }
+        int LargestWindowHeight { get; }
+        int WindowWidth { get; set; }
+        int WindowHeight { get; set; }
+        void SetWindowSize(int width, int height);
+
+        int WindowLeft { get; set; }
+        int WindowTop { get; set; }
+        void SetWindowPosition(int width, int height);
+    
     }
 
     // ReSharper restore InconsistentNaming
