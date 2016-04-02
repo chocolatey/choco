@@ -17,18 +17,29 @@ namespace chocolatey.infrastructure.powershell
 {
     using System;
     using System.Management.Automation.Host;
+    using adapters;
+    using Console = adapters.Console;
 
     public class PoshHostRawUserInterface : PSHostRawUserInterface
     {
-       public override ConsoleColor BackgroundColor
+        private static readonly Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
+        private static IConsole Console { get { return _console.Value; } }
+
+        public override ConsoleColor BackgroundColor
         {
-            get { return Console.BackgroundColor; }
+            get { return Console.BackgroundColor; } 
             set { Console.BackgroundColor = value; }
+        }
+
+        public override ConsoleColor ForegroundColor
+        {
+            get { return Console.ForegroundColor; } 
+            set { Console.ForegroundColor = value; }
         }
 
         public override Size BufferSize
         {
-            get { return new Size(Console.BufferWidth, Console.BufferHeight); }
+            get { return new Size(Console.BufferWidth, Console.BufferHeight); } 
             set { Console.SetBufferSize(value.Width, value.Height); }
         }
 
@@ -36,14 +47,8 @@ namespace chocolatey.infrastructure.powershell
 
         public override int CursorSize
         {
-            get { return Console.CursorSize; }
+            get { return Console.CursorSize; } 
             set { Console.CursorSize = value; }
-        }
-
-        public override ConsoleColor ForegroundColor
-        {
-            get { return Console.ForegroundColor; }
-            set { Console.ForegroundColor = value; }
         }
 
         public override bool KeyAvailable
@@ -61,21 +66,19 @@ namespace chocolatey.infrastructure.powershell
             get { return new Size(Console.LargestWindowWidth, Console.LargestWindowHeight); }
         }
 
-        public override Coordinates WindowPosition
-        {
-            get { return new Coordinates(Console.WindowLeft, Console.WindowTop); }
-            set { Console.SetWindowPosition(value.X, value.Y); }
-        }
+        public override Coordinates WindowPosition {
+            get { return new Coordinates(Console.WindowLeft, Console.WindowTop); } 
+            set { Console.SetWindowPosition(value.X, value.Y); } }
 
         public override Size WindowSize
         {
-            get { return new Size(Console.WindowWidth, Console.WindowHeight); }
+            get { return new Size(Console.WindowWidth, Console.WindowHeight); } 
             set { Console.SetWindowSize(value.Width, value.Height); }
         }
 
         public override string WindowTitle
         {
-            get { return Console.Title; }
+            get { return Console.Title; } 
             set { Console.Title = value; }
         }
 
