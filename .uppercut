@@ -38,6 +38,7 @@
   <property name="run.fxcop" value="false" overwrite="false" />
   <property name="run.obfuscator" value="false" overwrite="false" />
   <property name="run.ilmerge" value="true" overwrite="false" />
+  <property name="run.codesign" value="true" overwrite="false" />
 
   <!-- EXTERNAL TOOL OVERRIDES -->
   <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
