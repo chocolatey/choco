@@ -30,7 +30,7 @@ $toolsDir   = ""$(Split-Path -parent $MyInvocation.MyCommand.Definition)""
 $url        = '[[Url]]' # download url
 $url64      = '[[Url64]]' # 64bit URL here or remove - if installer is both, use $url
 #$fileLocation = Join-Path $toolsDir 'NAME_OF_EMBEDDED_INSTALLER_FILE'
-#$fileLocation = Join-Path $toolsDir 'SHARE_LOCATION_OF_INSTALLER_FILE'
+#$fileLocation = '\\SHARE_LOCATION\to\INSTALLER_FILE'
 
 $packageArgs = @{
   packageName   = $packageName
