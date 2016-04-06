@@ -51,7 +51,7 @@ Install-ChocolateyShortcut -shortcutFilePath "C:\notepad.lnk" -targetPath "C:\Wi
 
 This will create a new shortcut at the location of "C:\notepad.lnk" and link to the
 Notepad application.  In addition, other properties are being set to specify the working 
-directoy, an icon to be used for the shortcut, along with a description and arguments.
+directory, an icon to be used for the shortcut, along with a description and arguments.
 
 #>
 	param(
@@ -64,6 +64,12 @@ directoy, an icon to be used for the shortcut, along with a description and argu
 	)
 
 	Write-Debug "Running 'Install-ChocolateyShortcut' with parameters ShortcutFilePath: `'$shortcutFilePath`', TargetPath: `'$targetPath`', WorkingDirectory: `'$workingDirectory`', Arguments: `'$arguments`', IconLocation: `'$iconLocation`', Description: `'$description`'";
+
+	# http://powershell.com/cs/blogs/tips/archive/2009/02/05/validating-a-url.aspx
+	function isURIWeb($address) { 
+	  $uri = $address -as [System.URI] 
+	  $uri.AbsoluteURI -ne $null -and $uri.Scheme -match '[http|https]' 
+	} 
 
 	if(!$shortcutFilePath) {
 	  throw "Install-ChocolateyShortcut - `$shortcutFilePath can not be null."
@@ -78,7 +84,7 @@ directoy, an icon to be used for the shortcut, along with a description and argu
 	  throw "Install-ChocolateyShortcut - `$targetPath can not be null."
 	}
 		
-	if(!(Test-Path($targetPath))) {
+	if(!(Test-Path($targetPath)) -and !(IsURIWeb($targetPath))) {
 	  Write-Warning "'$targetPath' does not exist. If it is not created the shortcut will not be valid."
 	}
 	
@@ -117,3 +123,4 @@ directoy, an icon to be used for the shortcut, along with a description and argu
 		Write-Warning "Unable to create shortcut. Error captured was $($_.Exception.Message)."
 	}
 }
+
