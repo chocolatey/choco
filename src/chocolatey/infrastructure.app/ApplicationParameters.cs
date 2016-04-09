@@ -112,6 +112,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string UsePowerShellHost = "powershellHost";
             public static readonly string LogEnvironmentValues = "logEnvironmentValues";
             public static readonly string VirusCheck = "virusCheck";
+            public static readonly string FailOnInvalidOrMissingLicense = "failOnInvalidOrMissingLicense";
         }
 
         public static class Messages

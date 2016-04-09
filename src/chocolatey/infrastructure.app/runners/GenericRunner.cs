@@ -122,8 +122,17 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             this.Log().Debug(()=> "The source '{0}' evaluated to a '{1}' source type".format_with(config.Sources,sourceType.to_string()));
         }
 
+        public void fail_when_license_is_missing_or_invalid_if_requested(ChocolateyConfiguration config)
+        {
+            if (!config.Features.FailOnInvalidOrMissingLicense) return;
+           
+            if (!config.Information.IsLicensedVersion) throw new ApplicationException("License is missing or invalid.");
+        }
+
         public void run(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
         {
+            fail_when_license_is_missing_or_invalid_if_requested(config);
+
             var command = find_command(config, container, isConsole, parseArgs);
             if(command != null)
             {
@@ -134,6 +143,8 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
         public IEnumerable<T> list<T>(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
         {
+            fail_when_license_is_missing_or_invalid_if_requested(config);
+
             var command = find_command(config, container, isConsole, parseArgs) as IListCommand<T>;
             if (command == null)
             {
@@ -152,6 +163,8 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
         public int count(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
         {
+            fail_when_license_is_missing_or_invalid_if_requested(config);
+
             var command = find_command(config, container, isConsole, parseArgs) as IListCommand;
             if (command == null)
             {

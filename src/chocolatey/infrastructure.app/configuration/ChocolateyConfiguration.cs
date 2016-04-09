@@ -340,6 +340,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool UsePowerShellHost { get; set; }
         public bool LogEnvironmentValues { get; set; }
         public bool VirusCheck { get; set; }
+        public bool FailOnInvalidOrMissingLicense { get; set; }
     }
 
     //todo: retrofit other command configs this way
