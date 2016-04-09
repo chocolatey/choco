@@ -199,7 +199,6 @@ namespace chocolatey.infrastructure.app.services
             {
                 var failure = false;
 
-                //todo: this is here for any possible compatibility issues. Should be reviewed and removed.
                 ConfigurationBuilder.set_environment_variables(configuration);
 
                 var package = packageResult.Package;
