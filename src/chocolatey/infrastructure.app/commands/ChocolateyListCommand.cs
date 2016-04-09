@@ -97,8 +97,11 @@ namespace chocolatey.infrastructure.app.commands
                      "DownloadCacheAvailable - Only return packages that have a download cache available - this option will filter out results not from the community repository.",
                      option => configuration.ListCommand.DownloadCacheAvailable = option != null) 
                  .Add("not-broken",
-                     "NotBroken - Only return packages that are not failing testing - this option only filters out failing results from the community feed. It will not filter against other sources. ",
+                     "NotBroken - Only return packages that are not failing testing - this option only filters out failing results from the community feed. It will not filter against other sources.",
                      option => configuration.ListCommand.NotBroken = option != null)
+                  .Add("detail|detailed",
+                     "Detailed - Alias for verbose.",
+                     option => configuration.Verbose = option != null)
                 ;
         }
 

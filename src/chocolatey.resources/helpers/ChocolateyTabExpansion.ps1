@@ -32,15 +32,16 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
       where { $_ -like "$filter*" }
 }
 
-$script:someCommands = @('-?','search','list','install','outdated','upgrade','uninstall','new','pack','push','-h','--help','pin','source','config','feature','apikey')
+$script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','pack','push','-h','--help','pin','source','config','feature','apikey')
 
 $allcommands = " --debug --verbose --force --noop --help --accept-license --confirm --limit-output --execution-timeout= --cache-location='' --fail-on-error-output --use-system-powershell"
 
 $proInstallUpgradeOptions = " --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum="
 
 $commandOptions = @{
-  list = "--lo --pre --exact --by-id-only --id-starts-with --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
-  search = "--pre --exact --by-id-only --id-starts-with --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
+  list = "--lo --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
+  search = "--pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
+  info = "--pre --lo --source='' --user= --password= --local-only --prerelease" + $allcommands
   install = "-y -whatif -? --pre --version= --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user= --password= --prerelease --forcex86 --not-silent --package-parameters='' --allow-downgrade --force-dependencies --skip-automation-scripts --allow-multiple-versions --ignore-checksums" + $allcommands + $proInstallUpgradeOptions
   pin = "--name= --version= -?" + $allcommands
   outdated = "-? --source='' --user= --password=" + $allcommands

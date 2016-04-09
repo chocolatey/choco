@@ -66,7 +66,8 @@ namespace chocolatey.infrastructure.services
                 () =>
                 {
                     var xmlSerializer = new XmlSerializer(typeof(XmlType));
-                    var textWriter = new StreamWriter(xmlUpdateFilePath, append: false, encoding: Encoding.UTF8)
+                    //var textWriter = new StreamWriter(xmlUpdateFilePath, append: false, encoding: new UTF8Encoding(encoderShouldEmitUTF8Identifier: false))
+                    var textWriter = new StreamWriter(xmlUpdateFilePath, append: false, encoding: new UTF8Encoding(encoderShouldEmitUTF8Identifier: true))
                     {
                         AutoFlush = true
                     };

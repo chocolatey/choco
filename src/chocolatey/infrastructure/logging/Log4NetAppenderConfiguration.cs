@@ -23,6 +23,7 @@ namespace chocolatey.infrastructure.logging
     using log4net.Appender;
     using log4net.Config;
     using log4net.Core;
+    using log4net.Filter;
     using log4net.Layout;
     using log4net.Repository;
     using log4net.Repository.Hierarchy;
@@ -30,9 +31,10 @@ namespace chocolatey.infrastructure.logging
 
     public sealed class Log4NetAppenderConfiguration
     {
-        private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof (Log4NetAppenderConfiguration));
+        private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof(Log4NetAppenderConfiguration));
 
         private static bool _alreadyConfiguredFileAppender;
+        private static string _summaryLogAppenderName = "{0}.summary.log.appender".format_with(ApplicationParameters.Name);
 
         /// <summary>
         ///   Pulls xml configuration from embedded location and applies it. 
@@ -76,8 +78,6 @@ namespace chocolatey.infrastructure.logging
                     };
                 layout.ActivateOptions();
 
-                var lockingModel = new FileAppender.MinimalLock();
-
                 var app = new RollingFileAppender
                     {
                         Name = "{0}.changes.log.appender".format_with(ApplicationParameters.Name),
@@ -85,11 +85,26 @@ namespace chocolatey.infrastructure.logging
                         Layout = layout,
                         AppendToFile = true,
                         RollingStyle = RollingFileAppender.RollingMode.Size,
-                        MaxFileSize = 1024*1024,
+                        MaxFileSize = 1024 * 1024,
                         MaxSizeRollBackups = 10,
-                        LockingModel = lockingModel,
+                        LockingModel = new FileAppender.MinimalLock(),
                     };
                 app.ActivateOptions();
+
+                var infoOnlyAppender = new RollingFileAppender
+                {
+                    Name = _summaryLogAppenderName,
+                    File = Path.Combine(Path.GetFullPath(outputDirectory), ApplicationParameters.LoggingSummaryFile),
+                    Layout = layout,
+                    AppendToFile = true,
+                    RollingStyle = RollingFileAppender.RollingMode.Size,
+                    MaxFileSize = 1024 * 1024,
+                    MaxSizeRollBackups = 10,
+                    LockingModel = new FileAppender.MinimalLock(),
+
+                };
+                infoOnlyAppender.AddFilter(new LevelRangeFilter { LevelMin = Level.Info, LevelMax = Level.Fatal });
+                infoOnlyAppender.ActivateOptions();
 
                 ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
                 foreach (ILogger log in logRepository.GetCurrentLoggers())
@@ -98,6 +113,7 @@ namespace chocolatey.infrastructure.logging
                     if (logger != null)
                     {
                         logger.AddAppender(app);
+                        logger.AddAppender(infoOnlyAppender);
                     }
                 }
             }
@@ -128,7 +144,7 @@ namespace chocolatey.infrastructure.logging
                 foreach (var append in logRepository.GetAppenders().Where(a => !a.Name.is_equal_to(excludeLoggerName.to_string())).or_empty_list_if_null())
                 {
                     var appender = append as AppenderSkeleton;
-                    if (appender != null)
+                    if (appender != null && !appender.Name.is_equal_to(_summaryLogAppenderName))
                     {
                         // slightly naive implementation
                         appender.ClearFilters();

@@ -56,7 +56,8 @@ param(
   [alias("installerType")][string] $fileType = 'exe',
   [string] $silentArgs = '',
   [string] $file,
-  $validExitCodes = @(0)
+  $validExitCodes = @(0),
+  [switch] $onlyUsePackageSilentArgs
 )
   Write-Debug "Running 'Install-ChocolateyInstallPackage' for $packageName with file:`'$file`', args: `'$silentArgs`', fileType: `'$fileType`', validExitCodes: `'$validExitCodes`' ";
   $installMessage = "Installing $packageName..."

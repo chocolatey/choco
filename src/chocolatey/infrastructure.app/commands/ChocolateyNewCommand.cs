@@ -58,6 +58,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("maintainer=",
                      "Maintainer - the name of the maintainer. Can also be passed as the property MaintainerName=somevalue",
                      option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.MaintainerPropertyName, option.remove_surrounding_quotes()))
+                .Add("outputdirectory=",
+                    "OutputDirectory - Specifies the directory for the created Chocolatey package file. If not specified, uses the current directory.",
+                    option => configuration.OutputDirectory = option)
                 ;
             //todo: more built-in templates
         }
@@ -130,6 +133,7 @@ Possible properties to pass:
     choco new bob
     choco new bob -a --version 1.2.0 maintainername=""This guy""
     choco new bob silentargs=""/S"" url=""https://somewhere/out/there.msi""
+    choco new bob --outputdirectory Packages
 
 ");
           

@@ -64,6 +64,5 @@ Update has been deprecated and will be removed/replaced in version
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
-
     }
 }
