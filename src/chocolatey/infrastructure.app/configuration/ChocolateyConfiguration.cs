@@ -185,6 +185,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string Version { get; set; }
         public bool AllVersions { get; set; }
         public bool SkipPackageInstallProvider { get; set; }
+        public string OutputDirectory { get; set; }
 
         // install/update
         /// <summary>
