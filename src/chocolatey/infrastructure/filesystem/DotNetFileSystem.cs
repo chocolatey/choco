@@ -601,7 +601,7 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="filePath">Path to the file name</param>
         /// <returns>A best guess at the encoding of the file</returns>
         /// <remarks>http://www.west-wind.com/WebLog/posts/197245.aspx</remarks>
-        public static Encoding get_file_encoding(string filePath)
+        public Encoding get_file_encoding(string filePath)
         {
             // *** Use Default of Encoding.Default (Ansi CodePage)
             Encoding enc = Encoding.Default;
@@ -612,14 +612,13 @@ namespace chocolatey.infrastructure.filesystem
             file.Read(buffer, 0, 5);
             file.Close();
 
-            if (buffer[0] == 0xef && buffer[1] == 0xbb && buffer[2] == 0xbf)
-                enc = Encoding.UTF8;
-            else if (buffer[0] == 0xfe && buffer[1] == 0xff)
-                enc = Encoding.Unicode;
-            else if (buffer[0] == 0 && buffer[1] == 0 && buffer[2] == 0xfe && buffer[3] == 0xff)
-                enc = Encoding.UTF32;
-            else if (buffer[0] == 0x2b && buffer[1] == 0x2f && buffer[2] == 0x76)
-                enc = Encoding.UTF7;
+            if (buffer[0] == 0xef && buffer[1] == 0xbb && buffer[2] == 0xbf) enc = Encoding.UTF8;
+            else if (buffer[0] == 0xfe && buffer[1] == 0xff) enc = Encoding.Unicode;
+            else if (buffer[0] == 0 && buffer[1] == 0 && buffer[2] == 0xfe && buffer[3] == 0xff) enc = Encoding.UTF32;
+            else if (buffer[0] == 0x2b && buffer[1] == 0x2f && buffer[2] == 0x76) enc = Encoding.UTF7;
+
+            //assume xml is utf8
+            //if (enc == Encoding.Default && get_file_extension(filePath).is_equal_to(".xml")) enc = Encoding.UTF8;
 
             return enc;
         }
