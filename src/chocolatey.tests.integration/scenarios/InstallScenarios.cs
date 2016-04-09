@@ -15,6 +15,7 @@
 
 namespace chocolatey.tests.integration.scenarios
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
@@ -92,13 +93,13 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_contain_a_message_that_it_would_have_run_a_powershell_script()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
-                {
-                    if (message.Contains("chocolateyinstall.ps1")) expectedMessage = true;
-                }
+                MockLogger.contains_message("chocolateyinstall.ps1", LogLevel.Info).ShouldBeTrue();
+            }
 
-                expectedMessage.ShouldBeTrue();
+            [Fact]
+            public void should_not_contain_a_message_that_it_would_have_run_powershell_modification_script()
+            {
+                MockLogger.contains_message("chocolateyBeforeModify.ps1", LogLevel.Info).ShouldBeFalse();
             }
         }
 
@@ -313,6 +314,12 @@ namespace chocolatey.tests.integration.scenarios
             public void should_have_a_version_of_one_dot_zero_dot_zero()
             {
                 packageResult.Version.ShouldEqual("1.0.0");
+            }
+
+            [Fact]
+            public void should_have_executed_chocolateyInstall_script()
+            {
+                MockLogger.contains_message("installpackage v1.0.0 has been installed", LogLevel.Info).ShouldBeTrue();
             }
         }
 

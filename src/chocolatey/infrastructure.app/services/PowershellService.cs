@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Management.Automation;
@@ -59,7 +60,7 @@ namespace chocolatey.infrastructure.app.services
             _customImports = customImports;
         }
 
-        public void noop_action(PackageResult packageResult, CommandNameType command)
+        private string get_script_for_action(PackageResult packageResult, CommandNameType command)
         {
             var file = "chocolateyInstall.ps1";
             switch (command)
@@ -67,15 +68,28 @@ namespace chocolatey.infrastructure.app.services
                 case CommandNameType.uninstall:
                     file = "chocolateyUninstall.ps1";
                     break;
+
+                case CommandNameType.upgrade:
+                    file = "chocolateyBeforeModify.ps1";
+                    break;
             }
 
             var packageDirectory = packageResult.InstallLocation;
             var installScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories).Where(p => !p.to_lower().contains("\\templates\\"));
             if (installScript.Count() != 0)
             {
-                var chocoInstall = installScript.FirstOrDefault();
+                return installScript.FirstOrDefault();
+            }
 
-                this.Log().Info("Would have run '{0}':".format_with(chocoInstall));
+            return string.Empty;
+        }
+
+        public void noop_action(PackageResult packageResult, CommandNameType command)
+        {
+            var chocoInstall = get_script_for_action(packageResult, command);
+            if (!string.IsNullOrEmpty(chocoInstall))
+            {
+                this.Log().Info("Would have run '{0}':".format_with(_fileSystem.get_file_name(chocoInstall)));
                 this.Log().Warn(_fileSystem.read_file(chocoInstall).escape_curly_braces());
             }
         }
@@ -100,6 +114,16 @@ namespace chocolatey.infrastructure.app.services
             return run_action(configuration, packageResult, CommandNameType.uninstall);
         }
 
+        public void before_modify_noop(PackageResult packageResult)
+        {
+            noop_action(packageResult, CommandNameType.upgrade);
+        }
+
+        public bool before_modify(ChocolateyConfiguration configuration, PackageResult packageResult)
+        {
+            return run_action(configuration, packageResult, CommandNameType.upgrade);
+        }
+
         private string get_helpers_folder()
         {
             return _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "helpers");
@@ -109,6 +133,7 @@ namespace chocolatey.infrastructure.app.services
         {
             var installerModule = _fileSystem.combine_paths(get_helpers_folder(), "chocolateyInstaller.psm1");
             var scriptRunner = _fileSystem.combine_paths(get_helpers_folder(), "chocolateyScriptRunner.ps1");
+            
             // removed setting all errors to terminating. Will cause too
             // many issues in existing packages, including upgrading
             // Chocolatey from older POSH client due to log errors
@@ -169,14 +194,11 @@ namespace chocolatey.infrastructure.app.services
                 return installerRun;
             }
 
-            var powershellScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories).Where(p => !p.to_lower().contains("\\templates\\"));
-            if (powershellScript.Count() != 0)
+            var chocoPowerShellScript = get_script_for_action(packageResult, command);
+            if (!string.IsNullOrEmpty(chocoPowerShellScript))
             {
-                var chocoPowerShellScript = powershellScript.FirstOrDefault();
-
                 var failure = false;
 
-                //todo: this is here for any possible compatibility issues. Should be reviewed and removed.
                 ConfigurationBuilder.set_environment_variables(configuration);
 
                 var package = packageResult.Package;
@@ -260,7 +282,7 @@ namespace chocolatey.infrastructure.app.services
                     if (selection.is_equal_to("no"))
                     {
                         Environment.ExitCode = 1;
-                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, "User cancelled powershell portion of installation for '{0}'.{1} Specify -n to skip automated script actions.".format_with(powershellScript.FirstOrDefault(), Environment.NewLine)));
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, "User cancelled powershell portion of installation for '{0}'.{1} Specify -n to skip automated script actions.".format_with(chocoPowerShellScript, Environment.NewLine)));
                     }
                 }
 
@@ -316,7 +338,7 @@ namespace chocolatey.infrastructure.app.services
                     if (failure)
                     {
                         Environment.ExitCode = result.ExitCode;
-                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Error while running '{0}'.{1} See log for details.".format_with(powershellScript.FirstOrDefault(), Environment.NewLine)));
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Error while running '{0}'.{1} See log for details.".format_with(chocoPowerShellScript, Environment.NewLine)));
                     }
                     packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Ran '{0}'".format_with(chocoPowerShellScript)));
                 }
