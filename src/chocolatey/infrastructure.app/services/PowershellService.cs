@@ -75,8 +75,13 @@ namespace chocolatey.infrastructure.app.services
             }
 
             var packageDirectory = packageResult.InstallLocation;
-            var installScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories).FirstOrDefault();
-            return installScript;
+            var installScript = _fileSystem.get_files(packageDirectory, file, SearchOption.AllDirectories).Where(p => !p.to_lower().contains("\\templates\\"));
+            if (installScript.Count() != 0)
+            {
+                return installScript.FirstOrDefault();
+            }
+
+            return string.Empty;
         }
 
         public void noop_action(PackageResult packageResult, CommandNameType command)
@@ -126,10 +131,9 @@ namespace chocolatey.infrastructure.app.services
 
         public string wrap_script_with_module(string script, ChocolateyConfiguration config)
         {
-            var installerModules = _fileSystem.get_files(ApplicationParameters.InstallLocation, "chocolateyInstaller.psm1", SearchOption.AllDirectories);
-            var installerModule = installerModules.FirstOrDefault();
-            var scriptRunners = _fileSystem.get_files(ApplicationParameters.InstallLocation, "chocolateyScriptRunner.ps1", SearchOption.AllDirectories);
-            var scriptRunner = scriptRunners.FirstOrDefault();
+            var installerModule = _fileSystem.combine_paths(get_helpers_folder(), "chocolateyInstaller.psm1");
+            var scriptRunner = _fileSystem.combine_paths(get_helpers_folder(), "chocolateyScriptRunner.ps1");
+            
             // removed setting all errors to terminating. Will cause too
             // many issues in existing packages, including upgrading
             // Chocolatey from older POSH client due to log errors
