@@ -110,7 +110,7 @@ C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\signtool.exe sign /t htt
 $certPfx = "$env:CHOCOLATEY_OFFICIAL_CERT"
 $certPassword = Get-Content "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
 $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPfx, $certPassword)
-Set-AuthenticodeSignature -Filepath @("C:\ProgramData\chocolatey\helpers\chocolateyInstaller.psm1","C:\ProgramData\chocolatey\helpers\chocolateyProfile.psm1") -Cert $cert -TimeStampServer "http://timestamp.digicert.com" -IncludeChain All -HashAlgorithm SHA256
+Set-AuthenticodeSignature -Filepath @("C:\ProgramData\chocolatey\helpers\chocolateyInstaller.psm1","C:\ProgramData\chocolatey\helpers\chocolateyProfile.psm1") -Cert $cert -TimeStampServer "http://timestamp.digicert.com" -IncludeChain NotRoot -HashAlgorithm SHA256
 -->
 
   <target name="sign_powershell_files" description="Signs the final PowerShell files prior to packaging them up." if="${file::exists(app.powershell) and property::exists('path.code.cert')}">
