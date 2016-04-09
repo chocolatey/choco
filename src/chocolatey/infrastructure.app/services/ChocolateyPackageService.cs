@@ -551,7 +551,7 @@ Would have determined packages that are out of date based on what is
 
             get_environment_before(config, allowLogging: true);
 
-            var beforeUpgradeAction = new Action<PackageResult>( packageResult => before_package_upgrade(packageResult, config));
+            var beforeUpgradeAction = new Action<PackageResult>(packageResult => before_package_upgrade(packageResult, config));
 
             var packageUpgrades = perform_source_runner_function(config, r => r.upgrade_run(config, action, beforeUpgradeAction));
 
