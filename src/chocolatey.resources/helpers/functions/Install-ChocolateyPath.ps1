@@ -26,7 +26,7 @@ param(
   if (!$envPath.ToLower().Contains($pathToInstall.ToLower()))
   {
     Write-Host "PATH environment variable does not have $pathToInstall in it. Adding..."
-    $actualPath = Get-EnvironmentVariable -Name 'Path' -Scope $pathType
+    $actualPath = Get-EnvironmentVariable -Name 'Path' -Scope $pathType -PreserveVariables $True
 
     $statementTerminator = ";"
     #does the path end in ';'?
