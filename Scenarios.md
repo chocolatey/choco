@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 35 Scenario(s), 289 Observation(s) ]
+### ChocolateyInstallCommand [ 35 Scenario(s), 291 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -140,6 +140,7 @@
  * should have a graphical shim that is set for gui access
  * should have a successful package result
  * should have a version of one dot zero dot zero
+ * should have executed chocolateyInstall script
  * should install the expected version of the package
  * should install the package in the lib directory
  * should install where install location reports
@@ -366,6 +367,7 @@
 
  * should contain a message that it would have run a powershell script
  * should contain a message that it would have used Nuget to install a package
+ * should not contain a message that it would have run powershell modification script
  * should not install a package in the lib directory
 
 #### when noop installing a package that does not exist
@@ -499,7 +501,7 @@
 
  * should contain success message
 
-### ChocolateyUninstallCommand [ 13 Scenario(s), 90 Observation(s) ]
+### ChocolateyUninstallCommand [ 13 Scenario(s), 93 Observation(s) ]
 
 #### when force uninstalling a package
 
@@ -530,6 +532,7 @@
 #### when noop uninstalling a package
 
  * should contain a message that it would have run a powershell script
+ * should contain a message that it would have run powershell modification script
  * should contain a message that it would have uninstalled a package
  * should not uninstall a package from the lib directory
 
@@ -546,6 +549,8 @@
  * should delete any files created during the install
  * should delete the rollback
  * should have a successful package result
+ * should have executed chocolateyBeforeModify script
+ * should have executed chocolateyUninstall script
  * should not have inconclusive package result
  * should not have warning package result
  * should remove the package from the lib directory
@@ -630,7 +635,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 29 Scenario(s), 221 Observation(s) ]
+### ChocolateyUpgradeCommand [ 29 Scenario(s), 226 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -929,7 +934,12 @@
  * should contain newer version in directory
  * should delete the rollback
  * should have a successful package result
+ * should have executed chocolateyBeforeModify before chocolateyInstall
+ * should have executed chocolateyBeforeModify script for original package
+ * should have executed chocolateyInstall script for new package
  * should match the upgrade version of one dot one dot zero
+ * should not have executed chocolateyBeforeModify script for new package
+ * should not have executed chocolateyUninstall script for original package
  * should not have inconclusive package result
  * should not have warning package result
  * should upgrade a package in the lib directory
