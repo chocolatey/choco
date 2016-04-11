@@ -167,14 +167,6 @@ namespace chocolatey.infrastructure.app.services
         {
             var installerRun = false;
 
-            var file = "chocolateyInstall.ps1";
-            switch (command)
-            {
-                case CommandNameType.uninstall:
-                    file = "chocolateyUninstall.ps1";
-                    break;
-            }
-
             var packageDirectory = packageResult.InstallLocation;
             if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
             {
@@ -213,6 +205,7 @@ namespace chocolatey.infrastructure.app.services
                 Environment.SetEnvironmentVariable("chocolateyInstallArguments", configuration.InstallArguments);
                 Environment.SetEnvironmentVariable("packageParameters", configuration.PackageParameters);
                 Environment.SetEnvironmentVariable("chocolateyPackageParameters", configuration.PackageParameters);
+
                 if (configuration.ForceX86)
                 {
                     Environment.SetEnvironmentVariable("chocolateyForceX86", "true");
