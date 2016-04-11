@@ -487,15 +487,18 @@ function Get-FileEncoding($Path) {
 }
 
 function Add-ChocolateyProfile {
+  Write-Debug "Add-ChocolateyProfile"
   try {
     $profileFile = "$profile"
     $profileDirectory = (Split-Path -Parent $profileFile)
 
     if (!(Test-Path($profileDirectory))) {
+      Write-Debug "Creating '$profileDirectory'"
       New-Item "$profileDirectory" -Type Directory -Force -ErrorAction SilentlyContinue | Out-Null
     }
 
     if (!(Test-Path($profileFile))) {
+      Write-Debug "Creating '$profileFile'"
       "" | Out-File $profileFile -Encoding UTF8
 
     }
@@ -547,8 +550,9 @@ param(
   # we can't take advantage of any chocolatey module functions, because they
   # haven't been unpacked because they require .NET Framework 4.0
 
-  Write-Debug "Install-DotNet4IfMissing"
-  if ([IntPtr]::Size -eq 8) {$fx="framework64"} else {$fx="framework"}
+  Write-Debug "Install-DotNet4IfMissing called with `$forceFxInstall=$forceFxInstall"
+  $NetFxArch = "Framework"
+  if ([IntPtr]::Size -eq 8) {$NetFxArch="Framework64" }
 
   $NetFx4ClientUrl = 'http://download.microsoft.com/download/5/6/2/562A10F9-C9F4-4313-A044-9C94E0A8FAC8/dotNetFx40_Client_x86_x64.exe'
   $NetFx4FullUrl = 'http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe'
@@ -557,7 +561,8 @@ param(
   $NetFx4InstallerFile = 'dotNetFx40_Full_x86_x64.exe'
   $NetFx4Installer = Join-Path $NetFx4Path $NetFx4InstallerFile
 
-  if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319") -or $forceFxInstall) {
+  if ((!(Test-Path "$env:SystemRoot\Microsoft.Net\$NetFxArch\v4.0.30319") -and !(Test-Path "C:\Windows\Microsoft.Net\$NetFxArch\v4.0.30319")) -or $forceFxInstall) {
+    Write-Output "'$env:SystemRoot\Microsoft.Net\$NetFxArch\v4.0.30319' was not found or this is forced"
     if (!(Test-Path $NetFx4Path)) {
       Write-Output "Creating folder `'$NetFx4Path`'"
       $null = New-Item -Path "$NetFx4Path" -ItemType Directory
@@ -582,11 +587,11 @@ param(
     $s = [System.Diagnostics.Process]::Start($psi);
     $s.WaitForExit();
     if ($s.ExitCode -ne 0 -and $s.ExitCode -ne 3010) {
-      if ($netFx4InstallTries -eq 2) {
+      if ($netFx4InstallTries -ge 2) {
         Write-ChocolateyError ".NET Framework install failed with exit code `'$($s.ExitCode)`'. `n This will cause the rest of the install to fail."
         throw "Error installing .NET Framework 4.0 (exit code $($s.ExitCode)). `n Please install the .NET Framework 4.0 manually and then try to install Chocolatey again. `n Download at `'$NetFx4Url`'"
       } else {
-        Write-ChocolateyWarning "First try of .NET framework install failed with exit code `'$($s.ExitCode)`'. Trying again."
+        Write-ChocolateyWarning "Try #$netFx4InstallTries of .NET framework install failed with exit code `'$($s.ExitCode)`'. Trying again."
         Install-DotNet4IfMissing $true
       }
     }
