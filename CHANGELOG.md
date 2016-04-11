@@ -8,7 +8,7 @@ Here's one you probably never knew existed - extensions. Chocolatey has had the 
 
 We redesigned our `choco new` default packaging template and we've made managing templates as easy as managing packages.
 
-`choco search`/`choco list` got so many enhancements, you may not need to visit dot org again. [See it in action](https://github.com/chocolatey/choco/wiki/CommandsList#see-it-in-action).
+`choco search`/`choco list` has so many enhancements, you may not need to visit dot org again. [See it in action](https://github.com/chocolatey/choco/wiki/CommandsList#see-it-in-action).
 * [search -v provides moderation related information and a world of nuspec information](https://github.com/chocolatey/choco/issues/493)
 * [search by id only](https://github.com/chocolatey/choco/issues/663)
 * [search by id exact](https://github.com/chocolatey/choco/issues/453)
