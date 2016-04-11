@@ -254,8 +254,12 @@ namespace chocolatey.infrastructure.app.services
 
             this.Log().Info(() => "Attempting to build package from '{0}'.".format_with(_fileSystem.get_file_name(nuspecFilePath)));
 
-            //IPackage package =
-            NugetPack.BuildPackage(builder, _fileSystem, outputPath);
+            IPackage package = NugetPack.BuildPackage(builder, _fileSystem, outputPath);
+            // package.Validate().Any(v => v.Level == PackageIssueLevel.Error)
+            if (package == null)
+            {
+                throw new ApplicationException("Unable to create nupkg. See the log for error details.");
+            }
             //todo: v1 analyze package
             //if (package != null)
             //{
