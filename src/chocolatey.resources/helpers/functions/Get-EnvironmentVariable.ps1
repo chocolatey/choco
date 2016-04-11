@@ -51,7 +51,7 @@ param(
     [string] $USER_ENVIRONMENT_REGISTRY_KEY_NAME = "Environment";
     [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($USER_ENVIRONMENT_REGISTRY_KEY_NAME)
   } elseif ($Scope -eq [System.EnvironmentVariableTarget]::Process) {
-    [Environment]::GetEnvironmentVariable($Name, $Scope)
+    return [Environment]::GetEnvironmentVariable($Name, $Scope)
   }
 
   [Microsoft.Win32.RegistryValueOptions] $registryValueOptions = [Microsoft.Win32.RegistryValueOptions]::None
@@ -64,7 +64,7 @@ param(
   [string] $environmentVariableValue = [string]::Empty
 
   try {
-    Write-Verbose "Getting environment variable $Name"
+    #Write-Verbose "Getting environment variable $Name"
     $environmentVariableValue = $win32RegistryKey.GetValue($Name, [string]::Empty, $registryValueOptions)
   } catch {
     Write-Debug "Unable to retrieve the $Name environment variable. Details: $_"
