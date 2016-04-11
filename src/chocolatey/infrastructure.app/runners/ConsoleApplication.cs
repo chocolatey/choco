@@ -60,13 +60,16 @@ namespace chocolatey.infrastructure.app.runners
 
                             command.handle_additional_argument_parsing(unparsedArgs, config);
 
-                            // all options / switches should be parsed, 
-                            //  so show help menu if there are any left
-                            foreach (var unparsedArg in unparsedArgs.or_empty_list_if_null())
+                            if (!config.Features.IgnoreInvalidOptionsSwitches)
                             {
-                                if (unparsedArg.StartsWith("-") || unparsedArg.StartsWith("/"))
+                                // all options / switches should be parsed, 
+                                //  so show help menu if there are any left
+                                foreach (var unparsedArg in unparsedArgs.or_empty_list_if_null())
                                 {
-                                    config.HelpRequested = true;
+                                    if (unparsedArg.StartsWith("-") || unparsedArg.StartsWith("/"))
+                                    {
+                                        config.HelpRequested = true;
+                                    }
                                 }
                             }
                         },
