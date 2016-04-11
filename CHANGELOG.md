@@ -38,6 +38,7 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
 
  * Alternative Sources - see [#14](https://github.com/chocolatey/choco/issues/14)
  * [POSH Host] Use Internal PowerShell Host - see [#8](https://github.com/chocolatey/choco/issues/8)
+ * Run a script before uninstall/upgrade (chocolateyBeforeModify.ps1) to allow for things like services to shutdown - see [#268](https://github.com/chocolatey/choco/issues/268)
  * Manage package templates with a specially named package and special package folder - see [#542](https://github.com/chocolatey/choco/issues/542)
  * Support for custom headers - see [#332](https://github.com/chocolatey/choco/issues/332)
  * [Security] Show moderation-related information in search results - see [#493](https://github.com/chocolatey/choco/issues/493)
@@ -46,6 +47,7 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * RefreshEnv (Refresh Environment Variables) Should also work in PowerShell - see [#664](https://github.com/chocolatey/choco/issues/664)
  * Provide PowerShell tab completion for Chocolatey - see [#412](https://github.com/chocolatey/choco/issues/412)
  * [Security] Sign the powershell scripts and assemblies - see [#501](https://github.com/chocolatey/choco/issues/501)
+ * Add a `choco info` command to show info for one package - see [#644](https://github.com/chocolatey/choco/issues/644)
 
 ### BUG FIXES
 
@@ -83,6 +85,10 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Fix - Notice for Get-BinRoot deprecation won't be displayed - see [#673](https://github.com/chocolatey/choco/issues/673)
  * Fix - choco new creates a bad ChocolateyUninstall.ps1 script which does not work.  - see [#460](https://github.com/chocolatey/choco/issues/460)
  * Fix - ShimGen fails when file metadata has strings that need literals - see [#677](https://github.com/chocolatey/choco/issues/677)
+ * Fix - Install-ChocolateyPath Expands Variables in PATH, Overwriting Preexisting Variables - see [#303](https://github.com/chocolatey/choco/issues/303)
+ * Fix - Install-ChocolateyShortcut gives invalid warning when target is a web url - see [#592](https://github.com/chocolatey/choco/issues/592)
+ * Fix - Argument Parsing failures should be reported as warnings and not debug messages - see [#571](https://github.com/chocolatey/choco/issues/571)
+ * Fix - choco pack returns zero exit code when Nuget.Core validation errors - see [#469](https://github.com/chocolatey/choco/issues/469)
 
 ### IMPROVEMENTS
 
@@ -108,15 +114,20 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Show a prompt character when asking a multiple choice question - see [#184](https://github.com/chocolatey/choco/issues/184)
  * When prompting for a user yes/no answer, use a short [y/n] representation - see [#181](https://github.com/chocolatey/choco/issues/181)
  * Default package template should include LICENSE.txt and VERIFICATION.txt for packages with binaries - see [#675](https://github.com/chocolatey/choco/issues/675)
+ * choco list/search aliases for -v - '-detail' and '-detailed' - see [#646](https://github.com/chocolatey/choco/issues/646)
+ * Log normal output to a secondary log - see [#682](https://github.com/chocolatey/choco/issues/682)
  * Pro - Also check for license in User Profile location - see [#606](https://github.com/chocolatey/choco/issues/606)
  * Pro - Set download cache information if available - see [#562](https://github.com/chocolatey/choco/issues/562)
  * Pro - Allow commands to be added - see [#583](https://github.com/chocolatey/choco/issues/583)
  * Pro - Load/Provide hooks for licensed version - see [#584](https://github.com/chocolatey/choco/issues/584)
  * Pro - On valid license, add pro/business source automatically - see [#604](https://github.com/chocolatey/choco/issues/604)
+ * Pro - Add switch to fail on invalid or missing license - see [#596](https://github.com/chocolatey/choco/issues/596)
+ * Pro - add ignore invalid switches/parameters - see [#586](https://github.com/chocolatey/choco/issues/586)
  * API - Add the ability to retrieve package count for a Source - see [#431](https://github.com/chocolatey/choco/issues/431)
  * API - Chocolatey Lib still marks vital package information as internal - see [#433](https://github.com/chocolatey/choco/issues/433)
  * API - Add paging to list command - see [#427](https://github.com/chocolatey/choco/issues/427)
  * API - Choco search should sort by version - see [#668](https://github.com/chocolatey/choco/issues/668)
+ * API - Switch dll to .NET Client Profile - see [#680](https://github.com/chocolatey/choco/issues/680)
 
 ## [0.9.9.12](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.12+is%3Aclosed) (March 18, 2016)
 

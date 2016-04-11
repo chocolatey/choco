@@ -57,14 +57,25 @@ See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
 
 ## 0.9.10
 
+The "I got 99 problems, but a package manager ain't one" release. With the release of 0.9.10 (or if you prefer 0.9.10.0), we're about to make everything 100% better in your Windows package management world. We've addressed over 100 features and bugs in this release. We looked at how we could improve PowerShell and we've come out with a [competely internal host](https://github.com/chocolatey/choco/issues/8) that can Prompt and Read-Host in a way that times out and selects default values after a period of time. Speaking of PowerShell, how about some tab completion `choco &lt;tab&gt;` to `choco install node&lt;tab&gt;`? How about never having to [close and reopen your shell again](https://github.com/chocolatey/choco/issues/664)?
+
+Alternative sources (`-source webpi`, `-s windowsfeature`, etc) are back! I mean, am I right?! Have you heard of auto uninstaller? If Chocolatey has installed something that works with Programs and Features, Chocolatey knows how to uninstall it without an uninstall script about 90+% of the time. This feature was in beta for the 0.9.9 series, it is on by default in 0.9.10 (unless you disabled it after trying it, you will need to reenable it, see `choco feature` for more details).
+
+Here's one you probably never knew existed - extensions. Chocolatey has had the ability to extend itself by adding PowerShell modules for years, and most folks either didn't know it existed or have never used them. We've enhanced them a bit in preparation for the licensed version of Chocolatey.
+
+We redesigned our `choco new` default packaging template and we've made managing templates as easy as managing packages.
+
+`choco search`/`choco list` got so many enhancements, you may not need to visit dot org again. [See it in action](https://github.com/chocolatey/choco/wiki/CommandsList#see-it-in-action).
+* [search -v provides moderation related information and a world of nuspec information](https://github.com/chocolatey/choco/issues/493)
+* [search by id only](https://github.com/chocolatey/choco/issues/663)
+* [search by id exact](https://github.com/chocolatey/choco/issues/453)
+* [search by approved only, not broken, and/or by download cache](https://github.com/chocolatey/choco/issues/670)
+* [sort by version](https://github.com/chocolatey/choco/issues/668)
+* [search with paging](https://github.com/chocolatey/choco/issues/427)
+
 What will be highlighted:
 
-* Alternative sources (webpi, windowsfeature, cygwin, etc) are back (finally, right?)!
-* Use an internal PowerShell host to take advantage of quite a few improvements!
 * Introduce managing package templates, reintroduce extensions.
-* Talk about using original download file name
-* Talk about the improvements in search information
-* Talk about tab completion and refreshenv!
 * Talk a little about what's coming with pro
 
 ### BREAKING CHANGES
@@ -84,8 +95,8 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
 
  * Alternative Sources - see [#14](https://github.com/chocolatey/choco/issues/14)
  * [POSH Host] Use Internal PowerShell Host - see [#8](https://github.com/chocolatey/choco/issues/8)
+ * Run a script before uninstall/upgrade (chocolateyBeforeModify.ps1) to allow for things like services to shutdown - see [#268](https://github.com/chocolatey/choco/issues/268)
  * Manage package templates with a specially named package and special package folder - see [#542](https://github.com/chocolatey/choco/issues/542)
- * Use the actual download file name instead of providing one - see [#435](https://github.com/chocolatey/choco/issues/435)
  * Support for custom headers - see [#332](https://github.com/chocolatey/choco/issues/332)
  * [Security] Show moderation-related information in search results - see [#493](https://github.com/chocolatey/choco/issues/493)
  * New Helper - Get-ToolsLocation helper (replacement for Get-BinRoot) - see [#631](https://github.com/chocolatey/choco/issues/631)
@@ -93,6 +104,7 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * RefreshEnv (Refresh Environment Variables) Should also work in PowerShell - see [#664](https://github.com/chocolatey/choco/issues/664)
  * Provide PowerShell tab completion for Chocolatey - see [#412](https://github.com/chocolatey/choco/issues/412)
  * [Security] Sign the powershell scripts and assemblies - see [#501](https://github.com/chocolatey/choco/issues/501)
+ * Add a `choco info` command to show info for one package - see [#644](https://github.com/chocolatey/choco/issues/644)
 
 ### BUG FIXES
 
@@ -127,14 +139,18 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Fix - ShimGen handling of spaces and arguments that have shimgen in them - see [#647](https://github.com/chocolatey/choco/issues/647)
  * Fix - PowerShell v2 - Choco installer messages can't actually be warnings (causes FileStream errors) - see [#666](https://github.com/chocolatey/choco/issues/666)
  * Fix - Installing chocolatey removes $env:PSModulePath changes for current PowerShell session - see [#295](https://github.com/chocolatey/choco/issues/295)
- * Fix: PowerShell v2 - Choco installer messages can't actually be warnings (can cause FileStream errors) - see [#666](https://github.com/chocolatey/choco/issues/666)
  * Fix - Notice for Get-BinRoot deprecation won't be displayed - see [#673](https://github.com/chocolatey/choco/issues/673)
  * Fix - choco new creates a bad ChocolateyUninstall.ps1 script which does not work.  - see [#460](https://github.com/chocolatey/choco/issues/460)
  * Fix - ShimGen fails when file metadata has strings that need literals - see [#677](https://github.com/chocolatey/choco/issues/677)
+ * Fix - Install-ChocolateyPath Expands Variables in PATH, Overwriting Preexisting Variables - see [#303](https://github.com/chocolatey/choco/issues/303)
+ * Fix - Install-ChocolateyShortcut gives invalid warning when target is a web url - see [#592](https://github.com/chocolatey/choco/issues/592)
+ * Fix - Argument Parsing failures should be reported as warnings and not debug messages - see [#571](https://github.com/chocolatey/choco/issues/571)
+ * Fix - choco pack returns zero exit code when Nuget.Core validation errors - see [#469](https://github.com/chocolatey/choco/issues/469)
 
 ### IMPROVEMENTS
 
  * AutoUninstaller is on by default - see [#308](https://github.com/chocolatey/choco/issues/308)
+ * Use the actual download file name instead of providing one - see [#435](https://github.com/chocolatey/choco/issues/435)
  * Unset Configuration Values - see [#551](https://github.com/chocolatey/choco/issues/551)
  * Ability to run "choco upgrade all" ignoring specific packages - see [#293](https://github.com/chocolatey/choco/issues/293)
  * Extensions enhancements - see [#588](https://github.com/chocolatey/choco/issues/588)
@@ -155,15 +171,20 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Show a prompt character when asking a multiple choice question - see [#184](https://github.com/chocolatey/choco/issues/184)
  * When prompting for a user yes/no answer, use a short [y/n] representation - see [#181](https://github.com/chocolatey/choco/issues/181)
  * Default package template should include LICENSE.txt and VERIFICATION.txt for packages with binaries - see [#675](https://github.com/chocolatey/choco/issues/675)
+ * choco list/search aliases for -v - '-detail' and '-detailed' - see [#646](https://github.com/chocolatey/choco/issues/646)
+ * Log normal output to a secondary log - see [#682](https://github.com/chocolatey/choco/issues/682)
  * Pro - Also check for license in User Profile location - see [#606](https://github.com/chocolatey/choco/issues/606)
  * Pro - Set download cache information if available - see [#562](https://github.com/chocolatey/choco/issues/562)
  * Pro - Allow commands to be added - see [#583](https://github.com/chocolatey/choco/issues/583)
  * Pro - Load/Provide hooks for licensed version - see [#584](https://github.com/chocolatey/choco/issues/584)
  * Pro - On valid license, add pro/business source automatically - see [#604](https://github.com/chocolatey/choco/issues/604)
+ * Pro - Add switch to fail on invalid or missing license - see [#596](https://github.com/chocolatey/choco/issues/596)
+ * Pro - add ignore invalid switches/parameters - see [#586](https://github.com/chocolatey/choco/issues/586)
  * API - Add the ability to retrieve package count for a Source - see [#431](https://github.com/chocolatey/choco/issues/431)
  * API - Chocolatey Lib still marks vital package information as internal - see [#433](https://github.com/chocolatey/choco/issues/433)
  * API - Add paging to list command - see [#427](https://github.com/chocolatey/choco/issues/427)
  * API - Choco search should sort by version - see [#668](https://github.com/chocolatey/choco/issues/668)
+ * API - Switch dll to .NET Client Profile - see [#680](https://github.com/chocolatey/choco/issues/680)
     </releaseNotes>
   </metadata>
 </package>
