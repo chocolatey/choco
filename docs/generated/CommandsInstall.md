@@ -1,4 +1,4 @@
-# Chocolatey Install (choco install)
+﻿# Chocolatey Install (choco install)
 ***NOTE***: 100% compatible with older chocolatey client (0.9.8.33 and below) with options and switches. Add `-y` for previous behavior with no prompt or set configuration value `allowGlobalConfirmation` to enabled. In most cases you can still pass options and switches with one dash (`-`). See [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] for more details.
 
 Installs a package or a list of packages (sometimes specified as a

@@ -1,4 +1,4 @@
-# Chocolatey Upgrade (choco upgrade)
+﻿# Chocolatey Upgrade (choco upgrade)
 ***NOTE***: 100% compatible with older chocolatey client (0.9.8.32 and below) with options and switches. Add `-y` for previous behavior with no prompt. In most cases you can still pass options and switches with one dash (`-`). See [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] for more details.
 
 Upgrades an existing package to the latest version, if there is a newer

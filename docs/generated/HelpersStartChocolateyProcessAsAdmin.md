@@ -1,4 +1,4 @@
-# Start-ChocolateyProcessAsAdmin
+﻿# Start-ChocolateyProcessAsAdmin
 
 Runs a process as an administrator. If $exeToRun is not specified, it is run with PowerShell.
 

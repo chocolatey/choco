@@ -1,4 +1,4 @@
-# Install-ChocolateyShortcut
+﻿# Install-ChocolateyShortcut
 
 This adds a shortcut, at the specified location, with the option to specify
 a number of additional properties for the shortcut, such as Working Directory,

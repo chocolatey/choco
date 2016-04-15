@@ -1,4 +1,4 @@
-## Chocolatey Uninstall (choco uninstall)
+﻿## Chocolatey Uninstall (choco uninstall)
 ***NOTE***: 100% compatible with older chocolatey client (0.9.8.32 and below) with options and switches. Add `-y` for previous behavior with no prompt. In most cases you can still pass options and switches with one dash (`-`). See [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] for more details.
 
 Uninstalls a package or a list of packages.  Some

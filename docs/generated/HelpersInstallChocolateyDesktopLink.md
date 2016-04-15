@@ -1,4 +1,4 @@
-# Install-ChocolateyDesktopLink
+﻿# Install-ChocolateyDesktopLink
 
 This adds a shortcut on the desktop to the specified file path.
 

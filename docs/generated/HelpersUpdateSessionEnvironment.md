@@ -1,4 +1,4 @@
-## Update-SessionEnvironment
+﻿## Update-SessionEnvironment
 
 When Chocolatey installs a package, the package author may ad or change
 certain environment variables that will affect how the application runs

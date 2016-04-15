@@ -1,4 +1,4 @@
-## Install-ChocolateyPinnedTaskBarItem
+﻿## Install-ChocolateyPinnedTaskBarItem
 
 Creates an item in the task bar linking to the provided path.
 

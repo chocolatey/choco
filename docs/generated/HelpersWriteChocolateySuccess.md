@@ -1,4 +1,4 @@
-# [DEPRECATED] Write-ChocolateySuccess
+﻿# [DEPRECATED] Write-ChocolateySuccess
 
 Notes a successful Chocolatey install.
 

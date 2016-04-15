@@ -1,4 +1,4 @@
-# Chocolatey Package Functions aka Helpers Reference
+﻿# Chocolatey Package Functions aka Helpers Reference
 
 ## Main Functions
 

@@ -1,4 +1,4 @@
-## Install-ChocolateyFileAssociation
+﻿## Install-ChocolateyFileAssociation
 
 Install-ChocolateyFileAssociation can associate a file extension
 with a downloaded application. Once this command has created an

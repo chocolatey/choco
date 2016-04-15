@@ -1,4 +1,4 @@
-# Chocolatey Pack (choco pack)
+﻿# Chocolatey Pack (choco pack)
 ***NOTE***: 100% compatible with older chocolatey client (0.9.8.32 and below) with options and switches. In most cases you can still pass options and switches with one dash (`-`). See [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] for more details.
 
 Chocolatey will attempt to package a nuspec into a compiled nupkg. Some

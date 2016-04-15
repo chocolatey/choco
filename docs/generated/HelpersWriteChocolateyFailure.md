@@ -1,4 +1,4 @@
-# [DEPRECATED] Write-ChocolateyFailure
+﻿# [DEPRECATED] Write-ChocolateyFailure
 
 Notes an unsuccessful Chocolatey install.
 

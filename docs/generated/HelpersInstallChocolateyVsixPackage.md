@@ -1,4 +1,4 @@
-# Install-ChocolateyVsixPackage
+﻿# Install-ChocolateyVsixPackage
 
 Downloads and installs a VSIX package for Visual Studio. You do not need to surround this with try catch if it is the only thing in your [[chocolateyInstall.ps1|ChocolateyInstallPS1]].
 

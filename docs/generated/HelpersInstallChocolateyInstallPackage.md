@@ -1,4 +1,4 @@
-# Install-ChocolateyInstallPackage
+﻿# Install-ChocolateyInstallPackage
 
 This will run a native installer to perform an install/upgrade on your machine.
 

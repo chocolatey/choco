@@ -1,4 +1,4 @@
-# Chocolatey Upgrade (choco apikey)
+﻿# Chocolatey Upgrade (choco apikey)
 This lists api keys that are a set, or sets an api key, for a particular
  source so it doesn't need to be specified every time.
 
