@@ -1,4 +1,4 @@
-# Install-ChocolateyPath
+﻿# Install-ChocolateyPath
 
 This puts a directory on the PATH environment variable. This is used when the application/tool is not being linked by Chocolatey (not in the lib folder).
 

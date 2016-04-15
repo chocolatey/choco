@@ -1,4 +1,4 @@
-# Chocolatey Config (choco config)
+﻿# Chocolatey Config (choco config)
 ***NOTE***: New in 0.9.9.9.
 
 Chocolatey will allow you to interact with the configuration file settings.

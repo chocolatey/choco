@@ -1,4 +1,4 @@
-# Chocolatey Outdated (choco outdated)
+﻿# Chocolatey Outdated (choco outdated)
 ***NOTE***: New in 0.9.9.6.
 
 Returns a list of outdated packages

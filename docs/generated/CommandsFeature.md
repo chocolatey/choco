@@ -1,4 +1,4 @@
-# Chocolatey Feature (choco feature)
+﻿# Chocolatey Feature (choco feature)
 
 Chocolatey will allow you to interact with features.
 

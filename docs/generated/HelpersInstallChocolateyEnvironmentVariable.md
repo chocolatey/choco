@@ -1,4 +1,4 @@
-## Install-ChocolateyEnvironmentVariable
+﻿## Install-ChocolateyEnvironmentVariable
 
 Install-ChocolateyEnvironmentVariable creates an environment variable
 with the specified name and value. The variable is persistent and

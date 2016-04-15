@@ -1,4 +1,4 @@
-# Get-ChocolateyUnzip
+﻿# Get-ChocolateyUnzip
 
 Unzips a .zip file and returns the location for further processing.
 

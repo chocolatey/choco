@@ -1,4 +1,4 @@
-# Chocolatey New (choco new)
+﻿# Chocolatey New (choco new)
 Chocolatey will generate package specification files for a new package.
 
 ## Usage

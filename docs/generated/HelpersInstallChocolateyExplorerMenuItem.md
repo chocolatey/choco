@@ -1,4 +1,4 @@
-## Install-ChocolateyExplorerMenuItem
+﻿## Install-ChocolateyExplorerMenuItem
 
 Install-ChocolateyExplorerMenuItem can add an entry in the context menu of
 Windows Explorer. The menu item is given a text label and a command. The command

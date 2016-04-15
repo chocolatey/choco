@@ -1,4 +1,4 @@
-# Chocolatey Pin (choco pin)
+﻿# Chocolatey Pin (choco pin)
 Pin a package to suppress upgrades.
 
 ## Usage

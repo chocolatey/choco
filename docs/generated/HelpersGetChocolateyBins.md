@@ -1,4 +1,4 @@
-# Get-ChocolateyBins
+﻿# Get-ChocolateyBins
 
 Creates batch files for all executables in `$packageFolder` in the Chocolatey bin folder (usually C:\ProgramData\Chocolatey\bin)
 
