@@ -117,11 +117,17 @@ namespace chocolatey.infrastructure.app.nuget
             }
 
             //NOTE DO NOT EVER use this method - packageManager.PackageInstalling += (s, e) =>
-
             packageManager.PackageInstalled += (s, e) =>
                 {
                     var pkg = e.Package;
-                    "chocolatey".Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}".format_with(Environment.NewLine, pkg.Id, pkg.Version.to_string(), configuration.Force ? " (forced)" : string.Empty));
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".format_with(
+                        Environment.NewLine, 
+                        pkg.Id, 
+                        pkg.Version.to_string(), 
+                        configuration.Force ? " (forced)" : string.Empty,
+                        pkg.IsApproved ? " [Approved]" : string.Empty,
+                        pkg.PackageTestResultStatus == "Failing" && pkg.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : pkg.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
+                        ));
 
                     if (installSuccessAction != null) installSuccessAction.Invoke(e);
                 };
