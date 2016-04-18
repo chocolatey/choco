@@ -1,11 +1,11 @@
 ﻿# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,35 +15,45 @@
 function UnInstall-ChocolateyZipPackage {
 <#
 .SYNOPSIS
-UnInstalls a previous installed zip package
+Uninstalls a previous installed zip package
 
 .DESCRIPTION
 This will uninstall a zip file if installed via Install-ChocolateyZipPackage
 
+.NOTES
+This helper reduces the number of lines one would have to remove the
+files extracted from a previously installed zip file.
+This method has error handling built into it.
+
+.INPUTS
+None
+
+.OUTPUTS
+None
+
 .PARAMETER PackageName
-The name of the package the zip file is associated with
+The name of the package - while this is an arbitrary value, it's
+recommended that it matches the package id.
 
 .PARAMETER ZipFileName
 This is the zip filename originally installed.
 
 .EXAMPLE
-UnInstall-ChocolateyZipPackage '__NAME__' 'filename.zip' 
+UnInstall-ChocolateyZipPackage '__NAME__' 'filename.zip'
 
-.OUTPUTS
-None
+.LINK
+Install-ChocolateyZipPackage
 
-.NOTES
-This helper reduces the number of lines one would have to remove the files extracted from a previously installed zip file.
-This method has error handling built into it.
+.LINK
+Uninstall-ChocolateyPackage
 
-  
 #>
 param(
-  [string] $packageName, 
+  [string] $packageName,
   [string] $zipFileName
 )
   Write-Debug "Running 'UnInstall-ChocolateyZipPackage' for $packageName $zipFileName "
-  
+
   $packagelibPath=$env:chocolateyPackageFolder
   $zipContentFile=(join-path $packagelibPath $zipFileName) + ".txt"
   if ((Test-Path -path $zipContentFile)) {

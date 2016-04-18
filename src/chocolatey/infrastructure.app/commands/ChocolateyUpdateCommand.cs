@@ -58,7 +58,7 @@ DEPRECATION NOTICE - choco update is deprecated and will be removed or
         {
             this.Log().Info(ChocolateyLoggers.Important, "[DEPRECATED] Update Command");
             this.Log().Info(@"
-Update has been deprecated and will be removed/replaced in version 
+NOTE: Update has been deprecated and will be removed/replaced in version 
  1.0.0 with something that performs the functions of updating package
  indexes.  Please use `choco upgrade` instead.
 ");

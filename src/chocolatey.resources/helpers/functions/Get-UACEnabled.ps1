@@ -1,11 +1,11 @@
 # Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +17,7 @@ function Get-UACEnabled {
   $uacRegValue = "EnableLUA"
   $uacEnabled = $false
 
-  Write-Debug "Running 'Get-UACEnabled'";
-
+  Write-Debug "Running 'Get-UACEnabled'"
 
   # http://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
   $osVersion = [Environment]::OSVersion.Version
@@ -31,7 +30,8 @@ function Get-UACEnabled {
         $uacEnabled = $true
       }
     } catch {
-      #regkey doesn't exist, so proceed with false
+      #regkey doesn't exist, so proceed with false
+
     }
   }
 

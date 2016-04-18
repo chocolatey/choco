@@ -62,7 +62,10 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Outdated Command");
             this.Log().Info(@"
-Returns a list of outdated packages
+Returns a list of outdated packages.
+
+NOTE: Available with 0.9.9.6+.
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
@@ -73,11 +76,17 @@ Returns a list of outdated packages
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
     choco outdated
-    choco outdated -s ""https://somewhere/out/there""
-    choco outdated -s ""https://somewhere/protected"" -u user -p pass
+    choco outdated -s https://somewhere/out/there
+    choco outdated -s ""'https://somewhere/protected'"" -u user -p pass
 
 If you use `--source=https://somewhere/out/there`, it is 
  going to look for outdated packages only based on that source.
+
+");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
+            "chocolatey".Log().Info(@"
+choco outdated: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_outdated.gif
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");

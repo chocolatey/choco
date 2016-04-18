@@ -92,11 +92,15 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Config Command");
             this.Log().Info(@"
 Chocolatey will allow you to interact with the configuration file settings.
+
+NOTE: Available in 0.9.9.9+.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco config [list]|get|set|unset [<options/switches>]
+
+NOTE: `Unset` subcommand available in 0.9.10+.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
@@ -109,6 +113,12 @@ Chocolatey will allow you to interact with the configuration file settings.
     choco config set --name cacheLocation --value c:\temp\choco
     choco config unset proxy
     choco config unset --name proxy
+
+");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
+            "chocolatey".Log().Info(@"
+Config shown in action: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_config.gif
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
