@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,7 +61,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
                      option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
                 .Add("priority=",
-                     "Priority - The priority order of this source as compared to other sources, lower is better. Defaults to 0 (no priority). All priorities above 0 will be evaluated first, then zero-based values will be evaluated in config file order.",
+                     "Priority - The priority order of this source as compared to other sources, lower is better. Defaults to 0 (no priority). All priorities above 0 will be evaluated first, then zero-based values will be evaluated in config file order. Available in 0.9.9.9+.",
                      option => configuration.SourceCommand.Priority = int.Parse(option.remove_surrounding_quotes()))
                 ;
         }
@@ -100,6 +100,12 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Source Command");
             this.Log().Info(@"
 Chocolatey will allow you to interact with sources.
+
+NOTE: Mostly compatible with older chocolatey client (0.9.8.x and
+ below) with options and switches. When enabling, disabling or removing
+ a source, use `-name` in front of the option now. In most cases you
+ can still pass options and switches with one dash (`-`). For more
+ details, see the command reference (`choco -?`).
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
@@ -113,8 +119,8 @@ Chocolatey will allow you to interact with sources.
     choco source
     choco source list
     choco source add -n=bob -s""https://somewhere/out/there/api/v2/""
-    choco source add -n=bob -s""https://somewhere/out/there/api/v2/"" -cert=\Users\bob\bob.pfx
-    choco source add -n=bob -s""https://somewhere/out/there/api/v2/"" -u=bob -p=12345
+    choco source add -n=bob -s""'https://somewhere/out/there/api/v2/'"" -cert=\Users\bob\bob.pfx
+    choco source add -n=bob -s""'https://somewhere/out/there/api/v2/'"" -u=bob -p=12345
     choco source disable -n=bob
     choco source enable -n=bob
     choco source remove -n=bob

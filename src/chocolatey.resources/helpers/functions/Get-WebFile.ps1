@@ -14,14 +14,77 @@
 ## v2   - adds a ton of parsing to make the output pretty
 ##        added measuring the scripts involved in the command, (uses Tokenizer)
 ##############################################################################################################
+## Additional functionality added by Chocolatey Team / Chocolatey Contributors
+##  - Proxy
+##  - Better error handling
+##  - Inline documentation
+##  - Cmdlet conversion
+##  - Closing request/response and cleanup
+##  - Request / ReadWriteResponse Timeouts
+##############################################################################################################
 function Get-WebFile {
+<#
+.SYNOPSIS
+Downloads a file from an HTTP/HTTPS location. Prefer HTTPS when
+available.
+
+.DESCRIPTION
+This will download a file from an HTTP/HTTPS location, saving the file
+to the FileName location specified.
+
+.NOTES
+This is a low-level function and not recommended for use in package
+scripts. It is recommended you call `Get-ChocolateyWebFile` instead.
+
+.INPUTS
+None
+
+.OUTPUTS
+None
+
+.PARAMETER Url
+This is the url to download the file from. Prefer HTTPS when available.
+
+.PARAMETER FileName
+This is the full path to the file to create. If downloading to the
+package folder next to the install script, the path will be like
+`"$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\\file.exe"`
+
+.PARAMETER UserAgent
+The user agent to use as part of the request. Defaults to 'chocolatey
+command line'.
+
+.PARAMETER PassThru
+DO NOT USE - holdover from original function.
+
+.PARAMETER Quiet
+Silences the progress output.
+
+.PARAMETER Options
+OPTIONAL - Specify custom headers. Available in 0.9.10+.
+
+.PARAMETER IgnoredArguments
+Allows splatting with arguments that do not apply. Do not use directly.
+
+.LINK
+Get-ChocolateyWebFile
+
+.LINK
+Get-FtpFile
+
+.LINK
+Get-WebHeaders
+
+.LINK
+Get-WebFileName
+#>
 param(
-  $url = '', #(Read-Host "The URL to download"),
-  $fileName = $null,
-  $userAgent = 'chocolatey command line',
-  [switch]$Passthru,
-  [switch]$quiet,
-  [hashtable] $options = @{Headers=@{}}
+  [parameter(Mandatory=$false, Position=0)][string] $url = '', #(Read-Host "The URL to download"),
+  [parameter(Mandatory=$false, Position=1)][string] $fileName = $null,
+  [parameter(Mandatory=$false, Position=2)][string] $userAgent = 'chocolatey command line',
+  [parameter(Mandatory=$false)][switch] $Passthru,
+  [parameter(Mandatory=$false)][switch] $quiet,
+  [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}}
 )
   Write-Debug "Running 'Get-WebFile' for $fileName with url:`'$url`', userAgent: `'$userAgent`' ";
   #if ($url -eq '' return)
@@ -47,10 +110,10 @@ param(
 	  $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
 	  $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
 	}
-    
+
 	Write-Host "Using explicit proxy server '$explicitProxy'."
     $req.Proxy = $proxy
-  
+
   } elseif (!$webclient.Proxy.IsBypassed($url))
   {
 	# system proxy (pass through)
@@ -101,7 +164,7 @@ param(
     }
   }
 
-  try { 
+  try {
    [System.Net.HttpWebResponse]$res = $req.GetResponse();
 
    try {
@@ -121,7 +184,7 @@ param(
             Set-Content -Path "$fileName.istext" -Value "$fileName has content type $contentType" -Encoding UTF8 -Force
           }
         }
-      } 
+      }
     } catch {
       # not able to get content-type header
       Write-Debug "Error getting content type - $($_.Exception.Message)"
@@ -161,7 +224,7 @@ param(
       [long]$goal = $res.ContentLength
       $goalFormatted = Format-FileSize $goal
       $reader = $res.GetResponseStream()
-    
+
       if ($fileName) {
         $fileDirectory = $([System.IO.Path]::GetDirectoryName($fileName))
         if (!(Test-Path($fileDirectory))) {
@@ -174,7 +237,7 @@ param(
           throw $_.Exception
         }
       }
-    
+
       [byte[]]$buffer = new-object byte[] 1048576
       [long]$total = [long]$count = [long]$iterLoop =0
 
@@ -187,7 +250,7 @@ param(
           if($fileName) {
             $writer.Write($buffer, 0, $count);
           }
-        
+
           if($Passthru){
             $output += $encoding.GetString($buffer,0,$count)
           } elseif(!$quiet) {
@@ -196,7 +259,7 @@ param(
             if($goal -gt 0 -and ++$iterLoop%10 -eq 0) {
               Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete (($total/$goal)*100)
             }
-          
+
             if ($total -eq $goal) {
               Write-Progress "Completed download of $url." "Completed download of $fileName ($goalFormatted)." -id 0 -Completed
             }
@@ -228,7 +291,7 @@ param(
       Start-Sleep 1
       [GC]::Collect()
     }
-    
+
     Set-PowerShellExitCode 404
     throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"
   } finally {

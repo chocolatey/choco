@@ -1,11 +1,11 @@
 # Copyright 2011 - Present RealDimensions Software, LLC
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,14 +13,66 @@
 # limitations under the License.
 #
 # Based on http://stackoverflow.com/a/13571471/18475
+
 function Get-WebFileName {
+<#
+.SYNOPSIS
+Gets the original file name from a url. Used by Get-WebFile to determine
+the original file name for a file.
+
+.DESCRIPTION
+Uses several techniques to determine the original file name of the file
+based on the url for the file.
+
+.NOTES
+Available in 0.9.10+.
+Falls back to DefaultName when the name cannot be determined.
+
+Chocolatey works best when the packages contain the software it is
+managing and doesn't require downloads. However most software in the
+Windows world requires redistribution rights and when sharing packages
+publicly (like on the community feed), maintainers may not have those
+aforementioned rights. Chocolatey understands how to work with that,
+hence this function. You are not subject to this limitation with
+internal packages.
+
+.INPUTS
+None
+
+.OUTPUTS
+None
+
+.PARAMETER Url
+This is the url to a file that will be possibly downloaded.
+
+.PARAMETER DefaultName
+The name of the file to use when not able to determine the file name
+from the url response.
+
+.PARAMETER UserAgent
+The user agent to use as part of the request. Defaults to 'chocolatey
+command line'.
+
+.PARAMETER IgnoredArguments
+Allows splatting with arguments that do not apply. Do not use directly.
+
+.EXAMPLE
+Get-WebFileName -Url $url -DefaultName $originalFileName
+
+.LINK
+Get-WebHeaders
+
+.LINK
+Get-ChocolateyWebFile
+#>
 param(
-  [string]$url = '',
-  [string]$defaultName,
-  $userAgent = 'chocolatey command line'
+  [parameter(Mandatory=$false, Position=0)][string] $url = '',
+  [parameter(Mandatory=$true, Position=1)][string] $defaultName,
+  [parameter(Mandatory=$false)][string]$userAgent = 'chocolatey command line'
 )
 
   Write-Debug "Running 'Get-WebFileName' to determine name with url:'$url', defaultName:'$defaultName'";
+
 
   $originalFileName = $defaultName
   $fileName = $null
@@ -31,7 +83,7 @@ param(
   }
 
   $request = [System.Net.HttpWebRequest]::Create($url)
-  if ($request -eq $null) { 
+  if ($request -eq $null) {
     $request.Close()
     Write-Debug "Request was null, using default name."
     return $originalFileName
@@ -61,7 +113,7 @@ param(
 
     Write-Debug "Using explicit proxy server '$explicitProxy'."
     $request.Proxy = $proxy
-  
+
   } elseif (!$client.Proxy.IsBypassed($url))
   {
     # system proxy (pass through)
@@ -94,7 +146,7 @@ param(
   #http://stackoverflow.com/questions/518181/too-many-automatic-redirections-were-attempted-error-message-when-using-a-httpw
   $request.CookieContainer = New-Object System.Net.CookieContainer
   $request.UserAgent = $userAgent
-  
+
   [System.Text.RegularExpressions.Regex]$containsABadCharacter = New-Object Regex("[" + [System.Text.RegularExpressions.Regex]::Escape([System.IO.Path]::GetInvalidFileNameChars() -join '') + "\=\;]");
 
   try
@@ -108,7 +160,7 @@ param(
 
     [string]$header = $response.Headers['Content-Disposition']
     [string]$headerLocation = $response.Headers['Location']
-    
+
     # start with content-disposition header
     if ($header -ne '') {
       $fileHeaderName = 'filename='
@@ -119,7 +171,7 @@ param(
       }
     }
     if ($containsABadCharacter.IsMatch($fileName)) { $fileName = $null }
-    
+
     # If empty, check location header next
     if ($fileName -eq $null -or  $fileName -eq '') {
       if ($headerLocation -ne '') {
@@ -134,7 +186,7 @@ param(
       $responseUrl = $response.ResponseUri.ToString()
       if (!$responseUrl.Contains('?')) {
         Write-Debug "Using response url to determine file name. '$responseUrl'"
-        $fileName = [System.IO.Path]::GetFileName($responseUrl) 
+        $fileName = [System.IO.Path]::GetFileName($responseUrl)
       }
     }
     if ($containsABadCharacter.IsMatch($fileName)) { $fileName = $null }
@@ -145,7 +197,7 @@ param(
       $extension = [System.IO.Path]::GetExtension($requestUrl)
       if (!$requestUrl.Contains('?') -and $extension -ne $null -and $extension -ne '') {
         Write-Debug "Using request url to determine file name. ' $requestUrl'"
-        $fileName = [System.IO.Path]::GetFileName($requestUrl) 
+        $fileName = [System.IO.Path]::GetFileName($requestUrl)
       }
     }
 
@@ -154,9 +206,9 @@ param(
       Write-Debug "File name is null or illegal. Using $originalFileName instead."
       $fileName = $originalFileName
     }
-    
+
     Write-Debug "File name determined from url is '$fileName'"
-    
+
     return $fileName
   } catch {
     if ($request -ne $null) {
@@ -167,9 +219,9 @@ param(
       Start-Sleep 1
       [GC]::Collect()
     }
-    
+
     Write-Debug "Url request/response failed - file name will be '$originalFileName':  $($_)"
-    
+
     return $originalFileName
   } finally {
    if ($response -ne $null) {

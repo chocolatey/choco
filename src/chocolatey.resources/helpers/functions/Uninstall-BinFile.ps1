@@ -1,11 +1,11 @@
 ﻿# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,9 +13,46 @@
 # limitations under the License.
 
 function Uninstall-BinFile {
+<#
+.SYNOPSIS
+Removes a shim (or batch redirect) for a file.
+
+.DESCRIPTION
+Chocolatey installs have the folder `$($env:ChocolateyInstall)\bin`
+included in the PATH environment variable. Chocolatey automatically
+shims executables in package folders that are not explicitly ignored,
+putting them into the bin folder (and subsequently onto the PATH).
+
+When you have other files you have shimmed, you need to use this
+function to remove them from the bin folder.
+
+.NOTES
+Not normally needed for exe files in the package folder, those are
+automatically discovered and the shims removed.
+
+.INPUTS
+None
+
+.OUTPUTS
+None
+
+.PARAMETER Name
+The name of the redirect file without ".exe" appended to it.
+
+.PARAMETER Path
+The path to the original file. Can be relative from
+`$($env:ChocolateyInstall)\bin` back to your file or a full path to the
+file.
+
+.PARAMETER IgnoredArguments
+Allows splatting with arguments that do not apply. Do not use directly.
+
+.LINK
+Install-BinFile
+#>
 param(
-  [string] $name, 
-  [string] $path
+  [parameter(Mandatory=$true, Position=0)][string] $name,
+  [parameter(Mandatory=$false, Position=1)][string] $path
 )
   Write-Debug "Running 'Uninstall-BinFile' for $name with path:`'$path`'";
 

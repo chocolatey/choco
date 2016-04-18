@@ -1,12 +1,12 @@
 ﻿# Copyright © 2011 - Present RealDimensions Software, LLC
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# 
+#
 # You may obtain a copy of the License at
-# 
+#
 #   http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,10 +14,37 @@
 # limitations under the License.
 
 Function Set-PowerShellExitCode {
+<#
+.SYNOPSIS
+Sets the exit code for the PowerShell scripts.
+
+.DESCRIPTION
+Sets the exit code as an environment variable that is checked and used
+as the exit code for the package at the end of the package script.
+
+.NOTES
+This tells PowerShell that it should prepare to shut down.
+
+.INPUTS
+None
+
+.OUTPUTS
+None
+
+.PARAMETER ExitCode
+The exit code to set.
+
+.PARAMETER IgnoredArguments
+Allows splatting with arguments that do not apply. Do not use directly.
+
+.EXAMPLE
+Set-PowerShellExitCode 3010
+#>
 param (
-  [int]$exitCode
+  [parameter(Mandatory=$true, Position=0)][int]$exitCode,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]]$ignoredArguments
 )
 
-  $host.SetShouldExit($exitCode); 
+  $host.SetShouldExit($exitCode);
   $env:ChocolateyExitCode = $exitCode;
 }

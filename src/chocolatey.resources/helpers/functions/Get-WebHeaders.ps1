@@ -1,11 +1,11 @@
 # Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,9 +13,46 @@
 # limitations under the License.
 
 function Get-WebHeaders {
+<#
+.SYNOPSIS
+Gets the request/response headers for a url.
+
+.DESCRIPTION
+This is a low-level function that is used by Chocolatey to get the
+headers for a request/response to better help when getting and
+validating internet resources.
+
+.NOTES
+Not recommended for use in package scripts.
+
+.INPUTS
+None
+
+.OUTPUTS
+None
+
+.PARAMETER Url
+This is the url to get a request/response from.
+
+.PARAMETER UserAgent
+The user agent to use as part of the request. Defaults to 'chocolatey
+command line'.
+
+.PARAMETER IgnoredArguments
+Allows splatting with arguments that do not apply. Do not use directly.
+
+.LINK
+Get-ChocolateyWebFile
+
+.LINK
+Get-WebFileName
+
+.LINK
+Get-WebFile
+#>
 param(
-  $url = '',
-  $userAgent = 'chocolatey command line'
+  [parameter(Mandatory=$false, Position=0)][string] $url = '',
+  [parameter(Mandatory=$true, Position=1)][string] $userAgent = 'chocolatey command line'
 )
   Write-Debug "Running 'Get-WebHeaders' with url:`'$url`', userAgent: `'$userAgent`'";
   if ($url -eq '') { return }
@@ -46,7 +83,7 @@ param(
 
     Write-Host "Using explicit proxy server '$explicitProxy'."
     $request.Proxy = $proxy
-  
+
   } elseif (!$client.Proxy.IsBypassed($url))
   {
     # system proxy (pass through)
@@ -113,8 +150,8 @@ param(
       Start-Sleep 1
       [GC]::Collect()
     }
-    
-    throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"    
+
+    throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"
   } finally {
    if ($response -ne $null) {
       $response.Close();

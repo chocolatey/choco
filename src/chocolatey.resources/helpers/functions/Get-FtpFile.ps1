@@ -6,13 +6,60 @@
 ## Written by Stephen C. Austin, Pwnt & Co. http://pwnt.co
 ##############################################################################################################
 function Get-FtpFile {
+<#
+.SYNOPSIS
+Downloads a file from a File Transfter Protocol (FTP) location.
+
+.DESCRIPTION
+This will download a file from an FTP location, saving the file to the
+FileName location specified.
+
+.NOTES
+This is a low-level function and not recommended for use in package
+scripts. It is recommended you call `Get-ChocolateyWebFile` instead.
+
+.INPUTS
+None
+
+.OUTPUTS
+None
+
+.PARAMETER Url
+This is the url to download the file from.
+
+.PARAMETER FileName
+This is the full path to the file to create. If FTPing to the
+package folder next to the install script, the path will be like
+`"$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\\file.exe"`
+
+.PARAMETER UserName
+The user account to connect to FTP with.
+
+.PARAMETER Password
+The password for the user account on the FTP server.
+
+.PARAMETER Quiet
+Silences the progress output.
+
+.PARAMETER IgnoredArguments
+Allows splatting with arguments that do not apply. Do not use directly.
+
+.LINK
+Get-ChocolateyWebFile
+
+.LINK
+Get-WebFile
+#>
 param(
-  $url = '', #(Read-Host "The URL to download"),
-  $fileName = $null,
-  $username = $null,
-  $password = $null,
-  [switch]$quiet
+  [parameter(Mandatory=$false, Position=0)][string] $url = '',
+  [parameter(Mandatory=$true, Position=1)][string] $fileName = $null,
+  [parameter(Mandatory=$false, Position=2)][string] $username = $null,
+  [parameter(Mandatory=$false, Position=3)][string] $password = $null,
+  [parameter(Mandatory=$false)][switch]$quiet
 )
+
+  Write-Debug "Running 'Get-FtpFile' for $fileName with url:'$url', userName: '$userName', password: '$password'";
+
   # Create a FTPWebRequest object to handle the connection to the ftp server
   $ftprequest = [System.Net.FtpWebRequest]::create($url)
 

@@ -12,12 +12,59 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 function Get-ChecksumValid {
+<#
+.SYNOPSIS
+Checks a file's checksum versus a passed checksum and checksum type.
+
+.DESCRIPTION
+Makes a determination if a file meets an expected checksum. This
+function is usually used when comparing a file that is downloaded from
+an official distribution point. If the checksum fails to
+match, this function throws an error.
+
+.NOTES
+This uses the checksum.exe tool available separately at
+https://chocolatey.org/packages/checksum.
+
+.INPUTS
+None
+
+.OUTPUTS
+None
+
+.PARAMETER File
+The full path to a binary file that is checksummed and compared to the
+passed Checksum parameter value.
+
+.PARAMETER Checksum
+The expected checksum hash value of the File resource. The checksum
+type is covered by ChecksumType.
+
+.PARAMETER ChecksumType
+The type of checkum that the file is validated with - 'md5', 'sha1',
+'sha256' or 'sha512' - defaults to 'md5'.
+
+MD5 is not recommended as certain organizations need to use FIPS
+compliant algorithms for hashing - see
+https://support.microsoft.com/en-us/kb/811833 for more details.
+
+.PARAMETER IgnoredArguments
+Allows splatting with arguments that do not apply. Do not use directly.
+
+.EXAMPLE
+Get-CheckSumValid -File $fileFullPath -CheckSum $checksum -ChecksumType $checksumType
+
+.LINK
+Get-ChocolateyWebFile
+
+.LINK
+Install-ChocolateyPackage
+#>
 param(
-  [string] $file,
-  [string] $checksum = '',
-  [string] $checksumType = 'md5'
+  [parameter(Mandatory=$true, Position=0)][string] $file,
+  [parameter(Mandatory=$false, Position=1)][string] $checksum = '',
+  [parameter(Mandatory=$false, Position=2)][string] $checksumType = 'md5'
 )
   Write-Debug "Running 'Get-ChecksumValid' with file:`'$file`', checksum: `'$checksum`', checksumType: `'$checksumType`'";
   if ($env:chocolateyIgnoreChecksums -eq 'true') {

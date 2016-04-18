@@ -127,8 +127,16 @@ NOTE: For chocolatey.org, you must update the source to be secure.".format_with(
 Chocolatey will attempt to push a compiled nupkg to a package feed. 
  Some may prefer to use `cpush` as a shortcut for `choco push`.
 
+NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
+ with options and switches. Default push location is deprecated and 
+ will be removed by v1. In most cases you can still pass options and 
+ switches with one dash (`-`). For more details, see 
+ the command reference (`choco -?`).
+
 A feed can be a local folder, a file share, the community feed 
- '{0}' or a custom/private feed.
+ ({0}), or a custom/private feed. For web
+ feeds, it has a requirement that it implements the proper OData
+ endpoints required for NuGet packages.
 ".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
@@ -142,9 +150,9 @@ NOTE: If there is more than one nupkg file in the folder, the command
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
-    choco push --source ""https://chocolatey.org/""
-    choco push --source ""https://chocolatey.org/"" -t 500
-    choco push --source ""https://chocolatey.org/"" -k=""123-123123-123""
+    choco push --source https://chocolatey.org/
+    choco push --source ""'https://chocolatey.org/'"" -t 500
+    choco push --source ""'https://chocolatey.org/'"" -k=""'123-123123-123'""
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Troubleshooting");
             "chocolatey".Log().Info(()=> @"

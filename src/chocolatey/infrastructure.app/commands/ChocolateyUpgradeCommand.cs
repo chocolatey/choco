@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -87,14 +87,15 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("p=|password=",
                      "Password - the user's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
+
                 .Add("cert=",
                      "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty. Available in 0.9.10+.",
                      option => configuration.SourceCommand.Certificate = option.remove_surrounding_quotes())
                 .Add("cp=|certpassword=",
                      "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
                      option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
-                .Add("ignorechecksums|ignore-checksums",
-                      "IgnoreChecksums - Ignore checksums provided by the package",
+                .Add("ignorechecksum|ignore-checksum|ignorechecksums|ignore-checksums",
+                      "IgnoreChecksums - Ignore checksums provided by the package. Available in 0.9.9.9+.",
                       option =>
                       {
                         if (option != null) configuration.Features.CheckSumFiles = false;
@@ -113,7 +114,7 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.Features.UsePackageExitCodes = option != null
                      )
                  .Add("except=",
-                     "Except - a comma-separated list of package names that should not be upgraded when upgrading 'all'. Defaults to empty.",
+                     "Except - a comma-separated list of package names that should not be upgraded when upgrading 'all'. Defaults to empty. Available in 0.9.10+.",
                      option => configuration.UpgradeCommand.PackageNamesToSkip = option.remove_surrounding_quotes())
                 ;
         }
@@ -136,8 +137,14 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Upgrade Command");
             this.Log().Info(@"
-Upgrades a package or a list of packages. Some may prefer to use `cup` 
- as a shortcut for `choco upgrade`.
+Upgrades a package or a list of packages. Some may prefer to use `cup`
+ as a shortcut for `choco upgrade`. If you do not have a package
+ installed, upgrade will install it.
+
+NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
+ with options and switches. Add `-y` for previous behavior with no
+ prompt. In most cases you can still pass options and switches with one
+ dash (`-`). For more details, see the command reference (`choco -?`).
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
@@ -145,29 +152,39 @@ Upgrades a package or a list of packages. Some may prefer to use `cup`
     choco upgrade <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
     cup <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
 
-NOTE: `all` is a special package keyword that will allow you to upgrade 
+NOTE: `all` is a special package keyword that will allow you to upgrade
  all currently installed packages.
+
+Skip upgrading certain packages with `choco pin` or with the option
+ `--except`.
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
     choco upgrade chocolatey
-    choco upgrade notepadplusplus googlechrome atom 7zip 
+    choco upgrade notepadplusplus googlechrome atom 7zip
     choco upgrade notepadplusplus googlechrome atom 7zip -dvfy
-    choco upgrade git --params=""/GitAndUnixToolsOnPath /NoAutoCrlf"" -y
+    choco upgrade git --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'"" -y
     choco upgrade nodejs.install --version 0.10.35
-    choco upgrade git -s ""https://somewhere/out/there""
-    choco upgrade git -s ""https://somewhere/protected"" -u user -p pass
+    choco upgrade git -s ""'https://somewhere/out/there'""
+    choco upgrade git -s ""'https://somewhere/protected'"" -u user -p pass
     choco upgrade all
-    choco upgrade all --except=""skype,conemu""
+    choco upgrade all --except=""'skype,conemu'""
 ");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
+            "chocolatey".Log().Info(@"
+choco upgrade: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_upgrade.gif
+
+");
+
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
             "chocolatey".Log().Info(@"
-NOTE: Options and switches apply to all items passed, so if you are 
- installing multiple packages, and you use `--version=1.0.0`, it is 
- going to look for and try to install version 1.0.0 of every package 
- passed. So please split out multiple package calls when wanting to 
+NOTE: Options and switches apply to all items passed, so if you are
+ installing multiple packages, and you use `--version=1.0.0`, it is
+ going to look for and try to install version 1.0.0 of every package
+ passed. So please split out multiple package calls when wanting to
  pass specific options.
 ");
         }
