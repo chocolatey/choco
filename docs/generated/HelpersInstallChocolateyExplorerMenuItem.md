@@ -1,51 +1,124 @@
-﻿## Install-ChocolateyExplorerMenuItem
+﻿# Install-ChocolateyExplorerMenuItem
 
-Install-ChocolateyExplorerMenuItem can add an entry in the context menu of
-Windows Explorer. The menu item is given a text label and a command. The command
-can be any command accepted on the Windows command line. The menu item can be
-applied to either folder items or file items.
+Creates a windows explorer context menu item that can be associated with
+a command
 
-**NOTE:** This command will assert UAC/Admin privileges on the machine.
+## Syntax
 
-## Usage
+~~~powershell
+Install-ChocolateyExplorerMenuItem `
+  [-MenuKey <String>] `
+  [-MenuLabel <String>] `
+  [-Command <String>] `
+  [-Type <String>]
+~~~
 
-```powershell
-Install-ChocolateyExplorerMenuItem "sublime" "Open with Sublime Text 2" $sublimeExe
-```
+## Description
 
-## Examples
+Install-ChocolateyExplorerMenuItem can add an entry in the context menu
+of Windows Explorer. The menu item is given a text label and a command.
+The command can be any command accepted on the windows command line. The
+menu item can be applied to either folder items or file items.
 
-```powershell
-$sublimeDir = (Get-ChildItem $env:systemdrive\chocolatey\lib\sublimetext* `
- | select $_.last)
-$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
-Install-ChocolateyExplorerMenuItem "sublime" "Open with Sublime Text" $sublimeExe
-```
+Because this command accesses and edits the root class registry node, it
+will be elevated to admin.
 
-This will create a context menu item in Windows Explorer when any file is right clicked. The menu item will appear with the text "Open with Sublime Text 2" and will invoke sublime text 2 when selected.
+## Notes
 
-```powershell
-$sublimeDir = (Get-ChildItem $env:systemdrive\chocolatey\lib\sublimetext* `
- | select $_.last)
-$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
-Install-ChocolateyExplorerMenuItem "sublime" "Open with Sublime Text 2" `
- $sublimeExe "directory"
-```
+This command will assert UAC/Admin privileges on the machine.
 
-This will create a context menu item in Windows Explorer when any folder is right clicked. The menu item will appear with the text "Open with Sublime Text 2" and will invoke sublime text 2 when seleted.
+Chocolatey will automatically add the path of the file or folder clicked
+to the command. This is done simply by appending a %1 to the end of the
+command.
+
+## Aliases
+
+None
+
+## Inputs
+
+None
+
+## Outputs
+
+None
 
 ## Parameters
 
-* `-MenuKey`
+###  -MenuKey [\<String\>]
+A unique string to identify this menu item in the registry
 
-    A unique string to identify this menu item in the registry.
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 1
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -MenuLabel [\<String\>]
+The string that will be displayed in the context menu
 
-* `-MenuLabel`
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 2
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -Command [\<String\>]
+A command line command that will be invoked when the menu item is
+selected
 
-    The string that will be displayed in the context menu.
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 3
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -Type [\<String\>]
+Specifies if the menu item should be applied to a folder or a file
 
-* `-Command`
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 4
+Default Value          | file
+Accept Pipeline Input? | false
+ 
 
-    A command line command that will be invoked when the menu item is selected.
+
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+# This will create a context menu item in Windows Explorer when any file
+# is right clicked. The menu item will appear with the text "Open with
+# Sublime Text 2" and will invoke sublime text 2 when selected.
+$sublimeDir = (Get-ChildItem $env:ALLUSERSPROFILE\chocolatey\lib\sublimetext* | select $_.last)
+$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
+Install-ChocolateyExplorerMenuItem "sublime" "Open with Sublime Text 2" $sublimeExe
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+# This will create a context menu item in Windows Explorer when any
+# folder is right clicked. The menu item will appear with the text
+# "Open with Sublime Text 2" and will invoke sublime text 2 when selected.
+$sublimeDir = (Get-ChildItem $env:ALLUSERSPROFILE\chocolatey\lib\sublimetext* | select $_.last)
+$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
+Install-ChocolateyExplorerMenuItem "sublime" "Open with Sublime Text 2" $sublimeExe "directory"
+~~~
+
 
 [[Function Reference|HelpersReference]]
+
+***NOTE:*** This documentation has been automatically generated from `Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1" -Force; Get-Help Install-ChocolateyExplorerMenuItem -Full`.

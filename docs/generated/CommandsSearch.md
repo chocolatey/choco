@@ -1,4 +1,4 @@
-﻿# List/Search Command (choco list)
+﻿# List/Search Command (choco search)
 
 Chocolatey will perform a search for a package local or remote. Some 
  may prefer to use [[`clist`|Commandslist]] as a shortcut for [[`choco list`|Commandslist]].
@@ -173,5 +173,5 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
 [[Command Reference|CommandsReference]]
 
 
-***NOTE:*** This documentation has been automatically generated from `choco list -h`. 
+***NOTE:*** This documentation has been automatically generated from `choco search -h`. 
 

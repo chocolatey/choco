@@ -1,72 +1,156 @@
 ﻿# Install-ChocolateyInstallPackage
 
-This will run a native installer to perform an install/upgrade on your machine.
+Installs software into "Programs and Features". Use
+Install-ChocolateyPackage when software must be downloaded first.
 
-**NOTE:** This command will assert UAC/Admin privileges on the machine.
+## Syntax
 
-## Usage
-
-```powershell
-Install-ChocolateyInstallPackage $packageName $installType $silentArgs $file
-```
-
-## Examples
 ~~~powershell
-$toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$fileLocation = Join-Path $toolsDir 'someinstaller.msi'
-Install-ChocolateyInstallPackage '7zip' 'exe' '/S' "$fileLocation"
-
-Install-ChocolateyInstallPackage '7zip' 'exe' '/S' '\\uncshare\somepath\7zipInstaller.msi' `
- -validExitCodes @(0,21,33)
+Install-ChocolateyInstallPackage `
+  -PackageName <String> `
+  [-FileType <String>] `
+  [-SilentArgs <String>] `
+  -File <String> `
+  [-ValidExitCodes <Object>] `
+  [-UseOnlyPackageSilentArguments] [<CommonParameters>]
 ~~~
+
+## Description
+
+This will run an installer (local file) on your machine.
+
+## Notes
+
+If you are embedding files into a package, ensure that you have the
+rights to redistribute those files if you are sharing this package
+publicly (like on the [community feed](https://chocolatey.org/packages)). Otherwise, please use
+Install-ChocolateyPackage to download those resources from their
+official distribution points.
+
+This is a native installer wrapper function. A "true" package will
+contain all the run time files and not an installer. That could come
+pre-zipped and require unzipping in a PowerShell script. Chocolatey
+works best when the packages contain the software it is managing. Most
+software in the Windows world comes as installers and Chocolatey
+understands how to work with that, hence this wrapper function.
+
+## Aliases
+
+None
+
+## Inputs
+
+None
+
+## Outputs
+
+None
 
 ## Parameters
 
-* `-packageName`
+###  -PackageName \<String\>
+The name of the package - while this is an arbitrary value, it's
+recommended that it matches the package id.
 
-    This is an arbitrary name.
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | true
+Position?              | 1
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -FileType [\<String\>]
+This is the extension of the file. This can be 'exe', 'msi', or 'msu'.
+Licensed versions of Chocolatey use this to automatically determine
+silent arguments. If this is not provided, Chocolatey will
+automatically determine this using the downloaded file's extension.
 
-    Example: `'7zip'`
+Property               | Value
+---------------------- | --------------------------
+Aliases                | installerType, installType
+Required?              | false
+Position?              | 2
+Default Value          | exe
+Accept Pipeline Input? | false
+ 
+###  -SilentArgs [\<String\>]
+OPTIONAL - These are the parameters to pass to the native installer.
+Licensed versions of Chocolatey will automatically determine the
+installer type and merge the arguments with what is provided here.
 
-* `-fileType` (in process of renaming to `installType`)
+Try any of the to get the silent installer -
+`/s /S /q /Q /quiet /silent /SILENT /VERYSILENT`. With msi it is always
+`/quiet`. Please pass it in still but it will be overridden by
+Chocolatey to `/quiet`. If you don't pass anything it could invoke the
+installer with out any arguments. That means a nonsilent installer.
 
-    Pick only one : 'exe' or 'msi'
+Please include the `notSilent` tag in your Chocolatey package if you
+are not setting up a silent package. Please note that if you are
+submitting to the [community repository](https://chocolatey.org/packages), it is nearly a requirement for
+the package to be completely unattended.
 
-    Example: `'exe'` or `'msi'`
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 3
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -File \<String\>
+Full file path to native installer to run. If embedding in the package,
+you can get it to the path with
+`"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
 
-* `-silentArgs`
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | true
+Position?              | 4
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -ValidExitCodes [\<Object\>]
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | named
+Default Value          | @(0)
+Accept Pipeline Input? | false
+ 
+###  -UseOnlyPackageSilentArguments
+Do not allow choco to provide/merge additional silent arguments and
+only use the ones available with the package. Available in 0.9.10+.
 
-    Silent and other arguments to pass to the native installer.
+Property               | Value
+---------------------- | ------------------------
+Aliases                | useOnlyPackageSilentArgs
+Required?              | false
+Position?              | named
+Default Value          | False
+Accept Pipeline Input? | false
+ 
+### \<CommonParameters\>
 
-    Example: `'/S'`
+This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-    If there are no silent arguments, pass this as `''`
 
-* `-file`
+## Examples
 
-    This is the file to install. This is a full path to the file.
-
-    Example:
-
-    Embedded in the tools directory of the package:
+ **EXAMPLE 1**
 
 ~~~powershell
-$toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$fileLocation = Join-Path $toolsDir 'someinstaller.msi'
+Install-ChocolateyInstallPackage '__NAME__' 'EXE_OR_MSI' 'SILENT_ARGS' 'FilePath'
+
 ~~~
 
-   On an internal share:
+## Links
 
-~~~powershell
-$fileLocation = '\\someunc\share\location\someinstaller.msi'
-~~~
+ * [[Install-ChocolateyPackage|HelpersInstallChocolateyPackage]]
 
-* `-validExitCodes` _(optional)_
-
-    If there are other valid exit codes besides zero signifying a successful install, please pass `-validExitCodes` with the value, including 0 as long as it is still valid.
-
-    Example: `-validExitCodes @(0,44)`
-
-    Defaults to `@(0)`.
 
 [[Function Reference|HelpersReference]]
+
+***NOTE:*** This documentation has been automatically generated from `Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1" -Force; Get-Help Install-ChocolateyInstallPackage -Full`.

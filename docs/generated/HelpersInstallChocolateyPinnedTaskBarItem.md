@@ -1,27 +1,43 @@
-﻿## Install-ChocolateyPinnedTaskBarItem
+﻿# Install-ChocolateyPinnedTaskBarItem
 
 Creates an item in the task bar linking to the provided path.
 
-## Usage
+## Syntax
 
-```powershell
+~~~powershell
 Install-ChocolateyPinnedTaskBarItem `
- "${env:ProgramFiles(x86)}\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
-```
+  [-TargetFilePath <String>]
+~~~
+
+
+
+## Aliases
+
+None
+
+## Inputs
+
+None
+
+## Outputs
+
+None
+
+## Parameters
+ 
+
 
 ## Examples
 
-```powershell
-Install-ChocolateyPinnedTaskBarItem `
- "${env:ProgramFiles(x86)}\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
-```
+ **EXAMPLE 1**
 
-This will create a Visual Studio task bar icon.
+~~~powershell
 
-## Parameters
+# This will create a Visual Studio task bar icon.
+Install-ChocolateyPinnedTaskBarItem -TargetFilePath "${env:ProgramFiles(x86)}\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
+~~~
 
-* `-targetFilePath`
-
-    The path to the application that should be launched when clicking on the task bar icon.
 
 [[Function Reference|HelpersReference]]
+
+***NOTE:*** This documentation has been automatically generated from `Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1" -Force; Get-Help Install-ChocolateyPinnedTaskBarItem -Full`.

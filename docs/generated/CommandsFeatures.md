@@ -1,28 +1,17 @@
-﻿# Outdated Command (choco outdated)
+﻿# Feature Command (choco features)
 
-Returns a list of outdated packages.
-
-**NOTE:** Available with 0.9.9.6+.
-
+Chocolatey will allow you to interact with features.
 
 ## Usage
 
-    choco outdated [<options/switches>]
+    choco feature [list]|disable|enable [<options/switches>]
 
 ## Examples
 
-    choco outdated
-    choco outdated -s https://somewhere/out/there
-    choco outdated -s "'https://somewhere/protected'" -u user -p pass
-
-If you use `--source=https://somewhere/out/there`, it is 
- going to look for outdated packages only based on that source.
-
-
-## See It In Action
-
-![choco outdated](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_outdated.gif)
-
+    choco feature
+    choco feature list
+    choco feature disable -n=bob
+    choco feature enable -n=bob
 
 ## Options and Switches
 
@@ -82,21 +71,14 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      UseSystemPowerShell - Execute PowerShell using an external process 
        instead of the built-in PowerShell host. Available in 0.9.10+.
 
- -s, --source=VALUE
-     Source - The source to find the package(s) to install. Special sources 
-       include: ruby, webpi, cygwin, windowsfeatures, and python. Defaults to 
-       default feeds.
-
- -u, --user=VALUE
-     User - used with authenticated feeds. Defaults to empty.
-
- -p, --password=VALUE
-     Password - the user's password to the source. Defaults to empty.
+ -n, --name=VALUE
+     Name - the name of the source. Required with some actions. Defaults to 
+       empty.
 
 ~~~
 
 [[Command Reference|CommandsReference]]
 
 
-***NOTE:*** This documentation has been automatically generated from `choco outdated -h`. 
+***NOTE:*** This documentation has been automatically generated from `choco features -h`. 
 

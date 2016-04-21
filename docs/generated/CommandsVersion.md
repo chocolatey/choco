@@ -1,28 +1,12 @@
-﻿# Outdated Command (choco outdated)
+﻿# [DEPRECATED] Version Command (choco version)
 
-Returns a list of outdated packages.
+**NOTE:** Version has been deprecated and will be removed in version 1.0.0. 
 
-**NOTE:** Available with 0.9.9.6+.
+ If you are attempting to get local installed items, use 
+ `choco list -lo`. 
 
-
-## Usage
-
-    choco outdated [<options/switches>]
-
-## Examples
-
-    choco outdated
-    choco outdated -s https://somewhere/out/there
-    choco outdated -s "'https://somewhere/protected'" -u user -p pass
-
-If you use `--source=https://somewhere/out/there`, it is 
- going to look for outdated packages only based on that source.
-
-
-## See It In Action
-
-![choco outdated](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_outdated.gif)
-
+ If you want to know what has available upgrades, use 
+ `choco upgrade <pkg|all> -whatif` or [[`choco outdated`|Commandsoutdated]].
 
 ## Options and Switches
 
@@ -87,16 +71,16 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        include: ruby, webpi, cygwin, windowsfeatures, and python. Defaults to 
        default feeds.
 
- -u, --user=VALUE
-     User - used with authenticated feeds. Defaults to empty.
+     --lo, --localonly
+     LocalOnly - Only search against local machine items.
 
- -p, --password=VALUE
-     Password - the user's password to the source. Defaults to empty.
+     --pre, --prerelease
+     Prerelease - Include Prereleases? Defaults to false.
 
 ~~~
 
 [[Command Reference|CommandsReference]]
 
 
-***NOTE:*** This documentation has been automatically generated from `choco outdated -h`. 
+***NOTE:*** This documentation has been automatically generated from `choco version -h`. 
 

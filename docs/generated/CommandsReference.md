@@ -1,76 +1,31 @@
-﻿# Command Reference
-
-This is a listing of all of the different things you can pass to choco.
+﻿This is a listing of all of the different things you can pass to choco.
 
 ## Commands
 
- * [[list / search |CommandsList]] - searches and lists remote or local packages
- * [[install|CommandsInstall]] - installs packages from various sources
- * installmissing - **REMOVED**
- * update - **DEPRECATED** - RESERVED for future use (You are looking for upgrade, these are not the droids you are looking for)
- * [[outdated|CommandsOutdated]] - show a list of packages that have updates (similar to `choco upgrade --noop`, but only outputs out of date packages, current version and available update version).
- * [[upgrade|CommandsUpgrade]] - upgrades packages from various sources
- * version - **DEPRECATED** - will be removed in v1 - use `choco upgrade <pkg|all> -whatif` instead
- * [[uninstall|CommandsUninstall]] - uninstalls a package
- * help - **REMOVED** - use `-h` on any command.
-
-## Commands (intermediate to advanced)
- * [[config|CommandsConfig]] - Retrieve and configure config file settings
- * [[source / sources|CommandsSources]] - view and configure default sources
- * [[apikey / setapikey|CommandsApiKey]] - retrieves or saves an apikey for a particular source
- * [[pin|CommandsPin]] - suppress upgrades to a package
-
-## Package Creation Commands
- * [[new|CommandsNew]] - generates files necessary for a Chocolatey package
- * [[pack|CommandsPack]] - packages up a nuspec to a compiled nupkg
- * [[push|CommandsPush]] - pushes a compiled nupkg
-
-## See Help Menu In Action
-
-![choco help in action](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_help.gif)
+ * [[search|Commandssearch]] - searches remote or local packages (alias for list)
+ * [[list|Commandslist]] - lists remote or local packages
+ * [[install|Commandsinstall]] - installs packages from various sources
+ * [[pin|Commandspin]] - suppress upgrades for a package
+ * [[outdated|Commandsoutdated]] - retrieves packages that are outdated. Similar to upgrade all --noop
+ * [[upgrade|Commandsupgrade]] - upgrades packages from various sources
+ * [[uninstall|Commandsuninstall]] - uninstalls a package
+ * [[pack|Commandspack]] - packages up a nuspec to a compiled nupkg
+ * [[push|Commandspush]] - pushes a compiled nupkg
+ * [[new|Commandsnew]] - generates files necessary for a chocolatey package from a template
+ * [[sources|Commandssources]] - view and configure default sources (alias for source)
+ * [[source|Commandssource]] - view and configure default sources
+ * [[config|Commandsconfig]] - Retrieve and configure config file settings
+ * [[feature|Commandsfeature]] - view and configure choco features
+ * [[features|Commandsfeatures]] - view and configure choco features (alias for feature)
+ * [[apikey|Commandsapikey]] - retrieves or saves an apikey for a particular source
+ * [[setapikey|Commandssetapikey]] - retrieves or saves an apikey for a particular source (alias for apikey)
+ * [[unpackself|Commandsunpackself]] - have chocolatey set it self up
+ * [[version|Commandsversion]] - [DEPRECATED] will be removed in v1 - use [[`choco outdated`|Commandsoutdated]] or `cup <pkg|all> -whatif` instead
+ * [[update|Commandsupdate]] - [DEPRECATED] RESERVED for future use (you are looking for upgrade, these are not the droids you are looking for)
 
 
-## Default Options and Switches
-
-```
--?, --help, -h
-  Prints out the help menu.
-
--d, --debug
-  Debug - Run in Debug Mode.
-
--v, --verbose
-  Verbose - See verbose messaging.
-
---acceptlicense, --accept-license
-  AcceptLicense - Accept license dialogs automatically.
-
--y, --yes, --confirm
-  Confirm all prompts - Chooses default answer instead of prompting.
-  Implies --accept-license
-
--f, --force
-  Force - force the behavior
-
---noop, --whatif, --what-if
-  NoOp - Don't actually do anything.
-
--r, --limitoutput, --limit-output
-  LimitOuptut - Limit the output to essential information
-
---execution-timeout=VALUE
-  CommandExecutionTimeoutSeconds - Override the default execution
-  timeout in the configuration of 2700 seconds.
-
--c, --cache, --cachelocation, --cache-location=VALUE
-  CacheLocation - Location for download cache, defaults to %TEMP% or
-  value in chocolatey.config file.
-
---allowunofficial, --allow-unofficial, --allowunofficialbuild,
---allow-unofficial-build
-  AllowUnofficialBuild - When not using the official build you must set
-  this flag for choco to continue.
-```
+Please run chocolatey with `choco command -help` for specific help on
+ each command.
 
 ## How To Pass Options / Switches
 
@@ -82,7 +37,7 @@ You can pass options and switches in the following ways:
  * **Option Bundling / Bundled Options**: One character switches can be
    bundled. e.g. `-d` (debug), `-f` (force), `-v` (verbose), and `-y`
    (confirm yes) can be bundled as `-dfvy`.
- * ***Note:*** If `debug` or `verbose` are bundled with local options
+ * **NOTE:** If `debug` or `verbose` are bundled with local options
    (not the global ones above), some logging may not show up until after
    the local options are parsed.
  * **Use Equals**: You can also include or not include an equals sign
@@ -107,4 +62,65 @@ You can pass options and switches in the following ways:
    package passed. So please split out multiple package calls when
    wanting to pass specific options.
 
+## Default Options and Switches
+
+**NOTE:** Options and switches apply to all items passed, so if you are
+ running a command like install that allows installing multiple
+ packages, and you use `--version=1.0.0`, it is going to look for and
+ try to install version 1.0.0 of every package passed. So please split
+ out multiple package calls when wanting to pass specific options.
+
+~~~
+
+ -?, --help, -h
+     Prints out the help menu.
+
+ -d, --debug
+     Debug - Run in Debug Mode.
+
+ -v, --verbose
+     Verbose - See verbose messaging.
+
+     --acceptlicense, --accept-license
+     AcceptLicense - Accept license dialogs automatically.
+
+ -y, --yes, --confirm
+     Confirm all prompts - Chooses affirmative answer instead of prompting. 
+       Implies --accept-license
+
+ -f, --force
+     Force - force the behavior
+
+     --noop, --whatif, --what-if
+     NoOp - Don't actually do anything.
+
+ -r, --limitoutput, --limit-output
+     LimitOutput - Limit the output to essential information
+
+     --execution-timeout=VALUE
+     CommandExecutionTimeoutSeconds - Override the default execution timeout 
+       in the configuration of 2700 seconds.
+
+ -c, --cache, --cachelocation, --cache-location=VALUE
+     CacheLocation - Location for download cache, defaults to %TEMP% or value 
+       in chocolatey.config file.
+
+     --allowunofficial, --allow-unofficial, --allowunofficialbuild, --allow-unofficial-build
+     AllowUnofficialBuild - When not using the official build you must set 
+       this flag for choco to continue.
+
+     --failstderr, --failonstderr, --fail-on-stderr, --fail-on-standard-error, --fail-on-error-output
+     FailOnStandardError - Fail on standard error output (stderr), typically 
+       received when running external commands during install providers. This 
+       overrides the feature failOnStandardError.
+
+     --use-system-powershell
+     UseSystemPowerShell - Execute PowerShell using an external process 
+       instead of the built-in PowerShell host. Available in 0.9.10+.
+
+~~~
+
+
+
+***NOTE:*** This documentation has been automatically generated from `choco -h`. 
 

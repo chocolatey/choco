@@ -1,4 +1,17 @@
-﻿## Install-ChocolateyEnvironmentVariable
+﻿# Install-ChocolateyEnvironmentVariable
+
+Creates a persistent environment variable
+
+## Syntax
+
+~~~powershell
+Install-ChocolateyEnvironmentVariable `
+  [-VariableName <String>] `
+  [-VariableValue <String>] `
+  [-VariableType {Process | User | Machine}]
+~~~
+
+## Description
 
 Install-ChocolateyEnvironmentVariable creates an environment variable
 with the specified name and value. The variable is persistent and
@@ -7,46 +20,89 @@ line sessions. The variable can be scoped either to the user or to
 the machine. If machine level scoping is specified, the command is
 elevated to an administrative session.
 
-**NOTE:** This command will assert UAC/Admin privileges on the machine if $variableType== 'Machine'.
+## Notes
 
-## Usage
+This command will assert UAC/Admin privileges on the machine when
+`-VariableType Machine`.
 
-```powershell
-Install-ChocolateyEnvironmentVariable "JAVA_HOME" "d:\oracle\jdk\bin"
-```
+## Aliases
+
+None
+
+## Inputs
+
+None
+
+## Outputs
+
+None
 
 ## Parameters
 
-* `-variableName`
+###  -VariableName [\<String\>]
+The name or key of the environment variable
 
-    The name or key of the environment variable
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 1
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -VariableValue [\<String\>]
+A string value assigned to the above name.
+
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 2
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -VariableType
+Specifies whether this variable is to be accesible at either the
+individual user level or at the Machine level.
+
+
+Valid options: Process, User, Machine
+
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 3
+Default Value          | User
+Accept Pipeline Input? | false
+ 
+
 
 ## Examples
 
-```powershell
+ **EXAMPLE 1**
+
+~~~powershell
+
+# Creates a User environmet variable "JAVA_HOME" pointing to
+# "d:\oracle\jdk\bin".
 Install-ChocolateyEnvironmentVariable "JAVA_HOME" "d:\oracle\jdk\bin"
-```
+~~~
 
-Creates a User environment variable "JAVA_HOME" pointing to "d:\oracle\jdk\bin".
+**EXAMPLE 2**
 
-```powershell
-Install-ChocolateyEnvironmentVariable "_NT_SYMBOL_PATH" "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols" "Machine"
-```
+~~~powershell
 
-Creates a User environment variable "_NT_SYMBOL_PATH" pointing to "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols".
+# Creates a User environmet variable "_NT_SYMBOL_PATH" pointing to
+# "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols".
+# The command will be elevated to admin priviledges.
+Install-ChocolateyEnvironmentVariable `
+  -VariableName "_NT_SYMBOL_PATH" `
+  -VariableValue "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols" `
+  -VariableType Machine
+~~~
 
-## Parameters
-
-* `-variableValue`
-
-    A string value assigned to the above name
-
-* `-variableType` _(optional)_
-
-    Pick only one : 'User' or 'Machine'
-
-    Example: `'User'` or `'Machine'`
-
-    Defaults to `'User'`
 
 [[Function Reference|HelpersReference]]
+
+***NOTE:*** This documentation has been automatically generated from `Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1" -Force; Get-Help Install-ChocolateyEnvironmentVariable -Full`.

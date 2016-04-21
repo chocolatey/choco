@@ -1,27 +1,30 @@
-﻿# Outdated Command (choco outdated)
+﻿# ApiKey Command (choco setapiKey)
 
-Returns a list of outdated packages.
+This lists api keys that are set or sets an api key for a particular   
+ source so it doesn't need to be specified every time.
 
-**NOTE:** Available with 0.9.9.6+.
-
+Anything that doesn't contain source and key will list api keys.
 
 ## Usage
 
-    choco outdated [<options/switches>]
+    choco apikey [<options/switches>]
+    choco setapikey [<options/switches>]
 
 ## Examples
 
-    choco outdated
-    choco outdated -s https://somewhere/out/there
-    choco outdated -s "'https://somewhere/protected'" -u user -p pass
+    choco apikey
+    choco apikey -s"https://somewhere/out/there"
+    choco apikey -s"https://somewhere/out/there/" -k="value"
+    choco apikey -s"https://chocolatey.org/" -k="123-123123-123"
 
-If you use `--source=https://somewhere/out/there`, it is 
- going to look for outdated packages only based on that source.
+## Connecting to Chocolatey.org
 
+In order to save your API key for https://chocolatey.org/, 
+ log in (or register, confirm and then log in) to
+ https://chocolatey.org/, go to https://chocolatey.org/account, 
+ copy the API Key, and then use it in the following command:
 
-## See It In Action
-
-![choco outdated](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_outdated.gif)
+    choco apikey -k <your key here> -s https://chocolatey.org/
 
 
 ## Options and Switches
@@ -83,20 +86,15 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        instead of the built-in PowerShell host. Available in 0.9.10+.
 
  -s, --source=VALUE
-     Source - The source to find the package(s) to install. Special sources 
-       include: ruby, webpi, cygwin, windowsfeatures, and python. Defaults to 
-       default feeds.
+     Source [REQUIRED] - The source location for the key
 
- -u, --user=VALUE
-     User - used with authenticated feeds. Defaults to empty.
-
- -p, --password=VALUE
-     Password - the user's password to the source. Defaults to empty.
+ -k, --key, --apikey, --api-key=VALUE
+     ApiKey - The api key for the source.
 
 ~~~
 
 [[Command Reference|CommandsReference]]
 
 
-***NOTE:*** This documentation has been automatically generated from `choco outdated -h`. 
+***NOTE:*** This documentation has been automatically generated from `choco setapiKey -h`. 
 
