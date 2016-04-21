@@ -1,66 +1,179 @@
 ﻿# Install-ChocolateyVsixPackage
 
-Downloads and installs a VSIX package for Visual Studio. You do not need to surround this with try catch if it is the only thing in your [[chocolateyInstall.ps1|ChocolateyInstallPS1]].
+Downloads and installs a VSIX package for Visual Studio
 
-VSIX packages are Extensions for the Visual Studio IDE. The Visual Studio Gallery at http://visualstudiogallery.msdn.microsoft.com/ is the public extension feed and hosts thousands of extensions.
+## Syntax
 
-You can locate a VSIX Url by finding the download link of Visual Studio extensions on the Visual Studio Gallery.
+~~~powershell
+Install-ChocolateyVsixPackage `
+  -PackageName <String> `
+  [-VsixUrl <String>] `
+  [-VsVersion <Int32>] `
+  [-Checksum <String>] `
+  [-ChecksumType <String>] `
+  [-Options <Hashtable>] `
+  [-IgnoredArguments <Object[]>] [<CommonParameters>]
+~~~
 
-## Usage
+## Description
 
-```powershell
-Install-ChocolateyVsixPackage $packageName $vsixUrl `
- $vsVersion -checksum $checksum -checksumType $checksumType
-```
+VSIX packages are Extensions for the Visual Studio IDE. The Visual
+Studio Gallery at  http://visualstudiogallery.msdn.microsoft.com/ is the
+public extension feed and hosts thousands of extensions. You can locate
+a VSIX Url by finding the download link of Visual Studio extensions on
+the Visual Studio Gallery.
 
-## Examples
+## Notes
 
-```powershell
-Install-ChocolateyVsixPackage "MyPackage" `
- http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix
-```
+Chocolatey works best when the packages contain the software it is
+managing and doesn't require downloads. However most software in the
+Windows world requires redistribution rights and when sharing packages
+publicly (like on the [community feed](https://chocolatey.org/packages)), maintainers may not have those
+aforementioned rights. Chocolatey understands how to work with that,
+hence this function. You are not subject to this limitation with
+internal packages.
 
-This downloads the AutoWrockTestable VSIX from the Visual Studio Gallery and installs it to the latest version of VS.
+## Aliases
 
-```powershell
-Install-ChocolateyVsixPackage "MyPackage" `
- http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix 11
-```
+None
 
-This downloads the AutoWrockTestable VSIX from the Visual Studio Gallery and installs it to Visual Studio 2012 (v11.0).
+## Inputs
+
+None
+
+## Outputs
+
+None
 
 ## Parameters
 
-* `-packageName`
+###  -PackageName &lt;String&gt;
+The name of the package - while this is an arbitrary value, it's
+recommended that it matches the package id.
 
-    This is an arbitrary name.
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | true
+Position?              | 1
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -VsixUrl [&lt;String&gt;]
+The URL of the package to be installed.
 
-    Example: `'7zip'`
+Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
-* `-vsixUrl`
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 2
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -VsVersion [&lt;Int32&gt;]
+The Major version number of Visual Studio where the
+package should be installed. This is optional. If not
+specified, the most recent Visual Studio installation
+will be targetted.
 
-    The URL of the package to be installed.
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 3
+Default Value          | 0
+Accept Pipeline Input? | false
+ 
+###  -Checksum [&lt;String&gt;]
+OPTIONAL (Highly recommended) - The checksum hash value of the Url
+resource. This allows a checksum to be validated for files that are not
+local. The checksum type is covered by ChecksumType.
 
-    Example: `http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix`
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | named
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -ChecksumType [&lt;String&gt;]
+OPTIONAL - The type of checkum that the file is validated with - valid
+values are 'md5', 'sha1', 'sha256' or 'sha512' - defaults to 'md5'.
 
-* `-vsVersion` _(optional)_
-    
-    The Major version number of Visual Studio where the package should be installed. This is optional. If not specified, the most recent Visual Studio installation will be targeted.
+MD5 is not recommended as certain organizations need to use FIPS
+compliant algorithms for hashing - see
+https://support.microsoft.com/en-us/kb/811833 for more details.
 
-* `-checksum` _(optional)_
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | named
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -Options [&lt;Hashtable&gt;]
+OPTIONAL - Specify custom headers. Available in 0.9.10+.
 
-    This allows the file being downloaded to be validated. Can be an MD5 or SHA1 hash.
+Property               | Value
+---------------------- | --------------
+Aliases                | 
+Required?              | false
+Position?              | named
+Default Value          | @{Headers=@{}}
+Accept Pipeline Input? | false
+ 
+###  -IgnoredArguments [&lt;Object[]&gt;]
+Allows splatting with arguments that do not apply. Do not use directly.
 
-    Example: `-checksum 'C67962F064924F3C7B95D69F88E745C0'`
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | named
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+### &lt;CommonParameters&gt;
 
-    Defaults to ``.
+This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-* `-checksumType` _(optional)_
 
-    This allows the file being downloaded to be validated. Can be an MD5 or SHA1 hash.
+## Examples
 
-    Example: `-checksumType 'sha1'`
-    
-    Defaults to `md5`.
+ **EXAMPLE 1**
+
+~~~powershell
+
+# This downloads the AutoWrockTestable VSIX from the Visual Studio
+# Gallery and installs it to the latest version of VS.
+
+Install-ChocolateyVsixPackage -PackageName "MyPackage" `
+  -VsixUrl http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+# This downloads the AutoWrockTestable VSIX from the Visual Studio
+# Gallery and installs it to Visual Studio 2012 (v11.0).
+
+Install-ChocolateyVsixPackage -PackageName "MyPackage" `
+  -VsixUrl http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix `
+  -VsVersion 11
+~~~
+
+## Links
+
+ * [[Install-ChocolateyPackage|HelpersInstallChocolateyPackage]]
+ * [[Install-ChocolateyInstallPackage|HelpersInstallChocolateyInstallPackage]]
+ * [[Install-ChocolateyZipPackage|HelpersInstallChocolateyZipPackage]]
+
 
 [[Function Reference|HelpersReference]]
+
+***NOTE:*** This documentation has been automatically generated from `Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1" -Force; Get-Help Install-ChocolateyVsixPackage -Full`.
