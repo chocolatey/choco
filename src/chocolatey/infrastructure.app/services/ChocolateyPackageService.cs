@@ -48,6 +48,8 @@ namespace chocolatey.infrastructure.app.services
         private readonly IXmlService _xmlService;
         private readonly IConfigTransformService _configTransformService;
 
+        private readonly string _shutdownExe = Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\shutdown.exe");
+       
         public ChocolateyPackageService(INugetService nugetService, IPowershellService powershellService,
             IEnumerable<ISourceRunner> sourceRunners, IShimGenerationService shimgenService,
             IFileSystem fileSystem, IRegistryService registryService,
@@ -259,7 +261,7 @@ namespace chocolatey.infrastructure.app.services
                     if (powerShellRan)
                     {
                         // we don't care about the exit code
-                        if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute_static("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
+                        if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute_static(_shutdownExe, "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
                     }
 
                     var installersDifferences = _registryService.get_installer_key_differences(installersBefore, _registryService.get_installer_keys());
@@ -689,7 +691,7 @@ Would have determined packages that are out of date based on what is
             }
 
             // we don't care about the exit code
-            if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute_static("shutdown", "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
+            if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute_static(_shutdownExe, "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
 
             if (packageResult.Success)
             {
