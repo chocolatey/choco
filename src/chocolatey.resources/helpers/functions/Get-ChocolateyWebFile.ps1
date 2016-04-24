@@ -149,13 +149,17 @@ param(
   $headers = @{}
   if ($url.StartsWith('http')) {
     try {
-      $headers = Get-WebHeaders $url
+      $headers = Get-WebHeaders $url -ErrorAction "Stop"
     } catch {
       if ($host.Version -lt (new-object 'Version' 3,0)) {
         Write-Debug "Converting Security Protocol to SSL3 only for Powershell v2"
         # this should last for the entire duration
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Ssl3
-        $headers = Get-WebHeaders $url
+        try {
+          $headers = Get-WebHeaders $url -ErrorAction "Stop"
+        } catch {
+          Write-Host "Attempt to get headers for $url failed.`n  $($_.Exception.Message)"
+        }
       } else {
         Write-Host "Attempt to get headers for $url failed.`n  $($_.Exception.Message)"
       }

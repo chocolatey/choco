@@ -98,16 +98,21 @@ param(
         Write-Debug "  `'$key`':`'$value`'"
       }
     }
-    $response.Close();
-  }
-  catch {
-    $request.ServicePoint.MaxIdleTime = 0
-    $request.Abort();
-    # ruthlessly remove $request to ensure it isn't reused
-    Remove-Variable request
-    Start-Sleep 1
-    [GC]::Collect()
-    throw
+  } catch {
+    if ($request -ne $null) {
+      $request.ServicePoint.MaxIdleTime = 0
+      $request.Abort();
+      # ruthlessly remove $request to ensure it isn't reused
+      Remove-Variable request
+      Start-Sleep 1
+      [GC]::Collect()
+    }
+    
+    throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"    
+  } finally {
+   if ($response -ne $null) {
+      $response.Close();
+    }
   }
 
   $headers

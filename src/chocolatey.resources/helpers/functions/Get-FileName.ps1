@@ -126,9 +126,6 @@ param(
       $containsEquals = [System.IO.Path]::GetFileName($url).Contains('=')
       $fileName = [System.IO.Path]::GetFileName($response.ResponseUri.ToString()) 
     }
-    
-    $response.Close()
-    $response.Dispose()
 
     [System.Text.RegularExpressions.Regex]$containsABadCharacter = New-Object Regex("[" + [System.Text.RegularExpressions.Regex]::Escape([System.IO.Path]::GetInvalidFileNameChars()) + "]", [System.Text.RegularExpressions.RegexOptions]::IgnorePatternWhitespace);
 
@@ -141,12 +138,22 @@ param(
     Write-Debug "File name determined from url is '$fileName'"
     
     return $fileName
-  } catch
-  {
-    $request.ServicePoint.MaxIdleTime = 0
-    $request.Abort();
+  } catch {
+    if ($request -ne $null) {
+      $request.ServicePoint.MaxIdleTime = 0
+      $request.Abort();
+      # ruthlessly remove $request to ensure it isn't reused
+      Remove-Variable request
+      Start-Sleep 1
+      [GC]::Collect()
+    }
+    
     Write-Debug "Url request/response failed - file name will be '$originalFileName':  $($_)"
     
     return $originalFileName
+  } finally {
+   if ($response -ne $null) {
+      $response.Close();
+    }
   }
 }
