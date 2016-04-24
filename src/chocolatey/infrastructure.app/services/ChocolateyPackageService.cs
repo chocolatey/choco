@@ -875,7 +875,7 @@ Would have determined packages that are out of date based on what is
 
         private void handle_unsuccessful_operation(ChocolateyConfiguration config, PackageResult packageResult, bool movePackageToFailureLocation, bool attemptRollback)
         {
-            Environment.ExitCode = 1;
+            if (Environment.ExitCode == 0 ) Environment.ExitCode = 1;
 
             foreach (var message in packageResult.Messages.Where(m => m.MessageType == ResultType.Error))
             {

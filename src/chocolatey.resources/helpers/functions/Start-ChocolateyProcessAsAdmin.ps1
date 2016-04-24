@@ -126,8 +126,11 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
 
   Write-Debug "Command [`"$exeToRun`" $wrappedStatements] exited with `'$exitCode`'."
   if ($validExitCodes -notcontains $exitCode) {
+    Set-PowerShellExitCode $exitCode
     throw "Running [`"$exeToRun`" $statements] was not successful. Exit code was '$exitCode'. See log for possible error messages."
   }
  
   Write-Debug "Finishing 'Start-ChocolateyProcessAsAdmin'"
+
+  return $exitCode
 }

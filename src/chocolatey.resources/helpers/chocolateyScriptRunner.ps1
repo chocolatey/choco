@@ -46,3 +46,17 @@ $checksumExe = Join-Path $chocoTools 'checksum.exe'
 
 Write-Debug "Running `'$packageScript`'";
 & "$packageScript"
+
+$scriptSuccess = $?
+
+$exitCode = $LASTEXITCODE
+if ($exitCode -eq 0 -and -not $scriptSuccess) {
+  $exitCode = 1
+}
+
+if ($env:ChocolateyExitCode -ne $null -and $env:ChocolateyExitCode -ne '') {
+ $exitCode = $env:ChocolateyExitCode
+}
+
+
+Exit $exitCode
