@@ -192,7 +192,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             }
 
             // NOTE: blended options may not have been fully initialized yet
-            if (!config.PromptForConfirmation) return;
+            var timeoutInSeconds = config.PromptForConfirmation ? 0 : 20;
 
             if (shouldWarn)
             {
@@ -205,9 +205,10 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                 var selection = InteractivePrompt.prompt_for_confirmation(@"
  Do you want to continue?", new[] { "yes", "no" },
                         defaultChoice: null,
-                        requireAnswer: true,
+                        requireAnswer: false,
                         allowShortAnswer: true,
-                        shortPrompt: true
+                        shortPrompt: true,
+                        timeoutInSeconds: timeoutInSeconds
                         );
 
                 if (selection.is_equal_to("no"))
