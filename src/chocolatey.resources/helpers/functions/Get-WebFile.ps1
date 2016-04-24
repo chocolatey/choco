@@ -222,6 +222,7 @@ param(
       [GC]::Collect()
     }
     
+    Set-PowerShellExitCode 404
     throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"
   } finally {
     if ($res -ne $null) {
