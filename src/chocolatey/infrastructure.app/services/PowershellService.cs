@@ -564,11 +564,11 @@ try {
                             case PipelineState.Failed:
                             case PipelineState.Stopping:
                             case PipelineState.Stopped:
-                                host.SetShouldExit(1);
+                                if (host.ExitCode == 0) host.SetShouldExit(1);
                                 host.HostException = pipeline.PipelineStateInfo.Reason;
                                 break;
                             case PipelineState.Completed:
-                                host.SetShouldExit(0);
+                                if (host.ExitCode == -1) host.SetShouldExit(0);
                                 break;
                         }
 
