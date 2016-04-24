@@ -59,6 +59,11 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   
   Write-Debug $dbgMessage
 
+  $exeIsTextFile = [System.IO.Path]::GetFullPath($exeToRun) + ".istext"
+  if (([System.IO.File]::Exists($exeIsTextFile))) {
+    throw "The file was a text file but is attempting to be run as an executable - '$exeToRun'"
+  }
+
   # Redirecting output slows things down a bit.
   $writeOutput = {
     if ($EventArgs.Data -ne $null) {
