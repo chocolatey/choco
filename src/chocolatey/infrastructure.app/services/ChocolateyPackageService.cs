@@ -372,7 +372,7 @@ namespace chocolatey.infrastructure.app.services
                 this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
                 foreach (var warning in packageInstalls.Where(p => p.Value.Warning).or_empty_list_if_null())
                 {
-                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
+                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}{1}".format_with(warning.Value.Name, warning.Value.ExitCode != 0 ? " (exit code {0})".format_with(warning.Value.ExitCode) : string.Empty));
                 }
             }
 
@@ -381,7 +381,7 @@ namespace chocolatey.infrastructure.app.services
                 this.Log().Error("Failures:");
                 foreach (var failure in packageInstalls.Where(p => !p.Value.Success).or_empty_list_if_null())
                 {
-                    this.Log().Error(" - {0}".format_with(failure.Value.Name));
+                    this.Log().Error(" - {0}{1}".format_with(failure.Value.Name, failure.Value.ExitCode != 0 ? " (exit code {0})".format_with(failure.Value.ExitCode) : string.Empty));
                 }
             }
 
@@ -574,7 +574,7 @@ Would have determined packages that are out of date based on what is
                 this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
                 foreach (var warning in packageUpgrades.Where(p => p.Value.Warning).or_empty_list_if_null())
                 {
-                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
+                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}{1}".format_with(warning.Value.Name, warning.Value.ExitCode != 0 ? " (exit code {0})".format_with(warning.Value.ExitCode) : string.Empty));
                 }
             }
 
@@ -583,7 +583,7 @@ Would have determined packages that are out of date based on what is
                 this.Log().Error("Failures:");
                 foreach (var failure in packageUpgrades.Where(p => !p.Value.Success).or_empty_list_if_null())
                 {
-                    this.Log().Error(" - {0}".format_with(failure.Value.Name));
+                    this.Log().Error(" - {0}{1}".format_with(failure.Value.Name, failure.Value.ExitCode != 0 ? " (exit code {0})".format_with(failure.Value.ExitCode) : string.Empty));
                 }
             }
 
@@ -654,7 +654,7 @@ Would have determined packages that are out of date based on what is
                 this.Log().Error("Failures");
                 foreach (var failure in packageUninstalls.Where(p => !p.Value.Success).or_empty_list_if_null())
                 {
-                    this.Log().Error(" - {0}".format_with(failure.Value.Name));
+                    this.Log().Error(" - {0}{1}".format_with(failure.Value.Name, failure.Value.ExitCode != 0 ? " (exit code {0})".format_with(failure.Value.ExitCode) : string.Empty));
                 }
             }
 
@@ -875,7 +875,7 @@ Would have determined packages that are out of date based on what is
 
         private void handle_unsuccessful_operation(ChocolateyConfiguration config, PackageResult packageResult, bool movePackageToFailureLocation, bool attemptRollback)
         {
-            Environment.ExitCode = 1;
+            if (Environment.ExitCode == 0 ) Environment.ExitCode = 1;
 
             foreach (var message in packageResult.Messages.Where(m => m.MessageType == ResultType.Error))
             {

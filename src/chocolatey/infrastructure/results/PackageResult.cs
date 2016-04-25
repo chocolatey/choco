@@ -41,6 +41,7 @@ namespace chocolatey.infrastructure.results
         public string InstallLocation { get; set; }
         public string Source { get; set; }
         public string SourceUri { get; set; }
+        public int ExitCode { get; set; }
 
         public PackageResult(IPackage package, string installLocation, string source = null) : this(package.Id.to_lower(), package.Version.to_string(), installLocation)
         {

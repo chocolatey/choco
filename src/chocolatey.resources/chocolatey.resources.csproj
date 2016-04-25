@@ -123,7 +123,7 @@
     <EmbeddedResource Include="helpers\chocolateyScriptRunner.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="helpers\functions\Get-FileName.ps1" />
+    <EmbeddedResource Include="helpers\functions\Get-WebFileName.ps1" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="helpers\functions\Get-ToolsLocation.ps1" />
@@ -136,6 +136,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="helpers\ChocolateyTabExpansion.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="helpers\functions\Set-PowerShellExitCode.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

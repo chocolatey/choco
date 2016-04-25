@@ -323,14 +323,27 @@ namespace chocolatey.infrastructure.app.services
  `choco -h` for details.");
                     }
 
+                    
                     if (result.ExitCode != 0)
+                    {
+                        Environment.ExitCode = result.ExitCode;
+                        packageResult.ExitCode = result.ExitCode;
+                    }
+                    
+                    // 0 - most widely used success exit code
+                    // MSI valid exit codes
+                    // 1605 - (uninstall) - the product is not found, could have already been uninstalled
+                    // 1614 (uninstall) - the product is uninstalled
+                    // 1641 - restart initiated
+                    // 3010 - restart required
+                    var validExitCodes = new List<int> { 0, 1605, 1614, 1641, 3010 };
+                    if (!validExitCodes.Contains(result.ExitCode))
                     {
                         failure = true;
                     }
 
                     if (failure)
                     {
-                        Environment.ExitCode = result.ExitCode;
                         packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Error while running '{0}'.{1} See log for details.".format_with(chocoPowerShellScript, Environment.NewLine)));
                     }
                     packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Ran '{0}'".format_with(chocoPowerShellScript)));
@@ -564,11 +577,11 @@ try {
                             case PipelineState.Failed:
                             case PipelineState.Stopping:
                             case PipelineState.Stopped:
-                                host.SetShouldExit(1);
+                                if (host.ExitCode == 0) host.SetShouldExit(1);
                                 host.HostException = pipeline.PipelineStateInfo.Reason;
                                 break;
                             case PipelineState.Completed:
-                                host.SetShouldExit(0);
+                                if (host.ExitCode == -1) host.SetShouldExit(0);
                                 break;
                         }
 

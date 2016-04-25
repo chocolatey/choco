@@ -32,7 +32,7 @@ $packageParameters = $env:chocolateyPackageParameters
 # ensure module loading preference is on
 $PSModuleAutoLoadingPreference = "All";
 
-Write-Debug "PowerShell Version is '$($PSVersionTable.PSVersion)' and CLR Version is '$($PSVersionTable.CLRVersion)'."
+Write-Debug "Host version is $($host.Version), PowerShell Version is '$($PSVersionTable.PSVersion)' and CLR Version is '$($PSVersionTable.CLRVersion)'."
 
 # grab functions from files
 Get-Item $helpersPath\functions\*.ps1 |

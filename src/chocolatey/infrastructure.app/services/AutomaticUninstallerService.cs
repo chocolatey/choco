@@ -141,18 +141,20 @@ namespace chocolatey.infrastructure.app.services
                 if (!key.HasQuietUninstall &&  installer.GetType() == typeof(CustomInstaller))
                 {
                     var skipUninstaller = true;
-                    if (config.PromptForConfirmation)
-                    {
-                        var selection = InteractivePrompt.prompt_for_confirmation(
-                            "Uninstall may not be silent (could not detect). Proceed?",
-                            new[] { "yes", "no" },
-                            defaultChoice: null,
-                            requireAnswer: true,
-                            allowShortAnswer: true,
-                            shortPrompt: true
-                            );
-                        if (selection.is_equal_to("yes")) skipUninstaller = false;
-                    }
+
+                    var timeout = config.PromptForConfirmation ? 0 : 30;
+                    
+                    var selection = InteractivePrompt.prompt_for_confirmation(
+                        "Uninstall may not be silent (could not detect). Proceed?",
+                        new[] { "yes", "no" },
+                        defaultChoice: "no",
+                        requireAnswer: true,
+                        allowShortAnswer: true,
+                        shortPrompt: true,
+                        timeoutInSeconds: timeout
+                        );
+                    if (selection.is_equal_to("yes")) skipUninstaller = false;
+                    
 
                     if (skipUninstaller)
                     {

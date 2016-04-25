@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.commandline
             get { return _console.Value; }
         }
 
-        public static string prompt_for_confirmation(string prompt, IEnumerable<string> choices, string defaultChoice, bool requireAnswer, bool allowShortAnswer = true, bool shortPrompt = false, int repeat = 10)
+        public static string prompt_for_confirmation(string prompt, IEnumerable<string> choices, string defaultChoice, bool requireAnswer, bool allowShortAnswer = true, bool shortPrompt = false, int repeat = 10, int timeoutInSeconds = 0)
         {
             if (repeat < 0) throw new ApplicationException("Too many bad attempts. Stopping before application crash.");
             Ensure.that(() => prompt).is_not_null();
@@ -109,7 +109,7 @@ namespace chocolatey.infrastructure.commandline
 
             Console.Write(shortPrompt ? "): " : "> ");
 
-            var selection = Console.ReadLine();
+            var selection = timeoutInSeconds == 0 ? Console.ReadLine() : Console.ReadLine(timeoutInSeconds * 1000);
             if (shortPrompt) Console.WriteLine();
 
             if (string.IsNullOrWhiteSpace(selection) && defaultChoice != null)

@@ -95,16 +95,16 @@ param(
       $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
     }
 
-    Start-ChocolateyProcessAsAdmin "$msiArgs" 'msiexec' -validExitCodes $validExitCodes
+    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" 'msiexec' -validExitCodes $validExitCodes
     #Start-Process -FilePath msiexec -ArgumentList $msiArgs -Wait
   }
 
   if ($fileType -like 'exe') {
     if ($overrideArguments) {
-      Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes
+      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes
       write-host "Overriding package arguments with `'$additionalInstallArgs`'";
     } else {
-      Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes
+      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes
     }
   }
 
@@ -115,7 +115,7 @@ param(
     } else {
       $msuArgs = "$file $silentArgs $additionalInstallArgs"
     }
-    Start-ChocolateyProcessAsAdmin "$msuArgs" 'wusa.exe' -validExitCodes $validExitCodes
+    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" 'wusa.exe' -validExitCodes $validExitCodes
   }
 
   write-host "$packageName has been installed."

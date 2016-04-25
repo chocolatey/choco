@@ -59,6 +59,17 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   
   Write-Debug $dbgMessage
 
+  $exeIsTextFile = [System.IO.Path]::GetFullPath($exeToRun) + ".istext"
+  if (([System.IO.File]::Exists($exeIsTextFile))) {
+    Set-PowerShellExitCode 4
+    throw "The file was a text file but is attempting to be run as an executable - '$exeToRun'"
+  }
+
+  if (!([System.IO.File]::Exists($exeToRun))) {
+    Set-PowerShellExitCode 2
+    throw "Could not find '$exeToRun'"
+  }
+
   # Redirecting output slows things down a bit.
   $writeOutput = {
     if ($EventArgs.Data -ne $null) {
@@ -115,8 +126,11 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
 
   Write-Debug "Command [`"$exeToRun`" $wrappedStatements] exited with `'$exitCode`'."
   if ($validExitCodes -notcontains $exitCode) {
+    Set-PowerShellExitCode $exitCode
     throw "Running [`"$exeToRun`" $statements] was not successful. Exit code was '$exitCode'. See log for possible error messages."
   }
  
   Write-Debug "Finishing 'Start-ChocolateyProcessAsAdmin'"
+
+  return $exitCode
 }

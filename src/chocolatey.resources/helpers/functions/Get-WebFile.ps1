@@ -94,119 +94,141 @@ param(
     }
   }
 
-  $res = $req.GetResponse();
+  try { 
+   [System.Net.HttpWebResponse]$res = $req.GetResponse();
 
-  try {
-    $headers = @{}
-    foreach ($key in $res.Headers) {
-      $value = $res.Headers[$key];
-      if ($value) {
-        $headers.Add("$key","$value")
-      }
-    }
-
-    if ($headers.ContainsKey("Content-Type")) {
-      $contentType = $headers['Content-Type']
-      if ($contentType -ne $null) {
-        if ($contentType.ToLower().Contains("text/html") -or $contentType.ToLower().Contains("text/plain")) {
-          Write-Warning "$fileName is of content type $contentType"
-          Set-Content -Path "$fileName.istext" -Value "$fileName has content type $contentType" -Encoding UTF8 -Force
+   try {
+      $headers = @{}
+      foreach ($key in $res.Headers) {
+        $value = $res.Headers[$key];
+        if ($value) {
+          $headers.Add("$key","$value")
         }
       }
-    } 
-  } catch {
-    # not able to get content-type header
-    Write-Debug "Error getting content type - $($_.Exception.Message)"
-  }
 
-  if($fileName -and !(Split-Path $fileName)) {
-    $fileName = Join-Path (Get-Location -PSProvider "FileSystem") $fileName
-  }
-  elseif((!$Passthru -and ($fileName -eq $null)) -or (($fileName -ne $null) -and (Test-Path -PathType "Container" $fileName)))
-  {
-    [string]$fileName = ([regex]'(?i)filename=(.*)$').Match( $res.Headers["Content-Disposition"] ).Groups[1].Value
-    $fileName = $fileName.trim("\/""'")
-    if(!$fileName) {
-       $fileName = $res.ResponseUri.Segments[-1]
-       $fileName = $fileName.trim("\/")
-       if(!$fileName) {
-          $fileName = Read-Host "Please provide a file name"
-       }
-       $fileName = $fileName.trim("\/")
-       if(!([IO.FileInfo]$fileName).Extension) {
-          $fileName = $fileName + "." + $res.ContentType.Split(";")[0].Split("/")[1]
-       }
+      if ($headers.ContainsKey("Content-Type")) {
+        $contentType = $headers['Content-Type']
+        if ($contentType -ne $null) {
+          if ($contentType.ToLower().Contains("text/html") -or $contentType.ToLower().Contains("text/plain")) {
+            Write-Warning "$fileName is of content type $contentType"
+            Set-Content -Path "$fileName.istext" -Value "$fileName has content type $contentType" -Encoding UTF8 -Force
+          }
+        }
+      } 
+    } catch {
+      # not able to get content-type header
+      Write-Debug "Error getting content type - $($_.Exception.Message)"
     }
-    $fileName = Join-Path (Get-Location -PSProvider "FileSystem") $fileName
-  }
-  if($Passthru) {
-    $encoding = [System.Text.Encoding]::GetEncoding( $res.CharacterSet )
-    [string]$output = ""
-  }
 
-  if($res.StatusCode -eq 200) {
-    [long]$goal = $res.ContentLength
-    $goalFormatted = Format-FileSize $goal
-    $reader = $res.GetResponseStream()
-    
-    if ($fileName) {
-      $fileDirectory = $([System.IO.Path]::GetDirectoryName($fileName))
-      if (!(Test-Path($fileDirectory))) {
-        [System.IO.Directory]::CreateDirectory($fileDirectory) | Out-Null
+    if($fileName -and !(Split-Path $fileName)) {
+      $fileName = Join-Path (Get-Location -PSProvider "FileSystem") $fileName
+    }
+    elseif((!$Passthru -and ($fileName -eq $null)) -or (($fileName -ne $null) -and (Test-Path -PathType "Container" $fileName)))
+    {
+      [string]$fileName = ([regex]'(?i)filename=(.*)$').Match( $res.Headers["Content-Disposition"] ).Groups[1].Value
+      $fileName = $fileName.trim("\/""'")
+      if(!$fileName) {
+         $fileName = $res.ResponseUri.Segments[-1]
+         $fileName = $fileName.trim("\/")
+         if(!$fileName) {
+            $fileName = Read-Host "Please provide a file name"
+         }
+         $fileName = $fileName.trim("\/")
+         if(!([IO.FileInfo]$fileName).Extension) {
+            $fileName = $fileName + "." + $res.ContentType.Split(";")[0].Split("/")[1]
+         }
       }
+      $fileName = Join-Path (Get-Location -PSProvider "FileSystem") $fileName
+    }
+    if($Passthru) {
+      $encoding = [System.Text.Encoding]::GetEncoding( $res.CharacterSet )
+      [string]$output = ""
+    }
 
+    if($res.StatusCode -eq 401 -or $res.StatusCode -eq 403 -or $res.StatusCode -eq 404) {
+      $env:ChocolateyExitCode = $res.StatusCode
+      throw "Remote file either doesn't exist, is unauthorized, or is forbidden for '$url'."
+    }
+
+    if($res.StatusCode -eq 200) {
+      [long]$goal = $res.ContentLength
+      $goalFormatted = Format-FileSize $goal
+      $reader = $res.GetResponseStream()
+    
+      if ($fileName) {
+        $fileDirectory = $([System.IO.Path]::GetDirectoryName($fileName))
+        if (!(Test-Path($fileDirectory))) {
+          [System.IO.Directory]::CreateDirectory($fileDirectory) | Out-Null
+        }
+
+        try {
+          $writer = new-object System.IO.FileStream $fileName, "Create"
+        } catch {
+          throw $_.Exception
+        }
+      }
+    
+      [byte[]]$buffer = new-object byte[] 1048576
+      [long]$total = [long]$count = [long]$iterLoop =0
+
+      $originalEAP = $ErrorActionPreference
+      $ErrorActionPreference = 'Stop'
       try {
-        $writer = new-object System.IO.FileStream $fileName, "Create"
+        do
+        {
+          $count = $reader.Read($buffer, 0, $buffer.Length);
+          if($fileName) {
+            $writer.Write($buffer, 0, $count);
+          }
+        
+          if($Passthru){
+            $output += $encoding.GetString($buffer,0,$count)
+          } elseif(!$quiet) {
+            $total += $count
+            $totalFormatted = Format-FileSize $total
+            if($goal -gt 0 -and ++$iterLoop%10 -eq 0) {
+              Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete (($total/$goal)*100)
+            }
+          
+            if ($total -eq $goal) {
+              Write-Progress "Completed download of $url." "Completed download of $fileName ($goalFormatted)." -id 0 -Completed
+            }
+          }
+        } while ($count -gt 0)
+	    Write-Host ""
+	    Write-Host "Download of $([System.IO.Path]::GetFileName($fileName)) ($goalFormatted) completed."
       } catch {
         throw $_.Exception
+      } finally {
+        $ErrorActionPreference = $originalEAP
+      }
+
+      $reader.Close()
+      if($fileName) {
+         $writer.Flush()
+         $writer.Close()
+      }
+      if($Passthru){
+         $output
       }
     }
+  } catch {
+    if ($req -ne $null) {
+      $req.ServicePoint.MaxIdleTime = 0
+      $req.Abort();
+      # ruthlessly remove $req to ensure it isn't reused
+      Remove-Variable req
+      Start-Sleep 1
+      [GC]::Collect()
+    }
     
-    [byte[]]$buffer = new-object byte[] 1048576
-    [long]$total = [long]$count = [long]$iterLoop =0
-
-    $originalEAP = $ErrorActionPreference
-    $ErrorActionPreference = 'Stop'
-    try {
-      do
-      {
-        $count = $reader.Read($buffer, 0, $buffer.Length);
-        if($fileName) {
-          $writer.Write($buffer, 0, $count);
-        }
-        
-        if($Passthru){
-          $output += $encoding.GetString($buffer,0,$count)
-        } elseif(!$quiet) {
-          $total += $count
-          $totalFormatted = Format-FileSize $total
-          if($goal -gt 0 -and ++$iterLoop%10 -eq 0) {
-            Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete (($total/$goal)*100)
-          }
-          
-          if ($total -eq $goal) {
-            Write-Progress "Completed download of $url." "Completed download of $fileName ($goalFormatted)." -id 0 -Completed
-          }
-        }
-      } while ($count -gt 0)
-	  Write-Host ""
-	  Write-Host "Download of $([System.IO.Path]::GetFileName($fileName)) ($goalFormatted) completed."
-    } catch {
-      throw $_.Exception
-    } finally {
-      $ErrorActionPreference = $originalEAP
-    }
-
-    $reader.Close()
-    if($fileName) {
-       $writer.Flush()
-       $writer.Close()
-    }
-    if($Passthru){
-       $output
+    Set-PowerShellExitCode 404
+    throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"
+  } finally {
+    if ($res -ne $null) {
+      $res.Close()
     }
   }
-  $res.Close();
 }
 
 # this could be cleaned up with http://learn-powershell.net/2013/02/08/powershell-and-events-object-events/

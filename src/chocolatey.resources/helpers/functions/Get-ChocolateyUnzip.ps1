@@ -138,6 +138,7 @@ param(
   Unregister-Event -SourceIdentifier "LogErrors_ChocolateyZipProc"
 
   $exitCode = $process.ExitCode
+  Set-PowerShellExitCode $exitCode
   $process.Dispose()
   Write-Debug "Command ['$7zip' $params] exited with `'$exitCode`'."
 
