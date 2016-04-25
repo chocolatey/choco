@@ -93,6 +93,19 @@ namespace chocolatey.infrastructure.app.commands
                       {
                         if (option != null) configuration.Features.CheckSumFiles = false;
                       })
+                .Add("ignorepackagecodes|ignorepackageexitcodes|ignore-package-codes|ignore-package-exit-codes",
+                     "IgnorePackageExitCodes - Exit with a 0 for success and 1 for non-success, no matter what package scripts provide for exit codes. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
+                     option =>
+                     {
+                         if (option != null)
+                         {
+                             configuration.Features.UsePackageExitCodes = false;
+                         }
+                     })
+                 .Add("usepackagecodes|usepackageexitcodes|use-package-codes|use-package-exit-codes",
+                     "UsePackageExitCodes - Package scripts can provide exit codes. Use those for choco's exit code when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
+                     option => configuration.Features.UsePackageExitCodes = option != null
+                     )
                  .Add("except=",
                      "Except - a comma-separated list of package names that should not be upgraded when upgrading 'all'. Defaults to empty.",
                      option => configuration.UpgradeCommand.PackageNamesToSkip = option.remove_surrounding_quotes())
