@@ -129,7 +129,7 @@ param(
     try {
       $fileDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
       $originalFileName = [System.IO.Path]::GetFileName($fileFullPath)
-      $fileFullPath = Get-FileName -url $url -defaultName $originalFileName
+      $fileFullPath = Get-WebFileName -url $url -defaultName $originalFileName
       $fileFullPath = Join-Path $fileDirectory $fileFullPath
       $fileFullPath = [System.IO.Path]::GetFullPath($fileFullPath)
     } catch {

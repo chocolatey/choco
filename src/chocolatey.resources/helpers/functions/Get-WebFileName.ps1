@@ -13,14 +13,14 @@
 # limitations under the License.
 #
 # Based on http://stackoverflow.com/a/13571471/18475
-function Get-FileName {
+function Get-WebFileName {
 param(
   [string]$url = '',
   [string]$defaultName,
   $userAgent = 'chocolatey command line'
 )
 
-  Write-Debug "Running 'Get-FileName' to determine name with url:'$url', defaultName:'$defaultName'";
+  Write-Debug "Running 'Get-WebFileName' to determine name with url:'$url', defaultName:'$defaultName'";
 
   $originalFileName = $defaultName
   $fileName = $null
