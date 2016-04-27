@@ -146,7 +146,7 @@ Get-FtpFile
 param(
   [parameter(Mandatory=$true, Position=0)][string] $packageName,
   [parameter(Mandatory=$true, Position=1)][string] $fileFullPath,
-  [parameter(Mandatory=$true, Position=2)][string] $url,
+  [parameter(Mandatory=$false, Position=2)][string] $url = '',
   [parameter(Mandatory=$false, Position=3)][string] $url64bit = '',
   [parameter(Mandatory=$false)][string] $checksum = '',
   [parameter(Mandatory=$false)][string] $checksumType = '',
@@ -189,6 +189,12 @@ param(
     $url = $url32bit
     $checksum =  $checksum32
     $checksumType = $checksumType32
+  }
+
+  # If we're on 32 bit or attempting to force 32 bit and there is no
+  # 32 bit url, we need to throw an error.
+  if ($url -eq $null -or $url -eq '') {
+    throw "This package does not support $bitWidth bit architecture."
   }
 
   if ($getOriginalFileName) {

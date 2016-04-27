@@ -214,7 +214,7 @@ param(
   [parameter(Mandatory=$false, Position=1)]
   [alias("installerType","installType")][string] $fileType = 'exe',
   [parameter(Mandatory=$false, Position=2)][string] $silentArgs = '',
-  [parameter(Mandatory=$false, Position=3)][string] $url,
+  [parameter(Mandatory=$false, Position=3)][string] $url = '',
   [parameter(Mandatory=$false, Position=4)]
   [alias("url64")][string] $url64bit = '',
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
