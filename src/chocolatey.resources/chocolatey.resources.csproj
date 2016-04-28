@@ -48,7 +48,7 @@
     <EmbeddedResource Include="helpers\functions\Get-ChocolateyUnzip.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-ChocolateyWebFile.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-FtpFile.ps1" />
-    <EmbeddedResource Include="helpers\functions\Get-ProcessorBits.ps1" />
+    <EmbeddedResource Include="helpers\functions\Get-OSArchitectureWidth.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-UACEnabled.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-VirusCheckValid.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-WebFile.ps1" />
