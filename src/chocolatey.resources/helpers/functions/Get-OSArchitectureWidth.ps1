@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ProcessorBits {
+function Get-OSArchitectureWidth {
 <#
 .SYNOPSIS
-Get the system architecture address width.
+Get the operating system architecture address width.
 
 .DESCRIPTION
 This will return the system architecture address width (probably 32 or
@@ -25,6 +25,9 @@ of {`32`|`64`}.
 .NOTES
 When your installation script has to know what architecture it is run
 on, this simple function comes in handy.
+
+If you need compatibility with pre 0.9.10, please use the alias 
+`Get-ProcessorBits`.
 
 .INPUTS
 None
@@ -40,7 +43,7 @@ depending on wether or not the bit width matches.
 param(
   $compare
 )
-  Write-Debug "Running 'Get-ProcessorBits'"
+  Write-Debug "Running 'Get-OSArchitectureWidth'"
 
   $bits = 64
   if ([System.IntPtr]::Size -eq 4) {
@@ -56,3 +59,5 @@ param(
     return $bits
   }
 }
+
+Set-Alias Get-ProcessorBits Get-OSArchitectureWidth
