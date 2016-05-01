@@ -47,9 +47,10 @@ namespace chocolatey.infrastructure.app.services
         private readonly IAutomaticUninstallerService _autoUninstallerService;
         private readonly IXmlService _xmlService;
         private readonly IConfigTransformService _configTransformService;
+        private const string PRO_BUSINESS_MESSAGE = @"Check out Pro / Business for more features! https://bit.ly/choco_pro_business";
 
         private readonly string _shutdownExe = Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\shutdown.exe");
-       
+
         public ChocolateyPackageService(INugetService nugetService, IPowershellService powershellService,
             IEnumerable<ISourceRunner> sourceRunners, IShimGenerationService shimgenService,
             IFileSystem fileSystem, IRegistryService registryService,
@@ -150,6 +151,8 @@ namespace chocolatey.infrastructure.app.services
                     }
                 }
             }
+
+            randomly_notify_about_pro_business(config);
         }
 
         private IEnumerable<PackageResult> report_registry_programs(ChocolateyConfiguration config, IEnumerable<IPackage> list)
@@ -203,6 +206,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             _nugetService.pack_run(config);
+            randomly_notify_about_pro_business(config);
         }
 
         public void push_noop(ChocolateyConfiguration config)
@@ -225,6 +229,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             _nugetService.push_run(config);
+            randomly_notify_about_pro_business(config);
         }
 
         public void install_noop(ChocolateyConfiguration config)
@@ -239,6 +244,23 @@ namespace chocolatey.infrastructure.app.services
                 }
 
                 perform_source_runner_action(packageConfig, r => r.install_noop(packageConfig, action));
+            }
+        }
+
+        /// <summary>
+        /// Once every 10 runs or so, Chocolatey FOSS should inform the user of the Pro / Business versions.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <remarks>We want it random enough not to be annoying, but informative enough for awareness.</remarks>
+        public void randomly_notify_about_pro_business(ChocolateyConfiguration config)
+        {
+            if (!config.Information.IsLicensedVersion && config.RegularOutput)
+            {
+                // magic numbers! 
+                if (new Random().Next(1, 10) == 3)
+                {
+                    this.Log().Warn(ChocolateyLoggers.Important, PRO_BUSINESS_MESSAGE);
+                }
             }
         }
 
@@ -315,7 +337,7 @@ namespace chocolatey.infrastructure.app.services
 
                 return;
             }
-          
+
             remove_rollback_if_exists(packageResult);
 
             this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".format_with(commandName.to_string(), packageResult.Name));
@@ -335,7 +357,7 @@ namespace chocolatey.infrastructure.app.services
                 Environment.ExitCode = 1;
                 return packageInstalls;
             }
-            
+
             this.Log().Info(@"By installing you accept licenses for the packages.");
 
             get_environment_before(config, allowLogging: true);
@@ -357,7 +379,7 @@ namespace chocolatey.infrastructure.app.services
 
             var installFailures = packageInstalls.Count(p => !p.Value.Success);
             var installWarnings = packageInstalls.Count(p => p.Value.Warning);
-            var rebootPackages = packageInstalls.Count(p => new []{ 1641, 3010 }.Contains(p.Value.ExitCode));
+            var rebootPackages = packageInstalls.Count(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode));
             this.Log().Warn(() => @"{0}{1} installed {2}/{3} package(s). {4} package(s) failed.{5}{0} See the log for details ({6}).".format_with(
                 Environment.NewLine,
                 ApplicationParameters.Name,
@@ -403,6 +425,8 @@ The recent package installs indicate a reboot is necessary.
             {
                 Environment.ExitCode = 1;
             }
+
+            randomly_notify_about_pro_business(config);
 
             return packageInstalls;
         }
@@ -453,6 +477,8 @@ Would have determined packages that are out of date based on what is
                     }
                 }
             }
+
+            randomly_notify_about_pro_business(config);
         }
 
         private IEnumerable<ChocolateyConfiguration> set_config_from_package_names_and_packages_config(ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls)
@@ -536,6 +562,8 @@ Would have determined packages that are out of date based on what is
                         this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
                     }
                 }
+
+                randomly_notify_about_pro_business(config);
             }
         }
 
@@ -615,6 +643,8 @@ The recent package upgrades indicate a reboot is necessary.
                 }
             }
 
+            randomly_notify_about_pro_business(config);
+
             if (upgradeFailures != 0 && Environment.ExitCode == 0)
             {
                 Environment.ExitCode = 1;
@@ -678,7 +708,6 @@ The recent package upgrades indicate a reboot is necessary.
                 _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
                 ));
 
-
             if (rebootPackages != 0)
             {
                 this.Log().Warn(ChocolateyLoggers.Important, "Packages needing reboot:");
@@ -705,6 +734,8 @@ The recent package uninstalls indicate a reboot is necessary.
             {
                 Environment.ExitCode = 1;
             }
+
+            randomly_notify_about_pro_business(config);
 
             return packageUninstalls;
         }
@@ -815,21 +846,21 @@ The recent package uninstalls indicate a reboot is necessary.
                    "Attempted to rename '{0}' but had an error".format_with(dllFile));
                 }
 
-               FaultTolerance.try_catch_with_logging_exception(
-                            () =>
-                            {
-                                foreach (var file in _fileSystem.get_files(pkgExtensions, "*.*", SearchOption.AllDirectories).or_empty_list_if_null().Where(f=> !f.EndsWith(".dll.old")))
-                                {
-                                    FaultTolerance.try_catch_with_logging_exception(
-                                    () => _fileSystem.delete_file(file),
-                                    "Attempted to remove '{0}' but had an error".format_with(file),
-                                    throwError: false,
-                                    logWarningInsteadOfError: true);
-                                }
-                            },
-                            "Attempted to remove '{0}' but had an error".format_with(pkgExtensions),
-                            throwError: false,
-                            logWarningInsteadOfError: true);
+                FaultTolerance.try_catch_with_logging_exception(
+                             () =>
+                             {
+                                 foreach (var file in _fileSystem.get_files(pkgExtensions, "*.*", SearchOption.AllDirectories).or_empty_list_if_null().Where(f => !f.EndsWith(".dll.old")))
+                                 {
+                                     FaultTolerance.try_catch_with_logging_exception(
+                                     () => _fileSystem.delete_file(file),
+                                     "Attempted to remove '{0}' but had an error".format_with(file),
+                                     throwError: false,
+                                     logWarningInsteadOfError: true);
+                                 }
+                             },
+                             "Attempted to remove '{0}' but had an error".format_with(pkgExtensions),
+                             throwError: false,
+                             logWarningInsteadOfError: true);
             }
 
             if (!config.CommandName.is_equal_to(CommandNameType.uninstall.to_string()))
@@ -881,9 +912,9 @@ The recent package uninstalls indicate a reboot is necessary.
                     () =>
                     {
                         _fileSystem.copy_directory(templatesFolderToCopy, installTemplatePath, overwriteExisting: true);
-                        foreach (var nuspecFile in  _fileSystem.get_files(installTemplatePath, "*.nuspec.template").or_empty_list_if_null())
+                        foreach (var nuspecFile in _fileSystem.get_files(installTemplatePath, "*.nuspec.template").or_empty_list_if_null())
                         {
-                           _fileSystem.move_file(nuspecFile,nuspecFile.Replace(".nuspec.template",".nuspec")); 
+                            _fileSystem.move_file(nuspecFile, nuspecFile.Replace(".nuspec.template", ".nuspec"));
                         }
                     },
                     "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".format_with(Environment.NewLine, templatesFolderToCopy, installTemplatePath));
@@ -918,7 +949,7 @@ The recent package uninstalls indicate a reboot is necessary.
 
         private void handle_unsuccessful_operation(ChocolateyConfiguration config, PackageResult packageResult, bool movePackageToFailureLocation, bool attemptRollback)
         {
-            if (Environment.ExitCode == 0 ) Environment.ExitCode = 1;
+            if (Environment.ExitCode == 0) Environment.ExitCode = 1;
 
             foreach (var message in packageResult.Messages.Where(m => m.MessageType == ResultType.Error))
             {
@@ -1021,8 +1052,8 @@ ATTENTION: You must take manual action to remove {1} from
                 foreach (var environmentValue in environmentBefore.or_empty_list_if_null())
                 {
                     this.Log().Debug(@"  * '{0}'='{1}' ('{2}')".format_with(
-                        environmentValue.Name.escape_curly_braces(), 
-                        environmentValue.Value.escape_curly_braces(), 
+                        environmentValue.Name.escape_curly_braces(),
+                        environmentValue.Value.escape_curly_braces(),
                         environmentValue.ParentKeyName.to_lower().Contains("hkey_current_user") ? "User" : "Machine"));
                 }
             }
@@ -1046,7 +1077,7 @@ ATTENTION: You must take manual action to remove {1} from
             var hasEnvironmentRemovals = environmentRemovals.Count() != 0;
             if (hasEnvironmentChanges || hasEnvironmentRemovals)
             {
-                this.Log().Info(ChocolateyLoggers.Important,@"Environment Vars (like PATH) have changed. Close/reopen your shell to
+                this.Log().Info(ChocolateyLoggers.Important, @"Environment Vars (like PATH) have changed. Close/reopen your shell to
  see the changes (or in powershell/cmd.exe just type `refreshenv`).");
 
                 if (!config.Features.LogEnvironmentValues)
@@ -1077,7 +1108,7 @@ ATTENTION: You must take manual action to remove {1} from
                         this.Log().Debug(@"  * {0}='{1}' ({2})".format_with(
                             difference.Name.escape_curly_braces(),
                             config.Features.LogEnvironmentValues ? difference.Value.escape_curly_braces() : "[REDACTED]",
-                            difference.ParentKeyName.to_lower().Contains("hkey_current_user") ? "User": "Machine"
+                            difference.ParentKeyName.to_lower().Contains("hkey_current_user") ? "User" : "Machine"
                             ));
                     }
                 }
