@@ -83,7 +83,22 @@ param(
   }
 
   $additionalInstallArgs = $env:chocolateyInstallArguments;
-  if ($additionalInstallArgs -eq $null) { $additionalInstallArgs = ''; }
+  if ($additionalInstallArgs -eq $null) { 
+    $additionalInstallArgs = ''; 
+  } else {
+    if ($additionalInstallArgs -match 'installdir' -or `
+      $additionalInstallArgs -match 'targetdir' -or `
+      $additionalInstallArgs -match 'dir\=' -or `
+      $additionalInstallArgs -match '\/d\='
+    ) {
+@"
+Pro / Business suports a single, ubiquitous install directory option.
+ Stop the hassle of determining how to pass install directory overrides
+ to install arguments for each package / installer type.
+ Check out Pro / Business - https://bit.ly/choco_pro_business"
+"@ | Write-Warning
+    }
+  }
   $overrideArguments = $env:chocolateyInstallOverride;
   
   if ($fileType -like 'msi') {

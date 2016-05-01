@@ -47,6 +47,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IAutomaticUninstallerService _autoUninstallerService;
         private readonly IXmlService _xmlService;
         private readonly IConfigTransformService _configTransformService;
+        private const string PRO_BUSINESS_MESSAGE = @"Check out Pro / Business for more features! https://bit.ly/choco_pro_business";
 
         private readonly string _shutdownExe = Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\shutdown.exe");
        
@@ -150,6 +151,8 @@ namespace chocolatey.infrastructure.app.services
                     }
                 }
             }
+
+            randomly_notify_about_pro_business(config);
         }
 
         private IEnumerable<PackageResult> report_registry_programs(ChocolateyConfiguration config, IEnumerable<IPackage> list)
@@ -203,6 +206,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             _nugetService.pack_run(config);
+            randomly_notify_about_pro_business(config);
         }
 
         public void push_noop(ChocolateyConfiguration config)
@@ -225,6 +229,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             _nugetService.push_run(config);
+            randomly_notify_about_pro_business(config);
         }
 
         public void install_noop(ChocolateyConfiguration config)
@@ -239,6 +244,23 @@ namespace chocolatey.infrastructure.app.services
                 }
 
                 perform_source_runner_action(packageConfig, r => r.install_noop(packageConfig, action));
+            }
+        }
+
+        /// <summary>
+        /// Once every 10 runs or so, Chocolatey FOSS should inform the user of the Pro / Business versions.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <remarks>We want it random enough not to be annoying, but informative enough for awareness.</remarks>
+        public void randomly_notify_about_pro_business(ChocolateyConfiguration config)
+        {
+            if (!config.Information.IsLicensedVersion && config.RegularOutput)
+            {
+                // magic numbers! 
+                if (new Random().Next(1, 10) == 3)
+                {
+                    this.Log().Warn(ChocolateyLoggers.Important, PRO_BUSINESS_MESSAGE);
+                }
             }
         }
 
@@ -404,6 +426,8 @@ The recent package installs indicate a reboot is necessary.
                 Environment.ExitCode = 1;
             }
 
+            randomly_notify_about_pro_business(config);
+
             return packageInstalls;
         }
 
@@ -453,6 +477,8 @@ Would have determined packages that are out of date based on what is
                     }
                 }
             }
+
+            randomly_notify_about_pro_business(config);
         }
 
         private IEnumerable<ChocolateyConfiguration> set_config_from_package_names_and_packages_config(ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls)
@@ -536,6 +562,8 @@ Would have determined packages that are out of date based on what is
                         this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
                     }
                 }
+
+                randomly_notify_about_pro_business(config);
             }
         }
 
@@ -614,6 +642,8 @@ The recent package upgrades indicate a reboot is necessary.
                     this.Log().Error(" - {0}{1}".format_with(failure.Value.Name, failure.Value.ExitCode != 0 ? " (exit code {0})".format_with(failure.Value.ExitCode) : string.Empty));
                 }
             }
+
+            randomly_notify_about_pro_business(config);
 
             if (upgradeFailures != 0 && Environment.ExitCode == 0)
             {
@@ -705,6 +735,8 @@ The recent package uninstalls indicate a reboot is necessary.
             {
                 Environment.ExitCode = 1;
             }
+
+            randomly_notify_about_pro_business(config);
 
             return packageUninstalls;
         }
