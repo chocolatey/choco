@@ -27,7 +27,6 @@ namespace chocolatey.infrastructure.app.services
     public class FileTypeDetectorService : IFileTypeDetectorService
     {
         private readonly IFileSystem _fileSystem;
-        private readonly ChocolateyConfiguration _configuration;
 
         private const int DIE_SHOWERRORS = 0x00000001;
         private const int DIE_SHOWOPTIONS = 0x00000002;
@@ -36,10 +35,9 @@ namespace chocolatey.infrastructure.app.services
         private const int DIE_SINGLELINEOUTPUT = 0x00000010;
         private const int DIE_SHOWFILEFORMATONCE = 0x00000020;
 
-        public FileTypeDetectorService(IFileSystem fileSystem, ChocolateyConfiguration configuration)
+        public FileTypeDetectorService(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
-            _configuration = configuration;
         }
 
         //// http://stackoverflow.com/a/8861895/18475

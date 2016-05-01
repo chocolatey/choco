@@ -36,7 +36,8 @@ namespace chocolatey.infrastructure.app.domain.installers
             // http://msdn.microsoft.com/en-us/library/aa371101.aspx
             NoReboot = "/norestart"; //REBOOT=ReallySuppress
             LogFile = "/l*v \"{0}\\MSI.Install.log\"".format_with(InstallTokens.PACKAGE_LOCATION);
-            // http://msdn.microsoft.com/en-us/library/aa372064.aspx
+            // https://msdn.microsoft.com/en-us/library/aa372064.aspx
+            // http://apprepack.blogspot.com/2012/08/installdir-vs-targetdir.html
             CustomInstallLocation = "TARGETDIR=\"{0}\"".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
             // http://msdn.microsoft.com/en-us/library/aa370856.aspx
             Language = "ProductLanguage={0}".format_with(InstallTokens.LANGUAGE);

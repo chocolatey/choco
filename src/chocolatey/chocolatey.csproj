@@ -86,9 +86,12 @@
     <Compile Include="infrastructure.app\commands\ChocolateyInfoCommand.cs" />
     <Compile Include="infrastructure.app\domain\GenericRegistryKey.cs" />
     <Compile Include="infrastructure.app\domain\GenericRegistryValue.cs" />
+    <Compile Include="infrastructure.app\domain\installers\BitRockInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\GhostInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\InstallForJInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\IzPackInstaller.cs" />
+    <Compile Include="infrastructure.app\domain\installers\QtInstaller.cs" />
+    <Compile Include="infrastructure.app\domain\installers\SquirrelInstaller.cs" />
     <Compile Include="infrastructure.app\domain\RegistryValueKindType.cs" />
     <Compile Include="infrastructure.app\events\HandlePackageResultCompletedMessage.cs" />
     <Compile Include="infrastructure.app\services\FileTypeDetectorService.cs" />

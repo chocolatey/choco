@@ -71,6 +71,7 @@ namespace chocolatey.console
 @"Error when attempting to load chocolatey licensed assembly. Ensure
  that chocolatey.licensed.dll exists at 
  '{0}'.
+ Install with `choco install chocolatey.extension`.
  The error message itself may be helpful as well:{1} {2}".format_with(
                         ApplicationParameters.LicensedAssemblyLocation,
                         Environment.NewLine,

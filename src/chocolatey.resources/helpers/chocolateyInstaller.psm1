@@ -51,7 +51,8 @@ if (Test-Path($extensionsPath)) {
   Get-ChildItem $extensionsPath -recurse -filter "*.dll" | Select -ExpandProperty FullName | % { 
     $path = $_;
     try {
-      Write-Debug "Importing '$path'"; 
+      Write-Debug "Importing '$path'";
+      Write-Host "Loading '$([System.IO.Path]::GetFileNameWithoutExtension($path))' extension."; 
       Import-Module $path; 
     } catch {
       if ($env:ChocolateyPowerShellHost -eq 'true') {
