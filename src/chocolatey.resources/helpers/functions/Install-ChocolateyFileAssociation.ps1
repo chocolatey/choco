@@ -1,11 +1,11 @@
 # Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,14 @@ with a downloaded application. Once this command has created an
 association, all invocations of files with the specified extension
 will be opened via the executable specified.
 
-This command will run with elevated privileges.
+.NOTES
+This command will assert UAC/Admin privileges on the machine.
+
+.INPUTS
+None
+
+.OUTPUTS
+None
 
 .PARAMETER Extension
 The file extension to be associated.
@@ -32,11 +39,12 @@ The file extension to be associated.
 The path to the application's executable to be associated.
 
 .EXAMPLE
-C:\PS>$sublimeDir = (Get-ChildItem $env:ALLUSERSPROFILE\chocolatey\lib\sublimetext* | select $_.last)
-C:\PS>$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
-C:\PS>Install-ChocolateyFileAssociation ".txt" $sublimeExe
-
-This will create an association between Sublime Text 2 and all .txt files. Any .txt file opened will by default open with Sublime Text 2.
+>
+# This will create an association between Sublime Text 2 and all .txt
+# files. Any .txt file opened will by default open with Sublime Text 2.
+$sublimeDir = (Get-ChildItem $env:ALLUSERSPROFILE\chocolatey\lib\sublimetext* | select $_.last)
+$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
+Install-ChocolateyFileAssociation ".txt" $sublimeExe
 
 #>
 param(

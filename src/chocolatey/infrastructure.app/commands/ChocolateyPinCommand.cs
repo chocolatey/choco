@@ -93,7 +93,11 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Pin Command");
             this.Log().Info(@"
-Pin a package to suppress upgrades.
+Pin a package to suppress upgrades. 
+
+This is especially helpful when running `choco upgrade` for all 
+ packages, as it will automatically skip those packages. Another 
+ alternative is `choco upgrade --except=""pkg1,pk2""`.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");

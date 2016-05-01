@@ -1,0 +1,108 @@
+﻿# Install-ChocolateyEnvironmentVariable
+
+Creates a persistent environment variable
+
+## Syntax
+
+~~~powershell
+Install-ChocolateyEnvironmentVariable `
+  [-VariableName <String>] `
+  [-VariableValue <String>] `
+  [-VariableType {Process | User | Machine}]
+~~~
+
+## Description
+
+Install-ChocolateyEnvironmentVariable creates an environment variable
+with the specified name and value. The variable is persistent and
+will remain after reboots and across multiple PowerShell and command
+line sessions. The variable can be scoped either to the user or to
+the machine. If machine level scoping is specified, the command is
+elevated to an administrative session.
+
+## Notes
+
+This command will assert UAC/Admin privileges on the machine when
+`-VariableType Machine`.
+
+## Aliases
+
+None
+
+## Inputs
+
+None
+
+## Outputs
+
+None
+
+## Parameters
+
+###  -VariableName [\<String\>]
+The name or key of the environment variable
+
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 1
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -VariableValue [\<String\>]
+A string value assigned to the above name.
+
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 2
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -VariableType
+Specifies whether this variable is to be accesible at either the
+individual user level or at the Machine level.
+
+
+Valid options: Process, User, Machine
+
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 3
+Default Value          | User
+Accept Pipeline Input? | false
+ 
+
+
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+# Creates a User environmet variable "JAVA_HOME" pointing to
+# "d:\oracle\jdk\bin".
+Install-ChocolateyEnvironmentVariable "JAVA_HOME" "d:\oracle\jdk\bin"
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+# Creates a User environmet variable "_NT_SYMBOL_PATH" pointing to
+# "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols".
+# The command will be elevated to admin priviledges.
+Install-ChocolateyEnvironmentVariable `
+  -VariableName "_NT_SYMBOL_PATH" `
+  -VariableValue "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols" `
+  -VariableType Machine
+~~~
+
+
+[[Function Reference|HelpersReference]]
+
+***NOTE:*** This documentation has been automatically generated from `Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1" -Force; Get-Help Install-ChocolateyEnvironmentVariable -Full`.

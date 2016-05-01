@@ -19,10 +19,27 @@ Unzips an archive file and returns the location for further processing.
 
 .DESCRIPTION
 This unzips files using the 7-zip standalone command line tool 7za.exe.
-Supported archive formats are: 7z, lzma, cab, zip, gzip, bzip2, Z and tar.
+Supported archive formats are: 7z, lzma, cab, zip, gzip, bzip2, and tar.
+
+.INPUTS
+None
+
+.OUTPUTS
+Returns the passed in $destination.
+
+.NOTES
+If extraction fails, an exception is thrown.
+
+If you are embedding files into a package, ensure that you have the
+rights to redistribute those files if you are sharing this package
+publicly (like on the community feed). Otherwise, please use
+Install-ChocolateyZipPackage to download those resources from their
+official distribution points.
 
 .PARAMETER FileFullPath
-This is the full path to your zip file.
+This is the full path to the zip file. If embedding it in the package
+next to the install script, the path will be like
+`"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\file.zip"`
 
 .PARAMETER Destination
 This is a directory where you would like the unzipped files to end up.
@@ -32,18 +49,17 @@ If it does not exist, it will be created.
 OPTIONAL - This is a specific directory within zip file to extract.
 
 .PARAMETER PackageName
-OPTIONAL - This will faciliate logging unzip activity for subsequent uninstall
+OPTIONAL - This will faciliate logging unzip activity for subsequent
+uninstalls
 
 .EXAMPLE
-$scriptPath = (Split-Path -parent $MyInvocation.MyCommand.Definition)
-Get-ChocolateyUnzip "c:\someFile.zip" $scriptPath somedirinzip\somedirinzip
+>
+# Path to the folder where the script is executing
+$toolsDir = (Split-Path -parent $MyInvocation.MyCommand.Definition)
+Get-ChocolateyUnzip -FileFullPath "c:\someFile.zip" -Destination $toolsDir
 
-.OUTPUTS
-Returns the passed in $destination.
-
-.NOTES
-This helper reduces the number of lines one would have to write to unzip a file to 1 line.
-If extraction fails, an exception is thrown.
+.LINK
+Install-ChocolateyZipPackage
 
 #>
 param(

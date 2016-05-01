@@ -63,7 +63,8 @@ namespace chocolatey.infrastructure.app.commands
                      "Password - the user's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
                 .Add("page=",
-                     "Page - the 'page' of results to return. Defaults to return all results.", option =>
+                     "Page - the 'page' of results to return. Defaults to return all results. Available in 0.9.10+.", 
+                     option =>
                          {
                              int page;
                              if (int.TryParse(option, out page))
@@ -76,31 +77,31 @@ namespace chocolatey.infrastructure.app.commands
                              }
                          })
                 .Add("page-size=",
-                     "Page Size - the amount of package results to return per page. Defaults to 25.",
+                     "Page Size - the amount of package results to return per page. Defaults to 25. Available in 0.9.10+.",
                      option => configuration.ListCommand.PageSize = int.Parse(option))
                 .Add("e|exact",
-                     "Exact - Only return packages with this exact name.",
+                     "Exact - Only return packages with this exact name. Available in 0.9.10+.",
                      option => configuration.ListCommand.Exact = option != null)
                  .Add("by-id-only",
-                     "ByIdOnly - Only return packages where the id contains the search filter.",
+                     "ByIdOnly - Only return packages where the id contains the search filter. Available in 0.9.10+.",
                      option => configuration.ListCommand.ByIdOnly = option != null)
                  .Add("id-starts-with",
-                     "IdStartsWith - Only return packages where the id starts with the search filter.",
+                     "IdStartsWith - Only return packages where the id starts with the search filter. Available in 0.9.10+.",
                      option => configuration.ListCommand.IdStartsWith = option != null)
                  .Add("order-by-popularity",
-                     "OrderByPopularity - Sort by package results by popularity.",
+                     "OrderByPopularity - Sort by package results by popularity. Available in 0.9.10+.",
                      option => configuration.ListCommand.OrderByPopularity = option != null)    
                  .Add("approved-only",
-                     "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository.",
+                     "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository. Available in 0.9.10+.",
                      option => configuration.ListCommand.ApprovedOnly = option != null)   
                  .Add("download-cache|download-cache-only",
-                     "DownloadCacheAvailable - Only return packages that have a download cache available - this option will filter out results not from the community repository.",
+                     "DownloadCacheAvailable - Only return packages that have a download cache available - this option will filter out results not from the community repository. Available in 0.9.10+.",
                      option => configuration.ListCommand.DownloadCacheAvailable = option != null) 
                  .Add("not-broken",
-                     "NotBroken - Only return packages that are not failing testing - this option only filters out failing results from the community feed. It will not filter against other sources.",
+                     "NotBroken - Only return packages that are not failing testing - this option only filters out failing results from the community feed. It will not filter against other sources. Available in 0.9.10+.",
                      option => configuration.ListCommand.NotBroken = option != null)
                   .Add("detail|detailed",
-                     "Detailed - Alias for verbose.",
+                     "Detailed - Alias for verbose. Available in 0.9.10+.",
                      option => configuration.Verbose = option != null)
                 ;
         }
@@ -120,6 +121,11 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(@"
 Chocolatey will perform a search for a package local or remote. Some 
  may prefer to use `clist` as a shortcut for `choco list`.
+
+NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below) 
+ with options and switches. In most cases you can still pass options 
+ and switches  with one dash (`-`). For more details, see 
+ the command reference (`choco -?`).
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
@@ -136,9 +142,30 @@ Chocolatey will perform a search for a package local or remote. Some
     choco list -lai
     choco list --page=0 --page-size=25
     choco search git
-    choco search git -s ""https://somewhere/out/there""
-    choco search bob -s ""https://somewhere/protected"" -u user -p pass
+    choco search git -s ""'https://somewhere/out/there'""
+    choco search bob -s ""'https://somewhere/protected'"" -u user -p pass
+");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
+            "chocolatey".Log().Info(@"
+choco search: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_search.gif
 
+");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Alternative Sources");
+            "chocolatey".Log().Info(@" 
+Available in 0.9.10+.
+
+WebPI
+This specifies the source is Web PI (Web Platform Installer) and that 
+ we are searching for a WebPI product, such as IISExpress. If you do 
+ not have the Web PI command line installed, it will install that first 
+ and then perform the search requested.
+ e.g. `choco list --source webpi`
+
+Windows Features
+This specifies that the source is a Windows Feature and we should 
+ install via the Deployment Image Servicing and Management tool (DISM) 
+ on the local machine.
+ e.g. `choco list --source windowsfeatures`
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");

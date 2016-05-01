@@ -58,6 +58,11 @@ namespace chocolatey.infrastructure.app.commands
 Chocolatey will attempt to package a nuspec into a compiled nupkg. Some
  may prefer to use `cpack` as a shortcut for `choco pack`.
 
+NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
+ with options and switches. In most cases you can still pass options 
+ and switches with one dash (`-`). For more details, see 
+ the command reference (`choco -?`).
+
 NOTE: `cpack` has been deprecated as it has a name collision with CMake. Please 
  use `choco pack` instead. The shortcut will be removed in v1.
 
