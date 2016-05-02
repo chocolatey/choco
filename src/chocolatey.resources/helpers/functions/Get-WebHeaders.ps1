@@ -55,7 +55,7 @@ param(
   [parameter(Mandatory=$true, Position=1)][string] $userAgent = 'chocolatey command line'
 )
   Write-Debug "Running 'Get-WebHeaders' with url:`'$url`', userAgent: `'$userAgent`'";
-  if ($url -eq '') { return }
+  if ($url -eq '') { return @{} }
 
   $request = [System.Net.HttpWebRequest]::Create($url);
   $defaultCreds = [System.Net.CredentialCache]::DefaultCredentials

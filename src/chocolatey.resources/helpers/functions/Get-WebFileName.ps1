@@ -84,7 +84,6 @@ param(
 
   $request = [System.Net.HttpWebRequest]::Create($url)
   if ($request -eq $null) {
-    $request.Close()
     Write-Debug "Request was null, using default name."
     return $originalFileName
   }
@@ -153,7 +152,6 @@ param(
   {
     [System.Net.HttpWebResponse]$response = $request.GetResponse()
     if ($response -eq $null) {
-      $response.Close()
       Write-Debug "Response was null, using default name."
       return $originalFileName
     }
