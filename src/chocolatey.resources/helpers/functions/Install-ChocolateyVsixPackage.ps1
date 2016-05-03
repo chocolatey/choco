@@ -122,6 +122,11 @@ param(
 
 function Install-Vsix($installer, $installFile) {
     Write-Host "Installing $installFile using $installer"
+
+    if ($env:chocolateyPackageName -ne $null -and $env:chocolateyPackageName -eq $env:ChocolateyInstallDirectoryPackage) {
+      Write-Warning "Install Directory override not available for VSIX packages."
+    }
+
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.FileName=$installer
     $psi.Arguments="/q $installFile"

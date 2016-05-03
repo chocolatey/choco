@@ -69,6 +69,10 @@ param(
     $zipExtractLogFullPath= Join-Path $packagelibPath $zipFilename`.txt
   }
 
+  if ($env:chocolateyPackageName -ne $null -and $env:chocolateyPackageName -eq $env:ChocolateyInstallDirectoryPackage) {
+    Write-Warning "Install Directory override not available for zip packages at this time.`n If this package also runs a native installer using Chocolatey`n functions, the directory will be honored."
+  }
+
   Write-Host "Extracting $fileFullPath to $destination..."
   if (![System.IO.Directory]::Exists($destination)) {[System.IO.Directory]::CreateDirectory($destination)}
 
