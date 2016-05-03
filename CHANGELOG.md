@@ -24,11 +24,17 @@ What will be highlighted:
 ### BREAKING CHANGES
 
  * Only fail automation scripts (chocolateyInstall.ps1) if the script returns non-zero exit code - see [#445](https://github.com/chocolatey/choco/issues/445)
+
+The 0.9.8 series would only fail a package with terminating errors. The 0.9.9 series took that a bit further and started failing packages if anything wrote to stderr. It turns out that is a bad idea. Only when PowerShell exits with non-zero (which comes with terminating errors) should the package fail due to this. If you need the old behavior of the 0.9.9 series, you can get it back with a switch (`--fail-on-standard-error` and its aliases) and/or a feature flip (`failOnStandardError`).
+
  * Fix - Force reinstall, force upgrade, and uninstall should delete the download cache - see [#590](https://github.com/chocolatey/choco/issues/590)
 
-For 445 - the 0.9.8 series would only fail a package with terminating errors. The 0.9.9 series took that a bit further and started failing packages if anything wrote to stderr. It turns out that is a bad idea. Only when PowerShell exits with non-zero (which comes with terminating errors) should the package fail due to this. If you need the old behavior of the 0.9.9 series, you can get it back with a switch (`--fail-on-standard-error` and its aliases) and/or a feature flip (`failOnStandardError`).
+If you set a custom cache directory for downloads, it will no longer use a "chocolatey" subdirectory under that. You may need to make any adjustments if this is going to affect you.
 
-For 590 - if you set a custom cache directory for downloads, it will no longer use a "chocolatey" subdirectory under that. You may need to make any adjustments if this is going to affect you.
+ * Exit with the same exit code as the software being installed - see [#512](https://github.com/chocolatey/choco/issues/512)
+
+There are more exit codes from Chocolatey now that indicate success -`0`, `1605`, `1614`, `1641`, and `3010`. You may need to adjust anything you were using that would only check for 0 and nonzero.
+If you need the previous behavior, be sure to disable the feature `usePackageExitCodes` or use the `--ignore-package-exit-codes` switch in your choco commands.
 
 ### KNOWN ISSUES
 
@@ -48,6 +54,9 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * Provide PowerShell tab completion for Chocolatey - see [#412](https://github.com/chocolatey/choco/issues/412)
  * [Security] Sign the powershell scripts and assemblies - see [#501](https://github.com/chocolatey/choco/issues/501)
  * Add a `choco info` command to show info for one package - see [#644](https://github.com/chocolatey/choco/issues/644)
+ * Pro/Business - Ubiquitous Install Directory Switch - see [#258](https://github.com/chocolatey/choco/issues/258)
+ * Pro/Business - Runtime Virus Scanning - see [virus scanning](https://www.kickstarter.com/projects/ferventcoder/chocolatey-the-alternative-windows-store-like-yum/posts/1518468)
+ * Pro/Business - Permanent private download location - see [alternate download location](https://www.kickstarter.com/projects/ferventcoder/chocolatey-the-alternative-windows-store-like-yum/posts/1479944)
 
 ### BUG FIXES
 
@@ -78,8 +87,8 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * [POSH Host] Fix - PowerShell Host doesn't show colorization overrides - see [#674](https://github.com/chocolatey/choco/issues/674)
  * [POSH Host] Fix - $profile is empty string when installing packages - does not automatically install the ChocolateyProfile - see [#667](https://github.com/chocolatey/choco/issues/667)
  * Fix - Verbose shows in output on debug switch - see [#611](https://github.com/chocolatey/choco/issues/611)
- * Fix: Get-ChocolateyUnzip captures files that don't belong to the package / Unzip should not do a full disk scan - see [#616](https://github.com/chocolatey/choco/issues/616) and [#155](https://github.com/chocolatey/choco/issues/155)
- * Fix: Package succeeds but software install silently fails when Install-ChocolateyInstallPackage has the wrong arguments - see [#629](https://github.com/chocolatey/choco/issues/629)
+ * Fix - Get-ChocolateyUnzip captures files that don't belong to the package / Unzip should not do a full disk scan - see [#616](https://github.com/chocolatey/choco/issues/616) and [#155](https://github.com/chocolatey/choco/issues/155)
+ * Fix - Package succeeds but software install silently fails when Install-ChocolateyInstallPackage has the wrong arguments - see [#629](https://github.com/chocolatey/choco/issues/629)
  * Fix - ShimGen handling of spaces and arguments that have shimgen in them - see [#647](https://github.com/chocolatey/choco/issues/647)
  * Fix - PowerShell v2 - Choco installer messages can't actually be warnings (causes FileStream errors) - see [#666](https://github.com/chocolatey/choco/issues/666)
  * Fix - Installing chocolatey removes $env:PSModulePath changes for current PowerShell session - see [#295](https://github.com/chocolatey/choco/issues/295)
@@ -118,13 +127,20 @@ For 590 - if you set a custom cache directory for downloads, it will no longer u
  * choco list/search aliases for -v - '-detail' and '-detailed' - see [#646](https://github.com/chocolatey/choco/issues/646)
  * Log normal output to a secondary log - see [#682](https://github.com/chocolatey/choco/issues/682)
  * Display Package test status information on install/upgrade - see [#696](https://github.com/chocolatey/choco/issues/696)
- * Pro - Also check for license in User Profile location - see [#606](https://github.com/chocolatey/choco/issues/606)
- * Pro - Set download cache information if available - see [#562](https://github.com/chocolatey/choco/issues/562)
- * Pro - Allow commands to be added - see [#583](https://github.com/chocolatey/choco/issues/583)
- * Pro - Load/Provide hooks for licensed version - see [#584](https://github.com/chocolatey/choco/issues/584)
- * Pro - On valid license, add pro/business source automatically - see [#604](https://github.com/chocolatey/choco/issues/604)
- * Pro - Add switch to fail on invalid or missing license - see [#596](https://github.com/chocolatey/choco/issues/596)
- * Pro - add ignore invalid switches/parameters - see [#586](https://github.com/chocolatey/choco/issues/586)
+ * Report when reboots are necessary from package installs - see [#712](https://github.com/chocolatey/choco/issues/712)
+ * Report loaded extensions - see [#715](https://github.com/chocolatey/choco/issues/715)
+ * Exit with specific codes on certain actions - see [#707](https://github.com/chocolatey/choco/issues/707)
+ * Determine if Downloaded File is HTML or Plain Text - see [#649](https://github.com/chocolatey/choco/issues/649)
+ * Interactively prompt with timeout on some questions - see [#710](https://github.com/chocolatey/choco/issues/710)
+ * [POSH Host] Exit code from PowerShell Host should be useful - see [#709](https://github.com/chocolatey/choco/issues/709)
+ * Pro/Business - Also check for license in User Profile location - see [#606](https://github.com/chocolatey/choco/issues/606)
+ * Pro/Business - Set download cache information if available - see [#562](https://github.com/chocolatey/choco/issues/562)
+ * Pro/Business - Allow commands to be added - see [#583](https://github.com/chocolatey/choco/issues/583)
+ * Pro/Business - Load/Provide hooks for licensed version - see [#584](https://github.com/chocolatey/choco/issues/584)
+ * Pro/Business - On valid license, add pro/business source automatically - see [#604](https://github.com/chocolatey/choco/issues/604)
+ * Pro/Business - Add switch to fail on invalid or missing license - see [#596](https://github.com/chocolatey/choco/issues/596)
+ * Pro/Business - add ignore invalid switches/parameters - see [#586](https://github.com/chocolatey/choco/issues/586)
+ * Pro/Business - Don't prompt to upload file for virus scanning if it is too large - see [#695](https://github.com/chocolatey/choco/issues/695)
  * API - Add the ability to retrieve package count for a Source - see [#431](https://github.com/chocolatey/choco/issues/431)
  * API - Chocolatey Lib still marks vital package information as internal - see [#433](https://github.com/chocolatey/choco/issues/433)
  * API - Add paging to list command - see [#427](https://github.com/chocolatey/choco/issues/427)
