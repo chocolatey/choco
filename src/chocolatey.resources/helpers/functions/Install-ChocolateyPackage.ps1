@@ -224,7 +224,8 @@ param(
   [parameter(Mandatory=$false)][string] $checksumType64 = '',
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
   [parameter(Mandatory=$false)]
-  [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false
+  [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
   Write-Debug "Running 'Install-ChocolateyPackage' for $packageName with url:`'$url`', args: `'$silentArgs`', fileType: `'$fileType`', url64bit: `'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`', validExitCodes: `'$validExitCodes`' ";

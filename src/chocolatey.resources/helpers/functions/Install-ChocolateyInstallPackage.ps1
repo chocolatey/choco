@@ -144,7 +144,8 @@ param(
   [parameter(Mandatory=$true, Position=3)][string] $file,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
   [parameter(Mandatory=$false)]
-  [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false
+  [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Install-ChocolateyInstallPackage' for $packageName with file:`'$file`', args: `'$silentArgs`', fileType: `'$fileType`', validExitCodes: `'$validExitCodes`', useOnlyPackageSilentArguments: '$($useOnlyPackageSilentArguments.IsPresent)'";
   $installMessage = "Installing $packageName..."

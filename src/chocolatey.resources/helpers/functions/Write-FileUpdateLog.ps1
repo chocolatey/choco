@@ -50,7 +50,8 @@ param (
   [string] $logFilePath,
   [string] $locationToMonitor,
   [scriptblock] $scriptToRun,
-  [object[]] $argumentList
+  [object[]] $argumentList,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Write-FileUpdateLog' with logFilePath:`'$logFilePath`'', locationToMonitor:$locationToMonitor, Operation: `'$scriptToRun`'";
 

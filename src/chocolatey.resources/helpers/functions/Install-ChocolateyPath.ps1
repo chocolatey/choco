@@ -66,7 +66,8 @@ Get-ToolsLocation
 #>
 param(
   [parameter(Mandatory=$true, Position=0)][string] $pathToInstall,
-  [parameter(Mandatory=$false, Position=1)][System.EnvironmentVariableTarget] $pathType = [System.EnvironmentVariableTarget]::User
+  [parameter(Mandatory=$false, Position=1)][System.EnvironmentVariableTarget] $pathType = [System.EnvironmentVariableTarget]::User,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Install-ChocolateyPath' with pathToInstall:`'$pathToInstall`'";
   $originalPathToInstall = $pathToInstall

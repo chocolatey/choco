@@ -153,7 +153,8 @@ param(
   [parameter(Mandatory=$false)][string] $checksum64 = '',
   [parameter(Mandatory=$false)][string] $checksumType64 = $checksumType,
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
-  [parameter(Mandatory=$false)][switch] $getOriginalFileName
+  [parameter(Mandatory=$false)][switch] $getOriginalFileName,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Get-ChocolateyWebFile' for $packageName with url:`'$url`', fileFullPath:`'$fileFullPath`', url64bit:`'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`'";
 

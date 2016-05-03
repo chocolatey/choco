@@ -23,6 +23,7 @@ Formats file size into a human readable format.
 
 .NOTES
 Available in 0.9.10+.
+
 This function is not part of the API.
 
 .INPUTS
@@ -45,7 +46,8 @@ Format-FileSize -Size $fileSizeBytes
 Get-WebFile
 #>
 param (
-  [Parameter(Mandatory=$true)][double]$size
+  [Parameter(Mandatory=$true, Position=0)][double] $size,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Format-FileSize' with size: '$size'";
 

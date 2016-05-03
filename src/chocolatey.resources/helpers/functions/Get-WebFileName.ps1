@@ -68,7 +68,8 @@ Get-ChocolateyWebFile
 param(
   [parameter(Mandatory=$false, Position=0)][string] $url = '',
   [parameter(Mandatory=$true, Position=1)][string] $defaultName,
-  [parameter(Mandatory=$false)][string]$userAgent = 'chocolatey command line'
+  [parameter(Mandatory=$false)][string] $userAgent = 'chocolatey command line',
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
   Write-Debug "Running 'Get-WebFileName' to determine name with url:'$url', defaultName:'$defaultName'";

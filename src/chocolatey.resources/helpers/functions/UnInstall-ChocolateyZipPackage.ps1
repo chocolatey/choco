@@ -53,7 +53,8 @@ Uninstall-ChocolateyPackage
 #>
 param(
   [parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [parameter(Mandatory=$true, Position=1)][string] $zipFileName
+  [parameter(Mandatory=$true, Position=1)][string] $zipFileName,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'UnInstall-ChocolateyZipPackage' for $packageName $zipFileName "
 

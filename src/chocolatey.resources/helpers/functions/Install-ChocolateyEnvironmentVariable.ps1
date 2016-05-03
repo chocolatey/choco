@@ -89,7 +89,8 @@ param(
   [parameter(Mandatory=$false, Position=0)][string] $variableName,
   [parameter(Mandatory=$false, Position=1)][string] $variableValue,
   [parameter(Mandatory=$false, Position=2)]
-  [System.EnvironmentVariableTarget] $variableType = [System.EnvironmentVariableTarget]::User
+  [System.EnvironmentVariableTarget] $variableType = [System.EnvironmentVariableTarget]::User,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Install-ChocolateyEnvironmentVariable' with variableName:`'$variableName`' and variableValue:`'$variableValue`'";
 

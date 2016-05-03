@@ -104,7 +104,8 @@ param(
   [alias("installerType")][string] $fileType = 'exe',
   [parameter(Mandatory=$false, Position=2)][string] $silentArgs = '',
   [parameter(Mandatory=$false, Position=3)][string] $file,
-  [parameter(Mandatory=$false)]$validExitCodes = @(0)
+  [parameter(Mandatory=$false)] $validExitCodes = @(0),
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Uninstall-ChocolateyPackage' for $packageName with fileType:`'$fileType`', silentArgs: `'$silentArgs`', file: `'$file`'";
 

@@ -52,7 +52,8 @@ Install-BinFile
 #>
 param(
   [parameter(Mandatory=$true, Position=0)][string] $name,
-  [parameter(Mandatory=$false, Position=1)][string] $path
+  [parameter(Mandatory=$false, Position=1)][string] $path,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Uninstall-BinFile' for $name with path:`'$path`'";
 

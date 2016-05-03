@@ -105,7 +105,8 @@ param(
   [parameter(Mandatory=$false, Position=2)][int] $vsVersion = 0,
   [parameter(Mandatory=$false)][string] $checksum = '',
   [parameter(Mandatory=$false)][string] $checksumType = '',
-  [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}}
+  [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
     Write-Debug "Running 'Install-ChocolateyVsixPackage' for $packageName with vsixUrl:`'$vsixUrl`', vsVersion: `'$vsVersion`', checksum: `'$checksum`', checksumType: `'$checksumType`' ";
     if($vsVersion -eq 0) {

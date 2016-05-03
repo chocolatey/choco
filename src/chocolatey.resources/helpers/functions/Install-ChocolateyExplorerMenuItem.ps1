@@ -84,7 +84,8 @@ param(
   [parameter(Mandatory=$false, Position=1)][string] $menuLabel,
   [parameter(Mandatory=$false, Position=2)][string] $command,
   [parameter(Mandatory=$false, Position=3)]
-  [ValidateSet('file','directory')][string]$type = "file"
+  [ValidateSet('file','directory')][string] $type = "file",
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 try {
   Write-Debug "Running 'Install-ChocolateyExplorerMenuItem' with menuKey:'$menuKey', menuLabel:'$menuLabel', command:'$command', type '$type'"

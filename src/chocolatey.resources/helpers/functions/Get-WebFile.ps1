@@ -84,7 +84,8 @@ param(
   [parameter(Mandatory=$false, Position=2)][string] $userAgent = 'chocolatey command line',
   [parameter(Mandatory=$false)][switch] $Passthru,
   [parameter(Mandatory=$false)][switch] $quiet,
-  [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}}
+  [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Get-WebFile' for $fileName with url:`'$url`', userAgent: `'$userAgent`' ";
   #if ($url -eq '' return)

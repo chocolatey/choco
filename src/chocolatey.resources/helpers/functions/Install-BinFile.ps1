@@ -78,7 +78,8 @@ param(
   [parameter(Mandatory=$true, Position=1)][string] $path,
   [parameter(Mandatory=$false)]
   [alias("isGui")][switch] $useStart,
-  [parameter(Mandatory=$false)][string] $command = ''
+  [parameter(Mandatory=$false)][string] $command = '',
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Install-BinFile' for $name with path:`'$path`'|`$useStart:$useStart|`$command:$command";
 

@@ -55,7 +55,8 @@ param(
   [parameter(Mandatory=$true, Position=1)][string] $fileName = $null,
   [parameter(Mandatory=$false, Position=2)][string] $username = $null,
   [parameter(Mandatory=$false, Position=3)][string] $password = $null,
-  [parameter(Mandatory=$false)][switch]$quiet
+  [parameter(Mandatory=$false)][switch] $quiet,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
   Write-Debug "Running 'Get-FtpFile' for $fileName with url:'$url', userName: '$userName', password: '$password'";

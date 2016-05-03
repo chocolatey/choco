@@ -76,7 +76,8 @@ param(
   [parameter(Mandatory=$false, Position=1)][string] $exeToRun = 'powershell',
   [parameter(Mandatory=$false)][switch] $minimized,
   [parameter(Mandatory=$false)][switch] $noSleep,
-  [parameter(Mandatory=$false)] $validExitCodes = @(0)
+  [parameter(Mandatory=$false)] $validExitCodes = @(0),
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Start-ChocolateyProcessAsAdmin' with exeToRun:`'$exeToRun`', statements: `'$statements`' ";
 

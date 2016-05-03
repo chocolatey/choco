@@ -55,7 +55,8 @@ Install-ChocolateyDesktopLink -TargetFilePath "C:\tools\NHibernatProfiler\nhprof
 Install-ChocolateyShortcut
 #>
 param(
-  [parameter(Mandatory=$true, Position=0)][string] $targetFilePath
+  [parameter(Mandatory=$true, Position=0)][string] $targetFilePath,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Install-ChocolateyDesktopLink' with targetFilePath:`'$targetFilePath`'";
 

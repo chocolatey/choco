@@ -94,7 +94,8 @@ Install-ChocolateyPinnedTaskBarItem
 	  [parameter(Mandatory=$false, Position=2)][string] $workingDirectory,
 	  [parameter(Mandatory=$false, Position=3)][string] $arguments,
 	  [parameter(Mandatory=$false, Position=4)][string] $iconLocation,
-	  [parameter(Mandatory=$false, Position=5)][string] $description
+	  [parameter(Mandatory=$false, Position=5)][string] $description,
+    [parameter(ValueFromRemainingArguments = $true)][Object[]]$ignoredArguments
 	)
 
 	Write-Debug "Running 'Install-ChocolateyShortcut' with parameters ShortcutFilePath: `'$shortcutFilePath`', TargetPath: `'$targetPath`', WorkingDirectory: `'$workingDirectory`', Arguments: `'$arguments`', IconLocation: `'$iconLocation`', Description: `'$description`'";

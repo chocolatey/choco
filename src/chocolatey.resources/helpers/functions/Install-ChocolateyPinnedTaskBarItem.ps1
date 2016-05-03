@@ -46,7 +46,8 @@ Install-ChocolateyShortcut
 Install-ChocolateyExplorerMenuItem
 #>
 param(
-  [parameter(Mandatory=$true, Position=0)][string] $targetFilePath
+  [parameter(Mandatory=$true, Position=0)][string] $targetFilePath,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]]$ignoredArguments
 )
 
   Write-Debug "Running 'Install-ChocolateyPinnedTaskBarItem' with targetFilePath:`'$targetFilePath`'";

@@ -43,7 +43,8 @@ Allows splatting with arguments that do not apply. Do not use directly.
 #>
 param(
   [parameter(Mandatory=$false, Position=0)][string] $url,
-  [parameter(Mandatory=$false, Position=1)][string] $file = ''
+  [parameter(Mandatory=$false, Position=1)][string] $file = '',
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "No virus checking built into FOSS Chocolatey. Check out Pro or Business if you need this. https://chocolatey.org/compare"
 }

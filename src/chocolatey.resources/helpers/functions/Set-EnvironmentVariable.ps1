@@ -57,7 +57,8 @@ param (
   [parameter(Mandatory=$true, Position=0)][string] $Name,
   [parameter(Mandatory=$false, Position=1)][string] $Value,
   [parameter(Mandatory=$false, Position=2)]
-  [System.EnvironmentVariableTarget] $Scope
+  [System.EnvironmentVariableTarget] $Scope,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
 	Write-Debug "Calling Set-EnvironmentVariable with `$Name = '$Name', `$Value = '$Value', `$Scope = '$Scope'"

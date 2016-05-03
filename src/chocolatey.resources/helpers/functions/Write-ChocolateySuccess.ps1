@@ -43,7 +43,8 @@ Allows splatting with arguments that do not apply. Do not use directly.
 Write-ChocolateyFailure
 #>
 param(
-  [string] $packageName
+  [string] $packageName,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Warning "Write-ChocolateySuccess is deprecated and will be removed in v2. If you are the maintainer, please remove it from your package file."
 }

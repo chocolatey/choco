@@ -64,7 +64,8 @@ Install-ChocolateyPackage
 param(
   [parameter(Mandatory=$true, Position=0)][string] $file,
   [parameter(Mandatory=$false, Position=1)][string] $checksum = '',
-  [parameter(Mandatory=$false, Position=2)][string] $checksumType = 'md5'
+  [parameter(Mandatory=$false, Position=2)][string] $checksumType = 'md5',
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Get-ChecksumValid' with file:`'$file`', checksum: `'$checksum`', checksumType: `'$checksumType`'";
   if ($env:chocolateyIgnoreChecksums -eq 'true') {

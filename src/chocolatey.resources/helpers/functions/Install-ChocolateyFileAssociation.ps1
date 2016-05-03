@@ -54,7 +54,8 @@ Install-ChocolateyFileAssociation ".txt" $sublimeExe
 #>
 param(
   [parameter(Mandatory=$true, Position=0)][string] $extension,
-  [parameter(Mandatory=$true, Position=1)][string] $executable
+  [parameter(Mandatory=$true, Position=1)][string] $executable,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Install-ChocolateyFileAssociation' associating $extension with `'$executable`'";
   if(-not(Test-Path $executable)){

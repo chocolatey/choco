@@ -52,7 +52,8 @@ Get-WebFile
 #>
 param(
   [parameter(Mandatory=$false, Position=0)][string] $url = '',
-  [parameter(Mandatory=$true, Position=1)][string] $userAgent = 'chocolatey command line'
+  [parameter(Mandatory=$false, Position=1)][string] $userAgent = 'chocolatey command line',
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Get-WebHeaders' with url:`'$url`', userAgent: `'$userAgent`'";
   if ($url -eq '') { return @{} }

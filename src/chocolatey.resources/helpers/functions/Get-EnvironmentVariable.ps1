@@ -58,7 +58,8 @@ Set-EnvironmentVariable
 param(
   [Parameter(Mandatory=$true)][string] $Name,
   [Parameter(Mandatory=$true)][System.EnvironmentVariableTarget] $Scope,
-  [Parameter(Mandatory=$false)][switch] $PreserveVariables = $false
+  [Parameter(Mandatory=$false)][switch] $PreserveVariables = $false,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   [string] $MACHINE_ENVIRONMENT_REGISTRY_KEY_NAME = "SYSTEM\CurrentControlSet\Control\Session Manager\Environment\";
   [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey($MACHINE_ENVIRONMENT_REGISTRY_KEY_NAME)
