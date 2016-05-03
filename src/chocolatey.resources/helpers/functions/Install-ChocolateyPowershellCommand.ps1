@@ -28,6 +28,10 @@ param(
   if ($url -ne '') {
   Get-ChocolateyWebFile $packageName $psFileFullPath $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64
   }
+
+  if ($env:chocolateyPackageName -ne $null -and $env:chocolateyPackageName -eq $env:ChocolateyInstallDirectoryPackage) {
+    Write-Warning "Install Directory override not available for PowerShell command packages."
+  }
   
   $nugetPath = $(Split-Path -parent $helpersPath)
   $nugetExePath = Join-Path $nuGetPath 'bin'
