@@ -1,7 +1,7 @@
 # Chocolatey - like yum or apt-get, but for Windows
 You can just call me choco.
 
-![Chocolatey Logo](https://github.com/chocolatey/chocolatey/raw/master/docs/logo/chocolateyicon.gif "Chocolatey")
+![Chocolatey Logo](https://cdn.rawgit.com/chocolatey/choco/14a627932c78c8baaba6bef5f749ebfa1957d28d/docs/logo/chocolateyicon.gif "Chocolatey")
 
 [![](http://img.shields.io/chocolatey/dt/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/chocolatey/v/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/gittip/Chocolatey.svg)](https://www.gittip.com/Chocolatey/)
 
@@ -25,7 +25,7 @@ Or, you can find us in IRC at #chocolatey on freenode. IRC is not as often check
 
 Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
-## Support Chocolatey! 
+## Support Chocolatey!
 
  * Purchase [Chocolatey Professional / Chocolatey for Business](https://bit.ly/choco_pro_business)
  * [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=E8ZPVL5PNTABW)
