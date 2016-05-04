@@ -25,13 +25,18 @@ Or, you can find us in IRC at #chocolatey on freenode. IRC is not as often check
 
 Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
+## Support Chocolatey! 
+
+ * Purchase [Chocolatey Professional / Chocolatey for Business](https://bit.ly/choco_pro_business)
+ * [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=E8ZPVL5PNTABW)
+
 ## See Chocolatey In Action
 
 Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update environment variables without restarting your shell):
 
 ![install](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_install.gif "Wat? Tab completion and updating environment variables!")
 
-Chocolatey Professional showing private download cache and virus scan protection:
+[Chocolatey Professional](https://bit.ly/choco_pro_business) showing private download cache and virus scan protection:
 
 ![install pro](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/chocopro_install_stopped.gif "Get ready! Chocolatey Professional availability is May 2nd, 2016")
 
@@ -45,6 +50,7 @@ When requesting support, try to remember that we are all volunteers that have li
  * [Mailing List/Forum](http://groups.google.com/group/chocolatey)
  * [Twitter](https://twitter.com/chocolateynuget)
  * [Build Status Email List](http://groups.google.com/group/chocolatey-build-status)
+ * Join the [newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&id=73b018498d) and stay up to date with the latest happenings!
 
 ### Documentation
 Please see the [wiki](https://github.com/chocolatey/choco/wiki)
