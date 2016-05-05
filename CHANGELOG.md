@@ -101,6 +101,7 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * Fix - Install-ChocolateyShortcut gives invalid warning when target is a web url - see [#592](https://github.com/chocolatey/choco/issues/592)
  * Fix - Argument Parsing failures should be reported as warnings and not debug messages - see [#571](https://github.com/chocolatey/choco/issues/571)
  * Fix - choco pack returns zero exit code when Nuget.Core validation errors - see [#469](https://github.com/chocolatey/choco/issues/469)
+ * Fix - `Install-ChocolateyPath` updates `PATH` to `REG_SZ`, which may break using Windows dir and system32 tools - see [#699](https://github.com/chocolatey/choco/issues/699)
 
 ### IMPROVEMENTS
 
