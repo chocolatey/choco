@@ -103,6 +103,7 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * Fix - Argument Parsing failures should be reported as warnings and not debug messages - see [#571](https://github.com/chocolatey/choco/issues/571)
  * Fix - choco pack returns zero exit code when Nuget.Core validation errors - see [#469](https://github.com/chocolatey/choco/issues/469)
  * Fix - `Install-ChocolateyPath` updates `PATH` to `REG_SZ`, which may break using Windows dir and system32 tools - see [#699](https://github.com/chocolatey/choco/issues/699)
+ * Fix - Removing environment variables sets empty environment variables - see [#724](https://github.com/chocolatey/choco/issues/724)
 
 ### IMPROVEMENTS
 
