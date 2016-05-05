@@ -66,6 +66,7 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * [Security] Fix - Package source authentication at http://location/path doesn't also use http://location/ (base url) - see [#466](https://github.com/chocolatey/choco/issues/466)
  * [Security] Fix - When defining a proxy without credentials - proxy password is shown in plain text - see [#503](https://github.com/chocolatey/choco/issues/503)
  * [Security] Fix - Fully qualify shutdown command - see [#702](https://github.com/chocolatey/choco/issues/702)
+ * [Security] Fix - MSI packages fail install with `Could not find 'msiexec'` - see [#723](https://github.com/chocolatey/choco/issues/723)
  * Fix - Force should set allow-downgrade to true - see [#585](https://github.com/chocolatey/choco/issues/585)
  * Fix - Do not use NuGet package cache - see [#479](https://github.com/chocolatey/choco/issues/479)
  * Fix - Pack doesn't include chocolatey-specific metadata - see [#607](https://github.com/chocolatey/choco/issues/607)
