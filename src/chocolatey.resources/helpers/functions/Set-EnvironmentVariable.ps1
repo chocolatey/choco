@@ -15,7 +15,7 @@
 function Set-EnvironmentVariable([string] $Name, [string] $Value, [System.EnvironmentVariableTarget] $Scope) {
 	Write-Debug "Calling Set-EnvironmentVariable with `$Name = '$Name', `$Value = '$Value', `$Scope = '$Scope'"
 
-  if ($Scope -eq [System.EnvironmentVariableTarget]::Process) {
+  if ($Scope -eq [System.EnvironmentVariableTarget]::Process -or $Value -eq $null -or $Value -eq '') {
     return [Environment]::SetEnvironmentVariable($Name, $Value, $Scope)
   }
 
