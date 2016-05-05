@@ -14,5 +14,32 @@
 
 function Set-EnvironmentVariable([string] $Name, [string] $Value, [System.EnvironmentVariableTarget] $Scope) {
 	Write-Debug "Calling Set-EnvironmentVariable with `$Name = '$Name', `$Value = '$Value', `$Scope = '$Scope'"
-    [Environment]::SetEnvironmentVariable($Name, $Value, $Scope)
+
+  if ($Scope -eq [System.EnvironmentVariableTarget]::Process) {
+    return [Environment]::SetEnvironmentVariable($Name, $Value, $Scope)
+  }
+
+  [string]$keyHive = 'HKEY_LOCAL_MACHINE'
+  [string]$registryKey = "SYSTEM\CurrentControlSet\Control\Session Manager\Environment\"
+  [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey($registryKey)
+  if ($Scope -eq [System.EnvironmentVariableTarget]::User) {
+    $keyHive = 'HKEY_CURRENT_USER'
+    $registryKey = "Environment"
+    [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($registryKey)
+  }
+  
+  [Microsoft.Win32.RegistryValueKind]$registryType = [Microsoft.Win32.RegistryValueKind]::String
+  try { 
+    $registryType = $reg.GetValueKind($Name)
+  } catch { 
+    # the value doesn't yet exist
+    # move along, nothing to see here
+  }
+  Write-Debug "Registry type for $Name is/will be $registryType"
+
+  if ($Name -eq 'PATH') {
+    $registryType = [Microsoft.Win32.RegistryValueKind]::ExpandString
+  }
+
+  [Microsoft.Win32.Registry]::SetValue($keyHive + "\" + $registryKey, $Name, $Value, $registryType)
 }
