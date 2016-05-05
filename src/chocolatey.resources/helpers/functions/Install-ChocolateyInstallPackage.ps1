@@ -110,8 +110,7 @@ Pro / Business supports a single, ubiquitous install directory option.
       $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
     }
 
-    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" 'msiexec' -validExitCodes $validExitCodes
-    #Start-Process -FilePath msiexec -ArgumentList $msiArgs -Wait
+    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes
   }
 
   if ($fileType -like 'exe') {
