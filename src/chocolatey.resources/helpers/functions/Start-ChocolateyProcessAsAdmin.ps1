@@ -26,7 +26,7 @@ param(
   if ($wrappedStatements -eq $null) { $wrappedStatements = ''}
 
   if ($exeToRun -eq 'powershell') {
-    $exeToRun = "$($env:windir)\System32\WindowsPowerShell\v1.0\powershell.exe"
+    $exeToRun = "$($env:SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe"
     $importChocolateyHelpers = ""
     Get-ChildItem "$helpersPath" -Filter *.psm1 | ForEach-Object { $importChocolateyHelpers = "& import-module -name  `'$($_.FullName)`';$importChocolateyHelpers" };
     $block = @"
@@ -65,7 +65,7 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
     throw "The file was a text file but is attempting to be run as an executable - '$exeToRun'"
   }
 
-  if (!([System.IO.File]::Exists($exeToRun))) {
+  if (!([System.IO.File]::Exists($exeToRun)) -and $exeToRun -notmatch 'msiexec') {
     Set-PowerShellExitCode 2
     throw "Could not find '$exeToRun'"
   }

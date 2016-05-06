@@ -92,7 +92,7 @@ param(
       $additionalInstallArgs -match '\/d\='
     ) {
 @"
-Pro / Business suports a single, ubiquitous install directory option.
+Pro / Business supports a single, ubiquitous install directory option.
  Stop the hassle of determining how to pass install directory overrides
  to install arguments for each package / installer type.
  Check out Pro / Business - https://bit.ly/choco_pro_business"
@@ -110,8 +110,7 @@ Pro / Business suports a single, ubiquitous install directory option.
       $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
     }
 
-    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" 'msiexec' -validExitCodes $validExitCodes
-    #Start-Process -FilePath msiexec -ArgumentList $msiArgs -Wait
+    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes
   }
 
   if ($fileType -like 'exe') {

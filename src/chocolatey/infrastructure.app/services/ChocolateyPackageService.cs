@@ -824,56 +824,24 @@ The recent package uninstalls indicate a reboot is necessary.
 
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.ExtensionsLocation);
             var extensionsFolderName = packageResult.Name.to_lower().Replace(".extensions", string.Empty).Replace(".extension", string.Empty);
-            var pkgExtensions = _fileSystem.combine_paths(ApplicationParameters.ExtensionsLocation, extensionsFolderName);
+            var packageExtensionsInstallDirectory = _fileSystem.combine_paths(ApplicationParameters.ExtensionsLocation, extensionsFolderName);
 
-            if (_fileSystem.directory_exists(pkgExtensions))
-            {
-                // remove old dll files files
-                foreach (var oldDllFile in _fileSystem.get_files(pkgExtensions, "*.dll.old", SearchOption.AllDirectories).or_empty_list_if_null())
-                {
-                    FaultTolerance.try_catch_with_logging_exception(
-                    () => _fileSystem.delete_file(oldDllFile),
-                    "Attempted to remove '{0}' but had an error".format_with(oldDllFile),
-                    throwError: false,
-                    logWarningInsteadOfError: true);
-                }
-
-                // rename possibly locked dll files
-                foreach (var dllFile in _fileSystem.get_files(pkgExtensions, "*.dll", SearchOption.AllDirectories).or_empty_list_if_null())
-                {
-                    FaultTolerance.try_catch_with_logging_exception(
-                   () => _fileSystem.move_file(dllFile, dllFile + ".old"),
-                   "Attempted to rename '{0}' but had an error".format_with(dllFile));
-                }
-
-                FaultTolerance.try_catch_with_logging_exception(
-                             () =>
-                             {
-                                 foreach (var file in _fileSystem.get_files(pkgExtensions, "*.*", SearchOption.AllDirectories).or_empty_list_if_null().Where(f => !f.EndsWith(".dll.old")))
-                                 {
-                                     FaultTolerance.try_catch_with_logging_exception(
-                                     () => _fileSystem.delete_file(file),
-                                     "Attempted to remove '{0}' but had an error".format_with(file),
-                                     throwError: false,
-                                     logWarningInsteadOfError: true);
-                                 }
-                             },
-                             "Attempted to remove '{0}' but had an error".format_with(pkgExtensions),
-                             throwError: false,
-                             logWarningInsteadOfError: true);
-            }
+            remove_extension_folder(packageExtensionsInstallDirectory);
+            // don't name your package *.extension.extension
+            remove_extension_folder(packageExtensionsInstallDirectory + ".extension");
+            remove_extension_folder(packageExtensionsInstallDirectory + ".extensions");
 
             if (!config.CommandName.is_equal_to(CommandNameType.uninstall.to_string()))
             {
                 if (packageResult.InstallLocation == null) return;
 
-                _fileSystem.create_directory_if_not_exists(pkgExtensions);
+                _fileSystem.create_directory_if_not_exists(packageExtensionsInstallDirectory);
                 var extensionsFolder = _fileSystem.combine_paths(packageResult.InstallLocation, "extensions");
                 var extensionFolderToCopy = _fileSystem.directory_exists(extensionsFolder) ? extensionsFolder : packageResult.InstallLocation;
 
                 FaultTolerance.try_catch_with_logging_exception(
-                    () => _fileSystem.copy_directory(extensionFolderToCopy, pkgExtensions, overwriteExisting: true),
-                    "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".format_with(Environment.NewLine, extensionFolderToCopy, pkgExtensions));
+                    () => _fileSystem.copy_directory(extensionFolderToCopy, packageExtensionsInstallDirectory, overwriteExisting: true),
+                    "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".format_with(Environment.NewLine, extensionFolderToCopy, packageExtensionsInstallDirectory));
 
                 string logMessage = " Installed/updated {0} extensions.".format_with(extensionsFolderName);
                 this.Log().Warn(logMessage);
@@ -885,6 +853,46 @@ The recent package uninstalls indicate a reboot is necessary.
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
             }
+        }
+
+        private void remove_extension_folder(string packageExtensionsDirectory)
+        {
+            if (!_fileSystem.directory_exists(packageExtensionsDirectory)) return;
+
+            // remove old dll files files
+            foreach (var oldDllFile in _fileSystem.get_files(packageExtensionsDirectory, "*.dll.old", SearchOption.AllDirectories).or_empty_list_if_null())
+            {
+                FaultTolerance.try_catch_with_logging_exception(
+                    () => _fileSystem.delete_file(oldDllFile),
+                    "Attempted to remove '{0}' but had an error".format_with(oldDllFile),
+                    throwError: false,
+                    logWarningInsteadOfError: true);
+            }
+
+            // rename possibly locked dll files
+            foreach (var dllFile in _fileSystem.get_files(packageExtensionsDirectory, "*.dll", SearchOption.AllDirectories).or_empty_list_if_null())
+            {
+                FaultTolerance.try_catch_with_logging_exception(
+                    () => _fileSystem.move_file(dllFile, dllFile + ".old"),
+                    "Attempted to rename '{0}' but had an error".format_with(dllFile));
+            }
+
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                {
+                    foreach (var file in _fileSystem.get_files(packageExtensionsDirectory, "*.*", SearchOption.AllDirectories).or_empty_list_if_null().Where(f => !f.EndsWith(".dll.old")))
+                    {
+                        FaultTolerance.try_catch_with_logging_exception(
+                            () => _fileSystem.delete_file(file),
+                            "Attempted to remove '{0}' but had an error".format_with(file),
+                            throwError: false,
+                            logWarningInsteadOfError: true);
+                    }
+                },
+                "Attempted to remove '{0}' but had an error".format_with(packageExtensionsDirectory),
+                throwError: false,
+                logWarningInsteadOfError: true);
+
         }
 
         private void handle_template_packages(ChocolateyConfiguration config, PackageResult packageResult)
