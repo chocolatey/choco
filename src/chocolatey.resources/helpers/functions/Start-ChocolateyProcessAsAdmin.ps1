@@ -116,6 +116,76 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   if ($process.StartInfo.RedirectStandardError) { $process.BeginErrorReadLine() }
   $process.WaitForExit()  
 
+  # This handles installers which exit immediately, and spawn lingering children tasks
+  # which may be carrying on additional installation tasks.
+  #
+  # Few installers spawn child processes which outlive the parent process. So,
+  # let's monitor the exit of these children (and any of their children).
+  #
+  # Implementation inspired by:
+  # http://powershell.com/cs/blogs/tobias/archive/2012/05/09/managing-child-processes.aspx
+  #
+  # TODO: Will some installers provide meaningful exit-codes here?
+  #
+  # BEGIN handling of process children
+    function Get-ProcessChildren {
+    param(
+      $Id
+    )
+
+      Write-Debug "Searching for any active children to process ($($Id))"
+
+      $children = Get-WmiObject -Class Win32_Process -Filter "ParentProcessID=$($Id)"
+
+      $result = $null
+
+      if ( $children ) {
+        # filter to only include results with ProcessId
+        $children = $children | Where-Object { $_.ProcessId -ne $null }
+
+        # add children to result
+        $result = @( $children )
+
+        # recursively collect grandchildren processes
+        foreach ( $child in $children ) {
+
+          Write-Debug "Found active child process ($($child.ProcessId))"
+
+          $grandchildren = Get-ProcessChildren -Id $child.ProcessId
+
+          # add grandchildren to result
+          $result += @( $grandchildren )
+
+        }
+
+      }
+
+      Return $result
+
+    }
+
+    $children = Get-ProcessChildren -Id $process.Id
+
+    Write-Debug "Children processes: $($children)"
+
+    foreach ($child in $children)
+    {
+      try {
+
+        if ( $child.ProcessId ) {
+
+          Write-Debug "Waiting for child process ($($child.Processid))"
+
+          Wait-Process -Id $child.ProcessId
+
+        }
+
+      } catch [Microsoft.PowerShell.Commands.ProcessCommandException] {
+        # Okay, this happens when child process already exited
+      }
+    }
+  # END handling of process children
+
   # For some reason this forces the jobs to finish and waits for
   # them to do so. Without this it never finishes.
   Unregister-Event -SourceIdentifier "LogOutput_ChocolateyProc"
