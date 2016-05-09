@@ -97,7 +97,7 @@ param(
       Write-Debug "Response was null, using default name."
       return $originalFileName
     }
-    
+
     [string]$header = $response.Headers['Content-Disposition']
     [string]$headerLocation = $response.Headers['Location']
     
@@ -119,12 +119,26 @@ param(
       }
     }
 
+    #$containsQuery = [System.IO.Path]::GetFileName($url).Contains('?')
+    #$containsEquals = [System.IO.Path]::GetFileName($url).Contains('=')
+
     # Next comes using the response url value
     if ($fileName -eq $null -or  $fileName -eq '') {
-      Write-Debug "Using response url to determine file name."
-      $containsQuery = [System.IO.Path]::GetFileName($url).Contains('?')
-      $containsEquals = [System.IO.Path]::GetFileName($url).Contains('=')
-      $fileName = [System.IO.Path]::GetFileName($response.ResponseUri.ToString()) 
+      $responseUrl = $response.ResponseUri.ToString()
+      if (!$responseUrl.Contains('?')) {
+        Write-Debug "Using response url to determine file name. '$responseUrl'"
+        $fileName = [System.IO.Path]::GetFileName($responseUrl) 
+      }
+    }
+
+    # Next comes using the request url value
+    if ($fileName -eq $null -or  $fileName -eq '') {
+      $requestUrl = $url
+      $extension = [System.IO.Path]::GetExtension($requestUrl)
+      if (!$requestUrl.Contains('?') -and $extension -ne $null -and $extension -ne '') {
+        Write-Debug "Using request url to determine file name. ' $requestUrl'"
+        $fileName = [System.IO.Path]::GetFileName($requestUrl) 
+      }
     }
 
     [System.Text.RegularExpressions.Regex]$containsABadCharacter = New-Object Regex("[" + [System.Text.RegularExpressions.Regex]::Escape([System.IO.Path]::GetInvalidFileNameChars()) + "]", [System.Text.RegularExpressions.RegexOptions]::IgnorePatternWhitespace);

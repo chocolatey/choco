@@ -129,7 +129,7 @@ Pro / Business supports a single, ubiquitous install directory option.
     } else {
       $msuArgs = "$file $silentArgs $additionalInstallArgs"
     }
-    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" 'wusa.exe' -validExitCodes $validExitCodes
+    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes
   }
 
   write-host "$packageName has been installed."
