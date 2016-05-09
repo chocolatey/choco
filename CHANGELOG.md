@@ -104,6 +104,8 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * Fix - choco pack returns zero exit code when Nuget.Core validation errors - see [#469](https://github.com/chocolatey/choco/issues/469)
  * Fix - `Install-ChocolateyPath` updates `PATH` to `REG_SZ`, which may break using Windows dir and system32 tools - see [#699](https://github.com/chocolatey/choco/issues/699)
  * Fix - Removing environment variables sets empty environment variables - see [#724](https://github.com/chocolatey/choco/issues/724)
+ * Fix - Environment Variable Changes Require Reboot - see [#728](https://github.com/chocolatey/choco/issues/728)
+ * Fix - Get-WebFileName determines strange file name - see [#727](https://github.com/chocolatey/choco/issues/727)
 
 ### IMPROVEMENTS
 
@@ -138,6 +140,7 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * Determine if Downloaded File is HTML or Plain Text - see [#649](https://github.com/chocolatey/choco/issues/649)
  * Interactively prompt with timeout on some questions - see [#710](https://github.com/chocolatey/choco/issues/710)
  * [POSH Host] Exit code from PowerShell Host should be useful - see [#709](https://github.com/chocolatey/choco/issues/709)
+ * Update environment for scripts after setting environment variables - see [#729](https://github.com/chocolatey/choco/issues/729)
  * Pro/Business - Also check for license in User Profile location - see [#606](https://github.com/chocolatey/choco/issues/606)
  * Pro/Business - Set download cache information if available - see [#562](https://github.com/chocolatey/choco/issues/562)
  * Pro/Business - Allow commands to be added - see [#583](https://github.com/chocolatey/choco/issues/583)
