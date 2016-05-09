@@ -70,8 +70,10 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   }
 
   if (!([System.IO.File]::Exists($exeToRun)) -and $exeToRun -notmatch 'msiexec') {
-    Set-PowerShellExitCode 2
-    throw "Could not find '$exeToRun'"
+    Write-Warning "May not be able to find '$exeToRun'. Please use full path for executables."
+    # until we have search paths enabled, let's just pass a warning
+    #Set-PowerShellExitCode 2
+    #throw "Could not find '$exeToRun'"
   }
 
   # Redirecting output slows things down a bit.
