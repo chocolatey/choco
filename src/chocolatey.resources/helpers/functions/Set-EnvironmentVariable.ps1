@@ -42,4 +42,6 @@ function Set-EnvironmentVariable([string] $Name, [string] $Value, [System.Enviro
   }
 
   [Microsoft.Win32.Registry]::SetValue($keyHive + "\" + $registryKey, $Name, $Value, $registryType)
+
+  Update-SessionEnvironment
 }
