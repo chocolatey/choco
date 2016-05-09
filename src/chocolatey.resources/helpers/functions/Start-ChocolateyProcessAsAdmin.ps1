@@ -64,6 +64,10 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
     Set-PowerShellExitCode 4
     throw "The file was a text file but is attempting to be run as an executable - '$exeToRun'"
   }
+  
+  if ($exeToRun -eq 'msiexec' -or $exeToRun -eq 'msiexec.exe') {
+    $exeToRun = "$($env:SystemRoot)\System32\msiexec.exe"
+  }
 
   if (!([System.IO.File]::Exists($exeToRun)) -and $exeToRun -notmatch 'msiexec') {
     Set-PowerShellExitCode 2
