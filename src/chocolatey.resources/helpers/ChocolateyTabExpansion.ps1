@@ -35,8 +35,8 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
 $script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','pack','push','-h','--help','pin','source','config','feature','apikey')
 
 $allcommands = " --debug --verbose --force --noop --help --accept-license --confirm --limit-output --execution-timeout= --cache-location='' --fail-on-error-output --use-system-powershell"
-
-$proInstallUpgradeOptions = " --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum="
+$proInstallUpgradeOptions = " --install-directory='Pro/Biz editions' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum="
+$proNewOptions = " --file=<biz>"
 
 $commandOptions = @{
   list = "--lo --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
@@ -47,7 +47,7 @@ $commandOptions = @{
   outdated = "-? --source='' --user= --password=" + $allcommands
   upgrade = "-y -whatif -? --pre --version= --except='' --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user= --password= --prerelease --forcex86 --not-silent --package-parameters='' --allow-downgrade --allow-multiple-versions --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --fail-on-unfound --fail-on-not-installed --ignore-checksums" + $allcommands + $proInstallUpgradeOptions
   uninstall = "-y -whatif -? --force-dependencies --remove-dependencies --all-versions --source='windowsfeatures' --source='webpi' --version= --uninstall-arguments='' --override-arguments --not-silent --params='' --package-parameters='' --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts" + $allcommands
-  new = "--template-name= --automaticpackage --version= --maintainer='' packageversion= maintainername='' maintainerrepo='' installertype= url='' url64='' silentargs='' -?" + $allcommands
+  new = "--template-name= --file='Biz editions only' --automaticpackage --version= --maintainer='' packageversion= maintainername='' maintainerrepo='' installertype= url='' url64='' silentargs='' -?" + $allcommands
   pack = "--version= -?" + $allcommands
   push = "--source='' --api-key= --timeout= -?" + $allcommands
   source = "--name= --source='' --user= --password= --priority= -?" + $allcommands
