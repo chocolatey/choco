@@ -47,7 +47,11 @@ namespace chocolatey.infrastructure.app.services
         private readonly IAutomaticUninstallerService _autoUninstallerService;
         private readonly IXmlService _xmlService;
         private readonly IConfigTransformService _configTransformService;
-        private const string PRO_BUSINESS_MESSAGE = @"Check out Pro / Business for more features! https://bit.ly/choco_pro_business";
+        private const string PRO_BUSINESS_MESSAGE = @"
+Check out Pro / Business for more features! https://bit.ly/choco_pro_business";
+        private const string PRO_BUSINESS_LIST_MESSAGE = @"
+Did you know Pro/Business automatically syncs with Programs and 
+ Features? Find out more at https://bit.ly/choco_pro_business";
 
         private readonly string _shutdownExe = Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\shutdown.exe");
 
@@ -152,7 +156,7 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
 
-            randomly_notify_about_pro_business(config);
+            randomly_notify_about_pro_business(config, PRO_BUSINESS_LIST_MESSAGE);
         }
 
         private IEnumerable<PackageResult> report_registry_programs(ChocolateyConfiguration config, IEnumerable<IPackage> list)
@@ -251,15 +255,16 @@ namespace chocolatey.infrastructure.app.services
         /// Once every 10 runs or so, Chocolatey FOSS should inform the user of the Pro / Business versions.
         /// </summary>
         /// <param name="config">The configuration.</param>
+        /// <param name="message">The message to send.</param>
         /// <remarks>We want it random enough not to be annoying, but informative enough for awareness.</remarks>
-        public void randomly_notify_about_pro_business(ChocolateyConfiguration config)
+        public void randomly_notify_about_pro_business(ChocolateyConfiguration config, string message = PRO_BUSINESS_MESSAGE)
         {
             if (!config.Information.IsLicensedVersion && config.RegularOutput)
             {
                 // magic numbers! 
                 if (new Random().Next(1, 10) == 3)
                 {
-                    this.Log().Warn(ChocolateyLoggers.Important, PRO_BUSINESS_MESSAGE);
+                    this.Log().Warn(ChocolateyLoggers.Important, message);
                 }
             }
         }
