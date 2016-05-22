@@ -95,7 +95,7 @@ param(
 Pro / Business supports a single, ubiquitous install directory option.
  Stop the hassle of determining how to pass install directory overrides
  to install arguments for each package / installer type.
- Check out Pro / Business - https://bit.ly/choco_pro_business"
+ Check out Pro / Business - https://chocolatey.org/pricing"
 "@ | Write-Warning
     }
   }

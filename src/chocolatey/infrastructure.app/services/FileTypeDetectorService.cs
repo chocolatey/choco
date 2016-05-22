@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Runtime.InteropServices;
     using System.Security;
     using System.Text;
+    using System.Threading;
     using configuration;
     using filesystem;
     using infrastructure.commands;
@@ -115,6 +116,8 @@ namespace chocolatey.infrastructure.app.services
             {
                 var dieZipLocation = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "detector.zip");
                 unzip_die_files(dieZipLocation, dieDllLocation);
+                // finish unpacking
+                Thread.Sleep(1000);
             }
            
             if (!_fileSystem.file_exists(filePath))
