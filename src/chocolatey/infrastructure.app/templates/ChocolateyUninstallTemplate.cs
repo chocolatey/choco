@@ -55,13 +55,12 @@ if ($installerType -ne 'MSI') {
 }
 
 $uninstalled = $false
-$local_key     = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*'
-$machine_key   = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'
-$machine_key6432 = 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'
-
-[array]$key = Get-ItemProperty -Path @($machine_key6432,$machine_key, $local_key) `
-                        -ErrorAction SilentlyContinue `
-         | ? { $_.DisplayName -like ""$softwareName"" }
+# Get-UninstallRegistryKey is new to 0.9.10, if supporting 0.9.9.x and below,
+# take a dependency on ""chocolatey-uninstall.extension"" in your nuspec file.
+# This is only a fuzzy search if $softwareName includes '*'. Otherwise it is 
+# exact. In the case of versions in key names, we recommend removing the version
+# and using '*'.
+[array]$key = Get-UninstallRegistryKey -SoftwareName $softwareName
 
 if ($key.Count -eq 1) {
   $key | % { 

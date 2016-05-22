@@ -61,6 +61,7 @@ These are the functions from above as one list.
  * [[Get-OSArchitectureWidth|HelpersGetOSArchitectureWidth]]
  * [[Get-ToolsLocation|HelpersGetToolsLocation]]
  * [[Get-UACEnabled|HelpersGetUACEnabled]]
+ * [[Get-UninstallRegistryKey|HelpersGetUninstallRegistryKey]]
  * [[Get-VirusCheckValid|HelpersGetVirusCheckValid]]
  * [[Get-WebFile|HelpersGetWebFile]]
  * [[Get-WebFileName|HelpersGetWebFileName]]

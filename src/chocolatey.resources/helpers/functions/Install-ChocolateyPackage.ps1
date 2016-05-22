@@ -207,6 +207,9 @@ Get-ChocolateyWebFile
 Install-ChocolateyInstallPackage
 
 .LINK
+Get-UninstallRegistryKey
+
+.LINK
 Install-ChocolateyZipPackage
 #>
 param(

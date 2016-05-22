@@ -215,6 +215,7 @@ This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -Err
 
  * [[Install-ChocolateyPackage|HelpersInstallChocolateyPackage]]
  * [[Uninstall-ChocolateyPackage|HelpersUninstallChocolateyPackage]]
+ * [[Get-UninstallRegistryKey|HelpersGetUninstallRegistryKey]]
  * [[Start-ChocolateyProcessAsAdmin|HelpersStartChocolateyProcessAsAdmin]]
 
 
