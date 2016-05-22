@@ -54,13 +54,8 @@ if ($installerType -ne 'MSI') {
 }
 
 $uninstalled = $false
-$local_key     = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*'
-$machine_key   = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'
-$machine_key6432 = 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'
-
-[array]$key = Get-ItemProperty -Path @($machine_key6432,$machine_key, $local_key) `
-                        -ErrorAction SilentlyContinue `
-         | ? { $_.DisplayName -like ""$softwareName"" }
+# Get-UninstallRegistryKey is provided by the chocolatey extension package ""chocolatey-uninstall.extension"" and must be included as a dependency in this package's nuspec if used.
+[array]$key = Get-UninstallRegistryKey -SoftwareName $softwareName
 
 if ($key.Count -eq 1) {
   $key | % { 
