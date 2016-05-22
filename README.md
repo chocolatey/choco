@@ -27,7 +27,7 @@ Please make sure you've read over and agree with the [etiquette regarding commun
 
 ## Support Chocolatey!
 
- * Purchase [Chocolatey Professional / Chocolatey for Business](https://bit.ly/choco_pro_business)
+ * Purchase [Chocolatey Professional / Chocolatey for Business](https://chocolatey.org/pricing)
  * [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=E8ZPVL5PNTABW)
 
 ## See Chocolatey In Action
@@ -36,7 +36,7 @@ Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update
 
 ![install](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_install.gif "Wat? Tab completion and updating environment variables!")
 
-[Chocolatey Professional](https://bit.ly/choco_pro_business) showing private download cache and virus scan protection:
+[Chocolatey Professional](https://chocolatey.org/pricing) showing private download cache and virus scan protection:
 
 ![install pro](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/chocopro_install_stopped.gif "Get ready! Chocolatey Professional availability is May 2nd, 2016")
 

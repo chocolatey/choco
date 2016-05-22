@@ -48,10 +48,10 @@ namespace chocolatey.infrastructure.app.services
         private readonly IXmlService _xmlService;
         private readonly IConfigTransformService _configTransformService;
         private const string PRO_BUSINESS_MESSAGE = @"
-Check out Pro / Business for more features! https://bit.ly/choco_pro_business";
+Check out Pro / Business for more features! https://chocolatey.org/pricing";
         private const string PRO_BUSINESS_LIST_MESSAGE = @"
-Did you know Pro/Business automatically syncs with Programs and 
- Features? Find out more at https://bit.ly/choco_pro_business";
+Did you know Pro/Business automatically syncs with Programs and
+ Features? Find out more at https://chocolatey.org/pricing";
 
         private readonly string _shutdownExe = Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\shutdown.exe");
 
