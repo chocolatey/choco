@@ -105,6 +105,12 @@ namespace chocolatey.infrastructure.app.commands
             {
                 throw new ApplicationException("Name is required. Please pass in a name for the new package.");
             }
+
+            if (configuration.NewCommand.Name.StartsWith("-file", StringComparison.OrdinalIgnoreCase) || configuration.NewCommand.Name.StartsWith("--file", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ApplicationException(@"Automatic package creation from installer files only available in Business 
+ edition. See https://chocolatey.org/pricing for details.");
+            }
         }
 
         public virtual void help_message(ChocolateyConfiguration configuration)
