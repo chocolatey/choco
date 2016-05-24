@@ -28,9 +28,13 @@ namespace chocolatey.infrastructure.app.domain
         IzPack,
         BitRock,
         Squirrel,
+        PackageForTheWeb,
+        SetupFactory,
+        Wise,
         QtInstaller,
         Zip,
         SevenZip,
+        SevenZipInstaller,
         HotfixOrSecurityUpdate,
         ServicePack
     }
