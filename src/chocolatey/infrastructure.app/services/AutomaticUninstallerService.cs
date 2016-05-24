@@ -131,10 +131,11 @@ namespace chocolatey.infrastructure.app.services
                     uninstallArgs += " " + installer.build_uninstall_command_arguments();
                 }
 
-                var logLocation = _fileSystem.combine_paths(_fileSystem.get_full_path(config.CacheLocation), "chocolatey", pkgInfo.Package.Id, pkgInfo.Package.Version.to_string());
-                this.Log().Debug(() => " Setting up uninstall logging directory at {0}".format_with(logLocation.escape_curly_braces()));
-                _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(logLocation));
-                uninstallArgs = uninstallArgs.Replace(InstallTokens.PACKAGE_LOCATION, logLocation);
+                var packageCacheLocation = _fileSystem.combine_paths(_fileSystem.get_full_path(config.CacheLocation), pkgInfo.Package.Id, pkgInfo.Package.Version.to_string());
+                this.Log().Debug(() => " Setting up uninstall logging directory at {0}".format_with(packageCacheLocation.escape_curly_braces()));
+                _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(packageCacheLocation));
+                uninstallArgs = uninstallArgs.Replace(InstallTokens.PACKAGE_LOCATION, packageCacheLocation);
+                uninstallArgs = uninstallArgs.Replace(InstallTokens.TEMP_LOCATION, packageCacheLocation);
 
                 this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs.escape_curly_braces()));
 

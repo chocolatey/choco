@@ -22,5 +22,6 @@ namespace chocolatey.infrastructure.app.domain
         public const string PACKAGE_LOCATION = "{{PACKAGE_LOCATION}}";
         public const string LANGUAGE = "{{LANGUAGE}}";
         public const string UNINSTALLER_LOCATION = "{{UNINSTALLER_LOCATION}}";
+        public const string TEMP_LOCATION = "{{TEMP_LOCATION}}";
     }
 }
