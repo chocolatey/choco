@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.services
     using System.Reactive.Subjects;
     using events;
     using guards;
+    using logging;
 
     /// <summary>
     ///   Implementation of IEventSubscriptionManagerService
@@ -35,7 +36,7 @@ namespace chocolatey.infrastructure.services
         {
             Ensure.that(() => eventMessage).is_not_null();
 
-            this.Log().Debug(() => "Sending message '{0}' out if there are subscribers...".format_with(typeof (Event).Name));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Sending message '{0}' out if there are subscribers...".format_with(typeof (Event).Name));
 
             _subject.OnNext(eventMessage);
         }

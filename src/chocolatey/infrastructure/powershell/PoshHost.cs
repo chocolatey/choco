@@ -26,6 +26,8 @@ namespace chocolatey.infrastructure.powershell
         private readonly ChocolateyConfiguration _configuration;
         private readonly Guid _hostId = Guid.NewGuid();
         private readonly PoshHostUserInterface _psUI;
+        private readonly CultureInfo _cultureInfo = System.Threading.Thread.CurrentThread.CurrentCulture;
+        private readonly CultureInfo _cultureUiInfo = System.Threading.Thread.CurrentThread.CurrentUICulture;
 
         private bool _isClosing;
 
@@ -60,12 +62,12 @@ namespace chocolatey.infrastructure.powershell
 
         public override CultureInfo CurrentCulture
         {
-            get { return CultureInfo.InvariantCulture; }
+            get { return _cultureInfo; }
         }
 
         public override CultureInfo CurrentUICulture
         {
-            get { return CultureInfo.InvariantCulture; }
+            get { return _cultureUiInfo; }
         }
 
         public override Guid InstanceId

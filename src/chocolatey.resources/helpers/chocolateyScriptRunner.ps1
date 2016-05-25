@@ -58,5 +58,4 @@ if ($env:ChocolateyExitCode -ne $null -and $env:ChocolateyExitCode -ne '') {
  $exitCode = $env:ChocolateyExitCode
 }
 
-
 Exit $exitCode
