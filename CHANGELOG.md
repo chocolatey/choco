@@ -89,6 +89,7 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * [POSH Host] Fix - Write-Host adding multiple line breaks - see [#672](https://github.com/chocolatey/choco/issues/672)
  * [POSH Host] Fix - PowerShell Host doesn't show colorization overrides - see [#674](https://github.com/chocolatey/choco/issues/674)
  * [POSH Host] Fix - $profile is empty string when installing packages - does not automatically install the ChocolateyProfile - see [#667](https://github.com/chocolatey/choco/issues/667)
+ * [POSH Host] Fix - Getting LCID doesn't work properly with the built-in PowerShell - see [#741](https://github.com/chocolatey/choco/issues/741)
  * Fix - Verbose shows in output on debug switch - see [#611](https://github.com/chocolatey/choco/issues/611)
  * Fix - Get-ChocolateyUnzip captures files that don't belong to the package / Unzip should not do a full disk scan - see [#616](https://github.com/chocolatey/choco/issues/616) and [#155](https://github.com/chocolatey/choco/issues/155)
  * Fix - Package succeeds but software install silently fails when Install-ChocolateyInstallPackage has the wrong arguments - see [#629](https://github.com/chocolatey/choco/issues/629)
