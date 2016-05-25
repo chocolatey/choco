@@ -200,21 +200,39 @@ namespace chocolatey.infrastructure.app.services
                 Environment.SetEnvironmentVariable("packageVersion", package.Version.to_string());
                 Environment.SetEnvironmentVariable("chocolateyPackageFolder", packageDirectory);
                 Environment.SetEnvironmentVariable("packageFolder", packageDirectory);
-                Environment.SetEnvironmentVariable("installArguments", configuration.InstallArguments);
-                Environment.SetEnvironmentVariable("installerArguments", configuration.InstallArguments);
-                Environment.SetEnvironmentVariable("chocolateyInstallArguments", configuration.InstallArguments);
-                Environment.SetEnvironmentVariable("packageParameters", configuration.PackageParameters);
-                Environment.SetEnvironmentVariable("chocolateyPackageParameters", configuration.PackageParameters);
+
+
+                // unset variables that may not be updated so they don't get passed again
+                Environment.SetEnvironmentVariable("installArguments", null);
+                Environment.SetEnvironmentVariable("installerArguments", null);
+                Environment.SetEnvironmentVariable("chocolateyInstallArguments", null);
+                Environment.SetEnvironmentVariable("packageParameters", null);
+                Environment.SetEnvironmentVariable("chocolateyPackageParameters", null);
+                Environment.SetEnvironmentVariable("chocolateyInstallOverride", null);
+
+                // we only want to pass the following args to packages that would apply. 
+                // like choco install git -params '' should pass those params to git.install, 
+                // but not another package
+                if (!package_is_a_dependency_not_a_virtual(configuration, package.Id))
+                {
+                    this.Log().Debug(ChocolateyLoggers.Verbose, "Setting installer args and package parameters for {0}".format_with(package.Id));
+                    Environment.SetEnvironmentVariable("installArguments", configuration.InstallArguments);
+                    Environment.SetEnvironmentVariable("installerArguments", configuration.InstallArguments);
+                    Environment.SetEnvironmentVariable("chocolateyInstallArguments", configuration.InstallArguments);
+                    Environment.SetEnvironmentVariable("packageParameters", configuration.PackageParameters);
+                    Environment.SetEnvironmentVariable("chocolateyPackageParameters", configuration.PackageParameters);
+                   
+                    if (configuration.OverrideArguments)
+                    {
+                        Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
+                    }
+                }
 
                 if (configuration.ForceX86)
                 {
                     Environment.SetEnvironmentVariable("chocolateyForceX86", "true");
                 }
-                if (configuration.OverrideArguments)
-                {
-                    Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
-                }
-                
+
                 if (configuration.NotSilent)
                 {
                     Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
@@ -351,6 +369,26 @@ namespace chocolatey.infrastructure.app.services
             }
 
             return installerRun;
+        }
+
+        /// <summary>
+        /// Is the package we are installing a dependency? Semi-virtual packages do not count:
+        /// .install / .app / .portable / .tool / .commandline
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="packageName">Name of the package.</param>
+        /// <returns></returns>
+        private bool package_is_a_dependency_not_a_virtual(ChocolateyConfiguration config, string packageName)
+        {
+            foreach (var package in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            {
+                if (packageName.is_equal_to(package) || packageName.contains(package + "."))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private class PowerShellExecutionResults
