@@ -57,8 +57,8 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * [Security] Sign the powershell scripts and assemblies - see [#501](https://github.com/chocolatey/choco/issues/501)
  * Add a `choco info` command to show info for one package - see [#644](https://github.com/chocolatey/choco/issues/644)
  * Pro/Business - Ubiquitous Install Directory Switch - see [#258](https://github.com/chocolatey/choco/issues/258)
- * Pro/Business - Runtime Virus Scanning - see [virus scanning](https://www.kickstarter.com/projects/ferventcoder/chocolatey-the-alternative-windows-store-like-yum/posts/1518468)
- * Pro/Business - Permanent private download location - see [alternate download location](https://www.kickstarter.com/projects/ferventcoder/chocolatey-the-alternative-windows-store-like-yum/posts/1479944)
+ * Pro/Business - Runtime Virus Scanning - see [virus scanning](https://chocolatey.org/docs/features-virus-check)
+ * Pro/Business - Private CDN cache for downloads - see [private CDN cache](https://chocolatey.org/docs/features-private-cdn)
 
 ### BUG FIXES
 
