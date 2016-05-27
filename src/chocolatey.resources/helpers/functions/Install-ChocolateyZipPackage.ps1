@@ -94,8 +94,8 @@ param(
   $fileType = 'zip'
 
   $chocTempDir = $env:TEMP
-  $tempDir = Join-Path $chocTempDir "$packageName"
-  if ($env:packageVersion -ne $null) {$tempDir = Join-Path $tempDir "$env:packageVersion"; }
+  $tempDir = Join-Path $chocTempDir "$($env:chocolateyPackageName)"
+  if ($env:chocolateyPackageVersion -ne $null) {$tempDir = Join-Path $tempDir "$($env:chocolateyPackageVersion)"; }
 
   if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir) | Out-Null}
   $file = Join-Path $tempDir "$($packageName)Install.$fileType"
