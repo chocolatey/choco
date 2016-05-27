@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.runners
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using filesystem;
     using SimpleInjector;
     using adapters;
     using attributes;
@@ -138,6 +139,28 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             {
                 this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
                 command.run(config);
+            }
+
+            remove_nuget_cache(container);
+        }
+
+        /// <summary>
+        /// if there is a NuGetScratch cache found, kill it with fire
+        /// </summary>
+        /// <param name="container">The container.</param>
+        private void remove_nuget_cache(Container container)
+        {
+            try
+            {
+                var fileSystem = container.GetInstance<IFileSystem>();
+                var scratch = fileSystem.combine_paths(fileSystem.get_temp_path(), "NuGetScratch");
+                fileSystem.delete_directory_if_exists(scratch, recursive: true, overrideAttributes: true, isSilent: true);
+                var nugetX = fileSystem.combine_paths(fileSystem.get_temp_path(), "x", "nuget");
+                fileSystem.delete_directory_if_exists(nugetX, recursive: true, overrideAttributes: true, isSilent: true);
+            }
+            catch (Exception ex)
+            {
+                this.Log().Debug(ChocolateyLoggers.Important, "Not able to cleanup NuGet temp folders. Failure was {0}".format_with(ex.Message));
             }
         }
 
