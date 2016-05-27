@@ -56,6 +56,7 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * Provide PowerShell tab completion for Chocolatey - see [#412](https://github.com/chocolatey/choco/issues/412)
  * [Security] Sign the powershell scripts and assemblies - see [#501](https://github.com/chocolatey/choco/issues/501)
  * Add a `choco info` command to show info for one package - see [#644](https://github.com/chocolatey/choco/issues/644)
+ * Resolve sources by name - see [#356](https://github.com/chocolatey/choco/issues/356)
  * Pro/Business - Ubiquitous Install Directory Switch - see [#258](https://github.com/chocolatey/choco/issues/258)
  * Pro/Business - Runtime Virus Scanning - see [virus scanning](https://chocolatey.org/docs/features-virus-check)
  * Pro/Business - Private CDN cache for downloads - see [private CDN cache](https://chocolatey.org/docs/features-private-cdn)
@@ -107,6 +108,8 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * Fix - Removing environment variables sets empty environment variables - see [#724](https://github.com/chocolatey/choco/issues/724)
  * Fix - Environment Variable Changes Require Reboot - see [#728](https://github.com/chocolatey/choco/issues/728)
  * Fix - Get-WebFileName determines strange file name - see [#727](https://github.com/chocolatey/choco/issues/727)
+ * Fix - Package params are also applied to dependent package - see [#733](https://github.com/chocolatey/choco/issues/733)
+ * Fix - Use package name/version from environment, not parameters - see [#751](https://github.com/chocolatey/choco/issues/751)
 
 ### IMPROVEMENTS
 
@@ -142,6 +145,9 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * Interactively prompt with timeout on some questions - see [#710](https://github.com/chocolatey/choco/issues/710)
  * [POSH Host] Exit code from PowerShell Host should be useful - see [#709](https://github.com/chocolatey/choco/issues/709)
  * Update environment for scripts after setting environment variables - see [#729](https://github.com/chocolatey/choco/issues/729)
+ * Clean up any temp nuget folder actions after NuGet operations - see [#622](https://github.com/chocolatey/choco/issues/622)
+ * Ensure Web Requests and Responses Do Not Timeout - make configurable - see [#732](https://github.com/chocolatey/choco/issues/732)
+ * Combine timeout from push and execution timeout as one parameter - see [#752](https://github.com/chocolatey/choco/issues/752)
  * Pro/Business - Also check for license in User Profile location - see [#606](https://github.com/chocolatey/choco/issues/606)
  * Pro/Business - Set download cache information if available - see [#562](https://github.com/chocolatey/choco/issues/562)
  * Pro/Business - Allow commands to be added - see [#583](https://github.com/chocolatey/choco/issues/583)
