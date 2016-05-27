@@ -27,15 +27,13 @@ namespace chocolatey.console
     using infrastructure.commandline;
     using infrastructure.configuration;
     using infrastructure.extractors;
-    using infrastructure.filesystem;
-    using infrastructure.information;
     using infrastructure.licensing;
     using infrastructure.logging;
     using infrastructure.registration;
     using resources;
-    using SimpleInjector;
     using Console = System.Console;
     using Environment = System.Environment;
+    using IFileSystem = infrastructure.filesystem.IFileSystem;
 
     public sealed class Program
     {
@@ -52,33 +50,7 @@ namespace chocolatey.console
                 Log4NetAppenderConfiguration.configure(loggingLocation);
                 Bootstrap.initialize();
                 Bootstrap.startup();
-
-                var license = LicenseValidation.validate();
-                if (license.is_licensed_version())
-                {
-                    try
-                    {
-                        var licensedAssembly = Assembly.LoadFile(ApplicationParameters.LicensedAssemblyLocation);
-                        license.AssemblyLoaded = true;
-                        license.Assembly = licensedAssembly;
-                        license.Version = VersionInformation.get_current_informational_version(licensedAssembly);
-                        Type licensedComponent = licensedAssembly.GetType(ApplicationParameters.LicensedComponentRegistry, throwOnError: false, ignoreCase: true);
-                        SimpleInjectorContainer.add_component_registry_class(licensedComponent);
-                    }
-                    catch (Exception ex)
-                    {
-                        "chocolatey".Log().Error(
-@"Error when attempting to load chocolatey licensed assembly. Ensure
- that chocolatey.licensed.dll exists at 
- '{0}'.
- Install with `choco install chocolatey.extension`.
- The error message itself may be helpful as well:{1} {2}".format_with(
-                        ApplicationParameters.LicensedAssemblyLocation,
-                        Environment.NewLine,
-                        ex.Message
-                        ));
-                    }
-                }
+                var license = License.validate_license();
                 var container = SimpleInjectorContainer.Container;
 
                 var config = container.GetInstance<ChocolateyConfiguration>();
@@ -185,7 +157,6 @@ namespace chocolatey.console
 #endif
                 pause_execution_if_debug();
                 Bootstrap.shutdown();
-
                 Environment.Exit(Environment.ExitCode);
             }
         }

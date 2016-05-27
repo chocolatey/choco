@@ -18,6 +18,7 @@ namespace chocolatey
     using System;
     using System.Collections.Generic;
     using infrastructure.licensing;
+    using NuGet;
     using SimpleInjector;
     using infrastructure.adapters;
     using infrastructure.app;
@@ -26,11 +27,10 @@ namespace chocolatey
     using infrastructure.app.runners;
     using infrastructure.configuration;
     using infrastructure.extractors;
-    using infrastructure.filesystem;
     using infrastructure.logging;
     using infrastructure.registration;
-    using infrastructure.services;
     using resources;
+    using IFileSystem = infrastructure.filesystem.IFileSystem;
 
     // ReSharper disable InconsistentNaming
 
@@ -61,7 +61,7 @@ namespace chocolatey
         {
             Log4NetAppenderConfiguration.configure();
             Bootstrap.initialize();
-            _license = LicenseValidation.validate();
+            _license = License.validate_license();
             _container = SimpleInjectorContainer.Container;
         }
 
@@ -221,7 +221,13 @@ namespace chocolatey
         private ChocolateyConfiguration create_configuration(IList<string> args)
         {
             var configuration = new ChocolateyConfiguration();
-            ConfigurationBuilder.set_up_configuration(args, configuration, _container, _license, null);
+            ConfigurationBuilder.set_up_configuration(
+                args, 
+                configuration, 
+                _container, 
+                _license, 
+                null);
+            
             Config.initialize_with(configuration);
 
             configuration.PromptForConfirmation = false;
