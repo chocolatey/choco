@@ -71,6 +71,13 @@ param(
   $req.AllowAutoRedirect = $true
   $req.MaximumAutomaticRedirections = 20
   #$req.KeepAlive = $true
+  # use the default request timeout of 100000
+  if ($env:chocolateyRequestTimeout -ne $null -and $env:chocolateyRequestTimeout -ne '') {
+    $req.Timeout =  $env:chocolateyRequestTimeout
+  }
+  if ($env:chocolateyResponseTimeout -ne $null -and $env:chocolateyResponseTimeout -ne '') {
+    $req.ReadWriteTimeout =  $env:chocolateyResponseTimeout
+  }
 
   #http://stackoverflow.com/questions/518181/too-many-automatic-redirections-were-attempted-error-message-when-using-a-httpw
   $req.CookieContainer = New-Object System.Net.CookieContainer

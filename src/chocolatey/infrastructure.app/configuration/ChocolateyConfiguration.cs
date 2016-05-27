@@ -141,6 +141,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string CacheLocation { get; set; }
         public bool ContainsLegacyPackageInstalls { get; set; }
         public int CommandExecutionTimeoutSeconds { get; set; }
+        public int WebRequestTimeoutSeconds { get; set; }
 
         /// <summary>
         ///   One or more source locations set by configuration or by command line. Separated by semi-colon

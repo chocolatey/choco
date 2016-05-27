@@ -205,6 +205,21 @@ namespace chocolatey.infrastructure.app.builders
                 config.CommandExecutionTimeoutSeconds = ApplicationParameters.DefaultWaitForExitInSeconds;
             }
 
+            var webRequestTimeoutSeconds = -1;
+            int.TryParse(
+                set_config_item(
+                    ApplicationParameters.ConfigSettings.WebRequestTimeoutSeconds,
+                    configFileSettings,
+                    ApplicationParameters.DefaultWebRequestTimeoutInSeconds.to_string(),
+                    "Default timeout for web requests. Available in 0.9.10+."),
+                    out webRequestTimeoutSeconds);
+            if (webRequestTimeoutSeconds <= 0)
+            {
+                webRequestTimeoutSeconds = ApplicationParameters.DefaultWebRequestTimeoutInSeconds;
+                set_config_item(ApplicationParameters.ConfigSettings.WebRequestTimeoutSeconds,configFileSettings, ApplicationParameters.DefaultWebRequestTimeoutInSeconds.to_string(),"Default timeout for web requests. Available in 0.9.10+.", forceSettingValue: true);
+            }
+            config.WebRequestTimeoutSeconds = webRequestTimeoutSeconds;
+
             config.ContainsLegacyPackageInstalls = set_config_item(ApplicationParameters.ConfigSettings.ContainsLegacyPackageInstalls, configFileSettings, "true", "Install has packages installed prior to 0.9.9 series.").is_equal_to(bool.TrueString);
             config.Proxy.Location = set_config_item(ApplicationParameters.ConfigSettings.Proxy, configFileSettings, string.Empty, "Explicit proxy location.");
             config.Proxy.User = set_config_item(ApplicationParameters.ConfigSettings.ProxyUser, configFileSettings, string.Empty, "Optional proxy user.");
@@ -437,6 +452,8 @@ You can pass options and switches in the following ways:
             if (config.Debug) Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
             if (config.Verbose) Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
             if (!config.Features.CheckSumFiles) Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
+            Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
+            Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
 
             if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
