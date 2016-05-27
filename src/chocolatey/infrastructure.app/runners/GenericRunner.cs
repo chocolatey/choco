@@ -38,7 +38,7 @@ namespace chocolatey.infrastructure.app.runners
             var commands = container.GetAllInstances<ICommand>();
             var command = commands.Where((c) =>
                 {
-                    var attributes = c.GetType().GetCustomAttributes(typeof (CommandForAttribute), false);
+                    var attributes = c.GetType().GetCustomAttributes(typeof(CommandForAttribute), false);
                     return attributes.Cast<CommandForAttribute>().Any(attribute => attribute.CommandName.is_equal_to(config.CommandName));
                 }).FirstOrDefault();
 
@@ -120,13 +120,13 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             Enum.TryParse(config.Sources, true, out sourceType);
             config.SourceType = sourceType;
 
-            this.Log().Debug(()=> "The source '{0}' evaluated to a '{1}' source type".format_with(config.Sources,sourceType.to_string()));
+            this.Log().Debug(() => "The source '{0}' evaluated to a '{1}' source type".format_with(config.Sources, sourceType.to_string()));
         }
 
         public void fail_when_license_is_missing_or_invalid_if_requested(ChocolateyConfiguration config)
         {
             if (!config.Features.FailOnInvalidOrMissingLicense) return;
-           
+
             if (!config.Information.IsLicensedVersion) throw new ApplicationException("License is missing or invalid.");
         }
 
@@ -135,7 +135,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             fail_when_license_is_missing_or_invalid_if_requested(config);
 
             var command = find_command(config, container, isConsole, parseArgs);
-            if(command != null)
+            if (command != null)
             {
                 this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
                 command.run(config);

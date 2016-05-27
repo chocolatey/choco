@@ -33,6 +33,7 @@ namespace chocolatey.infrastructure.app.nuget
             const bool disableBuffering = false;
 
             var packageServer = new PackageServer(config.Sources, ApplicationParameters.UserAgent);
+            
             packageServer.SendingRequest += (sender, e) => { if (config.Verbose) "chocolatey".Log().Info(ChocolateyLoggers.Verbose, "{0} {1}".format_with(e.Request.Method, e.Request.RequestUri)); };
 
             var package = new OptimizedZipPackage(nupkgFilePath);
@@ -56,7 +57,6 @@ namespace chocolatey.infrastructure.app.nuget
 
                 throw;
             }
-
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} was pushed successfully to {1}".format_with(package.GetFullName(), config.Sources));
         }
