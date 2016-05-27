@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.nuget
     {
         public static void push_package(ChocolateyConfiguration config, string nupkgFilePath)
         {
-            var timeout = TimeSpan.FromSeconds(Math.Abs(config.PushCommand.TimeoutInSeconds));
+            var timeout = TimeSpan.FromSeconds(Math.Abs(config.CommandExecutionTimeoutSeconds));
             if (timeout.Seconds <= 0)
             {
                 timeout = TimeSpan.FromMinutes(5); // Default to 5 minutes

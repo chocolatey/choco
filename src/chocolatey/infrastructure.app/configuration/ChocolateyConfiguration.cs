@@ -444,7 +444,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class PushCommandConfiguration
     {
         public string Key { get; set; }
-        public int TimeoutInSeconds { get; set; }
         //DisableBuffering?
     } 
     

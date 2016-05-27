@@ -311,9 +311,17 @@ namespace chocolatey.infrastructure.app.builders
                             .Add("r|limitoutput|limit-output",
                                  "LimitOutput - Limit the output to essential information",
                                  option => config.RegularOutput = option == null)
-                            .Add("execution-timeout=",
-                                 "CommandExecutionTimeoutSeconds - Override the default execution timeout in the configuration of {0} seconds.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
-                                 option => config.CommandExecutionTimeoutSeconds = int.Parse(option.remove_surrounding_quotes()))
+                            .Add("timeout=|execution-timeout=",
+                                 "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
+                                option =>
+                                {
+                                    int timeout = 0;
+                                    int.TryParse(option.remove_surrounding_quotes(), out timeout);
+                                    if (timeout > 0)
+                                    {
+                                        config.CommandExecutionTimeoutSeconds = timeout;
+                                    }
+                                })
                             .Add("c=|cache=|cachelocation=|cache-location=",
                                  "CacheLocation - Location for download cache, defaults to %TEMP% or value in chocolatey.config file.",
                                  option => config.CacheLocation = option.remove_surrounding_quotes())
