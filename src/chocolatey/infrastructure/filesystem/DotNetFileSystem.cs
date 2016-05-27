@@ -41,13 +41,14 @@ namespace chocolatey.infrastructure.filesystem
         private readonly int TIMES_TO_TRY_OPERATION = 3;
         private static Lazy<IEnvironment> environment_initializer = new Lazy<IEnvironment>(() => new Environment());
 
-        private void allow_retries(Action action)
+        private void allow_retries(Action action, bool isSilent = false)
         {
             FaultTolerance.retry(
                 TIMES_TO_TRY_OPERATION,
                 action,
                 waitDurationMilliseconds: 200,
-                increaseRetryByMilliseconds: 100);
+                increaseRetryByMilliseconds: 100,
+                isSilent:isSilent);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -511,10 +512,15 @@ namespace chocolatey.infrastructure.filesystem
 
         public void delete_directory(string directoryPath, bool recursive)
         {
-            delete_directory(directoryPath, recursive, overrideAttributes: false);
+            delete_directory(directoryPath, recursive, overrideAttributes: false, isSilent: false);
         }
 
         public void delete_directory(string directoryPath, bool recursive, bool overrideAttributes)
+        {
+            delete_directory(directoryPath, recursive, overrideAttributes: overrideAttributes, isSilent: false);
+        }
+
+        public void delete_directory(string directoryPath, bool recursive, bool overrideAttributes, bool isSilent)
         {
             if (string.IsNullOrWhiteSpace(directoryPath)) throw new ApplicationException("You must provide a directory to delete.");
             if (combine_paths(directoryPath, "").is_equal_to(combine_paths(Environment.GetEnvironmentVariable("SystemDrive"), ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
@@ -532,20 +538,26 @@ namespace chocolatey.infrastructure.filesystem
                 }
             }
 
-            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directoryPath)));
-            allow_retries(() => Directory.Delete(directoryPath, recursive));
+            if (!isSilent) this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directoryPath)));
+            allow_retries(() => Directory.Delete(directoryPath, recursive),isSilent: isSilent);
         }
+        
 
         public void delete_directory_if_exists(string directoryPath, bool recursive)
         {
-            delete_directory_if_exists(directoryPath, recursive, overrideAttributes: false);
+            delete_directory_if_exists(directoryPath, recursive, overrideAttributes: false, isSilent: false);
         }
 
         public void delete_directory_if_exists(string directoryPath, bool recursive, bool overrideAttributes)
         {
+            delete_directory_if_exists(directoryPath, recursive, overrideAttributes: overrideAttributes, isSilent: false);
+        }
+
+        public void delete_directory_if_exists(string directoryPath, bool recursive, bool overrideAttributes, bool isSilent)
+        {
             if (directory_exists(directoryPath))
             {
-                delete_directory(directoryPath, recursive, overrideAttributes);
+                delete_directory(directoryPath, recursive, overrideAttributes, isSilent);
             }
         }
 

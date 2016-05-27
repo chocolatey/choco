@@ -357,11 +357,20 @@ namespace chocolatey.infrastructure.filesystem
         void delete_directory(string directoryPath, bool recursive, bool overrideAttributes);
 
         /// <summary>
+        ///  Deletes a directory
+        /// </summary>
+        /// <param name="directoryPath">The directory path.</param>
+        /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
+        /// <param name="overrideAttributes">Override the attributes, e.g. delete readonly and/or system files.</param>
+        /// <param name="isSilent">Should this method be silent? false by default</param>
+        void delete_directory(string directoryPath, bool recursive, bool overrideAttributes, bool isSilent);
+
+        /// <summary>
         ///   Deletes a directory if it exists
         /// </summary>
         /// <param name="directoryPath">The directory path.</param>
         /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
-        void delete_directory_if_exists(string directoryPath, bool recursive);
+        void delete_directory_if_exists(string directoryPath, bool recursive);      
 
         /// <summary>
         /// Deletes a directory if it exists
@@ -370,6 +379,15 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
         /// <param name="overrideAttributes">Override the attributes, e.g. delete readonly and/or system files.</param>
         void delete_directory_if_exists(string directoryPath, bool recursive, bool overrideAttributes);
+
+        /// <summary>
+        /// Deletes a directory if it exists
+        /// </summary>
+        /// <param name="directoryPath">The directory path.</param>
+        /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
+        /// <param name="overrideAttributes">Override the attributes, e.g. delete readonly and/or system files.</param>
+        /// <param name="isSilent">Should this method be silent? false by default</param>
+        void delete_directory_if_exists(string directoryPath, bool recursive, bool overrideAttributes, bool isSilent);
 
         #endregion
 

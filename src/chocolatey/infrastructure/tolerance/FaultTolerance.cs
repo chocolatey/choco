@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.tolerance
     using System;
     using System.Threading;
     using configuration;
+    using logging;
 
     /// <summary>
     /// Provides methods that are able to tolerate faults and recover
@@ -46,7 +47,8 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="action">The action.</param>
         /// <param name="waitDurationMilliseconds">The wait duration in milliseconds.</param>
         /// <param name="increaseRetryByMilliseconds">The time for each try to increase the wait duration by in milliseconds.</param>
-        public static void retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0)
+        /// <param name="isSilent">Log messages?</param>
+        public static void retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
         {
             if (action == null) return;
 
@@ -58,7 +60,8 @@ namespace chocolatey.infrastructure.tolerance
                         return true;
                     },
                 waitDurationMilliseconds,
-                increaseRetryByMilliseconds);
+                increaseRetryByMilliseconds,
+                isSilent);
         }
 
         /// <summary>
@@ -71,13 +74,16 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="increaseRetryByMilliseconds">The time for each try to increase the wait duration by in milliseconds.</param>
         /// <returns>The return value from the function</returns>
         /// <exception cref="System.ApplicationException">You must specify a number of retries greater than zero.</exception>
-        public static T retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0)
+        /// <param name="isSilent">Log messages?</param>
+        public static T retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
         {
             if (function == null) return default(T);
             if (numberOfTries == 0) throw new ApplicationException("You must specify a number of retries greater than zero.");
             var returnValue = default(T);
 
             var debugging = log_is_in_debug_mode();
+            var logLocation = ChocolateyLoggers.Normal;
+            if (isSilent) logLocation = ChocolateyLoggers.LogFileOnly;
 
             for (int i = 1; i <= numberOfTries; i++)
             {
@@ -90,7 +96,7 @@ namespace chocolatey.infrastructure.tolerance
                 {
                     if (i == numberOfTries)
                     {
-                        "chocolatey".Log().Error("Maximum tries of {0} reached. Throwing error.".format_with(numberOfTries));
+                        "chocolatey".Log().Error(logLocation, "Maximum tries of {0} reached. Throwing error.".format_with(numberOfTries));
                         throw;
                     }
                     
@@ -98,7 +104,7 @@ namespace chocolatey.infrastructure.tolerance
 
                     var exceptionMessage = debugging ? ex.ToString() : ex.Message;
 
-                    "chocolatey".Log().Warn("This is try {3}/{4}. Retrying after {2} milliseconds.{0} Error converted to warning:{0} {1}".format_with(
+                    "chocolatey".Log().Warn(logLocation, "This is try {3}/{4}. Retrying after {2} milliseconds.{0} Error converted to warning:{0} {1}".format_with(
                         Environment.NewLine,
                         exceptionMessage,
                         retryWait,
