@@ -110,6 +110,7 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * Fix - Get-WebFileName determines strange file name - see [#727](https://github.com/chocolatey/choco/issues/727)
  * Fix - Package params are also applied to dependent package - see [#733](https://github.com/chocolatey/choco/issues/733)
  * Fix - Use package name/version from environment, not parameters - see [#751](https://github.com/chocolatey/choco/issues/751)
+ * Fix - Get-WebFileName Does Not Match on Invalid Characters - see [#753](https://github.com/chocolatey/choco/issues/753)
 
 ### IMPROVEMENTS
 
