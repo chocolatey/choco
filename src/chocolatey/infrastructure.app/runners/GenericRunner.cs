@@ -143,12 +143,17 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
             fail_when_license_is_missing_or_invalid_if_requested(config);
 
+
+            EventManager.publish(new PreRunMessage());
+
             var command = find_command(config, container, isConsole, parseArgs);
             if (command != null)
             {
                 this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
                 command.run(config);
             }
+
+            EventManager.publish(new PostRunMessage());
 
             foreach (var task in tasks.or_empty_list_if_null())
             {
