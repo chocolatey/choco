@@ -77,6 +77,32 @@ namespace chocolatey.infrastructure.app.commands
                      "UsePackageExitCodes - Package scripts can provide exit codes. Use those for choco's exit code when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
                      option => configuration.Features.UsePackageExitCodes = option != null
                      )
+                 .Add("autouninstaller|use-autouninstaller",
+                     "UseAutoUninstaller - Use auto uninstaller service when uninstalling. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.AutoUninstaller, configuration.Features.AutoUninstaller.to_string()),
+                     option => configuration.Features.AutoUninstaller = option != null
+                     )
+                 .Add("skipautouninstaller|skip-autouninstaller",
+                     "SkipAutoUninstaller - Skip auto uninstaller service when uninstalling. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.AutoUninstaller, configuration.Features.AutoUninstaller.to_string()),
+                     option =>
+                     {
+                         if (option != null)
+                         {
+                             configuration.Features.AutoUninstaller = false;
+                         }
+                     })
+                 .Add("failonautouninstaller|fail-on-autouninstaller",
+                     "FailOnAutoUninstaller - Fail the package uninstall if the auto uninstaller reports and error. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.FailOnAutoUninstaller, configuration.Features.FailOnAutoUninstaller.to_string()),
+                     option => configuration.Features.FailOnAutoUninstaller = option != null
+                     )
+                 .Add("ignoreautouninstallerfailure|ignore-autouninstaller-failure",
+                     "Ignore Auto Uninstaller Failure - Do not fail the package if auto uninstaller reports an error. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.FailOnAutoUninstaller, configuration.Features.FailOnAutoUninstaller.to_string()),
+                     option =>
+                     {
+                         if (option != null)
+                         {
+                             configuration.Features.FailOnAutoUninstaller = false;
+                         }
+                     })
                 ;
         }
 
