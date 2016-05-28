@@ -1057,6 +1057,7 @@ ATTENTION: You must take manual action to remove {1} from
         public void set_pending(PackageResult packageResult, ChocolateyConfiguration config)
         {
             var packageDirectory = packageResult.InstallLocation;
+            if (string.IsNullOrWhiteSpace(packageDirectory)) return;
             if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
             {
                 packageResult.Messages.Add(
@@ -1076,6 +1077,7 @@ ATTENTION: You must take manual action to remove {1} from
         public void remove_pending(PackageResult packageResult, ChocolateyConfiguration config)
         {
             var packageDirectory = packageResult.InstallLocation;
+            if (string.IsNullOrWhiteSpace(packageDirectory)) return;
             if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
             {
                 packageResult.Messages.Add(
