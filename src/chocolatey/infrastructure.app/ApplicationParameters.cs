@@ -78,6 +78,7 @@ namespace chocolatey.infrastructure.app
         ///   Default is 45 minutes
         /// </summary>
         public static int DefaultWaitForExitInSeconds = 2700;
+        public static int DefaultWebRequestTimeoutInSeconds = 45;
 
         public static readonly string[] ConfigFileExtensions = new string[] {".autoconf",".config",".conf",".cfg",".jsc",".json",".jsonp",".ini",".xml",".yaml"};
         public static readonly string ConfigFileTransformExtension = ".install.xdt";
@@ -100,6 +101,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string Proxy = "proxy";
             public static readonly string ProxyUser = "proxyUser";
             public static readonly string ProxyPassword = "proxyPassword";
+            public static readonly string WebRequestTimeoutSeconds = "webRequestTimeoutSeconds";
         }
         
         public static class Features

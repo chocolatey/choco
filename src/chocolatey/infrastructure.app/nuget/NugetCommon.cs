@@ -17,7 +17,10 @@ namespace chocolatey.infrastructure.app.nuget
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
+    using System.Text;
+    using infrastructure.configuration;
     using NuGet;
     using configuration;
     using logging;
@@ -71,8 +74,26 @@ namespace chocolatey.infrastructure.app.nuget
                 ProxyCache.Instance.Override(proxy);
             }
 
-            foreach (var source in sources.or_empty_list_if_null())
+            var updatedSources = new StringBuilder();
+            foreach (var sourceValue in sources.or_empty_list_if_null())
             {
+
+                var source = sourceValue;
+                if (configuration.MachineSources.Any(m => m.Name.is_equal_to(source)))
+                {
+                    "chocolatey".Log().Debug("Switching source name {0} to actual source value.".format_with(sourceValue));
+                    try
+                    {
+                        source = configuration.MachineSources.FirstOrDefault(m => m.Name.is_equal_to(source)).Key;
+                    }
+                    catch (Exception ex)
+                    {
+                        "chocolatey".Log().Warn("Attempted to use a source name {0} to get default source but failed:{1} {2}".format_with(sourceValue, Environment.NewLine, ex.Message));
+                    }
+                }
+
+                updatedSources.AppendFormat("{0};", source);
+
                 try
                 {
                     var uri = new Uri(source);
@@ -89,6 +110,11 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     repositories.Add(new ChocolateyLocalPackageRepository(source));
                 }
+            }
+
+            if (updatedSources.Length != 0)
+            {
+                configuration.Sources = updatedSources.Remove(updatedSources.Length - 1, 1).to_string();
             }
 
             //todo well that didn't work on failing repos... grrr
@@ -135,7 +161,6 @@ namespace chocolatey.infrastructure.app.nuget
             if (addUninstallHandler)
             {
                 // NOTE DO NOT EVER use this method, or endless loop - packageManager.PackageUninstalling += (s, e) =>
-
 
                 packageManager.PackageUninstalled += (s, e) =>
                     {

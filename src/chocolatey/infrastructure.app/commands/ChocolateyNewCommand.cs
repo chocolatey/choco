@@ -109,7 +109,7 @@ namespace chocolatey.infrastructure.app.commands
             if (configuration.NewCommand.Name.StartsWith("-file", StringComparison.OrdinalIgnoreCase) || configuration.NewCommand.Name.StartsWith("--file", StringComparison.OrdinalIgnoreCase))
             {
                 throw new ApplicationException(@"Automatic package creation from installer files only available in Business 
- edition. See https://chocolatey.org/pricing for details.");
+ edition. See https://chocolatey.org/compare for details.");
             }
         }
 

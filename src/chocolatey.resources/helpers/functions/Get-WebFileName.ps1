@@ -83,12 +83,20 @@ param(
   $request.AllowAutoRedirect = $true
   $request.MaximumAutomaticRedirections = 20
   #$request.KeepAlive = $true
-  $request.Timeout = 20000
+  $request.Timeout = 30000
+  if ($env:chocolateyRequestTimeout -ne $null -and $env:chocolateyRequestTimeout -ne '') {
+    $request.Timeout =  $env:chocolateyRequestTimeout
+  }
+  if ($env:chocolateyResponseTimeout -ne $null -and $env:chocolateyResponseTimeout -ne '') {
+    $request.ReadWriteTimeout =  $env:chocolateyResponseTimeout
+  }
 
   #http://stackoverflow.com/questions/518181/too-many-automatic-redirections-were-attempted-error-message-when-using-a-httpw
   $request.CookieContainer = New-Object System.Net.CookieContainer
   $request.UserAgent = $userAgent
   
+  [System.Text.RegularExpressions.Regex]$containsABadCharacter = New-Object Regex("[" + [System.Text.RegularExpressions.Regex]::Escape([System.IO.Path]::GetInvalidFileNameChars() -join '') + "\=\;]");
+
   try
   {
     [System.Net.HttpWebResponse]$response = $request.GetResponse()
@@ -110,6 +118,7 @@ param(
         $fileName = $header.Substring($index + $fileHeaderName.Length).Replace('"', '')
       }
     }
+    if ($containsABadCharacter.IsMatch($fileName)) { $fileName = $null }
     
     # If empty, check location header next
     if ($fileName -eq $null -or  $fileName -eq '') {
@@ -118,9 +127,7 @@ param(
         $fileName = [System.IO.Path]::GetFileName($headerLocation)
       }
     }
-
-    #$containsQuery = [System.IO.Path]::GetFileName($url).Contains('?')
-    #$containsEquals = [System.IO.Path]::GetFileName($url).Contains('=')
+    if ($containsABadCharacter.IsMatch($fileName)) { $fileName = $null }
 
     # Next comes using the response url value
     if ($fileName -eq $null -or  $fileName -eq '') {
@@ -130,6 +137,7 @@ param(
         $fileName = [System.IO.Path]::GetFileName($responseUrl) 
       }
     }
+    if ($containsABadCharacter.IsMatch($fileName)) { $fileName = $null }
 
     # Next comes using the request url value
     if ($fileName -eq $null -or  $fileName -eq '') {
@@ -140,8 +148,6 @@ param(
         $fileName = [System.IO.Path]::GetFileName($requestUrl) 
       }
     }
-
-    [System.Text.RegularExpressions.Regex]$containsABadCharacter = New-Object Regex("[" + [System.Text.RegularExpressions.Regex]::Escape([System.IO.Path]::GetInvalidFileNameChars()) + "]", [System.Text.RegularExpressions.RegexOptions]::IgnorePatternWhitespace);
 
     # when all else fails, default the name
     if ($fileName -eq $null -or  $fileName -eq '' -or $containsABadCharacter.IsMatch($fileName)) {

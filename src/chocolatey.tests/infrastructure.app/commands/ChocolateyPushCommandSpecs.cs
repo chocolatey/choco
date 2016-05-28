@@ -105,13 +105,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 optionSet.Contains("k").ShouldBeTrue();
             }
-
-            [Fact]
-            public void should_add_timeout_to_the_option_set()
-            {
-                optionSet.Contains("timeout").ShouldBeTrue();
-            }
-
+            
             [Fact]
             public void should_add_short_version_of_timeout_to_the_option_set()
             {

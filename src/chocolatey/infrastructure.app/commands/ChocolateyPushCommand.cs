@@ -39,7 +39,6 @@ namespace chocolatey.infrastructure.app.commands
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             configuration.Sources = null;
-            configuration.PushCommand.TimeoutInSeconds = 300;
 
             optionSet
                 .Add("s=|source=",
@@ -48,15 +47,16 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The api key for the source. If not specified (and not local file source), does a lookup. If not specified and one is not found for an https source, push will fail.",
                      option => configuration.PushCommand.Key = option.remove_surrounding_quotes())
-                .Add("t=|timeout=",
-                     "Timeout (in seconds) - The time to allow a package push to occur before timing out. Defaults to 300 seconds (5 minutes).",
+                .Add("t=",
+                     "Timeout (in seconds) - The time to allow a package push to occur before timing out. Defaults to execution timeout {0}.".format_with(configuration.CommandExecutionTimeoutSeconds),
                      option =>
                          {
+                             this.Log().Warn("Using -t for timeout has been deprecated and will be removed in v1. Please update to use --timeout or --execution-timeout instead.");
                              int timeout = 0;
                              int.TryParse(option, out timeout);
                              if (timeout > 0)
                              {
-                                 configuration.PushCommand.TimeoutInSeconds = timeout;
+                                 configuration.CommandExecutionTimeoutSeconds = timeout;
                              }
                          })
                 //.Add("b|disablebuffering|disable-buffering",
