@@ -131,6 +131,7 @@ namespace chocolatey.infrastructure.app.services
 
             if (configuration.RegularOutput) this.Log().Info(() => "Generating template to a file{0} at '{1}'".format_with(Environment.NewLine, fileLocation));
             this.Log().Debug(() => "{0}".format_with(template));
+            _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(fileLocation));
             _fileSystem.write_file(fileLocation, template, encoding);
         }
     }
