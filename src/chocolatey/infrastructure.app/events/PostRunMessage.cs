@@ -18,12 +18,16 @@ namespace chocolatey.infrastructure.app.events
     using infrastructure.commands;
     using infrastructure.events;
 
-    public class PreRunEvent<TCommand> : IMessage where TCommand : ICommand
+    public class PostRunMessage : IMessage
+    {
+    } 
+    
+    public class PostRunMessage<TCommand> : IMessage where TCommand : ICommand
     {
         public TCommand Command { get; private set; }
         public object[] State { get; private set; }
 
-        public PreRunEvent(TCommand command, object[] state)
+        public PostRunMessage(TCommand command, object[] state)
         {
             Command = command;
             State = state;

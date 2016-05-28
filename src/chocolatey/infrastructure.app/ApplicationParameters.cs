@@ -87,6 +87,8 @@ namespace chocolatey.infrastructure.app
         public static readonly string HashProviderFileTooBig = "UnableToDetectChanges_FileTooBig";
         public static readonly string HashProviderFileLocked = "UnableToDetectChanges_FileLocked";
 
+        public static readonly string PackagePendingFileName = ".chocolateyPending";
+
         public static class Tools
         {
             //public static readonly string WebPiCmdExe = _fileSystem.combine_paths(InstallLocation, "nuget.exe");

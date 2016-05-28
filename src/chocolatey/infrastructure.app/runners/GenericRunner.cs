@@ -19,7 +19,10 @@ namespace chocolatey.infrastructure.app.runners
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using events;
     using filesystem;
+    using infrastructure.events;
+    using infrastructure.tasks;
     using SimpleInjector;
     using adapters;
     using attributes;
@@ -132,13 +135,29 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
         public void run(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
         {
+            var tasks = container.GetAllInstances<ITask>();
+            foreach (var task in tasks)
+            {
+                task.initialize();
+            }
+
             fail_when_license_is_missing_or_invalid_if_requested(config);
+
+
+            EventManager.publish(new PreRunMessage());
 
             var command = find_command(config, container, isConsole, parseArgs);
             if (command != null)
             {
                 this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
                 command.run(config);
+            }
+
+            EventManager.publish(new PostRunMessage());
+
+            foreach (var task in tasks.or_empty_list_if_null())
+            {
+                task.shutdown();
             }
 
             remove_nuget_cache(container);
