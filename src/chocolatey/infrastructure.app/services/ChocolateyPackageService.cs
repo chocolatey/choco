@@ -271,6 +271,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
         {
+            set_pending(packageResult, config);
             var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
             if (config.AllowMultipleVersions)
             {
@@ -315,10 +316,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 _configTransformService.run(packageResult, config);
                 pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
 
-                if (packageResult.Success)
-                {
-                    _shimgenService.install(config, packageResult);
-                }
+                if (packageResult.Success) _shimgenService.install(config, packageResult);
             }
             else
             {
@@ -344,6 +342,8 @@ Did you know Pro / Business automatically syncs with Programs and
             }
 
             remove_rollback_if_exists(packageResult);
+
+            if (packageResult.Success) remove_pending(packageResult, config);
 
             this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".format_with(commandName.to_string(), packageResult.Name));
         }
@@ -1052,6 +1052,44 @@ ATTENTION: You must take manual action to remove {1} from
         private void remove_rollback_if_exists(PackageResult packageResult)
         {
             _nugetService.remove_rollback_directory_if_exists(packageResult.Name);
+        }
+
+        public void set_pending(PackageResult packageResult, ChocolateyConfiguration config)
+        {
+            var packageDirectory = packageResult.InstallLocation;
+            if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
+            {
+                packageResult.Messages.Add(
+                    new ResultMessage(
+                        ResultType.Error,
+                        "Install location is not specific enough, cannot run set package to pending:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, packageResult.InstallLocation)
+                        )
+                    );
+
+                return;
+            }
+
+            var pendingFile = _fileSystem.combine_paths(packageDirectory, ApplicationParameters.PackagePendingFileName);
+            _fileSystem.write_file(pendingFile, "{0}".format_with(packageResult.Name));
+        }
+
+        public void remove_pending(PackageResult packageResult, ChocolateyConfiguration config)
+        {
+            var packageDirectory = packageResult.InstallLocation;
+            if (packageDirectory.is_equal_to(ApplicationParameters.InstallLocation) || packageDirectory.is_equal_to(ApplicationParameters.PackagesLocation))
+            {
+                packageResult.Messages.Add(
+                    new ResultMessage(
+                        ResultType.Error,
+                        "Install location is not specific enough, cannot run set package to pending:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, packageResult.InstallLocation)
+                        )
+                    );
+
+                return;
+            }
+
+            var pendingFile = _fileSystem.combine_paths(packageDirectory, ApplicationParameters.PackagePendingFileName);
+            if (_fileSystem.file_exists(pendingFile)) _fileSystem.delete_file(pendingFile);
         }
 
         private IEnumerable<GenericRegistryValue> get_environment_before(ChocolateyConfiguration config, bool allowLogging = true)
