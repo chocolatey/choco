@@ -60,7 +60,10 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.MaintainerPropertyName, option.remove_surrounding_quotes()))
                 .Add("outputdirectory=",
                     "OutputDirectory - Specifies the directory for the created Chocolatey package file. If not specified, uses the current directory.",
-                    option => configuration.OutputDirectory = option)
+                    option => configuration.OutputDirectory = option)   
+                .Add("built-in|built-in-template|originaltemplate|original-template|use-original-template|use-built-in-template",
+                    "BuiltInTemplate - Use the original built-in template instead of any override. Available in 0.9.10+.",
+                    option => configuration.NewCommand.UseOriginalTemplate = option != null)
                 ;
             //todo: more built-in templates
         }

@@ -92,7 +92,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             var defaultTemplateOverride = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, "default");
-            if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && !_fileSystem.directory_exists(defaultTemplateOverride))
+            if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && (!_fileSystem.directory_exists(defaultTemplateOverride) || configuration.NewCommand.UseOriginalTemplate))
             {
                 generate_file_from_template(configuration, tokens, NuspecTemplate.Template, _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower)), Encoding.UTF8);
                 generate_file_from_template(configuration, tokens, ChocolateyInstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyinstall.ps1"), Encoding.UTF8);
