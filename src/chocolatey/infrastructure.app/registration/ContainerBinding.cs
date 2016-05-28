@@ -17,6 +17,7 @@ namespace chocolatey.infrastructure.app.registration
 {
     using System.Collections.Generic;
     using infrastructure.events;
+    using infrastructure.tasks;
     using NuGet;
     using SimpleInjector;
     using adapters;
@@ -28,6 +29,7 @@ namespace chocolatey.infrastructure.app.registration
     using infrastructure.services;
     using nuget;
     using services;
+    using tasks;
     using CryptoHashProvider = cryptography.CryptoHashProvider;
     using IFileSystem = filesystem.IFileSystem;
     using IHashProvider = cryptography.IHashProvider;
@@ -110,6 +112,18 @@ namespace chocolatey.infrastructure.app.registration
 
             container.Register<IEventSubscriptionManagerService, EventSubscriptionManagerService>(Lifestyle.Singleton);
             EventManager.initialize_with(container.GetInstance<IEventSubscriptionManagerService>);
+
+            container.Register<IEnumerable<ITask>>(
+              () =>
+              {
+                  var list = new List<ITask>
+                    {
+                        new RemovePendingPackagesTask(container.GetInstance<IFileSystem>())
+                    };
+
+                  return list.AsReadOnly();
+              },
+              Lifestyle.Singleton);
 
             container.Register<IDateTimeService, SystemDateTimeUtcService>(Lifestyle.Singleton);
         }
