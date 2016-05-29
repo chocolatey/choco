@@ -144,7 +144,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             fail_when_license_is_missing_or_invalid_if_requested(config);
 
 
-            EventManager.publish(new PreRunMessage());
+            EventManager.publish(new PreRunMessage(config));
 
             var command = find_command(config, container, isConsole, parseArgs);
             if (command != null)
@@ -153,7 +153,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                 command.run(config);
             }
 
-            EventManager.publish(new PostRunMessage());
+            EventManager.publish(new PostRunMessage(config));
 
             foreach (var task in tasks.or_empty_list_if_null())
             {
