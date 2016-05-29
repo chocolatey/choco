@@ -50,10 +50,10 @@ namespace chocolatey.infrastructure.app.services
 
         private RegistryKey open_key(RegistryHive hive, RegistryView view)
         {
-           return FaultTolerance.try_catch_with_logging_exception(
-                () => RegistryKey.OpenBaseKey(hive, view),
-                "Could not open registry hive '{0}' for view '{1}'".format_with(hive.to_string(), view.to_string()),
-                logWarningInsteadOfError: true);
+            return FaultTolerance.try_catch_with_logging_exception(
+                 () => RegistryKey.OpenBaseKey(hive, view),
+                 "Could not open registry hive '{0}' for view '{1}'".format_with(hive.to_string(), view.to_string()),
+                 logWarningInsteadOfError: true);
         }
 
         private void add_key(IList<RegistryKey> keys, RegistryHive hive, RegistryView view)
@@ -281,7 +281,7 @@ namespace chocolatey.infrastructure.app.services
                         {
                             Name = valueName,
                             ParentKeyName = subKey.Name,
-                            Type = (RegistryValueKindType)Enum.Parse(typeof(RegistryValueKindType), subKey.GetValueKind(valueName).to_string(), ignoreCase:true),
+                            Type = (RegistryValueKindType)Enum.Parse(typeof(RegistryValueKindType), subKey.GetValueKind(valueName).to_string(), ignoreCase: true),
                             Value = subKey.GetValue(valueName, expandValues ? RegistryValueOptions.None : RegistryValueOptions.DoNotExpandEnvironmentNames).to_string(),
                         });
                     }
