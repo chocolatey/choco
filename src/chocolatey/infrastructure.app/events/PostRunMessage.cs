@@ -15,21 +15,30 @@
 
 namespace chocolatey.infrastructure.app.events
 {
+    using configuration;
     using infrastructure.commands;
     using infrastructure.events;
 
     public class PostRunMessage : IMessage
     {
+        public ChocolateyConfiguration Configuration { get; private set; }
+
+        public PostRunMessage(ChocolateyConfiguration configuration)
+        {
+            this.Configuration = configuration;
+        }
     } 
     
     public class PostRunMessage<TCommand> : IMessage where TCommand : ICommand
     {
         public TCommand Command { get; private set; }
+        public ChocolateyConfiguration Configuration { get; set; }
         public object[] State { get; private set; }
 
-        public PostRunMessage(TCommand command, object[] state)
+        public PostRunMessage(TCommand command, ChocolateyConfiguration configuration, object[] state)
         {
             Command = command;
+            this.Configuration = configuration;
             State = state;
         }
     }

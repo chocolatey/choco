@@ -50,10 +50,10 @@ namespace chocolatey.infrastructure.app.services
 
         private RegistryKey open_key(RegistryHive hive, RegistryView view)
         {
-           return FaultTolerance.try_catch_with_logging_exception(
-                () => RegistryKey.OpenBaseKey(hive, view),
-                "Could not open registry hive '{0}' for view '{1}'".format_with(hive.to_string(), view.to_string()),
-                logWarningInsteadOfError: true);
+            return FaultTolerance.try_catch_with_logging_exception(
+                 () => RegistryKey.OpenBaseKey(hive, view),
+                 "Could not open registry hive '{0}' for view '{1}'".format_with(hive.to_string(), view.to_string()),
+                 logWarningInsteadOfError: true);
         }
 
         private void add_key(IList<RegistryKey> keys, RegistryHive hive, RegistryView view)
@@ -281,7 +281,7 @@ namespace chocolatey.infrastructure.app.services
                         {
                             Name = valueName,
                             ParentKeyName = subKey.Name,
-                            Type = (RegistryValueKindType)Enum.Parse(typeof(RegistryValueKindType), subKey.GetValueKind(valueName).to_string(), ignoreCase:true),
+                            Type = (RegistryValueKindType)Enum.Parse(typeof(RegistryValueKindType), subKey.GetValueKind(valueName).to_string(), ignoreCase: true),
                             Value = subKey.GetValue(valueName, expandValues ? RegistryValueOptions.None : RegistryValueOptions.DoNotExpandEnvironmentNames).to_string(),
                         });
                     }
@@ -343,6 +343,53 @@ namespace chocolatey.infrastructure.app.services
             }
 
             return null;
+        }
+
+        public static GenericRegistryValue get_value(RegistryHiveType hive, string subKeyPath, string registryValue)
+        {
+            var hiveActual = (RegistryHive)Enum.Parse(typeof(RegistryHive), hive.to_string(), ignoreCase: true);
+            IList<RegistryKey> keyLocations = new List<RegistryKey>();
+            if (Environment.Is64BitOperatingSystem)
+            {
+                keyLocations.Add(RegistryKey.OpenBaseKey(hiveActual, RegistryView.Registry64));
+            }
+
+            keyLocations.Add(RegistryKey.OpenBaseKey(hiveActual, RegistryView.Registry32));
+
+            GenericRegistryValue value = null;
+
+            foreach (var topLevelRegistryKey in keyLocations)
+            {
+                using (topLevelRegistryKey)
+                {
+                    var key = topLevelRegistryKey.OpenSubKey(subKeyPath, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
+                    if (key != null)
+                    {
+                        value = FaultTolerance.try_catch_with_logging_exception(
+                            () =>
+                            {
+                                if (key.GetValueNames().Contains(registryValue,StringComparer.InvariantCultureIgnoreCase))
+                                {
+                                    return new GenericRegistryValue
+                                    {
+                                        Name = registryValue,
+                                        ParentKeyName = key.Name,
+                                        Type = (RegistryValueKindType)Enum.Parse(typeof(RegistryValueKindType), key.GetValueKind(registryValue).to_string(), ignoreCase: true),
+                                        Value = key.GetValue(registryValue).to_string(),
+                                    };
+                                }
+
+                                return null;
+                            },
+                            "Could not get registry value '{0}' from key '{1}'".format_with(registryValue, key.Name),
+                            logWarningInsteadOfError: true);
+
+                        if (value != null) break;
+                    }
+                }
+            }
+
+            return value;
         }
     }
 
