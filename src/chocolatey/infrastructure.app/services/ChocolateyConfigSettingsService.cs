@@ -162,7 +162,7 @@ namespace chocolatey.infrastructure.app.services
         {
             foreach (var feature in configFileSettings.Features)
             {
-                this.Log().Info(() => "{0} - {1} | {2}".format_with(feature.Name, !feature.Enabled ? "[Disabled]" : "[Enabled]", feature.Description));
+                this.Log().Info(() => "{0} {1} - {2}".format_with(!feature.Enabled ? "[Disabled]" : "[Enabled] ", feature.Name, feature.Description));
             }
         }
 
