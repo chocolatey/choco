@@ -153,7 +153,7 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void GetExecutablePath_should_find_existing_executable()
             {
-                FileSystem.get_executable_path("cmd").ShouldEqual(
+                FileSystem.get_executable_path("cmd").to_lower().ShouldEqual(
                     Platform.get_platform() == PlatformType.Windows ?
                         "c:\\windows\\system32\\cmd.exe"
                         : "cmd",
@@ -164,9 +164,9 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void GetExecutablePath_should_find_existing_executable_with_extension()
             {
-                FileSystem.get_executable_path("cmd.exe").ShouldEqual(
+                FileSystem.get_executable_path("cmd.exe").to_lower().ShouldEqual(
                     Platform.get_platform() == PlatformType.Windows ?
-                        "C:\\Windows\\system32\\cmd.exe"
+                        "c:\\windows\\system32\\cmd.exe"
                         : "cmd.exe",
                     StringComparer.OrdinalIgnoreCase
                     );
