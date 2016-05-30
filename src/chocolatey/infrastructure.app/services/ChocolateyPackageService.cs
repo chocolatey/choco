@@ -431,7 +431,8 @@ Did you know Pro / Business automatically syncs with Programs and
                 this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
                 foreach (var warning in packageInstalls.Where(p => p.Value.Warning).or_empty_list_if_null())
                 {
-                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}{1}".format_with(warning.Value.Name, warning.Value.ExitCode != 0 ? " (exit code {0})".format_with(warning.Value.ExitCode) : string.Empty));
+                    var warningMessage = warning.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Warn);
+                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}{1}".format_with(warning.Value.Name, warningMessage != null ? " - {0}".format_with(warningMessage.Message) : string.Empty));
                 }
             }
 
@@ -453,7 +454,11 @@ The recent package installs indicate a reboot is necessary.
                 this.Log().Error("Failures:");
                 foreach (var failure in packageInstalls.Where(p => !p.Value.Success).or_empty_list_if_null())
                 {
-                    this.Log().Error(" - {0}{1}".format_with(failure.Value.Name, failure.Value.ExitCode != 0 ? " (exit code {0})".format_with(failure.Value.ExitCode) : string.Empty));
+                    var errorMessage = failure.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Error);
+                    this.Log().Error(" - {0}{1}{2}".format_with(failure.Value.Name,
+                        failure.Value.ExitCode != 0 ? " (exited {0})".format_with(failure.Value.ExitCode) : string.Empty,
+                        errorMessage != null ? " - {0}".format_with(errorMessage.Message) : string.Empty
+                        ));
                 }
             }
 
@@ -653,7 +658,8 @@ Would have determined packages that are out of date based on what is
                 this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
                 foreach (var warning in packageUpgrades.Where(p => p.Value.Warning).or_empty_list_if_null())
                 {
-                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}{1}".format_with(warning.Value.Name, warning.Value.ExitCode != 0 ? " (exit code {0})".format_with(warning.Value.ExitCode) : string.Empty));
+                    var warningMessage = warning.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Warn);
+                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}{1}".format_with(warning.Value.Name, warningMessage != null ? " - {0}".format_with(warningMessage.Message) : string.Empty));
                 }
             }
 
@@ -675,7 +681,11 @@ The recent package upgrades indicate a reboot is necessary.
                 this.Log().Error("Failures:");
                 foreach (var failure in packageUpgrades.Where(p => !p.Value.Success).or_empty_list_if_null())
                 {
-                    this.Log().Error(" - {0}{1}".format_with(failure.Value.Name, failure.Value.ExitCode != 0 ? " (exit code {0})".format_with(failure.Value.ExitCode) : string.Empty));
+                    var errorMessage = failure.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Error);
+                    this.Log().Error(" - {0}{1}{2}".format_with(failure.Value.Name,
+                        failure.Value.ExitCode != 0 ? " (exited {0})".format_with(failure.Value.ExitCode) : string.Empty,
+                        errorMessage != null ? " - {0}".format_with(errorMessage.Message) : string.Empty
+                        ));
                 }
             }
 
@@ -734,6 +744,7 @@ The recent package upgrades indicate a reboot is necessary.
             get_environment_after(config, environmentBefore, out environmentChanges, out environmentRemovals);
 
             var uninstallFailures = packageUninstalls.Count(p => !p.Value.Success);
+            var uninstallWarnings = packageUninstalls.Count(p => p.Value.Warning);
             var rebootPackages = packageUninstalls.Count(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode));
             this.Log().Warn(() => @"{0}{1} uninstalled {2}/{3} packages. {4} packages failed.{0} See the log for details ({5}).".format_with(
                 Environment.NewLine,
@@ -743,6 +754,16 @@ The recent package upgrades indicate a reboot is necessary.
                 uninstallFailures,
                 _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
                 ));
+
+            if (uninstallWarnings != 0)
+            {
+                this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
+                foreach (var warning in packageUninstalls.Where(p => p.Value.Warning).or_empty_list_if_null())
+                {
+                    var warningMessage = warning.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Warn);
+                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}{1}".format_with(warning.Value.Name, warningMessage != null ? " - {0}".format_with(warningMessage.Message) : string.Empty));
+                }
+            }
 
             if (rebootPackages != 0)
             {
@@ -762,7 +783,11 @@ The recent package uninstalls indicate a reboot is necessary.
                 this.Log().Error("Failures");
                 foreach (var failure in packageUninstalls.Where(p => !p.Value.Success).or_empty_list_if_null())
                 {
-                    this.Log().Error(" - {0}{1}".format_with(failure.Value.Name, failure.Value.ExitCode != 0 ? " (exit code {0})".format_with(failure.Value.ExitCode) : string.Empty));
+                    var errorMessage = failure.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Error);
+                    this.Log().Error(" - {0}{1}{2}".format_with(failure.Value.Name, 
+                        failure.Value.ExitCode != 0 ? " (exited {0})".format_with(failure.Value.ExitCode) : string.Empty,
+                        errorMessage != null ? " - {0}".format_with(errorMessage.Message) : string.Empty
+                        ));
                 }
             }
 
