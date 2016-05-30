@@ -329,6 +329,19 @@ Did you know Pro / Business automatically syncs with Programs and
                 handle_template_packages(config, packageResult);
             }
 
+            var toolsLocation = _fileSystem.combine_paths(Environment.GetEnvironmentVariable("ChocolateyToolsLocation"), packageResult.Name);
+            if (_fileSystem.directory_exists(toolsLocation))
+            {
+                Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", toolsLocation, EnvironmentVariableTarget.Process);
+            }
+
+
+            if (pkgInfo.RegistrySnapshot != null && pkgInfo.RegistrySnapshot.RegistryKeys.Any(k => !string.IsNullOrWhiteSpace(k.InstallLocation)))
+            {
+                var key = pkgInfo.RegistrySnapshot.RegistryKeys.FirstOrDefault(k => !string.IsNullOrWhiteSpace(k.InstallLocation));
+                if (key != null) Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", key.InstallLocation, EnvironmentVariableTarget.Process);
+            }
+
             _packageInfoService.save_package_information(pkgInfo);
             ensure_bad_package_path_is_clean(config, packageResult);
             EventManager.publish(new HandlePackageResultCompletedMessage(packageResult, config, commandName));
@@ -346,6 +359,22 @@ Did you know Pro / Business automatically syncs with Programs and
             if (packageResult.Success) remove_pending(packageResult, config);
 
             this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".format_with(commandName.to_string(), packageResult.Name));
+
+            var installLocation = Environment.GetEnvironmentVariable("ChocolateyPackageInstallLocation");
+            var installerDetected = Environment.GetEnvironmentVariable("ChocolateyInstallerType");
+            if (!string.IsNullOrWhiteSpace(installLocation))
+            {
+                 this.Log().Info(ChocolateyLoggers.Important, "  Software installed to '{0}'".format_with(installLocation));
+            }
+            else if (!string.IsNullOrWhiteSpace(installerDetected))
+            {
+                this.Log().Info(ChocolateyLoggers.Important, @"  Software installed as '{0}', install location is likely default.".format_with(installerDetected));
+            }
+            else
+            {
+                this.Log().Info(ChocolateyLoggers.Important, @"  Software install location not explicitly set, could be in package or 
+  default install location if installer.");
+            }
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
@@ -851,6 +880,8 @@ The recent package uninstalls indicate a reboot is necessary.
                 string logMessage = " Installed/updated {0} extensions.".format_with(extensionsFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+
+                Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", packageExtensionsInstallDirectory, EnvironmentVariableTarget.Process);
             }
             else
             {
@@ -935,6 +966,8 @@ The recent package uninstalls indicate a reboot is necessary.
                 string logMessage = " Installed/updated {0} template.".format_with(templateFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+
+                Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", installTemplatePath, EnvironmentVariableTarget.Process);
             }
             else
             {
