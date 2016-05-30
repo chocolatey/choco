@@ -1010,6 +1010,60 @@ spam/junk folder.");
                     }
                 };
 
+            // if we are uninstalling a package and not forcing dependencies, 
+            // look to see if the user is missing the actual package they meant
+            // to uninstall.
+            if (!config.ForceDependencies)
+            {
+                // if you find an install of an .install / .portable / .commandline, allow adding it to the list               
+                var installedPackages = get_all_intalled_packages(config).Select(p => p.Name).ToList().@join(ApplicationParameters.PackageNamesSeparator);
+                foreach (var packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+                {
+                    var installerExists = installedPackages.contains("{0}.install".format_with(packageName));
+                    var portableExists = installedPackages.contains("{0}.portable".format_with(packageName));
+                    var cmdLineExists = installedPackages.contains("{0}.commandline".format_with(packageName));
+                    if ((!config.PackageNames.contains("{0}.install".format_with(packageName))
+                            && !config.PackageNames.contains("{0}.portable".format_with(packageName))
+                            && !config.PackageNames.contains("{0}.commandline".format_with(packageName))
+                            )
+                        && (installerExists || portableExists || cmdLineExists)
+                        )
+                    {
+                        var actualPackageName = installerExists ? 
+                            "{0}.install".format_with(packageName) 
+                            : portableExists ? 
+                                "{0}.portable".format_with(packageName) 
+                                : "{0}.commandline".format_with(packageName);
+                   
+                        var timeoutInSeconds = config.PromptForConfirmation ? 0 : 20;
+                        this.Log().Warn(@"You are uninstalling {0}, which is likely a metapackage for an 
+ *.install/*.portable package that it installed 
+ ({0} represents discoverability).".format_with(packageName));
+                        var selection = InteractivePrompt.prompt_for_confirmation(
+                            "Would you like to uninstall {0} as well?".format_with(actualPackageName),
+                            new[] { "yes", "no" },
+                            defaultChoice: null,
+                            requireAnswer: false,
+                            allowShortAnswer: true,
+                            shortPrompt: true,
+                            timeoutInSeconds: timeoutInSeconds
+                        );
+
+                        if (selection.is_equal_to("yes"))
+                        {
+                            config.PackageNames += ";{0}".format_with(actualPackageName);
+                        }
+                        else
+                        {
+                            var logMessage = "To finish removing {0}, please also run the command: `choco uninstall {1}`.".format_with(packageName, actualPackageName);
+                            var actualPackageResult = packageUninstalls.GetOrAdd(actualPackageName, new PackageResult(actualPackageName, null, null));
+                            actualPackageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                            actualPackageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        }
+                    }
+                }
+            }
+
             set_package_names_if_all_is_specified(config, () =>
                 {
                     // force remove the item, ignore the dependencies
