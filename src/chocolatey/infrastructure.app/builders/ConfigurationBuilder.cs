@@ -439,6 +439,9 @@ You can pass options and switches in the following ways:
 
         public static void set_environment_variables(ChocolateyConfiguration config)
         {
+            Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", null);
+            Environment.SetEnvironmentVariable("ChocolateyInstallerType", null);
+
             Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, ApplicationParameters.InstallLocation);
             Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION", config.Information.ChocolateyVersion);
             Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION_PRODUCT", config.Information.ChocolateyProductVersion);
@@ -474,7 +477,7 @@ You can pass options and switches in the following ways:
                 Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
                 Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
             }
-
+            
             if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable("ChocolateyPowerShellHost", "true");
             if (config.Force) Environment.SetEnvironmentVariable("ChocolateyForce", "true");
         }

@@ -116,7 +116,6 @@ namespace chocolatey.infrastructure.app.services
             if (config.RegularOutput) this.Log().Debug(() => "Running list with the following filter = '{0}'".format_with(config.Input));
             if (config.RegularOutput) this.Log().Debug(() => "--- Start of List ---");
             foreach (var pkg in NugetList.GetPackages(config, _nugetLogger))
-
             {
                 var package = pkg; // for lamda access
 
@@ -125,7 +124,7 @@ namespace chocolatey.infrastructure.app.services
                     if (config.RegularOutput)
                     {
                         this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0} {1}{2}{3}{4}".format_with(
-                            package.Id, 
+                            package.Id,
                             package.Version.to_string(),
                             package.IsApproved ? " [Approved]" : string.Empty,
                             package.IsDownloadCacheAvailable ? " Downloads cached for licensed users" : string.Empty,
@@ -169,7 +168,7 @@ namespace chocolatey.infrastructure.app.services
                                 package.DocsUrl != null && !string.IsNullOrWhiteSpace(package.DocsUrl.to_string()) ? "{0} Documentation: {1}".format_with(Environment.NewLine, package.DocsUrl.to_string()) : string.Empty,
                                 package.MailingListUrl != null && !string.IsNullOrWhiteSpace(package.MailingListUrl.to_string()) ? "{0} Mailing List: {1}".format_with(Environment.NewLine, package.MailingListUrl.to_string()) : string.Empty,
                                 package.BugTrackerUrl != null && !string.IsNullOrWhiteSpace(package.BugTrackerUrl.to_string()) ? "{0} Issues: {1}".format_with(Environment.NewLine, package.BugTrackerUrl.to_string()) : string.Empty,
-                                package.Description.escape_curly_braces().Replace("\n    ","\n").Replace("\n","\n  ")
+                                package.Description.escape_curly_braces().Replace("\n    ", "\n").Replace("\n", "\n  ")
                         ));
                     }
                     else
@@ -187,7 +186,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             if (config.RegularOutput) this.Log().Debug(() => "--- End of List ---");
-            if (config.RegularOutput)
+            if (config.RegularOutput && !config.QuietOutput)
             {
                 this.Log().Warn(() => @"{0} packages {1}.".format_with(count, config.ListCommand.LocalOnly ? "installed" : "found"));
             }
@@ -286,7 +285,7 @@ namespace chocolatey.infrastructure.app.services
             if (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) && config.RegularOutput)
             {
 
-            this.Log().Warn(ChocolateyLoggers.Important, () => @"
+                this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
 Your package may be subject to moderation. A moderator will review the
 package prior to acceptance. You should have received an email. If you
@@ -488,10 +487,10 @@ spam/junk folder.");
 
                 rollbackDirectory = _fileSystem.get_full_path(rollbackDirectory);
             }
-            
+
             if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
             if (!rollbackDirectory.StartsWith(ApplicationParameters.PackageBackupLocation) || rollbackDirectory.is_equal_to(ApplicationParameters.PackageBackupLocation)) return;
-              
+
             FaultTolerance.try_catch_with_logging_exception(
                 () => _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true),
                 "Attempted to remove '{0}' but had an error:".format_with(rollbackDirectory),
@@ -668,7 +667,7 @@ spam/junk folder.");
                                 this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
                             }
                         }
-                        
+
                         continue;
                     }
 
@@ -719,7 +718,7 @@ spam/junk folder.");
                                     var currentPackageResult = new PackageResult(installedPackage, get_install_directory(config, installedPackage));
                                     beforeUpgradeAction(currentPackageResult);
                                 }
-                                
+
                                 backup_existing_version(config, installedPackage, pkgInfo);
                                 remove_shim_directors(config, installedPackage, pkgInfo);
                                 if (config.Force && (installedPackage.Version == availablePackage.Version))
@@ -913,10 +912,10 @@ spam/junk folder.");
             }
         }
 
-        private void remove_cache_for_package( ChocolateyConfiguration config, IPackage installedPackage)
+        private void remove_cache_for_package(ChocolateyConfiguration config, IPackage installedPackage)
         {
             var cacheDirectory = _fileSystem.combine_paths(config.CacheLocation, installedPackage.Id, installedPackage.Version.to_string());
-            
+
             FaultTolerance.try_catch_with_logging_exception(
                                        () => _fileSystem.delete_directory_if_exists(cacheDirectory, recursive: true),
                                        "Unable to removed cached files");
@@ -936,7 +935,7 @@ spam/junk folder.");
             if (_fileSystem.file_exists(nugetCachedFile))
             {
                 FaultTolerance.try_catch_with_logging_exception(
-                                       () =>  _fileSystem.delete_file(nugetCachedFile),
+                                       () => _fileSystem.delete_file(nugetCachedFile),
                                        "Unable to removed cached NuGet package file");
             }
         }
@@ -1010,6 +1009,60 @@ spam/junk folder.");
                     }
                 };
 
+            // if we are uninstalling a package and not forcing dependencies, 
+            // look to see if the user is missing the actual package they meant
+            // to uninstall.
+            if (!config.ForceDependencies)
+            {
+                // if you find an install of an .install / .portable / .commandline, allow adding it to the list               
+                var installedPackages = get_all_intalled_packages(config).Select(p => p.Name).ToList().@join(ApplicationParameters.PackageNamesSeparator);
+                foreach (var packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+                {
+                    var installerExists = installedPackages.contains("{0}.install".format_with(packageName));
+                    var portableExists = installedPackages.contains("{0}.portable".format_with(packageName));
+                    var cmdLineExists = installedPackages.contains("{0}.commandline".format_with(packageName));
+                    if ((!config.PackageNames.contains("{0}.install".format_with(packageName))
+                            && !config.PackageNames.contains("{0}.portable".format_with(packageName))
+                            && !config.PackageNames.contains("{0}.commandline".format_with(packageName))
+                            )
+                        && (installerExists || portableExists || cmdLineExists)
+                        )
+                    {
+                        var actualPackageName = installerExists ? 
+                            "{0}.install".format_with(packageName) 
+                            : portableExists ? 
+                                "{0}.portable".format_with(packageName) 
+                                : "{0}.commandline".format_with(packageName);
+                   
+                        var timeoutInSeconds = config.PromptForConfirmation ? 0 : 20;
+                        this.Log().Warn(@"You are uninstalling {0}, which is likely a metapackage for an 
+ *.install/*.portable package that it installed 
+ ({0} represents discoverability).".format_with(packageName));
+                        var selection = InteractivePrompt.prompt_for_confirmation(
+                            "Would you like to uninstall {0} as well?".format_with(actualPackageName),
+                            new[] { "yes", "no" },
+                            defaultChoice: null,
+                            requireAnswer: false,
+                            allowShortAnswer: true,
+                            shortPrompt: true,
+                            timeoutInSeconds: timeoutInSeconds
+                        );
+
+                        if (selection.is_equal_to("yes"))
+                        {
+                            config.PackageNames += ";{0}".format_with(actualPackageName);
+                        }
+                        else
+                        {
+                            var logMessage = "To finish removing {0}, please also run the command: `choco uninstall {1}`.".format_with(packageName, actualPackageName);
+                            var actualPackageResult = packageUninstalls.GetOrAdd(actualPackageName, new PackageResult(actualPackageName, null, null));
+                            actualPackageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                            actualPackageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                        }
+                    }
+                }
+            }
+
             set_package_names_if_all_is_specified(config, () =>
                 {
                     // force remove the item, ignore the dependencies
@@ -1064,10 +1117,10 @@ spam/junk folder.");
                             choices.Add(allVersionsChoice);
                         }
 
-                        var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), 
-                            choices, 
-                            defaultChoice: null, 
-                            requireAnswer: true, 
+                        var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName),
+                            choices,
+                            defaultChoice: null,
+                            requireAnswer: true,
                             allowShortAnswer: false);
 
                         if (string.IsNullOrWhiteSpace(selection)) continue;
@@ -1134,7 +1187,7 @@ spam/junk folder.");
                     }
                 }
             }
-
+            
             return packageUninstalls;
         }
 
@@ -1175,11 +1228,11 @@ spam/junk folder.");
                         FaultTolerance.try_catch_with_logging_exception(
                             () => _fileSystem.delete_file(file),
                             "Error deleting file");
-                    } 
+                    }
 
                     if (fileSnapshot.Checksum == ApplicationParameters.HashProviderFileLocked)
                     {
-                        this.Log().Warn(()=> "Snapshot for '{0}' was attempted when file was locked.{1} Please inspect and manually remove file{1} at '{2}'".format_with(_fileSystem.get_file_name(file), Environment.NewLine, _fileSystem.get_directory_name(file)));
+                        this.Log().Warn(() => "Snapshot for '{0}' was attempted when file was locked.{1} Please inspect and manually remove file{1} at '{2}'".format_with(_fileSystem.get_file_name(file), Environment.NewLine, _fileSystem.get_directory_name(file)));
                     }
                 }
             }
@@ -1190,25 +1243,40 @@ spam/junk folder.");
             }
         }
 
+        private IEnumerable<PackageResult> get_all_intalled_packages(ChocolateyConfiguration config)
+        {
+            config.ListCommand.LocalOnly = true;
+            var sources = config.Sources;
+            config.Sources = ApplicationParameters.PackagesLocation;
+            var pre = config.Prerelease;
+            config.Prerelease = true;
+            var noop = config.Noop;
+            config.Noop = false;
+            var packageNames = config.PackageNames;
+            config.PackageNames = string.Empty;
+            var input = config.Input;
+            config.Input = string.Empty;
+            var quiet = config.QuietOutput;
+            config.QuietOutput = true;
+
+            var installedPackages = list_run(config).ToList();
+
+            config.QuietOutput = quiet;
+            config.Input = input;
+            config.PackageNames = packageNames;
+            config.Noop = noop;
+            config.Prerelease = pre;
+            config.Sources = sources;
+
+            return installedPackages;
+        }
+
         private void set_package_names_if_all_is_specified(ChocolateyConfiguration config, Action customAction)
         {
             if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
             {
-                config.ListCommand.LocalOnly = true;
-                var sources = config.Sources;
-                config.Sources = ApplicationParameters.PackagesLocation;
-                var pre = config.Prerelease;
-                config.Prerelease = true;
-                var noop = config.Noop;
-                config.Noop = false;
-                config.PackageNames = string.Empty;
-                var input = config.Input;
-                config.Input = string.Empty;
-                var quiet = config.QuietOutput;
-                config.QuietOutput = true;
-
-                var packagesToUpdate = list_run(config).Select(p => p.Name).ToList();
-
+                var packagesToUpdate = get_all_intalled_packages(config).Select(p => p.Name).ToList();
+                
                 if (!string.IsNullOrWhiteSpace(config.UpgradeCommand.PackageNamesToSkip))
                 {
                     var packagesToSkip = config.UpgradeCommand.PackageNamesToSkip
@@ -1240,11 +1308,6 @@ spam/junk folder.");
                     }
                 }
 
-                config.QuietOutput = quiet;
-                config.Input = input;
-                config.Noop = noop;
-                config.Prerelease = pre;
-                config.Sources = sources;
                 config.PackageNames = packagesToUpdate.@join(ApplicationParameters.PackageNamesSeparator);
 
                 if (customAction != null) customAction.Invoke();

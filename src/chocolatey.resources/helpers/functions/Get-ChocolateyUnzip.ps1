@@ -161,5 +161,6 @@ param(
     default { throw "7-Zip signalled an unknown error (code $exitCode)" }
   }
 
+  $env:ChocolateyPackageInstallLocation = $destination
   return $destination
 }
