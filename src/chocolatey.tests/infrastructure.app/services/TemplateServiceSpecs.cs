@@ -364,6 +364,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
+            [WindowsOnly]
             public void should_generate_all_files_and_directories()
             {
                 because();
@@ -384,6 +385,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
+            [WindowsOnly]
             public void should_generate_all_files_and_directories_even_with_outputdirectory()
             {
                 config.OutputDirectory = "c:\\packages";
