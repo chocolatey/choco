@@ -187,7 +187,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             if (config.RegularOutput) this.Log().Debug(() => "--- End of List ---");
-            if (config.RegularOutput)
+            if (config.RegularOutput && !config.QuietOutput)
             {
                 this.Log().Warn(() => @"{0} packages {1}.".format_with(count, config.ListCommand.LocalOnly ? "installed" : "found"));
             }
@@ -1190,25 +1190,40 @@ spam/junk folder.");
             }
         }
 
+        private IEnumerable<PackageResult> get_all_intalled_packages(ChocolateyConfiguration config)
+        {
+            config.ListCommand.LocalOnly = true;
+            var sources = config.Sources;
+            config.Sources = ApplicationParameters.PackagesLocation;
+            var pre = config.Prerelease;
+            config.Prerelease = true;
+            var noop = config.Noop;
+            config.Noop = false;
+            var packageNames = config.PackageNames;
+            config.PackageNames = string.Empty;
+            var input = config.Input;
+            config.Input = string.Empty;
+            var quiet = config.QuietOutput;
+            config.QuietOutput = true;
+
+            var installedPackages = list_run(config).ToList();
+
+            config.QuietOutput = quiet;
+            config.Input = input;
+            config.PackageNames = packageNames;
+            config.Noop = noop;
+            config.Prerelease = pre;
+            config.Sources = sources;
+
+            return installedPackages;
+        }
+
         private void set_package_names_if_all_is_specified(ChocolateyConfiguration config, Action customAction)
         {
             if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
             {
-                config.ListCommand.LocalOnly = true;
-                var sources = config.Sources;
-                config.Sources = ApplicationParameters.PackagesLocation;
-                var pre = config.Prerelease;
-                config.Prerelease = true;
-                var noop = config.Noop;
-                config.Noop = false;
-                config.PackageNames = string.Empty;
-                var input = config.Input;
-                config.Input = string.Empty;
-                var quiet = config.QuietOutput;
-                config.QuietOutput = true;
-
-                var packagesToUpdate = list_run(config).Select(p => p.Name).ToList();
-
+                var packagesToUpdate = get_all_intalled_packages(config).Select(p => p.Name).ToList();
+                
                 if (!string.IsNullOrWhiteSpace(config.UpgradeCommand.PackageNamesToSkip))
                 {
                     var packagesToSkip = config.UpgradeCommand.PackageNamesToSkip
@@ -1240,11 +1255,6 @@ spam/junk folder.");
                     }
                 }
 
-                config.QuietOutput = quiet;
-                config.Input = input;
-                config.Noop = noop;
-                config.Prerelease = pre;
-                config.Sources = sources;
                 config.PackageNames = packagesToUpdate.@join(ApplicationParameters.PackageNamesSeparator);
 
                 if (customAction != null) customAction.Invoke();
