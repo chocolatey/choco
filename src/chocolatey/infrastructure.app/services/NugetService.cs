@@ -116,7 +116,6 @@ namespace chocolatey.infrastructure.app.services
             if (config.RegularOutput) this.Log().Debug(() => "Running list with the following filter = '{0}'".format_with(config.Input));
             if (config.RegularOutput) this.Log().Debug(() => "--- Start of List ---");
             foreach (var pkg in NugetList.GetPackages(config, _nugetLogger))
-
             {
                 var package = pkg; // for lamda access
 
@@ -125,7 +124,7 @@ namespace chocolatey.infrastructure.app.services
                     if (config.RegularOutput)
                     {
                         this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0} {1}{2}{3}{4}".format_with(
-                            package.Id, 
+                            package.Id,
                             package.Version.to_string(),
                             package.IsApproved ? " [Approved]" : string.Empty,
                             package.IsDownloadCacheAvailable ? " Downloads cached for licensed users" : string.Empty,
@@ -169,7 +168,7 @@ namespace chocolatey.infrastructure.app.services
                                 package.DocsUrl != null && !string.IsNullOrWhiteSpace(package.DocsUrl.to_string()) ? "{0} Documentation: {1}".format_with(Environment.NewLine, package.DocsUrl.to_string()) : string.Empty,
                                 package.MailingListUrl != null && !string.IsNullOrWhiteSpace(package.MailingListUrl.to_string()) ? "{0} Mailing List: {1}".format_with(Environment.NewLine, package.MailingListUrl.to_string()) : string.Empty,
                                 package.BugTrackerUrl != null && !string.IsNullOrWhiteSpace(package.BugTrackerUrl.to_string()) ? "{0} Issues: {1}".format_with(Environment.NewLine, package.BugTrackerUrl.to_string()) : string.Empty,
-                                package.Description.escape_curly_braces().Replace("\n    ","\n").Replace("\n","\n  ")
+                                package.Description.escape_curly_braces().Replace("\n    ", "\n").Replace("\n", "\n  ")
                         ));
                     }
                     else
@@ -286,7 +285,7 @@ namespace chocolatey.infrastructure.app.services
             if (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) && config.RegularOutput)
             {
 
-            this.Log().Warn(ChocolateyLoggers.Important, () => @"
+                this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
 Your package may be subject to moderation. A moderator will review the
 package prior to acceptance. You should have received an email. If you
@@ -488,10 +487,10 @@ spam/junk folder.");
 
                 rollbackDirectory = _fileSystem.get_full_path(rollbackDirectory);
             }
-            
+
             if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.directory_exists(rollbackDirectory)) return;
             if (!rollbackDirectory.StartsWith(ApplicationParameters.PackageBackupLocation) || rollbackDirectory.is_equal_to(ApplicationParameters.PackageBackupLocation)) return;
-              
+
             FaultTolerance.try_catch_with_logging_exception(
                 () => _fileSystem.delete_directory_if_exists(rollbackDirectory, recursive: true),
                 "Attempted to remove '{0}' but had an error:".format_with(rollbackDirectory),
@@ -668,7 +667,7 @@ spam/junk folder.");
                                 this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
                             }
                         }
-                        
+
                         continue;
                     }
 
@@ -719,7 +718,7 @@ spam/junk folder.");
                                     var currentPackageResult = new PackageResult(installedPackage, get_install_directory(config, installedPackage));
                                     beforeUpgradeAction(currentPackageResult);
                                 }
-                                
+
                                 backup_existing_version(config, installedPackage, pkgInfo);
                                 remove_shim_directors(config, installedPackage, pkgInfo);
                                 if (config.Force && (installedPackage.Version == availablePackage.Version))
@@ -913,10 +912,10 @@ spam/junk folder.");
             }
         }
 
-        private void remove_cache_for_package( ChocolateyConfiguration config, IPackage installedPackage)
+        private void remove_cache_for_package(ChocolateyConfiguration config, IPackage installedPackage)
         {
             var cacheDirectory = _fileSystem.combine_paths(config.CacheLocation, installedPackage.Id, installedPackage.Version.to_string());
-            
+
             FaultTolerance.try_catch_with_logging_exception(
                                        () => _fileSystem.delete_directory_if_exists(cacheDirectory, recursive: true),
                                        "Unable to removed cached files");
@@ -936,7 +935,7 @@ spam/junk folder.");
             if (_fileSystem.file_exists(nugetCachedFile))
             {
                 FaultTolerance.try_catch_with_logging_exception(
-                                       () =>  _fileSystem.delete_file(nugetCachedFile),
+                                       () => _fileSystem.delete_file(nugetCachedFile),
                                        "Unable to removed cached NuGet package file");
             }
         }
@@ -1118,10 +1117,10 @@ spam/junk folder.");
                             choices.Add(allVersionsChoice);
                         }
 
-                        var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName), 
-                            choices, 
-                            defaultChoice: null, 
-                            requireAnswer: true, 
+                        var selection = InteractivePrompt.prompt_for_confirmation("Which version of {0} would you like to uninstall?".format_with(packageName),
+                            choices,
+                            defaultChoice: null,
+                            requireAnswer: true,
                             allowShortAnswer: false);
 
                         if (string.IsNullOrWhiteSpace(selection)) continue;
@@ -1188,7 +1187,7 @@ spam/junk folder.");
                     }
                 }
             }
-
+            
             return packageUninstalls;
         }
 
@@ -1229,11 +1228,11 @@ spam/junk folder.");
                         FaultTolerance.try_catch_with_logging_exception(
                             () => _fileSystem.delete_file(file),
                             "Error deleting file");
-                    } 
+                    }
 
                     if (fileSnapshot.Checksum == ApplicationParameters.HashProviderFileLocked)
                     {
-                        this.Log().Warn(()=> "Snapshot for '{0}' was attempted when file was locked.{1} Please inspect and manually remove file{1} at '{2}'".format_with(_fileSystem.get_file_name(file), Environment.NewLine, _fileSystem.get_directory_name(file)));
+                        this.Log().Warn(() => "Snapshot for '{0}' was attempted when file was locked.{1} Please inspect and manually remove file{1} at '{2}'".format_with(_fileSystem.get_file_name(file), Environment.NewLine, _fileSystem.get_directory_name(file)));
                     }
                 }
             }
