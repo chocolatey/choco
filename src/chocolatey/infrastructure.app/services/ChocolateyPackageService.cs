@@ -333,13 +333,16 @@ Did you know Pro / Business automatically syncs with Programs and
                 handle_template_packages(config, packageResult);
             }
 
-            var toolsLocation = _fileSystem.combine_paths(Environment.GetEnvironmentVariable("ChocolateyToolsLocation"), packageResult.Name);
-            if (_fileSystem.directory_exists(toolsLocation))
+            var toolsLocation = Environment.GetEnvironmentVariable("ChocolateyToolsLocation");
+            if (!string.IsNullOrWhiteSpace(toolsLocation))
             {
-                Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", toolsLocation, EnvironmentVariableTarget.Process);
+                toolsLocation = _fileSystem.combine_paths(toolsLocation, packageResult.Name);
+                if (_fileSystem.directory_exists(toolsLocation))
+                {
+                    Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", toolsLocation, EnvironmentVariableTarget.Process);
+                }
             }
-
-
+            
             if (pkgInfo.RegistrySnapshot != null && pkgInfo.RegistrySnapshot.RegistryKeys.Any(k => !string.IsNullOrWhiteSpace(k.InstallLocation)))
             {
                 var key = pkgInfo.RegistrySnapshot.RegistryKeys.FirstOrDefault(k => !string.IsNullOrWhiteSpace(k.InstallLocation));
