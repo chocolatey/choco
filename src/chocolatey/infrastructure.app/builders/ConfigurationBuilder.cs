@@ -439,8 +439,8 @@ You can pass options and switches in the following ways:
 
         public static void reset_environment_variables(ChocolateyConfiguration config)
         {
-            Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", null);
-            Environment.SetEnvironmentVariable("ChocolateyInstallerType", null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallerTypeEnvironmentVariableName, null);
         }
 
         public static void set_environment_variables(ChocolateyConfiguration config)
