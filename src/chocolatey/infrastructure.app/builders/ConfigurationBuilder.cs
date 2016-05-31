@@ -437,10 +437,15 @@ You can pass options and switches in the following ways:
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
         }
 
-        public static void set_environment_variables(ChocolateyConfiguration config)
+        public static void reset_environment_variables(ChocolateyConfiguration config)
         {
             Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", null);
             Environment.SetEnvironmentVariable("ChocolateyInstallerType", null);
+        }
+
+        public static void set_environment_variables(ChocolateyConfiguration config)
+        {
+            reset_environment_variables(config);
 
             Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, ApplicationParameters.InstallLocation);
             Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION", config.Information.ChocolateyVersion);

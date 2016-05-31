@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using builders;
     using commandline;
     using configuration;
     using domain;
@@ -271,6 +272,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
         {
+            ConfigurationBuilder.reset_environment_variables(config);
             set_pending(packageResult, config);
             var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
             if (config.AllowMultipleVersions)
