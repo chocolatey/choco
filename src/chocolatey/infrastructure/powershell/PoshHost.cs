@@ -20,6 +20,8 @@ namespace chocolatey.infrastructure.powershell
     using System.Management.Automation.Host;
     using app;
     using app.configuration;
+    using app.domain;
+    using app.services;
 
     public class PoshHost : PSHost
     {
@@ -28,6 +30,7 @@ namespace chocolatey.infrastructure.powershell
         private readonly PoshHostUserInterface _psUI;
         private readonly CultureInfo _cultureInfo = System.Threading.Thread.CurrentThread.CurrentCulture;
         private readonly CultureInfo _cultureUiInfo = System.Threading.Thread.CurrentThread.CurrentUICulture;
+        private readonly Version _version;
 
         private bool _isClosing;
 
@@ -48,6 +51,26 @@ namespace chocolatey.infrastructure.powershell
             ExitCode = -1;
             _configuration = configuration;
             _psUI = new PoshHostUserInterface(configuration);
+            _version = get_current_version();
+        }
+
+        /// <summary>
+        /// Grabs the current version of PowerShell from the registry 
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>We can cheat because we require at least v2, which takes us down to just the check for v3</remarks>
+        private Version get_current_version()
+        {
+            // users need at least v2 to even use Chocolatey
+            // this allows us to shortcut the check for the v1/2 key
+            var version = new Version(2, 0);
+            var majorMinor = RegistryService.get_value(RegistryHiveType.LocalMachine, "SOFTWARE\\Microsoft\\PowerShell\\3\\PowerShellEngine", "PowerShellVersion");
+            if (majorMinor != null)
+            {
+                version = new Version(majorMinor.Value);
+            }
+          
+            return version;
         }
 
         public override void SetShouldExit(int exitCode)
@@ -87,7 +110,7 @@ namespace chocolatey.infrastructure.powershell
 
         public override Version Version
         {
-            get { return new Version(_configuration.Information.ChocolateyVersion); }
+            get { return _version; }
         }
 
         #region Not Implemented / Empty

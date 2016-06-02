@@ -16,12 +16,13 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using System.Security.AccessControl;
     using System.Security.Principal;
+    using System.Text;
+    using System.Text.RegularExpressions;
     using Microsoft.Win32;
     using domain;
     using filesystem;
@@ -37,8 +38,10 @@ namespace chocolatey.infrastructure.app.services
         private readonly IXmlService _xmlService;
         private readonly IFileSystem _fileSystem;
         private readonly bool _logOutput = false;
+        //public RegistryService() {}
 
         private const string UNINSTALLER_KEY_NAME = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+        private const string UNINSTALLER_MSI_MACHINE_KEY_NAME = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer\\UserData";
         private const string USER_ENVIRONMENT_REGISTRY_KEY_NAME = "Environment";
         private const string MACHINE_ENVIRONMENT_REGISTRY_KEY_NAME = "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment";
 
@@ -50,10 +53,10 @@ namespace chocolatey.infrastructure.app.services
 
         private RegistryKey open_key(RegistryHive hive, RegistryView view)
         {
-           return FaultTolerance.try_catch_with_logging_exception(
-                () => RegistryKey.OpenBaseKey(hive, view),
-                "Could not open registry hive '{0}' for view '{1}'".format_with(hive.to_string(), view.to_string()),
-                logWarningInsteadOfError: true);
+            return FaultTolerance.try_catch_with_logging_exception(
+                 () => RegistryKey.OpenBaseKey(hive, view),
+                 "Could not open registry hive '{0}' for view '{1}'".format_with(hive.to_string(), view.to_string()),
+                 logWarningInsteadOfError: true);
         }
 
         private void add_key(IList<RegistryKey> keys, RegistryHive hive, RegistryView view)
@@ -213,22 +216,27 @@ namespace chocolatey.infrastructure.app.services
                     appKey.InstallerType = InstallerType.Custom;
                 }
 
+                if (appKey.InstallerType == InstallerType.Msi)
+                {
+                    get_msi_information(appKey, key);
+                }
+
                 if (_logOutput)
                 {
-                    if (appKey.is_in_programs_and_features() && appKey.InstallerType == InstallerType.Unknown)
-                    {
+                    //if (appKey.is_in_programs_and_features() && appKey.InstallerType == InstallerType.Unknown)
+                    //{
                         foreach (var name in key.GetValueNames())
                         {
                             //var kind = key.GetValueKind(name);
                             var value = key.GetValue(name);
                             if (name.is_equal_to("QuietUninstallString") || name.is_equal_to("UninstallString"))
                             {
-                                Console.WriteLine("key - {0}|{1}={2}|Type detected={3}".format_with(key.Name, name, value.to_string(), appKey.InstallerType.to_string()));
+                                Console.WriteLine("key - {0}|{1}={2}|Type detected={3}|install location={4}".format_with(key.Name, name, value.to_string(), appKey.InstallerType.to_string(),appKey.InstallLocation.to_string()));
                             }
 
                             //Console.WriteLine("key - {0}, name - {1}, kind - {2}, value - {3}".format_with(key.Name, name, kind, value.to_string()));
                         }
-                    }
+                    //}
                 }
 
                 snapshot.RegistryKeys.Add(appKey);
@@ -236,6 +244,133 @@ namespace chocolatey.infrastructure.app.services
 
             key.Close();
             key.Dispose();
+        }
+
+        private int _componentLoopCount = 0;
+
+        private void get_msi_information(RegistryApplicationKey appKey, RegistryKey key)
+        {
+            _componentLoopCount = 0;
+            
+            var userDataProductKeyId = get_msi_user_data_key(key.Name);
+            if (string.IsNullOrWhiteSpace(userDataProductKeyId)) return;
+
+            var hklm = open_key(RegistryHive.LocalMachine, RegistryView.Default);
+            if (Environment.Is64BitOperatingSystem)
+            {
+                hklm = open_key(RegistryHive.LocalMachine, RegistryView.Registry64);
+            }
+
+            FaultTolerance.try_catch_with_logging_exception(
+             () =>
+             {
+                 var msiRegistryKey = hklm.OpenSubKey(UNINSTALLER_MSI_MACHINE_KEY_NAME, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
+                 if (msiRegistryKey == null) return;
+
+                 foreach (var subKeyName in msiRegistryKey.GetSubKeyNames())
+                 {
+                     var msiProductKey = FaultTolerance.try_catch_with_logging_exception(
+                         () => msiRegistryKey.OpenSubKey("{0}\\Products\\{1}\\InstallProperties".format_with(subKeyName, userDataProductKeyId), RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
+                         "Failed to open subkey named '{0}' for '{1}', likely due to permissions".format_with(subKeyName, msiRegistryKey.Name),
+                         logWarningInsteadOfError: true);
+                     if (msiProductKey == null) continue;
+
+                     appKey.InstallLocation = set_if_empty(appKey.InstallLocation, msiProductKey.GetValue("InstallLocation").to_string());
+                     // informational
+                     appKey.Publisher = set_if_empty(appKey.Publisher, msiProductKey.GetValue("Publisher").to_string());
+                     appKey.InstallDate = set_if_empty(appKey.InstallDate, msiProductKey.GetValue("InstallDate").to_string());
+                     appKey.InstallSource = set_if_empty(appKey.InstallSource, msiProductKey.GetValue("InstallSource").to_string());
+                     appKey.Language = set_if_empty(appKey.Language, msiProductKey.GetValue("Language").to_string());
+                     appKey.LocalPackage = set_if_empty(appKey.LocalPackage, msiProductKey.GetValue("LocalPackage").to_string());
+
+                     // Version
+                     appKey.DisplayVersion = set_if_empty(appKey.DisplayVersion, msiProductKey.GetValue("DisplayVersion").to_string());
+                     appKey.Version = set_if_empty(appKey.Version, msiProductKey.GetValue("Version").to_string());
+                     appKey.VersionMajor = set_if_empty(appKey.VersionMajor, msiProductKey.GetValue("VersionMajor").to_string());
+                     appKey.VersionMinor = set_if_empty(appKey.VersionMinor, msiProductKey.GetValue("VersionMinor").to_string());
+
+                     // search components for install location if still empty
+                     // the performance of this is very bad - without this the query is sub-second
+                     // with this it takes about 15 seconds with around 200 apps installed
+                     //if (string.IsNullOrWhiteSpace(appKey.InstallLocation) && !appKey.Publisher.contains("Microsoft"))
+                     //{
+                     //    var msiComponentsKey = FaultTolerance.try_catch_with_logging_exception(
+                     //       () => msiRegistryKey.OpenSubKey("{0}\\Components".format_with(subKeyName), RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
+                     //       "Failed to open subkey named '{0}' for '{1}', likely due to permissions".format_with(subKeyName, msiRegistryKey.Name),
+                     //       logWarningInsteadOfError: true);
+                     //    if (msiComponentsKey == null) continue;
+
+                     //    foreach (var msiComponentKeyName in msiComponentsKey.GetSubKeyNames())
+                     //    {
+                     //        var msiComponentKey = FaultTolerance.try_catch_with_logging_exception(
+                     //           () => msiComponentsKey.OpenSubKey(msiComponentKeyName, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
+                     //           "Failed to open subkey named '{0}' for '{1}', likely due to permissions".format_with(subKeyName, msiRegistryKey.Name),
+                     //           logWarningInsteadOfError: true);
+
+                     //        if (msiComponentKey.GetValueNames().Contains(userDataProductKeyId, StringComparer.OrdinalIgnoreCase))
+                     //        {
+                     //            _componentLoopCount++;
+                     //            appKey.InstallLocation = set_if_empty(appKey.InstallLocation, get_install_location_estimate(msiComponentKey.GetValue(userDataProductKeyId).to_string()));
+                     //            if (!string.IsNullOrWhiteSpace(appKey.InstallLocation)) break;
+                     //            if (_componentLoopCount >= 10) break;
+                     //        }
+                     //    }
+                     //}
+                 }
+             },
+             "Failed to open subkeys for '{0}', likely due to permissions".format_with(hklm.Name),
+             logWarningInsteadOfError: true);
+        }
+
+        private string set_if_empty(string current, string proposed)
+        {
+            if (string.IsNullOrWhiteSpace(current)) return proposed;
+
+            return current;
+        }
+
+        private Regex _guidRegex = new Regex(@"\{(?<ReverseFull1>\w*)\-(?<ReverseFull2>\w*)\-(?<ReverseFull3>\w*)\-(?<ReversePairs1>\w*)\-(?<ReversePairs2>\w*)\}", RegexOptions.Compiled);
+        private Regex _programFilesRegex = new Regex(@"(?<Drive>\w)[\:\?]\\(?<ProgFiles>[Pp]rogram\s[Ff]iles|[Pp]rogram\s[Ff]iles\s\(x86\))\\(?:[Mm]icrosoft[^\\]*|[Cc]ommon\s[Ff]iles|IIS|MSBuild|[Rr]eference\s[Aa]ssemblies|[Ww]indows[^\\]*|(?<Name>[^\\]+))\\", RegexOptions.Compiled);
+        private StringBuilder _userDataKey = new StringBuilder();
+
+        private string get_install_location_estimate(string componentPath)
+        {
+            var match = _programFilesRegex.Match(componentPath);
+            if (!match.Success) return string.Empty;
+            if (string.IsNullOrWhiteSpace(match.Groups["Name"].Value)) return string.Empty;
+
+            return "{0}:\\{1}\\{2}".format_with(match.Groups["Drive"].Value, match.Groups["ProgFiles"].Value, match.Groups["Name"].Value);
+        }
+
+        private string get_msi_user_data_key(string name)
+        {
+            _userDataKey.Clear();
+            var match = _guidRegex.Match(name);
+            if (!match.Success) return string.Empty;
+
+            for (int i = 0; i < 3; i++)
+            {
+                var fullGroup = match.Groups["ReverseFull{0}".format_with(i + 1)];
+                if (fullGroup != null)
+                {
+                    _userDataKey.Append(fullGroup.Value.ToCharArray().Reverse().ToArray());
+                }
+            }
+            for (int i = 0; i < 2; i++)
+            {
+                var pairsGroup = match.Groups["ReversePairs{0}".format_with(i + 1)];
+                if (pairsGroup != null)
+                {
+                    var pairValue = pairsGroup.Value;
+                    for (int j = 0; j < pairValue.Length - 1; j++)
+                    {
+                        _userDataKey.Append("{1}{0}".format_with(pairValue[j], pairValue[j + 1]));
+                        j++;
+                    }
+                }
+            }
+
+            return _userDataKey.to_string();
         }
 
         public Registry get_installer_key_differences(Registry before, Registry after)
@@ -281,7 +416,7 @@ namespace chocolatey.infrastructure.app.services
                         {
                             Name = valueName,
                             ParentKeyName = subKey.Name,
-                            Type = (RegistryValueKindType)Enum.Parse(typeof(RegistryValueKindType), subKey.GetValueKind(valueName).to_string(), ignoreCase:true),
+                            Type = (RegistryValueKindType)Enum.Parse(typeof(RegistryValueKindType), subKey.GetValueKind(valueName).to_string(), ignoreCase: true),
                             Value = subKey.GetValue(valueName, expandValues ? RegistryValueOptions.None : RegistryValueOptions.DoNotExpandEnvironmentNames).to_string(),
                         });
                     }
@@ -343,6 +478,53 @@ namespace chocolatey.infrastructure.app.services
             }
 
             return null;
+        }
+
+        public static GenericRegistryValue get_value(RegistryHiveType hive, string subKeyPath, string registryValue)
+        {
+            var hiveActual = (RegistryHive)Enum.Parse(typeof(RegistryHive), hive.to_string(), ignoreCase: true);
+            IList<RegistryKey> keyLocations = new List<RegistryKey>();
+            if (Environment.Is64BitOperatingSystem)
+            {
+                keyLocations.Add(RegistryKey.OpenBaseKey(hiveActual, RegistryView.Registry64));
+            }
+
+            keyLocations.Add(RegistryKey.OpenBaseKey(hiveActual, RegistryView.Registry32));
+
+            GenericRegistryValue value = null;
+
+            foreach (var topLevelRegistryKey in keyLocations)
+            {
+                using (topLevelRegistryKey)
+                {
+                    var key = topLevelRegistryKey.OpenSubKey(subKeyPath, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
+                    if (key != null)
+                    {
+                        value = FaultTolerance.try_catch_with_logging_exception(
+                            () =>
+                            {
+                                if (key.GetValueNames().Contains(registryValue, StringComparer.InvariantCultureIgnoreCase))
+                                {
+                                    return new GenericRegistryValue
+                                    {
+                                        Name = registryValue,
+                                        ParentKeyName = key.Name,
+                                        Type = (RegistryValueKindType)Enum.Parse(typeof(RegistryValueKindType), key.GetValueKind(registryValue).to_string(), ignoreCase: true),
+                                        Value = key.GetValue(registryValue).to_string(),
+                                    };
+                                }
+
+                                return null;
+                            },
+                            "Could not get registry value '{0}' from key '{1}'".format_with(registryValue, key.Name),
+                            logWarningInsteadOfError: true);
+
+                        if (value != null) break;
+                    }
+                }
+            }
+
+            return value;
         }
     }
 

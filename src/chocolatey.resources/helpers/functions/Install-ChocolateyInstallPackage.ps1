@@ -82,6 +82,8 @@ param(
     Write-Warning "Unable to generate `'$ignoreFile`'"
   }
 
+  $env:ChocolateyInstallerType = $fileType
+
   $additionalInstallArgs = $env:chocolateyInstallArguments;
   if ($additionalInstallArgs -eq $null) { 
     $additionalInstallArgs = ''; 

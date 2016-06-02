@@ -75,12 +75,17 @@ namespace chocolatey.infrastructure.commandline
                      (name, value) => { throw new ApplicationException("Multiple choices have the same first letter. Please ensure you pass choices with different first letters."); });
             }
 
+            if (timeoutInSeconds > 0)
+            {
+                "chocolatey".Log().Info(ChocolateyLoggers.Important, "For the question below, you have {0} seconds to make a selection.".format_with(timeoutInSeconds));
+            }
+
             if (shortPrompt)
             {
                 Console.Write(prompt + "(");
 
             } 
-            
+
             "chocolatey".Log().Info(shortPrompt ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, prompt);
 
             int counter = 1;
@@ -136,7 +141,7 @@ namespace chocolatey.infrastructure.commandline
 
                 if (!selectionFound)
                 {
-                    "chocolatey".Log().Error(ChocolateyLoggers.Important, "Your choice of '{0}' is not a valid selection.".format_with(selection.escape_curly_braces()));
+                    "chocolatey".Log().Error(ChocolateyLoggers.Important, "Timeout or your choice of '{0}' is not a valid selection.".format_with(selection.escape_curly_braces()));
                     if (requireAnswer)
                     {
                         "chocolatey".Log().Warn(ChocolateyLoggers.Important, "You must select an answer");
