@@ -5,6 +5,14 @@
 ## Additional functionality emulated from http://poshcode.org/417 (Get-WebFile)
 ## Written by Stephen C. Austin, Pwnt & Co. http://pwnt.co
 ##############################################################################################################
+## Additional functionality added by Chocolatey Team / Chocolatey Contributors
+##  - Proxy
+##  - Better error handling
+##  - Inline documentation
+##  - Cmdlet conversion
+##  - Closing request/response and cleanup
+##  - Request / ReadWriteResponse Timeouts
+##############################################################################################################
 function Get-FtpFile {
 <#
 .SYNOPSIS
@@ -61,48 +69,113 @@ param(
 
   Write-Debug "Running 'Get-FtpFile' for $fileName with url:'$url', userName: '$userName', password: '$password'";
 
+  if ($url -eq $null -or $url -eq '') {
+    Write-Warning "Url parameter is empty, Get-FtpFile has nothing to do."
+    return
+  }
+
+  if ($fileName -eq $null -or $fileName -eq '') {
+    Write-Warning "FileName parameter is empty, Get-FtpFile cannot save the output."
+    return
+  }
+
   # Create a FTPWebRequest object to handle the connection to the ftp server
   $ftprequest = [System.Net.FtpWebRequest]::create($url)
 
+  # check if a proxy is required
+  $explicitProxy = $env:chocolateyProxyLocation
+  $explicitProxyUser = $env:chocolateyProxyUser
+  $explicitProxyPassword = $env:chocolateyProxyPassword
+  if ($explicitProxy -ne $null) {
+    # explicit proxy
+	  $proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
+	  if ($explicitProxyPassword -ne $null) {
+	    $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
+	    $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
+	  }
+
+  	Write-Host "Using explicit proxy server '$explicitProxy'."
+    $ftprequest.Proxy = $proxy
+  }
+
   # set the request's network credentials for an authenticated connection
-  $ftprequest.Credentials =
-    New-Object System.Net.NetworkCredential($username,$password)
+  $ftprequest.Credentials = New-Object System.Net.NetworkCredential($username, $password)
 
   $ftprequest.Method = [System.Net.WebRequestMethods+Ftp]::DownloadFile
   $ftprequest.UseBinary = $true
   $ftprequest.KeepAlive = $false
 
-  # send the ftp request to the server
-  $ftpresponse = $ftprequest.GetResponse()
-  [int]$goal = $ftpresponse.ContentLength
-  $goalFormatted = Format-FileSize $goal
+  # use the default request timeout of 100000
+  if ($env:chocolateyRequestTimeout -ne $null -and $env:chocolateyRequestTimeout -ne '') {
+    $ftprequest.Timeout =  $env:chocolateyRequestTimeout
+  }
+  if ($env:chocolateyResponseTimeout -ne $null -and $env:chocolateyResponseTimeout -ne '') {
+    $ftprequest.ReadWriteTimeout =  $env:chocolateyResponseTimeout
+  }
 
-  # get a download stream from the server response
-  $reader = $ftpresponse.GetResponseStream()
+  try {
+    # send the ftp request to the server
+    $ftpresponse = $ftprequest.GetResponse()
+    [int]$goal = $ftpresponse.ContentLength
+    $goalFormatted = Format-FileSize $goal
 
-  # create the target file on the local system and the download buffer
-  $writer = New-Object IO.FileStream ($fileName,[IO.FileMode]::Create)
-  [byte[]]$buffer = New-Object byte[] 1024
+    # get a download stream from the server response
+    $reader = $ftpresponse.GetResponseStream()
+
+    # create the target file on the local system and the download buffer
+    $writer = New-Object IO.FileStream ($fileName,[IO.FileMode]::Create)
+    [byte[]]$buffer = New-Object byte[] 1024
     [int]$total = [int]$count = 0
 
-  # loop through the download stream and send the data to the target file
-  do{
-    $count = $reader.Read($buffer, 0, $buffer.Length);
-    $writer.Write($buffer, 0, $count);
-    if(!$quiet) {
-      $total += $count
-      $totalFormatted = Format-FileSize $total
-      if($goal -gt 0) {
-        Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete (($total/$goal)*100)
-      } else {
-        Write-Progress "Downloading $url to $fileName" "Saving $total bytes..." -id 0 -Completed
-      }
-      if ($total -eq $goal) {
-        Write-Progress "Completed download of $url." "Completed a total of $total bytes of $fileName" -id 0 -Completed
-      }
+    $originalEAP = $ErrorActionPreference
+    $ErrorActionPreference = 'Stop'
+    try {
+      # loop through the download stream and send the data to the target file
+      do {
+        $count = $reader.Read($buffer, 0, $buffer.Length);
+        $writer.Write($buffer, 0, $count);
+        if(!$quiet) {
+          $total += $count
+          $totalFormatted = Format-FileSize $total
+          if($goal -gt 0) {
+            Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete (($total/$goal)*100)
+          } else {
+            Write-Progress "Downloading $url to $fileName" "Saving $total bytes..." -id 0 -Completed
+          }
+          if ($total -eq $goal) {
+            Write-Progress "Completed download of $url." "Completed a total of $total bytes of $fileName" -id 0 -Completed
+          }
+        }
+      } while ($count -ne 0)
+      Write-Host ""
+      Write-Host "Download of $([System.IO.Path]::GetFileName($fileName)) ($goalFormatted) completed."
+    } catch {
+      throw $_.Exception
+    } finally {
+        $ErrorActionPreference = $originalEAP
     }
-  } while ($count -ne 0)
 
-  $writer.Flush()
-  $writer.close()
+    $reader.Close()
+    if ($fileName) {
+      $writer.Flush()
+      $writer.Close()
+    }
+
+  } catch {
+    if ($ftprequest -ne $null) {
+      $ftprequest.ServicePoint.MaxIdleTime = 0
+      $ftprequest.Abort();
+      # ruthlessly remove $ftprequest to ensure it isn't reused
+      Remove-Variable ftprequest
+      Start-Sleep 1
+      [GC]::Collect()
+    }
+
+    Set-PowerShellExitCode 404
+    throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"
+  } finally {
+    if ($ftpresponse -ne $null) {
+      $ftpresponse.Close()
+    }
+  }
 }
