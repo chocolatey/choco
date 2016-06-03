@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -124,13 +124,39 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Uninstall Command");
             this.Log().Info(@"
-Uninstalls a package or a list of packages. Some may prefer to use 
+Uninstalls a package or a list of packages. Some may prefer to use
  `cuninst` as a shortcut for `choco uninstall`.
 
-NOTE: Automatic Uninstaller (AutoUninstall) is turned off by default 
- while in preview mode. To turn it on, run the following command:
+NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
+ with options and switches. Add `-y` for previous behavior with no
+ prompt. In most cases you can still pass options and switches with one
+ dash (`-`). For more details, see the command reference (`choco -?`).
 
-    feature enable -n autoUninstaller
+Choco 0.9.9+ automatically tracks registry changes for ""Programs and
+ Features"" of the underlying software's native installers when
+ installing packages. The ""Automatic Uninstaller"" (auto uninstaller)
+ service is a feature that can use that information to automatically
+ determine how to uninstall these natively installed applications. This
+ means that a package may not need an explicit chocolateyUninstall.ps1
+ to reverse the installation done in the install script.
+
+Chocolatey tracks packages, which are the files in
+ `$env:ChocolateyInstall\lib\packagename`. These packages may or may not
+ contain the software (applications/tools) that each package represents.
+ The software may actually be installed in Program Files (most native
+ installers will install the software there) or elsewhere on the
+ machine.
+
+With auto uninstaller turned off, a chocolateyUninstall.ps1 is required
+ to perform uninstall from the system. In the absence of
+ chocolateyUninstall.ps1, choco uninstall only removes the package from
+ Chocolatey but does not remove the software from your system (unless
+ in the package directory).
+
+NOTE: Starting in 0.9.10+, the Automatic Uninstaller (AutoUninstaller)
+ is turned on by default. To turn it off, run the following command:
+
+    choco feature disable -n autoUninstaller
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
@@ -138,14 +164,20 @@ NOTE: Automatic Uninstaller (AutoUninstall) is turned off by default
     choco uninstall <pkg|all> [pkg2 pkgN] [options/switches]
     cuninst <pkg|all> [pkg2 pkgN] [options/switches]
 
-NOTE: `all` is a special package keyword that will allow you to 
+NOTE: `all` is a special package keyword that will allow you to
  uninstall all packages.
+
+");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
+            "chocolatey".Log().Info(@"
+choco uninstall: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_uninstall.gif
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
     choco uninstall git
-    choco uninstall notepadplusplus googlechrome atom 7zip 
+    choco uninstall notepadplusplus googlechrome atom 7zip
     choco uninstall notepadplusplus googlechrome atom 7zip -dv
     choco uninstall ruby --version 1.8.7.37402
     choco uninstall nodejs.install --all-versions
@@ -153,10 +185,10 @@ NOTE: `all` is a special package keyword that will allow you to
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
             "chocolatey".Log().Info(@"
-NOTE: Options and switches apply to all items passed, so if you are 
- installing multiple packages, and you use `--version=1.0.0`, it is 
- going to look for and try to install version 1.0.0 of every package 
- passed. So please split out multiple package calls when wanting to 
+NOTE: Options and switches apply to all items passed, so if you are
+ installing multiple packages, and you use `--version=1.0.0`, it is
+ going to look for and try to install version 1.0.0 of every package
+ passed. So please split out multiple package calls when wanting to
  pass specific options.
 ");
         }

@@ -1,12 +1,12 @@
 ﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -89,8 +89,8 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("cp=|certpassword=",
                      "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
                      option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
-                .Add("ignorechecksums|ignore-checksums",
-                      "IgnoreChecksums - Ignore checksums provided by the package",
+                .Add("ignorechecksum|ignore-checksum|ignorechecksums|ignore-checksums",
+                      "IgnoreChecksums - Ignore checksums provided by the package. Available in 0.9.9.9+.",
                       option =>
                       {
                           if (option != null) configuration.Features.CheckSumFiles = false;
@@ -143,8 +143,13 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Install Command");
             this.Log().Info(@"
 Installs a package or a list of packages (sometimes specified as a
- packages.config). Some may prefer to use `cinst` as a shortcut for 
+ packages.config). Some may prefer to use `cinst` as a shortcut for
  `choco install`.
+
+NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
+ with options and switches. Add `-y` for previous behavior with no
+ prompt. In most cases you can still pass options and switches with one
+ dash (`-`). For more details, see the command reference (`choco -?`).
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
@@ -152,49 +157,130 @@ Installs a package or a list of packages (sometimes specified as a
     choco install <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>]
     cinst <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>]
 
-NOTE: `all` is a special package keyword that will allow you to install 
- all packages from a custom feed. Will not work with Chocolatey default 
+NOTE: `all` is a special package keyword that will allow you to install
+ all packages from a custom feed. Will not work with Chocolatey default
  feed. THIS IS NOT YET REIMPLEMENTED.
 
-NOTE: For packages.config, please see https://bit.ly/packages_config
+NOTE: Any package name ending with .config is considered a
+ 'packages.config' file. Please see https://bit.ly/packages_config
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
     choco install sysinternals
-    choco install notepadplusplus googlechrome atom 7zip 
+    choco install notepadplusplus googlechrome atom 7zip
     choco install notepadplusplus --force --force-dependencies
     choco install notepadplusplus googlechrome atom 7zip -dvfy
-    choco install git --params=""/GitAndUnixToolsOnPath /NoAutoCrlf"" -y
+    choco install git --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'"" -y
     choco install nodejs.install --version 0.10.35
-    choco install git -s ""https://somewhere/out/there""
-    choco install git -s ""https://somewhere/protected"" -u user -p pass
+    choco install git -s ""'https://somewhere/out/there'""
+    choco install git -s ""'https://somewhere/protected'"" -u user -p pass
 
-Choco can also install directly from a nuspec/nupkg file. This aids in 
- testing packages.
+Choco can also install directly from a nuspec/nupkg file. This aids in
+ testing packages:
 
     choco install <path/to/nuspec>
     choco install <path/to/nupkg>
 
 Install multiple versions of a package using -m (AllowMultiple versions)
- 
+
     choco install ruby --version 1.9.3.55100 -my
     choco install ruby --version 2.0.0.59800 -my
     choco install ruby --version 2.1.5 -my
 
-NOTE: All of these will add to PATH variable. We'll be adding a special 
- option to not allow PATH changes. Until then you will need to manually 
- go modify Path to just one Ruby and then use something like uru or pik
- to switch between versions.
+What is `-my`? See option bundling in the command reference
+ (`choco -?`).
+
+NOTE: All of these will add to PATH variable. We'll be adding a special
+ option to not allow PATH changes. Until then you will need to manually
+ go modify Path to just one Ruby and then use something like uru
+ (https://bitbucket.org/jonforums/uru) or pik
+ (https://chocolatey.org/packages/pik) to switch between versions.
+");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
+            "chocolatey".Log().Info(@"
+Chocolatey FOSS install showing tab completion and `refreshenv` (a way
+ to update environment variables without restarting the shell).
+
+FOSS install in action: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_install.gif
+
+Chocolatey Professional showing private download cache and virus scan
+ protection.
+
+Pro install in action: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/chocopro_install_stopped.gif
+");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Packages.config");
+            "chocolatey".Log().Info(@"
+Alternative to PackageName. This is a list of packages in an xml manifest for Chocolatey to install. This is like the packages.config that NuGet uses except it also adds other options and switches. This can also be the path to the packages.config file if it is not in the current working directory.
+
+NOTE: The filename is only required to end in .config, the name is not required to be packages.config.
+
+    <?xml version=""1.0"" encoding=""utf-8""?>
+    <packages>
+      <package id=""apackage"" />
+      <package id=""anotherPackage"" version=""1.1"" />
+      <package id=""chocolateytestpackage"" version=""0.1"" source=""somelocation"" />
+      <package id=""alloptions"" version=""0.1.1""
+               source=""https://somewhere/api/v2/"" installArguments=""""
+               packageParameters="""" forceX86=""false"" allowMultipleVersions=""false""
+               ignoreDependencies=""false""
+               />
+    </packages>
+
+");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Alternative Sources");
+            "chocolatey".Log().Info(@"
+Available in 0.9.10+.
+
+Ruby
+This specifies the source is Ruby Gems and that we are installing a
+ gem. If you do not have ruby installed prior to running this command,
+ the command will install that first.
+ e.g. `choco install compass -source ruby`
+
+WebPI
+This specifies the source is Web PI (Web Platform Installer) and that
+ we are installing a WebPI product, such as IISExpress. If you do not
+ have the Web PI command line installed, it will install that first and
+ then the product requested.
+ e.g. `choco install IISExpress --source webpi`
+
+Cygwin
+This specifies the source is Cygwin and that we are installing a cygwin
+ package, such as bash. If you do not have Cygwin installed, it will
+ install that first and then the product requested.
+ e.g. `choco install bash --source cygwin`
+
+Python
+This specifies the source is Python and that we are installing a python
+ package, such as Sphinx. If you do not have easy_install and Python
+ installed, it will install those first and then the product requested.
+ e.g. `choco install sphinx --source python`
+
+Windows Features
+This specifies that the source is a Windows Feature and we should
+ install via the Deployment Image Servicing and Management tool (DISM)
+ on the local machine.
+ e.g. `choco install IIS-WebServerRole --source windowsfeatures`
+
+");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Resources");
+            "chocolatey".Log().Info(@"
+ * How-To: A complete example of how you can use the PackageParameters argument
+   when creating a Chocolatey Package can be seen at
+   https://github.com/chocolatey/choco/wiki/How-To-Parse-PackageParameters-Argument
+ * One may want to override the default installation directory of a
+   piece of software. See
+   https://github.com/chocolatey/choco/wiki/GettingStarted#overriding-default-install-directory-or-other-advanced-install-concepts.
 
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
             "chocolatey".Log().Info(@"
-NOTE: Options and switches apply to all items passed, so if you are 
- installing multiple packages, and you use `--version=1.0.0`, it is 
- going to look for and try to install version 1.0.0 of every package 
- passed. So please split out multiple package calls when wanting to 
+NOTE: Options and switches apply to all items passed, so if you are
+ installing multiple packages, and you use `--version=1.0.0`, it is
+ going to look for and try to install version 1.0.0 of every package
+ passed. So please split out multiple package calls when wanting to
  pass specific options.
 ");
         }
