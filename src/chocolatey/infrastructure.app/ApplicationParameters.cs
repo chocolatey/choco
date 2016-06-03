@@ -66,6 +66,9 @@ namespace chocolatey.infrastructure.app
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
         public static readonly string AllPackages = "all";
+        public static readonly string ChocolateyToolsLocationEnvironmentVariableName = "ChocolateyToolsLocation";
+        public static readonly string ChocolateyPackageInstallLocationEnvironmentVariableName = "ChocolateyPackageInstallLocation";
+        public static readonly string ChocolateyPackageInstallerTypeEnvironmentVariableName = "ChocolateyInstallerType";
 
         public static class Environment
         {
