@@ -75,7 +75,7 @@ namespace chocolatey.infrastructure.app
         {
             public static readonly string Path = "Path";
             public static readonly string PathExtensions = "PATHEXT";
-            public static readonly string PathExtensionsSeparator = ";";
+            public static readonly string EnvironmentSeparator = ";";
         }
 
         /// <summary>
