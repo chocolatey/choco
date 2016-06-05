@@ -15,8 +15,6 @@
 
 namespace chocolatey.infrastructure.cryptography
 {
-    using adapters;
-
     /// <summary>
     /// A hash provider for hashing files
     /// </summary>

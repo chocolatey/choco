@@ -34,25 +34,37 @@ None
 None
 
 .PARAMETER ShortcutFilePath
-The full absolute path to where the shortcut should be created.  This is mandatory.
+The full absolute path to where the shortcut should be created.
 
 .PARAMETER TargetPath
-The full absolute path to the target for new shortcut.  This is mandatory.
+The full absolute path to the target for new shortcut.
 
 .PARAMETER WorkingDirectory
-The full absolute path of the Working Directory that will be used by
-the new shortcut.  This is optional
+OPTIONAL - The full absolute path of the Working Directory that will be
+used by the new shortcut.
 
 .PARAMETER Arguments
-Additonal arguments that should be passed along to the new shortcut.  This
-is optional.
+OPTIONAL - Additonal arguments that should be passed along to the new
+shortcut.
 
 .PARAMETER IconLocation
-The full absolute path to an icon file to be used for the new shortcut.  This
-is optional.
+OPTIONAL- The full absolute path to an icon file to be used for the new
+shortcut.
 
 .PARAMETER Description
-A text description to be associated with the new description.  This is optional.
+OPTIONAL - A text description to be associated with the new description.
+
+.PARAMETER WindowStyle
+OPTIONAL - Type of windows target application should open with.
+0 = Hidden, 1 = Normal Size, 3 = Maximized, 7 - Minimized.
+Full list table 3.9 here: https://technet.microsoft.com/en-us/library/ee156605.aspx
+
+.PARAMETER RunAsAdmin
+OPTIONAL - Set "Run As Administrator" checkbox for the created the
+shortcut.
+
+.PARAMETER PinToTaskbar
+OPTIONAL - Pin the new shortcut to the taskbar.
 
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
@@ -79,6 +91,18 @@ Install-ChocolateyShortcut `
   -IconLocation "C:\test.ico" `
   -Description "This is the description"
 
+.EXAMPLE
+>
+# Creates a new notepad shortcut on the root of c: that starts
+# notepad.exe as Administrator.  Shortcut is also pinned to taskbar.
+
+Install-ChocolateyShortcut `
+  -ShortcutFilePath "C:\notepad.lnk" `
+  -TargetPath "C:\Windows\System32\notepad.exe" `
+  -WindowStyle 3 `
+  -RunAsAdmin `
+  -PinToTaskbar
+
 .LINK
 Install-ChocolateyDesktopLink
 
@@ -89,16 +113,19 @@ Install-ChocolateyExplorerMenuItem
 Install-ChocolateyPinnedTaskBarItem
 #>
 	param(
-	  [parameter(Mandatory=$true, Position=0)][string] $shortcutFilePath,
-	  [parameter(Mandatory=$true, Position=1)][string] $targetPath,
-	  [parameter(Mandatory=$false, Position=2)][string] $workingDirectory,
-	  [parameter(Mandatory=$false, Position=3)][string] $arguments,
-	  [parameter(Mandatory=$false, Position=4)][string] $iconLocation,
-	  [parameter(Mandatory=$false, Position=5)][string] $description,
+    [parameter(Mandatory=$true, Position=0)][string] $shortcutFilePath,
+    [parameter(Mandatory=$true, Position=1)][string] $targetPath,
+    [parameter(Mandatory=$false, Position=2)][string] $workingDirectory,
+    [parameter(Mandatory=$false, Position=3)][string] $arguments,
+    [parameter(Mandatory=$false, Position=4)][string] $iconLocation,
+    [parameter(Mandatory=$false, Position=5)][string] $description,
+    [parameter(Mandatory=$false, Position=6)][int] $windowStyle,
+    [parameter(Mandatory=$false)][switch] $runAsAdmin,
+    [parameter(Mandatory=$false)][switch] $pinToTaskbar,
     [parameter(ValueFromRemainingArguments = $true)][Object[]]$ignoredArguments
 	)
 
-	Write-Debug "Running 'Install-ChocolateyShortcut' with parameters ShortcutFilePath: `'$shortcutFilePath`', TargetPath: `'$targetPath`', WorkingDirectory: `'$workingDirectory`', Arguments: `'$arguments`', IconLocation: `'$iconLocation`', Description: `'$description`'";
+	Write-Debug "Running 'Install-ChocolateyShortcut' with parameters ShortcutFilePath: `'$shortcutFilePath`', TargetPath: `'$targetPath`', WorkingDirectory: `'$workingDirectory`', Arguments: `'$arguments`', IconLocation: `'$iconLocation`', Description: `'$description`', WindowStyle: `'$windowStyle`', RunAsAdmin: `'$runAsAdmin`', PinToTaskbar: `'$pinToTaskbar`'";
 
 	# http://powershell.com/cs/blogs/tips/archive/2009/02/05/validating-a-url.aspx
 	function isURIWeb($address) {
@@ -152,12 +179,41 @@ Install-ChocolateyPinnedTaskBarItem
 		  $lnk.Description = $description
 		}
 
-	    $lnk.Save()
+    if ($windowStyle) {
+      $lnk.WindowStyle = $windowStyle
+    }
+
+    $lnk.Save()
 
 		Write-Debug "Shortcut created."
+
+    [System.IO.FileInfo]$Path = $shortcutFilePath
+    If ($runAsAdmin) {
+      #In order to enable the "Run as Admin" checkbox, this code reads the .LNK as a stream
+      #  and flips a specific bit while writing a new copy.  It then replaces the original
+      #  .LNK with the copy, similar to this example: http://poshcode.org/2513
+      $TempFileName = [IO.Path]::GetRandomFileName()
+      $TempFile = [IO.FileInfo][IO.Path]::Combine($Path.Directory, $TempFileName)
+      $Writer = New-Object System.IO.FileStream $TempFile, ([System.IO.FileMode]::Create)
+      $Reader = $Path.OpenRead()
+      While ($Reader.Position -lt $Reader.Length) {
+        $Byte = $Reader.ReadByte()
+        If ($Reader.Position -eq 22) {$Byte = 34}
+        $Writer.WriteByte($Byte)
+        }
+      $Reader.Close()
+      $Writer.Close()
+      $Path.Delete()
+      Rename-Item -Path $TempFile -NewName $Path.Name | Out-Null
+    }
+
+    If ($pinToTaskbar) {
+      $scfilename = $Path.FullName
+      $pinverb = (new-object -com "shell.application").namespace($(split-path -parent $Path.FullName)).Parsename($(split-path -leaf $Path.FullName)).verbs() | ?{$_.Name -eq 'Pin to Tas&kbar'}
+      If ($pinverb) {$pinverb.doit()}
+    }
 	}
 	catch {
 		Write-Warning "Unable to create shortcut. Error captured was $($_.Exception.Message)."
 	}
 }
-
