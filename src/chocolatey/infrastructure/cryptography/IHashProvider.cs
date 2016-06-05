@@ -21,6 +21,12 @@ namespace chocolatey.infrastructure.cryptography
     public interface IHashProvider
     {
         /// <summary>
+        /// Changes the algorithm
+        /// </summary>
+        /// <param name="algorithmType">Type of the algorithm.</param>
+        void set_hash_algorithm(CryptoHashProviderType algorithmType);
+
+        /// <summary>
         /// Returns a hash of the specified file path.
         /// </summary>
         /// <param name="filePath">The file path.</param>

@@ -17,6 +17,7 @@ namespace chocolatey
 {
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using infrastructure.adapters;
 
     /// <summary>
@@ -71,7 +72,14 @@ namespace chocolatey
         {
             if (assembly == null) return string.Empty;
 
-            byte[] publicKeyToken = assembly.GetName().GetPublicKeyToken();
+            return assembly.GetName().get_public_key_token();
+        }
+
+        public static string get_public_key_token(this AssemblyName assemblyName)
+        {
+            if (assemblyName == null) return string.Empty;
+
+            byte[] publicKeyToken = assemblyName.GetPublicKeyToken();
 
             if (publicKeyToken == null || publicKeyToken.Length == 0) return string.Empty;
 

@@ -344,6 +344,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool FailOnInvalidOrMissingLicense { get; set; }
         public bool IgnoreInvalidOptionsSwitches { get; set; }
         public bool UsePackageExitCodes { get; set; }
+        public bool UseFipsCompliantChecksums { get; set; }
     }
 
     //todo: retrofit other command configs this way

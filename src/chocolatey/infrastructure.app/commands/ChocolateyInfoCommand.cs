@@ -76,6 +76,8 @@ namespace chocolatey.infrastructure.app.commands
 Chocolatey will perform a search for a package local or remote and provide 
  detailed information about that package. This is a synonym for 
  `choco search <pkgname> --exact --detailed`.
+
+NOTE: New as of 0.9.10.0.
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }

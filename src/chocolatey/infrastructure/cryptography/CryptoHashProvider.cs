@@ -16,7 +16,6 @@
 namespace chocolatey.infrastructure.cryptography
 {
     using System;
-    using System.ComponentModel;
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Security.Cryptography;
@@ -24,36 +23,58 @@ namespace chocolatey.infrastructure.cryptography
     using adapters;
     using app;
     using filesystem;
-    using platforms;
     using Environment = System.Environment;
     using HashAlgorithm = adapters.HashAlgorithm;
 
     public sealed class CryptoHashProvider : IHashProvider
     {
         private readonly IFileSystem _fileSystem;
-        private readonly IHashAlgorithm _hashAlgorithm;
+        private IHashAlgorithm _hashAlgorithm;
         private const int ERROR_LOCK_VIOLATION = 33;
         private const int ERROR_SHARING_VIOLATION = 32;
 
-        public CryptoHashProvider(IFileSystem fileSystem, CryptoHashProviderType providerType)
+        public void set_hash_algorithm(CryptoHashProviderType algorithmType)
         {
-            _fileSystem = fileSystem;
+            _hashAlgorithm = get_hash_algorithm_static(algorithmType);
+        }
 
-            switch (providerType)
+        private static IHashAlgorithm get_hash_algorithm_static(CryptoHashProviderType algorithmType)
+        {
+
+            var fipsOnly = false;
+            try
+            {
+                fipsOnly = CryptoConfig.AllowOnlyFipsAlgorithms;
+            }
+            catch (Exception ex)
+            {
+                "chocolatey".Log().Debug("Unable to get FipsPolicy from CryptoConfig:{0} {1}".format_with(Environment.NewLine, ex.Message));
+            }
+
+            HashAlgorithm hashAlgorithm = null;
+            switch (algorithmType)
             {
                 case CryptoHashProviderType.Md5:
-                    _hashAlgorithm = new HashAlgorithm(MD5.Create());
+                    hashAlgorithm = new HashAlgorithm(MD5.Create());
                     break;
                 case CryptoHashProviderType.Sha1:
-                    _hashAlgorithm = new HashAlgorithm(SHA1.Create());
+                    hashAlgorithm = new HashAlgorithm(fipsOnly ? new SHA1Cng() : SHA1.Create());
                     break;
                 case CryptoHashProviderType.Sha256:
-                    _hashAlgorithm = new HashAlgorithm(SHA256.Create());
+                    hashAlgorithm = new HashAlgorithm(fipsOnly ? new SHA256Cng() : SHA256.Create());
                     break;
                 case CryptoHashProviderType.Sha512:
-                    _hashAlgorithm = new HashAlgorithm(SHA512.Create());
+                    hashAlgorithm = new HashAlgorithm(fipsOnly ? new SHA512Cng() : SHA512.Create());
                     break;
             }
+
+            return hashAlgorithm;
+        }
+
+        public CryptoHashProvider(IFileSystem fileSystem)
+        {
+            _fileSystem = fileSystem;
+            set_hash_algorithm(CryptoHashProviderType.Sha256);
         }
 
         public CryptoHashProvider(IFileSystem fileSystem, IHashAlgorithm hashAlgorithm)
@@ -96,27 +117,11 @@ namespace chocolatey.infrastructure.cryptography
 
             return errorCode == ERROR_SHARING_VIOLATION || errorCode == ERROR_LOCK_VIOLATION;
         }
-
-
+        
         public static string hash_value(string originalText, CryptoHashProviderType providerType)
         {
-            HashAlgorithm hashAlgorithm = null;
-            switch (providerType)
-            {
-                case CryptoHashProviderType.Md5:
-                    hashAlgorithm = new HashAlgorithm(MD5.Create());
-                    break;
-                case CryptoHashProviderType.Sha1:
-                    hashAlgorithm = new HashAlgorithm(SHA1.Create());
-                    break;
-                case CryptoHashProviderType.Sha256:
-                    hashAlgorithm = new HashAlgorithm(SHA256.Create());
-                    break;
-                case CryptoHashProviderType.Sha512:
-                    hashAlgorithm = new HashAlgorithm(SHA512.Create());
-                    break;
-            }
 
+            IHashAlgorithm hashAlgorithm = get_hash_algorithm_static(providerType);
             if (hashAlgorithm == null) return string.Empty;
 
              var hash = hashAlgorithm.ComputeHash(Encoding.ASCII.GetBytes(originalText));
