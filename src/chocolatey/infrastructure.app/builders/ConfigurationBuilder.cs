@@ -78,7 +78,7 @@ namespace chocolatey.infrastructure.app.builders
             ConfigurationOptions.reset_options();
             set_global_options(args, config, container);
             set_environment_options(config);
-            set_environment_variables(config);
+            EnvironmentSettings.set_environment_variables(config);
             // must be done last for overrides
             set_licensed_options(config, license, configFileSettings);
             // save all changes if there are any
@@ -462,56 +462,6 @@ You can pass options and switches in the following ways:
             config.Information.IsInteractive = Environment.UserInteractive;
             config.Information.IsUserAdministrator = ProcessInformation.user_is_administrator();
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
-        }
-
-        public static void reset_environment_variables(ChocolateyConfiguration config)
-        {
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName, null);
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallerTypeEnvironmentVariableName, null);
-        }
-
-        public static void set_environment_variables(ChocolateyConfiguration config)
-        {
-            reset_environment_variables(config);
-
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, ApplicationParameters.InstallLocation);
-            Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION", config.Information.ChocolateyVersion);
-            Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION_PRODUCT", config.Information.ChocolateyProductVersion);
-            Environment.SetEnvironmentVariable("OS_PLATFORM", config.Information.PlatformType.get_description_or_value());
-            Environment.SetEnvironmentVariable("OS_VERSION", config.Information.PlatformVersion.to_string());
-            Environment.SetEnvironmentVariable("OS_NAME", config.Information.PlatformName.to_string());
-            // experimental until we know if this value returns correctly based on the OS and not the current process.
-            Environment.SetEnvironmentVariable("OS_IS64BIT", config.Information.Is64Bit ? "true" : "false");
-            Environment.SetEnvironmentVariable("IS_ADMIN", config.Information.IsUserAdministrator ? "true" : "false");
-            Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", config.Information.IsProcessElevated ? "true" : "false");
-            Environment.SetEnvironmentVariable("TEMP", config.CacheLocation);
-
-            if (config.Debug) Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
-            if (config.Verbose) Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
-            if (!config.Features.CheckSumFiles) Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
-            Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
-            Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
-
-            if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
-            {
-                var proxyCreds = string.Empty;
-                if (!string.IsNullOrWhiteSpace(config.Proxy.User) &&
-                    !string.IsNullOrWhiteSpace(config.Proxy.EncryptedPassword)
-                   )
-                {
-                    proxyCreds = "{0}:{1}@".format_with(config.Proxy.User, NugetEncryptionUtility.DecryptString(config.Proxy.EncryptedPassword));
-
-                    Environment.SetEnvironmentVariable("chocolateyProxyUser", config.Proxy.User);
-                    Environment.SetEnvironmentVariable("chocolateyProxyPassword", NugetEncryptionUtility.DecryptString(config.Proxy.EncryptedPassword));
-                }
-
-                Environment.SetEnvironmentVariable("http_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
-                Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
-                Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
-            }
-            
-            if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable("ChocolateyPowerShellHost", "true");
-            if (config.Force) Environment.SetEnvironmentVariable("ChocolateyForce", "true");
         }
 
         private static void set_licensed_options(ChocolateyConfiguration config, ChocolateyLicense license, ConfigFileSettings configFileSettings)

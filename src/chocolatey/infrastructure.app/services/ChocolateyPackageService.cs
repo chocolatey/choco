@@ -272,7 +272,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
         {
-            ConfigurationBuilder.reset_environment_variables(config);
+            EnvironmentSettings.reset_environment_variables(config);
             set_pending(packageResult, config);
             var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
             if (config.AllowMultipleVersions)
