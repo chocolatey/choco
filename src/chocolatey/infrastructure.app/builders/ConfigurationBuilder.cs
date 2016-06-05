@@ -24,6 +24,8 @@ namespace chocolatey.infrastructure.app.builders
     using adapters;
     using attributes;
     using configuration;
+    using cryptography;
+    using domain;
     using extractors;
     using filesystem;
     using information;
@@ -81,6 +83,30 @@ namespace chocolatey.infrastructure.app.builders
             set_licensed_options(config, license, configFileSettings);
             // save all changes if there are any
             set_config_file_settings(configFileSettings, xmlService);
+
+            if (!config.Features.UseFipsCompliantChecksums)
+            {
+                var hashprovider = container.GetInstance<IHashProvider>();
+                try
+                {
+                    hashprovider.set_hash_algorithm(CryptoHashProviderType.Md5);
+                }
+                catch (Exception ex)
+                {
+                    if (!config.CommandName.is_equal_to("feature"))
+                    {
+                        if (ex.InnerException != null && ex.InnerException.Message.contains("FIPS"))
+                        {
+                            "chocolatey".Log().Warn(ChocolateyLoggers.Important, @"
+FIPS Mode detected - run 'choco feature enable -n {0}' 
+ to use Chocolatey.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
+                            throw new ApplicationException("When FIPS Mode is enabled, Chocolatey requires {0} feature also be enabled.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
+                        }
+
+                        throw;
+                    }
+                }
+            }
         }
 
         private static ConfigFileSettings get_config_file_settings(IFileSystem fileSystem, IXmlService xmlService)
@@ -264,6 +290,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.FailOnInvalidOrMissingLicense = set_feature_flag(ApplicationParameters.Features.FailOnInvalidOrMissingLicense, configFileSettings, defaultEnabled: false, description: "Fail On Invalid Or Missing License - allows knowing when a license is expired or not applied to a machine. Available in 0.9.10+.");
             config.Features.IgnoreInvalidOptionsSwitches = set_feature_flag(ApplicationParameters.Features.IgnoreInvalidOptionsSwitches, configFileSettings, defaultEnabled: true, description: "Ignore Invalid Options/Switches - If a switch or option is passed that is not recognized, should choco fail? Available in 0.9.10+.");
             config.Features.UsePackageExitCodes = set_feature_flag(ApplicationParameters.Features.UsePackageExitCodes, configFileSettings, defaultEnabled: true, description: "Use Package Exit Codes - Package scripts can provide exit codes. With this on, package exit codes will be what choco uses for exit when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. With this feature off, choco will exit with a 0 or a 1 (matching previous behavior). Available in 0.9.10+.");
+            config.Features.UseFipsCompliantChecksums = set_feature_flag(ApplicationParameters.Features.UseFipsCompliantChecksums, configFileSettings, defaultEnabled: false, description: "Use FIPS Compliant Checksums - Ensure checksumming done by choco uses FIPS compliant algorithms. Not recommended unless required by FIPS Mode. Enabling on an existing installation could have unintended consequences related to upgrades/uninstalls. Available in 0.9.10+.");
             config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
         }
 
