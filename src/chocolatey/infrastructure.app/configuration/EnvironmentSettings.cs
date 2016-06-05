@@ -91,6 +91,50 @@ namespace chocolatey.infrastructure.app.configuration
 
             if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable("ChocolateyPowerShellHost", "true");
             if (config.Force) Environment.SetEnvironmentVariable("ChocolateyForce", "true");
+            set_licensed_environment(config);
+        }
+
+        private static void set_licensed_environment(ChocolateyConfiguration config)
+        {
+            if (!config.Information.IsLicensedVersion) return;
+
+            var licenseAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name.is_equal_to("chocolatey.licensed"));
+
+            if (licenseAssembly != null)
+            {
+                Type licensedEnvironmentSettings = licenseAssembly.GetType(ApplicationParameters.LicensedEnvironmentSettings, throwOnError: false, ignoreCase: true);
+
+                if (licensedEnvironmentSettings == null)
+                {
+                    "chocolatey".Log().Warn(
+                        ChocolateyLoggers.Important,
+                        @"Unable to set licensed environment. This is likely related to a
+ missing or outdated licensed DLL.");
+                    return;
+                }
+                try
+                {
+                    object componentClass = Activator.CreateInstance(licensedEnvironmentSettings);
+
+                    licensedEnvironmentSettings.InvokeMember(
+                        SET_ENVIRONMENT_METHOD,
+                        BindingFlags.InvokeMethod,
+                        null,
+                        componentClass,
+                        new Object[] { config }
+                        );
+                }
+                catch (Exception ex)
+                {
+                    "chocolatey".Log().Error(
+                        ChocolateyLoggers.Important,
+                        @"Error when setting configuration for '{0}':{1} {2}".format_with(
+                            licensedEnvironmentSettings.FullName,
+                            Environment.NewLine,
+                            ex.Message
+                            ));
+                }
+            }
         }
     }
 }
