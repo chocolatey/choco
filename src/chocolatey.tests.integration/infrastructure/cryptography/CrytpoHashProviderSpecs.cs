@@ -19,6 +19,7 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
     using System.IO;
     using System.Reflection;
     using System.Security.Cryptography;
+    using chocolatey.infrastructure.app.configuration;
     using Should;
     using chocolatey.infrastructure.cryptography;
     using chocolatey.infrastructure.filesystem;
@@ -34,7 +35,7 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
             public override void Context()
             {
                 FileSystem = new DotNetFileSystem();
-                Provider = new CryptoHashProvider(FileSystem,CryptoHashProviderType.Md5);
+                Provider = new CryptoHashProvider(FileSystem);
                 ContextDirectory = FileSystem.combine_paths(FileSystem.get_directory_name(FileSystem.get_current_assembly_path()), "context");
             }
         }
