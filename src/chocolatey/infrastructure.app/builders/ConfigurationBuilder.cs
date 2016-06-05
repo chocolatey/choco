@@ -83,32 +83,9 @@ namespace chocolatey.infrastructure.app.builders
             set_licensed_options(config, license, configFileSettings);
             // save all changes if there are any
             set_config_file_settings(configFileSettings, xmlService);
-
-            if (!config.Features.UseFipsCompliantChecksums)
-            {
-                var hashprovider = container.GetInstance<IHashProvider>();
-                try
-                {
-                    hashprovider.set_hash_algorithm(CryptoHashProviderType.Md5);
-                }
-                catch (Exception ex)
-                {
-                    if (!config.CommandName.is_equal_to("feature"))
-                    {
-                        if (ex.InnerException != null && ex.InnerException.Message.contains("FIPS"))
-                        {
-                            "chocolatey".Log().Warn(ChocolateyLoggers.Important, @"
-FIPS Mode detected - run 'choco feature enable -n {0}' 
- to use Chocolatey.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
-                            throw new ApplicationException("When FIPS Mode is enabled, Chocolatey requires {0} feature also be enabled.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
-                        }
-
-                        throw;
-                    }
-                }
-            }
+            set_hash_provider(config, container);
         }
-
+        
         private static ConfigFileSettings get_config_file_settings(IFileSystem fileSystem, IXmlService xmlService)
         {
             var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
@@ -502,7 +479,33 @@ You can pass options and switches in the following ways:
                             ));
                 }
             }
+        }
 
+        private static void set_hash_provider(ChocolateyConfiguration config, Container container)
+        {
+            if (!config.Features.UseFipsCompliantChecksums)
+            {
+                var hashprovider = container.GetInstance<IHashProvider>();
+                try
+                {
+                    hashprovider.set_hash_algorithm(CryptoHashProviderType.Md5);
+                }
+                catch (Exception ex)
+                {
+                    if (!config.CommandName.is_equal_to("feature"))
+                    {
+                        if (ex.InnerException != null && ex.InnerException.Message.contains("FIPS"))
+                        {
+                            "chocolatey".Log().Warn(ChocolateyLoggers.Important, @"
+FIPS Mode detected - run 'choco feature enable -n {0}' 
+ to use Chocolatey.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
+                            throw new ApplicationException("When FIPS Mode is enabled, Chocolatey requires {0} feature also be enabled.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
+                        }
+
+                        throw;
+                    }
+                }
+            }
         }
     }
 }
