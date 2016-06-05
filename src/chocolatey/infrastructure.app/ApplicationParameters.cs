@@ -75,6 +75,9 @@ namespace chocolatey.infrastructure.app
         {
             public static readonly string Path = "Path";
             public static readonly string PathExtensions = "PATHEXT";
+            public static readonly string PsModulePath = "PSModulePath";
+            public static readonly string Username = "USERNAME";
+            public static readonly string ProcessorArchitecture = "PROCESSOR_ARCHITECTURE";
             public static readonly string EnvironmentSeparator = ";";
         }
 

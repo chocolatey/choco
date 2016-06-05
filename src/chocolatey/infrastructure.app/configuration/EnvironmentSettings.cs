@@ -136,5 +136,97 @@ namespace chocolatey.infrastructure.app.configuration
                 }
             }
         }
+
+        /// <summary>
+        ///   Refreshes the current environment values with the updated values,
+        ///   even if updated outside of the current process.
+        /// </summary>
+        /// <remarks>
+        ///   This does not remove environment variables, but will ensure all updates are shown.
+        ///   To see actual update with removed variables, one will need to restart a shell.
+        /// </remarks>
+        public static void update_environment_variables()
+        {
+            // grab original values 
+            var originalEnvironmentVariables = convert_to_case_insensitive_dictionary(Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Process));
+            var userName = originalEnvironmentVariables[ApplicationParameters.Environment.Username].to_string();
+            var architecture = originalEnvironmentVariables[ApplicationParameters.Environment.ProcessorArchitecture].to_string();
+            var originalPath = originalEnvironmentVariables[ApplicationParameters.Environment.Path]
+                .to_string()
+                .Split(new[] { ApplicationParameters.Environment.EnvironmentSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            var originalPathExt = originalEnvironmentVariables[ApplicationParameters.Environment.PathExtensions]
+                .to_string()
+                .Split(new[] { ApplicationParameters.Environment.EnvironmentSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            var originalPsModulePath = originalEnvironmentVariables[ApplicationParameters.Environment.PsModulePath]
+                .to_string()
+                .Split(new[] { ApplicationParameters.Environment.EnvironmentSeparator }, StringSplitOptions.RemoveEmptyEntries);
+
+            // get updated values from the registry
+            var machineVariables = convert_to_case_insensitive_dictionary(Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Machine));
+            var userVariables = convert_to_case_insensitive_dictionary(Environment.GetEnvironmentVariables(EnvironmentVariableTarget.User));
+
+            // refresh current values with updated values, mathine first
+            refresh_environment_variables(machineVariables);
+            refresh_environment_variables(userVariables);
+
+            // restore process overridden variables
+            if (originalEnvironmentVariables.Contains(ApplicationParameters.Environment.Username)) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.Username, userName);
+            if (originalEnvironmentVariables.Contains(ApplicationParameters.Environment.ProcessorArchitecture)) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ProcessorArchitecture, architecture);
+
+            // combine environment values that append together
+            var updatedPath = "{0};{1};".format_with(
+                machineVariables[ApplicationParameters.Environment.Path].to_string(),
+                userVariables[ApplicationParameters.Environment.Path].to_string()
+                ).Replace(";;", ";");
+            var updatedPathExt = "{0};{1};".format_with(
+                machineVariables[ApplicationParameters.Environment.PathExtensions].to_string(),
+                userVariables[ApplicationParameters.Environment.PathExtensions].to_string()
+                ).Replace(";;", ";");
+            var updatedPsModulePath = "{0};{1};".format_with(
+                userVariables[ApplicationParameters.Environment.PsModulePath].to_string(),
+                machineVariables[ApplicationParameters.Environment.PsModulePath].to_string()
+                ).Replace(";;", ";");
+
+            // add back in process items
+            updatedPath += append_process_items(updatedPath, originalPath);
+            updatedPathExt += append_process_items(updatedPathExt, originalPathExt);
+            updatedPsModulePath += append_process_items(updatedPsModulePath, originalPsModulePath);
+
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.Path, updatedPath);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions, updatedPathExt);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.PsModulePath, updatedPsModulePath);
+        }
+
+        private static IDictionary convert_to_case_insensitive_dictionary(IDictionary originalDictionary)
+        {
+            return new Hashtable(originalDictionary, StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        private static void refresh_environment_variables(IDictionary environmentVariables)
+        {
+            foreach (DictionaryEntry variable in environmentVariables)
+            {
+                Environment.SetEnvironmentVariable(variable.Key.to_string(), variable.Value.to_string());
+            }
+        }
+
+        private static string append_process_items(string currentValues, IEnumerable<string> originalValues)
+        {
+            var additionalItems = new StringBuilder();
+            var items = currentValues.Split(
+                new[] { ApplicationParameters.Environment.EnvironmentSeparator },
+                StringSplitOptions.RemoveEmptyEntries
+                );
+
+            foreach (string originalValue in originalValues.or_empty_list_if_null())
+            {
+                if (!items.Contains(originalValue, StringComparer.InvariantCultureIgnoreCase))
+                {
+                    additionalItems.AppendFormat("{0};", originalValue);
+                }
+            }
+
+            return additionalItems.to_string();
+        }
     }
 }
