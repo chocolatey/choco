@@ -49,6 +49,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string LicensedAssemblyLocation = _fileSystem.combine_paths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
         public static readonly string LicensedComponentRegistry = @"chocolatey.licensed.infrastructure.app.registration.ContainerBinding";
         public static readonly string LicensedConfigurationBuilder = @"chocolatey.licensed.infrastructure.app.builders.ConfigurationBuilder";
+        public static readonly string LicensedEnvironmentSettings = @"chocolatey.licensed.infrastructure.app.configuration.EnvironmentSettings";
         public static readonly string PackageNamesSeparator = ";";
         public static readonly string OfficialChocolateyPublicKey = "79d02ea9cad655eb";
 
@@ -74,7 +75,10 @@ namespace chocolatey.infrastructure.app
         {
             public static readonly string Path = "Path";
             public static readonly string PathExtensions = "PATHEXT";
-            public static readonly string PathExtensionsSeparator = ";";
+            public static readonly string PsModulePath = "PSModulePath";
+            public static readonly string Username = "USERNAME";
+            public static readonly string ProcessorArchitecture = "PROCESSOR_ARCHITECTURE";
+            public static readonly string EnvironmentSeparator = ";";
         }
 
         /// <summary>

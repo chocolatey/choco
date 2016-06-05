@@ -15,13 +15,11 @@
 
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using results;

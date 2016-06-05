@@ -16,6 +16,7 @@
 namespace chocolatey.infrastructure.adapters
 {
     using System;
+    using System.Collections;
 
     public sealed class Environment : IEnvironment
     {
@@ -42,6 +43,16 @@ namespace chocolatey.infrastructure.adapters
         public string GetEnvironmentVariable(string variable)
         {
             return System.Environment.GetEnvironmentVariable(variable);
+        }
+
+        public IDictionary GetEnvironmentVariables()
+        {
+            return System.Environment.GetEnvironmentVariables();
+        }
+
+        public IDictionary GetEnvironmentVariables(EnvironmentVariableTarget target)
+        {
+            return System.Environment.GetEnvironmentVariables(target);
         }
 
         public void SetEnvironmentVariable(string variable, string value)
