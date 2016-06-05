@@ -17,10 +17,9 @@ namespace chocolatey
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using infrastructure.licensing;
-    using NuGet;
     using SimpleInjector;
-    using infrastructure.adapters;
     using infrastructure.app;
     using infrastructure.app.builders;
     using infrastructure.app.configuration;
@@ -30,6 +29,7 @@ namespace chocolatey
     using infrastructure.logging;
     using infrastructure.registration;
     using resources;
+    using Assembly = infrastructure.adapters.Assembly;
     using IFileSystem = infrastructure.filesystem.IFileSystem;
 
     // ReSharper disable InconsistentNaming
@@ -41,7 +41,26 @@ namespace chocolatey
     {
         public static GetChocolatey GetChocolatey()
         {
+            add_assembly_resolver();
             return new GetChocolatey();
+        }
+
+        private static ResolveEventHandler _handler = null;
+
+        private static void add_assembly_resolver()
+        {
+            _handler = (sender, args) =>
+            {
+                var requestedAssembly = new AssemblyName(args.Name);
+                if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey))
+                {
+                     return typeof(Lets).Assembly;
+                }
+
+                return null;
+            };
+
+            AppDomain.CurrentDomain.AssemblyResolve += _handler;
         }
     }
 
