@@ -79,6 +79,18 @@ These are the functions from above as one list.
 
 '@
 
+function Get-Aliases($commandName){
+
+  $aliasOutput = ''
+  Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | %{ $aliasOutput += "``$($_.Name)``$lineFeed"}
+
+  if ($aliasOutput -eq $null -or $aliasOutput -eq '') {
+    $aliasOutput = 'None'
+  }
+
+  Write-Output $aliasOutput
+}
+
 function Convert-Example($objItem) {
   @"
 **$($objItem.title.Replace('-','').Trim())**
@@ -260,7 +272,7 @@ try
   if(-not(Test-Path $docsFolder)){ mkdir $docsFolder -EA Continue | Out-Null }
 
   Write-Host 'Creating per PowerShell function markdown files...'
-  Get-Command -Module $psModuleName | ForEach-Object -Process { Get-Help $_ -Full } | ForEach-Object -Process { `
+  Get-Command -Module $psModuleName -CommandType Function | ForEach-Object -Process { Get-Help $_ -Full } | ForEach-Object -Process { `
     $commandName = $_.Name
     $fileName = Join-Path $docsFolder "Helpers$($_.Name.Replace('-','')).md"
     $global:powerShellReferenceTOC += "$lineFeed * [[$commandName|$([System.IO.Path]::GetFileNameWithoutExtension($fileName))]]"
@@ -279,8 +291,7 @@ $( if ($_.alertSet -ne $null) { $lineFeed + "## Notes" + $lineFeed + $lineFeed +
 
 ## Aliases
 
-$( if ($_.aliases -ne $null) { $_.aliases } else { 'None'} )
-
+$(Get-Aliases $_.Name)
 ## Inputs
 
 $( if ($_.InputTypes -ne $null -and $_.InputTypes.Length -gt 0 -and -not $_.InputTypes.Contains('inputType')) { $lineFeed + " * $($_.InputTypes)" + $lineFeed} else { 'None'})
