@@ -42,6 +42,26 @@ May not be required. Starting in 0.9.10+, the Automatic Uninstaller
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+Uninstall-ChocolateyPackage '__NAME__' 'EXE_OR_MSI' 'SILENT_ARGS' 'FilePath'
+
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+Uninstall-ChocolateyPackage -PackageName $packageName `
+                                -FileType $installerType `
+                                -SilentArgs "$silentArgs" `
+                                -ValidExitCodes $validExitCodes `
+                                -File "$file"
+~~~ 
+
 ## Inputs
 
 None
@@ -137,26 +157,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-Uninstall-ChocolateyPackage '__NAME__' 'EXE_OR_MSI' 'SILENT_ARGS' 'FilePath'
-
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-
-Uninstall-ChocolateyPackage -PackageName $packageName `
-                                -FileType $installerType `
-                                -SilentArgs "$silentArgs" `
-                                -ValidExitCodes $validExitCodes `
-                                -File "$file"
-~~~
 
 ## Links
 

@@ -31,6 +31,17 @@ Will not throw an error if it fails.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+# This will create a new Desktop Shortcut pointing at the NHibernate
+# Profiler exe.
+Install-ChocolateyDesktopLink -TargetFilePath "C:\tools\NHibernatProfiler\nhprof.exe"
+~~~ 
+
 ## Inputs
 
 None
@@ -68,17 +79,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-# This will create a new Desktop Shortcut pointing at the NHibernate
-# Profiler exe.
-Install-ChocolateyDesktopLink -TargetFilePath "C:\tools\NHibernatProfiler\nhprof.exe"
-~~~
 
 ## Links
 

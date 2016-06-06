@@ -26,6 +26,38 @@ This command will assert UAC/Admin privileges on the machine.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+Start-ChocolateyProcessAsAdmin -Statements "$msiArgs" -ExeToRun 'msiexec'
+
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+Start-ChocolateyProcessAsAdmin -Statements "$silentArgs" -ExeToRun $file
+
+~~~
+
+**EXAMPLE 3**
+
+~~~powershell
+Start-ChocolateyProcessAsAdmin -Statements "$silentArgs" -ExeToRun $file -ValidExitCodes @(0,21)
+
+~~~
+
+**EXAMPLE 4**
+
+~~~powershell
+
+# Run PowerShell statements
+$psFile = Join-Path "$(Split-Path -parent $MyInvocation.MyCommand.Definition)" 'someInstall.ps1'
+Start-ChocolateyProcessAsAdmin "& `'$psFile`'"
+~~~ 
+
 ## Inputs
 
 None
@@ -109,38 +141,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-Start-ChocolateyProcessAsAdmin -Statements "$msiArgs" -ExeToRun 'msiexec'
-
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-Start-ChocolateyProcessAsAdmin -Statements "$silentArgs" -ExeToRun $file
-
-~~~
-
-**EXAMPLE 3**
-
-~~~powershell
-Start-ChocolateyProcessAsAdmin -Statements "$silentArgs" -ExeToRun $file -ValidExitCodes @(0,21)
-
-~~~
-
-**EXAMPLE 4**
-
-~~~powershell
-
-# Run PowerShell statements
-$psFile = Join-Path "$(Split-Path -parent $MyInvocation.MyCommand.Definition)" 'someInstall.ps1'
-Start-ChocolateyProcessAsAdmin "& `'$psFile`'"
-~~~
 
 ## Links
 

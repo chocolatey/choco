@@ -26,6 +26,15 @@ This method has error handling built into it.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+Uninstall-ChocolateyZipPackage '__NAME__' 'filename.zip'
+
+~~~ 
+
 ## Inputs
 
 None
@@ -74,15 +83,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-Uninstall-ChocolateyZipPackage '__NAME__' 'filename.zip'
-
-~~~
 
 ## Links
 

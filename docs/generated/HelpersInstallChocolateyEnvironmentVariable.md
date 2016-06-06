@@ -34,6 +34,38 @@ This will add the environment variable to the current session.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+# Creates a User environment variable "JAVA_HOME" pointing to
+# "d:\oracle\jdk\bin".
+Install-ChocolateyEnvironmentVariable "JAVA_HOME" "d:\oracle\jdk\bin"
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+# Creates a User environment variable "_NT_SYMBOL_PATH" pointing to
+# "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols".
+# The command will be elevated to admin priviledges.
+Install-ChocolateyEnvironmentVariable `
+  -VariableName "_NT_SYMBOL_PATH" `
+  -VariableValue "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols" `
+  -VariableType Machine
+~~~
+
+**EXAMPLE 3**
+
+~~~powershell
+
+# Remove an environment variable
+Install-ChocolateyEnvironmentVariable -VariableName 'bob' -VariableValue $null
+~~~ 
+
 ## Inputs
 
 None
@@ -96,38 +128,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-# Creates a User environment variable "JAVA_HOME" pointing to
-# "d:\oracle\jdk\bin".
-Install-ChocolateyEnvironmentVariable "JAVA_HOME" "d:\oracle\jdk\bin"
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-
-# Creates a User environment variable "_NT_SYMBOL_PATH" pointing to
-# "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols".
-# The command will be elevated to admin priviledges.
-Install-ChocolateyEnvironmentVariable `
-  -VariableName "_NT_SYMBOL_PATH" `
-  -VariableValue "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols" `
-  -VariableType Machine
-~~~
-
-**EXAMPLE 3**
-
-~~~powershell
-
-# Remove an environment variable
-Install-ChocolateyEnvironmentVariable -VariableName 'bob' -VariableValue $null
-~~~
 
 ## Links
 

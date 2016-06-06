@@ -28,6 +28,22 @@ must.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+Get-EnvironmentVariable -Name 'TEMP' -Scope User -PreserveVariables
+
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+Get-EnvironmentVariable -Name 'PATH' -Scope Machine
+
+~~~ 
+
 ## Inputs
 
 None
@@ -91,22 +107,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-Get-EnvironmentVariable -Name 'TEMP' -Scope User -PreserveVariables
-
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-Get-EnvironmentVariable -Name 'PATH' -Scope Machine
-
-~~~
 
 ## Links
 

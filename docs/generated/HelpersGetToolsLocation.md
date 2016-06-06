@@ -32,7 +32,8 @@ removes the older variable.
 
 ## Aliases
 
-None
+`Get-BinRoot`
+
 
 ## Inputs
 
@@ -44,7 +45,6 @@ None
 
 ## Parameters
  
-
 
 
 

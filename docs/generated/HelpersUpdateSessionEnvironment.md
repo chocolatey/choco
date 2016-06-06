@@ -33,7 +33,8 @@ Preserves `PSModulePath` as set by the process starting in 0.9.10.
 
 ## Aliases
 
-None
+`refreshenv`
+
 
 ## Inputs
 
@@ -45,7 +46,6 @@ None
 
 ## Parameters
  
-
 
 
 

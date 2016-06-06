@@ -34,6 +34,52 @@ of failing a package installation.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+# This will create a new shortcut at the location of "C:\test.lnk" and
+# link to the file located at "C:\text.exe"
+
+Install-ChocolateyShortcut -ShortcutFilePath "C:\test.lnk" -TargetPath "C:\test.exe"
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+# This will create a new shortcut at the location of "C:\notepad.lnk"
+# and link to the Notepad application.  In addition, other properties
+# are being set to specify the working directory, an icon to be used for
+# the shortcut, along with a description and arguments.
+
+Install-ChocolateyShortcut `
+  -ShortcutFilePath "C:\notepad.lnk" `
+  -TargetPath "C:\Windows\System32\notepad.exe" `
+  -WorkDirectory "C:\" `
+  -Arguments "C:\test.txt" `
+  -IconLocation "C:\test.ico" `
+  -Description "This is the description"
+~~~
+
+**EXAMPLE 3**
+
+~~~powershell
+
+# Creates a new notepad shortcut on the root of c: that starts
+# notepad.exe as Administrator. Shortcut is also pinned to taskbar.
+# These parameters are available in 0.9.10+.
+
+Install-ChocolateyShortcut `
+  -ShortcutFilePath "C:\notepad.lnk" `
+  -TargetPath "C:\Windows\System32\notepad.exe" `
+  -WindowStyle 3 `
+  -RunAsAdmin `
+  -PinToTaskbar
+~~~ 
+
 ## Inputs
 
 None
@@ -114,7 +160,8 @@ Default Value          |
 Accept Pipeline Input? | false
  
 ###  -WindowStyle [&lt;Int32&gt;]
-OPTIONAL - Type of windows target application should open with.
+OPTIONAL - Type of windows target application should open with. 
+Available in 0.9.10+.
 0 = Hidden, 1 = Normal Size, 3 = Maximized, 7 - Minimized.
 Full list table 3.9 here: https://technet.microsoft.com/en-us/library/ee156605.aspx
 
@@ -128,7 +175,7 @@ Accept Pipeline Input? | false
  
 ###  -RunAsAdmin
 OPTIONAL - Set "Run As Administrator" checkbox for the created the
-shortcut.
+shortcut. Available in 0.9.10+.
 
 Property               | Value
 ---------------------- | -----
@@ -139,7 +186,7 @@ Default Value          | False
 Accept Pipeline Input? | false
  
 ###  -PinToTaskbar
-OPTIONAL - Pin the new shortcut to the taskbar.
+OPTIONAL - Pin the new shortcut to the taskbar. Available in 0.9.10+.
 
 Property               | Value
 ---------------------- | -----
@@ -164,51 +211,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-# This will create a new shortcut at the location of "C:\test.lnk" and
-# link to the file located at "C:\text.exe"
-
-Install-ChocolateyShortcut -ShortcutFilePath "C:\test.lnk" -TargetPath "C:\test.exe"
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-
-# This will create a new shortcut at the location of "C:\notepad.lnk"
-# and link to the Notepad application.  In addition, other properties
-# are being set to specify the working directory, an icon to be used for
-# the shortcut, along with a description and arguments.
-
-Install-ChocolateyShortcut `
-  -ShortcutFilePath "C:\notepad.lnk" `
-  -TargetPath "C:\Windows\System32\notepad.exe" `
-  -WorkDirectory "C:\" `
-  -Arguments "C:\test.txt" `
-  -IconLocation "C:\test.ico" `
-  -Description "This is the description"
-~~~
-
-**EXAMPLE 3**
-
-~~~powershell
-
-# Creates a new notepad shortcut on the root of c: that starts
-# notepad.exe as Administrator.  Shortcut is also pinned to taskbar.
-
-Install-ChocolateyShortcut `
-  -ShortcutFilePath "C:\notepad.lnk" `
-  -TargetPath "C:\Windows\System32\notepad.exe" `
-  -WindowStyle 3 `
-  -RunAsAdmin `
-  -PinToTaskbar
-~~~
 
 ## Links
 

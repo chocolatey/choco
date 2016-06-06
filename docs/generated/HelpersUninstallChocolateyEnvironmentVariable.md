@@ -34,6 +34,24 @@ This will remove the environment variable from the current session.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+# Remove an environment variable
+Uninstall-ChocolateyEnvironmentVariable -VariableName 'bob'
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+# Remove an environment variable from Machine
+Uninstall-ChocolateyEnvironmentVariable -VariableName 'bob' -VariableType 'Machine'
+~~~ 
+
 ## Inputs
 
 None
@@ -85,24 +103,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-# Remove an environment variable
-Uninstall-ChocolateyEnvironmentVariable -VariableName 'bob'
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-
-# Remove an environment variable from Machine
-Uninstall-ChocolateyEnvironmentVariable -VariableName 'bob' -VariableType 'Machine'
-~~~
 
 ## Links
 

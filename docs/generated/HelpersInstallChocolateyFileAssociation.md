@@ -28,6 +28,19 @@ This command will assert UAC/Admin privileges on the machine.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+# This will create an association between Sublime Text 2 and all .txt
+# files. Any .txt file opened will by default open with Sublime Text 2.
+$sublimeDir = (Get-ChildItem $env:ALLUSERSPROFILE\chocolatey\lib\sublimetext* | select $_.last)
+$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
+Install-ChocolateyFileAssociation ".txt" $sublimeExe
+~~~ 
+
 ## Inputs
 
 None
@@ -75,19 +88,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-# This will create an association between Sublime Text 2 and all .txt
-# files. Any .txt file opened will by default open with Sublime Text 2.
-$sublimeDir = (Get-ChildItem $env:ALLUSERSPROFILE\chocolatey\lib\sublimetext* | select $_.last)
-$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
-Install-ChocolateyFileAssociation ".txt" $sublimeExe
-~~~
 
 
 [[Function Reference|HelpersReference]]

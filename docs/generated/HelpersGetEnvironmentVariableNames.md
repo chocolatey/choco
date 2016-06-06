@@ -23,6 +23,15 @@ session. The other scopes refer to the registry values.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+Get-EnvironmentVariableNames -Scope Machine
+
+~~~ 
+
 ## Inputs
 
 None
@@ -34,15 +43,6 @@ None
 ## Parameters
  
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-Get-EnvironmentVariableNames -Scope Machine
-
-~~~
 
 ## Links
 

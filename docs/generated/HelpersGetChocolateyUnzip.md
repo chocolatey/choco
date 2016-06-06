@@ -32,6 +32,17 @@ official distribution points.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+# Path to the folder where the script is executing
+$toolsDir = (Split-Path -parent $MyInvocation.MyCommand.Definition)
+Get-ChocolateyUnzip -FileFullPath "c:\someFile.zip" -Destination $toolsDir
+~~~ 
+
 ## Inputs
 
 None
@@ -105,17 +116,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-# Path to the folder where the script is executing
-$toolsDir = (Split-Path -parent $MyInvocation.MyCommand.Definition)
-Get-ChocolateyUnzip -FileFullPath "c:\someFile.zip" -Destination $toolsDir
-~~~
 
 ## Links
 

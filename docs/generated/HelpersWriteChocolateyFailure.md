@@ -75,7 +75,6 @@ Accept Pipeline Input? | false
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
 
-
 ## Links
 
  * [[Write-ChocolateySuccess|HelpersWriteChocolateySuccess]]

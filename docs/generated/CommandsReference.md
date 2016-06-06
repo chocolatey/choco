@@ -4,8 +4,8 @@ This is a listing of all of the different things you can pass to choco.
 
 ## Commands
 
- * [[search|Commandssearch]] - searches remote or local packages (alias for list)
  * [[list|Commandslist]] - lists remote or local packages
+ * [[search|Commandssearch]] - searches remote or local packages (alias for list)
  * [[info|Commandsinfo]] - retrieves package information. Shorthand for choco search pkgname --exact --verbose
  * [[install|Commandsinstall]] - installs packages from various sources
  * [[pin|Commandspin]] - suppress upgrades for a package
