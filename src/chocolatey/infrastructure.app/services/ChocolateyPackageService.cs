@@ -1195,7 +1195,7 @@ ATTENTION: You must take manual action to remove {1} from
             var hasEnvironmentRemovals = environmentRemovals.Count() != 0;
             if (hasEnvironmentChanges || hasEnvironmentRemovals)
             {
-                this.Log().Info(ChocolateyLoggers.Important, @"Environment Vars (like PATH) have changed. Close/reopen your shell to
+                this.Log().Warn(ChocolateyLoggers.Important, @"Environment Vars (like PATH) have changed. Close/reopen your shell to
  see the changes (or in powershell/cmd.exe just type `refreshenv`).");
 
                 if (!config.Features.LogEnvironmentValues)
