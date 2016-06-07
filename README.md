@@ -46,14 +46,15 @@ When requesting support, try to remember that we are all volunteers that have li
 
 ## Information
 
- * [Community Feed aka Chocolatey.org](https://chocolatey.org) (if this is down, try the backup at http://chocolatey.apphb.com )
+ * [Chocolatey site](https://chocolatey.org)
+ * [Community Package Repository aka Chocolatey.org](https://chocolatey.org/packages)
  * [Mailing List/Forum](http://groups.google.com/group/chocolatey)
  * [Twitter](https://twitter.com/chocolateynuget)
  * [Build Status Email List](http://groups.google.com/group/chocolatey-build-status)
  * Join the [newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&id=73b018498d) and stay up to date with the latest happenings!
 
 ### Documentation
-Please see the [wiki](https://github.com/chocolatey/choco/wiki)
+Please see the [docs](https://chocolatey.org/docs)
 
 Give `choco.exe /?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
 
@@ -68,8 +69,8 @@ Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICEN
 ## Submitting Issues
 ![submitting issues](https://cloud.githubusercontent.com/assets/63502/12534554/6ea7cc04-c224-11e5-82ad-3805d0b5c724.png)
 
- * If you are having issue with a package, please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://github.com/chocolatey/choco/wiki/PackageTriageProcess).
- * If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://github.com/chocolatey/choco/wiki/PackageTriageProcess#package-request-package-missing).
+ * If you are having issue with a package, please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://chocolatey.org/docs/package-triage-process).
+ * If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://chocolatey.org/docs/package-triage-process#package-request-package-missing).
  * If it is an issue with the website (the community feed aka https://chocolatey.org), please submit the issue to the [Chocolatey.org repo](https://github.com/chocolatey/chocolatey.org).
  * If you have found an issue with the GUI (Chocolatey GUI), please see [the ChocolateyGUI repository](https://github.com/chocolatey/ChocolateyGUI#submitting-issues).
  * If you have found an issue with the client (choco.exe), you are in the right place. Keep reading below.

@@ -19,15 +19,15 @@ namespace chocolatey.infrastructure.app.templates
     {
         public static string Template =
             @"## Summary
-How do I create packages? See https://github.com/chocolatey/choco/wiki/CreatePackages
+How do I create packages? See https://chocolatey.org/docs/create-packages
 
 If you are submitting packages to the community feed (https://chocolatey.org)
 always try to ensure you have read, understood and adhere to the create
 packages wiki link above.
 
-## Automatic Packages?
+## Automatic Packaging Updates?
 Consider making this package an automatic package, for the best 
-maintainability over time. Read up at https://github.com/chocolatey/choco/wiki/AutomaticPackages
+maintainability over time. Read up at https://chocolatey.org/docs/automatic-packages
 
 ## Shim Generation
 Any executables you include in the package or download (but don't call 
@@ -37,22 +37,22 @@ This means those executables will automatically be included on the path.
 Shim generation runs whether the package is self-contained or uses automation 
 scripts. 
 
-By default, these are considered console applications. 
+By default, these are considered console applications.
 
 If the application is a GUI, you should create an empty file next to the exe 
 named 'name.exe.gui' e.g. 'bob.exe' would need a file named 'bob.exe.gui'.
-See https://github.com/chocolatey/choco/wiki/CreatePackages#how-do-i-set-up-batch-redirects-for-applications-that-have-a-gui
+See https://chocolatey.org/docs/create-packages#how-do-i-set-up-shims-for-applications-that-have-a-gui
 
 If you want to ignore the executable, create an empty file next to the exe 
 named 'name.exe.ignore' e.g. 'bob.exe' would need a file named 
 'bob.exe.ignore'. 
-See https://github.com/chocolatey/choco/wiki/CreatePackages#how-do-i-exclude-executables-from-getting-batch-redirects
+See https://chocolatey.org/docs/create-packages#how-do-i-exclude-executables-from-getting-shims
 
 ## Self-Contained? 
 If you have a self-contained package, you can remove the automation scripts 
 entirely and just include the executables, they will automatically get shimmed, 
 which puts them on the path. Ensure you have the legal right to distribute 
-the application though. See https://github.com/chocolatey/choco/wiki/Legal. 
+the application though. See https://chocolatey.org/docs/legal. 
 
 You should read up on the Shim Generation section to familiarize yourself 
 on what to do with GUI applications and/or ignoring shims.
@@ -63,18 +63,18 @@ can do just about anything you need. Choco has some very handy built-in
 functions that you can use, these are sometimes called the helpers.
 
 ### Built-In Functions
-https://github.com/chocolatey/choco/wiki/HelpersReference
+https://chocolatey.org/docs/helpers-reference
 
 A note about a couple:
-* Get-BinRoot - this is a horribly named function that doesn't do what new folks think it does. It gets you the 'tools' root, which by default is set to 'c:\tools', not the chocolateyInstall bin folder. 
-* Install-BinFile - used for non-exe files - executables are automatically shimmed...
-* Uninstall-BinFile - used for non-exe files - executables are automatically shimmed
+* Get-BinRoot - this is a horribly named function that doesn't do what new folks think it does. It gets you the 'tools' root, which by default is set to 'c:\tools', not the chocolateyInstall bin folder - see https://chocolatey.org/docs/helpers-get-tools-location
+* Install-BinFile - used for non-exe files - executables are automatically shimmed... - see https://chocolatey.org/docs/helpers-install-bin-file
+* Uninstall-BinFile - used for non-exe files - executables are automatically shimmed - see https://chocolatey.org/docs/helpers-uninstall-bin-file
 
 ### Getting package specific information
-Use the package parameters pattern - see https://github.com/chocolatey/choco/wiki/How-To-Parse-PackageParameters-Argument
+Use the package parameters pattern - see https://chocolatey.org/docs/how-to-parse-package-parameters-argument
 
 ### Need to mount an ISO?
-https://github.com/chocolatey/choco/wiki/How-To-Mount-An-Iso-In-Chocolatey-Package
+https://chocolatey.org/docs/how-to-mount-an-iso-in-chocolatey-package
 
 
 ### Environment Variables

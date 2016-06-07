@@ -66,57 +66,75 @@ $packageArgs = @{
   checksumType64= '[[ChecksumType64]]' #default is checksumType
 }
 
-Install-ChocolateyPackage @packageArgs
-#Install-ChocolateyZipPackage @packageArgs
-# if you are making your own internal packages (organizations), you can embed the installer or 
-# put on internal file share and use the following instead (you'll need to add $file to the above)
-#Install-ChocolateyInstallPackage @packageArgs 
+Install-ChocolateyPackage @packageArgs # https://chocolatey.org/docs/helpers-install-chocolatey-package
+#Install-ChocolateyZipPackage @packageArgs # https://chocolatey.org/docs/helpers-install-chocolatey-zip-package
+## If you are making your own internal packages (organizations), you can embed the installer or 
+## put on internal file share and use the following instead (you'll need to add $file to the above)
+#Install-ChocolateyInstallPackage @packageArgs # https://chocolatey.org/docs/helpers-install-chocolatey-install-package
 
 ## Main helper functions - these have error handling tucked into them already
-## see https://github.com/chocolatey/choco/wiki/HelpersReference
+## see https://chocolatey.org/docs/helpers-reference
 
 ## Install an application, will assert administrative rights
+## - https://chocolatey.org/docs/helpers-install-chocolatey-package
+## - https://chocolatey.org/docs/helpers-install-chocolatey-install-package
 ## add additional optional arguments as necessary
 ##Install-ChocolateyPackage $packageName $fileType $silentArgs $url [$url64 -validExitCodes $validExitCodes -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64]
 
-## Download and unpack a zip file
+## Download and unpack a zip file - https://chocolatey.org/docs/helpers-install-chocolatey-zip-package
 ##Install-ChocolateyZipPackage $packageName $url $toolsDir [$url64 -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64]
 
-## Install Visual Studio Package
+## Install Visual Studio Package - https://chocolatey.org/docs/helpers-install-chocolatey-vsix-package
 #Install-ChocolateyVsixPackage $packageName $url [$vsVersion] [-checksum $checksum -checksumType $checksumType]
 #Install-ChocolateyVsixPackage @packageArgs
 
-# see the full list at https://github.com/chocolatey/choco/wiki/HelpersReference
+## see the full list at https://chocolatey.org/docs/helpers-reference
 
-# downloader that the main helpers use to download items
-# if removing $url64, please remove from here
+## downloader that the main helpers use to download items
+## if removing $url64, please remove from here
+## - https://chocolatey.org/docs/helpers-get-chocolatey-web-file
 #Get-ChocolateyWebFile $packageName 'DOWNLOAD_TO_FILE_FULL_PATH' $url $url64
 
-# installer, will assert administrative rights - used by Install-ChocolateyPackage
-# use this for embedding installers in the package when not going to community feed or when you have distribution rights
+## Installer, will assert administrative rights - used by Install-ChocolateyPackage
+## use this for embedding installers in the package when not going to community feed or when you have distribution rights
+## - https://chocolatey.org/docs/helpers-install-chocolatey-install-package
 #Install-ChocolateyInstallPackage $packageName $fileType $silentArgs '_FULLFILEPATH_' -validExitCodes $validExitCodes
 
-# unzips a file to the specified location - auto overwrites existing content
+## Unzips a file to the specified location - auto overwrites existing content
+## - https://chocolatey.org/docs/helpers-get-chocolatey-unzip
 #Get-ChocolateyUnzip ""FULL_LOCATION_TO_ZIP.zip"" $toolsDir
 
-# Runs processes asserting UAC, will assert administrative rights - used by Install-ChocolateyInstallPackage
+## Runs processes asserting UAC, will assert administrative rights - used by Install-ChocolateyInstallPackage
+## - https://chocolatey.org/docs/helpers-start-chocolatey-process-as-admin
 #Start-ChocolateyProcessAsAdmin 'STATEMENTS_TO_RUN' 'Optional_Application_If_Not_PowerShell' -validExitCodes $validExitCodes
 
-# add specific folders to the path - any executables found in the chocolatey package folder will already be on the path. This is used in addition to that or for cases when a native installer doesn't add things to the path.
+## add specific folders to the path - any executables found in the chocolatey package 
+## folder will already be on the path. This is used in addition to that or for cases 
+## when a native installer doesn't add things to the path.
+## - https://chocolatey.org/docs/helpers-install-chocolatey-path
 #Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
 
-# add specific files as shortcuts to the desktop
+## Add specific files as shortcuts to the desktop
+## - https://chocolatey.org/docs/helpers-install-chocolatey-shortcut
 #$target = Join-Path $toolsDir ""$($packageName).exe""
 # Install-ChocolateyShortcut -shortcutFilePath ""<path>"" -targetPath ""<path>"" [-workDirectory ""C:\"" -arguments ""C:\test.txt"" -iconLocation ""C:\test.ico"" -description ""This is the description""]
 
-# outputs the bitness of the OS (either ""32"" or ""64"")
+## Outputs the bitness of the OS (either ""32"" or ""64"")
+## - https://chocolatey.org/docs/helpers-get-o-s-architecture-width
 #$osBitness = Get-ProcessorBits
 
+## Set persistent Environment variables
+## - https://chocolatey.org/docs/helpers-install-chocolatey-environment-variable
 #Install-ChocolateyEnvironmentVariable -variableName ""SOMEVAR"" -variableValue ""value"" [-variableType = 'Machine' #Defaults to 'User']
 
+## Set up a file association
+## - https://chocolatey.org/docs/helpers-install-chocolatey-file-association
 #Install-ChocolateyFileAssociation 
-#Install-BinFile ## only use this for non-exe files - chocolatey will automatically pick up the exe files and shim them automatically
-## https://github.com/chocolatey/choco/wiki/CreatePackages#how-do-i-exclude-executables-from-getting-batch-redirects
+
+## Adding a shim when not automatically found - Cocolatey automatically shims exe files found in package directory.
+## - https://chocolatey.org/docs/helpers-install-bin-file
+## - https://chocolatey.org/docs/create-packages#how-do-i-exclude-executables-from-getting-shims
+#Install-BinFile
 
 ##PORTABLE EXAMPLE
 #$toolsDir = ""$(Split-Path -parent $MyInvocation.MyCommand.Definition)""
