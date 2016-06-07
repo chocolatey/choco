@@ -15,13 +15,15 @@
 function Uninstall-ChocolateyZipPackage {
 <#
 .SYNOPSIS
-Uninstalls a previous installed zip package
+Uninstalls a previous installed zip package, may not be necessary.
 
 .DESCRIPTION
 This will uninstall a zip file if installed via Install-ChocolateyZipPackage.
-This is not necessary if the files are unzipped to the package location.
+This is not necessary if the files are unzipped to the package directory.
 
 .NOTES
+Not necessary if files are unzippped to package directory.
+
 This helper reduces the number of lines one would have to remove the
 files extracted from a previously installed zip file.
 This method has error handling built into it.
