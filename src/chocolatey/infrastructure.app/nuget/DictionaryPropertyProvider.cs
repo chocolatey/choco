@@ -20,7 +20,7 @@ namespace chocolatey.infrastructure.app.nuget
 
     // ReSharper disable InconsistentNaming
 
-    internal sealed class DictionaryPropertyProvider : IPropertyProvider
+    public sealed class DictionaryPropertyProvider : IPropertyProvider
     {
         private readonly IDictionary<string, string> _properties;
 
