@@ -142,6 +142,11 @@ NOTE: Starting in 0.9.10, you can pass arbitrary property value pairs
 
 NOTE: Chocolatey for Business can create complete packages by just
  pointing the new command to native installers!
+
+NOTE: Chocolatey for Business can also download and internalize remote
+ resources from existing packages so that existing packages can be used 
+ without being tied to the internet.
+ This is called automatic recompile.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
