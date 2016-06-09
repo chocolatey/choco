@@ -358,6 +358,7 @@ Install-ChocolateyZipPackage '$env:chocolateyPackageName' $url $binRoot
   Generate-CommandReference('unpackself')
   Generate-CommandReference('update')
   Generate-CommandReference('version')
+  Generate-CommandReference('download')
   Generate-TopLevelCommandReference
 
   Exit 0

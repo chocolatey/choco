@@ -34,6 +34,10 @@ With auto uninstaller turned off, a chocolateyUninstall.ps1 is required
 
     choco feature disable -n autoUninstaller
 
+**NOTE:** [Chocolatey Pro](https://chocolatey.org/compare) / Business automatically synchronizes with 
+ Programs and Features, ensuring manually removed apps are 
+ automatically removed from Chocolatey's repository.
+
 ## Usage
 
     choco uninstall <pkg|all> [pkg2 pkgN] [options/switches]

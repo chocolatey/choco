@@ -1,6 +1,6 @@
 ﻿# Uninstall-ChocolateyZipPackage
 
-Uninstalls a previous installed zip package, may not be necessary
+Uninstalls a previous installed zip package, may not be necessary.
 
 ## Syntax
 

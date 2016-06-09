@@ -20,6 +20,9 @@ Upgrades a package or a list of packages. Some may prefer to use `cup`
 Skip upgrading certain packages with [[`choco pin`|Commandspin]] or with the option
  `--except`.
 
+**NOTE:** [Chocolatey Pro](https://chocolatey.org/compare) / Business automatically synchronizes with 
+ Programs and Features, ensuring automatically updating apps' versions
+ (like Chrome) are up to date in Chocolatey's repository. 
 
 ## Examples
 
