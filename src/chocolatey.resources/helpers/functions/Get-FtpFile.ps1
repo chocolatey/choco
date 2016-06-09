@@ -79,6 +79,20 @@ param(
     return
   }
 
+  try {
+    $uri = [System.Uri]$url
+    if ($uri.IsFile()) {
+      Write-Debug "Url is local file, setting destination"
+      if ($url.LocalPath -ne $fileName) {
+        Copy-Item $uri.LocalPath -Destination $fileName -Force
+      }
+      
+      return
+    }
+  } catch {
+    //continue on
+  }
+
   # Create a FTPWebRequest object to handle the connection to the ftp server
   $ftprequest = [System.Net.FtpWebRequest]::create($url)
 
