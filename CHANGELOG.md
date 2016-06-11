@@ -38,6 +38,10 @@ If you set a custom cache directory for downloads, it will no longer use a "choc
 There are more exit codes from Chocolatey now that indicate success -`0`, `1605`, `1614`, `1641`, and `3010`. You may need to adjust anything you were using that would only check for 0 and nonzero.
 If you need the previous behavior, be sure to disable the feature `usePackageExitCodes` or use the `--ignore-package-exit-codes` switch in your choco commands.
 
+ * PowerShell module functions adjusted for automatic documentation - see [#697](https://github.com/chocolatey/choco/issues/697)
+
+If you were using any of the functions in a non-recommended way or not comliant with the examples, you are going to find breakages in the functions as some of the things that were called out as non-optional are now enforced. This shouldn't affect most folks.
+
 ### KNOWN ISSUES
 
  * [Known Issues](https://github.com/chocolatey/choco/labels/Bug)
@@ -58,9 +62,11 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * Add a `choco info` command to show info for one package - see [#644](https://github.com/chocolatey/choco/issues/644)
  * Mark packages pending until install completes successfully - see [#198](https://github.com/chocolatey/choco/issues/198)
  * Resolve sources by name - see [#356](https://github.com/chocolatey/choco/issues/356)
+ * Uninstall-ChocolateyEnvironmentVariable function - see [#772](https://github.com/chocolatey/choco/issues/772)
  * Pro/Business - Ubiquitous Install Directory Switch - see [#258](https://github.com/chocolatey/choco/issues/258)
  * Pro/Business - Runtime Virus Scanning - see [virus scanning](https://chocolatey.org/docs/features-virus-check)
  * Pro/Business - Private CDN cache for downloads - see [private CDN cache](https://chocolatey.org/docs/features-private-cdn)
+ * Pro/Business - Sync "choco installed status" with "Windows installed status" - see [#567](https://github.com/chocolatey/choco/issues/567)
 
 ### BUG FIXES
 
@@ -114,6 +120,11 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * Fix - Use package name/version from environment, not parameters - see [#751](https://github.com/chocolatey/choco/issues/751)
  * Fix - Get-WebFileName Does Not Match on Invalid Characters - see [#753](https://github.com/chocolatey/choco/issues/753)
  * Fix - `choco new` cannot introduce multistage folder hierarchy template - see [#706](https://github.com/chocolatey/choco/issues/706)
+ * Fix - Empty $env:ChocolateyToolsLocation combine error - see [#756](https://github.com/chocolatey/choco/issues/756)
+ * Fix - Installing chocolatey removes $env:PSModulePath changes for current powershell session - see [#295](https://github.com/chocolatey/choco/issues/295)
+ * Fix - Some environment variables are set too early for options/switches to have an effect - see [#620](https://github.com/chocolatey/choco/issues/620)
+ * [API] Fix - Issue when attempting to execute run command through API - see [#769](https://github.com/chocolatey/choco/issues/769)
+ * Fix - Logging of upgrade messages - placement of some messages is incorrect - see [#557](https://github.com/chocolatey/choco/issues/557)
 
 ### IMPROVEMENTS
 
@@ -160,6 +171,14 @@ If you need the previous behavior, be sure to disable the feature `usePackageExi
  * Support for client certificates - see [#399](https://github.com/chocolatey/choco/issues/399)
  * choco feature list formatting enhancements - see [#742](https://github.com/chocolatey/choco/issues/742)
  * choco new --original-template - see [#737](https://github.com/chocolatey/choco/issues/737)
+ * Update Get-FtpFile with fixes for Get-WebFile - see [#765](https://github.com/chocolatey/choco/issues/765)
+ * Rename Get-ProcessorBits as a more appropriately named Get-OSArchitectureWidth - see [#713](https://github.com/chocolatey/choco/issues/713)
+ * Allow passing no 32-bit url and fail the package on 32-bit systems - see [#527](https://github.com/chocolatey/choco/issues/527)
+ * Enhance Install-ChocolateyShortcut to support WindowStyle, Pin to Taskbar and Run As Administrator checkbox - see [#519](https://github.com/chocolatey/choco/issues/519)
+ * [Security] Allow hashing files for checksums with FIPS compliant algorithms - see [#446](https://github.com/chocolatey/choco/issues/446)
+ * After upgrading provide summary of upgraded packages - see [#759](https://github.com/chocolatey/choco/issues/759)
+ * Web functions - Check for local file and return early - see [#781](https://github.com/chocolatey/choco/issues/781)
+ * Refresh environment variables after each install - see [#439](https://github.com/chocolatey/choco/issues/439)
  * Pro/Business - Also check for license in User Profile location - see [#606](https://github.com/chocolatey/choco/issues/606)
  * Pro/Business - Set download cache information if available - see [#562](https://github.com/chocolatey/choco/issues/562)
  * Pro/Business - Allow commands to be added - see [#583](https://github.com/chocolatey/choco/issues/583)
