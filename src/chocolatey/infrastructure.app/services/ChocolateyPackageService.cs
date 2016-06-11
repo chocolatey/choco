@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using builders;
     using commandline;
     using configuration;
     using domain;
@@ -271,6 +272,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
         {
+            EnvironmentSettings.reset_environment_variables(config);
             set_pending(packageResult, config);
             var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
             if (config.AllowMultipleVersions)
@@ -331,17 +333,20 @@ Did you know Pro / Business automatically syncs with Programs and
                 handle_template_packages(config, packageResult);
             }
 
-            var toolsLocation = _fileSystem.combine_paths(Environment.GetEnvironmentVariable("ChocolateyToolsLocation"), packageResult.Name);
-            if (_fileSystem.directory_exists(toolsLocation))
+            var toolsLocation = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyToolsLocationEnvironmentVariableName);
+            if (!string.IsNullOrWhiteSpace(toolsLocation) && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName)))
             {
-                Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", toolsLocation, EnvironmentVariableTarget.Process);
+                toolsLocation = _fileSystem.combine_paths(toolsLocation, packageResult.Name);
+                if (_fileSystem.directory_exists(toolsLocation))
+                {
+                    Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName, toolsLocation, EnvironmentVariableTarget.Process);
+                }
             }
-
-
+            
             if (pkgInfo.RegistrySnapshot != null && pkgInfo.RegistrySnapshot.RegistryKeys.Any(k => !string.IsNullOrWhiteSpace(k.InstallLocation)))
             {
                 var key = pkgInfo.RegistrySnapshot.RegistryKeys.FirstOrDefault(k => !string.IsNullOrWhiteSpace(k.InstallLocation));
-                if (key != null) Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", key.InstallLocation, EnvironmentVariableTarget.Process);
+                if (key != null) Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName, key.InstallLocation, EnvironmentVariableTarget.Process);
             }
 
             _packageInfoService.save_package_information(pkgInfo);
@@ -362,8 +367,8 @@ Did you know Pro / Business automatically syncs with Programs and
 
             this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".format_with(commandName.to_string(), packageResult.Name));
 
-            var installLocation = Environment.GetEnvironmentVariable("ChocolateyPackageInstallLocation");
-            var installerDetected = Environment.GetEnvironmentVariable("ChocolateyInstallerType");
+            var installLocation = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName);
+            var installerDetected = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallerTypeEnvironmentVariableName);
             if (!string.IsNullOrWhiteSpace(installLocation))
             {
                  this.Log().Info(ChocolateyLoggers.Important, "  Software installed to '{0}'".format_with(installLocation));
@@ -908,7 +913,7 @@ The recent package uninstalls indicate a reboot is necessary.
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", packageExtensionsInstallDirectory, EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName, packageExtensionsInstallDirectory, EnvironmentVariableTarget.Process);
             }
             else
             {
@@ -994,7 +999,7 @@ The recent package uninstalls indicate a reboot is necessary.
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", installTemplatePath, EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName, installTemplatePath, EnvironmentVariableTarget.Process);
             }
             else
             {

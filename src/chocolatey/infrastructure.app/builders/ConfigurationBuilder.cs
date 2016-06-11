@@ -24,6 +24,8 @@ namespace chocolatey.infrastructure.app.builders
     using adapters;
     using attributes;
     using configuration;
+    using cryptography;
+    using domain;
     using extractors;
     using filesystem;
     using information;
@@ -76,13 +78,14 @@ namespace chocolatey.infrastructure.app.builders
             ConfigurationOptions.reset_options();
             set_global_options(args, config, container);
             set_environment_options(config);
-            set_environment_variables(config);
+            EnvironmentSettings.set_environment_variables(config);
             // must be done last for overrides
             set_licensed_options(config, license, configFileSettings);
             // save all changes if there are any
             set_config_file_settings(configFileSettings, xmlService);
+            set_hash_provider(config, container);
         }
-
+        
         private static ConfigFileSettings get_config_file_settings(IFileSystem fileSystem, IXmlService xmlService)
         {
             var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
@@ -257,13 +260,14 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings, defaultEnabled: true, description: "Checksum files when pulled in from internet (based on package).");
             config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings, defaultEnabled: true, description: "Uninstall from programs and features without requiring an explicit uninstall script.");
             config.Features.FailOnAutoUninstaller = set_feature_flag(ApplicationParameters.Features.FailOnAutoUninstaller, configFileSettings, defaultEnabled: false, description: "Fail if automatic uninstaller fails.");
-            config.Features.FailOnStandardError = set_feature_flag(ApplicationParameters.Features.FailOnStandardError, configFileSettings, defaultEnabled: false, description: "Fail if install provider writes to stderr.");
-            config.Features.UsePowerShellHost = set_feature_flag(ApplicationParameters.Features.UsePowerShellHost, configFileSettings, defaultEnabled: true, description: "Use Chocolatey's built-in PowerShell host.");
-            config.Features.LogEnvironmentValues = set_feature_flag(ApplicationParameters.Features.LogEnvironmentValues, configFileSettings, defaultEnabled: false, description: "Log Environment Values - will log values of environment before and after install (could disclose sensitive data).");
-            config.Features.VirusCheck = set_feature_flag(ApplicationParameters.Features.VirusCheck, configFileSettings, defaultEnabled: false, description: "Virus Check [licensed versions only] - perform virus checking on downloaded files.");
-            config.Features.FailOnInvalidOrMissingLicense = set_feature_flag(ApplicationParameters.Features.FailOnInvalidOrMissingLicense, configFileSettings, defaultEnabled: false, description: "Fail On Invalid Or Missing License - allows knowing when a license is expired or not applied to a machine.");
-            config.Features.IgnoreInvalidOptionsSwitches = set_feature_flag(ApplicationParameters.Features.IgnoreInvalidOptionsSwitches, configFileSettings, defaultEnabled: true, description: "Ignore Invalid Options/Switches - If a switch or option is passed that is not recognized, should choco fail?");
+            config.Features.FailOnStandardError = set_feature_flag(ApplicationParameters.Features.FailOnStandardError, configFileSettings, defaultEnabled: false, description: "Fail if install provider writes to stderr. Available in 0.9.10+.");
+            config.Features.UsePowerShellHost = set_feature_flag(ApplicationParameters.Features.UsePowerShellHost, configFileSettings, defaultEnabled: true, description: "Use Chocolatey's built-in PowerShell host. Available in 0.9.10+.");
+            config.Features.LogEnvironmentValues = set_feature_flag(ApplicationParameters.Features.LogEnvironmentValues, configFileSettings, defaultEnabled: false, description: "Log Environment Values - will log values of environment before and after install (could disclose sensitive data). Available in 0.9.10+.");
+            config.Features.VirusCheck = set_feature_flag(ApplicationParameters.Features.VirusCheck, configFileSettings, defaultEnabled: false, description: "Virus Check - perform virus checking on downloaded files. Available in 0.9.10+. Licensed versions only.");
+            config.Features.FailOnInvalidOrMissingLicense = set_feature_flag(ApplicationParameters.Features.FailOnInvalidOrMissingLicense, configFileSettings, defaultEnabled: false, description: "Fail On Invalid Or Missing License - allows knowing when a license is expired or not applied to a machine. Available in 0.9.10+.");
+            config.Features.IgnoreInvalidOptionsSwitches = set_feature_flag(ApplicationParameters.Features.IgnoreInvalidOptionsSwitches, configFileSettings, defaultEnabled: true, description: "Ignore Invalid Options/Switches - If a switch or option is passed that is not recognized, should choco fail? Available in 0.9.10+.");
             config.Features.UsePackageExitCodes = set_feature_flag(ApplicationParameters.Features.UsePackageExitCodes, configFileSettings, defaultEnabled: true, description: "Use Package Exit Codes - Package scripts can provide exit codes. With this on, package exit codes will be what choco uses for exit when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. With this feature off, choco will exit with a 0 or a 1 (matching previous behavior). Available in 0.9.10+.");
+            config.Features.UseFipsCompliantChecksums = set_feature_flag(ApplicationParameters.Features.UseFipsCompliantChecksums, configFileSettings, defaultEnabled: false, description: "Use FIPS Compliant Checksums - Ensure checksumming done by choco uses FIPS compliant algorithms. Not recommended unless required by FIPS Mode. Enabling on an existing installation could have unintended consequences related to upgrades/uninstalls. Available in 0.9.10+.");
             config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
         }
 
@@ -344,12 +348,12 @@ namespace chocolatey.infrastructure.app.builders
                                  option => config.CacheLocation = option.remove_surrounding_quotes())
                             .Add("allowunofficial|allow-unofficial|allowunofficialbuild|allow-unofficial-build",
                                  "AllowUnofficialBuild - When not using the official build you must set this flag for choco to continue.",
-                                 option => config.AllowUnofficialBuild = option != null) 
+                                 option => config.AllowUnofficialBuild = option != null)
                             .Add("failstderr|failonstderr|fail-on-stderr|fail-on-standard-error|fail-on-error-output",
                                  "FailOnStandardError - Fail on standard error output (stderr), typically received when running external commands during install providers. This overrides the feature failOnStandardError.",
                                  option => config.Features.FailOnStandardError = option != null)
                             .Add("use-system-powershell",
-                                 "UseSystemPowerShell - Execute PowerShell using an external process instead of the built-in PowerShell host.",
+                                 "UseSystemPowerShell - Execute PowerShell using an external process instead of the built-in PowerShell host. Available in 0.9.10+.",
                                  option => config.Features.UsePowerShellHost = option == null)
                             ;
                     },
@@ -394,7 +398,7 @@ You can pass options and switches in the following ways:
  * **Option Bundling / Bundled Options**: One character switches can be
    bundled. e.g. `-d` (debug), `-f` (force), `-v` (verbose), and `-y`
    (confirm yes) can be bundled as `-dfvy`.
- * ***Note:*** If `debug` or `verbose` are bundled with local options
+ * NOTE: If `debug` or `verbose` are bundled with local options
    (not the global ones above), some logging may not show up until after
    the local options are parsed.
  * **Use Equals**: You can also include or not include an equals sign
@@ -437,51 +441,6 @@ You can pass options and switches in the following ways:
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
         }
 
-        public static void set_environment_variables(ChocolateyConfiguration config)
-        {
-            Environment.SetEnvironmentVariable("ChocolateyPackageInstallLocation", null);
-            Environment.SetEnvironmentVariable("ChocolateyInstallerType", null);
-
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, ApplicationParameters.InstallLocation);
-            Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION", config.Information.ChocolateyVersion);
-            Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION_PRODUCT", config.Information.ChocolateyProductVersion);
-            Environment.SetEnvironmentVariable("OS_PLATFORM", config.Information.PlatformType.get_description_or_value());
-            Environment.SetEnvironmentVariable("OS_VERSION", config.Information.PlatformVersion.to_string());
-            Environment.SetEnvironmentVariable("OS_NAME", config.Information.PlatformName.to_string());
-            // experimental until we know if this value returns correctly based on the OS and not the current process.
-            Environment.SetEnvironmentVariable("OS_IS64BIT", config.Information.Is64Bit ? "true" : "false");
-            Environment.SetEnvironmentVariable("IS_ADMIN", config.Information.IsUserAdministrator ? "true" : "false");
-            Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", config.Information.IsProcessElevated ? "true" : "false");
-            Environment.SetEnvironmentVariable("TEMP", config.CacheLocation);
-
-            if (config.Debug) Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
-            if (config.Verbose) Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
-            if (!config.Features.CheckSumFiles) Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
-            Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
-            Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
-
-            if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
-            {
-                var proxyCreds = string.Empty;
-                if (!string.IsNullOrWhiteSpace(config.Proxy.User) &&
-                    !string.IsNullOrWhiteSpace(config.Proxy.EncryptedPassword)
-                   )
-                {
-                    proxyCreds = "{0}:{1}@".format_with(config.Proxy.User, NugetEncryptionUtility.DecryptString(config.Proxy.EncryptedPassword));
-
-                    Environment.SetEnvironmentVariable("chocolateyProxyUser", config.Proxy.User);
-                    Environment.SetEnvironmentVariable("chocolateyProxyPassword", NugetEncryptionUtility.DecryptString(config.Proxy.EncryptedPassword));
-                }
-
-                Environment.SetEnvironmentVariable("http_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
-                Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
-                Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
-            }
-            
-            if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable("ChocolateyPowerShellHost", "true");
-            if (config.Force) Environment.SetEnvironmentVariable("ChocolateyForce", "true");
-        }
-
         private static void set_licensed_options(ChocolateyConfiguration config, ChocolateyLicense license, ConfigFileSettings configFileSettings)
         {
             config.Information.IsLicensedVersion = license.is_licensed_version();
@@ -493,7 +452,7 @@ You can pass options and switches in the following ways:
                 if (licensedConfigBuilder == null)
                 {
                     "chocolatey".Log().Warn(ChocolateyLoggers.Important,
-@"Unable to set licensed configuration. This is likely related to a 
+@"Unable to set licensed configuration. This is likely related to a
  missing or outdated licensed DLL.");
                     return;
                 }
@@ -520,7 +479,33 @@ You can pass options and switches in the following ways:
                             ));
                 }
             }
+        }
 
+        private static void set_hash_provider(ChocolateyConfiguration config, Container container)
+        {
+            if (!config.Features.UseFipsCompliantChecksums)
+            {
+                var hashprovider = container.GetInstance<IHashProvider>();
+                try
+                {
+                    hashprovider.set_hash_algorithm(CryptoHashProviderType.Md5);
+                }
+                catch (Exception ex)
+                {
+                    if (!config.CommandName.is_equal_to("feature"))
+                    {
+                        if (ex.InnerException != null && ex.InnerException.Message.contains("FIPS"))
+                        {
+                            "chocolatey".Log().Warn(ChocolateyLoggers.Important, @"
+FIPS Mode detected - run 'choco feature enable -n {0}' 
+ to use Chocolatey.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
+                            throw new ApplicationException("When FIPS Mode is enabled, Chocolatey requires {0} feature also be enabled.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
+                        }
+
+                        throw;
+                    }
+                }
+            }
         }
     }
 }

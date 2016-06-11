@@ -116,7 +116,7 @@ namespace chocolatey.infrastructure.filesystem
 
             if (get_file_name_without_extension(executableName).is_equal_to(executableName) && isWindows)
             {
-                var pathExtensions = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions).to_string().Split(new[] {ApplicationParameters.Environment.PathExtensionsSeparator}, StringSplitOptions.RemoveEmptyEntries);
+                var pathExtensions = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions).to_string().Split(new[] {ApplicationParameters.Environment.EnvironmentSeparator}, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var extension in pathExtensions.or_empty_list_if_null())
                 {
                     extensions.Add(extension.StartsWith(".") ? extension : ".{0}".format_with(extension));

@@ -1,11 +1,11 @@
 ﻿# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,35 +16,48 @@ function Update-SessionEnvironment {
 <#
 .SYNOPSIS
 Updates the environment variables of the current powershell session with
-any environment variable changes that may have occured during a chocolatey
-package install.
+any environment variable changes that may have occured during a
+Chocolatey package install.
 
 .DESCRIPTION
-When chocolatey installs a package, the package author may add or change
+When Chocolatey installs a package, the package author may add or change
 certain environment variables that will affect how the application runs
-or how it is accessed. Often, these changes are not visible to the current
-powershell session. This means the user needs to open a new powershell
-session before these settings take effect which can render the installed
-application unfunctional until that time.
+or how it is accessed. Often, these changes are not visible to the
+current PowerShell session. This means the user needs to open a new
+PowerShell session before these settings take effect which can render
+the installed application nonfunctional until that time.
 
 Use the Update-SessionEnvironment command to refresh the current
-powershell session with all environment settings possibly performed by
-chocolatey package installs.
+PowerShell session with all environment settings possibly performed by
+Chocolatey package installs.
 
-#>
+.NOTES
+This method is also added to the user's PowerShell profile as
+`refreshenv`. When called as `refreshenv`, the method will provide
+additional output.
+
+Preserves `PSModulePath` as set by the process starting in 0.9.10.
+
+.INPUTS
+None
+
+.OUTPUTS
+None
+#>
+
   Write-Debug "Running 'Update-SessionEnvironment'"
   $refreshEnv = $false
   $invocation = $MyInvocation
   if ($invocation.InvocationName -eq 'refreshenv') {
     $refreshEnv = $true
   }
-  
+
   if ($refreshEnv) {
     Write-Output "Refreshing environment variables from the registry..."
   } else {
     Write-Verbose "Refreshing environment variables from the registry."
   }
-  
+
   $psModulePath = $env:PSModulePath
 
   #ordering is important here, $user comes after so we can override $machine
@@ -64,10 +77,10 @@ chocolatey package installs.
     } |
     Select -Unique
   $Env:PATH = $paths -join ';'
-  
+
   # PSModulePath is almost always updated by process, so we want to preserve it.
   $env:PSModulePath = $psModulePath
-  
+
   if ($refreshEnv) {
     Write-Output "Finished"
   }

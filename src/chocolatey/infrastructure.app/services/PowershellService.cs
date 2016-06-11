@@ -191,7 +191,8 @@ namespace chocolatey.infrastructure.app.services
             {
                 var failure = false;
 
-                ConfigurationBuilder.set_environment_variables(configuration);
+                EnvironmentSettings.set_environment_variables(configuration);
+                EnvironmentSettings.update_environment_variables();
 
                 var package = packageResult.Package;
                 Environment.SetEnvironmentVariable("chocolateyPackageName", package.Id);

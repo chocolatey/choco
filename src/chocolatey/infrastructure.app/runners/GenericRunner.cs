@@ -68,6 +68,8 @@ namespace chocolatey.infrastructure.app.runners
                 }
 
                 set_source_type(config);
+                // guaranteed that all settings are set.
+                EnvironmentSettings.set_environment_variables(config);
 
                 this.Log().Debug(() => "Configuration: {0}".format_with(config.ToString()));
 
@@ -82,7 +84,7 @@ namespace chocolatey.infrastructure.app.runners
                 }
 
                 var token = Assembly.GetExecutingAssembly().get_public_key_token();
-                if (string.IsNullOrWhiteSpace(token) || token != ApplicationParameters.OfficialChocolateyPublicKey)
+                if (string.IsNullOrWhiteSpace(token) || !token.is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey))
                 {
                     if (!config.AllowUnofficialBuild)
                     {

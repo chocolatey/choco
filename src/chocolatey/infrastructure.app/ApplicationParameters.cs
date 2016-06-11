@@ -49,6 +49,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string LicensedAssemblyLocation = _fileSystem.combine_paths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
         public static readonly string LicensedComponentRegistry = @"chocolatey.licensed.infrastructure.app.registration.ContainerBinding";
         public static readonly string LicensedConfigurationBuilder = @"chocolatey.licensed.infrastructure.app.builders.ConfigurationBuilder";
+        public static readonly string LicensedEnvironmentSettings = @"chocolatey.licensed.infrastructure.app.configuration.EnvironmentSettings";
         public static readonly string PackageNamesSeparator = ";";
         public static readonly string OfficialChocolateyPublicKey = "79d02ea9cad655eb";
 
@@ -66,12 +67,18 @@ namespace chocolatey.infrastructure.app
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
         public static readonly string AllPackages = "all";
+        public static readonly string ChocolateyToolsLocationEnvironmentVariableName = "ChocolateyToolsLocation";
+        public static readonly string ChocolateyPackageInstallLocationEnvironmentVariableName = "ChocolateyPackageInstallLocation";
+        public static readonly string ChocolateyPackageInstallerTypeEnvironmentVariableName = "ChocolateyInstallerType";
 
         public static class Environment
         {
             public static readonly string Path = "Path";
             public static readonly string PathExtensions = "PATHEXT";
-            public static readonly string PathExtensionsSeparator = ";";
+            public static readonly string PsModulePath = "PSModulePath";
+            public static readonly string Username = "USERNAME";
+            public static readonly string ProcessorArchitecture = "PROCESSOR_ARCHITECTURE";
+            public static readonly string EnvironmentSeparator = ";";
         }
 
         /// <summary>
@@ -119,6 +126,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string FailOnInvalidOrMissingLicense = "failOnInvalidOrMissingLicense";
             public static readonly string IgnoreInvalidOptionsSwitches = "ignoreInvalidOptionsSwitches";
             public static readonly string UsePackageExitCodes = "usePackageExitCodes";
+            public static readonly string UseFipsCompliantChecksums = "useFipsCompliantChecksums";
         }
 
         public static class Messages
