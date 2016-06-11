@@ -649,6 +649,7 @@ Would have determined packages that are out of date based on what is
 
         private int report_action_summary(ConcurrentDictionary<string, PackageResult> packageResults, string actionName)
         {
+            var successes = packageResults.or_empty_list_if_null().Where(p => p.Value.Success && !p.Value.Inconclusive);
             var failures = packageResults.Count(p => !p.Value.Success);
             var warnings = packageResults.Count(p => p.Value.Warning);
             var rebootPackages = packageResults.Count(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode));
@@ -657,11 +658,22 @@ Would have determined packages that are out of date based on what is
                     Environment.NewLine,
                     ApplicationParameters.Name,
                     actionName,
-                    packageResults.Count(p => p.Value.Success && !p.Value.Inconclusive),
+                    successes.Count(),
                     packageResults.Count,
                     failures,
                     _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
                     ));
+
+            // summarize results when more than 5
+            if (packageResults.Count >= 5 && successes.Count() != 0)
+            {
+                this.Log().Info("");
+                this.Log().Warn("{0}{1}:".format_with(actionName.Substring(0,1).ToUpper(), actionName.Substring(1)));
+                foreach (var packageResult in successes.or_empty_list_if_null())
+                {
+                    this.Log().Info(" - {0} v{1}".format_with(packageResult.Value.Name, packageResult.Value.Version));
+                }
+            }
 
             if (warnings != 0)
             {
