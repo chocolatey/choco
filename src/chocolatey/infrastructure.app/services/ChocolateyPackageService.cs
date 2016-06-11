@@ -418,55 +418,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 }
             }
 
-            var installFailures = packageInstalls.Count(p => !p.Value.Success);
-            var installWarnings = packageInstalls.Count(p => p.Value.Warning);
-            var rebootPackages = packageInstalls.Count(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode));
-            this.Log().Warn(() => @"{0}{1} installed {2}/{3} package(s). {4} package(s) failed.{5}{0} See the log for details ({6}).".format_with(
-                Environment.NewLine,
-                ApplicationParameters.Name,
-                packageInstalls.Count(p => p.Value.Success && !p.Value.Inconclusive),
-                packageInstalls.Count,
-                installFailures,
-                installWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, installWarnings),
-                _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
-                ));
-
-            if (installWarnings != 0)
-            {
-                this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
-                foreach (var warning in packageInstalls.Where(p => p.Value.Warning).or_empty_list_if_null())
-                {
-                    var warningMessage = warning.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Warn);
-                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}{1}".format_with(warning.Value.Name, warningMessage != null ? " - {0}".format_with(warningMessage.Message) : string.Empty));
-                }
-            }
-
-            if (rebootPackages != 0)
-            {
-                this.Log().Warn(ChocolateyLoggers.Important, "Packages needing reboot:");
-                foreach (var reboot in packageInstalls.Where(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode)).or_empty_list_if_null())
-                {
-                    this.Log().Warn(" - {0}{1}".format_with(reboot.Value.Name, reboot.Value.ExitCode != 0 ? " (exit code {0})".format_with(reboot.Value.ExitCode) : string.Empty));
-                }
-                this.Log().Warn(@"
-The recent package installs indicate a reboot is necessary. 
- Please reboot at your earliest convenience.
-");
-            }
-
-            if (installFailures != 0)
-            {
-                this.Log().Error("Failures:");
-                foreach (var failure in packageInstalls.Where(p => !p.Value.Success).or_empty_list_if_null())
-                {
-                    var errorMessage = failure.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Error);
-                    this.Log().Error(" - {0}{1}{2}".format_with(failure.Value.Name,
-                        failure.Value.ExitCode != 0 ? " (exited {0})".format_with(failure.Value.ExitCode) : string.Empty,
-                        errorMessage != null ? " - {0}".format_with(errorMessage.Message) : string.Empty
-                        ));
-                }
-            }
-
+            var installFailures = report_action_summary(packageInstalls, "installed");
             if (installFailures != 0 && Environment.ExitCode == 0)
             {
                 Environment.ExitCode = 1;
@@ -590,25 +542,8 @@ Would have determined packages that are out of date based on what is
             var noopUpgrades = perform_source_runner_function(config, r => r.upgrade_noop(config, action));
             if (config.RegularOutput)
             {
-                var upgradeWarnings = noopUpgrades.Count(p => p.Value.Warning);
-                this.Log().Warn(() => @"{0}{1} can upgrade {2}/{3} package(s). {4}{0} See the log for details ({5}).".format_with(
-                    Environment.NewLine,
-                    ApplicationParameters.Name,
-                    noopUpgrades.Count(p => p.Value.Success && !p.Value.Inconclusive),
-                    noopUpgrades.Count,
-                    upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings),
-                    _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
-                    ));
-
-                if (upgradeWarnings != 0)
-                {
-                    this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
-                    foreach (var warning in noopUpgrades.Where(p => p.Value.Warning).or_empty_list_if_null())
-                    {
-                        this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
-                    }
-                }
-
+                var noopFailures = report_action_summary(noopUpgrades, "can upgrade");
+               
                 randomly_notify_about_pro_business(config);
             }
         }
@@ -644,63 +579,15 @@ Would have determined packages that are out of date based on what is
             var beforeUpgradeAction = new Action<PackageResult>(packageResult => before_package_upgrade(packageResult, config));
 
             var packageUpgrades = perform_source_runner_function(config, r => r.upgrade_run(config, action, beforeUpgradeAction));
-
-            var upgradeFailures = packageUpgrades.Count(p => !p.Value.Success);
-            var upgradeWarnings = packageUpgrades.Count(p => p.Value.Warning);
-            var rebootPackages = packageUpgrades.Count(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode));
-            this.Log().Warn(() => @"{0}{1} upgraded {2}/{3} package(s). {4} package(s) failed.{5}{0} See the log for details ({6}).".format_with(
-                Environment.NewLine,
-                ApplicationParameters.Name,
-                packageUpgrades.Count(p => p.Value.Success && !p.Value.Inconclusive),
-                packageUpgrades.Count,
-                upgradeFailures,
-                upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings),
-                _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
-                ));
-
-            if (upgradeWarnings != 0)
-            {
-                this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
-                foreach (var warning in packageUpgrades.Where(p => p.Value.Warning).or_empty_list_if_null())
-                {
-                    var warningMessage = warning.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Warn);
-                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}{1}".format_with(warning.Value.Name, warningMessage != null ? " - {0}".format_with(warningMessage.Message) : string.Empty));
-                }
-            }
-
-            if (rebootPackages != 0)
-            {
-                this.Log().Warn(ChocolateyLoggers.Important, "Packages needing reboot:");
-                foreach (var reboot in packageUpgrades.Where(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode)).or_empty_list_if_null())
-                {
-                    this.Log().Warn(" - {0}{1}".format_with(reboot.Value.Name, reboot.Value.ExitCode != 0 ? " (exit code {0})".format_with(reboot.Value.ExitCode) : string.Empty));
-                }
-                this.Log().Warn(@"
-The recent package upgrades indicate a reboot is necessary. 
- Please reboot at your earliest convenience.
-");
-            }
-
-            if (upgradeFailures != 0)
-            {
-                this.Log().Error("Failures:");
-                foreach (var failure in packageUpgrades.Where(p => !p.Value.Success).or_empty_list_if_null())
-                {
-                    var errorMessage = failure.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Error);
-                    this.Log().Error(" - {0}{1}{2}".format_with(failure.Value.Name,
-                        failure.Value.ExitCode != 0 ? " (exited {0})".format_with(failure.Value.ExitCode) : string.Empty,
-                        errorMessage != null ? " - {0}".format_with(errorMessage.Message) : string.Empty
-                        ));
-                }
-            }
-
-            randomly_notify_about_pro_business(config);
-
+            
+            var upgradeFailures = report_action_summary(packageUpgrades, "upgraded");
             if (upgradeFailures != 0 && Environment.ExitCode == 0)
             {
                 Environment.ExitCode = 1;
             }
 
+            randomly_notify_about_pro_business(config);
+            
             return packageUpgrades;
         }
 
@@ -749,54 +636,7 @@ The recent package upgrades indicate a reboot is necessary.
             IEnumerable<GenericRegistryValue> environmentRemovals;
             get_log_environment_changes(config, environmentBefore, out environmentChanges, out environmentRemovals);
 
-            var uninstallFailures = packageUninstalls.Count(p => !p.Value.Success);
-            var uninstallWarnings = packageUninstalls.Count(p => p.Value.Warning);
-            var rebootPackages = packageUninstalls.Count(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode));
-            this.Log().Warn(() => @"{0}{1} uninstalled {2}/{3} packages. {4} packages failed.{0} See the log for details ({5}).".format_with(
-                Environment.NewLine,
-                ApplicationParameters.Name,
-                packageUninstalls.Count(p => p.Value.Success && !p.Value.Inconclusive),
-                packageUninstalls.Count,
-                uninstallFailures,
-                _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
-                ));
-
-            if (uninstallWarnings != 0)
-            {
-                this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
-                foreach (var warning in packageUninstalls.Where(p => p.Value.Warning).or_empty_list_if_null())
-                {
-                    var warningMessage = warning.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Warn);
-                    this.Log().Warn(ChocolateyLoggers.Important, " - {0}{1}".format_with(warning.Value.Name, warningMessage != null ? " - {0}".format_with(warningMessage.Message) : string.Empty));
-                }
-            }
-
-            if (rebootPackages != 0)
-            {
-                this.Log().Warn(ChocolateyLoggers.Important, "Packages needing reboot:");
-                foreach (var reboot in packageUninstalls.Where(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode)).or_empty_list_if_null())
-                {
-                    this.Log().Warn(" - {0}{1}".format_with(reboot.Value.Name, reboot.Value.ExitCode != 0 ? " (exit code {0})".format_with(reboot.Value.ExitCode) : string.Empty));
-                }
-                this.Log().Warn(@"
-The recent package uninstalls indicate a reboot is necessary. 
- Please reboot at your earliest convenience.
-");
-            }
-
-            if (uninstallFailures != 0)
-            {
-                this.Log().Error("Failures");
-                foreach (var failure in packageUninstalls.Where(p => !p.Value.Success).or_empty_list_if_null())
-                {
-                    var errorMessage = failure.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Error);
-                    this.Log().Error(" - {0}{1}{2}".format_with(failure.Value.Name, 
-                        failure.Value.ExitCode != 0 ? " (exited {0})".format_with(failure.Value.ExitCode) : string.Empty,
-                        errorMessage != null ? " - {0}".format_with(errorMessage.Message) : string.Empty
-                        ));
-                }
-            }
-
+            var uninstallFailures = report_action_summary(packageUninstalls, "uninstalled");
             if (uninstallFailures != 0 && Environment.ExitCode == 0)
             {
                 Environment.ExitCode = 1;
@@ -805,6 +645,65 @@ The recent package uninstalls indicate a reboot is necessary.
             randomly_notify_about_pro_business(config);
 
             return packageUninstalls;
+        }
+
+        private int report_action_summary(ConcurrentDictionary<string, PackageResult> packageResults, string actionName)
+        {
+            var failures = packageResults.Count(p => !p.Value.Success);
+            var warnings = packageResults.Count(p => p.Value.Warning);
+            var rebootPackages = packageResults.Count(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode));
+            this.Log().Warn(
+                () => @"{0}{1} {2} {3}/{4} packages. {5} packages failed.{0} See the log for details ({6}).".format_with(
+                    Environment.NewLine,
+                    ApplicationParameters.Name,
+                    actionName,
+                    packageResults.Count(p => p.Value.Success && !p.Value.Inconclusive),
+                    packageResults.Count,
+                    failures,
+                    _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
+                    ));
+
+            if (warnings != 0)
+            {
+                this.Log().Info("");
+                this.Log().Warn("Warnings:");
+                foreach (var warning in packageResults.Where(p => p.Value.Warning).or_empty_list_if_null())
+                {
+                    var warningMessage = warning.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Warn);
+                    this.Log().Warn(" - {0}{1}".format_with(warning.Value.Name, warningMessage != null ? " - {0}".format_with(warningMessage.Message) : string.Empty));
+                }
+            }
+
+            if (rebootPackages != 0)
+            {
+                this.Log().Info("");
+                this.Log().Warn("Packages requiring reboot:");
+                foreach (var reboot in packageResults.Where(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode)).or_empty_list_if_null())
+                {
+                    this.Log().Warn(" - {0}{1}".format_with(reboot.Value.Name, reboot.Value.ExitCode != 0 ? " (exit code {0})".format_with(reboot.Value.ExitCode) : string.Empty));
+                }
+                this.Log().Warn(ChocolateyLoggers.Important, @"
+The recent package changes indicate a reboot is necessary. 
+ Please reboot at your earliest convenience.");
+            }
+
+            if (failures != 0)
+            {
+                this.Log().Info("");
+                this.Log().Error("Failures");
+                foreach (var failure in packageResults.Where(p => !p.Value.Success).or_empty_list_if_null())
+                {
+                    var errorMessage = failure.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Error);
+                    this.Log().Error(
+                        " - {0}{1}{2}".format_with(
+                            failure.Value.Name,
+                            failure.Value.ExitCode != 0 ? " (exited {0})".format_with(failure.Value.ExitCode) : string.Empty,
+                            errorMessage != null ? " - {0}".format_with(errorMessage.Message) : string.Empty
+                            ));
+                }
+            }
+
+            return failures;
         }
 
         public void handle_package_uninstall(PackageResult packageResult, ChocolateyConfiguration config)
