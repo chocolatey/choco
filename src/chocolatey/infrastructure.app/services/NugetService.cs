@@ -602,7 +602,7 @@ spam/junk folder.");
                     }
                     else
                     {
-                        unfoundResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                        unfoundResult.Messages.Add(new ResultMessage(ResultType.Warn, "{0} was not found with the source(s) listed.".format_with(packageName)));
                         unfoundResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         if (config.RegularOutput)
                         {
