@@ -382,6 +382,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         public bool FailOnUnfound { get; set; }
         public bool FailOnNotInstalled { get; set; }
+        public bool IncludePreRelease { get; set; }
         public bool NotifyOnlyAvailableUpgrades { get; set; }
         public string PackageNamesToSkip { get; set; }
     }

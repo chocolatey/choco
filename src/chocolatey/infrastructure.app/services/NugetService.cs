@@ -536,7 +536,8 @@ spam/junk folder.");
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            var packages = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null();
+            foreach (string packageName in packages)
             {
                 remove_rollback_directory_if_exists(packageName);
 
@@ -577,9 +578,9 @@ spam/junk folder.");
                     continue;
                 }
 
-                if (version != null && version < installedPackage.Version && !config.AllowMultipleVersions && !config.AllowDowngrade)
+                if (version != null && version < installedPackage.Version && !config.AllowMultipleVersions && !config.AllowDowngrade && !config.UpgradeCommand.IncludePreRelease)
                 {
-                    string logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to upgrade to older versions, or use side by side to allow multiple versions.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
+                    string logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to upgrade to older versions, or use --includepre to upgrade prerelease versions, or use side by side to allow multiple versions.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
                     var nullResult = packageInstalls.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
                     nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
@@ -591,6 +592,12 @@ spam/junk folder.");
 
 
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+                if (availablePackage != null && installedPackage.Version > availablePackage.Version && config.UpgradeCommand.IncludePreRelease)
+                {
+                    availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.UpgradeCommand.IncludePreRelease, allowUnlisted: false);
+                }
+
+
                 if (availablePackage == null)
                 {
                     string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"; Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
@@ -628,7 +635,12 @@ spam/junk folder.");
 
                 if (installedPackage.Version > availablePackage.Version && !config.AllowDowngrade)
                 {
-                    string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
+                    IPackage prePackage = packageManager.SourceRepository.FindPackage(packageName, version, allowPrereleaseVersions:true, allowUnlisted: false);
+                    string logMessage = "{0} v{1} is newer than the most recent.{2} {3}".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine,
+                        prePackage != null && !prePackage.IsReleaseVersion() ? 
+                        packages.Count() > 1 ? "A newer Prerelease is available. Use --includepre to upgrade to latest prerelease version." :
+                           "A newer Prerelease is available. Use -pre to upgrade to latest prerelease version." :
+                        " You must be smarter than the average bear...");
                     packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
 
                     if (!config.UpgradeCommand.NotifyOnlyAvailableUpgrades)
