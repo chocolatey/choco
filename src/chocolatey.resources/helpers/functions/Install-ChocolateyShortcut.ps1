@@ -55,16 +55,17 @@ shortcut.
 OPTIONAL - A text description to be associated with the new description.
 
 .PARAMETER WindowStyle
-OPTIONAL - Type of windows target application should open with.
+OPTIONAL - Type of windows target application should open with. 
+Available in 0.9.10+.
 0 = Hidden, 1 = Normal Size, 3 = Maximized, 7 - Minimized.
 Full list table 3.9 here: https://technet.microsoft.com/en-us/library/ee156605.aspx
 
 .PARAMETER RunAsAdmin
 OPTIONAL - Set "Run As Administrator" checkbox for the created the
-shortcut.
+shortcut. Available in 0.9.10+.
 
 .PARAMETER PinToTaskbar
-OPTIONAL - Pin the new shortcut to the taskbar.
+OPTIONAL - Pin the new shortcut to the taskbar. Available in 0.9.10+.
 
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
@@ -94,7 +95,8 @@ Install-ChocolateyShortcut `
 .EXAMPLE
 >
 # Creates a new notepad shortcut on the root of c: that starts
-# notepad.exe as Administrator.  Shortcut is also pinned to taskbar.
+# notepad.exe as Administrator. Shortcut is also pinned to taskbar.
+# These parameters are available in 0.9.10+.
 
 Install-ChocolateyShortcut `
   -ShortcutFilePath "C:\notepad.lnk" `

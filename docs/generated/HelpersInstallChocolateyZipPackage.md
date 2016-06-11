@@ -40,6 +40,34 @@ internal packages.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+Install-ChocolateyZipPackage -PackageName 'gittfs' -Url 'https://github.com/downloads/spraints/git-tfs/GitTfs-0.11.0.zip' -UnzipLocation $gittfsPath
+
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+Install-ChocolateyZipPackage -PackageName 'sysinternals' `
+ -Url 'http://download.sysinternals.com/Files/SysinternalsSuite.zip' `
+ -UnzipLocation "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+~~~
+
+**EXAMPLE 3**
+
+~~~powershell
+
+Install-ChocolateyZipPackage -PackageName 'sysinternals' `
+ -Url 'http://download.sysinternals.com/Files/SysinternalsSuite.zip' `
+ -UnzipLocation "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)" `
+ -Url64 'http://download.sysinternals.com/Files/SysinternalsSuitex64.zip'
+~~~ 
+
 ## Inputs
 
 None
@@ -207,34 +235,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-Install-ChocolateyZipPackage -PackageName 'gittfs' -Url 'https://github.com/downloads/spraints/git-tfs/GitTfs-0.11.0.zip' -UnzipLocation $gittfsPath
-
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-
-Install-ChocolateyZipPackage -PackageName 'sysinternals' `
- -Url 'http://download.sysinternals.com/Files/SysinternalsSuite.zip' `
- -UnzipLocation "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-~~~
-
-**EXAMPLE 3**
-
-~~~powershell
-
-Install-ChocolateyZipPackage -PackageName 'sysinternals' `
- -Url 'http://download.sysinternals.com/Files/SysinternalsSuite.zip' `
- -UnzipLocation "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)" `
- -Url64 'http://download.sysinternals.com/Files/SysinternalsSuitex64.zip'
-~~~
 
 ## Links
 

@@ -48,12 +48,12 @@ if (Test-Path($extensionsPath)) {
   Write-Debug 'Loading community extensions'
   #Resolve-Path $extensionsPath\**\*\*.psm1 | % { Write-Debug "Importing `'$_`'"; Import-Module $_.ProviderPath }
   Get-ChildItem $extensionsPath -recurse -filter "*.psm1" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }
-  Get-ChildItem $extensionsPath -recurse -filter "*.dll" | Select -ExpandProperty FullName | % { 
+  Get-ChildItem $extensionsPath -recurse -filter "*.dll" | Select -ExpandProperty FullName | % {
     $path = $_;
     try {
       Write-Debug "Importing '$path'";
-      Write-Host "Loading '$([System.IO.Path]::GetFileNameWithoutExtension($path))' extension."; 
-      Import-Module $path; 
+      Write-Debug "Loading '$([System.IO.Path]::GetFileNameWithoutExtension($path))' extension.";
+      Import-Module $path;
     } catch {
       if ($env:ChocolateyPowerShellHost -eq 'true') {
         Write-Warning "Import failed for '$path'.  Error: '$_'"

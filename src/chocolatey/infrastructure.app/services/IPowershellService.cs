@@ -15,7 +15,10 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
+    using System.Management.Automation.Runspaces;
     using configuration;
+    using NuGet;
     using results;
 
     public interface IPowershellService
@@ -61,5 +64,8 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="packageResult">The package result.</param>
         /// <returns>true if the chocolateyBeforeModify.ps1 was found, even if it has failures</returns>
         bool before_modify(ChocolateyConfiguration configuration, PackageResult packageResult);
+
+        void prepare_powershell_environment(IPackage package, ChocolateyConfiguration configuration, string packageDirectory);
+        PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript);
     }
 }

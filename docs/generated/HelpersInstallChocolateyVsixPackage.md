@@ -37,6 +37,31 @@ internal packages.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+# This downloads the AutoWrockTestable VSIX from the Visual Studio
+# Gallery and installs it to the latest version of VS.
+
+Install-ChocolateyVsixPackage -PackageName "MyPackage" `
+  -VsixUrl http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+# This downloads the AutoWrockTestable VSIX from the Visual Studio
+# Gallery and installs it to Visual Studio 2012 (v11.0).
+
+Install-ChocolateyVsixPackage -PackageName "MyPackage" `
+  -VsixUrl http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix `
+  -VsVersion 11
+~~~ 
+
 ## Inputs
 
 None
@@ -141,31 +166,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-# This downloads the AutoWrockTestable VSIX from the Visual Studio
-# Gallery and installs it to the latest version of VS.
-
-Install-ChocolateyVsixPackage -PackageName "MyPackage" `
-  -VsixUrl http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-
-# This downloads the AutoWrockTestable VSIX from the Visual Studio
-# Gallery and installs it to Visual Studio 2012 (v11.0).
-
-Install-ChocolateyVsixPackage -PackageName "MyPackage" `
-  -VsixUrl http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix `
-  -VsVersion 11
-~~~
 
 ## Links
 

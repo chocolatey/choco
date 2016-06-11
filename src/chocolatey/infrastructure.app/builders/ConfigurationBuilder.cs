@@ -451,7 +451,7 @@ You can pass options and switches in the following ways:
 
                 if (licensedConfigBuilder == null)
                 {
-                    "chocolatey".Log().Warn(ChocolateyLoggers.Important,
+                    if (config.RegularOutput) "chocolatey".Log().Warn(ChocolateyLoggers.Important,
 @"Unable to set licensed configuration. This is likely related to a
  missing or outdated licensed DLL.");
                     return;

@@ -1,4 +1,4 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+// Copyright � 2011 - Present RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,17 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.licensing
+namespace chocolatey.infrastructure.results
 {
-    public enum ChocolateyLicenseType
+    public class PowerShellExecutionResults
     {
-        Unknown,
-        Foss,
-        Professional,
-        BusinessTrial,
-        ManagedServiceProvider,
-        Educational,
-        Business,
-        Enterprise,
+        public int ExitCode { get; set; }
+        public bool StandardErrorWritten { get; set; }
     }
 }

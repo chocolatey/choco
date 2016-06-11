@@ -43,6 +43,61 @@ understands how to work with that, hence this wrapper function.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+$packageName= 'bob'
+$toolsDir   = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$fileLocation = Join-Path $toolsDir 'INSTALLER_EMBEDDED_IN_PACKAGE'
+
+$packageArgs = @{
+  packageName   = $packageName
+  fileType      = 'msi'
+  file          = $fileLocation
+  silentArgs    = "/qn /norestart"
+  validExitCodes= @(0, 3010, 1641)
+  softwareName  = 'Bob*'
+}
+
+Install-ChocolateyInstallPackage @packageArgs
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+$packageArgs = @{
+  packageName   = 'bob'
+  fileType      = 'exe'
+  file          = '\\SHARE_LOCATION\to\INSTALLER_FILE'
+  silentArgs    = "/S"
+  validExitCodes= @(0)
+  softwareName  = 'Bob*'
+}
+
+Install-ChocolateyInstallPackage @packageArgs
+~~~
+
+**EXAMPLE 3**
+
+~~~powershell
+Install-ChocolateyInstallPackage 'bob' 'exe' '/S' "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\bob.exe"
+
+~~~
+
+**EXAMPLE 4**
+
+~~~powershell
+
+Install-ChocolateyInstallPackage -PackageName 'bob' -FileType 'exe' `
+  -SilentArgs '/S' `
+  -File "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\bob.exe" `
+  -ValidExitCodes = @(0)
+~~~ 
+
 ## Inputs
 
 None
@@ -155,61 +210,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-$packageName= 'bob'
-$toolsDir   = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$fileLocation = Join-Path $toolsDir 'INSTALLER_EMBEDDED_IN_PACKAGE'
-
-$packageArgs = @{
-  packageName   = $packageName
-  fileType      = 'msi'
-  file          = $fileLocation
-  silentArgs    = "/qn /norestart"
-  validExitCodes= @(0, 3010, 1641)
-  softwareName  = 'Bob*'
-}
-
-Install-ChocolateyInstallPackage @packageArgs
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-
-$packageArgs = @{
-  packageName   = 'bob'
-  fileType      = 'exe'
-  file          = '\\SHARE_LOCATION\to\INSTALLER_FILE'
-  silentArgs    = "/S"
-  validExitCodes= @(0)
-  softwareName  = 'Bob*'
-}
-
-Install-ChocolateyInstallPackage @packageArgs
-~~~
-
-**EXAMPLE 3**
-
-~~~powershell
-Install-ChocolateyInstallPackage 'bob' 'exe' '/S' "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\bob.exe"
-
-~~~
-
-**EXAMPLE 4**
-
-~~~powershell
-
-Install-ChocolateyInstallPackage -PackageName 'bob' -FileType 'exe' `
-  -SilentArgs '/S' `
-  -File "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\bob.exe" `
-  -ValidExitCodes = @(0)
-~~~
 
 ## Links
 

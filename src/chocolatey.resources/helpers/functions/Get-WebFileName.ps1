@@ -83,6 +83,17 @@ param(
     return $originalFileName
   }
 
+  try {
+    $uri = [System.Uri]$url
+    if ($uri.IsFile()) {
+      $fileName = [System.IO.Path]::GetFileName($uri.LocalPath)
+      Write-Debug "Url is local file, returning fileName"
+      return $fileName
+    }
+  } catch {
+    //continue on
+  }
+
   $request = [System.Net.HttpWebRequest]::Create($url)
   if ($request -eq $null) {
     Write-Debug "Request was null, using default name."

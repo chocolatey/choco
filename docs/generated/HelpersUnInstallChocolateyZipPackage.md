@@ -1,6 +1,6 @@
 ﻿# Uninstall-ChocolateyZipPackage
 
-Uninstalls a previous installed zip package
+Uninstalls a previous installed zip package, may not be necessary.
 
 ## Syntax
 
@@ -14,9 +14,11 @@ Uninstall-ChocolateyZipPackage `
 ## Description
 
 This will uninstall a zip file if installed via Install-ChocolateyZipPackage.
-This is not necessary if the files are unzipped to the package location.
+This is not necessary if the files are unzipped to the package directory.
 
 ## Notes
+
+Not necessary if files are unzippped to package directory.
 
 This helper reduces the number of lines one would have to remove the
 files extracted from a previously installed zip file.
@@ -25,6 +27,15 @@ This method has error handling built into it.
 ## Aliases
 
 None
+
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+Uninstall-ChocolateyZipPackage '__NAME__' 'filename.zip'
+
+~~~ 
 
 ## Inputs
 
@@ -74,15 +85,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-Uninstall-ChocolateyZipPackage '__NAME__' 'filename.zip'
-
-~~~
 
 ## Links
 

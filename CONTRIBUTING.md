@@ -10,10 +10,10 @@ Submitting an Issue (or a Bug)? See the **[Submitting Issues](https://github.com
 This is the right place. See below.
 
 ## Package Issue?
-Please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://github.com/chocolatey/choco/wiki/PackageTriageProcess).
+Please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://chocolatey.org/docs/package-triage-process).
 
 ## Package Request? Package Missing?
-If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://github.com/chocolatey/choco/wiki/PackageTriageProcess#package-request-package-missing).
+If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://chocolatey.org/docs/package-triage-process#package-request-package-missing).
 
 # Submitting an Enhancement
 

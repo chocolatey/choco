@@ -38,6 +38,32 @@ command.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+# This will create a context menu item in Windows Explorer when any file
+# is right clicked. The menu item will appear with the text "Open with
+# Sublime Text 2" and will invoke sublime text 2 when selected.
+$sublimeDir = (Get-ChildItem $env:ALLUSERSPROFILE\chocolatey\lib\sublimetext* | select $_.last)
+$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
+Install-ChocolateyExplorerMenuItem "sublime" "Open with Sublime Text 2" $sublimeExe
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+# This will create a context menu item in Windows Explorer when any
+# folder is right clicked. The menu item will appear with the text
+# "Open with Sublime Text 2" and will invoke sublime text 2 when selected.
+$sublimeDir = (Get-ChildItem $env:ALLUSERSPROFILE\chocolatey\lib\sublimetext* | select $_.last)
+$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
+Install-ChocolateyExplorerMenuItem "sublime" "Open with Sublime Text 2" $sublimeExe "directory"
+~~~ 
+
 ## Inputs
 
 None
@@ -108,32 +134,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-# This will create a context menu item in Windows Explorer when any file
-# is right clicked. The menu item will appear with the text "Open with
-# Sublime Text 2" and will invoke sublime text 2 when selected.
-$sublimeDir = (Get-ChildItem $env:ALLUSERSPROFILE\chocolatey\lib\sublimetext* | select $_.last)
-$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
-Install-ChocolateyExplorerMenuItem "sublime" "Open with Sublime Text 2" $sublimeExe
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-
-# This will create a context menu item in Windows Explorer when any
-# folder is right clicked. The menu item will appear with the text
-# "Open with Sublime Text 2" and will invoke sublime text 2 when selected.
-$sublimeDir = (Get-ChildItem $env:ALLUSERSPROFILE\chocolatey\lib\sublimetext* | select $_.last)
-$sublimeExe = "$sublimeDir\tools\sublime_text.exe"
-Install-ChocolateyExplorerMenuItem "sublime" "Open with Sublime Text 2" $sublimeExe "directory"
-~~~
 
 ## Links
 

@@ -25,7 +25,8 @@ compatibility with pre 0.9.10, please use the alias `Get-ProcessorBits`.
 
 ## Aliases
 
-None
+`Get-ProcessorBits`
+
 
 ## Inputs
 
@@ -37,7 +38,6 @@ None
 
 ## Parameters
  
-
 
 
 

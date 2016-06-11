@@ -35,7 +35,9 @@ completes.
 
 ## Aliases
 
-None
+`Add-BinFile`
+`Generate-BinFile`
+
 
 ## Inputs
 
@@ -113,7 +115,6 @@ Accept Pipeline Input? | false
 ### &lt;CommonParameters&gt;
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
-
 
 
 ## Links

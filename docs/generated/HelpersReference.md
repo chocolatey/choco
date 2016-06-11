@@ -51,9 +51,6 @@ These are the functions from above as one list.
 
 ## Complete List (alphabetical order)
 
- * [[Get-ToolsLocation|HelpersGetToolsLocation]]
- * [[Get-OSArchitectureWidth|HelpersGetOSArchitectureWidth]]
- * [[Uninstall-BinFile|HelpersUninstallBinFile]]
  * [[Format-FileSize|HelpersFormatFileSize]]
  * [[Get-ChecksumValid|HelpersGetChecksumValid]]
  * [[Get-ChocolateyUnzip|HelpersGetChocolateyUnzip]]

@@ -22,6 +22,11 @@ Possible properties to pass:
 **NOTE:** [Chocolatey for Business](https://chocolatey.org/compare) can create complete packages by just
  pointing the new command to native installers!
 
+**NOTE:** [Chocolatey for Business](https://chocolatey.org/compare) can also download and internalize remote
+ resources from existing packages so that existing packages can be used 
+ without being tied to the internet.
+ This is called automatic recompile.
+
 ## Examples
 
     choco new bob
@@ -118,6 +123,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      --built-in, --built-in-template, --originaltemplate, --original-template, --use-original-template, --use-built-in-template
      BuiltInTemplate - Use the original built-in template instead of any 
        override. Available in 0.9.10+.
+
+     --file=VALUE
+     Inspect a file (installer) to determine everything and create a package. 
+       Available in 0.9.10+. Business versions only.
 
 ~~~
 

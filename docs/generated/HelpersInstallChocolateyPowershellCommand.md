@@ -39,6 +39,42 @@ internal packages.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+$psFile = Join-Path $(Split-Path -Parent $MyInvocation.MyCommand.Definition) "Install-WindowsImage.ps1"
+Install-ChocolateyPowershellCommand -PackageName 'installwindowsimage.powershell' -PSFileFullPath $psFile
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+$psFile = Join-Path $(Split-Path -Parent $MyInvocation.MyCommand.Definition) `
+ "Install-WindowsImage.ps1"
+Install-ChocolateyPowershellCommand `
+ -PackageName 'installwindowsimage.powershell' `
+ -PSFileFullPath $psFile `
+ -PSFileFullPath $psFile `
+ -Url 'http://somewhere.com/downloads/Install-WindowsImage.ps1'
+~~~
+
+**EXAMPLE 3**
+
+~~~powershell
+
+$psFile = Join-Path $(Split-Path -Parent $MyInvocation.MyCommand.Definition) `
+ "Install-WindowsImage.ps1"
+Install-ChocolateyPowershellCommand `
+ -PackageName 'installwindowsimage.powershell' `
+ -PSFileFullPath $psFile `
+ -Url 'http://somewhere.com/downloads/Install-WindowsImage.ps1' `
+ -Url64 'http://somewhere.com/downloads/Install-WindowsImagex64.ps1'
+~~~ 
+
 ## Inputs
 
 None
@@ -196,42 +232,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-$psFile = Join-Path $(Split-Path -Parent $MyInvocation.MyCommand.Definition) "Install-WindowsImage.ps1"
-Install-ChocolateyPowershellCommand -PackageName 'installwindowsimage.powershell' -PSFileFullPath $psFile
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-
-$psFile = Join-Path $(Split-Path -Parent $MyInvocation.MyCommand.Definition) `
- "Install-WindowsImage.ps1"
-Install-ChocolateyPowershellCommand `
- -PackageName 'installwindowsimage.powershell' `
- -PSFileFullPath $psFile `
- -PSFileFullPath $psFile `
- -Url 'http://somewhere.com/downloads/Install-WindowsImage.ps1'
-~~~
-
-**EXAMPLE 3**
-
-~~~powershell
-
-$psFile = Join-Path $(Split-Path -Parent $MyInvocation.MyCommand.Definition) `
- "Install-WindowsImage.ps1"
-Install-ChocolateyPowershellCommand `
- -PackageName 'installwindowsimage.powershell' `
- -PSFileFullPath $psFile `
- -Url 'http://somewhere.com/downloads/Install-WindowsImage.ps1' `
- -Url64 'http://somewhere.com/downloads/Install-WindowsImagex64.ps1'
-~~~
 
 ## Links
 

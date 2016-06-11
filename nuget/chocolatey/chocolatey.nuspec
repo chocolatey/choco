@@ -13,11 +13,11 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>RealDimensions Software, LLC - 2011-Present</copyright>
     <!--<projectSourceUrl>https://github.com/chocolatey/choco</projectSourceUrl>
-    <docsUrl>https://github.com/chocolatey/choco/wiki</docsUrl>
+    <docsUrl>https://chocolatey.org/docs</docsUrl>
     <mailingListUrl>https://groups.google.com/forum/#!forum/chocolatey</mailingListUrl>
     <bugTrackerUrl>https://github.com/chocolatey/choco/issues</bugTrackerUrl>-->
     <tags>nuget apt-get machine repository chocolatey</tags>
-    <summary>Chocolatey is your machine level NuGet repository. Think apt-get for Windows (executables/application packages), not library packages.</summary>
+    <summary>Chocolatey is the package manager for Windows (like apt-get but for Windows)</summary>
     <description>
 Chocolatey is a package manager for Windows (like apt-get but for Windows). It was designed to be a decentralized framework for quickly installing applications and tools that you need. It is built on the NuGet infrastructure currently using PowerShell as its focus for delivering packages from the distros to your door, err computer.
 
@@ -26,7 +26,7 @@ Chocolatey is brought to you by the work and inspiration of the community, the w
 You can host your own sources and add them to Chocolatey, you can extend Chocolatey's capabilities, and folks, it's only going to get better.
 
 ### Commands
-There are quite a few commands you can call - you should check out the [command reference](https://github.com/chocolatey/choco/wiki/CommandsReference). Here are the most common:
+There are quite a few commands you can call - you should check out the [command reference](https://chocolatey.org/docs/commands-reference). Here are the most common:
 
  * Help - choco -? or choco command -?
  * Search - choco search something
@@ -45,12 +45,12 @@ There are quite a few commands you can call - you should check out the [command 
  * Install webpi feature - choco install IIS7.5Express -source webpi
 
 #### More
-For more advanced commands and switches, use `choco -?` or `choco command -h`. You can also look at the [command reference](https://github.com/chocolatey/choco/wiki/CommandsReference), including how you can force a package to install the x86 version of a package.
+For more advanced commands and switches, use `choco -?` or `choco command -h`. You can also look at the [command reference](https://chocolatey.org/docs/commands-reference), including how you can force a package to install the x86 version of a package.
 
 ### Create Packages?
-We have some great guidance on how to do that. Where? I'll give you a hint, it rhymes with sticky! [Wiki!](https://github.com/chocolatey/choco/wiki/CreatePackages)
+We have some great guidance on how to do that. Where? I'll give you a hint, it rhymes with socks! [Docs!](https://chocolatey.org/docs/create-packages)
 
-In that mess there is a link to the [Helper Reference](https://github.com/chocolatey/choco/wiki/HelpersReference).
+In that mess there is a link to the [PowerShell Chocolatey module reference](https://chocolatey.org/docs/helpers-reference).
 </description>
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
@@ -65,7 +65,7 @@ Here's one you probably never knew existed - extensions. Chocolatey has had the 
 
 We redesigned our `choco new` default packaging template and we've made managing templates as easy as managing packages.
 
-`choco search`/`choco list` has so many enhancements, you may not need to visit dot org again. [See it in action](https://github.com/chocolatey/choco/wiki/CommandsList#see-it-in-action).
+`choco search`/`choco list` has so many enhancements, you may not need to visit dot org again. [See it in action](https://chocolatey.org/docs/commands-list#see-it-in-action).
 * [search -v provides moderation related information and a world of nuspec information](https://github.com/chocolatey/choco/issues/493)
 * [search by id only](https://github.com/chocolatey/choco/issues/663)
 * [search by id exact](https://github.com/chocolatey/choco/issues/453)

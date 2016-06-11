@@ -38,6 +38,60 @@ internal packages.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+Get-ChocolateyWebFile '__NAME__' 'C:\somepath\somename.exe' 'URL' '64BIT_URL_DELETE_IF_NO_64BIT'
+
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+# Download from an HTTPS location
+$toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
+Get-ChocolateyWebFile -PackageName 'bob' -FileFullPath "$toolsDir\bob.exe" -Url 'https://somewhere/bob.exe'
+~~~
+
+**EXAMPLE 3**
+
+~~~powershell
+
+# Download from FTP
+$toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+Get-ChocolateyWebFile -PackageName 'bob' -FileFullPath "$toolsDir\bob.exe" -Url 'ftp://somewhere/bob.exe'
+~~~
+
+**EXAMPLE 4**
+
+~~~powershell
+
+# Download from a file share
+$toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+Get-ChocolateyWebFile -PackageName 'bob' -FileFullPath "$toolsDir\bob.exe" -Url 'file:///\\fileshare\location\bob.exe'
+~~~
+
+**EXAMPLE 5**
+
+~~~powershell
+
+$options =
+@{
+  Headers = @{
+    Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+    'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
+    'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
+    Cookie = 'requiredinfo=info';
+    Referer = 'https://somelocation.com/';
+  }
+}
+
+Get-ChocolateyWebFile -PackageName 'package' -FileFullPath "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\thefile.exe" -Url 'https://somelocation.com/thefile.exe' -Options $options
+~~~ 
+
 ## Inputs
 
 None
@@ -205,60 +259,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-Get-ChocolateyWebFile '__NAME__' 'C:\somepath\somename.exe' 'URL' '64BIT_URL_DELETE_IF_NO_64BIT'
-
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-
-# Download from an HTTPS location
-$toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-Get-ChocolateyWebFile -PackageName 'bob' -FileFullPath "$toolsDir\bob.exe" -Url 'https://somewhere/bob.exe'
-~~~
-
-**EXAMPLE 3**
-
-~~~powershell
-
-# Download from FTP
-$toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-Get-ChocolateyWebFile -PackageName 'bob' -FileFullPath "$toolsDir\bob.exe" -Url 'ftp://somewhere/bob.exe'
-~~~
-
-**EXAMPLE 4**
-
-~~~powershell
-
-# Download from a file share
-$toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-Get-ChocolateyWebFile -PackageName 'bob' -FileFullPath "$toolsDir\bob.exe" -Url 'file:///\\fileshare\location\bob.exe'
-~~~
-
-**EXAMPLE 5**
-
-~~~powershell
-
-$options =
-@{
-  Headers = @{
-    Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
-    'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
-    'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
-    Cookie = 'requiredinfo=info';
-    Referer = 'https://somelocation.com/';
-  }
-}
-
-Get-ChocolateyWebFile -PackageName 'package' -FileFullPath "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\thefile.exe" -Url 'https://somelocation.com/thefile.exe' -Options $options
-~~~
 
 ## Links
 

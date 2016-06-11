@@ -106,7 +106,7 @@ namespace chocolatey.infrastructure.app.configuration
 
                 if (licensedEnvironmentSettings == null)
                 {
-                    "chocolatey".Log().Warn(
+                    if (config.RegularOutput) "chocolatey".Log().Warn(
                         ChocolateyLoggers.Important,
                         @"Unable to set licensed environment. This is likely related to a
  missing or outdated licensed DLL.");

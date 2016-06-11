@@ -79,6 +79,18 @@ These are the functions from above as one list.
 
 '@
 
+function Get-Aliases($commandName){
+
+  $aliasOutput = ''
+  Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | %{ $aliasOutput += "``$($_.Name)``$lineFeed"}
+
+  if ($aliasOutput -eq $null -or $aliasOutput -eq '') {
+    $aliasOutput = 'None'
+  }
+
+  Write-Output $aliasOutput
+}
+
 function Convert-Example($objItem) {
   @"
 **$($objItem.title.Replace('-','').Trim())**
@@ -260,7 +272,7 @@ try
   if(-not(Test-Path $docsFolder)){ mkdir $docsFolder -EA Continue | Out-Null }
 
   Write-Host 'Creating per PowerShell function markdown files...'
-  Get-Command -Module $psModuleName | ForEach-Object -Process { Get-Help $_ -Full } | ForEach-Object -Process { `
+  Get-Command -Module $psModuleName -CommandType Function | ForEach-Object -Process { Get-Help $_ -Full } | ForEach-Object -Process { `
     $commandName = $_.Name
     $fileName = Join-Path $docsFolder "Helpers$($_.Name.Replace('-','')).md"
     $global:powerShellReferenceTOC += "$lineFeed * [[$commandName|$([System.IO.Path]::GetFileNameWithoutExtension($fileName))]]"
@@ -279,8 +291,8 @@ $( if ($_.alertSet -ne $null) { $lineFeed + "## Notes" + $lineFeed + $lineFeed +
 
 ## Aliases
 
-$( if ($_.aliases -ne $null) { $_.aliases } else { 'None'} )
-
+$(Get-Aliases $_.Name)
+$( if ($_.Examples -ne $null) { Write-Output "$lineFeed## Examples$lineFeed$lineFeed"; ($_.Examples.Example | % { Convert-Example $_ }) -join "$lineFeed$lineFeed"; Write-Output "$lineFeed" })
 ## Inputs
 
 $( if ($_.InputTypes -ne $null -and $_.InputTypes.Length -gt 0 -and -not $_.InputTypes.Contains('inputType')) { $lineFeed + " * $($_.InputTypes)" + $lineFeed} else { 'None'})
@@ -292,7 +304,6 @@ $( if ($_.ReturnValues -ne $null -and $_.ReturnValues.Length -gt 0 -and -not $_.
 ## Parameters
 $( if ($_.parameters.parameter.count -gt 0) { $_.parameters.parameter | % { Convert-Parameter $_ $commandName }}) $( if ($hasCmdletBinding) { "$lineFeed### &lt;CommonParameters&gt;$lineFeed$($lineFeed)This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see ``about_CommonParameters`` http://go.microsoft.com/fwlink/p/?LinkID=113216 ." } )
 
-$( if ($_.Examples -ne $null) { Write-Output "$lineFeed## Examples$lineFeed$lineFeed"; ($_.Examples.Example | % { Convert-Example $_ }) -join "$lineFeed$lineFeed" })
 $( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$lineFeed"; $_.relatedLinks.navigationLink | ? { $_.linkText -ne $null} | % { Write-Output "* [[$($_.LinkText)|Helpers$($_.LinkText.Replace('-',''))]]$lineFeed" }})
 
 [[Function Reference|HelpersReference]]
@@ -347,6 +358,7 @@ Install-ChocolateyZipPackage '$env:chocolateyPackageName' $url $binRoot
   Generate-CommandReference('unpackself')
   Generate-CommandReference('update')
   Generate-CommandReference('version')
+  Generate-CommandReference('download')
   Generate-TopLevelCommandReference
 
   Exit 0

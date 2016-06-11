@@ -20,6 +20,16 @@ message.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+# This will create a Visual Studio task bar icon.
+Install-ChocolateyPinnedTaskBarItem -TargetFilePath "${env:ProgramFiles(x86)}\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
+~~~ 
+
 ## Inputs
 
 None
@@ -57,16 +67,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-# This will create a Visual Studio task bar icon.
-Install-ChocolateyPinnedTaskBarItem -TargetFilePath "${env:ProgramFiles(x86)}\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
-~~~
 
 ## Links
 

@@ -157,6 +157,10 @@ NOTE: Starting in 0.9.10+, the Automatic Uninstaller (AutoUninstaller)
  is turned on by default. To turn it off, run the following command:
 
     choco feature disable -n autoUninstaller
+
+NOTE: Chocolatey Pro / Business automatically synchronizes with 
+ Programs and Features, ensuring manually removed apps are 
+ automatically removed from Chocolatey's repository.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");

@@ -56,6 +56,87 @@ internal packages.
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+
+$packageName= 'bob'
+$toolsDir   = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$url        = 'https://somewhere.com/file.msi'
+$url64      = 'https://somewhere.com/file-x64.msi'
+
+$packageArgs = @{
+  packageName   = $packageName
+  fileType      = 'msi'
+  url           = $url
+  url64bit      = $url64
+  silentArgs    = "/qn /norestart"
+  validExitCodes= @(0, 3010, 1641)
+  softwareName  = 'Bob*'
+  checksum      = '12345'
+  checksumType  = 'sha1'
+  checksum64    = '123356'
+  checksumType64= 'sha256'
+}
+
+Install-ChocolateyPackage @packageArgs
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+
+Install-ChocolateyPackage 'StExBar' 'msi' '/quiet' `
+ 'http://stexbar.googlecode.com/files/StExBar-1.8.3.msi' `
+ 'http://stexbar.googlecode.com/files/StExBar64-1.8.3.msi'
+~~~
+
+**EXAMPLE 3**
+
+~~~powershell
+
+Install-ChocolateyPackage 'mono' 'exe' '/SILENT' `
+ 'http://somehwere/something.exe' -ValidExitCodes @(0,21)
+~~~
+
+**EXAMPLE 4**
+
+~~~powershell
+
+Install-ChocolateyPackage 'ruby.devkit' 'exe' '/SILENT' `
+ 'http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe' `
+ 'http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe' `
+ -checksum '9383f12958aafc425923e322460a84de' -checksumType = 'md5' `
+ -checksum64 'ce99d873c1acc8bffc639bd4e764b849'
+~~~
+
+**EXAMPLE 5**
+
+~~~powershell
+Install-ChocolateyPackage 'bob' 'exe' '/S' 'https://somewhere/bob.exe' 'https://somewhere/bob-x64.exe'
+
+~~~
+
+**EXAMPLE 6**
+
+~~~powershell
+
+$options =
+@{
+  Headers = @{
+    Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+    'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
+    'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
+    Cookie = 'requiredinfo=info';
+    Referer = 'https://somelocation.com/';
+  }
+}
+
+Install-ChocolateyPackage -PackageName 'package' -FileType 'exe' -SilentArgs '/S' 'https://somelocation.com/thefile.exe' -Options $options
+~~~ 
+
 ## Inputs
 
 None
@@ -262,87 +343,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-
-$packageName= 'bob'
-$toolsDir   = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$url        = 'https://somewhere.com/file.msi'
-$url64      = 'https://somewhere.com/file-x64.msi'
-
-$packageArgs = @{
-  packageName   = $packageName
-  fileType      = 'msi'
-  url           = $url
-  url64bit      = $url64
-  silentArgs    = "/qn /norestart"
-  validExitCodes= @(0, 3010, 1641)
-  softwareName  = 'Bob*'
-  checksum      = '12345'
-  checksumType  = 'sha1'
-  checksum64    = '123356'
-  checksumType64= 'sha256'
-}
-
-Install-ChocolateyPackage @packageArgs
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-
-Install-ChocolateyPackage 'StExBar' 'msi' '/quiet' `
- 'http://stexbar.googlecode.com/files/StExBar-1.8.3.msi' `
- 'http://stexbar.googlecode.com/files/StExBar64-1.8.3.msi'
-~~~
-
-**EXAMPLE 3**
-
-~~~powershell
-
-Install-ChocolateyPackage 'mono' 'exe' '/SILENT' `
- 'http://somehwere/something.exe' -ValidExitCodes @(0,21)
-~~~
-
-**EXAMPLE 4**
-
-~~~powershell
-
-Install-ChocolateyPackage 'ruby.devkit' 'exe' '/SILENT' `
- 'http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe' `
- 'http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe' `
- -checksum '9383f12958aafc425923e322460a84de' -checksumType = 'md5' `
- -checksum64 'ce99d873c1acc8bffc639bd4e764b849'
-~~~
-
-**EXAMPLE 5**
-
-~~~powershell
-Install-ChocolateyPackage 'bob' 'exe' '/S' 'https://somewhere/bob.exe' 'https://somewhere/bob-x64.exe'
-
-~~~
-
-**EXAMPLE 6**
-
-~~~powershell
-
-$options =
-@{
-  Headers = @{
-    Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
-    'Accept-Charset' = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
-    'Accept-Language' = 'en-GB,en-US;q=0.8,en;q=0.6';
-    Cookie = 'requiredinfo=info';
-    Referer = 'https://somelocation.com/';
-  }
-}
-
-Install-ChocolateyPackage -PackageName 'package' -FileType 'exe' -SilentArgs '/S' 'https://somelocation.com/thefile.exe' -Options $options
-~~~
 
 ## Links
 

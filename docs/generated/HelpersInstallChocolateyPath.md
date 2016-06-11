@@ -30,6 +30,22 @@ This is used when the application/tool is not being linked by Chocolatey
 
 None
 
+## Examples
+
+ **EXAMPLE 1**
+
+~~~powershell
+Install-ChocolateyPath -PathToInstall "$($env:SystemDrive)\tools\gittfs"
+
+~~~
+
+**EXAMPLE 2**
+
+~~~powershell
+Install-ChocolateyPath "$($env:SystemDrive)\Program Files\MySQL\MySQL Server 5.5\bin" -PathType 'Machine'
+
+~~~ 
+
 ## Inputs
 
 None
@@ -81,22 +97,6 @@ Accept Pipeline Input? | false
 
 This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see `about_CommonParameters` http://go.microsoft.com/fwlink/p/?LinkID=113216 .
 
-
-## Examples
-
- **EXAMPLE 1**
-
-~~~powershell
-Install-ChocolateyPath -PathToInstall "$($env:SystemDrive)\tools\gittfs"
-
-~~~
-
-**EXAMPLE 2**
-
-~~~powershell
-Install-ChocolateyPath "$($env:SystemDrive)\Program Files\MySQL\MySQL Server 5.5\bin" -PathType 'Machine'
-
-~~~
 
 ## Links
 

@@ -158,6 +158,9 @@ NOTE: `all` is a special package keyword that will allow you to upgrade
 Skip upgrading certain packages with `choco pin` or with the option
  `--except`.
 
+NOTE: Chocolatey Pro / Business automatically synchronizes with 
+ Programs and Features, ensuring automatically updating apps' versions
+ (like Chrome) are up to date in Chocolatey's repository. 
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");

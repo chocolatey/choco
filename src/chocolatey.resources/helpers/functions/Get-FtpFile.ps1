@@ -79,6 +79,20 @@ param(
     return
   }
 
+  try {
+    $uri = [System.Uri]$url
+    if ($uri.IsFile()) {
+      Write-Debug "Url is local file, setting destination"
+      if ($url.LocalPath -ne $fileName) {
+        Copy-Item $uri.LocalPath -Destination $fileName -Force
+      }
+      
+      return
+    }
+  } catch {
+    //continue on
+  }
+
   # Create a FTPWebRequest object to handle the connection to the ftp server
   $ftprequest = [System.Net.FtpWebRequest]::create($url)
 
@@ -172,7 +186,11 @@ param(
     }
 
     Set-PowerShellExitCode 404
-    throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"
+    if (env:DownloadCacheAvailable -eq 'true') {
+       throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message) `nThis package is likely not broken for licensed users - see https://chocolatey.org/docs/features-private-cdn."
+    } else {
+       throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"
+    }
   } finally {
     if ($ftpresponse -ne $null) {
       $ftpresponse.Close()

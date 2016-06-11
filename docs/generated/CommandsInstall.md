@@ -21,6 +21,16 @@ Installs a package or a list of packages (sometimes specified as a
 **NOTE:** Any package name ending with .config is considered a
  'packages.config' file. Please see https://bit.ly/packages_config
 
+**NOTE:** [Chocolatey Pro](https://chocolatey.org/compare) / Business builds on top of a great open source 
+ experience with quite a few features that enhance the your use of the 
+ community package repository (when using Pro), and really enhance the
+ Chocolatey experience all around. If you are an organization looking
+ for a better ROI, look no further than Business - automatic package
+ creation from installer files, automatic recompile support, runtime
+ malware protection, private CDN download cache, synchronize with 
+ Programs and Features, etc - https://chocolatey.org/compare.
+
+
 ## Examples
 
     choco install sysinternals
@@ -126,10 +136,10 @@ This specifies that the source is a Windows Feature and we should
 
  * How-To: A complete example of how you can use the PackageParameters argument
    when creating a Chocolatey Package can be seen at
-   https://github.com/chocolatey/choco/wiki/How-To-Parse-PackageParameters-Argument
+   https://chocolatey.org/docs/how-to-parse-package-parameters-argument
  * One may want to override the default installation directory of a
    piece of software. See
-   https://github.com/chocolatey/choco/wiki/GettingStarted#overriding-default-install-directory-or-other-advanced-install-concepts.
+   https://chocolatey.org/docs/getting-started#overriding-default-install-directory-or-other-advanced-install-concepts.
 
 
 ## Options and Switches
