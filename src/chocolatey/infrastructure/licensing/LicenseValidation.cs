@@ -66,6 +66,15 @@ namespace chocolatey.infrastructure.licensing
                     case LicenseType.Professional :
                         chocolateyLicense.LicenseType = ChocolateyLicenseType.Professional;
                         break;
+                    case LicenseType.Trial:
+                        chocolateyLicense.LicenseType = ChocolateyLicenseType.BusinessTrial;
+                        break;
+                    case LicenseType.ManagedServiceProvider:
+                        chocolateyLicense.LicenseType = ChocolateyLicenseType.ManagedServiceProvider;
+                        break;
+                    case LicenseType.Education:
+                        chocolateyLicense.LicenseType = ChocolateyLicenseType.Educational;
+                        break;
                     case LicenseType.Business :
                         chocolateyLicense.LicenseType = ChocolateyLicenseType.Business;
                         break;

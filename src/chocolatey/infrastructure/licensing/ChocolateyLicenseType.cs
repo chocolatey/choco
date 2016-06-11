@@ -20,6 +20,9 @@ namespace chocolatey.infrastructure.licensing
         Unknown,
         Foss,
         Professional,
+        BusinessTrial,
+        ManagedServiceProvider,
+        Educational,
         Business,
         Enterprise,
     }
