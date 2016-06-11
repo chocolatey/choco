@@ -310,7 +310,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
                     IEnumerable<GenericRegistryValue> environmentChanges;
                     IEnumerable<GenericRegistryValue> environmentRemovals;
-                    get_environment_after(config, environmentBefore, out environmentChanges, out environmentRemovals);
+                    get_log_environment_changes(config, environmentBefore, out environmentChanges, out environmentRemovals);
                     //todo: record this with package info
                 }
 
@@ -744,9 +744,10 @@ The recent package upgrades indicate a reboot is necessary.
 
             var packageUninstalls = perform_source_runner_function(config, r => r.uninstall_run(config, action));
 
+            // not handled in the uninstall handler
             IEnumerable<GenericRegistryValue> environmentChanges;
             IEnumerable<GenericRegistryValue> environmentRemovals;
-            get_environment_after(config, environmentBefore, out environmentChanges, out environmentRemovals);
+            get_log_environment_changes(config, environmentBefore, out environmentChanges, out environmentRemovals);
 
             var uninstallFailures = packageUninstalls.Count(p => !p.Value.Success);
             var uninstallWarnings = packageUninstalls.Count(p => p.Value.Warning);
@@ -1178,7 +1179,7 @@ ATTENTION: You must take manual action to remove {1} from
             return environmentBefore;
         }
 
-        private void get_environment_after(ChocolateyConfiguration config, IEnumerable<GenericRegistryValue> environmentBefore, out IEnumerable<GenericRegistryValue> environmentChanges, out IEnumerable<GenericRegistryValue> environmentRemovals)
+        private void get_log_environment_changes(ChocolateyConfiguration config, IEnumerable<GenericRegistryValue> environmentBefore, out IEnumerable<GenericRegistryValue> environmentChanges, out IEnumerable<GenericRegistryValue> environmentRemovals)
         {
             if (config.Information.PlatformType != PlatformType.Windows)
             {
