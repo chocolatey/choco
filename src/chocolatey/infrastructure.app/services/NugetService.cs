@@ -592,13 +592,13 @@ spam/junk folder.");
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                 if (availablePackage == null)
                 {
-                    string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
+                    string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"; Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
                     var unfoundResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
 
                     if (config.UpgradeCommand.FailOnUnfound)
                     {
                         unfoundResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                        if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, "{0}{1}".format_with(Environment.NewLine, logMessage));
                     }
                     else
                     {
@@ -606,7 +606,7 @@ spam/junk folder.");
                         unfoundResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         if (config.RegularOutput)
                         {
-                            this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                            this.Log().Warn(ChocolateyLoggers.Important, "{0}{1}".format_with(Environment.NewLine, logMessage));
                         }
                         else
                         {
@@ -634,7 +634,7 @@ spam/junk folder.");
                     {
                         if (config.RegularOutput)
                         {
-                            this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                            this.Log().Info(ChocolateyLoggers.Important, "{0}{1}".format_with(Environment.NewLine, logMessage));
                         }
                         else
                         {
@@ -660,7 +660,7 @@ spam/junk folder.");
                         {
                             if (config.RegularOutput)
                             {
-                                this.Log().Info(logMessage);
+                                this.Log().Info("{0}{1}".format_with(Environment.NewLine, logMessage));
                             }
                             else
                             {
@@ -684,7 +684,7 @@ spam/junk folder.");
 
                         if (config.RegularOutput)
                         {
-                            this.Log().Warn(logMessage);
+                            this.Log().Warn("{0}{1}".format_with(Environment.NewLine, logMessage));
                         }
                         else
                         {
