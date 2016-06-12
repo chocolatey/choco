@@ -78,12 +78,12 @@ namespace chocolatey.infrastructure.app.services
             
             foreach (var key in registryKeys.or_empty_list_if_null())
             {
-                this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString.escape_curly_braces()));
+                this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString.to_string().escape_curly_braces()));
 
                 if ((!string.IsNullOrWhiteSpace(key.InstallLocation) && !_fileSystem.directory_exists(key.InstallLocation)) || !_registryService.installer_value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation))
                 {
                     this.Log().Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means.");
-                    this.Log().Debug(() => " Searched for install path '{0}' - found? {1}".format_with(key.InstallLocation.escape_curly_braces(), _fileSystem.directory_exists(key.InstallLocation)));
+                    this.Log().Debug(() => " Searched for install path '{0}' - found? {1}".format_with(key.InstallLocation.to_string().escape_curly_braces(), _fileSystem.directory_exists(key.InstallLocation)));
                     this.Log().Debug(() => " Searched for registry key '{0}' value '{1}' - found? {2}".format_with(key.KeyPath.escape_curly_braces(), ApplicationParameters.RegistryValueInstallLocation, _registryService.installer_value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation)));
                     continue;
                 }

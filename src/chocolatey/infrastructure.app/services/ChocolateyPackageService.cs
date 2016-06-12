@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using builders;
     using commandline;
     using configuration;
@@ -30,6 +31,7 @@ namespace chocolatey.infrastructure.app.services
     using infrastructure.services;
     using logging;
     using NuGet;
+    using nuget;
     using platforms;
     using results;
     using tolerance;
@@ -178,7 +180,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 if (config.RegularOutput)
                 {
                     this.Log().Info("{0}|{1}".format_with(key.DisplayName, key.DisplayVersion));
-                    if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation.escape_curly_braces(), Environment.NewLine, key.UninstallString.escape_curly_braces()));
+                    if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation.to_string().escape_curly_braces(), Environment.NewLine, key.UninstallString.to_string().escape_curly_braces()));
                 }
                 count++;
 
@@ -331,6 +333,7 @@ Did you know Pro / Business automatically syncs with Programs and
             {
                 handle_extension_packages(config, packageResult);
                 handle_template_packages(config, packageResult);
+                pkgInfo.Arguments = capture_arguments(config, packageResult);
             }
 
             var toolsLocation = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyToolsLocationEnvironmentVariableName);
@@ -382,6 +385,39 @@ Did you know Pro / Business automatically syncs with Programs and
                 this.Log().Info(ChocolateyLoggers.Important, @"  Software install location not explicitly set, could be in package or 
   default install location if installer.");
             }
+        }
+
+        private string capture_arguments(ChocolateyConfiguration config, PackageResult packageResult)
+        {
+            var arguments = new StringBuilder();
+
+            // use the config to reconstruct
+            arguments.Append(" --source=\"'{0}'\"".format_with(config.Sources));
+            if (config.Prerelease) arguments.Append(" --prerelease");
+            if (config.ForceX86) arguments.Append(" --forcex86");
+            if (!string.IsNullOrWhiteSpace(config.InstallArguments)) arguments.Append(" --install-arguments=\"'{0}'\"".format_with(config.InstallArguments));
+            if (config.OverrideArguments) arguments.Append(" --override-arguments");
+            if (!string.IsNullOrWhiteSpace(config.PackageParameters)) arguments.Append(" --package-parameters=\"'{0}'\"".format_with(config.PackageParameters));
+            if (config.AllowDowngrade) arguments.Append(" --allow-downgrade");
+            if (config.AllowMultipleVersions) arguments.Append(" --allow-multiple-versions");
+            if (config.IgnoreDependencies) arguments.Append(" --ignore-dependencies");
+            if (config.SkipPackageInstallProvider) arguments.Append(" --skip-automation-scripts");
+            if (config.UpgradeCommand.FailOnUnfound) arguments.Append(" --fail-on-unfound");
+            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Username)) arguments.Append(" --user=\"'{0}'\"".format_with(config.SourceCommand.Username));
+            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Password)) arguments.Append(" --password=\"'{0}'\"".format_with(NugetEncryptionUtility.EncryptString(config.SourceCommand.Password)));    
+            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Certificate)) arguments.Append(" --cert=\"'{0}'\"".format_with(config.SourceCommand.Certificate));
+            if (!string.IsNullOrWhiteSpace(config.SourceCommand.CertificatePassword)) arguments.Append(" --certpassword=\"'{0}'\"".format_with(NugetEncryptionUtility.EncryptString(config.SourceCommand.CertificatePassword)));
+            if (!config.Features.CheckSumFiles) arguments.Append(" --ignore-checksums");
+            arguments.Append(config.Features.UsePackageExitCodes ? " --use-package-exit-codes" : " --ignore-package-exit-codes");
+
+            //global options
+            arguments.Append(" --execution-timeout=\"'{0}'\"".format_with(config.CommandExecutionTimeoutSeconds));
+            if (!string.IsNullOrWhiteSpace(config.CacheLocation)) arguments.Append(" --cache-location=\"'{0}'\"".format_with(config.CacheLocation));
+            if (config.Features.FailOnStandardError) arguments.Append(" --fail-on-error-output");
+            if (!config.Features.UsePowerShellHost) arguments.Append(" --use-system-powershell");
+
+
+            return arguments.to_string();
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)

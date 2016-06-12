@@ -86,11 +86,11 @@ param(
       if ($url.LocalPath -ne $fileName) {
         Copy-Item $uri.LocalPath -Destination $fileName -Force
       }
-      
+
       return
     }
   } catch {
-    //continue on
+    #continue on
   }
 
   # Create a FTPWebRequest object to handle the connection to the ftp server

@@ -97,11 +97,11 @@ param(
       if ($url.LocalPath -ne $fileName) {
         Copy-Item $uri.LocalPath -Destination $fileName -Force
       }
-      
+
       return
     }
   } catch {
-    //continue on
+    #continue on
   }
 
   $req = [System.Net.HttpWebRequest]::Create($url);

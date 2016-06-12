@@ -88,10 +88,11 @@ param(
     if ($uri.IsFile()) {
       $fileName = [System.IO.Path]::GetFileName($uri.LocalPath)
       Write-Debug "Url is local file, returning fileName"
+
       return $fileName
     }
   } catch {
-    //continue on
+    #continue on
   }
 
   $request = [System.Net.HttpWebRequest]::Create($url)

@@ -33,6 +33,7 @@ namespace chocolatey.infrastructure.app.services
         private const string SILENT_UNINSTALLER_FILE = ".silentUninstaller";
         private const string SIDE_BY_SIDE_FILE = ".sxs";
         private const string PIN_FILE = ".pin";
+        private const string ARGS_FILE = ".arguments";
 
         public ChocolateyPackageInformationService(IFileSystem fileSystem, IRegistryService registryService, IFilesService filesService)
         {
@@ -61,7 +62,7 @@ namespace chocolatey.infrastructure.app.services
                     {
                         packageInformation.RegistrySnapshot = _registryService.read_from_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE)); 
                     }, 
-                    "Unable to read registry snapshot file", 
+                    "Unable to read registry snapshot file for {0} (located at {1})".format_with(package.Id, _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE)), 
                     throwError: false, 
                     logWarningInsteadOfError: true
                  );     
@@ -79,6 +80,8 @@ namespace chocolatey.infrastructure.app.services
             packageInformation.HasSilentUninstall = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, SILENT_UNINSTALLER_FILE));
             packageInformation.IsSideBySide = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, SIDE_BY_SIDE_FILE));
             packageInformation.IsPinned = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, PIN_FILE));
+            var argsFile = _fileSystem.combine_paths(pkgStorePath, ARGS_FILE);
+            if (_fileSystem.file_exists(argsFile)) packageInformation.Arguments = _fileSystem.read_file(argsFile);
 
             return packageInformation;
         }
@@ -105,6 +108,13 @@ namespace chocolatey.infrastructure.app.services
             if (packageInformation.FilesSnapshot != null)
             {
                 _filesService.save_to_file(packageInformation.FilesSnapshot, _fileSystem.combine_paths(pkgStorePath, FILES_SNAPSHOT_FILE));
+            }
+
+            if (!string.IsNullOrWhiteSpace(packageInformation.Arguments))
+            {
+                var argsFile = _fileSystem.combine_paths(pkgStorePath, ARGS_FILE);
+                if (_fileSystem.file_exists(argsFile)) _fileSystem.delete_file(argsFile);
+                _fileSystem.write_file(argsFile,packageInformation.Arguments);
             }
 
             if (packageInformation.HasSilentUninstall)

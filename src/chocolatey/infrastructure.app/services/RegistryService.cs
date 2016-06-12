@@ -37,6 +37,7 @@ namespace chocolatey.infrastructure.app.services
     {
         private readonly IXmlService _xmlService;
         private readonly IFileSystem _fileSystem;
+
         private readonly bool _logOutput = false;
         //public RegistryService() {}
 
@@ -138,8 +139,8 @@ namespace chocolatey.infrastructure.app.services
                 {
                     KeyPath = key.Name,
                     RegistryView = key.View,
-                    DefaultValue = key.GetValue("").to_string(),
-                    DisplayName = key.GetValue("DisplayName").to_string()
+                    DefaultValue = key.get_value_as_string(""),
+                    DisplayName = key.get_value_as_string("DisplayName")
                 };
 
             if (string.IsNullOrWhiteSpace(appKey.DisplayName))
@@ -149,52 +150,52 @@ namespace chocolatey.infrastructure.app.services
 
             if (!string.IsNullOrWhiteSpace(appKey.DisplayName))
             {
-                appKey.InstallLocation = key.GetValue("InstallLocation").to_string();
-                appKey.UninstallString = key.GetValue("UninstallString").to_string();
-                if (key.GetValue("QuietUninstallString") != null)
+                appKey.InstallLocation = key.get_value_as_string("InstallLocation");
+                appKey.UninstallString = key.get_value_as_string("UninstallString");
+                if (!string.IsNullOrWhiteSpace(key.get_value_as_string("QuietUninstallString")))
                 {
-                    appKey.UninstallString = key.GetValue("QuietUninstallString").to_string();
+                    appKey.UninstallString = key.get_value_as_string("QuietUninstallString");
                     appKey.HasQuietUninstall = true;
                 }
 
                 // informational
-                appKey.Publisher = key.GetValue("Publisher").to_string();
-                appKey.InstallDate = key.GetValue("InstallDate").to_string();
-                appKey.InstallSource = key.GetValue("InstallSource").to_string();
-                appKey.Language = key.GetValue("Language").to_string();
+                appKey.Publisher = key.get_value_as_string("Publisher");
+                appKey.InstallDate = key.get_value_as_string("InstallDate");
+                appKey.InstallSource = key.get_value_as_string("InstallSource");
+                appKey.Language = key.get_value_as_string("Language");
 
                 // Version
-                appKey.DisplayVersion = key.GetValue("DisplayVersion").to_string();
-                appKey.Version = key.GetValue("Version").to_string();
-                appKey.VersionMajor = key.GetValue("VersionMajor").to_string();
-                appKey.VersionMinor = key.GetValue("VersionMinor").to_string();
+                appKey.DisplayVersion = key.get_value_as_string("DisplayVersion");
+                appKey.Version = key.get_value_as_string("Version");
+                appKey.VersionMajor = key.get_value_as_string("VersionMajor");
+                appKey.VersionMinor = key.get_value_as_string("VersionMinor");
 
                 // installinformation
-                appKey.SystemComponent = key.GetValue("SystemComponent").to_string() == "1";
-                appKey.WindowsInstaller = key.GetValue("WindowsInstaller").to_string() == "1";
-                appKey.NoRemove = key.GetValue("NoRemove").to_string() == "1";
-                appKey.NoModify = key.GetValue("NoModify").to_string() == "1";
-                appKey.NoRepair = key.GetValue("NoRepair").to_string() == "1";
-                appKey.ReleaseType = key.GetValue("ReleaseType").to_string();
-                appKey.ParentKeyName = key.GetValue("ParentKeyName").to_string();
+                appKey.SystemComponent = key.get_value_as_string("SystemComponent") == "1";
+                appKey.WindowsInstaller = key.get_value_as_string("WindowsInstaller") == "1";
+                appKey.NoRemove = key.get_value_as_string("NoRemove") == "1";
+                appKey.NoModify = key.get_value_as_string("NoModify") == "1";
+                appKey.NoRepair = key.get_value_as_string("NoRepair") == "1";
+                appKey.ReleaseType = key.get_value_as_string("ReleaseType");
+                appKey.ParentKeyName = key.get_value_as_string("ParentKeyName");
 
-                if (appKey.WindowsInstaller || appKey.UninstallString.to_lower().Contains("msiexec"))
+                if (appKey.WindowsInstaller || appKey.UninstallString.to_string().to_lower().Contains("msiexec"))
                 {
                     appKey.InstallerType = InstallerType.Msi;
                 }
 
-                if (key.Name.EndsWith("_is1") || !string.IsNullOrWhiteSpace(key.GetValue("Inno Setup: Setup Version").to_string()))
+                if (key.Name.EndsWith("_is1") || !string.IsNullOrWhiteSpace(key.get_value_as_string("Inno Setup: Setup Version")))
                 {
                     appKey.InstallerType = InstallerType.InnoSetup;
                 }
 
-                if (key.GetValue("dwVersionMajor") != null)
+                if (!string.IsNullOrWhiteSpace(key.get_value_as_string("dwVersionMajor")))
                 {
                     appKey.InstallerType = InstallerType.Nsis;
-                    appKey.VersionMajor = key.GetValue("dwVersionMajor").to_string();
-                    appKey.VersionMinor = key.GetValue("dwVersionMinor").to_string();
-                    appKey.VersionRevision = key.GetValue("dwVersionRev").to_string();
-                    appKey.VersionBuild = key.GetValue("dwVersionBuild").to_string();
+                    appKey.VersionMajor = key.get_value_as_string("dwVersionMajor");
+                    appKey.VersionMinor = key.get_value_as_string("dwVersionMinor");
+                    appKey.VersionRevision = key.get_value_as_string("dwVersionRev");
+                    appKey.VersionBuild = key.get_value_as_string("dwVersionBuild");
                 }
                 if (appKey.ReleaseType.is_equal_to("Hotfix") || appKey.ReleaseType.is_equal_to("Update Rollup") || appKey.ReleaseType.is_equal_to("Security Update") || appKey.DefaultValue.to_string().StartsWith("KB", ignoreCase: true, culture: CultureInfo.InvariantCulture))
                 {
@@ -206,7 +207,7 @@ namespace chocolatey.infrastructure.app.services
                 }
 
                 // assume NSIS if we still don't know and we find uninst.exe
-                if (appKey.InstallerType == InstallerType.Unknown && appKey.UninstallString.to_lower().Contains("uninst.exe"))
+                if (appKey.InstallerType == InstallerType.Unknown && appKey.UninstallString.to_string().to_lower().Contains("uninst.exe"))
                 {
                     appKey.InstallerType = InstallerType.Nsis;
                 }
@@ -228,7 +229,7 @@ namespace chocolatey.infrastructure.app.services
                         foreach (var name in key.GetValueNames())
                         {
                             //var kind = key.GetValueKind(name);
-                            var value = key.GetValue(name);
+                            var value = key.get_value_as_string(name);
                             if (name.is_equal_to("QuietUninstallString") || name.is_equal_to("UninstallString"))
                             {
                                 Console.WriteLine("key - {0}|{1}={2}|Type detected={3}|install location={4}".format_with(key.Name, name, value.to_string(), appKey.InstallerType.to_string(),appKey.InstallLocation.to_string()));
@@ -275,19 +276,19 @@ namespace chocolatey.infrastructure.app.services
                          logWarningInsteadOfError: true);
                      if (msiProductKey == null) continue;
 
-                     appKey.InstallLocation = set_if_empty(appKey.InstallLocation, msiProductKey.GetValue("InstallLocation").to_string());
+                     appKey.InstallLocation = set_if_empty(appKey.InstallLocation, msiProductKey.get_value_as_string("InstallLocation"));
                      // informational
-                     appKey.Publisher = set_if_empty(appKey.Publisher, msiProductKey.GetValue("Publisher").to_string());
-                     appKey.InstallDate = set_if_empty(appKey.InstallDate, msiProductKey.GetValue("InstallDate").to_string());
-                     appKey.InstallSource = set_if_empty(appKey.InstallSource, msiProductKey.GetValue("InstallSource").to_string());
-                     appKey.Language = set_if_empty(appKey.Language, msiProductKey.GetValue("Language").to_string());
-                     appKey.LocalPackage = set_if_empty(appKey.LocalPackage, msiProductKey.GetValue("LocalPackage").to_string());
+                     appKey.Publisher = set_if_empty(appKey.Publisher, msiProductKey.get_value_as_string("Publisher"));
+                     appKey.InstallDate = set_if_empty(appKey.InstallDate, msiProductKey.get_value_as_string("InstallDate"));
+                     appKey.InstallSource = set_if_empty(appKey.InstallSource, msiProductKey.get_value_as_string("InstallSource"));
+                     appKey.Language = set_if_empty(appKey.Language, msiProductKey.get_value_as_string("Language"));
+                     appKey.LocalPackage = set_if_empty(appKey.LocalPackage, msiProductKey.get_value_as_string("LocalPackage"));
 
                      // Version
-                     appKey.DisplayVersion = set_if_empty(appKey.DisplayVersion, msiProductKey.GetValue("DisplayVersion").to_string());
-                     appKey.Version = set_if_empty(appKey.Version, msiProductKey.GetValue("Version").to_string());
-                     appKey.VersionMajor = set_if_empty(appKey.VersionMajor, msiProductKey.GetValue("VersionMajor").to_string());
-                     appKey.VersionMinor = set_if_empty(appKey.VersionMinor, msiProductKey.GetValue("VersionMinor").to_string());
+                     appKey.DisplayVersion = set_if_empty(appKey.DisplayVersion, msiProductKey.get_value_as_string("DisplayVersion"));
+                     appKey.Version = set_if_empty(appKey.Version, msiProductKey.get_value_as_string("Version"));
+                     appKey.VersionMajor = set_if_empty(appKey.VersionMajor, msiProductKey.get_value_as_string("VersionMajor"));
+                     appKey.VersionMinor = set_if_empty(appKey.VersionMinor, msiProductKey.get_value_as_string("VersionMinor"));
 
                      // search components for install location if still empty
                      // the performance of this is very bad - without this the query is sub-second
@@ -310,7 +311,7 @@ namespace chocolatey.infrastructure.app.services
                      //        if (msiComponentKey.GetValueNames().Contains(userDataProductKeyId, StringComparer.OrdinalIgnoreCase))
                      //        {
                      //            _componentLoopCount++;
-                     //            appKey.InstallLocation = set_if_empty(appKey.InstallLocation, get_install_location_estimate(msiComponentKey.GetValue(userDataProductKeyId).to_string()));
+                     //            appKey.InstallLocation = set_if_empty(appKey.InstallLocation, get_install_location_estimate(msiComponentKey.get_value(userDataProductKeyId)));
                      //            if (!string.IsNullOrWhiteSpace(appKey.InstallLocation)) break;
                      //            if (_componentLoopCount >= 10) break;
                      //        }
@@ -417,7 +418,7 @@ namespace chocolatey.infrastructure.app.services
                             Name = valueName,
                             ParentKeyName = subKey.Name,
                             Type = (RegistryValueKindType)Enum.Parse(typeof(RegistryValueKindType), subKey.GetValueKind(valueName).to_string(), ignoreCase: true),
-                            Value = subKey.GetValue(valueName, expandValues ? RegistryValueOptions.None : RegistryValueOptions.DoNotExpandEnvironmentNames).to_string(),
+                            Value = subKey.GetValue(valueName, expandValues ? RegistryValueOptions.None : RegistryValueOptions.DoNotExpandEnvironmentNames).to_string().Replace("\0", string.Empty),
                         });
                     }
                 }
@@ -510,7 +511,7 @@ namespace chocolatey.infrastructure.app.services
                                         Name = registryValue,
                                         ParentKeyName = key.Name,
                                         Type = (RegistryValueKindType)Enum.Parse(typeof(RegistryValueKindType), key.GetValueKind(registryValue).to_string(), ignoreCase: true),
-                                        Value = key.GetValue(registryValue).to_string(),
+                                        Value = key.get_value_as_string(registryValue),
                                     };
                                 }
 

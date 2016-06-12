@@ -15,21 +15,15 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
-    using NuGet;
+    using Microsoft.Win32;
 
-    public sealed class ChocolateyPackageInformation
+    public static class RegistryValueExtensions
     {
-        public ChocolateyPackageInformation(IPackage package)
+        public static string get_value_as_string(this RegistryKey key, string name)
         {
-            Package = package;
-        }
+            if (key == null) return string.Empty;
 
-        public IPackage Package { get; set; }
-        public Registry RegistrySnapshot { get; set; }
-        public PackageFiles FilesSnapshot { get; set; }
-        public string Arguments { get; set; }
-        public bool HasSilentUninstall { get; set; }
-        public bool IsSideBySide { get; set; }
-        public bool IsPinned { get; set; }
+            return key.GetValue(name).to_string().Replace("\0", string.Empty);
+        }
     }
 }
