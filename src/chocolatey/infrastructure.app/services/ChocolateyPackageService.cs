@@ -180,7 +180,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 if (config.RegularOutput)
                 {
                     this.Log().Info("{0}|{1}".format_with(key.DisplayName, key.DisplayVersion));
-                    if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation.escape_curly_braces(), Environment.NewLine, key.UninstallString.escape_curly_braces()));
+                    if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".format_with(key.InstallLocation.to_string().escape_curly_braces(), Environment.NewLine, key.UninstallString.to_string().escape_curly_braces()));
                 }
                 count++;
 

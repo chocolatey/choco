@@ -62,7 +62,7 @@ namespace chocolatey.infrastructure.app.services
                     {
                         packageInformation.RegistrySnapshot = _registryService.read_from_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE)); 
                     }, 
-                    "Unable to read registry snapshot file", 
+                    "Unable to read registry snapshot file for {0} (located at {1})".format_with(package.Id, _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE)), 
                     throwError: false, 
                     logWarningInsteadOfError: true
                  );     
