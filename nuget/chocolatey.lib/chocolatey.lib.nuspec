@@ -20,7 +20,7 @@ This is the core package which allows Chocolatey to be embedded in your applicat
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>RealDimensions Software, LLC - 2011 - Present</copyright>
     <tags>apt-get yum machine repository chocolatey</tags>
-    <iconUrl>https://github.com/chocolatey/chocolatey/raw/master/docs/logo/chocolateyicon.gif</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/chocolatey/choco/master/docs/logo/chocolateyicon.gif</iconUrl>
     <dependencies>
       <dependency id="log4net" version="[2.0.3]" />
     </dependencies>
