@@ -118,6 +118,7 @@ If you were using any of the functions in a non-recommended way or not compliant
  * Mark packages pending until install completes successfully - see [#198](https://github.com/chocolatey/choco/issues/198)
  * Resolve sources by name - see [#356](https://github.com/chocolatey/choco/issues/356)
  * Uninstall-ChocolateyEnvironmentVariable function - see [#772](https://github.com/chocolatey/choco/issues/772)
+ * Get-UninstallRegistryKey function - see [#739](https://github.com/chocolatey/choco/issues/739)
  * Pro/Business - Ubiquitous Install Directory Switch - see [#258](https://github.com/chocolatey/choco/issues/258)
  * Pro/Business - Runtime Virus Scanning - see [virus scanning](https://chocolatey.org/docs/features-virus-check)
  * Pro/Business - Private CDN cache for downloads - see [private CDN cache](https://chocolatey.org/docs/features-private-cdn)
@@ -182,7 +183,8 @@ If you were using any of the functions in a non-recommended way or not compliant
  * Fix - Logging of upgrade messages - placement of some messages is incorrect - see [#557](https://github.com/chocolatey/choco/issues/557)
  * Fix - Get-WebFile fails with - The term '//continue' is not recognized as the name of a cmdlet - see [#789](https://github.com/chocolatey/choco/issues/789)
  * Fix - Unable to read registry snapshot file - see [#487](https://github.com/chocolatey/choco/issues/487)
-
+ * Fix - Uninstall template fails when encountering "bad" registry keys - see [#739](https://github.com/chocolatey/choco/issues/739)
+ 
 ### IMPROVEMENTS
 
  * AutoUninstaller is on by default - see [#308](https://github.com/chocolatey/choco/issues/308)

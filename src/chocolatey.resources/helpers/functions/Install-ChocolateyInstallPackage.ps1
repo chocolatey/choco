@@ -134,6 +134,9 @@ Install-ChocolateyPackage
 Uninstall-ChocolateyPackage
 
 .LINK
+Get-UninstallRegistryKey
+
+.LINK
 Start-ChocolateyProcessAsAdmin
 #>
 param(

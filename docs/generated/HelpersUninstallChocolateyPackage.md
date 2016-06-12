@@ -163,6 +163,7 @@ This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -Err
  * [[Install-ChocolateyPackage|HelpersInstallChocolateyPackage]]
  * [[Install-ChocolateyInstallPackage|HelpersInstallChocolateyInstallPackage]]
  * [[Uninstall-ChocolateyZipPackage|HelpersUninstallChocolateyZipPackage]]
+ * [[Get-UninstallRegistryKey|HelpersGetUninstallRegistryKey]]
 
 
 [[Function Reference|HelpersReference]]

@@ -348,6 +348,7 @@ This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -Err
 
  * [[Get-ChocolateyWebFile|HelpersGetChocolateyWebFile]]
  * [[Install-ChocolateyInstallPackage|HelpersInstallChocolateyInstallPackage]]
+ * [[Get-UninstallRegistryKey|HelpersGetUninstallRegistryKey]]
  * [[Install-ChocolateyZipPackage|HelpersInstallChocolateyZipPackage]]
 
 

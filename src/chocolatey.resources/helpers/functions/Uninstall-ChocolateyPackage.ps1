@@ -97,6 +97,9 @@ Install-ChocolateyInstallPackage
 
 .LINK
 Uninstall-ChocolateyZipPackage
+
+.LINK
+Get-UninstallRegistryKey
 #>
 param(
   [parameter(Mandatory=$true, Position=0)][string] $packageName,
