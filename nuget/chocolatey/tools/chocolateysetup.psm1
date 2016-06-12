@@ -174,6 +174,18 @@ function Create-DirectoryIfNotExists($folderName){
   if (![System.IO.Directory]::Exists($folderName)) { [System.IO.Directory]::CreateDirectory($folderName) | Out-Null }
 }
 
+function Get-LocalizedWellKnownPrincipalName {
+param (
+  [Parameter(Mandatory = $true)]
+  [Security.Principal.WellKnownSidType] $WellKnownSidType
+)
+  $sid = New-Object -TypeName 'System.Security.Principal.SecurityIdentifier' -ArgumentList @($WellKnownSidType, $null)
+  $account = $sid.Translate([Security.Principal.NTAccount])
+
+  return $account.Value
+}
+
+
 function Ensure-UserPermissions {
 param(
   [string]$folder
@@ -181,29 +193,67 @@ param(
   Write-Debug "Ensure-UserPermissions"
 
   if (!(Test-ProcessAdminRights)) {
-    Write-ChocolateyWarning "User is not running elevated, cannot set user permissions."
+    Write-ChocolateyWarning "User is not running elevated, cannot set permissions."
     return
   }
 
   $currentEA = $ErrorActionPreference
   $ErrorActionPreference = 'Stop'
   try {
-    # get current user
-    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
     # get current acl
-    $acl = Get-Acl $folder
+    $acl = (Get-Item $folder).GetAccessControl('Access')
 
-    # define rule to set
-    $rights = "Modify"
-    $userAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($currentUser.Name, $rights, "Allow")
+    $inheritanceFlags = ([Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [Security.AccessControl.InheritanceFlags]::ObjectInherit)
+    $propagationFlags = [Security.AccessControl.PropagationFlags]::None
+
+    $rightsFullControl = [Security.AccessControl.FileSystemRights]::FullControl
+    $rightsModify = [Security.AccessControl.FileSystemRights]::Modify
+    $rightsReadExecute = [Security.AccessControl.FileSystemRights]::ReadAndExecute
+
+    Write-Output "Restricting write permissions to Administrators"
+    $builtinAdmins = Get-LocalizedWellKnownPrincipalName -WellKnownSidType ([Security.Principal.WellKnownSidType]::BuiltinAdministratorsSid)
+    $adminsAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($builtinAdmins, $rightsFullControl, $inheritanceFlags, $propagationFlags, "Allow")
+    $acl.SetAccessRule($adminsAccessRule)
+    $localSystem = Get-LocalizedWellKnownPrincipalName -WellKnownSidType ([Security.Principal.WellKnownSidType]::LocalSystemSid)
+    $localSystemAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($localSystem, $rightsFullControl, $inheritanceFlags, $propagationFlags, "Allow")
+    $acl.SetAccessRule($localSystemAccessRule)
+    $builtinUsers = Get-LocalizedWellKnownPrincipalName -WellKnownSidType ([Security.Principal.WellKnownSidType]::BuiltinUsersSid)
+    $usersAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($builtinUsers, $rightsReadExecute, $inheritanceFlags, $propagationFlags, "Allow")
+    $acl.SetAccessRule($usersAccessRule)
+
+    $allowCurrentUser = $env:ChocolateyInstallAllowCurrentUser -eq 'true'
+    if ($allowCurrentUser) {
+      # get current user
+      $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+
+      if ($currentUser.Name -ne $localSystem) {
+        $userAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($currentUser.Name, $rightsModify, $inheritanceFlags, $propagationFlags, "Allow")
+        Write-ChocolateyWarning 'Adding Modify permission for current user due to $env:ChocolateyInstallAllowCurrentUser'
+        $acl.SetAccessRule($userAccessRule)
+      }
+    } else {
+      Write-Debug 'Current user no longer set due to possible escalation of privileges - set $env:ChocolateyInstallAllowCurrentUser="true" if you require this.'
+    }
+
+    $defaultInstallPath = "$env:SystemDrive\ProgramData\chocolatey"
+    try {
+      $defaultInstallPath = Join-Path [Environment]::GetFolderPath("CommonApplicationData") 'chocolatey'
+    } catch {
+      # keep first setting
+    }
+
+    if ($folder.ToLower() -eq $defaultInstallPath.ToLower()) {
+      Write-Debug "Default Installation folder - removing inheritance with no copy"
+      $acl.SetAccessRuleProtection($true, $false)
+    } else {
+      Write-Debug "Non-standard install location - leaving inheritance on"
+      $acl.SetAccessRuleProtection($false, $true)
+    }
 
     # this is idempotent
-    Write-Output "Adding Modify permission for current user to '$folder'"
-    $acl.SetAccessRuleProtection($false,$true)
-    $acl.SetAccessRule($userAccessRule)
-    Set-Acl $folder $acl
+    (Get-Item $folder).SetAccessControl($acl)
   } catch {
-    Write-ChocolateyWarning "Not able to set permissions for user."
+    Write-ChocolateyWarning "Not able to set permissions for $folder."
   }
   $ErrorActionPreference = $currentEA
 }
