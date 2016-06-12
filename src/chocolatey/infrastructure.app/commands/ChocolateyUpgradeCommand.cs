@@ -87,7 +87,6 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("p=|password=",
                      "Password - the user's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
-
                 .Add("cert=",
                      "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty. Available in 0.9.10+.",
                      option => configuration.SourceCommand.Certificate = option.remove_surrounding_quotes())

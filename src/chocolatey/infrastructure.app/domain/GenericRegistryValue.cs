@@ -47,7 +47,5 @@ namespace chocolatey.infrastructure.app.domain
                    && Type.to_string().is_equal_to(other.Type.to_string())
                 ;
         }
-
-
     }
 }
