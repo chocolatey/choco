@@ -209,6 +209,7 @@ param(
     $rightsFullControl = [Security.AccessControl.FileSystemRights]::FullControl
     $rightsModify = [Security.AccessControl.FileSystemRights]::Modify
     $rightsReadExecute = [Security.AccessControl.FileSystemRights]::ReadAndExecute
+    $rightsAppend = [Security.AccessControl.FileSystemRights]::AppendData
 
     Write-Output "Restricting write permissions to Administrators"
     $builtinAdmins = Get-LocalizedWellKnownPrincipalName -WellKnownSidType ([Security.Principal.WellKnownSidType]::BuiltinAdministratorsSid)
@@ -252,6 +253,15 @@ param(
 
     # this is idempotent
     (Get-Item $folder).SetAccessControl($acl)
+
+    # set an explicit append permission on the logs folder
+    $logsFolder = "$folder\logs"
+    Create-DirectoryIfNotExists $logsFolder
+    $logsAcl = (Get-Item $logsFolder).GetAccessControl('Access')
+    $usersAppendAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($builtinUsers, $rightsAppend, $inheritanceFlags, $propagationFlags, "Allow")
+    $logsAcl.SetAccessRule($usersAppendAccessRule)
+    $logsAcl.SetAccessRuleProtection($false, $true)
+    (Get-Item $logsFolder).SetAccessControl($logsAcl)
   } catch {
     Write-ChocolateyWarning "Not able to set permissions for $folder."
   }

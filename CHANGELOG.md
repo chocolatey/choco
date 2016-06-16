@@ -42,7 +42,6 @@ If you were using any of the functions in a non-recommended way or not compliant
  * [Security] Explicit permissions - remove inheritance/lock down to admins - see [#398](https://github.com/chocolatey/choco/issues/398)
 
 This further restricts the default installation location by removing all permissions and inheritance of permissions, explicitly giving Administrator/LocalSystem to Full access, and Users are granted Read and Execute.
-In prior installations, we ensured Modify access to the installing user, but that has been removed for security reasons. Should you need the previous behavior, set `$env:ChocolateyInstallAllowCurrentUser="true"`.
 
 ### KNOWN ISSUES
 
