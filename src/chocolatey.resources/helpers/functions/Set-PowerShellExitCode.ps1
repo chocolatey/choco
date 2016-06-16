@@ -45,6 +45,11 @@ param (
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
-  $host.SetShouldExit($exitCode);
+  try {
+    $host.SetShouldExit($exitCode);  
+  } catch {
+    Write-Warning "Unable to set host exit code"
+  }
+  
   $env:ChocolateyExitCode = $exitCode;
 }
