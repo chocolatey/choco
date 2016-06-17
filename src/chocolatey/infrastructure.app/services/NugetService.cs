@@ -634,7 +634,7 @@ spam/junk folder.");
                     {
                         if (config.RegularOutput)
                         {
-                            this.Log().Info(ChocolateyLoggers.Important, "{0}{1}".format_with(Environment.NewLine, logMessage));
+                            this.Log().Info(ChocolateyLoggers.Important, logMessage);
                         }
                         else
                         {
@@ -660,7 +660,7 @@ spam/junk folder.");
                         {
                             if (config.RegularOutput)
                             {
-                                this.Log().Info("{0}{1}".format_with(Environment.NewLine, logMessage));
+                                this.Log().Info(logMessage);
                             }
                             else
                             {

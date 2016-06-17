@@ -85,7 +85,7 @@ namespace chocolatey.infrastructure.app
         ///   Default is 45 minutes
         /// </summary>
         public static int DefaultWaitForExitInSeconds = 2700;
-        public static int DefaultWebRequestTimeoutInSeconds = 45;
+        public static int DefaultWebRequestTimeoutInSeconds = 30;
 
         public static readonly string[] ConfigFileExtensions = new string[] {".autoconf",".config",".conf",".cfg",".jsc",".json",".jsonp",".ini",".xml",".yaml"};
         public static readonly string ConfigFileTransformExtension = ".install.xdt";

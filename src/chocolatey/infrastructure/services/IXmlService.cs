@@ -32,5 +32,14 @@ namespace chocolatey.infrastructure.services
         /// <param name="xmlType">Type of the XML.</param>
         /// <param name="xmlFilePath">The XML file path.</param>
         void serialize<XmlType>(XmlType xmlType, string xmlFilePath);
+
+        /// <summary>
+        ///   Serializes the specified XML type.
+        /// </summary>
+        /// <typeparam name="XmlType">The type of the ml type.</typeparam>
+        /// <param name="xmlType">Type of the XML.</param>
+        /// <param name="xmlFilePath">The XML file path.</param>
+        /// <param name="isSilent">Log messages?</param>
+        void serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent);
     }
 }

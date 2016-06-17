@@ -80,9 +80,9 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
       <dependency id="""" version=""[_MIN_VERSION_INCLUSIVE, MAX_VERSION_INCLUSIVE]"" />
       <dependency id="""" version=""[_MIN_VERSION_INCLUSIVE, MAX_VERSION_EXCLUSIVE)"" />
       <dependency id="""" />
-      <!-- If supporting 0.9.9.x (or below) and including a chocolateyUninstall.ps1 file to uninstall an EXE/MSI, you probably want to uncomment the below lines. Please verify whether you are using a helper function from that package. -->
       <dependency id=""chocolatey-uninstall.extension"" />
     </dependencies>-->
+    <!-- chocolatey-uninstall.extension - If supporting 0.9.9.x (or below) and including a chocolateyUninstall.ps1 file to uninstall an EXE/MSI, you probably want to include chocolatey-uninstall.extension as a dependency. Please verify whether you are using a helper function from that package. -->
 
     <!--<provides>NOT YET IMPLEMENTED</provides>-->
     <!--<conflicts>NOT YET IMPLEMENTED</conflicts>-->

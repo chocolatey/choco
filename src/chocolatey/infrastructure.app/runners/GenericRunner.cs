@@ -227,7 +227,8 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
         public void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
         {
-            var shouldWarn = (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator);
+            var shouldWarn = (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator)
+                          || (!config.Information.IsUserAdministrator && ApplicationParameters.InstallLocation.is_equal_to(ApplicationParameters.CommonAppDataChocolatey));
 
             if (shouldWarn)
             {
@@ -244,7 +245,11 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
  You may experience errors - many functions/packages
  require admin rights. Only advanced users should run choco w/out an
  elevated shell. When you open the command shell, you should ensure 
- that you do so with ""Run as Administrator"" selected.
+ that you do so with ""Run as Administrator"" selected. If you are 
+ attempting to use Chocolatey in a non-administrator setting, you
+ must select a different location other than the default install
+ location. See 
+ https://chocolatey.org/install#non-administrative-install for details.
 ");
                 var selection = InteractivePrompt.prompt_for_confirmation(@"
  Do you want to continue?", new[] { "yes", "no" },

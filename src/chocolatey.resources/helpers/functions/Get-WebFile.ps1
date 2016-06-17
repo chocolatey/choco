@@ -150,11 +150,13 @@ param(
   $req.AllowAutoRedirect = $true
   $req.MaximumAutomaticRedirections = 20
   #$req.KeepAlive = $true
-  # use the default request timeout of 100000
+  $req.Timeout = 30000
   if ($env:chocolateyRequestTimeout -ne $null -and $env:chocolateyRequestTimeout -ne '') {
+    Write-Debug "Setting request timeout to  $env:chocolateyRequestTimeout"
     $req.Timeout =  $env:chocolateyRequestTimeout
   }
   if ($env:chocolateyResponseTimeout -ne $null -and $env:chocolateyResponseTimeout -ne '') {
+    Write-Debug "Setting read/write timeout to  $env:chocolateyResponseTimeout"
     $req.ReadWriteTimeout =  $env:chocolateyResponseTimeout
   }
 
@@ -181,7 +183,7 @@ param(
   }
 
   try {
-   [System.Net.HttpWebResponse]$res = $req.GetResponse();
+   $res = $req.GetResponse();
 
    try {
       $headers = @{}
@@ -309,7 +311,7 @@ param(
     }
 
     Set-PowerShellExitCode 404
-    if (env:DownloadCacheAvailable -eq 'true') {
+    if ($env:DownloadCacheAvailable -eq 'true') {
        throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message) `nThis package is likely not broken for licensed users - see https://chocolatey.org/docs/features-private-cdn."
     } else {
        throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"

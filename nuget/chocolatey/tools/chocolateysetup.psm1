@@ -78,8 +78,7 @@ param(
     Set-ChocolateyInstallFolder $chocolateyPath
   }
   Create-DirectoryIfNotExists $chocolateyPath
-
-  Ensure-UserPermissions $chocolateyPath
+  Ensure-Permissions $chocolateyPath
 
   #set up variables to add
   $chocolateyExePath = Join-Path $chocolateyPath 'bin'
@@ -185,23 +184,38 @@ param (
   return $account.Value
 }
 
-
-function Ensure-UserPermissions {
+function Ensure-Permissions {
 param(
   [string]$folder
 )
-  Write-Debug "Ensure-UserPermissions"
+  Write-Debug "Ensure-Permissions"
+
+  $defaultInstallPath = "$env:SystemDrive\ProgramData\chocolatey"
+  try {
+    $defaultInstallPath = Join-Path [Environment]::GetFolderPath("CommonApplicationData") 'chocolatey'
+  } catch {
+      # keep first setting
+  }
+
+  if ($folder.ToLower() -ne $defaultInstallPath.ToLower()) {
+    Write-ChocolateyWarning "Installation folder is not the default. Not changing permissions. Please ensure your installation is secure."
+    return
+  }
+
+  # Everything from here on out applies to the default installation folder
 
   if (!(Test-ProcessAdminRights)) {
-    Write-ChocolateyWarning "User is not running elevated, cannot set permissions."
-    return
+    throw "Installation of Chocolatey to default folder requires Administrative permissions. Please run from elevated prompt. Please see https://chocolatey.org/install for details and alternatives if needing to install as a non-administrator."
   }
 
   $currentEA = $ErrorActionPreference
   $ErrorActionPreference = 'Stop'
   try {
     # get current acl
-    $acl = (Get-Item $folder).GetAccessControl('Access')
+    $acl = (Get-Item $folder).GetAccessControl('Access,Owner')
+
+    Write-Debug "Removing existing permissions."
+    $acl.Access | % { $acl.RemoveAccessRuleAll($_) }
 
     $inheritanceFlags = ([Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [Security.AccessControl.InheritanceFlags]::ObjectInherit)
     $propagationFlags = [Security.AccessControl.PropagationFlags]::None
@@ -209,6 +223,7 @@ param(
     $rightsFullControl = [Security.AccessControl.FileSystemRights]::FullControl
     $rightsModify = [Security.AccessControl.FileSystemRights]::Modify
     $rightsReadExecute = [Security.AccessControl.FileSystemRights]::ReadAndExecute
+    $rightsWrite = [Security.AccessControl.FileSystemRights]::Write
 
     Write-Output "Restricting write permissions to Administrators"
     $builtinAdmins = Get-LocalizedWellKnownPrincipalName -WellKnownSidType ([Security.Principal.WellKnownSidType]::BuiltinAdministratorsSid)
@@ -228,30 +243,32 @@ param(
 
       if ($currentUser.Name -ne $localSystem) {
         $userAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($currentUser.Name, $rightsModify, $inheritanceFlags, $propagationFlags, "Allow")
-        Write-ChocolateyWarning 'Adding Modify permission for current user due to $env:ChocolateyInstallAllowCurrentUser'
+        Write-ChocolateyWarning 'Adding Modify permission for current user due to $env:ChocolateyInstallAllowCurrentUser. This could lead to escalation of privilege attacks. Consider not allowing this.'
         $acl.SetAccessRule($userAccessRule)
       }
     } else {
       Write-Debug 'Current user no longer set due to possible escalation of privileges - set $env:ChocolateyInstallAllowCurrentUser="true" if you require this.'
     }
 
-    $defaultInstallPath = "$env:SystemDrive\ProgramData\chocolatey"
-    try {
-      $defaultInstallPath = Join-Path [Environment]::GetFolderPath("CommonApplicationData") 'chocolatey'
-    } catch {
-      # keep first setting
-    }
+    Write-Debug "Set Owner to Administrators"
+    $builtinAdminsSid = New-Object System.Security.Principal.SecurityIdentifier([Security.Principal.WellKnownSidType]::BuiltinAdministratorsSid, $null)
+    $acl.SetOwner($builtinAdminsSid)
 
-    if ($folder.ToLower() -eq $defaultInstallPath.ToLower()) {
-      Write-Debug "Default Installation folder - removing inheritance with no copy"
-      $acl.SetAccessRuleProtection($true, $false)
-    } else {
-      Write-Debug "Non-standard install location - leaving inheritance on"
-      $acl.SetAccessRuleProtection($false, $true)
-    }
+    Write-Debug "Default Installation folder - removing inheritance with no copy"
+    $acl.SetAccessRuleProtection($true, $false)
 
-    # this is idempotent
+    # enact the changes against the actual
     (Get-Item $folder).SetAccessControl($acl)
+
+    # set an explicit append permission on the logs folder
+    Write-Debug "Allow users to append to log files."
+    $logsFolder = "$folder\logs"
+    Create-DirectoryIfNotExists $logsFolder
+    $logsAcl = (Get-Item $logsFolder).GetAccessControl('Access')
+    $usersAppendAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($builtinUsers, $rightsWrite, [Security.AccessControl.InheritanceFlags]::ObjectInherit, [Security.AccessControl.PropagationFlags]::InheritOnly, "Allow")
+    $logsAcl.SetAccessRule($usersAppendAccessRule)
+    $logsAcl.SetAccessRuleProtection($false, $true)
+    (Get-Item $logsFolder).SetAccessControl($logsAcl)
   } catch {
     Write-ChocolateyWarning "Not able to set permissions for $folder."
   }

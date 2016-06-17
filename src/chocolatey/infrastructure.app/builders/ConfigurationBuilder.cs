@@ -82,7 +82,7 @@ namespace chocolatey.infrastructure.app.builders
             // must be done last for overrides
             set_licensed_options(config, license, configFileSettings);
             // save all changes if there are any
-            set_config_file_settings(configFileSettings, xmlService);
+            set_config_file_settings(configFileSettings, xmlService, config);
             set_hash_provider(config, container);
         }
         
@@ -94,14 +94,16 @@ namespace chocolatey.infrastructure.app.builders
             return xmlService.deserialize<ConfigFileSettings>(globalConfigPath);
         }
 
-        private static void set_config_file_settings(ConfigFileSettings configFileSettings, IXmlService xmlService)
+        private static void set_config_file_settings(ConfigFileSettings configFileSettings, IXmlService xmlService, ChocolateyConfiguration config)
         {
+            var shouldLogSilently = (!config.Information.IsProcessElevated || !config.Information.IsUserAdministrator);
+
             var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
             // save so all updated configuration items get set to existing config
             FaultTolerance.try_catch_with_logging_exception(
-                () => xmlService.serialize(configFileSettings, globalConfigPath),
+                () => xmlService.serialize(configFileSettings, globalConfigPath, isSilent: shouldLogSilently),
                 "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
-                logWarningInsteadOfError: true);
+                logDebugInsteadOfError: true);
         }
 
         private static void add_or_remove_licensed_source(ChocolateyLicense license, ConfigFileSettings configFileSettings)
@@ -451,9 +453,9 @@ You can pass options and switches in the following ways:
 
                 if (licensedConfigBuilder == null)
                 {
-                    if (config.RegularOutput) "chocolatey".Log().Warn(ChocolateyLoggers.Important,
-@"Unable to set licensed configuration. This is likely related to a
- missing or outdated licensed DLL.");
+                    if (config.RegularOutput) "chocolatey".Log().Warn(ChocolateyLoggers.Important, 
+                        @"Unable to set licensed configuration. Please upgrade to a newer 
+ licensed version.");
                     return;
                 }
                 try

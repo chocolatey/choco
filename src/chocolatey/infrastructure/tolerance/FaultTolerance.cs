@@ -124,7 +124,9 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="errorMessage">The error message.</param>
         /// <param name="throwError">if set to <c>true</c> [throw error].</param>
         /// <param name="logWarningInsteadOfError">if set to <c>true</c> log as warning instead of error.</param>
-        public static void try_catch_with_logging_exception(Action action, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false)
+        /// <param name="logDebugInsteadOfError">Log to debug</param>
+        /// <param name="isSilent">Log messages?</param>
+        public static void try_catch_with_logging_exception(Action action, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
         {
             if (action == null) return;
 
@@ -136,7 +138,9 @@ namespace chocolatey.infrastructure.tolerance
                     },
                 errorMessage,
                 throwError,
-                logWarningInsteadOfError
+                logWarningInsteadOfError,
+                logDebugInsteadOfError,
+                isSilent
                 );
         }
 
@@ -148,11 +152,16 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="errorMessage">The error message.</param>
         /// <param name="throwError">if set to <c>true</c> [throw error].</param>
         /// <param name="logWarningInsteadOfError">if set to <c>true</c> log as warning instead of error.</param>
+        /// <param name="logDebugInsteadOfError">Log to debug</param>
+        /// <param name="isSilent">Log messages?</param>
         /// <returns>The return value from the function</returns>
-        public static T try_catch_with_logging_exception<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false)
+        public static T try_catch_with_logging_exception<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
         {
             if (function == null) return default(T);
             var returnValue = default(T);
+
+            var logLocation = ChocolateyLoggers.Normal;
+            if (isSilent) logLocation = ChocolateyLoggers.LogFileOnly;
 
             try
             {
@@ -162,13 +171,17 @@ namespace chocolatey.infrastructure.tolerance
             {
                 var exceptionMessage = log_is_in_debug_mode() ? ex.ToString() : ex.Message;
 
-                if (logWarningInsteadOfError)
+                if (logDebugInsteadOfError)
                 {
-                    "chocolatey".Log().Warn("{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
+                    "chocolatey".Log().Debug(logLocation, "{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
+                }
+                else if (logWarningInsteadOfError)
+                {
+                    "chocolatey".Log().Warn(logLocation, "{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
                 }
                 else
                 {
-                    "chocolatey".Log().Error("{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
+                    "chocolatey".Log().Error(logLocation, "{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
                 }
 
                 if (throwError)

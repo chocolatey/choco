@@ -58,6 +58,11 @@ namespace chocolatey.infrastructure.services
 
         public void serialize<XmlType>(XmlType xmlType, string xmlFilePath)
         {
+            serialize(xmlType,xmlFilePath, isSilent: false);
+        }
+
+        public void serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent)
+        {
             _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(xmlFilePath));
 
             var xmlUpdateFilePath = xmlFilePath + ".update";
@@ -86,7 +91,8 @@ namespace chocolatey.infrastructure.services
                     _fileSystem.delete_file(xmlUpdateFilePath);
                 },
                 "Error serializing type {0}".format_with(typeof(XmlType)),
-                throwError: true);
+                throwError: true, 
+                isSilent: isSilent);
         }
     }
 }
