@@ -1,4 +1,4 @@
-## [0.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.10+is%3Aclosed) (unreleased)
+## [0.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.10+is%3Aclosed) (June 17, 2016)
 
 ![Chocolatey Logo](https://cdn.rawgit.com/chocolatey/choco/14a627932c78c8baaba6bef5f749ebfa1957d28d/docs/logo/chocolateyicon.gif "Chocolatey")
 
