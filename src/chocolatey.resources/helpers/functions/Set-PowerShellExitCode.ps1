@@ -41,9 +41,14 @@ Allows splatting with arguments that do not apply. Do not use directly.
 Set-PowerShellExitCode 3010
 #>
 param (
-  [parameter(Mandatory=$true, Position=0)][int] $exitCode,
+  [parameter(Mandatory=$false, Position=0)][int] $exitCode,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
+
+  if ($exitCode -eq $null -or $exitCode -eq '') {
+    Write-Debug '$exitCode was passed null'
+    return
+  }
 
   try {
     $host.SetShouldExit($exitCode);  

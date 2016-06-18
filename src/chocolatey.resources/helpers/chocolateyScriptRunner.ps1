@@ -58,7 +58,7 @@ if ($env:ChocolateyExitCode -ne $null -and $env:ChocolateyExitCode -ne '') {
  $exitCode = $env:ChocolateyExitCode
 }
 
-if ($exitCode -ne 0) {
+if ($exitCode -ne $null -and $exitCode -ne '' -and $exitCode -ne 0) {
   Set-PowerShellExitCode $exitCode
 }
 
