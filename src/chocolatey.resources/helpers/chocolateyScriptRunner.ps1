@@ -40,7 +40,7 @@ $extensionsPath = Join-Path $nugetPath 'extensions'
 $chocInstallVariableName = "ChocolateyInstall"
 $chocoTools = Join-Path $nuGetPath 'tools'
 $nugetExe = Join-Path $chocoTools 'nuget.exe'
-$7zip = Join-Path $chocoTools '7za.exe'
+$7zip = Join-Path $chocoTools '7z.exe'
 $ShimGen = Join-Path $chocoTools 'shimgen.exe'
 $checksumExe = Join-Path $chocoTools 'checksum.exe'
 
