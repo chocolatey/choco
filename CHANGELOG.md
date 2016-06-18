@@ -1,3 +1,13 @@
+## [0.9.10.1](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.10.1+is%3Aclosed) (June 17, 2016)
+
+### BUG FIXES
+
+ * Fix - Cannot bind argument to parameter 'exitCode' because it is null - see [#810](https://github.com/chocolatey/choco/issues/810)
+
+### IMPROVEMENTS
+
+ * [Security] Upgrade to 7zip 16.02 to overcome CVE-2016-2334/CVE-2016-2335 - see [#812](https://github.com/chocolatey/choco/issues/812)
+
 ## [0.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.10+is%3Aclosed) (June 17, 2016)
 
 ![Chocolatey Logo](https://cdn.rawgit.com/chocolatey/choco/14a627932c78c8baaba6bef5f749ebfa1957d28d/docs/logo/chocolateyicon.gif "Chocolatey")
