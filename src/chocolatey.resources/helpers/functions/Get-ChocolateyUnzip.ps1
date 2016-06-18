@@ -36,6 +36,9 @@ publicly (like on the community feed). Otherwise, please use
 Install-ChocolateyZipPackage to download those resources from their
 official distribution points.
 
+Starting in 0.9.10, will automatically call Set-PowerShellExitCode to
+set the package exit code based on 7-zip's exit code.
+
 .PARAMETER FileFullPath
 This is the full path to the zip file. If embedding it in the package
 next to the install script, the path will be like

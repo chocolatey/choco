@@ -23,6 +23,12 @@ specified, it is run with PowerShell.
 .NOTES
 This command will assert UAC/Admin privileges on the machine.
 
+Starting in 0.9.10, will automatically call Set-PowerShellExitCode to
+set the package exit code in the following ways:
+
+- 4 if the binary turns out to be a text file.
+- The same exit code returned from the process that is run. If a 3010 is returned, it will set 3010 for the package.
+
 .INPUTS
 None
 
