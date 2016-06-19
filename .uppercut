@@ -18,7 +18,7 @@
   <property name="version.major" value="0" overwrite="false" />
   <property name="version.minor" value="9" overwrite="false" />
   <property name="version.patch" value="10" overwrite="false" />
-  <property name="version.fix" value="1" overwrite="false" />
+  <property name="version.fix" value="2" overwrite="false" />
   <property name="version.nuget.prerelease" value="" overwrite="false" />
   <property name="version.use.build_date" value="false" overwrite="false" />
   <property name="assembly.description" value="${project.name} is a product of ${company.name} - All Rights Reserved." overwrite="false" />
