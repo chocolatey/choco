@@ -201,7 +201,7 @@ Pro / Business supports a single, ubiquitous install directory option.
     $msiArgs = "/i `"$file`""
     if ($overrideArguments) {
       $msiArgs = "$msiArgs $additionalInstallArgs";
-      Write-Host "Overriding package arguments with `'$additionalInstallArgs`'";
+      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
     } else {
       $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
     }
@@ -212,7 +212,7 @@ Pro / Business supports a single, ubiquitous install directory option.
   if ($fileType -like 'exe') {
     if ($overrideArguments) {
       $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes
-      write-host "Overriding package arguments with `'$additionalInstallArgs`'";
+      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
     } else {
       $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes
     }
@@ -222,11 +222,12 @@ Pro / Business supports a single, ubiquitous install directory option.
 
     if ($overrideArguments) {
       $msuArgs = "$file $additionalInstallArgs"
+      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
     } else {
       $msuArgs = "$file $silentArgs $additionalInstallArgs"
     }
     $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes
   }
 
-  write-host "$packageName has been installed."
+  Write-Host "$packageName has been installed."
 }
