@@ -310,13 +310,13 @@ namespace chocolatey.infrastructure.app.builders
                     {
                         option_set
                             .Add("d|debug",
-                                 "Debug - Run in Debug Mode.",
+                                 "Debug - Show debug messaging.",
                                  option => config.Debug = option != null)
                             .Add("v|verbose",
-                                 "Verbose - See verbose messaging.",
+                                 "Verbose - Show verbose messaging.",
                                  option => config.Verbose = option != null)
                             .Add("acceptlicense|accept-license",
-                                 "AcceptLicense - Accept license dialogs automatically.",
+                                 "AcceptLicense - Accept license dialogs automatically. Reserved for future use.",
                                  option => config.AcceptLicense = option != null)
                             .Add("y|yes|confirm",
                                  "Confirm all prompts - Chooses affirmative answer instead of prompting. Implies --accept-license",
@@ -326,10 +326,10 @@ namespace chocolatey.infrastructure.app.builders
                                          config.AcceptLicense = option != null;
                                      })
                             .Add("f|force",
-                                 "Force - force the behavior",
+                                 "Force - force the behavior. Do not use force during normal operation - it subverts some of the smart behavior for commands.",
                                  option => config.Force = option != null)
                             .Add("noop|whatif|what-if",
-                                 "NoOp - Don't actually do anything.",
+                                 "NoOp / WhatIf - Don't actually do anything.",
                                  option => config.Noop = option != null)
                             .Add("r|limitoutput|limit-output",
                                  "LimitOutput - Limit the output to essential information",
@@ -355,7 +355,7 @@ namespace chocolatey.infrastructure.app.builders
                                  "FailOnStandardError - Fail on standard error output (stderr), typically received when running external commands during install providers. This overrides the feature failOnStandardError.",
                                  option => config.Features.FailOnStandardError = option != null)
                             .Add("use-system-powershell",
-                                 "UseSystemPowerShell - Execute PowerShell using an external process instead of the built-in PowerShell host. Available in 0.9.10+.",
+                                 "UseSystemPowerShell - Execute PowerShell using an external process instead of the built-in PowerShell host. Should only be used when internal host is failing. Available in 0.9.10+.",
                                  option => config.Features.UsePowerShellHost = option == null)
                             ;
                     },
