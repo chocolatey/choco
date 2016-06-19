@@ -52,7 +52,9 @@ namespace chocolatey
             _handler = (sender, args) =>
             {
                 var requestedAssembly = new AssemblyName(args.Name);
-                if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey))
+                if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
+                    && !requestedAssembly.Name.is_equal_to("chocolatey.licensed") 
+                    && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
                 {
                      return typeof(Lets).Assembly;
                 }
