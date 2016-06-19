@@ -124,6 +124,10 @@ param(
     }
     
     if ($success) { break; }
+    if ($attempt -eq 10) {
+      Write-Warning "Found more than 10 bad registry keys. Run command again with `'--verbose --debug`' for details."
+      Write-Debug "Each key searched should correspond to an installed program. It is very unlikely to have more than a few programs with incorrectly encoded keys, if any at all. This may be indicative of one or more corrupted registry branches."
+    }
   }
   
   if ($($foundkey.Count) -eq $null) {
