@@ -197,11 +197,30 @@ Pro / Business supports a single, ubiquitous install directory option.
   }
   $overrideArguments = $env:chocolateyInstallOverride;
 
+  # remove \chocolatey\chocolatey\
+  $silentArgs = $silentArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+  $additionalInstallArgs = $additionalInstallArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+
+  try {
+    # make sure any logging folder exists 
+    $pattern = "(?:['`"])([a-zA-Z]\:\\[^'`"]+)(?:[`"'])|([a-zA-Z]\:\\[\S]+)"
+    $silentArgs, $additionalInstallArgs | %{ Select-String $pattern -input $_ -AllMatches } | 
+      % { $_.Matches } | % {
+        $argDirectory = $_.Groups[1]
+        if ($argDirectory -eq $null -or $argDirectory -eq '') { continue }
+        $argDirectory = [System.IO.Path]::GetFullPath([System.IO.Path]::GetDirectoryName($argDirectory))
+        Write-Debug "Ensuring '$argDirectory' exists"
+        if (![System.IO.Directory]::Exists($argDirectory)) { [System.IO.Directory]::CreateDirectory($argDirectory) | Out-Null }
+      }
+  } catch {
+    Write-Debug "Error ensuring directories exist -  $($_.Exception.Message)"
+  }
+
   if ($fileType -like 'msi') {
     $msiArgs = "/i `"$file`""
     if ($overrideArguments) {
       $msiArgs = "$msiArgs $additionalInstallArgs";
-      Write-Host "Overriding package arguments with `'$additionalInstallArgs`'";
+      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
     } else {
       $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
     }
@@ -212,7 +231,7 @@ Pro / Business supports a single, ubiquitous install directory option.
   if ($fileType -like 'exe') {
     if ($overrideArguments) {
       $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes
-      write-host "Overriding package arguments with `'$additionalInstallArgs`'";
+      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
     } else {
       $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes
     }
@@ -222,11 +241,12 @@ Pro / Business supports a single, ubiquitous install directory option.
 
     if ($overrideArguments) {
       $msuArgs = "$file $additionalInstallArgs"
+      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
     } else {
       $msuArgs = "$file $silentArgs $additionalInstallArgs"
     }
     $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes
   }
 
-  write-host "$packageName has been installed."
+  Write-Host "$packageName has been installed."
 }

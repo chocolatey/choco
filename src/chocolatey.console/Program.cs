@@ -19,7 +19,7 @@ namespace chocolatey.console
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using infrastructure.adapters;
+    using System.Reflection;
     using infrastructure.app;
     using infrastructure.app.builders;
     using infrastructure.app.configuration;
@@ -31,6 +31,7 @@ namespace chocolatey.console
     using infrastructure.logging;
     using infrastructure.registration;
     using resources;
+    using Assembly = infrastructure.adapters.Assembly;
     using Console = System.Console;
     using Environment = System.Environment;
     using IFileSystem = infrastructure.filesystem.IFileSystem;
@@ -43,6 +44,8 @@ namespace chocolatey.console
         {
             try
             {
+                add_assembly_resolver();
+
                 string loggingLocation = ApplicationParameters.LoggingLocation;
                 //no file system at this point
                 if (!Directory.Exists(loggingLocation)) Directory.CreateDirectory(loggingLocation);
@@ -159,6 +162,26 @@ namespace chocolatey.console
                 Bootstrap.shutdown();
                 Environment.Exit(Environment.ExitCode);
             }
+        }
+
+        private static ResolveEventHandler _handler = null;
+
+        private static void add_assembly_resolver()
+        {
+            _handler = (sender, args) =>
+            {
+                var requestedAssembly = new AssemblyName(args.Name);
+                if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
+                    && !requestedAssembly.Name.is_equal_to("chocolatey.licensed")
+                    && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
+                {
+                    return typeof(ConsoleApplication).Assembly;
+                }
+
+                return null;
+            };
+
+            AppDomain.CurrentDomain.AssemblyResolve += _handler;
         }
 
         private static void report_version_and_exit_if_requested(string[] args, ChocolateyConfiguration config)

@@ -126,6 +126,9 @@ Creating Chocolatey folders if they do not already exist.
 
   Add-ChocolateyProfile
   Install-DotNet4IfMissing
+  if ($env:ChocolateyExitCode -eq $null -or $env:ChocolateyExitCode -eq '') {
+    $env:ChocolateyExitCode = 0
+  }
 
 @"
 Chocolatey (choco.exe) is now ready.
