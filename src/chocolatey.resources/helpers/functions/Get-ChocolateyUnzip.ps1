@@ -96,7 +96,7 @@ param(
   }
 
   Write-Host "Extracting $fileFullPath to $destination..."
-  if (![System.IO.Directory]::Exists($destination)) {[System.IO.Directory]::CreateDirectory($destination)}
+  if (![System.IO.Directory]::Exists($destination)) { [System.IO.Directory]::CreateDirectory($destination) | Out-Null }
 
   $7zip = Join-Path "$helpersPath" '..\tools\7za.exe'
   if (!([System.IO.File]::Exists($7zip))) {
