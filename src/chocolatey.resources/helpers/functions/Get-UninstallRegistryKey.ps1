@@ -106,9 +106,8 @@ param(
   [array]$keys = Get-ChildItem -Path @($machine_key6432, $machine_key, $local_key) `
                                -ErrorAction SilentlyContinue
 
-  Write-Debug "Error handling check: Get-ItemProperty will fail if a registry key is written incorrectly."
-  Write-Debug "If such a key is found, loop up to 10 times to try to bypass all badKeys"
-  [int]$maxAttempts = 10
+  Write-Debug "Error handling check: Get-ItemProperty will fail if a registry key is encoded incorrectly."
+  [int]$maxAttempts = $keys.Count
   for ([int]$attempt = 1; $attempt -le $maxAttempts; $attempt++) {
     [bool]$success = $FALSE
     
@@ -127,6 +126,9 @@ param(
     if ($success) { break; }
   }
   
+  if ($($foundkey.Count) -eq $null) {
+    Write-Verbose "No registry key found with SoftwareName:`'$softwareName`'";
+  }
   return $foundKey
 }
 
