@@ -120,10 +120,8 @@ param(
     } catch {
       Write-Debug "Found bad key."
       foreach ($key in $keys){ try { Get-ItemProperty $key.PsPath > $null } catch { $badKey = $key.PsPath }}
-      Write-Verbose "Skipping bad key: $($key.PsPath)"
-      [array]$keys = Get-ChildItem -Path @($machine_key6432, $machine_key, $local_key) `
-                                   -ErrorAction SilentlyContinue `
-                     | Where-Object { $badKey -NotContains $_.PsPath }
+      Write-Verbose "Skipping bad key: $badKey"
+      [array]$keys = $keys | Where-Object { $badKey -NotContains $_.PsPath }
     }
     
     if ($success) { break; }
