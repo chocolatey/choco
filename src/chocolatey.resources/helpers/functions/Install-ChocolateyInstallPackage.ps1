@@ -197,6 +197,10 @@ Pro / Business supports a single, ubiquitous install directory option.
   }
   $overrideArguments = $env:chocolateyInstallOverride;
 
+  # remove \chocolatey\chocolatey\
+  $silentArgs = $silentArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+  $additionalInstallArgs = $additionalInstallArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+
   if ($fileType -like 'msi') {
     $msiArgs = "/i `"$file`""
     if ($overrideArguments) {
