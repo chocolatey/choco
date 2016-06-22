@@ -156,7 +156,7 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
 
   $process = New-Object System.Diagnostics.Process
   $process.EnableRaisingEvents = $true
-  Register-ObjectEvent  -InputObject $process -SourceIdentifier "LogOutput_ChocolateyProc" -EventName OutputDataReceived -Action $writeOutput | Out-Null
+  Register-ObjectEvent -InputObject $process -SourceIdentifier "LogOutput_ChocolateyProc" -EventName OutputDataReceived -Action $writeOutput | Out-Null
   Register-ObjectEvent -InputObject $process -SourceIdentifier "LogErrors_ChocolateyProc" -EventName ErrorDataReceived -Action  $writeError | Out-Null
 
   #$process.StartInfo = New-Object System.Diagnostics.ProcessStartInfo($exeToRun, $wrappedStatements)
@@ -191,6 +191,9 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   # them to do so. Without this it never finishes.
   Unregister-Event -SourceIdentifier "LogOutput_ChocolateyProc"
   Unregister-Event -SourceIdentifier "LogErrors_ChocolateyProc"
+  
+  # sometimes the process hasn't fully exited yet.
+  Start-Sleep 2
 
   $exitCode = $process.ExitCode
   $process.Dispose()
