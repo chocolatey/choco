@@ -167,7 +167,7 @@ param(
   Unregister-Event -SourceIdentifier "LogErrors_ChocolateyZipProc"
 
   # sometimes the process hasn't fully exited yet.
-  Start-Sleep 2
+  Start-Sleep 1
 
   $exitCode = $process.ExitCode
   Set-PowerShellExitCode $exitCode

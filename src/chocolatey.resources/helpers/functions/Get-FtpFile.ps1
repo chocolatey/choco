@@ -198,5 +198,7 @@ param(
     if ($ftpresponse -ne $null) {
       $ftpresponse.Close()
     }
+
+    Start-Sleep 1
   }
 }

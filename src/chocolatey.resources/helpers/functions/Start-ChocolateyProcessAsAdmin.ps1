@@ -193,7 +193,7 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   Unregister-Event -SourceIdentifier "LogErrors_ChocolateyProc"
   
   # sometimes the process hasn't fully exited yet.
-  Start-Sleep 2
+  Start-Sleep 1
 
   $exitCode = $process.ExitCode
   $process.Dispose()
