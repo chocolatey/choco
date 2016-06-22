@@ -78,7 +78,7 @@ Install-ChocolateyPackage
 Install-ChocolateyInstallPackage
 #>
 param(
-  [parameter(Mandatory=$true, Position=0)][string] $statements,
+  [parameter(Mandatory=$false, Position=0)][string] $statements,
   [parameter(Mandatory=$false, Position=1)][string] $exeToRun = 'powershell',
   [parameter(Mandatory=$false)][switch] $minimized,
   [parameter(Mandatory=$false)][switch] $noSleep,
