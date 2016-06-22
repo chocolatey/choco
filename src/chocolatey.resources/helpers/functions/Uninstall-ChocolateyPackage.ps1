@@ -139,6 +139,5 @@ param(
     }
   }
 
-  write-host "$packageName has been uninstalled."
-  #cutStart-Sleep 3
+  Write-Host "$packageName has been uninstalled."
 }
