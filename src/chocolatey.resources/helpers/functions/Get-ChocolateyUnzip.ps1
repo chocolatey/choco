@@ -18,8 +18,11 @@ function Get-ChocolateyUnzip {
 Unzips an archive file and returns the location for further processing.
 
 .DESCRIPTION
-This unzips files using the 7-zip standalone command line tool 7za.exe.
-Supported archive formats are: 7z, lzma, cab, zip, gzip, bzip2, and tar.
+This unzips files using the 7-zip command line tool 7z.exe.
+Supported archive formats are listed at:
+https://sevenzip.osdn.jp/chm/general/formats.htm
+Prior to 0.9.10.1, 7za.exe was used. Supported archive formats for 
+7za.exe are: 7z, lzma, cab, zip, gzip, bzip2, and tar.
 
 .INPUTS
 None
@@ -98,15 +101,15 @@ param(
   Write-Host "Extracting $fileFullPath to $destination..."
   if (![System.IO.Directory]::Exists($destination)) { [System.IO.Directory]::CreateDirectory($destination) | Out-Null }
 
-  $7zip = Join-Path "$helpersPath" '..\tools\7za.exe'
+  $7zip = Join-Path "$helpersPath" '..\tools\7z.exe'
   if (!([System.IO.File]::Exists($7zip))) {
     Update-SessionEnvironment
-    $7zip = Join-Path "$env:ChocolateyInstall" 'tools\7za.exe'
+    $7zip = Join-Path "$env:ChocolateyInstall" 'tools\7z.exe'
   }
   $7zip = [System.IO.Path]::GetFullPath($7zip)
   Write-Debug "7zip found at `'$7zip`'"
 
-  # 32-bit 7za.exe would not find C:\Windows\System32\config\systemprofile\AppData\Local\Temp,
+  # 32-bit 7z.exe would not find C:\Windows\System32\config\systemprofile\AppData\Local\Temp,
   # because it gets translated to C:\Windows\SysWOW64\... by the WOW redirection layer.
   # Replace System32 with sysnative, which does not get redirected.
   if ([IntPtr]::Size -ne 4) {
@@ -117,7 +120,7 @@ param(
     $destination32 = $destination
   }
 
-  $params = "x -aoa -o`"$destination`" -y `"$fileFullPath`""
+  $params = "x -aoa -bd -bb1 -o`"$destination`" -y `"$fileFullPath`""
   Write-Debug "Executing command ['$7zip' $params]"
 
   # Capture 7z's output into a StringBuilder and write it out in blocks, to improve I/O performance.
@@ -129,8 +132,8 @@ param(
     if ($EventArgs.Data -ne $null) {
       $line = $EventArgs.Data
       Write-Verbose "$line"
-      if ($line.StartsWith("Extracting")) {
-        $global:zipFileList.AppendLine($global:zipDestinationFolder + "\" + $line.Substring(12))
+      if ($line.StartsWith("- ")) { 
+        $global:zipFileList.AppendLine($global:zipDestinationFolder + "\" + $line.Substring(2))
       }
     }
   }
@@ -143,7 +146,7 @@ param(
 
   $process = New-Object System.Diagnostics.Process
   $process.EnableRaisingEvents = $true
-  Register-ObjectEvent  -InputObject $process -SourceIdentifier "LogOutput_ChocolateyZipProc" -EventName OutputDataReceived -Action $writeOutput | Out-Null
+  Register-ObjectEvent -InputObject $process -SourceIdentifier "LogOutput_ChocolateyZipProc" -EventName OutputDataReceived -Action $writeOutput | Out-Null
   Register-ObjectEvent -InputObject $process -SourceIdentifier "LogErrors_ChocolateyZipProc" -EventName ErrorDataReceived -Action  $writeError | Out-Null
 
   $process.StartInfo = new-object System.Diagnostics.ProcessStartInfo($7zip, $params)
@@ -153,7 +156,7 @@ param(
   $process.StartInfo.WorkingDirectory = Get-Location
   $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
 
-  [void] $process.Start()
+  $process.Start() | Out-Null
   if ($process.StartInfo.RedirectStandardOutput) { $process.BeginOutputReadLine() }
   if ($process.StartInfo.RedirectStandardError) { $process.BeginErrorReadLine() }
   $process.WaitForExit()
@@ -172,7 +175,7 @@ param(
     Set-Content $zipExtractLogFullPath $global:zipFileList.ToString() -Encoding UTF8 -Force
   }
 
-  Write-Debug "7za exit code: $exitCode"
+  Write-Debug "7z exit code: $exitCode"
   switch ($exitCode) {
     0 { break }
     1 { throw 'Some files could not be extracted' } # this one is returned e.g. for access denied errors

@@ -158,7 +158,7 @@ namespace chocolatey.infrastructure.app.services
         private void unzip_die_files(string zipPath, string extractDirectory)
         {
             //todo: replace with https://github.com/adamhathcock/sharpcompress
-            var sevenZip = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "7za.exe");
+            var sevenZip = _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "tools", "7z.exe");
             CommandExecutor.execute_static(sevenZip, "x -aoa -o\"{0}\" -y \"{1}\"".format_with(extractDirectory, zipPath), 30, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
         }
     }
