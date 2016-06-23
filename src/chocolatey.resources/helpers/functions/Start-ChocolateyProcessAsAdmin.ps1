@@ -85,7 +85,8 @@ param(
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  [statements]$statements = $statements -join ' '
+  [string]$statements = $statements -join ' '
+  
   Write-Debug "Running 'Start-ChocolateyProcessAsAdmin' with exeToRun:`'$exeToRun`', statements: `'$statements`' ";
 
   $wrappedStatements = $statements
