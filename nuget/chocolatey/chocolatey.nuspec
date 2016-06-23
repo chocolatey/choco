@@ -55,6 +55,23 @@ In that mess there is a link to the [PowerShell Chocolatey module reference](htt
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
 
+## 0.9.10.3
+
+### BUG FIXES
+
+ * Fix - Ignore ValidPackage Exit Codes for Real - see [#827](https://github.com/chocolatey/choco/issues/827)
+ * Fix - Cache folder running under SYSTEM account should be C:\Windows\TEMP - see [#826](https://github.com/chocolatey/choco/issues/826)
+ * Fix - Built-in 7zip doesn't behave properly - see [#775](https://github.com/chocolatey/choco/issues/775)
+ * Fix - Successful installer exit codes not recognized by choco should return 0 - see [#821](https://github.com/chocolatey/choco/issues/821)
+ * Fix - NotSilent fails with "Cannot bind argument to parameter statements because it is an empty string" - see [#819](https://github.com/chocolatey/choco/issues/819)
+ * Fix - Silent Args being passed as a string array cause package failure - see [#808](https://github.com/chocolatey/choco/issues/808)
+
+### IMPROVEMENTS
+
+ * Hold pending check for 10 seconds / provide means of explicitly overriding the transactional install cleanup - see [#822](https://github.com/chocolatey/choco/issues/822)
+ * Pro/Business - Add runtime skip option to allow skipping the virus scanner - see [#786](https://github.com/chocolatey/choco/issues/786)
+
+
 ## 0.9.10.2
 
 ### BUG FIXES
