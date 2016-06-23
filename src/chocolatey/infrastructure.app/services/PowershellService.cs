@@ -301,6 +301,11 @@ namespace chocolatey.infrastructure.app.services
                         failure = true;
                     }
 
+                    if (!configuration.Features.UsePackageExitCodes)
+                    {
+                        Environment.ExitCode = failure ? 1 : 0;
+                    }
+
                     if (failure)
                     {
                         packageResult.Messages.Add(new ResultMessage(ResultType.Error, "Error while running '{0}'.{1} See log for details.".format_with(chocoPowerShellScript, Environment.NewLine)));
