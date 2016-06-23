@@ -202,6 +202,12 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   if ($validExitCodes -notcontains $exitCode) {
     Set-PowerShellExitCode $exitCode
     throw "Running [`"$exeToRun`" $statements] was not successful. Exit code was '$exitCode'. See log for possible error messages."
+  } else {
+    $chocoSuccessCodes = @(0, 1605, 1614, 1641, 3010)
+    if ($chocoSuccessCodes -notcontains $exitCode) {
+      Write-Warning "Exit code '$exitCode' was considered valid, but not as a choco success code. Returning 0"
+      $exitCode = 0
+    }
   }
 
   Write-Debug "Finishing 'Start-ChocolateyProcessAsAdmin'"
