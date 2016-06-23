@@ -78,13 +78,14 @@ Install-ChocolateyPackage
 Install-ChocolateyInstallPackage
 #>
 param(
-  [parameter(Mandatory=$false, Position=0)][string] $statements,
+  [parameter(Mandatory=$false, Position=0)][string[]] $statements,
   [parameter(Mandatory=$false, Position=1)][string] $exeToRun = 'powershell',
   [parameter(Mandatory=$false)][switch] $minimized,
   [parameter(Mandatory=$false)][switch] $noSleep,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
+  [statements]$statements = $statements -join ' '
   Write-Debug "Running 'Start-ChocolateyProcessAsAdmin' with exeToRun:`'$exeToRun`', statements: `'$statements`' ";
 
   $wrappedStatements = $statements

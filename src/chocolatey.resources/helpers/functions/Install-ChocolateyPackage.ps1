@@ -216,7 +216,7 @@ param(
   [parameter(Mandatory=$true, Position=0)][string] $packageName,
   [parameter(Mandatory=$false, Position=1)]
   [alias("installerType","installType")][string] $fileType = 'exe',
-  [parameter(Mandatory=$false, Position=2)][string] $silentArgs = '',
+  [parameter(Mandatory=$false, Position=2)][string[]] $silentArgs = '',
   [parameter(Mandatory=$false, Position=3)][string] $url = '',
   [parameter(Mandatory=$false, Position=4)]
   [alias("url64")][string] $url64bit = '',
@@ -230,6 +230,7 @@ param(
   [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
+  [string]$silentArgs = $silentArgs -join ' '
 
   Write-Debug "Running 'Install-ChocolateyPackage' for $packageName with url:`'$url`', args: `'$silentArgs`', fileType: `'$fileType`', url64bit: `'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`', validExitCodes: `'$validExitCodes`' ";
 
