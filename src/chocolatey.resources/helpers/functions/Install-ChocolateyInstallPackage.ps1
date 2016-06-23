@@ -184,10 +184,10 @@ param(
   if ($additionalInstallArgs -eq $null) {
     $additionalInstallArgs = '';
   } else {
-    if ($additionalInstallArgs -match 'installdir' -or `
-      $additionalInstallArgs -match 'targetdir' -or `
+    if ($additionalInstallArgs -match 'INSTALLDIR' -or `
+      $additionalInstallArgs -match 'TARGETDIR' -or `
       $additionalInstallArgs -match 'dir\=' -or `
-      $additionalInstallArgs -match '\/d\='
+      $additionalInstallArgs -match '\/D\='
     ) {
 @"
 Pro / Business supports a single, ubiquitous install directory option.
