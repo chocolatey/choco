@@ -323,6 +323,8 @@ param(
     if ($res -ne $null) {
       $res.Close()
     }
+
+    Start-Sleep 1
   }
 }
 

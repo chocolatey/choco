@@ -52,6 +52,8 @@ namespace chocolatey.infrastructure.app.registration
             container.Register(() => configuration, Lifestyle.Singleton);
             container.Register<IFileSystem, DotNetFileSystem>(Lifestyle.Singleton);
             container.Register<IXmlService, XmlService>(Lifestyle.Singleton);
+            container.Register<IDateTimeService, SystemDateTimeUtcService>(Lifestyle.Singleton);
+
             //nuget
             container.Register<ILogger, ChocolateyNugetLogger>(Lifestyle.Singleton);
             container.Register<INugetService, NugetService>(Lifestyle.Singleton);
@@ -119,14 +121,12 @@ namespace chocolatey.infrastructure.app.registration
               {
                   var list = new List<ITask>
                     {
-                        new RemovePendingPackagesTask(container.GetInstance<IFileSystem>())
+                        new RemovePendingPackagesTask(container.GetInstance<IFileSystem>(), container.GetInstance<IDateTimeService>())
                     };
 
                   return list.AsReadOnly();
               },
               Lifestyle.Singleton);
-
-            container.Register<IDateTimeService, SystemDateTimeUtcService>(Lifestyle.Singleton);
         }
     }
 

@@ -78,13 +78,14 @@ Install-ChocolateyPackage
 Install-ChocolateyInstallPackage
 #>
 param(
-  [parameter(Mandatory=$true, Position=0)][string] $statements,
+  [parameter(Mandatory=$false, Position=0)][string[]] $statements,
   [parameter(Mandatory=$false, Position=1)][string] $exeToRun = 'powershell',
   [parameter(Mandatory=$false)][switch] $minimized,
   [parameter(Mandatory=$false)][switch] $noSleep,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
+  [statements]$statements = $statements -join ' '
   Write-Debug "Running 'Start-ChocolateyProcessAsAdmin' with exeToRun:`'$exeToRun`', statements: `'$statements`' ";
 
   $wrappedStatements = $statements
@@ -156,7 +157,7 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
 
   $process = New-Object System.Diagnostics.Process
   $process.EnableRaisingEvents = $true
-  Register-ObjectEvent  -InputObject $process -SourceIdentifier "LogOutput_ChocolateyProc" -EventName OutputDataReceived -Action $writeOutput | Out-Null
+  Register-ObjectEvent -InputObject $process -SourceIdentifier "LogOutput_ChocolateyProc" -EventName OutputDataReceived -Action $writeOutput | Out-Null
   Register-ObjectEvent -InputObject $process -SourceIdentifier "LogErrors_ChocolateyProc" -EventName ErrorDataReceived -Action  $writeError | Out-Null
 
   #$process.StartInfo = New-Object System.Diagnostics.ProcessStartInfo($exeToRun, $wrappedStatements)
@@ -191,6 +192,9 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   # them to do so. Without this it never finishes.
   Unregister-Event -SourceIdentifier "LogOutput_ChocolateyProc"
   Unregister-Event -SourceIdentifier "LogErrors_ChocolateyProc"
+  
+  # sometimes the process hasn't fully exited yet.
+  Start-Sleep 1
 
   $exitCode = $process.ExitCode
   $process.Dispose()
@@ -199,6 +203,12 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   if ($validExitCodes -notcontains $exitCode) {
     Set-PowerShellExitCode $exitCode
     throw "Running [`"$exeToRun`" $statements] was not successful. Exit code was '$exitCode'. See log for possible error messages."
+  } else {
+    $chocoSuccessCodes = @(0, 1605, 1614, 1641, 3010)
+    if ($chocoSuccessCodes -notcontains $exitCode) {
+      Write-Warning "Exit code '$exitCode' was considered valid, but not as a choco success code. Returning 0"
+      $exitCode = 0
+    }
   }
 
   Write-Debug "Finishing 'Start-ChocolateyProcessAsAdmin'"

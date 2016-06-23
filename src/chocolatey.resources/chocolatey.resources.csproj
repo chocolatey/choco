@@ -81,8 +81,6 @@
     <EmbeddedResource Include="redirects\cuninst.exe.ignore" />
     <EmbeddedResource Include="redirects\cup.exe.ignore" />
     <EmbeddedResource Include="redirects\cver.exe.ignore" />
-    <EmbeddedResource Include="tools\7za.exe.ignore" />
-    <EmbeddedResource Include="tools\7za.exe.manifest" />
     <EmbeddedResource Include="tools\checksum.exe.ignore" />
     <EmbeddedResource Include="tools\shimgen.exe.ignore" />
   </ItemGroup>
@@ -97,7 +95,6 @@
     <EmbeddedResource Include="redirects\cuninst.exe" />
     <EmbeddedResource Include="redirects\cup.exe" />
     <EmbeddedResource Include="redirects\cver.exe" />
-    <EmbeddedResource Include="tools\7za.exe" />
     <EmbeddedResource Include="tools\7zip.license.txt" />
     <EmbeddedResource Include="tools\checksum.exe" />
     <EmbeddedResource Include="tools\checksum.license.txt" />
@@ -151,6 +148,14 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="helpers\functions\Get-UninstallRegistryKey.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="tools\7z.dll" />
+    <EmbeddedResource Include="tools\7z.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="tools\7z.exe.ignore" />
+    <EmbeddedResource Include="tools\7z.exe.manifest" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

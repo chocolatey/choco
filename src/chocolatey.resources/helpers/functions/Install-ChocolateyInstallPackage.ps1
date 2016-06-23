@@ -143,13 +143,15 @@ param(
   [parameter(Mandatory=$true, Position=0)][string] $packageName,
   [parameter(Mandatory=$false, Position=1)]
   [alias("installerType","installType")][string] $fileType = 'exe',
-  [parameter(Mandatory=$false, Position=2)][string] $silentArgs = '',
+  [parameter(Mandatory=$false, Position=2)][string[]] $silentArgs = '',
   [parameter(Mandatory=$true, Position=3)][string] $file,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
   [parameter(Mandatory=$false)]
   [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
+  [string]$silentArgs = $silentArgs -join ' '
+
   Write-Debug "Running 'Install-ChocolateyInstallPackage' for $packageName with file:`'$file`', args: `'$silentArgs`', fileType: `'$fileType`', validExitCodes: `'$validExitCodes`', useOnlyPackageSilentArguments: '$($useOnlyPackageSilentArguments.IsPresent)'";
   $installMessage = "Installing $packageName..."
   Write-Host $installMessage

@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.app.tasks
     using events;
     using filesystem;
     using infrastructure.events;
+    using infrastructure.services;
     using infrastructure.tasks;
     using logging;
     using tolerance;
@@ -28,11 +29,15 @@ namespace chocolatey.infrastructure.app.tasks
     public class RemovePendingPackagesTask : ITask
     {
         private readonly IFileSystem _fileSystem;
+        private readonly IDateTimeService _dateTimeService;
         private IDisposable _subscription;
+        private const int PENDING_FILE_AGE_SECONDS = 10;
+        private const string PENDING_SKIP_FILE = ".chocolateyPendingSkip";
 
-        public RemovePendingPackagesTask(IFileSystem fileSystem)
+        public RemovePendingPackagesTask(IFileSystem fileSystem, IDateTimeService dateTimeService)
         {
             _fileSystem = fileSystem;
+            _dateTimeService = dateTimeService;
         }
 
         public void initialize()
@@ -54,8 +59,25 @@ namespace chocolatey.infrastructure.app.tasks
             foreach (var pendingFile in pendingFiles.or_empty_list_if_null())
             {
                 var packageFolder = _fileSystem.get_directory_name(pendingFile);
-                this.Log().Warn("[Pending] Removing incomplete install for '{0}'".format_with(_fileSystem.get_directory_info_for(packageFolder).Name));
+                var packageFolderName = _fileSystem.get_directory_info_for(packageFolder).Name;
 
+                var pendingSkipFiles = _fileSystem.get_files(packageFolder, PENDING_SKIP_FILE, SearchOption.AllDirectories).ToList();
+                if (pendingSkipFiles.Count != 0)
+                {
+                    this.Log().Warn("Pending file found for {0}, but a {1} file was also found. Skipping removal".format_with(packageFolderName, PENDING_SKIP_FILE));
+                    continue;
+                }
+
+                // wait for the file to be at least x seconds old
+                // this allows commands running from the package for configuring sources, etc
+                var fileInfo = _fileSystem.get_file_info_for(pendingFile);
+                if (fileInfo.CreationTimeUtc.AddSeconds(PENDING_FILE_AGE_SECONDS) > _dateTimeService.get_current_date_time())
+                {
+                    this.Log().Debug("Pending file found for {0}, but the file is not {1} seconds old yet.".format_with(packageFolderName, PENDING_FILE_AGE_SECONDS));
+                    continue;
+                }
+                
+                this.Log().Warn("[Pending] Removing incomplete install for '{0}'".format_with(packageFolderName));
                 FaultTolerance.retry(2, () => _fileSystem.delete_directory_if_exists(packageFolder, recursive: true, overrideAttributes: true, isSilent: true), 500, isSilent: true);
             }
         }
