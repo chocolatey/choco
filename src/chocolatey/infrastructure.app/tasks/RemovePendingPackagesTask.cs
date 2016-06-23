@@ -34,6 +34,10 @@ namespace chocolatey.infrastructure.app.tasks
         private const int PENDING_FILE_AGE_SECONDS = 10;
         private const string PENDING_SKIP_FILE = ".chocolateyPendingSkip";
 
+        public RemovePendingPackagesTask(IFileSystem fileSystem) : this(fileSystem, new SystemDateTimeUtcService())
+        {
+        }
+
         public RemovePendingPackagesTask(IFileSystem fileSystem, IDateTimeService dateTimeService)
         {
             _fileSystem = fileSystem;
