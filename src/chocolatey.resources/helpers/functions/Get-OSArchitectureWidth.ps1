@@ -45,7 +45,9 @@ param(
   Write-Debug "Running 'Get-OSArchitectureWidth'"
 
   $bits = 64
-  if ([System.IntPtr]::Size -eq 4) {
+  if (([System.IntPtr]::Size -eq 4) -and (Test-Path env:\PROCESSOR_ARCHITEW6432)) {
+    $bits = 64
+  } elseif ([System.IntPtr]::Size -eq 4) {
     $bits = 32
   }
 
