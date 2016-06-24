@@ -42,7 +42,7 @@ Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update
 
 ## Etiquette Regarding Communication
 
-When requesting support, try to remember that we are all volunteers that have lives outside of open source and none of us are paid to ensure things work for you, so please be considerate of others' time when you are asking for things. Many of us have families that also need time as well and only have so much time to give on a daily basis. In the future we hope that some of us are paid to do this full time and can provide better support when folks are running into issues, but until then a little consideration and patience can go a long way. After all, you are using a pretty good tool without cost. It may not be perfect (yet), and we know that.
+When requesting support, try to remember that we are all volunteers that have lives outside of open source and none of us are paid to ensure things work for you, so please be considerate of others' time when you are asking for things. Many of us have families that also need time as well and only have so much time to give on a daily basis. In the future, we hope that some of us are paid to do this full time and can provide better support when folks are running into issues, but until then a little consideration and patience can go a long way. After all, you are using a pretty good tool without cost. It may not be perfect (yet), and we know that.
 
 ## Information
 
@@ -81,7 +81,7 @@ Prerequisites:
 
  * The issue has to do with choco itself and is not a package or website issue.
  * Please check to see if your issue already exists with a quick search of the issues. Start with one relevant term and then add if you get too many results.
- * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) guidlines.
+ * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) guidelines.
  * You are not submitting a question - questions are better served as [emails](http://groups.google.com/group/chocolatey) or [gitter chat questions](https://gitter.im/chocolatey/choco).
  * Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
