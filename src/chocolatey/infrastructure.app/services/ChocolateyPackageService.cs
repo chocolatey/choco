@@ -750,23 +750,23 @@ Would have determined packages that are out of date based on what is
                    () => _fileSystem.move_file(dllFile, dllFile + ".old"),
                    "Attempted to rename '{0}' but had an error".format_with(dllFile));
                 }
+
+               FaultTolerance.try_catch_with_logging_exception(
+                            () =>
+                            {
+                                foreach (var file in _fileSystem.get_files(pkgExtensions, "*.*", SearchOption.AllDirectories).or_empty_list_if_null().Where(f=> !f.EndsWith(".dll.old")))
+                                {
+                                    FaultTolerance.try_catch_with_logging_exception(
+                                    () => _fileSystem.delete_file(file),
+                                    "Attempted to remove '{0}' but had an error".format_with(file),
+                                    throwError: false,
+                                    logWarningInsteadOfError: true);
+                                }
+                            },
+                            "Attempted to remove '{0}' but had an error".format_with(pkgExtensions),
+                            throwError: false,
+                            logWarningInsteadOfError: true);
             }
-            
-            FaultTolerance.try_catch_with_logging_exception(
-                () =>
-                {
-                    foreach (var file in _fileSystem.get_files(pkgExtensions, "*.*", SearchOption.AllDirectories).or_empty_list_if_null().Where(f=> !f.EndsWith(".dll.old")))
-                    {
-                        FaultTolerance.try_catch_with_logging_exception(
-                        () => _fileSystem.delete_file(file),
-                        "Attempted to remove '{0}' but had an error".format_with(file),
-                        throwError: false,
-                        logWarningInsteadOfError: true);
-                    }
-                },
-                "Attempted to remove '{0}' but had an error".format_with(pkgExtensions),
-                throwError: false,
-                logWarningInsteadOfError: true);
 
             if (!config.CommandName.is_equal_to(CommandNameType.uninstall.to_string()))
             {

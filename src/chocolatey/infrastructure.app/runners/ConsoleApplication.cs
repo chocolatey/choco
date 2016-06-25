@@ -56,7 +56,7 @@ namespace chocolatey.infrastructure.app.runners
                             // if debug is bundled with local options, it may not get picked up when global 
                             // options are parsed. Attempt to set it again once local options are set.
                             // This does mean some output from debug will be missed (but not much)
-                            if (config.Debug) Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug);
+                            if (config.Debug) Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug, excludeLoggerName: "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()));
 
                             command.handle_additional_argument_parsing(unparsedArgs, config);
 

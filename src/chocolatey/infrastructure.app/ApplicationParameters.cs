@@ -58,6 +58,8 @@ namespace chocolatey.infrastructure.app
         public static readonly string TemplatesLocation = _fileSystem.combine_paths(InstallLocation, "templates");
         public static readonly string ChocolateyCommunityFeedPushSource = "https://chocolatey.org/";
         public static readonly string ChocolateyCommunityFeedSource = "https://chocolatey.org/api/v2/";
+        public static readonly string ChocolateyLicensedFeedSource = "https://licensedpackages.chocolatey.org/api/v2/";
+        public static readonly string ChocolateyLicensedFeedSourceName = "chocolatey.licensed";
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
         public static readonly string AllPackages = "all";

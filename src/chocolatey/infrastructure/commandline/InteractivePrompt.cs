@@ -27,6 +27,7 @@ namespace chocolatey.infrastructure.commandline
     public class InteractivePrompt
     {
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
+        private const int TIMEOUT_IN_SECONDS = 30;
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IConsole> console)
@@ -105,6 +106,42 @@ namespace chocolatey.infrastructure.commandline
             }
 
             return choiceDictionary[selected];
+        }
+
+        public static string get_password(bool interactive)
+        {
+            var password = string.Empty;
+            var possibleNonInteractive = !interactive;
+            ConsoleKeyInfo info = possibleNonInteractive ? Console.ReadKey(TIMEOUT_IN_SECONDS * 1000) : Console.ReadKey(true);
+            while (info.Key != ConsoleKey.Enter)
+            {
+                if (info.Key != ConsoleKey.Backspace)
+                {
+                    Console.Write("*");
+                    password += info.KeyChar;
+                    info = possibleNonInteractive ? Console.ReadKey(TIMEOUT_IN_SECONDS * 1000) : Console.ReadKey(true);
+                }
+                else if (info.Key == ConsoleKey.Backspace)
+                {
+                    if (!string.IsNullOrEmpty(password))
+                    {
+                        password = password.Substring(0, password.Length - 1);
+                        // get the location of the cursor
+                        int pos = System.Console.CursorLeft;
+                        // move the cursor to the left by one character
+                        System.Console.SetCursorPosition(pos - 1, System.Console.CursorTop);
+                        // replace it with space
+                        Console.Write(" ");
+                        // move the cursor to the left by one character again
+                        System.Console.SetCursorPosition(pos - 1, System.Console.CursorTop);
+                    }
+                    info = possibleNonInteractive ? Console.ReadKey(TIMEOUT_IN_SECONDS * 1000) : Console.ReadKey(true);
+                }
+            }
+            for (int i = 0; i < password.Length; i++) Console.Write("*");
+            System.Console.WriteLine("");
+
+            return password;
         }
     }
 }

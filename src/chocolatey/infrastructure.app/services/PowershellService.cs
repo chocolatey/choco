@@ -407,11 +407,15 @@ namespace chocolatey.infrastructure.app.services
 
         private PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript)
         {
+            // since we control output in the host, always set these true
+            Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
+            Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
+            
             var result = new PowerShellExecutionResults();
             string commandToRun = wrap_script_with_module(chocoPowerShellScript, config);
             var host = new PoshHost(config);
             this.Log().Debug(() => "Calling built-in PowerShell host with ['{0}']".format_with(commandToRun.escape_curly_braces()));
-
+            
             var initialSessionState = InitialSessionState.CreateDefault();
             // override system execution policy without accidentally setting it
             initialSessionState.AuthorizationManager = new AuthorizationManager("choco");

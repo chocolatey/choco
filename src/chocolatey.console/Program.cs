@@ -17,6 +17,7 @@ namespace chocolatey.console
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using infrastructure.adapters;
@@ -24,6 +25,7 @@ namespace chocolatey.console
     using infrastructure.app.builders;
     using infrastructure.app.configuration;
     using infrastructure.app.runners;
+    using infrastructure.app.services;
     using infrastructure.commandline;
     using infrastructure.configuration;
     using infrastructure.extractors;
@@ -33,14 +35,15 @@ namespace chocolatey.console
     using infrastructure.logging;
     using infrastructure.registration;
     using resources;
+    using SimpleInjector;
     using Console = System.Console;
     using Environment = System.Environment;
 
     public sealed class Program
     {
-// ReSharper disable InconsistentNaming
+        // ReSharper disable InconsistentNaming
         private static void Main(string[] args)
-// ReSharper restore InconsistentNaming
+        // ReSharper restore InconsistentNaming
         {
             try
             {
@@ -77,19 +80,21 @@ namespace chocolatey.console
                     }
                 }
                 var container = SimpleInjectorContainer.Container;
-                
+
+                add_or_remove_licensed_source(license, container);
+
                 var config = container.GetInstance<ChocolateyConfiguration>();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
                 var warnings = new List<string>();
 
-               ConfigurationBuilder.set_up_configuration(
-                    args,
-                    config,
-                    container,
-                    license,
-                    warning => { warnings.Add(warning); }
-                    );
+                ConfigurationBuilder.set_up_configuration(
+                     args,
+                     config,
+                     container,
+                     license,
+                     warning => { warnings.Add(warning); }
+                     );
                 Config.initialize_with(config);
 
                 report_version_and_exit_if_requested(args, config);
@@ -112,12 +117,12 @@ namespace chocolatey.console
                     }
 #endif
                 }
-                
+
                 if (warnings.Count != 0 && config.RegularOutput)
                 {
                     foreach (var warning in warnings.or_empty_list_if_null())
                     {
-                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, warning);    
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, warning);
                     }
                 }
 
@@ -127,8 +132,8 @@ namespace chocolatey.console
                     Environment.Exit(-1);
                 }
 
-                Log4NetAppenderConfiguration.set_verbose_logger_when_verbose(config.Verbose, "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()));
-                Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug);
+                Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug, excludeLoggerName: "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()));
+                Log4NetAppenderConfiguration.set_verbose_logger_when_verbose(config.Verbose, config.Debug, "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()));
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.Information.PlatformType, config.Information.PlatformVersion.to_string()));
                 //"chocolatey".Log().Debug(() => "Command Line: {0}".format_with(Environment.CommandLine));
 
@@ -142,7 +147,7 @@ namespace chocolatey.console
                         "redirects",
                         "tools"
                     };
-                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
+                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
 
                 var application = new ConsoleApplication();
                 application.run(args, config, container);
@@ -215,6 +220,37 @@ namespace chocolatey.console
             catch (Exception ex)
             {
                 "chocolatey".Log().Warn("Attempting to delete choco.exe.old ran into an issue:{0} {1}".format_with(Environment.NewLine, ex.Message));
+            }
+        }
+
+        private static void add_or_remove_licensed_source(ChocolateyLicense license, Container container)
+        {
+            var addOrUpdate = license.IsValid;
+            var config = new ChocolateyConfiguration {
+                    RegularOutput = false,
+                    QuietOutput = true,
+                };
+
+            var sourceService = container.GetInstance<IChocolateyConfigSettingsService>();
+            var sources = sourceService.source_list(config);
+
+            config.SourceCommand.Name = ApplicationParameters.ChocolateyLicensedFeedSourceName;
+            config.Sources = ApplicationParameters.ChocolateyLicensedFeedSource;
+            config.SourceCommand.Username = "customer";
+            config.SourceCommand.Password = license.Id;
+            config.SourceCommand.Priority = 10;
+
+            if (addOrUpdate && !sources.Any(s => 
+                    s.Id.is_equal_to(ApplicationParameters.ChocolateyLicensedFeedSourceName)
+                    && s.Authenticated)
+                )
+            {
+                sourceService.source_add(config);
+            }
+
+            if (!addOrUpdate)
+            {
+                sourceService.source_remove(config);
             }
         }
 
