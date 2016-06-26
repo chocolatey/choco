@@ -290,39 +290,6 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 MockLogger.reset();
             }
-
-            // Can't be tested because PackageBuilder isn't mocked and not used mocked filesystem
-            //[Fact]
-            //public void generated_package_should_be_in_current_directory()
-            //{
-            //    Context();
-
-            //    because();
-
-            //    var infos = MockLogger.MessagesFor(LogLevel.Info);
-            //    infos.Count.ShouldEqual(2);
-            //    infos[0].ShouldEqual("Attempting to build package from 'Package.nuspec'.");
-            //    infos[1].ShouldEqual("Successfully created package 'c:\\projects\\chocolatey\\Package.nupkg'.");
-
-            //    fileSystem.Verify(x => x.create_file("c:\\projects\\chocolatey\\Package.nupkg"), Times.Once);
-            //}
-
-            //[Fact]
-            //public void generated_package_should_be_in_specified_directory()
-            //{
-            //    Context();
-
-            //    config.OutputDirectory = "c:\\packages";
-
-            //    because();
-
-            //    var infos = MockLogger.MessagesFor(LogLevel.Info);
-            //    infos.Count.ShouldEqual(2);
-            //    infos[0].ShouldEqual("Attempting to build package from 'Package.nuspec'.");
-            //    infos[1].ShouldEqual("Successfully created package 'c:\\packages\\Package.nupkg'.");
-
-            //    fileSystem.Verify(x => x.create_file("c:\\packages\\Package.nupkg"), Times.Once);
-            //}
         }
     }
 }
