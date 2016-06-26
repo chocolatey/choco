@@ -44,6 +44,17 @@ namespace chocolatey.tests.integration.scenarios
         [Concern(typeof(ChocolateyPackCommand))]
         public class when_packing_without_specifying_an_output_directory : ScenariosBase
         {
+            private readonly string package_path = Path.Combine(Scenario.get_top_level(), "test-package.0.1.0.nupkg");
+
+            public override void Context()
+            {
+                base.Context();
+                if (File.Exists(package_path))
+                {
+                    File.Delete(package_path);
+                }
+            }
+
             public override void Because()
             {
                 MockLogger.reset();
@@ -56,10 +67,9 @@ namespace chocolatey.tests.integration.scenarios
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
                 infos.Count.ShouldEqual(2);
                 infos[0].ShouldEqual("Attempting to build package from 'myPackage.nuspec'.");
-                infos[1].ShouldStartWith("Successfully created package '");
-                infos[1].ShouldContain("test-package.0.1.0.nupkg'");
+                infos[1].ShouldEqual(string.Concat("Successfully created package '", package_path, "'"));
 
-                File.Exists("test-package.0.1.0.nupkg").ShouldBeTrue();
+                File.Exists(package_path).ShouldBeTrue();
             }
         }
 
