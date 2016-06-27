@@ -162,6 +162,7 @@ namespace chocolatey.tests.integration
             config.Features.UsePowerShellHost = true;
             config.Features.AutoUninstaller = true;
             config.Features.CheckSumFiles = true;
+            config.OutputDirectory = null;
 
             return config;
         }
