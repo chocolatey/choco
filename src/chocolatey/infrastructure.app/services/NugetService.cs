@@ -1082,8 +1082,8 @@ spam/junk folder.");
                 }
                 else
                 {
-                    IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
-                    if (installedPackage != null) installedPackageVersions.Add(installedPackage);
+                    SemanticVersion semanticVersion = new SemanticVersion(config.Version);
+                    installedPackageVersions = packageManager.LocalRepository.FindPackagesById(packageName).Where((p) => p.Version.Equals(semanticVersion)).ToList();
                 }
 
                 if (installedPackageVersions.Count == 0)
