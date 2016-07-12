@@ -88,6 +88,7 @@ namespace chocolatey.infrastructure.logging
                         MaxFileSize = 1024 * 1024,
                         MaxSizeRollBackups = 10,
                         LockingModel = new FileAppender.MinimalLock(),
+                        PreserveLogFileNameExtension = true,
                     };
                 app.ActivateOptions();
 
@@ -101,7 +102,7 @@ namespace chocolatey.infrastructure.logging
                     MaxFileSize = 1024 * 1024,
                     MaxSizeRollBackups = 10,
                     LockingModel = new FileAppender.MinimalLock(),
-
+                    PreserveLogFileNameExtension = true,
                 };
                 infoOnlyAppender.AddFilter(new LevelRangeFilter { LevelMin = Level.Info, LevelMax = Level.Fatal });
                 infoOnlyAppender.ActivateOptions();
