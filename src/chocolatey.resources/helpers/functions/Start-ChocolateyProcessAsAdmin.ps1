@@ -89,6 +89,13 @@ param(
   
   Write-Debug "Running 'Start-ChocolateyProcessAsAdmin' with exeToRun:`'$exeToRun`', statements: `'$statements`' ";
 
+  try{
+    if ($exeToRun -ne $null) { $exeToRun = $exeToRun -replace "`0", "" }
+    if ($statements -ne $null) { $statements = $statements -replace "`0", "" }
+  } catch {
+    Write-Debug "Removing null characters resulted in an error - $($_.Exception.Message)"
+  }
+
   $wrappedStatements = $statements
   if ($wrappedStatements -eq $null) { $wrappedStatements = ''}
 
@@ -126,10 +133,14 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
 
   Write-Debug $dbgMessage
 
-  $exeIsTextFile = [System.IO.Path]::GetFullPath($exeToRun) + ".istext"
-  if (([System.IO.File]::Exists($exeIsTextFile))) {
-    Set-PowerShellExitCode 4
-    throw "The file was a text file but is attempting to be run as an executable - '$exeToRun'"
+  try {
+    $exeIsTextFile = [System.IO.Path]::GetFullPath($exeToRun) + ".istext"
+    if (([System.IO.File]::Exists($exeIsTextFile))) {
+      Set-PowerShellExitCode 4
+      throw "The file was a text file but is attempting to be run as an executable - '$exeToRun'"
+    }
+  } catch {
+    Write-Debug "Unable to detect whether the file is a text file or not - $($_.Exception.Message)"
   }
 
   if ($exeToRun -eq 'msiexec' -or $exeToRun -eq 'msiexec.exe') {
