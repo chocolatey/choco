@@ -198,12 +198,14 @@ namespace chocolatey.infrastructure.app.configuration
 
         private static IDictionary convert_to_case_insensitive_dictionary(IDictionary originalDictionary)
         {
-            return new Hashtable(originalDictionary, StringComparer.InvariantCultureIgnoreCase);
+            if (originalDictionary == null) return new Hashtable(new Dictionary<string, string>(), StringComparer.OrdinalIgnoreCase);
+
+            return new Hashtable(originalDictionary, StringComparer.OrdinalIgnoreCase);
         }
 
         private static void refresh_environment_variables(IDictionary environmentVariables)
         {
-            foreach (DictionaryEntry variable in environmentVariables)
+            foreach (DictionaryEntry variable in environmentVariables.or_empty_list_if_null())
             {
                 Environment.SetEnvironmentVariable(variable.Key.to_string(), variable.Value.to_string());
             }

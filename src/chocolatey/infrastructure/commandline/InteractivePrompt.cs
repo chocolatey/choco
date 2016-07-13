@@ -51,7 +51,7 @@ namespace chocolatey.infrastructure.commandline
                     c => c.Count() > 0,
                     (name, value) => { throw new ApplicationException("No choices passed in. Please ensure you pass choices"); });
 
-            if (defaultChoice != null)
+            if (!string.IsNullOrWhiteSpace(defaultChoice))
             {
                 Ensure
                     .that(() => choices)
@@ -117,7 +117,7 @@ namespace chocolatey.infrastructure.commandline
             var selection = timeoutInSeconds == 0 ? Console.ReadLine() : Console.ReadLine(timeoutInSeconds * 1000);
             if (shortPrompt) Console.WriteLine();
 
-            if (string.IsNullOrWhiteSpace(selection) && defaultChoice != null)
+            if (string.IsNullOrWhiteSpace(selection) && !string.IsNullOrWhiteSpace(defaultChoice))
             {
                 "chocolatey".Log().Info(ChocolateyLoggers.LogFileOnly, "Choosing default choice of '{0}'".format_with(defaultChoice.escape_curly_braces()));
                 return defaultChoice;

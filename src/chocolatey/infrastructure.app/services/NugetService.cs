@@ -328,7 +328,7 @@ spam/junk folder.");
 
             //todo: handle all
 
-            SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
+            SemanticVersion version = !string.IsNullOrWhiteSpace(config.Version) ? new SemanticVersion(config.Version) : null;
             if (config.Force) config.AllowDowngrade = true;
 
             IList<string> packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
@@ -513,7 +513,7 @@ spam/junk folder.");
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
-            SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
+            SemanticVersion version = !string.IsNullOrWhiteSpace(config.Version) ? new SemanticVersion(config.Version) : null;
             if (config.Force) config.AllowDowngrade = true;
 
             var packageManager = NugetCommon.GetPackageManager(
@@ -1280,7 +1280,7 @@ spam/junk folder.");
                 if (!string.IsNullOrWhiteSpace(config.UpgradeCommand.PackageNamesToSkip))
                 {
                     var packagesToSkip = config.UpgradeCommand.PackageNamesToSkip
-                        .Split(',')
+                        .Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries)
                         .Where(item => !string.IsNullOrWhiteSpace(item))
                         .Select(p => p.trim_safe())
                         .ToList();

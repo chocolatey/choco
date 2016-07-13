@@ -54,7 +54,7 @@ namespace chocolatey.infrastructure.logging
 
             XmlConfigurator.Configure(xmlConfigStream);
 
-            if (outputDirectory != null)
+            if (!string.IsNullOrWhiteSpace(outputDirectory))
             {
                 set_file_appender(outputDirectory);
             }

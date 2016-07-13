@@ -186,7 +186,7 @@ namespace chocolatey.infrastructure.powershell
         private static string[] get_hotkey_and_label(string input)
         {
             var result = new[] { String.Empty, String.Empty };
-            string[] fragments = input.Split('&');
+            string[] fragments = input.Split(new char[] {'&'}, StringSplitOptions.RemoveEmptyEntries);
             if (fragments.Length == 2)
             {
                 if (fragments[1].Length > 0) result[0] = fragments[1][0].to_string().ToUpper(CultureInfo.CurrentCulture);
