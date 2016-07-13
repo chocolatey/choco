@@ -466,6 +466,7 @@ spam/junk folder.");
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     var errorResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                     errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    if (errorResult.ExitCode == 0) errorResult.ExitCode = 1;
                     if (continueAction != null) continueAction.Invoke(errorResult);
                 }
             }
@@ -744,6 +745,7 @@ spam/junk folder.");
                             var logMessage = "{0} not upgraded. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
                             packageResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            if (packageResult.ExitCode == 0) packageResult.ExitCode = 1;
                             if (continueAction != null) continueAction.Invoke(packageResult);
                         }
                     }
@@ -1176,6 +1178,7 @@ spam/junk folder.");
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
                             var result = packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, packageVersion.Id)));
                             result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            if (result.ExitCode == 0) result.ExitCode = 1;
                             // do not call continueAction - will result in multiple passes
                         }
                     }
