@@ -70,6 +70,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyToolsLocationEnvironmentVariableName = "ChocolateyToolsLocation";
         public static readonly string ChocolateyPackageInstallLocationEnvironmentVariableName = "ChocolateyPackageInstallLocation";
         public static readonly string ChocolateyPackageInstallerTypeEnvironmentVariableName = "ChocolateyInstallerType";
+        public static readonly string ChocolateyPackageExitCodeEnvironmentVariableName = "ChocolateyExitCode";
 
         public static class Environment
         {
