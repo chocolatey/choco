@@ -442,7 +442,6 @@ namespace chocolatey.infrastructure.app.services
                     Environment.SetEnvironmentVariable("CacheChecksumType_{0}".format_with(urlKey), "sha512");
                 }
             }
-
         }
 
         private ResolveEventHandler _handler = null;
@@ -480,7 +479,10 @@ namespace chocolatey.infrastructure.app.services
             }
             catch (Exception ex)
             {
+                if (requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase)) return null;
+
                 this.Log().Debug(ChocolateyLoggers.Verbose, "Attempting to load assembly {0} failed:{1} {2}".format_with(requestedAssembly.Name, Environment.NewLine, ex.Message.escape_curly_braces()));
+                
                 return null;
             }
         }
