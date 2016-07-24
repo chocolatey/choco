@@ -11,7 +11,7 @@ Install-ChocolateyPackage when software must be downloaded first.
 Install-ChocolateyInstallPackage `
   -PackageName <String> `
   [-FileType <String>] `
-  [-SilentArgs <String>] `
+  [-SilentArgs <String[]>] `
   -File <String> `
   [-ValidExitCodes <Object>] `
   [-UseOnlyPackageSilentArguments] `
@@ -134,7 +134,7 @@ Position?              | 2
 Default Value          | exe
 Accept Pipeline Input? | false
  
-###  -SilentArgs [&lt;String&gt;]
+###  -SilentArgs [&lt;String[]&gt;]
 OPTIONAL - These are the parameters to pass to the native installer,
 including any arguments to make the installer silent/unattended.
 Pro/Business Editions of Chocolatey will automatically determine the

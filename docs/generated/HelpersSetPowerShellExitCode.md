@@ -6,7 +6,7 @@ Sets the exit code for the PowerShell scripts.
 
 ~~~powershell
 Set-PowerShellExitCode `
-  -ExitCode <Int32> `
+  [-ExitCode <Int32>] `
   [-IgnoredArguments <Object[]>] [<CommonParameters>]
 ~~~
 
@@ -42,13 +42,13 @@ None
 
 ## Parameters
 
-###  -ExitCode &lt;Int32&gt;
+###  -ExitCode [&lt;Int32&gt;]
 The exit code to set.
 
 Property               | Value
 ---------------------- | -----
 Aliases                | 
-Required?              | true
+Required?              | false
 Position?              | 1
 Default Value          | 0
 Accept Pipeline Input? | false

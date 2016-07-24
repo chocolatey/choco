@@ -12,7 +12,7 @@ file.
 Install-ChocolateyPackage `
   -PackageName <String> `
   [-FileType <String>] `
-  [-SilentArgs <String>] `
+  [-SilentArgs <String[]>] `
   [-Url <String>] `
   [-Url64bit <String>] `
   [-ValidExitCodes <Object>] `
@@ -173,7 +173,7 @@ Position?              | 2
 Default Value          | exe
 Accept Pipeline Input? | false
  
-###  -SilentArgs [&lt;String&gt;]
+###  -SilentArgs [&lt;String[]&gt;]
 OPTIONAL - These are the parameters to pass to the native installer,
 including any arguments to make the installer silent/unattended.
 [Licensed editions](https://chocolatey.org/compare) of Chocolatey will automatically determine the

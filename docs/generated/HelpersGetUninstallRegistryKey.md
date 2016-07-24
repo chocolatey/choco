@@ -80,7 +80,7 @@ Part or all of the Display Name as you see it in Programs and Features.
 It should be enough to be unique.
 
 If the display name contains a version number, such as "Launchy 2.5", 
-it is recommended you use a fuzzy search "Launchy*" (the wildcard '*')
+it is recommended you use a fuzzy search `"Launchy*"` (the wildcard `*`)
 as if the version is upgraded or autoupgraded, suddenly the uninstall
 script will stop working and it may not be clear as to what went wrong
 at first.
