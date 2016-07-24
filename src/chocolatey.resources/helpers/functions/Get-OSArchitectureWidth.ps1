@@ -62,3 +62,4 @@ param(
 }
 
 Set-Alias Get-ProcessorBits Get-OSArchitectureWidth
+Set-Alias Get-OSBitness Get-OSArchitectureWidth
