@@ -35,23 +35,25 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Prints out the help menu.
 
  -d, --debug
-     Debug - Run in Debug Mode.
+     Debug - Show debug messaging.
 
  -v, --verbose
-     Verbose - See verbose messaging.
+     Verbose - Show verbose messaging.
 
      --acceptlicense, --accept-license
-     AcceptLicense - Accept license dialogs automatically.
+     AcceptLicense - Accept license dialogs automatically. Reserved for 
+       future use.
 
  -y, --yes, --confirm
      Confirm all prompts - Chooses affirmative answer instead of prompting. 
        Implies --accept-license
 
  -f, --force
-     Force - force the behavior
+     Force - force the behavior. Do not use force during normal operation - 
+       it subverts some of the smart behavior for commands.
 
      --noop, --whatif, --what-if
-     NoOp - Don't actually do anything.
+     NoOp / WhatIf - Don't actually do anything.
 
  -r, --limitoutput, --limit-output
      LimitOutput - Limit the output to essential information
@@ -76,7 +78,8 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
 
      --use-system-powershell
      UseSystemPowerShell - Execute PowerShell using an external process 
-       instead of the built-in PowerShell host. Available in 0.9.10+.
+       instead of the built-in PowerShell host. Should only be used when 
+       internal host is failing. Available in 0.9.10+.
 
  -n, --name=VALUE
      Name - the name of the package. Required with some actions. Defaults to 

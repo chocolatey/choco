@@ -8,7 +8,7 @@ Uninstalls software from "Programs and Features".
 Uninstall-ChocolateyPackage `
   -PackageName <String> `
   [-FileType <String>] `
-  [-SilentArgs <String>] `
+  [-SilentArgs <String[]>] `
   [-File <String>] `
   [-ValidExitCodes <Object>] `
   [-IgnoredArguments <Object[]>] [<CommonParameters>]
@@ -95,7 +95,7 @@ Position?              | 2
 Default Value          | exe
 Accept Pipeline Input? | false
  
-###  -SilentArgs [&lt;String&gt;]
+###  -SilentArgs [&lt;String[]&gt;]
 OPTIONAL - These are the parameters to pass to the native uninstaller,
 including any arguments to make the uninstaller silent/unattended.
 [Licensed editions](https://chocolatey.org/compare) of Chocolatey will automatically determine the

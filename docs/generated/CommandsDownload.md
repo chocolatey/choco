@@ -2,8 +2,10 @@
 
 [Chocolatey for Business](https://chocolatey.org/compare) starting at 0.9.10+.
 
-Downloads a package from a source, optionally recompiling it to 
-internal resources.
+Downloads a package from a source, optionally downloading remote 
+ resources and recompiling it to internal resources. This takes an
+ existing package and makes it available without any internet 
+ requirement.
 
 ## Usage
 
@@ -38,23 +40,25 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Prints out the help menu.
 
  -d, --debug
-     Debug - Run in Debug Mode.
+     Debug - Show debug messaging.
 
  -v, --verbose
-     Verbose - See verbose messaging.
+     Verbose - Show verbose messaging.
 
      --acceptlicense, --accept-license
-     AcceptLicense - Accept license dialogs automatically.
+     AcceptLicense - Accept license dialogs automatically. Reserved for 
+       future use.
 
  -y, --yes, --confirm
      Confirm all prompts - Chooses affirmative answer instead of prompting. 
        Implies --accept-license
 
  -f, --force
-     Force - force the behavior
+     Force - force the behavior. Do not use force during normal operation - 
+       it subverts some of the smart behavior for commands.
 
      --noop, --whatif, --what-if
-     NoOp - Don't actually do anything.
+     NoOp / WhatIf - Don't actually do anything.
 
  -r, --limitoutput, --limit-output
      LimitOutput - Limit the output to essential information
@@ -79,7 +83,8 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
 
      --use-system-powershell
      UseSystemPowerShell - Execute PowerShell using an external process 
-       instead of the built-in PowerShell host. Available in 0.9.10+.
+       instead of the built-in PowerShell host. Should only be used when 
+       internal host is failing. Available in 0.9.10+.
 
  -s, --source=VALUE
      Source - The source to find the package(s) to download. Defaults to 
@@ -112,6 +117,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      --embed
      Embed - When recompiling packages, embed the downloaded resources into 
        the package.
+
+     --outputdirectory=VALUE
+     OutputDirectory - Specifies the directory for the downloaded Chocolatey 
+       package file. If not specified, uses the current directory.
 
 ~~~
 
