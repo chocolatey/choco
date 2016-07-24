@@ -809,7 +809,7 @@ The recent package changes indicate a reboot is necessary.
 
             if (config.Force)
             {
-                var packageDirectory = _fileSystem.combine_paths(packageResult.InstallLocation);
+                var packageDirectory = packageResult.InstallLocation;
 
                 if (string.IsNullOrWhiteSpace(packageDirectory) || !_fileSystem.directory_exists(packageDirectory)) return;
 
@@ -1010,7 +1010,7 @@ ATTENTION: You must take manual action to remove {1} from
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageFailuresLocation);
 
-            if (packageResult.InstallLocation != null && _fileSystem.directory_exists(packageResult.InstallLocation))
+            if (!string.IsNullOrWhiteSpace(packageResult.InstallLocation) && _fileSystem.directory_exists(packageResult.InstallLocation))
             {
                 FaultTolerance.try_catch_with_logging_exception(
                  () => _fileSystem.move_directory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation)),

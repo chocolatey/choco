@@ -328,7 +328,7 @@ spam/junk folder.");
 
             //todo: handle all
 
-            SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
+            SemanticVersion version = !string.IsNullOrWhiteSpace(config.Version) ? new SemanticVersion(config.Version) : null;
             if (config.Force) config.AllowDowngrade = true;
 
             IList<string> packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
@@ -466,6 +466,7 @@ spam/junk folder.");
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     var errorResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                     errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    if (errorResult.ExitCode == 0) errorResult.ExitCode = 1;
                     if (continueAction != null) continueAction.Invoke(errorResult);
                 }
             }
@@ -513,7 +514,7 @@ spam/junk folder.");
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
-            SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
+            SemanticVersion version = !string.IsNullOrWhiteSpace(config.Version) ? new SemanticVersion(config.Version) : null;
             if (config.Force) config.AllowDowngrade = true;
 
             var packageManager = NugetCommon.GetPackageManager(
@@ -744,6 +745,7 @@ spam/junk folder.");
                             var logMessage = "{0} not upgraded. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
                             packageResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            if (packageResult.ExitCode == 0) packageResult.ExitCode = 1;
                             if (continueAction != null) continueAction.Invoke(packageResult);
                         }
                     }
@@ -1176,6 +1178,7 @@ spam/junk folder.");
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
                             var result = packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, packageVersion.Id)));
                             result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            if (result.ExitCode == 0) result.ExitCode = 1;
                             // do not call continueAction - will result in multiple passes
                         }
                     }
@@ -1280,7 +1283,7 @@ spam/junk folder.");
                 if (!string.IsNullOrWhiteSpace(config.UpgradeCommand.PackageNamesToSkip))
                 {
                     var packagesToSkip = config.UpgradeCommand.PackageNamesToSkip
-                        .Split(',')
+                        .Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries)
                         .Where(item => !string.IsNullOrWhiteSpace(item))
                         .Select(p => p.trim_safe())
                         .ToList();

@@ -54,7 +54,7 @@ namespace chocolatey.infrastructure.logging
 
             XmlConfigurator.Configure(xmlConfigStream);
 
-            if (outputDirectory != null)
+            if (!string.IsNullOrWhiteSpace(outputDirectory))
             {
                 set_file_appender(outputDirectory);
             }
@@ -85,8 +85,8 @@ namespace chocolatey.infrastructure.logging
                         Layout = layout,
                         AppendToFile = true,
                         RollingStyle = RollingFileAppender.RollingMode.Size,
-                        MaxFileSize = 1024 * 1024,
-                        MaxSizeRollBackups = 10,
+                        MaxFileSize = 1024 * 1024 * 10,
+                        MaxSizeRollBackups = 50,
                         LockingModel = new FileAppender.MinimalLock(),
                     };
                 app.ActivateOptions();
@@ -98,8 +98,8 @@ namespace chocolatey.infrastructure.logging
                     Layout = layout,
                     AppendToFile = true,
                     RollingStyle = RollingFileAppender.RollingMode.Size,
-                    MaxFileSize = 1024 * 1024,
-                    MaxSizeRollBackups = 10,
+                    MaxFileSize = 1024 * 1024 * 10,
+                    MaxSizeRollBackups = 50,
                     LockingModel = new FileAppender.MinimalLock(),
 
                 };

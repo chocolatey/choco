@@ -78,14 +78,17 @@ function script:chocoCommands($filter) {
 }
 
 function script:chocoLocalPackages($filter) {
+    if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
     @(& $script:choco list $filter -lo -r --id-starts-with) | %{ $_.Split('|')[0] }
 }
 
 function script:chocoLocalPackagesUpgrade($filter) {
+    if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
     @('all|') + @(& $script:choco list $filter -lo -r --id-starts-with) | where { $_ -like "$filter*" } | %{ $_.Split('|')[0] }
 }
 
 function script:chocoRemotePackages($filter) {
+    if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
     @('packages.config|') + @(& $script:choco search $filter --page=0 --page-size=30 -r --id-starts-with --order-by-popularity) | where { $_ -like "$filter*" } | %{ $_.Split('|')[0] }
 }
 
@@ -99,17 +102,17 @@ function ChocolateyTabExpansion($lastBlock) {
   switch -regex ($lastBlock -replace "^$(Get-AliasPattern choco) ","") {
 
     # Handles uninstall package names
-    "^uninstall\s+(?<package>[^-\s]*)$" {
+    "^uninstall\s+(?<package>[^\.][^-\s]*)$" {
       chocoLocalPackages $matches['package']
     }
 
     # Handles install package names
-    "^(install)\s+(?<package>[^-\s]*)$" {
+    "^(install)\s+(?<package>[^\.][^-\s]+)$" {
       chocoRemotePackages $matches['package']
     }
 
     # Handles upgrade / uninstall package names
-    "^upgrade\s+(?<package>[^-\s]*)$" {
+    "^upgrade\s+(?<package>[^\.][^-\s]*)$" {
       chocoLocalPackagesUpgrade $matches['package']
     }
 

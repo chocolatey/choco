@@ -66,6 +66,8 @@ namespace chocolatey.infrastructure.filesystem
 
         public string combine_paths(string leftItem, params string[] rightItems)
         {
+            if (leftItem == null) throw new ApplicationException("Path to combine cannot be empty.");
+
             var combinedPath = Platform.get_platform() == PlatformType.Windows ? leftItem : leftItem.Replace('\\', '/');
             foreach (var rightItem in rightItems)
             {
@@ -166,11 +168,15 @@ namespace chocolatey.infrastructure.filesystem
 
         public IEnumerable<string> get_files(string directoryPath, string pattern = "*.*", SearchOption option = SearchOption.TopDirectoryOnly)
         {
+            if (string.IsNullOrWhiteSpace(directoryPath)) return new List<string>();
+
             return Directory.EnumerateFiles(directoryPath, pattern, option);
         }
 
         public IEnumerable<string> get_files(string directoryPath, string[] extensions, SearchOption option = SearchOption.TopDirectoryOnly)
         {
+            if (string.IsNullOrWhiteSpace(directoryPath)) return new List<string>();
+
             return Directory.EnumerateFiles(directoryPath, "*.*", option)
                             .Where(f => extensions.Any(x => f.EndsWith(x, StringComparison.OrdinalIgnoreCase)));
         }
