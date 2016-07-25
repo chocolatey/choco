@@ -155,11 +155,12 @@ param(
           $total += $count
           $totalFormatted = Format-FileSize $total
           if($goal -gt 0) {
-            Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete (($total/$goal)*100)
+            $percentComplete = [Math]::Truncate(($total/$goal)*100)
+            Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete $percentComplete
           } else {
             Write-Progress "Downloading $url to $fileName" "Saving $total bytes..." -id 0 -Completed
           }
-          if ($total -eq $goal) {
+          if ($total -eq $goal -and $count -eq 0) {
             Write-Progress "Completed download of $url." "Completed a total of $total bytes of $fileName" -id 0 -Completed -PercentComplete 100
           }
         }
