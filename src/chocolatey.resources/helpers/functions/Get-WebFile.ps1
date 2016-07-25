@@ -282,7 +282,7 @@ param(
             }
 
             if ($total -eq $goal) {
-              Write-Progress "Completed download of $url." "Completed download of $fileName ($goalFormatted)." -id 0 -Completed
+              Write-Progress "Completed download of $url." "Completed download of $fileName ($goalFormatted)." -id 0 -Completed -PercentComplete 100
             }
           }
         } while ($count -gt 0)

@@ -160,7 +160,7 @@ param(
             Write-Progress "Downloading $url to $fileName" "Saving $total bytes..." -id 0 -Completed
           }
           if ($total -eq $goal) {
-            Write-Progress "Completed download of $url." "Completed a total of $total bytes of $fileName" -id 0 -Completed
+            Write-Progress "Completed download of $url." "Completed a total of $total bytes of $fileName" -id 0 -Completed -PercentComplete 100
           }
         }
       } while ($count -ne 0)
