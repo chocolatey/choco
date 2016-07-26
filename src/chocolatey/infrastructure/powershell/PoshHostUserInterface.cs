@@ -129,7 +129,7 @@ namespace chocolatey.infrastructure.powershell
             }
 
             // http://stackoverflow.com/a/888569/18475
-            Console.Write("\rProgress: {0}% - {1}".format_with(record.PercentComplete.to_string(), record.StatusDescription.PadRight(50, ' ')));
+            Console.Write("\rProgress: {0}% - {1}".format_with(record.PercentComplete.to_string(), record.StatusDescription).PadRight(Console.WindowWidth));
         }
 
         public override void WriteVerboseLine(string message)
