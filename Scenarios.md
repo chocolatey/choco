@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 35 Scenario(s), 291 Observation(s) ]
+### ChocolateyInstallCommand [ 35 Scenario(s), 293 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -362,6 +362,8 @@
  * should not have a successful package result for missing package
  * should not have inconclusive package result
  * should not have warning package result
+ * should print out package from config file in message
+ * should specify config file is being used in message
 
 #### when noop installing a package
 

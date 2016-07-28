@@ -422,7 +422,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
         {
-            this.Log().Info(@"Installing the following packages:");
+            this.Log().Info(is_packages_config_file(config) ? @"Installing from config file:" : @"Installing the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
 
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>();
@@ -446,6 +446,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 {
                     action = (packageResult) => handle_package_result(packageResult, packageConfig, CommandNameType.install);
                 }
+                
                 var results = perform_source_runner_function(packageConfig, r => r.install_run(packageConfig, action));
 
                 foreach (var result in results)
@@ -524,11 +525,16 @@ Would have determined packages that are out of date based on what is
 
                 foreach (var packageConfig in get_packages_from_config(packageConfigFile, config, packageInstalls).or_empty_list_if_null())
                 {
-                    yield return packageConfig;
+                   yield return packageConfig;
                 }
             }
 
             yield return config;
+        }
+
+        private bool is_packages_config_file(ChocolateyConfiguration config)
+        {
+            return config.PackageNames.Split(new[] {ApplicationParameters.PackageNamesSeparator}, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Any(p => p.EndsWith(".config"));
         }
 
         private IEnumerable<ChocolateyConfiguration> get_packages_from_config(string packageConfigFile, ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls)
@@ -546,6 +552,7 @@ Would have determined packages that are out of date based on what is
             }
 
             var settings = _xmlService.deserialize<PackagesConfigFileSettings>(_fileSystem.get_full_path(packageConfigFile));
+            this.Log().Info(@"Installing the following packages:");
             foreach (var pkgSettings in settings.Packages.or_empty_list_if_null())
             {
                 if (!pkgSettings.Disabled)
@@ -560,6 +567,7 @@ Would have determined packages that are out of date based on what is
                     if (pkgSettings.AllowMultipleVersions) packageConfig.AllowMultipleVersions = true;
                     if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
 
+                    this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(packageConfig.PackageNames));
                     packageConfigs.Add(packageConfig);
                 }
             }
