@@ -46,5 +46,5 @@ param(
   [parameter(Mandatory=$false, Position=1)][string] $file = '',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "No virus checking built into FOSS Chocolatey. Check out Pro or Business if you need this. https://chocolatey.org/compare"
+  Write-Debug "No runtime virus checking built into FOSS Chocolatey. Check out Pro/Business - https://chocolatey.org/compare"
 }
