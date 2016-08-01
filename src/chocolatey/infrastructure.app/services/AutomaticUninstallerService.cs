@@ -139,7 +139,7 @@ namespace chocolatey.infrastructure.app.services
 
                 this.Log().Debug(() => " Args are '{0}'".format_with(uninstallArgs.escape_curly_braces()));
 
-                if (!key.HasQuietUninstall &&  installer.GetType() == typeof(CustomInstaller))
+                if (!key.HasQuietUninstall && installer.GetType() == typeof(CustomInstaller))
                 {
                     var skipUninstaller = true;
 
