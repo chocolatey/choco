@@ -206,7 +206,11 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   Unregister-Event -SourceIdentifier "LogErrors_ChocolateyProc"
   
   # sometimes the process hasn't fully exited yet.
-  Start-Sleep 1
+  for ($loopCount=1; $loopCount -le 15; $loopCount++) { 
+    if ($process.HasExited) { break; }
+    Write-Debug "Waiting for process to exit - $loopCount/15 seconds"; 
+    Start-Sleep 1; 
+  }
 
   $exitCode = $process.ExitCode
   $process.Dispose()
@@ -218,7 +222,7 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   } else {
     $chocoSuccessCodes = @(0, 1605, 1614, 1641, 3010)
     if ($chocoSuccessCodes -notcontains $exitCode) {
-      Write-Warning "Exit code '$exitCode' was considered valid, but not as a choco success code. Returning 0"
+      Write-Warning "Exit code '$exitCode' was considered valid by script, but not as a Chocolatey success code. Returning '0'."
       $exitCode = 0
     }
   }
