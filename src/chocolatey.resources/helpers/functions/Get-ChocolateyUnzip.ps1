@@ -167,11 +167,16 @@ param(
   Unregister-Event -SourceIdentifier "LogErrors_ChocolateyZipProc"
 
   # sometimes the process hasn't fully exited yet.
-  Start-Sleep 1
+  for ($loopCount=1; $loopCount -le 15; $loopCount++) { 
+    if ($process.HasExited) { break; }
+    Write-Debug "Waiting for 7z.exe process to exit - $loopCount/15 seconds"; 
+    Start-Sleep 1; 
+  }
 
   $exitCode = $process.ExitCode
-  Set-PowerShellExitCode $exitCode
   $process.Dispose()
+
+  Set-PowerShellExitCode $exitCode
   Write-Debug "Command ['$7zip' $params] exited with `'$exitCode`'."
 
   if ($zipExtractLogFullPath) {
