@@ -102,7 +102,16 @@ param(
       Start-ChocolateyProcessAsAdmin "$psArgs"
     }
   } else {
-    Set-EnvironmentVariable -Name $variableName -Value $variableValue -Scope $variableType
+    try {
+      Set-EnvironmentVariable -Name $variableName -Value $variableValue -Scope $variableType
+    } catch {
+      if (Test-ProcessAdminRights) {
+        # HKCU:\Environment may not exist, which happens sometimes with Server Core
+        Set-EnvironmentVariable -Name $variableName -Value $variableValue -Scope Machine
+      } else {
+        throw $_.Exception
+      }
+    }
   }
 
   Set-Content env:\$variableName $variableValue

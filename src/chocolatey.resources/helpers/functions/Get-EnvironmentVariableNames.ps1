@@ -45,8 +45,9 @@ Get-EnvironmentVariable
 Set-EnvironmentVariable
 #>
 
+  # HKCU:\Environment may not exist in all Windows OSes (such as Server Core).
   switch ($Scope) {
-    'User' { Get-Item 'HKCU:\Environment' | Select-Object -ExpandProperty Property }
+    'User' { Get-Item 'HKCU:\Environment' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Property }
     'Machine' { Get-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment' | Select-Object -ExpandProperty Property }
     'Process' { Get-ChildItem Env:\ | Select-Object -ExpandProperty Key }
     default { throw "Unsupported environment scope: $Scope" }

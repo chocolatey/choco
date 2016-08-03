@@ -62,21 +62,30 @@ None
         if ($binRoot -eq $null) {
           $binRoot = $olderRoot
         }
-        Set-EnvironmentVariable -Name "chocolatey_bin_root" -Value '' -Scope User
+        Set-EnvironmentVariable -Name "chocolatey_bin_root" -Value '' -Scope User -ErrorAction SilentlyContinue
       }
 
       $toolsLocation = $binRoot
-      Set-EnvironmentVariable -Name "ChocolateyBinRoot" -Value '' -Scope User
+      Set-EnvironmentVariable -Name "ChocolateyBinRoot" -Value '' -Scope User -ErrorAction SilentlyContinue
     }
   }
 
   # Add a drive letter if one doesn't exist
   if (-not($toolsLocation -imatch "^\w:")) {
-    $toolsLocation = join-path $env:systemdrive $toolsLocation
+    $toolsLocation = Join-Path $env:systemdrive $toolsLocation
   }
 
   if (-not($env:ChocolateyToolsLocation -eq $toolsLocation)) {
-    Set-EnvironmentVariable -Name "ChocolateyToolsLocation" -Value $toolsLocation -Scope User
+    try {
+      Set-EnvironmentVariable -Name "ChocolateyToolsLocation" -Value $toolsLocation -Scope User
+    } catch {
+      if (Test-ProcessAdminRights) {
+        # sometimes User scope may not exist (such as with core)
+        Set-EnvironmentVariable -Name "ChocolateyToolsLocation" -Value $toolsLocation -Scope Machine
+      } else {
+        throw $_.Exception
+      }
+    }
   }
 
   return $toolsLocation
