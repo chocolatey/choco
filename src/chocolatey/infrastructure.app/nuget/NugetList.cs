@@ -39,6 +39,7 @@ namespace chocolatey.infrastructure.app.nuget
         private static IQueryable<IPackage> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
             var packageRepository = NugetCommon.GetRemoteRepository(configuration, nugetLogger);
+            var searchTerm = configuration.Input.to_lower();
 
             // Whether or not the package is remote determines two things:
             // 1. Does the repository have a notion of "listed"?
@@ -56,7 +57,7 @@ namespace chocolatey.infrastructure.app.nuget
                 isRemote = packageRepository is IServiceBasedRepository;
             }
 
-            IQueryable<IPackage> results = packageRepository.Search(configuration.Input, configuration.Prerelease);
+            IQueryable<IPackage> results = packageRepository.Search(searchTerm, configuration.Prerelease);
 
 
             if (configuration.ListCommand.Page.HasValue)
@@ -66,21 +67,21 @@ namespace chocolatey.infrastructure.app.nuget
 
             if (configuration.ListCommand.Exact)
             {
-                results = results.Where(p => p.Id == configuration.Input);
+                results = results.Where(p => p.Id.ToLower() == searchTerm);
             }
 
             if (configuration.ListCommand.ByIdOnly)
             {
                 results = isRemote ?
-                    results.Where(p => p.Id.Contains(configuration.Input))
-                  : results.Where(p => p.Id.contains(configuration.Input, StringComparison.OrdinalIgnoreCase));
+                    results.Where(p => p.Id.ToLower().Contains(searchTerm))
+                  : results.Where(p => p.Id.contains(searchTerm, StringComparison.OrdinalIgnoreCase));
             }
 
             if (configuration.ListCommand.IdStartsWith)
             {
                 results = isRemote ?
-                    results.Where(p => p.Id.StartsWith(configuration.Input))
-                  : results.Where(p => p.Id.StartsWith(configuration.Input, StringComparison.OrdinalIgnoreCase));
+                    results.Where(p => p.Id.ToLower().StartsWith(searchTerm))
+                  : results.Where(p => p.Id.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase));
             }
 
             if (configuration.ListCommand.ApprovedOnly)
