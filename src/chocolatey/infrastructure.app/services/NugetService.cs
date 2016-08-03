@@ -1084,7 +1084,7 @@ spam/junk folder.");
                 }
                 else
                 {
-                    SemanticVersion semanticVersion = new SemanticVersion(config.Version);
+                    var semanticVersion = new SemanticVersion(config.Version);
                     installedPackageVersions = packageManager.LocalRepository.FindPackagesById(packageName).Where((p) => p.Version.Equals(semanticVersion)).ToList();
                 }
 
