@@ -435,6 +435,30 @@ namespace chocolatey.tests.integration.scenarios
                     packageResult.Value.Warning.ShouldBeFalse();
                 }
             }
+
+            [Fact]
+            public void should_specify_config_file_is_being_used_in_message()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
+                {
+                    if (message.Contains("Installing from config file:")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_print_out_package_from_config_file_in_message()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
+                {
+                    if (message.Contains("installpackage")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
