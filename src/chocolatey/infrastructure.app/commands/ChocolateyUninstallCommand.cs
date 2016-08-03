@@ -58,6 +58,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("params=|parameters=|pkgparameters=|packageparameters=|package-parameters=",
                      "PackageParameters - Parameters to pass to the package. Defaults to unspecified.",
                      option => configuration.PackageParameters = option.remove_surrounding_quotes())
+                .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
+                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false.",
+                     option => configuration.AllowMultipleVersions = option != null)
                 .Add("x|forcedependencies|force-dependencies|removedependencies|remove-dependencies",
                      "RemoveDependencies - Uninstall dependencies when uninstalling package(s). Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
