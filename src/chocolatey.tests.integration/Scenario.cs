@@ -17,6 +17,7 @@ namespace chocolatey.tests.integration
 {
     using System;
     using System.IO;
+    using System.Collections.Generic;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
@@ -96,6 +97,23 @@ namespace chocolatey.tests.integration
             NUnitSetup.MockLogger.Messages.Clear();
         }
 
+        public static void add_files(IEnumerable<Tuple<string, string>> files)
+        {
+            foreach (var file in files)
+            {
+                if(_fileSystem.file_exists(file.Item1))
+                {
+                    _fileSystem.delete_file(file.Item1);
+                }
+                _fileSystem.write_file(file.Item1, file.Item2);
+            }
+        }
+
+        public static void create_directory(string directoryPath)
+        {
+            _fileSystem.create_directory(directoryPath);
+        }
+
         private static ChocolateyConfiguration baseline_configuration()
         {
             // note that this does not mean an empty configuration. It does get influenced by
@@ -144,6 +162,7 @@ namespace chocolatey.tests.integration
             config.Features.UsePowerShellHost = true;
             config.Features.AutoUninstaller = true;
             config.Features.CheckSumFiles = true;
+            config.OutputDirectory = null;
 
             return config;
         }
@@ -184,6 +203,14 @@ namespace chocolatey.tests.integration
         {
             var config = baseline_configuration();
             config.CommandName = "pin";
+
+            return config;
+        }
+
+        public static ChocolateyConfiguration pack()
+        {
+            var config = baseline_configuration();
+            config.CommandName = "pack";
 
             return config;
         }

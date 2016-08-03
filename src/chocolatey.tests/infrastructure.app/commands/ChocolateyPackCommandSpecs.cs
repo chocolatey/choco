@@ -76,6 +76,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 optionSet.Contains("version").ShouldBeTrue();
             }
+
+            [Fact]
+            public void should_add_outputdirectory_to_the_option_set()
+            {
+                optionSet.Contains("outputdirectory").ShouldBeTrue();
+            }
         }
 
         public class when_handling_additional_argument_parsing : ChocolateyPackCommandSpecsBase
@@ -126,6 +132,35 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_call_service_pack_run()
             {
                 packageService.Verify(c => c.pack_run(configuration), Times.Once);
+            }
+        }
+        
+        public class when_handling_arguments_parsing : ChocolateyPackCommandSpecsBase
+        {
+            private OptionSet optionSet;
+
+            public override void Context()
+            {
+                base.Context();
+                optionSet = new OptionSet();
+                command.configure_argument_parser(optionSet, configuration);
+            }
+
+            public override void Because()
+            {
+                optionSet.Parse(new[] { "--version", "0.42.0", "--outputdirectory", "c:\\packages" });
+            }
+
+            [Fact]
+            public void should_version_equal_to_42()
+            {
+                configuration.Version.ShouldEqual("0.42.0");
+            }
+
+            [Fact]
+            public void should_outputdirectory_equal_packages()
+            {
+                configuration.OutputDirectory.ShouldEqual("c:\\packages");
             }
         }
     }
