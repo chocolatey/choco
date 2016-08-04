@@ -408,6 +408,7 @@ Did you know Pro / Business automatically syncs with Programs and
             if (!string.IsNullOrWhiteSpace(config.SourceCommand.Certificate)) arguments.Append(" --cert=\"'{0}'\"".format_with(config.SourceCommand.Certificate));
             if (!string.IsNullOrWhiteSpace(config.SourceCommand.CertificatePassword)) arguments.Append(" --certpassword=\"'{0}'\"".format_with(NugetEncryptionUtility.EncryptString(config.SourceCommand.CertificatePassword)));
             if (!config.Features.ChecksumFiles) arguments.Append(" --ignore-checksums");
+            if (!config.Features.AllowEmptyChecksums) arguments.Append(" --allow-empty-checksums");
             arguments.Append(config.Features.UsePackageExitCodes ? " --use-package-exit-codes" : " --ignore-package-exit-codes");
 
             //global options

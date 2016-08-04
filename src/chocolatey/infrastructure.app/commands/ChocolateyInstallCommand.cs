@@ -95,6 +95,18 @@ namespace chocolatey.infrastructure.app.commands
                       {
                           if (option != null) configuration.Features.ChecksumFiles = false;
                       })
+                .Add("allowemptychecksum|allowemptychecksums|allow-empty-checksums",
+                      "Allow Empty Checksums - Allow packages to have empty checksums. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10.4+.".format_with(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.to_string()),
+                      option =>
+                      {
+                          if (option != null) configuration.Features.AllowEmptyChecksums = true;
+                      })
+                .Add("requirechecksum|requirechecksums|require-checksums",
+                      "Require Checksums - Requires packages to have checksums. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10.4+.".format_with(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.to_string()),
+                      option =>
+                      {
+                          if (option != null) configuration.Features.AllowEmptyChecksums = false;
+                      })
                 .Add("checksum=|downloadchecksum=|download-checksum=",
                      "Download Checksum - a user provided checksum for downloaded resources for the package. Overrides the package checksum (if it has one).  Defaults to empty. Available in 0.9.10.4+.",
                      option => configuration.DownloadChecksum = option.remove_surrounding_quotes())
