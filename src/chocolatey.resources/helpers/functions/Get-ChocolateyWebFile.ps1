@@ -294,14 +294,14 @@ param(
     if ($headers.ContainsKey("X-Checksum-Sha1")) {
       $remoteChecksum = $headers["X-Checksum-Sha1"]
       Write-Debug "Verifying remote checksum of `'$remoteChecksum`' for `'$fileFullPath`'."
-      Get-CheckSumValid -file $fileFullPath -checkSum $remoteChecksum -checksumType 'sha1'
+      Get-ChecksumValid -file $fileFullPath -checkSum $remoteChecksum -checksumType 'sha1'
     }
   }
 
   #skip requirement for embedded files if checksum is not provided
   if ($urlIsRemote -or ($checksum -ne $null -and $checksum -ne '')) {
     Write-Debug "Verifying package provided checksum of '$checksum' for '$fileFullPath'."
-    Get-CheckSumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType
+    Get-ChecksumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType -originalUrl $url
   }
   
 

@@ -53,7 +53,7 @@ https://support.microsoft.com/en-us/kb/811833 for more details.
 Allows splatting with arguments that do not apply. Do not use directly.
 
 .EXAMPLE
-Get-CheckSumValid -File $fileFullPath -CheckSum $checksum -ChecksumType $checksumType
+Get-ChecksumValid -File $fileFullPath -CheckSum $checksum -ChecksumType $checksumType
 
 .LINK
 Get-ChocolateyWebFile
@@ -65,14 +65,43 @@ param(
   [parameter(Mandatory=$true, Position=0)][string] $file,
   [parameter(Mandatory=$false, Position=1)][string] $checksum = '',
   [parameter(Mandatory=$false, Position=2)][string] $checksumType = 'md5',
+  [parameter(Mandatory=$false, Position=3)][string] $originalUrl = '',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Get-ChecksumValid' with file:`'$file`', checksum: `'$checksum`', checksumType: `'$checksumType`'";
-  if ($env:chocolateyIgnoreChecksums -eq 'true') {
-    Write-Warning "Ignoring checksums due to feature checksumFiles = false or config ignoreChecksums = true."
+  if ($env:ChocolateyIgnoreChecksums -eq 'true') {
+    Write-Warning "Ignoring checksums due to feature checksumFiles turned off or option --ignore-checksums set."
     return
   }
-  if ($checksum -eq '' -or $checksum -eq $null) { return }
+
+  if ($checksum -eq '' -or $checksum -eq $null) { 
+    $allowEmptyChecksums = $env:ChocolateyAllowEmptyChecksums
+    if ($allowEmptyChecksums -eq 'true') {
+      Write-Debug "Empty checksums are allowed due to allowEmptyChecksums feature or option"
+      return
+    }
+
+    Write-Warning "Missing package checksums are no longer allowed (by default) for safety and security reasons. `n If you need this functionality, please set the feature allowEmptyChecksums `n (choco feature enable -n allowEmptyChecksums) or pass in the option `n --allow-empty-checksums."
+    Write-Debug "If you are a maintainer attempting to determine the checksum for packaging purposes, please run `n 'choco install checksum' and run 'checksum -t sha256 -f $file' `n Ensure you do this for all remote resources."
+
+    if ($env:ChocolateyPowerShellHost -eq 'true') { 
+      $statement = "$([System.IO.Path]::GetFileName($file))"
+      if ($originalUrl -ne $null -and $originalUrl -ne '') {
+        $statement += " from '$originalUrl'"
+      }
+      $statement += " has not been verified by a package checksum as the originally intended file."
+      $question = 'Do you wish to allow the install to continue (not recommended)?'
+      $choices = New-Object System.Collections.ObjectModel.Collection[System.Management.Automation.Host.ChoiceDescription]
+      $choices.Add((New-Object System.Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
+      $choices.Add((New-Object System.Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
+
+      $selection = $Host.UI.PromptForChoice($statement, $question, $choices, 1)
+
+      if ($selection -eq 0) { return }
+    }
+    
+    throw "Empty checksums are no longer allowed by default. Please ask the maintainer to add checksums to this package. In the meantime, if you need this package to work correctly, please enable the feature allowEmptyChecksums or provide the runtime switch --allowEmptyChecksums"
+  }
 
   if (!([System.IO.File]::Exists($file))) { throw "Unable to checksum a file that doesn't exist - Could not find file `'$file`'" }
 
