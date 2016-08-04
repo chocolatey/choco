@@ -90,10 +90,10 @@ namespace chocolatey.infrastructure.app.commands
                      "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
                      option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
                 .Add("ignorechecksum|ignore-checksum|ignorechecksums|ignore-checksums",
-                      "IgnoreChecksums - Ignore checksums provided by the package. Available in 0.9.9.9+.",
+                      "IgnoreChecksums - Ignore checksums provided by the package. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.9.9+.".format_with(ApplicationParameters.Features.ChecksumFiles, configuration.Features.ChecksumFiles.to_string()),
                       option =>
                       {
-                          if (option != null) configuration.Features.CheckSumFiles = false;
+                          if (option != null) configuration.Features.ChecksumFiles = false;
                       })
                 .Add("ignorepackagecodes|ignorepackageexitcodes|ignore-package-codes|ignore-package-exit-codes",
                      "IgnorePackageExitCodes - Exit with a 0 for success and 1 for non-success, no matter what package scripts provide for exit codes. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),

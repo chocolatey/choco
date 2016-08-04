@@ -68,7 +68,7 @@ namespace chocolatey.infrastructure.app.configuration
 
             if (config.Debug) Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
             if (config.Verbose) Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
-            if (!config.Features.CheckSumFiles) Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
+            if (!config.Features.ChecksumFiles) Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
             Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
 

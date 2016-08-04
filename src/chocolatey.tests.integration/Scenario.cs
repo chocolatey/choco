@@ -143,7 +143,7 @@ namespace chocolatey.tests.integration
             config.ListCommand.Exact = false;
             config.Features.UsePowerShellHost = true;
             config.Features.AutoUninstaller = true;
-            config.Features.CheckSumFiles = true;
+            config.Features.ChecksumFiles = true;
 
             return config;
         }
