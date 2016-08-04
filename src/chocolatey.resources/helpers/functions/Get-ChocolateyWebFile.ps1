@@ -230,6 +230,7 @@ param(
     Write-Host "Attempt to create directory failed for '$fileFullPath'."
   }
 
+  $urlIsRemote = $true
   $headers = @{}
   if ($url.StartsWith('http')) {
     try {
@@ -274,6 +275,7 @@ param(
     Write-Host "Copying $packageName
   from `'$url`'"
     Copy-Item $url -Destination $fileFullPath -Force
+    $urlIsRemote = $false
   }
 
   Start-Sleep 2 #give it a sec or two to finish up copying
@@ -296,8 +298,12 @@ param(
     }
   }
 
-  Write-Debug "Verifying package provided checksum of '$checksum' for '$fileFullPath'."
-  Get-CheckSumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType
+  #skip requirement for embedded files if checksum is not provided
+  if ($urlIsRemote -or ($checksum -ne $null -and $checksum -ne '')) {
+    Write-Debug "Verifying package provided checksum of '$checksum' for '$fileFullPath'."
+    Get-CheckSumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType
+  }
+  
 
   return $fileFullPath
 }
