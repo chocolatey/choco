@@ -99,6 +99,18 @@ namespace chocolatey.infrastructure.app.commands
                       {
                           if (option != null) configuration.Features.ChecksumFiles = false;
                       })
+                .Add("checksum=|downloadchecksum=|download-checksum=",
+                     "Download Checksum - a user provided checksum for downloaded resources for the package. Overrides the package checksum (if it has one).  Defaults to empty. Available in 0.9.10.4+.",
+                     option => configuration.DownloadChecksum = option.remove_surrounding_quotes())
+                .Add("checksum64=|checksumx64=|downloadchecksumx64=|download-checksum-x64=",
+                     "Download Checksum 64bit - a user provided checksum for 64bit downloaded resources for the package. Overrides the package 64-bit checksum (if it has one). Defaults to same as Download Checksum. Available in 0.9.10.4+.",
+                     option => configuration.DownloadChecksum64 = option.remove_surrounding_quotes())
+                .Add("checksumtype=|checksum-type=|downloadchecksumtype=|download-checksum-type=",
+                     "Download Checksum Type - a user provided checksum type. Overrides the package checksum type (if it has one). Used in conjunction with Download Checksum. Available values are 'md5', 'sha1', 'sha256' or 'sha512'. Defaults to 'md5'. Available in 0.9.10.4+.",
+                     option => configuration.DownloadChecksumType = option.remove_surrounding_quotes())
+                .Add("checksumtype64=|checksumtypex64=|checksum-type-x64=|downloadchecksumtypex64=|download-checksum-type-x64=",
+                     "Download Checksum Type 64bit - a user provided checksum for 64bit downloaded resources for the package. Overrides the package 64-bit checksum (if it has one). Used in conjunction with Download Checksum 64bit. Available values are 'md5', 'sha1', 'sha256' or 'sha512'. Defaults to same as Download Checksum Type. Available in 0.9.10.4+.",
+                     option => configuration.DownloadChecksumType64 = option.remove_surrounding_quotes())
                 .Add("ignorepackagecodes|ignorepackageexitcodes|ignore-package-codes|ignore-package-exit-codes",
                      "IgnorePackageExitCodes - Exit with a 0 for success and 1 for non-success, no matter what package scripts provide for exit codes. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
                      option =>

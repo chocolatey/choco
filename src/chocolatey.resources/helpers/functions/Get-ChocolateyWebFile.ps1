@@ -158,7 +158,18 @@ param(
 )
   Write-Debug "Running 'Get-ChocolateyWebFile' for $packageName with url:`'$url`', fileFullPath:`'$fileFullPath`', url64bit:`'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`'";
 
-  $url32bit = $url;
+  $url32bit = $url
+
+  # allow user provided values for checksumming
+  $checksum32Override = $env:chocolateyChecksum32
+  $checksumType32Override = $env:chocolateyChecksumType32
+  $checksum64Override = $env:chocolateyChecksum64
+  $checksumType64Override = $env:chocolateyChecksumType64
+  if ($checksum32Override -ne $null -and $checksum32Override -ne '') { $checksum = $checksum32Override } 
+  if ($checksumType32Override -ne $null -and $checksumType32Override -ne '') { $checksumType = $checksumType32Override } 
+  if ($checksum64Override -ne $null -and $checksum64Override -ne '') { $checksum64 = $checksum64Override } 
+  if ($checksumType64Override -ne $null -and $checksumType64Override -ne '') { $checksumType64 = $checksumType64Override } 
+
   $checksum32 = $checksum
   $checksumType32 = $checksumType
   $bitWidth = 32
@@ -173,7 +184,7 @@ param(
   if ($bitWidth -eq 64 -and $url64bit -ne $null -and $url64bit -ne '') {
     Write-Debug "Setting url to '$url64bit' and bitPackage to $bitWidth"
     $bitPackage = '64 bit'
-    $url = $url64bit;
+    $url = $url64bit
     # only set if urls are different
     if ($url32bit -ne $url64bit) {
       $checksum = $checksum64

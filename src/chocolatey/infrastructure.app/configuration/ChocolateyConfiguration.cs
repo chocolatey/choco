@@ -207,7 +207,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool AllowMultipleVersions { get; set; }
         public bool AllowDowngrade { get; set; }
         public bool ForceDependencies { get; set; }
-
+        public string DownloadChecksum { get; set; }
+        public string DownloadChecksum64 { get; set; }
+        public string DownloadChecksumType { get; set; }
+        public string DownloadChecksumType64 { get; set; }
+        
         /// <summary>
         ///   Configuration values provided by choco.
         /// </summary>
