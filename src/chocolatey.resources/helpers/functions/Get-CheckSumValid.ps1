@@ -117,8 +117,13 @@ param(
       return
     }
 
-    Write-Warning "Missing package checksums are no longer allowed (by default) for safety and security reasons. `n If you need this functionality, please set the feature allowEmptyChecksums `n (choco feature enable -n allowEmptyChecksums) or pass in the option `n --allow-empty-checksums."
+    Write-Warning "Missing package checksums are no longer allowed (by default for HTTP, `n soon for HTTPS as well) for safety and security reasons. If you need `n this functionality, please set the feature allowEmptyChecksums `n (choco feature enable -n allowEmptyChecksums) or pass in the option `n --allow-empty-checksums."
     Write-Debug "If you are a maintainer attempting to determine the checksum for packaging purposes, please run `n 'choco install checksum' and run 'checksum -t sha256 -f $file' `n Ensure you do this for all remote resources."
+
+    if ($originalUrl -ne $null -and $originalUrl.ToLower().StartsWith("https")) {
+      Write-Warning "Download from HTTPS source. Checksum requirement for HTTPS is delayed until at least 0.10.1."
+      return
+    }
 
     if ($env:ChocolateyPowerShellHost -eq 'true') { 
       $statement = "$([System.IO.Path]::GetFileName($file))"
