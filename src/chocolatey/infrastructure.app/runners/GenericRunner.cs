@@ -104,18 +104,8 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
                     }
                 }
-
-                if (config.Noop)
-                {
-                    if (config.RegularOutput)
-                    {
-                        this.Log().Info("_ {0}:{1} - Noop Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
-                    }
-
-                    command.noop(config);
-                    return null;
-                }
             }
+
             return command;
         }
 
@@ -145,14 +135,25 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
             fail_when_license_is_missing_or_invalid_if_requested(config);
 
-
             EventManager.publish(new PreRunMessage(config));
 
             var command = find_command(config, container, isConsole, parseArgs);
             if (command != null)
             {
-                this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
-                command.run(config);
+                if (config.Noop)
+                {
+                    if (config.RegularOutput)
+                    {
+                        this.Log().Info("_ {0}:{1} - Noop Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                    }
+
+                    command.noop(config);
+                }
+                else
+                {
+                    this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                    command.run(config);
+                }
             }
 
             EventManager.publish(new PostRunMessage(config));
