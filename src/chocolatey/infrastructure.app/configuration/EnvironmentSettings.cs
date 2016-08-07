@@ -189,9 +189,24 @@ namespace chocolatey.infrastructure.app.configuration
                 ).Replace(";;", ";");
 
             // add back in process items
-            updatedPath += append_process_items(updatedPath, originalPath);
-            updatedPathExt += append_process_items(updatedPathExt, originalPathExt);
-            updatedPsModulePath += append_process_items(updatedPsModulePath, originalPsModulePath);
+            updatedPath += gather_process_only_items(updatedPath, originalPath);
+            updatedPathExt += gather_process_only_items(updatedPathExt, originalPathExt);
+            updatedPsModulePath = "{0};{1}".format_with(gather_process_only_items(updatedPsModulePath, originalPsModulePath),updatedPsModulePath);
+
+            if (!updatedPsModulePath.contains(ApplicationParameters.PowerShellModulePathProcessProgramFiles))
+            {
+                updatedPsModulePath = "{0};{1}".format_with(ApplicationParameters.PowerShellModulePathProcessProgramFiles, updatedPsModulePath).Replace(";;", ";");
+            }            
+            
+            if (!updatedPsModulePath.contains(ApplicationParameters.PowerShellModulePathProcessDocuments))
+            {
+                updatedPsModulePath = "{0};{1}".format_with(ApplicationParameters.PowerShellModulePathProcessDocuments, updatedPsModulePath).Replace(";;", ";");
+            }
+
+            if (updatedPsModulePath.StartsWith(";"))
+            {
+                updatedPsModulePath = updatedPsModulePath.Remove(0, 1);
+            }
 
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.Path, updatedPath);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions, updatedPathExt);
@@ -213,7 +228,7 @@ namespace chocolatey.infrastructure.app.configuration
             }
         }
 
-        private static string append_process_items(string currentValues, IEnumerable<string> originalValues)
+        private static string gather_process_only_items(string currentValues, IEnumerable<string> originalValues)
         {
             var additionalItems = new StringBuilder();
             var items = currentValues.Split(
