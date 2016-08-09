@@ -65,6 +65,7 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable("IS_ADMIN", config.Information.IsUserAdministrator ? "true" : "false");
             Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", config.Information.IsProcessElevated ? "true" : "false");
             Environment.SetEnvironmentVariable("TEMP", config.CacheLocation);
+            Environment.SetEnvironmentVariable("TMP", config.CacheLocation);
 
             if (config.Debug) Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
             if (config.Verbose) Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
