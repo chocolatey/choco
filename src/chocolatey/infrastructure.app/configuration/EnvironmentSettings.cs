@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System.ComponentModel;
     using System.Linq;
     using System.Reflection;
+    using System.Security.Principal;
     using System.Text;
     using adapters;
     using logging;
@@ -169,7 +170,23 @@ namespace chocolatey.infrastructure.app.configuration
 
             // refresh current values with updated values, mathine first
             refresh_environment_variables(machineVariables);
-            refresh_environment_variables(userVariables);
+
+            //if the user is SYSTEM, we should not even look at user Variables
+            var setUserEnvironmentVariables = true;
+            try
+            {
+                var userIdentity = WindowsIdentity.GetCurrent();
+                if (userIdentity != null && userIdentity.User == ApplicationParameters.LocalSystemSid)
+                {
+                    setUserEnvironmentVariables = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                "chocolatey".Log().Debug("Unable to determine current user to determine if LocalSystem account (to skip user env vars).{0} Reported error: {1}".format_with(Environment.NewLine, ex.Message));
+            }
+
+            if (setUserEnvironmentVariables) refresh_environment_variables(userVariables);
 
             // restore process overridden variables
             if (originalEnvironmentVariables.Contains(ApplicationParameters.Environment.Username)) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.Username, userName);
