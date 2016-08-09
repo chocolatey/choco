@@ -25,6 +25,7 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+    using Should;
 
     public class NugetServiceSpecs
     {
@@ -214,6 +215,54 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 fileSystem.Verify(x => x.delete_file(filePath),Times.Never);
+            }
+        }
+
+        public class when_NugetService_pack_noop : NugetServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+
+            public override void Context()
+            {
+                base.Context();
+                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\projects\\chocolatey");
+            }
+
+            public override void Because()
+            {
+                because = () => service.pack_noop(config);
+            }
+
+            public override void AfterEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            public void generated_package_should_be_in_current_directory()
+            {
+                Context();
+
+                because();
+
+                var infos = MockLogger.MessagesFor(LogLevel.Info);
+                infos.Count.ShouldEqual(1);
+                infos[0].ShouldEqual("Chocolatey would have searched for a nuspec file in \"c:\\projects\\chocolatey\" and attempted to compile it.");
+            }
+
+            [Fact]
+            public void generated_package_should_be_in_specified_directory()
+            {
+                Context();
+
+                config.OutputDirectory = "c:\\packages";
+
+                because();
+
+                var infos = MockLogger.MessagesFor(LogLevel.Info);
+                infos.Count.ShouldEqual(1);
+                infos[0].ShouldEqual("Chocolatey would have searched for a nuspec file in \"c:\\packages\" and attempted to compile it.");
             }
         }
     }

@@ -21,9 +21,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{FB6236DD-17EF-4C36-943C-47792FBC3306}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chocolatey", "chocolatey", "{DAB29F30-149D-4005-A8D2-4FA56CF2784D}"
-	ProjectSection(SolutionItems) = preProject
-		..\nuget\chocolatey\chocolatey.nuspec = ..\nuget\chocolatey\chocolatey.nuspec
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E5C987F8-6B95-4835-BBDD-A25C9D370BB9}"
 	ProjectSection(SolutionItems) = preProject
