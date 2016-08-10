@@ -227,7 +227,7 @@ namespace chocolatey.infrastructure.app.services
             var args = ExternalCommandArgsBuilder.build_arguments(config, argsDictionary);
 
             // at least Windows 8/2012
-            if (config.Information.PlatformVersion.Major >= 6 && config.Information.PlatformVersion.Minor >= 2)
+            if (config.Information.PlatformVersion.Major > 6 || (config.Information.PlatformVersion.Major == 6 && config.Information.PlatformVersion.Minor >= 2))
             {
                 args = args.Replace(ALL_TOKEN, "/All");
             }
