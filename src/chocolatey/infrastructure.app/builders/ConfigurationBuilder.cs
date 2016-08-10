@@ -259,7 +259,8 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void set_feature_flags(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
         {
-            config.Features.CheckSumFiles = set_feature_flag(ApplicationParameters.Features.CheckSumFiles, configFileSettings, defaultEnabled: true, description: "Checksum files when pulled in from internet (based on package).");
+            config.Features.ChecksumFiles = set_feature_flag(ApplicationParameters.Features.ChecksumFiles, configFileSettings, defaultEnabled: true, description: "Checksum files when pulled in from internet (based on package).");
+            config.Features.AllowEmptyChecksums = set_feature_flag(ApplicationParameters.Features.AllowEmptyChecksums, configFileSettings, defaultEnabled: false, description: "Allow packages to have empty checksums. Available in 0.10.0+.");
             config.Features.AutoUninstaller = set_feature_flag(ApplicationParameters.Features.AutoUninstaller, configFileSettings, defaultEnabled: true, description: "Uninstall from programs and features without requiring an explicit uninstall script.");
             config.Features.FailOnAutoUninstaller = set_feature_flag(ApplicationParameters.Features.FailOnAutoUninstaller, configFileSettings, defaultEnabled: false, description: "Fail if automatic uninstaller fails.");
             config.Features.FailOnStandardError = set_feature_flag(ApplicationParameters.Features.FailOnStandardError, configFileSettings, defaultEnabled: false, description: "Fail if install provider writes to stderr. Available in 0.9.10+.");

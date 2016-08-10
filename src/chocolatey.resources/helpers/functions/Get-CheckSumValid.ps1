@@ -18,10 +18,28 @@ function Get-ChecksumValid {
 Checks a file's checksum versus a passed checksum and checksum type.
 
 .DESCRIPTION
-Makes a determination if a file meets an expected checksum. This
-function is usually used when comparing a file that is downloaded from
-an official distribution point. If the checksum fails to
-match, this function throws an error.
+Makes a determination if a file meets an expected checksum signature. 
+This function is usually used when comparing a file that is downloaded 
+from an official distribution point. If the checksum fails to match the
+expected output, this function throws an error.
+
+Checksums have been used for years as a means of verification. A 
+checksum hash is a unique value or signature that corresponds to the 
+contents of a file. File names and extensions can be altered without 
+changing the checksum signature. However if you changed the contents of 
+the file, even one character, the checksum will be different.
+
+Checksums are used to provide as a means of cryptographically ensuring
+the contents of a file have not been changed. While some cryptographic 
+algorithms, including MD5 and SHA1, are no longer considered secure 
+against attack, the goal of a checksum algorithm is to make it 
+extremely difficult (near impossible with better algorithms) to alter
+the contents of a file (whether by accident or for malicious reasons)
+and still result in the same checksum signature.
+
+When verifying a checksum using a secure algorithm, if the checksum 
+matches the expected signature, the contents of the file are identical 
+to what is expected. 
 
 .NOTES
 This uses the checksum.exe tool available separately at
@@ -41,6 +59,24 @@ passed Checksum parameter value.
 The expected checksum hash value of the File resource. The checksum
 type is covered by ChecksumType.
 
+**NOTE:** Checksums in packages are meant as a measure to validate the 
+originally intended file that was used in the creation of a package is
+the same file that is received at a future date. Since this is used for
+other steps in the process related to the community repository, it 
+ensures that the file a user receives is the same file a maintainer
+and a moderator (if applicable), plus any moderation review has 
+intended for you to receive with this package. If you are looking at a 
+remote source that uses the same url for updates, you will need to 
+ensure the package also stays updated in line with those remote 
+resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages) 
+to help provide that functionality.
+
+**NOTE:** To determine checksums, you can get that from the original 
+site if provided. You can also use the [checksum tool available on 
+the community feed](https://chocolatey.org/packages/checksum) (`choco install checksum`) 
+and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you 
+provide checksums for all remote resources used.
+
 .PARAMETER ChecksumType
 The type of checkum that the file is validated with - 'md5', 'sha1',
 'sha256' or 'sha512' - defaults to 'md5'.
@@ -53,7 +89,7 @@ https://support.microsoft.com/en-us/kb/811833 for more details.
 Allows splatting with arguments that do not apply. Do not use directly.
 
 .EXAMPLE
-Get-CheckSumValid -File $fileFullPath -CheckSum $checksum -ChecksumType $checksumType
+Get-ChecksumValid -File $fileFullPath -CheckSum $checksum -ChecksumType $checksumType
 
 .LINK
 Get-ChocolateyWebFile
@@ -65,14 +101,48 @@ param(
   [parameter(Mandatory=$true, Position=0)][string] $file,
   [parameter(Mandatory=$false, Position=1)][string] $checksum = '',
   [parameter(Mandatory=$false, Position=2)][string] $checksumType = 'md5',
+  [parameter(Mandatory=$false, Position=3)][string] $originalUrl = '',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Get-ChecksumValid' with file:`'$file`', checksum: `'$checksum`', checksumType: `'$checksumType`'";
-  if ($env:chocolateyIgnoreChecksums -eq 'true') {
-    Write-Warning "Ignoring checksums due to feature checksumFiles = false or config ignoreChecksums = true."
+  if ($env:ChocolateyIgnoreChecksums -eq 'true') {
+    Write-Warning "Ignoring checksums due to feature checksumFiles turned off or option --ignore-checksums set."
     return
   }
-  if ($checksum -eq '' -or $checksum -eq $null) { return }
+
+  if ($checksum -eq '' -or $checksum -eq $null) { 
+    $allowEmptyChecksums = $env:ChocolateyAllowEmptyChecksums
+    if ($allowEmptyChecksums -eq 'true') {
+      Write-Debug "Empty checksums are allowed due to allowEmptyChecksums feature or option"
+      return
+    }
+
+    Write-Warning "Missing package checksums are no longer allowed (by default for HTTP, `n soon for HTTPS as well) for safety and security reasons. If you need `n this functionality, please set the feature allowEmptyChecksums `n (choco feature enable -n allowEmptyChecksums) or pass in the option `n --allow-empty-checksums."
+    Write-Debug "If you are a maintainer attempting to determine the checksum for packaging purposes, please run `n 'choco install checksum' and run 'checksum -t sha256 -f $file' `n Ensure you do this for all remote resources."
+
+    if ($originalUrl -ne $null -and $originalUrl.ToLower().StartsWith("https")) {
+      Write-Warning "Download from HTTPS source. Checksum requirement for HTTPS is delayed until at least 0.10.1."
+      return
+    }
+
+    if ($env:ChocolateyPowerShellHost -eq 'true') { 
+      $statement = "$([System.IO.Path]::GetFileName($file))"
+      if ($originalUrl -ne $null -and $originalUrl -ne '') {
+        $statement += " from '$originalUrl'"
+      }
+      $statement += " has not been verified by a package checksum as the originally intended file."
+      $question = 'Do you wish to allow the install to continue (not recommended)?'
+      $choices = New-Object System.Collections.ObjectModel.Collection[System.Management.Automation.Host.ChoiceDescription]
+      $choices.Add((New-Object System.Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
+      $choices.Add((New-Object System.Management.Automation.Host.ChoiceDescription -ArgumentList '&No'))
+
+      $selection = $Host.UI.PromptForChoice($statement, $question, $choices, 1)
+
+      if ($selection -eq 0) { return }
+    }
+    
+    throw "Empty checksums are no longer allowed by default. Please ask the maintainer to add checksums to this package. In the meantime, if you need this package to work correctly, please enable the feature allowEmptyChecksums or provide the runtime switch --allowEmptyChecksums"
+  }
 
   if (!([System.IO.File]::Exists($file))) { throw "Unable to checksum a file that doesn't exist - Could not find file `'$file`'" }
 

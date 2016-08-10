@@ -78,7 +78,7 @@ param (
 
   [Microsoft.Win32.RegistryValueKind]$registryType = [Microsoft.Win32.RegistryValueKind]::String
   try {
-    $registryType = $reg.GetValueKind($Name)
+    $registryType = $win32RegistryKey.GetValueKind($Name)
   } catch {
     # the value doesn't yet exist
     # move along, nothing to see here
@@ -114,7 +114,6 @@ public static extern IntPtr SendMessageTimeout(
     # Set a user environment variable making the system refresh
     $setx = "$($env:SystemRoot)\System32\setx.exe"
     & "$setx" ChocolateyLastPathUpdate `"$(Get-Date -UFormat %c)`" | Out-Null
-
   } catch {
     Write-Warning "Failure attempting to let Explorer know about updated environment settings.`n  $($_.Exception.Message)"
   }

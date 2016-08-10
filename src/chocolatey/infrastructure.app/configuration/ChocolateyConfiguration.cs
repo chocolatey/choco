@@ -207,7 +207,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool AllowMultipleVersions { get; set; }
         public bool AllowDowngrade { get; set; }
         public bool ForceDependencies { get; set; }
-
+        public string DownloadChecksum { get; set; }
+        public string DownloadChecksum64 { get; set; }
+        public string DownloadChecksumType { get; set; }
+        public string DownloadChecksumType64 { get; set; }
+        
         /// <summary>
         ///   Configuration values provided by choco.
         /// </summary>
@@ -335,7 +339,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class FeaturesConfiguration
     {
         public bool AutoUninstaller { get; set; }
-        public bool CheckSumFiles { get; set; }
+        public bool ChecksumFiles { get; set; }
+        public bool AllowEmptyChecksums { get; set; }
         public bool FailOnAutoUninstaller { get; set; }
         public bool FailOnStandardError { get; set; }
         public bool UsePowerShellHost { get; set; }

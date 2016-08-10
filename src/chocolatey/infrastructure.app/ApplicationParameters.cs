@@ -16,7 +16,7 @@
 namespace chocolatey.infrastructure.app
 {
     using System;
-    using System.Text.RegularExpressions;
+    using System.Security.Principal;
     using adapters;
     using filesystem;
     using Environment = System.Environment;
@@ -71,6 +71,10 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyPackageInstallLocationEnvironmentVariableName = "ChocolateyPackageInstallLocation";
         public static readonly string ChocolateyPackageInstallerTypeEnvironmentVariableName = "ChocolateyInstallerType";
         public static readonly string ChocolateyPackageExitCodeEnvironmentVariableName = "ChocolateyExitCode";
+        public static readonly string PowerShellModulePathProcessProgramFiles = _fileSystem.combine_paths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFiles), "WindowsPowerShell\\Modules");
+        public static readonly string PowerShellModulePathProcessDocuments = _fileSystem.combine_paths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "WindowsPowerShell\\Modules");
+        public static readonly string LocalSystemSidString = "S-1-5-18";
+        public static readonly SecurityIdentifier LocalSystemSid = new SecurityIdentifier(LocalSystemSidString);
 
         public static class Environment
         {
@@ -118,7 +122,8 @@ namespace chocolatey.infrastructure.app
         
         public static class Features
         {
-            public static readonly string CheckSumFiles = "checksumFiles";
+            public static readonly string ChecksumFiles = "checksumFiles";
+            public static readonly string AllowEmptyChecksums = "allowEmptyChecksums";
             public static readonly string AutoUninstaller = "autoUninstaller";
             public static readonly string FailOnAutoUninstaller = "failOnAutoUninstaller";
             public static readonly string AllowGlobalConfirmation = "allowGlobalConfirmation";

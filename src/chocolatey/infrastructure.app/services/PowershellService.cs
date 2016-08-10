@@ -396,6 +396,10 @@ namespace chocolatey.infrastructure.app.services
             Environment.SetEnvironmentVariable("packageParameters", null);
             Environment.SetEnvironmentVariable("chocolateyPackageParameters", null);
             Environment.SetEnvironmentVariable("chocolateyInstallOverride", null);
+            Environment.SetEnvironmentVariable("chocolateyChecksum32", null);
+            Environment.SetEnvironmentVariable("chocolateyChecksumType32", null);
+            Environment.SetEnvironmentVariable("chocolateyChecksum64", null);
+            Environment.SetEnvironmentVariable("chocolateyChecksumType64", null);
 
             // we only want to pass the following args to packages that would apply. 
             // like choco install git -params '' should pass those params to git.install, 
@@ -413,6 +417,28 @@ namespace chocolatey.infrastructure.app.services
                 {
                     Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
                 }
+            }
+
+            if (!string.IsNullOrWhiteSpace(configuration.DownloadChecksum))
+            {
+                Environment.SetEnvironmentVariable("chocolateyChecksum32", configuration.DownloadChecksum);
+                Environment.SetEnvironmentVariable("chocolateyChecksum64", configuration.DownloadChecksum);
+            }
+
+            if (!string.IsNullOrWhiteSpace(configuration.DownloadChecksumType))
+            {
+                Environment.SetEnvironmentVariable("chocolateyChecksumType32", configuration.DownloadChecksumType);
+                Environment.SetEnvironmentVariable("chocolateyChecksumType64", configuration.DownloadChecksumType);
+            }
+
+            if (!string.IsNullOrWhiteSpace(configuration.DownloadChecksum64))
+            {
+                Environment.SetEnvironmentVariable("chocolateyChecksum64", configuration.DownloadChecksum64);
+            }
+
+            if (!string.IsNullOrWhiteSpace(configuration.DownloadChecksumType64))
+            {
+                Environment.SetEnvironmentVariable("chocolateyChecksumType64", configuration.DownloadChecksumType64);
             }
 
             if (configuration.ForceX86)

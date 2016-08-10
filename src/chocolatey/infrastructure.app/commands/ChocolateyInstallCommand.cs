@@ -90,11 +90,35 @@ namespace chocolatey.infrastructure.app.commands
                      "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
                      option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
                 .Add("ignorechecksum|ignore-checksum|ignorechecksums|ignore-checksums",
-                      "IgnoreChecksums - Ignore checksums provided by the package. Available in 0.9.9.9+.",
+                      "IgnoreChecksums - Ignore checksums provided by the package. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.9.9+.".format_with(ApplicationParameters.Features.ChecksumFiles, configuration.Features.ChecksumFiles.to_string()),
                       option =>
                       {
-                          if (option != null) configuration.Features.CheckSumFiles = false;
+                          if (option != null) configuration.Features.ChecksumFiles = false;
                       })
+                .Add("allowemptychecksum|allowemptychecksums|allow-empty-checksums",
+                      "Allow Empty Checksums - Allow packages to have empty checksums. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.0+.".format_with(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.to_string()),
+                      option =>
+                      {
+                          if (option != null) configuration.Features.AllowEmptyChecksums = true;
+                      })
+                .Add("requirechecksum|requirechecksums|require-checksums",
+                      "Require Checksums - Requires packages to have checksums. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.0+.".format_with(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.to_string()),
+                      option =>
+                      {
+                          if (option != null) configuration.Features.AllowEmptyChecksums = false;
+                      })
+                .Add("checksum=|downloadchecksum=|download-checksum=",
+                     "Download Checksum - a user provided checksum for downloaded resources for the package. Overrides the package checksum (if it has one).  Defaults to empty. Available in 0.10.0+.",
+                     option => configuration.DownloadChecksum = option.remove_surrounding_quotes())
+                .Add("checksum64=|checksumx64=|downloadchecksumx64=|download-checksum-x64=",
+                     "Download Checksum 64bit - a user provided checksum for 64bit downloaded resources for the package. Overrides the package 64-bit checksum (if it has one). Defaults to same as Download Checksum. Available in 0.10.0+.",
+                     option => configuration.DownloadChecksum64 = option.remove_surrounding_quotes())
+                .Add("checksumtype=|checksum-type=|downloadchecksumtype=|download-checksum-type=",
+                     "Download Checksum Type - a user provided checksum type. Overrides the package checksum type (if it has one). Used in conjunction with Download Checksum. Available values are 'md5', 'sha1', 'sha256' or 'sha512'. Defaults to 'md5'. Available in 0.10.0+.",
+                     option => configuration.DownloadChecksumType = option.remove_surrounding_quotes())
+                .Add("checksumtype64=|checksumtypex64=|checksum-type-x64=|downloadchecksumtypex64=|download-checksum-type-x64=",
+                     "Download Checksum Type 64bit - a user provided checksum for 64bit downloaded resources for the package. Overrides the package 64-bit checksum (if it has one). Used in conjunction with Download Checksum 64bit. Available values are 'md5', 'sha1', 'sha256' or 'sha512'. Defaults to same as Download Checksum Type. Available in 0.10.0+.",
+                     option => configuration.DownloadChecksumType64 = option.remove_surrounding_quotes())
                 .Add("ignorepackagecodes|ignorepackageexitcodes|ignore-package-codes|ignore-package-exit-codes",
                      "IgnorePackageExitCodes - Exit with a 0 for success and 1 for non-success, no matter what package scripts provide for exit codes. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
                      option =>
@@ -110,7 +134,7 @@ namespace chocolatey.infrastructure.app.commands
                      )
                 ;
 
-            //todo: Checksum / ChecksumType defaults to md5 / package name can be a url / installertype
+            //todo: package name can be a url / installertype
         }
 
         public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)

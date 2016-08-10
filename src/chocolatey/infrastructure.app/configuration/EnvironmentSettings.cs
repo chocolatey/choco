@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System.ComponentModel;
     using System.Linq;
     using System.Reflection;
+    using System.Security.Principal;
     using System.Text;
     using adapters;
     using logging;
@@ -65,10 +66,12 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable("IS_ADMIN", config.Information.IsUserAdministrator ? "true" : "false");
             Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", config.Information.IsProcessElevated ? "true" : "false");
             Environment.SetEnvironmentVariable("TEMP", config.CacheLocation);
+            Environment.SetEnvironmentVariable("TMP", config.CacheLocation);
 
             if (config.Debug) Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
             if (config.Verbose) Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
-            if (!config.Features.CheckSumFiles) Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
+            if (!config.Features.ChecksumFiles) Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
+            if (config.Features.AllowEmptyChecksums) Environment.SetEnvironmentVariable("ChocolateyAllowEmptyChecksums", "true");
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
             Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
 
@@ -167,7 +170,23 @@ namespace chocolatey.infrastructure.app.configuration
 
             // refresh current values with updated values, mathine first
             refresh_environment_variables(machineVariables);
-            refresh_environment_variables(userVariables);
+
+            //if the user is SYSTEM, we should not even look at user Variables
+            var setUserEnvironmentVariables = true;
+            try
+            {
+                var userIdentity = WindowsIdentity.GetCurrent();
+                if (userIdentity != null && userIdentity.User == ApplicationParameters.LocalSystemSid)
+                {
+                    setUserEnvironmentVariables = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                "chocolatey".Log().Debug("Unable to determine current user to determine if LocalSystem account (to skip user env vars).{0} Reported error: {1}".format_with(Environment.NewLine, ex.Message));
+            }
+
+            if (setUserEnvironmentVariables) refresh_environment_variables(userVariables);
 
             // restore process overridden variables
             if (originalEnvironmentVariables.Contains(ApplicationParameters.Environment.Username)) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.Username, userName);
@@ -188,9 +207,24 @@ namespace chocolatey.infrastructure.app.configuration
                 ).Replace(";;", ";");
 
             // add back in process items
-            updatedPath += append_process_items(updatedPath, originalPath);
-            updatedPathExt += append_process_items(updatedPathExt, originalPathExt);
-            updatedPsModulePath += append_process_items(updatedPsModulePath, originalPsModulePath);
+            updatedPath += gather_process_only_items(updatedPath, originalPath);
+            updatedPathExt += gather_process_only_items(updatedPathExt, originalPathExt);
+            updatedPsModulePath = "{0};{1}".format_with(gather_process_only_items(updatedPsModulePath, originalPsModulePath),updatedPsModulePath);
+
+            if (!updatedPsModulePath.contains(ApplicationParameters.PowerShellModulePathProcessProgramFiles))
+            {
+                updatedPsModulePath = "{0};{1}".format_with(ApplicationParameters.PowerShellModulePathProcessProgramFiles, updatedPsModulePath).Replace(";;", ";");
+            }            
+            
+            if (!updatedPsModulePath.contains(ApplicationParameters.PowerShellModulePathProcessDocuments))
+            {
+                updatedPsModulePath = "{0};{1}".format_with(ApplicationParameters.PowerShellModulePathProcessDocuments, updatedPsModulePath).Replace(";;", ";");
+            }
+
+            if (updatedPsModulePath.StartsWith(";"))
+            {
+                updatedPsModulePath = updatedPsModulePath.Remove(0, 1);
+            }
 
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.Path, updatedPath);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions, updatedPathExt);
@@ -212,7 +246,7 @@ namespace chocolatey.infrastructure.app.configuration
             }
         }
 
-        private static string append_process_items(string currentValues, IEnumerable<string> originalValues)
+        private static string gather_process_only_items(string currentValues, IEnumerable<string> originalValues)
         {
             var additionalItems = new StringBuilder();
             var items = currentValues.Split(

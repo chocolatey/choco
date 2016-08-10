@@ -562,15 +562,36 @@ function Add-ChocolateyProfile {
     $profileFile = "$profile"
     $profileDirectory = (Split-Path -Parent $profileFile)
 
+    if ($env:ChocolateyNoProfile -ne $null -and $env:ChocolateyNoProfile -ne '') {
+      Write-Warning "Environment variable "ChocolateyNoProfile" exists and is set. Not setting profile."
+      return
+    }
+
+    $localSystem = Get-LocalizedWellKnownPrincipalName -WellKnownSidType ([Security.Principal.WellKnownSidType]::LocalSystemSid)
+    # get current user
+    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+    if ($currentUser.Name -eq $localSystem) {
+      Write-Warning "Not setting profile for SYSTEM user."
+      return
+    }
+
     if (!(Test-Path($profileDirectory))) {
       Write-Debug "Creating '$profileDirectory'"
       New-Item "$profileDirectory" -Type Directory -Force -ErrorAction SilentlyContinue | Out-Null
     }
 
     if (!(Test-Path($profileFile))) {
-      Write-Debug "Creating '$profileFile'"
-      "" | Out-File $profileFile -Encoding UTF8
+      Write-Warning "Not setting profile. Profile file does not exist at '$profileFile'."
+      return
 
+      #Write-Debug "Creating '$profileFile'"
+      #"" | Out-File $profileFile -Encoding UTF8
+    }
+
+    $signature = Get-AuthenticodeSignature $profile
+    if ($signature.Status -ne 'NotSigned') {
+      Write-Warning "Not setting profile, file is Authenticode signed at '$profile'."
+      return
     }
 
     $profileInstall = @'

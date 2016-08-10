@@ -173,8 +173,41 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        Defaults to empty. Available in 0.9.10+.
 
      --ignorechecksum, --ignore-checksum, --ignorechecksums, --ignore-checksums
-     IgnoreChecksums - Ignore checksums provided by the package. Available in 
-       0.9.9.9+.
+     IgnoreChecksums - Ignore checksums provided by the package. Overrides 
+       the default feature 'checksumFiles' set to 'True'. Available in 0.9.9.9+.
+
+     --allowemptychecksum, --allowemptychecksums, --allow-empty-checksums
+     Allow Empty Checksums - Allow packages to have empty checksums. 
+       Overrides the default feature 'allowEmptyChecksums' set to 'False'. 
+       Available in 0.10.0+.
+
+     --requirechecksum, --requirechecksums, --require-checksums
+     Require Checksums - Requires packages to have checksums. Overrides the 
+       default feature 'allowEmptyChecksums' set to 'False'. Available in 0.1-
+       0.0+.
+
+     --checksum, --downloadchecksum, --download-checksum=VALUE
+     Download Checksum - a user provided checksum for downloaded resources 
+       for the package. Overrides the package checksum (if it has one).  
+       Defaults to empty. Available in 0.10.0+.
+
+     --checksum64, --checksumx64, --downloadchecksumx64, --download-checksum-x64=VALUE
+     Download Checksum 64bit - a user provided checksum for 64bit downloaded 
+       resources for the package. Overrides the package 64-bit checksum (if it 
+       has one). Defaults to same as Download Checksum. Available in 0.10.0+.
+
+     --checksumtype, --checksum-type, --downloadchecksumtype, --download-checksum-type=VALUE
+     Download Checksum Type - a user provided checksum type. Overrides the 
+       package checksum type (if it has one). Used in conjunction with Download 
+       Checksum. Available values are 'md5', 'sha1', 'sha256' or 'sha512'. 
+       Defaults to 'md5'. Available in 0.10.0+.
+
+     --checksumtype64, --checksumtypex64, --checksum-type-x64, --downloadchecksumtypex64, --download-checksum-type-x64=VALUE
+     Download Checksum Type 64bit - a user provided checksum for 64bit 
+       downloaded resources for the package. Overrides the package 64-bit 
+       checksum (if it has one). Used in conjunction with Download Checksum 
+       64bit. Available values are 'md5', 'sha1', 'sha256' or 'sha512'. 
+       Defaults to same as Download Checksum Type. Available in 0.10.0+.
 
      --ignorepackagecodes, --ignorepackageexitcodes, --ignore-package-codes, --ignore-package-exit-codes
      IgnorePackageExitCodes - Exit with a 0 for success and 1 for non-succes-

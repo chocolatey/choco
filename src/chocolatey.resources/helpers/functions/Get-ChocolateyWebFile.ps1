@@ -59,12 +59,24 @@ this parameter.
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
 .PARAMETER Checksum
-OPTIONAL (Highly recommended) - The checksum hash value of the Url
-resource. This allows a checksum to be validated for files that are not
-local. The checksum type is covered by ChecksumType.
+The checksum hash value of the Url resource. This allows a checksum to 
+be validated for files that are not local. The checksum type is covered
+by ChecksumType. 
+
+**NOTE:** Checksums in packages are meant as a measure to validate the 
+originally intended file that was used in the creation of a package is
+the same file that is received at a future date. Since this is used for
+other steps in the process related to the community repository, it 
+ensures that the file a user receives is the same file a maintainer
+and a moderator (if applicable), plus any moderation review has 
+intended for you to receive with this package. If you are looking at a 
+remote source that uses the same url for updates, you will need to 
+ensure the package also stays updated in line with those remote 
+resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages) 
+to help provide that functionality.
 
 .PARAMETER ChecksumType
-OPTIONAL - The type of checkum that the file is validated with - valid
+The type of checkum that the file is validated with - valid
 values are 'md5', 'sha1', 'sha256' or 'sha512' - defaults to 'md5'.
 
 MD5 is not recommended as certain organizations need to use FIPS
@@ -72,9 +84,27 @@ compliant algorithms for hashing - see
 https://support.microsoft.com/en-us/kb/811833 for more details.
 
 .PARAMETER Checksum64
-OPTIONAL (Highly recommended) - The checksum hash value of the Url64bit
+OPTIONAL if no Url64bit - The checksum hash value of the Url64bit
 resource. This allows a checksum to be validated for files that are not
 local. The checksum type is covered by ChecksumType64.
+
+**NOTE:** Checksums in packages are meant as a measure to validate the 
+originally intended file that was used in the creation of a package is
+the same file that is received at a future date. Since this is used for
+other steps in the process related to the community repository, it 
+ensures that the file a user receives is the same file a maintainer
+and a moderator (if applicable), plus any moderation review has 
+intended for you to receive with this package. If you are looking at a 
+remote source that uses the same url for updates, you will need to 
+ensure the package also stays updated in line with those remote 
+resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages) 
+to help provide that functionality.
+
+**NOTE:** To determine checksums, you can get that from the original 
+site if provided. You can also use the [checksum tool available on 
+the community feed](https://chocolatey.org/packages/checksum) (`choco install checksum`) 
+and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you 
+provide checksums for all remote resources used.
 
 .PARAMETER ChecksumType64
 OPTIONAL - The type of checkum that the file is validated with - valid
@@ -158,7 +188,18 @@ param(
 )
   Write-Debug "Running 'Get-ChocolateyWebFile' for $packageName with url:`'$url`', fileFullPath:`'$fileFullPath`', url64bit:`'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`'";
 
-  $url32bit = $url;
+  $url32bit = $url
+
+  # allow user provided values for checksumming
+  $checksum32Override = $env:chocolateyChecksum32
+  $checksumType32Override = $env:chocolateyChecksumType32
+  $checksum64Override = $env:chocolateyChecksum64
+  $checksumType64Override = $env:chocolateyChecksumType64
+  if ($checksum32Override -ne $null -and $checksum32Override -ne '') { $checksum = $checksum32Override } 
+  if ($checksumType32Override -ne $null -and $checksumType32Override -ne '') { $checksumType = $checksumType32Override } 
+  if ($checksum64Override -ne $null -and $checksum64Override -ne '') { $checksum64 = $checksum64Override } 
+  if ($checksumType64Override -ne $null -and $checksumType64Override -ne '') { $checksumType64 = $checksumType64Override } 
+
   $checksum32 = $checksum
   $checksumType32 = $checksumType
   $bitWidth = 32
@@ -173,7 +214,7 @@ param(
   if ($bitWidth -eq 64 -and $url64bit -ne $null -and $url64bit -ne '') {
     Write-Debug "Setting url to '$url64bit' and bitPackage to $bitWidth"
     $bitPackage = '64 bit'
-    $url = $url64bit;
+    $url = $url64bit
     # only set if urls are different
     if ($url32bit -ne $url64bit) {
       $checksum = $checksum64
@@ -219,6 +260,7 @@ param(
     Write-Host "Attempt to create directory failed for '$fileFullPath'."
   }
 
+  $urlIsRemote = $true
   $headers = @{}
   if ($url.StartsWith('http')) {
     try {
@@ -263,6 +305,7 @@ param(
     Write-Host "Copying $packageName
   from `'$url`'"
     Copy-Item $url -Destination $fileFullPath -Force
+    $urlIsRemote = $false
   }
 
   Start-Sleep 2 #give it a sec or two to finish up copying
@@ -281,12 +324,16 @@ param(
     if ($headers.ContainsKey("X-Checksum-Sha1")) {
       $remoteChecksum = $headers["X-Checksum-Sha1"]
       Write-Debug "Verifying remote checksum of `'$remoteChecksum`' for `'$fileFullPath`'."
-      Get-CheckSumValid -file $fileFullPath -checkSum $remoteChecksum -checksumType 'sha1'
+      Get-ChecksumValid -file $fileFullPath -checkSum $remoteChecksum -checksumType 'sha1'
     }
   }
 
-  Write-Debug "Verifying package provided checksum of '$checksum' for '$fileFullPath'."
-  Get-CheckSumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType
+  #skip requirement for embedded files if checksum is not provided
+  if ($urlIsRemote -or ($checksum -ne $null -and $checksum -ne '')) {
+    Write-Debug "Verifying package provided checksum of '$checksum' for '$fileFullPath'."
+    Get-ChecksumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType -originalUrl $url
+  }
+  
 
   return $fileFullPath
 }

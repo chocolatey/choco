@@ -81,11 +81,16 @@ param(
 
   try {
     #Write-Verbose "Getting environment variable $Name"
-    $environmentVariableValue = $win32RegistryKey.GetValue($Name, [string]::Empty, $registryValueOptions)
+    if ($win32RegistryKey -ne $null) {
+      # Some versions of Windows do not have HKCU:\Environment
+      $environmentVariableValue = $win32RegistryKey.GetValue($Name, [string]::Empty, $registryValueOptions)
+    }
   } catch {
     Write-Debug "Unable to retrieve the $Name environment variable. Details: $_"
   } finally {
-    $win32RegistryKey.Close()
+    if ($win32RegistryKey -ne $null) {
+      $win32RegistryKey.Close()
+    }
   }
 
   if ($environmentVariableValue -eq $null -or $environmentVariableValue -eq '') {

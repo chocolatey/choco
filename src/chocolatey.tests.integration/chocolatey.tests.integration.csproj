@@ -90,6 +90,7 @@
     <Compile Include="Scenario.cs" />
     <Compile Include="scenarios\InstallScenarios.cs" />
     <Compile Include="scenarios\ListScenarios.cs" />
+    <Compile Include="scenarios\PackScenarios.cs" />
     <Compile Include="scenarios\PinScenarios.cs" />
     <Compile Include="scenarios\UninstallScenarios.cs" />
     <Compile Include="scenarios\UpgradeScenarios.cs" />

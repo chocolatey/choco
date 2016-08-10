@@ -462,6 +462,16 @@
  * should contain tags
  * should not contain packages and versions with a pipe between them
 
+### ChocolateyPackCommand [ 2 Scenario(s), 2 Observation(s) ]
+
+#### when packing with an output directory
+
+ * generated package should be in specified output directory
+
+#### when packing without specifying an output directory
+
+ * generated package should be in current directory
+
 ### ChocolateyPinCommand [ 9 Scenario(s), 12 Observation(s) ]
 
 #### when listing pins with an existing pin
