@@ -22,7 +22,7 @@ You can shut it off or turn it per package install/upgrade with `--allow-empty-c
 
 You can also disable the feature `allowEmptyChecksumsSecure` to enforce checksums for packages that download from secure locations (HTTPS).
 
-**Other things I should know?** Users also now have the ability to pass their own checksums and checksumtypes into the install. See https://chocolatey.org/docs/commands-install / https://chocolatey.org/docs/commands-upgrade. You can also disable `allowEmptyChecksumsSecure` to ensure HTTPS checksums are also .
+**Other things I should know?** Users also now have the ability to pass their own checksums and checksumtypes into the install. See https://chocolatey.org/docs/commands-install / https://chocolatey.org/docs/commands-upgrade.
 
 ### KNOWN ISSUES
 
