@@ -119,7 +119,7 @@ param(
   [parameter(Mandatory=$false, Position=3)][string] $originalUrl = '',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Get-ChecksumValid' with file:`'$file`', checksum: `'$checksum`', checksumType: `'$checksumType`'";
+  Write-Debug "Running 'Get-ChecksumValid' with file:'$file', checksum: '$checksum', checksumType: '$checksumType', originalUrl: '$originalUrl'";
   if ($env:ChocolateyIgnoreChecksums -eq 'true') {
     Write-Warning "Ignoring checksums due to feature checksumFiles turned off or option --ignore-checksums set."
     return
