@@ -49,6 +49,12 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageExitCode, null);
+
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyIgnoreChecksums, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksums, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, null);
         }
 
         public static void set_environment_variables(ChocolateyConfiguration config)
