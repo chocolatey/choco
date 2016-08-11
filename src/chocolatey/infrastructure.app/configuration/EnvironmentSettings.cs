@@ -46,9 +46,15 @@ namespace chocolatey.infrastructure.app.configuration
 
         public static void reset_environment_variables(ChocolateyConfiguration config)
         {
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName, null);
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallerTypeEnvironmentVariableName, null);
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageExitCodeEnvironmentVariableName, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageExitCode, null);
+
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyIgnoreChecksums, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksums, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, null);
         }
 
         public static void set_environment_variables(ChocolateyConfiguration config)
@@ -70,8 +76,9 @@ namespace chocolatey.infrastructure.app.configuration
 
             if (config.Debug) Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
             if (config.Verbose) Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
-            if (!config.Features.ChecksumFiles) Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
-            if (config.Features.AllowEmptyChecksums) Environment.SetEnvironmentVariable("ChocolateyAllowEmptyChecksums", "true");
+            if (!config.Features.ChecksumFiles) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyIgnoreChecksums, "true");
+            if (config.Features.AllowEmptyChecksums) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksums, "true");
+            if (config.Features.AllowEmptyChecksumsSecure) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, "true");
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
             Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
 
@@ -93,8 +100,8 @@ namespace chocolatey.infrastructure.app.configuration
                 Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
             }
 
-            if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable("ChocolateyPowerShellHost", "true");
-            if (config.Force) Environment.SetEnvironmentVariable("ChocolateyForce", "true");
+            if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, "true");
+            if (config.Force) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, "true");
             set_licensed_environment(config);
         }
 

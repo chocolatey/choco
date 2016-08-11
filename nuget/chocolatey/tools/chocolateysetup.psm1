@@ -560,10 +560,15 @@ function Add-ChocolateyProfile {
   Write-Debug "Add-ChocolateyProfile"
   try {
     $profileFile = "$profile"
+    if ($profileFile -eq $null -or $profileFile -eq '') {
+      Write-Output 'Not setting tab completion: Profile variable ($profile) resulted in an empty string.'
+      return
+    }
+
     $profileDirectory = (Split-Path -Parent $profileFile)
 
     if ($env:ChocolateyNoProfile -ne $null -and $env:ChocolateyNoProfile -ne '') {
-      Write-Warning "Environment variable "ChocolateyNoProfile" exists and is set. Not setting profile."
+      Write-Warning "Not setting tab completion: Environment variable "ChocolateyNoProfile" exists and is set."
       return
     }
 
@@ -571,7 +576,7 @@ function Add-ChocolateyProfile {
     # get current user
     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
     if ($currentUser.Name -eq $localSystem) {
-      Write-Warning "Not setting profile for SYSTEM user."
+      Write-Warning "Not setting tab completion: Current user is SYSTEM user."
       return
     }
 
@@ -581,7 +586,7 @@ function Add-ChocolateyProfile {
     }
 
     if (!(Test-Path($profileFile))) {
-      Write-Warning "Not setting profile. Profile file does not exist at '$profileFile'."
+      Write-Warning "Not setting tab completion: Profile file does not exist at '$profileFile'."
       return
 
       #Write-Debug "Creating '$profileFile'"
@@ -590,7 +595,7 @@ function Add-ChocolateyProfile {
 
     $signature = Get-AuthenticodeSignature $profile
     if ($signature.Status -ne 'NotSigned') {
-      Write-Warning "Not setting profile, file is Authenticode signed at '$profile'."
+      Write-Warning "Not setting tab completion: File is Authenticode signed at '$profile'."
       return
     }
 

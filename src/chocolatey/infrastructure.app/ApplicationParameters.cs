@@ -67,10 +67,6 @@ namespace chocolatey.infrastructure.app
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
         public static readonly string AllPackages = "all";
-        public static readonly string ChocolateyToolsLocationEnvironmentVariableName = "ChocolateyToolsLocation";
-        public static readonly string ChocolateyPackageInstallLocationEnvironmentVariableName = "ChocolateyPackageInstallLocation";
-        public static readonly string ChocolateyPackageInstallerTypeEnvironmentVariableName = "ChocolateyInstallerType";
-        public static readonly string ChocolateyPackageExitCodeEnvironmentVariableName = "ChocolateyExitCode";
         public static readonly string PowerShellModulePathProcessProgramFiles = _fileSystem.combine_paths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFiles), "WindowsPowerShell\\Modules");
         public static readonly string PowerShellModulePathProcessDocuments = _fileSystem.combine_paths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "WindowsPowerShell\\Modules");
         public static readonly string LocalSystemSidString = "S-1-5-18";
@@ -86,6 +82,16 @@ namespace chocolatey.infrastructure.app
             public static readonly string Username = "USERNAME";
             public static readonly string ProcessorArchitecture = "PROCESSOR_ARCHITECTURE";
             public static readonly string EnvironmentSeparator = ";";
+
+            public static readonly string ChocolateyToolsLocation = "ChocolateyToolsLocation";
+            public static readonly string ChocolateyPackageInstallLocation = "ChocolateyPackageInstallLocation";
+            public static readonly string ChocolateyPackageInstallerType = "ChocolateyInstallerType";
+            public static readonly string ChocolateyPackageExitCode = "ChocolateyExitCode";
+            public static readonly string ChocolateyIgnoreChecksums = "ChocolateyIgnoreChecksums";
+            public static readonly string ChocolateyAllowEmptyChecksums = "ChocolateyAllowEmptyChecksums";
+            public static readonly string ChocolateyAllowEmptyChecksumsSecure = "ChocolateyAllowEmptyChecksumsSecure";
+            public static readonly string ChocolateyPowerShellHost = "ChocolateyPowerShellHost";
+            public static readonly string ChocolateyForce = "ChocolateyForce";
         }
 
         /// <summary>
@@ -124,6 +130,7 @@ namespace chocolatey.infrastructure.app
         {
             public static readonly string ChecksumFiles = "checksumFiles";
             public static readonly string AllowEmptyChecksums = "allowEmptyChecksums";
+            public static readonly string AllowEmptyChecksumsSecure = "allowEmptyChecksumsSecure";
             public static readonly string AutoUninstaller = "autoUninstaller";
             public static readonly string FailOnAutoUninstaller = "failOnAutoUninstaller";
             public static readonly string AllowGlobalConfirmation = "allowGlobalConfirmation";

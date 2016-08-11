@@ -9,20 +9,54 @@ Get-ChecksumValid `
   -File <String> `
   [-Checksum <String>] `
   [-ChecksumType <String>] `
+  [-OriginalUrl <String>] `
   [-IgnoredArguments <Object[]>] [<CommonParameters>]
 ~~~
 
 ## Description
 
-Makes a determination if a file meets an expected checksum. This
-function is usually used when comparing a file that is downloaded from
-an official distribution point. If the checksum fails to
-match, this function throws an error.
+Makes a determination if a file meets an expected checksum signature. 
+This function is usually used when comparing a file that is downloaded 
+from an official distribution point. If the checksum fails to match the
+expected output, this function throws an error.
+
+Checksums have been used for years as a means of verification. A 
+checksum hash is a unique value or signature that corresponds to the 
+contents of a file. File names and extensions can be altered without 
+changing the checksum signature. However if you changed the contents of 
+the file, even one character, the checksum will be different.
+
+Checksums are used to provide as a means of cryptographically ensuring
+the contents of a file have not been changed. While some cryptographic 
+algorithms, including MD5 and SHA1, are no longer considered secure 
+against attack, the goal of a checksum algorithm is to make it 
+extremely difficult (near impossible with better algorithms) to alter
+the contents of a file (whether by accident or for malicious reasons)
+and still result in the same checksum signature.
+
+When verifying a checksum using a secure algorithm, if the checksum 
+matches the expected signature, the contents of the file are identical 
+to what is expected.
 
 ## Notes
 
 This uses the checksum.exe tool available separately at
 https://chocolatey.org/packages/checksum.
+
+Options that affect checksum verification:
+
+* `--ignore-checksums` - skips checksumming
+* `--allow-empty-checksums` - skips checksumming when the package is missing a checksum
+* `--allow-empty-checksums-secure` - skips checksumming when the package is missing a checksum for secure (HTTPS) locations
+* `--require-checksums` - requires checksums for both non-secure and secure locations
+* `--download-checksum`, `--download-checksum-type` - allows user to pass their own checksums
+* `--download-checksum-x64`, `--download-checksum-type-x64` - allows user to pass their own checksums
+
+Features that affect checksum verification:
+
+* `checksumFiles` - when turned off, skips checksumming
+* `allowEmptyChecksums` - when turned on, skips checksumming when the package is missing a checksum
+* `allowEmptyChecksumsSecure` - when turned on, skips checksumming when the package is missing a checksum for secure (HTTPS) locations
 
 ## Aliases
 
@@ -33,7 +67,7 @@ None
  **EXAMPLE 1**
 
 ~~~powershell
-Get-CheckSumValid -File $fileFullPath -CheckSum $checksum -ChecksumType $checksumType
+Get-ChecksumValid -File $fileFullPath -CheckSum $checksum -ChecksumType $checksumType
 
 ~~~ 
 
@@ -103,6 +137,15 @@ Aliases                |
 Required?              | false
 Position?              | 3
 Default Value          | md5
+Accept Pipeline Input? | false
+ 
+###  -OriginalUrl [&lt;String&gt;]
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 4
+Default Value          | 
 Accept Pipeline Input? | false
  
 ###  -IgnoredArguments [&lt;Object[]&gt;]

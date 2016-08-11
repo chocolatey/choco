@@ -22,6 +22,7 @@ Chocolatey will attempt to package a nuspec into a compiled nupkg. Some
     choco pack
     choco pack --version 1.2.3
     choco pack path/to/nuspec
+    choco pack --outputdirectory build
 
 
 ## Options and Switches
@@ -88,6 +89,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
 
      --version=VALUE
      Version - The version you would like to insert into the package.
+
+     --outputdirectory=VALUE
+     OutputDirectory - Specifies the directory for the created Chocolatey 
+       package file. If not specified, uses the current directory.
 
 ~~~
 

@@ -100,16 +100,27 @@ namespace chocolatey.infrastructure.app.commands
                           if (option != null) configuration.Features.ChecksumFiles = false;
                       })
                 .Add("allowemptychecksum|allowemptychecksums|allow-empty-checksums",
-                      "Allow Empty Checksums - Allow packages to have empty checksums. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.0+.".format_with(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.to_string()),
+                      "Allow Empty Checksums - Allow packages to have empty/missing checksums for downloaded resources from non-secure locations (HTTP, FTP). Use this switch is not recommended if using sources that download resources from the internet. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.0+.".format_with(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.to_string()),
                       option =>
                       {
                           if (option != null) configuration.Features.AllowEmptyChecksums = true;
                       })
-                .Add("requirechecksum|requirechecksums|require-checksums",
-                      "Require Checksums - Requires packages to have checksums. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.0+.".format_with(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.to_string()),
+                 .Add("allowemptychecksumsecure|allowemptychecksumssecure|allow-empty-checksums-secure",
+                      "Allow Empty Checksums Secure - Allow packages to have empty checksums for downloaded resources from secure locations (HTTPS). Overrides the default feature '{0}' set to '{1}'. Available in 0.10.0+.".format_with(ApplicationParameters.Features.AllowEmptyChecksumsSecure, configuration.Features.AllowEmptyChecksumsSecure.to_string()),
                       option =>
                       {
-                          if (option != null) configuration.Features.AllowEmptyChecksums = false;
+                          if (option != null) configuration.Features.AllowEmptyChecksumsSecure = true;
+                      })
+                .Add("requirechecksum|requirechecksums|require-checksums",
+                      "Require Checksums - Requires packages to have checksums for downloaded resources (both non-secure and secure). Overrides the default feature '{0}' set to '{1}' and '{2}' set to '{3}'. Available in 0.10.0+.".format_with(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.to_string(), ApplicationParameters.Features.AllowEmptyChecksumsSecure, configuration.Features.AllowEmptyChecksumsSecure.to_string()),
+                      option =>
+                      {
+                          if (option != null)
+                          {
+                              configuration.Features.AllowEmptyChecksums = false;
+                              configuration.Features.AllowEmptyChecksumsSecure = false;
+
+                          }
                       })
                 .Add("checksum=|downloadchecksum=|download-checksum=",
                      "Download Checksum - a user provided checksum for downloaded resources for the package. Overrides the package checksum (if it has one).  Defaults to empty. Available in 0.10.0+.",

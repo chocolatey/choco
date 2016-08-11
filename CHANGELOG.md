@@ -1,4 +1,4 @@
-## [0.10.0](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.0+is%3Aclosed) (unreleased)
+## [0.10.0](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.0+is%3Aclosed) (August 11, 2016)
 What was planned for 0.9.10.4 is now 0.10.0. This is due partly to a breaking change we are making for security purposes and a move to provide better a better versioning scheme for the remainder of the sub-v1 versions of Chocolatey. Instead of 0.y.z.0 being considered where major verions occur in the sub 1 series, 0.y.0 will now be considered where those major versions occur. We also are moving right along towards v1 (and hope to be there in 2017).
 
 0.10.0 carries the fixes for 0.9.10.4 and includes a major security enhancement (checksum requirement).
@@ -9,7 +9,7 @@ What was planned for 0.9.10.4 is now 0.10.0. This is due partly to a breaking ch
 
 Checksums in package scripts are meant as a measure to validate the originally intended downloaded resources used in the creation of a package are the same files that are received at a future date. This also ensures that the same files that are checked by all parts of moderation (if applicable) are the same files that are received by users for a package. This is seen mostly on the community repository because it is public and packages are subject to copyright laws (distribution rights), which typically requires the package scripts to download software from the official distribution locations. The Chocolatey framework has had the ability to use checksums in package scripts since [July 2014](https://chocolatey.org/packages/chocolatey/0.9.8.24#releasenotes).
 
-**What is the requirement?** choco will now fail if a package download resources from HTTP/FTP and does not use checksums to verify those downloaded resources. The requirement for HTTP/FTP is [#112](https://github.com/chocolatey/choco/issues/112). Soon we'll also require it for [HTTPS (#895)](https://github.com/chocolatey/choco/issues/895) as well.
+**What is the requirement?** choco will now fail if a package download resources from HTTP/FTP and does not use checksums to verify those downloaded resources. The requirement for HTTP/FTP is [#112](https://github.com/chocolatey/choco/issues/112). We are considering also requiring it for [HTTPS (#895)](https://github.com/chocolatey/choco/issues/895) as well. You can optionally set a feature (`allowEmptyChecksumsSecure`) to ensure packages using HTTPS also use checksums.
 
 **How does this protect the community anymore than before?** During moderation review, there is a check of these downloaded binaries against VirusTotal (which verifies these binaries against 50-60+ different virus scanners). The binaries are also verified for installation purposes against a test computer. With an independent 3rd party checksum in the package itself, it guarantees that the files received by a user from those remote sources are the exact same files that were used in the verification process.
 
@@ -20,7 +20,9 @@ You can shut off the checksum requirement by enabling the feature `allowEmptyChe
 
 You can shut it off or turn it per package install/upgrade with `--allow-empty-checksums` and `--require-checksums`, respectively. See https://chocolatey.org/docs/commands-install / https://chocolatey.org/docs/commands-upgrade.
 
-**Other things I should know?** Users also now have the ability to pass their own checksums and checksumtypes into the install. See https://chocolatey.org/docs/commands-install / https://chocolatey.org/docs/commands-upgrade.
+You can also disable the feature `allowEmptyChecksumsSecure` to enforce checksums for packages that download from secure locations (HTTPS).
+
+**Other things I should know?** Users also now have the ability to pass their own checksums and checksumtypes into the install. See https://chocolatey.org/docs/commands-install / https://chocolatey.org/docs/commands-upgrade. You can also disable `allowEmptyChecksumsSecure` to ensure HTTPS checksums are also .
 
 ### KNOWN ISSUES
 
@@ -50,6 +52,8 @@ You can shut it off or turn it per package install/upgrade with `--allow-empty-c
  * Fix - When Choco fails to get a package from NuGet Core, fail the package with exit code 1 - see [#867](https://github.com/chocolatey/choco/issues/867)
  * Fix - Illegal characters in path - see [#857](https://github.com/chocolatey/choco/issues/857)
  * Fix - Get-OSArchitectureWidth doesn't do what it says it does - see [#828](https://github.com/chocolatey/choco/issues/828)
+ * Fix - Pro/Business - Choco install config file fails on licensed assembly - see [#866](https://github.com/chocolatey/choco/issues/866)
+ * Fix - DISM /all doesn't run anywhere but Windows 6.2 -- no dependencies get installed - see [#897](https://github.com/chocolatey/choco/issues/897)
 
 ### IMPROVEMENTS
 
@@ -57,6 +61,7 @@ You can shut it off or turn it per package install/upgrade with `--allow-empty-c
  * Choco install with packages.config should print out the packages to install - see [#878](https://github.com/chocolatey/choco/issues/878)
  * Larger default log file size and retention - see [#852](https://github.com/chocolatey/choco/issues/852)
  * Allow getting installer type to be overridden - see [#885](https://github.com/chocolatey/choco/issues/885)
+ * Pack - Add optional output folder option - see [#598](https://github.com/chocolatey/choco/issues/598)
  * Little command name correction on init.ps1 - see [#595](https://github.com/chocolatey/choco/issues/595)
  * Tab completion - don't query if there is a file in the folder that meets completion - see [#847](https://github.com/chocolatey/choco/issues/847)
 
@@ -76,6 +81,7 @@ You can shut it off or turn it per package install/upgrade with `--allow-empty-c
 
  * Hold pending check for 10 seconds / provide means of explicitly overriding the transactional install cleanup - see [#822](https://github.com/chocolatey/choco/issues/822)
  * Pro/Business - Add runtime skip option to allow skipping the virus scanner - see [#786](https://github.com/chocolatey/choco/issues/786)
+
 
 ## [0.9.10.2](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.10.2+is%3Aclosed) (June 19, 2016)
 
@@ -309,17 +315,20 @@ This further restricts the default installation location by removing all permiss
  * API - Choco search should sort by version - see [#668](https://github.com/chocolatey/choco/issues/668)
  * API - Switch dll to .NET Client Profile - see [#680](https://github.com/chocolatey/choco/issues/680)
 
+
 ## [0.9.9.12](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.12+is%3Aclosed) (March 18, 2016)
 
 ### BUG FIXES
 
  * Fix - PowerShell "Collection is read-only" - see [#659](https://github.com/chocolatey/choco/issues/659)
 
+
 ## [0.9.9.11](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.11+is%3Aclosed) (October 6, 2015)
 
 ### BUG FIXES
 
  * Fix - Pin list is broken - see [#452](https://github.com/chocolatey/choco/issues/452)
+
 
 ## [0.9.9.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.10+is%3Aclosed) (October 3, 2015)
 
@@ -329,6 +338,7 @@ Not to be confused with 0.9.10 (this is not that version). This fixes a small bu
 
  * Fix - List output for other tools messed up in 0.9.9.9 (pipe separator missing) - see [#450](https://github.com/chocolatey/choco/issues/450)
  * Fix - accidentally escaped characters in "new" -help - see [#447](https://github.com/chocolatey/choco/issues/447)
+
 
 ## [0.9.9.9](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.9+is%3Aclosed) (October 2, 2015)
 
@@ -374,6 +384,7 @@ With this release you can completely configure choco from the command line (incl
  * Set environment variables once configuration is complete - see [#420](https://github.com/chocolatey/choco/issues/420)
  * Enhance Package Template for 0.9.9.9 - see [#366](https://github.com/chocolatey/choco/issues/366)
 
+
 ## [0.9.9.8](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.8+is%3Aclosed) (June 26, 2015)
 
 ### BUG FIXES
@@ -384,6 +395,7 @@ With this release you can completely configure choco from the command line (incl
 ### IMPROVEMENTS
 
  * Download Progress Bar is Missing - see [#56](https://github.com/chocolatey/choco/issues/56)
+
 
 ## [0.9.9.7](https://github.com/chocolatey/choco/issues?q=milestone%3A0.9.9.7+is%3Aclosed) (June 20, 2015)
 
