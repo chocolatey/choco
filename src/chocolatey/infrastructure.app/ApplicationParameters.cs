@@ -89,6 +89,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string ChocolateyPackageExitCode = "ChocolateyExitCode";
             public static readonly string ChocolateyIgnoreChecksums = "ChocolateyIgnoreChecksums";
             public static readonly string ChocolateyAllowEmptyChecksums = "ChocolateyAllowEmptyChecksums";
+            public static readonly string ChocolateyAllowEmptyChecksumsSecure = "ChocolateyAllowEmptyChecksumsSecure";
             public static readonly string ChocolateyPowerShellHost = "ChocolateyPowerShellHost";
             public static readonly string ChocolateyForce = "ChocolateyForce";
         }
@@ -129,6 +130,7 @@ namespace chocolatey.infrastructure.app
         {
             public static readonly string ChecksumFiles = "checksumFiles";
             public static readonly string AllowEmptyChecksums = "allowEmptyChecksums";
+            public static readonly string AllowEmptyChecksumsSecure = "allowEmptyChecksumsSecure";
             public static readonly string AutoUninstaller = "autoUninstaller";
             public static readonly string FailOnAutoUninstaller = "failOnAutoUninstaller";
             public static readonly string AllowGlobalConfirmation = "allowGlobalConfirmation";

@@ -112,25 +112,26 @@ param(
 
   if ($checksum -eq '' -or $checksum -eq $null) { 
     $allowEmptyChecksums = $env:ChocolateyAllowEmptyChecksums
+    $allowEmptyChecksumsSecure = $env:ChocolateyAllowEmptyChecksumsSecure
     if ($allowEmptyChecksums -eq 'true') {
-      Write-Debug "Empty checksums are allowed due to allowEmptyChecksums feature or option"
+      Write-Debug "Empty checksums are allowed due to allowEmptyChecksums feature or option."
       return
     }
 
-    Write-Warning "Missing package checksums are no longer allowed (by default for HTTP, `n soon for HTTPS as well) for safety and security reasons. If you need `n this functionality, please set the feature allowEmptyChecksums `n (choco feature enable -n allowEmptyChecksums) or pass in the option `n --allow-empty-checksums."
+    if ($originalUrl -ne $null -and $originalUrl.ToLower().StartsWith("https") -and $allowEmptyChecksumsSecure -eq 'true') {
+      Write-Debug "Download from HTTPS source with feature 'allowEmptyChecksumsSecure' enabled."
+      return
+    }
+
+    Write-Warning "Missing package checksums are not allowed (by default for HTTP/FTP, `n HTTPS when feature 'allowEmptyChecksumsSecure' is disabled) for `n safety and security reasons. Although we strongly advise against it, `n if you need this functionality, please set the feature `n 'allowEmptyChecksums' ('choco feature enable -n `n allowEmptyChecksums') `n or pass in the option '--allow-empty-checksums'."
     Write-Debug "If you are a maintainer attempting to determine the checksum for packaging purposes, please run `n 'choco install checksum' and run 'checksum -t sha256 -f $file' `n Ensure you do this for all remote resources."
 
-    if ($originalUrl -ne $null -and $originalUrl.ToLower().StartsWith("https")) {
-      Write-Warning "Download from HTTPS source. Checksum requirement for HTTPS is delayed until at least 0.10.1."
-      return
-    }
-
     if ($env:ChocolateyPowerShellHost -eq 'true') { 
-      $statement = "$([System.IO.Path]::GetFileName($file))"
+      $statement = "The integrity of the file '$([System.IO.Path]::GetFileName($file))'"
       if ($originalUrl -ne $null -and $originalUrl -ne '') {
         $statement += " from '$originalUrl'"
       }
-      $statement += " has not been verified by a package checksum as the originally intended file."
+      $statement += " has not been verified by a checksum in the package scripts."
       $question = 'Do you wish to allow the install to continue (not recommended)?'
       $choices = New-Object System.Collections.ObjectModel.Collection[System.Management.Automation.Host.ChoiceDescription]
       $choices.Add((New-Object System.Management.Automation.Host.ChoiceDescription -ArgumentList '&Yes'))
@@ -141,7 +142,7 @@ param(
       if ($selection -eq 0) { return }
     }
     
-    throw "Empty checksums are no longer allowed by default. Please ask the maintainer to add checksums to this package. In the meantime, if you need this package to work correctly, please enable the feature allowEmptyChecksums or provide the runtime switch --allowEmptyChecksums"
+    throw "Empty checksums are no longer allowed by default for non-secure sources. Please ask the maintainer to add checksums to this package. In the meantime if you need this package to work correctly, please enable the feature allowEmptyChecksums or provide the runtime switch '--allowEmptyChecksums'. We strongly advise against allowing empty checksums for HTTP/FTP sources."
   }
 
   if (!([System.IO.File]::Exists($file))) { throw "Unable to checksum a file that doesn't exist - Could not find file `'$file`'" }
