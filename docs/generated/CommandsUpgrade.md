@@ -177,14 +177,23 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        the default feature 'checksumFiles' set to 'True'. Available in 0.9.9.9+.
 
      --allowemptychecksum, --allowemptychecksums, --allow-empty-checksums
-     Allow Empty Checksums - Allow packages to have empty checksums. 
-       Overrides the default feature 'allowEmptyChecksums' set to 'False'. 
-       Available in 0.10.0+.
+     Allow Empty Checksums - Allow packages to have empty/missing checksums 
+       for downloaded resources from non-secure locations (HTTP, FTP). Use this 
+       switch is not recommended if using sources that download resources from 
+       the internet. Overrides the default feature 'allowEmptyChecksums' set to 
+       'False'. Available in 0.10.0+.
+
+     --allowemptychecksumsecure, --allowemptychecksumssecure, --allow-empty-checksums-secure
+     Allow Empty Checksums Secure - Allow packages to have empty checksums 
+       for downloaded resources from secure locations (HTTPS). Overrides the 
+       default feature 'allowEmptyChecksumsSecure' set to 'True'. Available in 
+       0.10.0+.
 
      --requirechecksum, --requirechecksums, --require-checksums
-     Require Checksums - Requires packages to have checksums. Overrides the 
-       default feature 'allowEmptyChecksums' set to 'False'. Available in 0.1-
-       0.0+.
+     Require Checksums - Requires packages to have checksums for downloaded 
+       resources (both non-secure and secure). Overrides the default feature 
+       'allowEmptyChecksums' set to 'False' and 'allowEmptyChecksumsSecure' set 
+       to 'True'. Available in 0.10.0+.
 
      --checksum, --downloadchecksum, --download-checksum=VALUE
      Download Checksum - a user provided checksum for downloaded resources 

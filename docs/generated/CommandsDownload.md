@@ -114,9 +114,9 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Recompile - Download all external resources and recompile the package to 
        use the local resources instead.
 
-     --embed
-     Embed - When recompiling packages, embed the downloaded resources into 
-       the package.
+     --resources-location=VALUE
+     Resources Location - When recompiling, use this location for resources 
+       instead of embedding the downloaded resources into the package.
 
      --outputdirectory=VALUE
      OutputDirectory - Specifies the directory for the downloaded Chocolatey 

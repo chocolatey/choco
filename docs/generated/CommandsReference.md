@@ -15,8 +15,8 @@ This is a listing of all of the different things you can pass to choco.
  * [[pack|Commandspack]] - packages up a nuspec to a compiled nupkg
  * [[push|Commandspush]] - pushes a compiled nupkg
  * [[new|Commandsnew]] - generates files necessary for a chocolatey package from a template
- * [[sources|Commandssources]] - view and configure default sources (alias for source)
  * [[source|Commandssource]] - view and configure default sources
+ * [[sources|Commandssources]] - view and configure default sources (alias for source)
  * [[config|Commandsconfig]] - Retrieve and configure config file settings
  * [[feature|Commandsfeature]] - view and configure choco features
  * [[features|Commandsfeatures]] - view and configure choco features (alias for feature)
