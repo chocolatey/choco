@@ -178,6 +178,19 @@ namespace chocolatey.console
                     return typeof(ConsoleApplication).Assembly;
                 }
 
+                try
+                {
+                    if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
+                        && requestedAssembly.Name.is_equal_to("chocolatey.licensed"))
+                    {
+                        return Assembly.LoadFile(ApplicationParameters.LicensedAssemblyLocation).UnderlyingType;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    "chocolatey".Log().Warn("Unable to load chocolatey.licensed assembly. {0}".format_with(ex.Message));
+                }
+
                 return null;
             };
 
