@@ -336,20 +336,20 @@ Did you know Pro / Business automatically syncs with Programs and
                 pkgInfo.Arguments = capture_arguments(config, packageResult);
             }
 
-            var toolsLocation = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyToolsLocationEnvironmentVariableName);
-            if (!string.IsNullOrWhiteSpace(toolsLocation) && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName)))
+            var toolsLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyToolsLocation);
+            if (!string.IsNullOrWhiteSpace(toolsLocation) && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation)))
             {
                 toolsLocation = _fileSystem.combine_paths(toolsLocation, packageResult.Name);
                 if (_fileSystem.directory_exists(toolsLocation))
                 {
-                    Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName, toolsLocation, EnvironmentVariableTarget.Process);
+                    Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, toolsLocation, EnvironmentVariableTarget.Process);
                 }
             }
             
             if (pkgInfo.RegistrySnapshot != null && pkgInfo.RegistrySnapshot.RegistryKeys.Any(k => !string.IsNullOrWhiteSpace(k.InstallLocation)))
             {
                 var key = pkgInfo.RegistrySnapshot.RegistryKeys.FirstOrDefault(k => !string.IsNullOrWhiteSpace(k.InstallLocation));
-                if (key != null) Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName, key.InstallLocation, EnvironmentVariableTarget.Process);
+                if (key != null) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, key.InstallLocation, EnvironmentVariableTarget.Process);
             }
 
             _packageInfoService.save_package_information(pkgInfo);
@@ -370,8 +370,8 @@ Did you know Pro / Business automatically syncs with Programs and
 
             this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".format_with(commandName.to_string(), packageResult.Name));
 
-            var installLocation = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName);
-            var installerDetected = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallerTypeEnvironmentVariableName);
+            var installLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation);
+            var installerDetected = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType);
             if (!string.IsNullOrWhiteSpace(installLocation))
             {
                  this.Log().Info(ChocolateyLoggers.Important, "  Software installed to '{0}'".format_with(installLocation));
@@ -875,7 +875,7 @@ The recent package changes indicate a reboot is necessary.
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName, packageExtensionsInstallDirectory, EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, packageExtensionsInstallDirectory, EnvironmentVariableTarget.Process);
             }
             else
             {
@@ -961,7 +961,7 @@ The recent package changes indicate a reboot is necessary.
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyPackageInstallLocationEnvironmentVariableName, installTemplatePath, EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, installTemplatePath, EnvironmentVariableTarget.Process);
             }
             else
             {
