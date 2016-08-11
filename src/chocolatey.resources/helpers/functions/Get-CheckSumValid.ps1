@@ -45,6 +45,21 @@ to what is expected.
 This uses the checksum.exe tool available separately at
 https://chocolatey.org/packages/checksum.
 
+Options that affect checksum verification:
+
+* `--ignore-checksums` - skips checksumming
+* `--allow-empty-checksums` - skips checksumming when the package is missing a checksum
+* `--allow-empty-checksums-secure` - skips checksumming when the package is missing a checksum for secure (HTTPS) locations
+* `--require-checksums` - requires checksums for both non-secure and secure locations
+* `--download-checksum`, `--download-checksum-type` - allows user to pass their own checksums
+* `--download-checksum-x64`, `--download-checksum-type-x64` - allows user to pass their own checksums
+
+Features that affect checksum verification:
+
+* `checksumFiles` - when turned off, skips checksumming
+* `allowEmptyChecksums` - when turned on, skips checksumming when the package is missing a checksum
+* `allowEmptyChecksumsSecure` - when turned on, skips checksumming when the package is missing a checksum for secure (HTTPS) locations
+
 .INPUTS
 None
 
