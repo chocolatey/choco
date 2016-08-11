@@ -70,8 +70,8 @@ namespace chocolatey.infrastructure.app.configuration
 
             if (config.Debug) Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
             if (config.Verbose) Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
-            if (!config.Features.ChecksumFiles) Environment.SetEnvironmentVariable("ChocolateyIgnoreChecksums", "true");
-            if (config.Features.AllowEmptyChecksums) Environment.SetEnvironmentVariable("ChocolateyAllowEmptyChecksums", "true");
+            if (!config.Features.ChecksumFiles) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyIgnoreChecksums, "true");
+            if (config.Features.AllowEmptyChecksums) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksums, "true");
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
             Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
 
@@ -93,8 +93,8 @@ namespace chocolatey.infrastructure.app.configuration
                 Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
             }
 
-            if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable("ChocolateyPowerShellHost", "true");
-            if (config.Force) Environment.SetEnvironmentVariable("ChocolateyForce", "true");
+            if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, "true");
+            if (config.Force) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, "true");
             set_licensed_environment(config);
         }
 

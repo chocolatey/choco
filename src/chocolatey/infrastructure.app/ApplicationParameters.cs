@@ -87,6 +87,10 @@ namespace chocolatey.infrastructure.app
             public static readonly string ChocolateyPackageInstallLocation = "ChocolateyPackageInstallLocation";
             public static readonly string ChocolateyPackageInstallerType = "ChocolateyInstallerType";
             public static readonly string ChocolateyPackageExitCode = "ChocolateyExitCode";
+            public static readonly string ChocolateyIgnoreChecksums = "ChocolateyIgnoreChecksums";
+            public static readonly string ChocolateyAllowEmptyChecksums = "ChocolateyAllowEmptyChecksums";
+            public static readonly string ChocolateyPowerShellHost = "ChocolateyPowerShellHost";
+            public static readonly string ChocolateyForce = "ChocolateyForce";
         }
 
         /// <summary>
