@@ -102,7 +102,7 @@ param(
   if ($exeToRun -eq 'powershell') {
     $exeToRun = "$($env:SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe"
     $importChocolateyHelpers = ""
-    Get-ChildItem "$helpersPath" -Filter *.psm1 | ForEach-Object { $importChocolateyHelpers = "& import-module -name  `'$($_.FullName)`';$importChocolateyHelpers" };
+    Get-ChildItem "$helpersPath" -Filter *.psm1 | ForEach-Object { $importChocolateyHelpers = "& import-module -name  `'$($_.FullName)`' | Out-Null;$importChocolateyHelpers" };
     $block = @"
       `$noSleep = `$$noSleep
       $importChocolateyHelpers
