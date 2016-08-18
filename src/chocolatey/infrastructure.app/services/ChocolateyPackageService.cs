@@ -398,6 +398,8 @@ Did you know Pro / Business automatically syncs with Programs and
             if (!string.IsNullOrWhiteSpace(config.InstallArguments)) arguments.Append(" --install-arguments=\"'{0}'\"".format_with(config.InstallArguments));
             if (config.OverrideArguments) arguments.Append(" --override-arguments");
             if (!string.IsNullOrWhiteSpace(config.PackageParameters)) arguments.Append(" --package-parameters=\"'{0}'\"".format_with(config.PackageParameters));
+            if (config.ApplyPackageParametersToDependencies) arguments.Append(" --apply-package-parameters-to-dependencies");
+            if (config.ApplyInstallArgumentsToDependencies) arguments.Append(" --apply-install-arguments-to-dependencies");
             if (config.AllowDowngrade) arguments.Append(" --allow-downgrade");
             if (config.AllowMultipleVersions) arguments.Append(" --allow-multiple-versions");
             if (config.IgnoreDependencies) arguments.Append(" --ignore-dependencies");
@@ -573,6 +575,8 @@ Would have determined packages that are out of date based on what is
                     if (pkgSettings.ForceX86) packageConfig.ForceX86 = true;
                     if (pkgSettings.AllowMultipleVersions) packageConfig.AllowMultipleVersions = true;
                     if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
+                    if (pkgSettings.ApplyInstallArgumentsToDependencies) packageConfig.ApplyInstallArgumentsToDependencies = true;
+                    if (pkgSettings.ApplyPackageParametersToDependencies) packageConfig.ApplyPackageParametersToDependencies = true;
 
                     this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(packageConfig.PackageNames));
                     packageConfigs.Add(packageConfig);
