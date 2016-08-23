@@ -5,7 +5,8 @@ Submitting an Issue (or a Bug)? See the **[Submitting Issues](https://github.com
 
 **NOTE**: Do not submit issues for missing `SolutionVersion.cs`. Please see [Compiling / Building Source](https://github.com/chocolatey/choco#compiling--building-source).
 
-# Submitting an Enhancement / Feature Request?
+# Submitting an Enhancement / Feature Request?
+
 
 This is the right place. See below.
 
@@ -15,7 +16,8 @@ Please see [Request Package Fixes or Updates / Become a maintainer of an existin
 ## Package Request? Package Missing?
 If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://chocolatey.org/docs/package-triage-process#package-request-package-missing).
 
-# Submitting an Enhancement
+# Submitting an Enhancement
+
 
 Log a github issue. There are less constraints on this versus reporting issues.
 
@@ -82,7 +84,7 @@ A commit message should observe the following (based on ["A Note About Git Commi
   * After the subject, skip one line and fill out a body if the subject line is not informative enough.
   * Sometimes you will find that even a tiny code change has a commit body that needs to be very detailed and make take more time to do than the actual change itself!
   * The body:
-    * Should indent at `72` characters.
+    * Should wrap at `72` characters.
     * Explains more fully the reason(s) for the change and contrasts with previous behavior.
     * Uses present tense. "Fix" versus "Fixed".
 
