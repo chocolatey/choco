@@ -384,6 +384,8 @@ namespace chocolatey.infrastructure.app.services
 
             Environment.SetEnvironmentVariable("chocolateyPackageName", package.Id);
             Environment.SetEnvironmentVariable("packageName", package.Id);
+            Environment.SetEnvironmentVariable("chocolateyPackageTitle", package.Title);
+            Environment.SetEnvironmentVariable("packageTitle", package.Title);
             Environment.SetEnvironmentVariable("chocolateyPackageVersion", package.Version.to_string());
             Environment.SetEnvironmentVariable("packageVersion", package.Version.to_string());
             Environment.SetEnvironmentVariable("chocolateyPackageFolder", packageDirectory);
