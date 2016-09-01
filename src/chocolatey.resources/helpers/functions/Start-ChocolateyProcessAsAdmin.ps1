@@ -157,7 +157,7 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   # Redirecting output slows things down a bit.
   $writeOutput = {
     if ($EventArgs.Data -ne $null) {
-      Write-Host "$($EventArgs.Data)"
+      Write-Verbose "$($EventArgs.Data)"
     }
   }
 
