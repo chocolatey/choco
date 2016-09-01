@@ -47,6 +47,8 @@ This is the full path to the zip file. If embedding it in the package
 next to the install script, the path will be like
 `"$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\\file.zip"`
 
+In 0.10.1+, `File` is an alias for FileFullPath.
+
 .PARAMETER Destination
 This is a directory where you would like the unzipped files to end up.
 If it does not exist, it will be created.
@@ -71,7 +73,7 @@ Get-ChocolateyUnzip -FileFullPath "c:\someFile.zip" -Destination $toolsDir
 Install-ChocolateyZipPackage
 #>
 param(
-  [parameter(Mandatory=$true, Position=0)][string] $fileFullPath,
+  [alias("file")][parameter(Mandatory=$true, Position=0)][string] $fileFullPath,
   [parameter(Mandatory=$true, Position=1)][string] $destination,
   [parameter(Mandatory=$false, Position=2)][string] $specificFolder,
   [parameter(Mandatory=$false, Position=3)][string] $packageName,
