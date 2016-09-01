@@ -388,6 +388,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ApprovedOnly { get; set; }
         public bool DownloadCacheAvailable { get; set; }
         public bool NotBroken { get; set; }
+        public bool IncludeVersionOverrides { get; set; }
     }
 
     [Serializable]

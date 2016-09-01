@@ -115,6 +115,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 config.Sources = ApplicationParameters.PackagesLocation;
                 config.Prerelease = true;
+                config.ListCommand.IncludeVersionOverrides = true;
             }
 
             if (config.RegularOutput) this.Log().Debug(() => "Running list with the following filter = '{0}'".format_with(config.Input));
@@ -126,6 +127,18 @@ namespace chocolatey.infrastructure.app.services
                 if (!string.IsNullOrWhiteSpace(config.Version))
                 {
                     if (!pkg.Version.to_string().is_equal_to(config.Version)) continue;
+                }
+
+                if (config.ListCommand.LocalOnly)
+                {
+                    var packageInfo = _packageInfoService.get_package_information(package);
+                    if (config.ListCommand.IncludeVersionOverrides)
+                    {
+                        if (packageInfo.VersionOverride != null)
+                        {
+                            package.OverrideOriginalVersion(packageInfo.VersionOverride);
+                        }
+                    }
                 }
 
                 if (!config.QuietOutput)
@@ -1324,9 +1337,12 @@ folder.");
             config.Input = string.Empty;
             var quiet = config.QuietOutput;
             config.QuietOutput = true;
+            //changed by the command automatically when LocalOnly = true
+            var includeVersionOverrides = config.ListCommand.IncludeVersionOverrides;
 
             var installedPackages = list_run(config).ToList();
 
+            config.ListCommand.IncludeVersionOverrides = includeVersionOverrides;
             config.QuietOutput = quiet;
             config.Input = input;
             config.PackageNames = packageNames;
