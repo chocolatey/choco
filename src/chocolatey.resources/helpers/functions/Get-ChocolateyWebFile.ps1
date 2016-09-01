@@ -53,10 +53,12 @@ parameter. Chocolatey will automatically determine if the user is
 running a 64 bit OS or not and adjust accordingly. Please note that
 the 32 bit url will be used in the absence of this. This parameter
 should only be used for 64 bit native software. If the original Url
-contains both (which is quite rare), set this to '$url' Otherwise remove
-this parameter.
+contains both (which is quite rare), set this to '$url' Otherwise 
+remove this parameter.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
+
+In 0.10.1+, `Url64` is an alias for Url64bit.
 
 .PARAMETER Checksum
 The checksum hash value of the Url resource. This allows a checksum to 
@@ -82,6 +84,8 @@ values are 'md5', 'sha1', 'sha256' or 'sha512' - defaults to 'md5'.
 MD5 is not recommended as certain organizations need to use FIPS
 compliant algorithms for hashing - see
 https://support.microsoft.com/en-us/kb/811833 for more details.
+
+The recommendation is to use at least SHA256.
 
 .PARAMETER Checksum64
 OPTIONAL if no Url64bit - The checksum hash value of the Url64bit
@@ -114,6 +118,8 @@ ChecksumType parameter value.
 MD5 is not recommended as certain organizations need to use FIPS
 compliant algorithms for hashing - see
 https://support.microsoft.com/en-us/kb/811833 for more details.
+
+The recommendation is to use at least SHA256.
 
 .PARAMETER Options
 OPTIONAL - Specify custom headers. Available in 0.9.10+.
