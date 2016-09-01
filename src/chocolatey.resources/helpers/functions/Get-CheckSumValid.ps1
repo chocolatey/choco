@@ -100,6 +100,8 @@ MD5 is not recommended as certain organizations need to use FIPS
 compliant algorithms for hashing - see
 https://support.microsoft.com/en-us/kb/811833 for more details.
 
+The recommendation is to use at least SHA256.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 

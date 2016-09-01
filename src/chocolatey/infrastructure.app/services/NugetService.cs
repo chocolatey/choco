@@ -1030,12 +1030,12 @@ spam/junk folder.");
                         && (installerExists || portableExists || cmdLineExists)
                         )
                     {
-                        var actualPackageName = installerExists ? 
-                            "{0}.install".format_with(packageName) 
-                            : portableExists ? 
-                                "{0}.portable".format_with(packageName) 
+                        var actualPackageName = installerExists ?
+                            "{0}.install".format_with(packageName)
+                            : portableExists ?
+                                "{0}.portable".format_with(packageName)
                                 : "{0}.commandline".format_with(packageName);
-                   
+
                         var timeoutInSeconds = config.PromptForConfirmation ? 0 : 20;
                         this.Log().Warn(@"You are uninstalling {0}, which is likely a metapackage for an 
  *.install/*.portable package that it installed 
@@ -1190,7 +1190,7 @@ spam/junk folder.");
                     }
                 }
             }
-            
+
             return packageUninstalls;
         }
 
@@ -1248,10 +1248,22 @@ spam/junk folder.");
 
         private IEnumerable<PackageResult> get_all_intalled_packages(ChocolateyConfiguration config)
         {
+            //todo : move to deep copy for get all installed
+            //var listConfig = config.deep_copy();
+            //listConfig.ListCommand.LocalOnly = true;
+            //listConfig.Noop = false;
+            //listConfig.PackageNames = string.Empty;
+            //listConfig.Input = string.Empty;
+            //listConfig.QuietOutput = true;
+
+            //return list_run(listConfig).ToList();
+
             config.ListCommand.LocalOnly = true;
             var sources = config.Sources;
+            //changed by the command automatically when LocalOnly = true
             config.Sources = ApplicationParameters.PackagesLocation;
             var pre = config.Prerelease;
+            //changed by the command automatically when LocalOnly = true
             config.Prerelease = true;
             var noop = config.Noop;
             config.Noop = false;
@@ -1279,11 +1291,11 @@ spam/junk folder.");
             if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
             {
                 var packagesToUpdate = get_all_intalled_packages(config).Select(p => p.Name).ToList();
-                
+
                 if (!string.IsNullOrWhiteSpace(config.UpgradeCommand.PackageNamesToSkip))
                 {
                     var packagesToSkip = config.UpgradeCommand.PackageNamesToSkip
-                        .Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries)
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                         .Where(item => !string.IsNullOrWhiteSpace(item))
                         .Select(p => p.trim_safe())
                         .ToList();

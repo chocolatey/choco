@@ -93,6 +93,8 @@ MD5 is not recommended as certain organizations need to use FIPS
 compliant algorithms for hashing - see
 https://support.microsoft.com/en-us/kb/811833 for more details.
 
+The recommendation is to use at least SHA256.
+
 .PARAMETER Checksum64
 OPTIONAL if no Url64bit - The checksum hash value of the Url64bit
 resource. This allows a checksum to be validated for files that are not
@@ -124,6 +126,8 @@ ChecksumType parameter value.
 MD5 is not recommended as certain organizations need to use FIPS
 compliant algorithms for hashing - see
 https://support.microsoft.com/en-us/kb/811833 for more details.
+
+The recommendation is to use at least SHA256.
 
 .PARAMETER Options
 OPTIONAL - Specify custom headers. Available in 0.9.10+.
