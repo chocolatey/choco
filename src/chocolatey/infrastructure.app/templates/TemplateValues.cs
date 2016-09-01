@@ -39,9 +39,9 @@ namespace chocolatey.infrastructure.app.templates
             SilentArgs = @"/qn /norestart /l*v `""$($env:TEMP)\$($packageName).$($env:chocolateyPackageVersion).MsiInstall.log`""";
             AutomaticPackageNotesNuspec = "";
             Checksum = "";
-            ChecksumType = "md5";
+            ChecksumType = "sha256";
             Checksum64 = "";
-            ChecksumType64 = "md5";
+            ChecksumType64 = "sha256";
         }
 
         public void set_auto()
@@ -54,6 +54,8 @@ namespace chocolatey.infrastructure.app.templates
             Url64 = "{{DownloadUrlx64}}";
             Checksum = "{{Checksum}}";
             Checksum64 = "{{Checksumx64}}";
+            ChecksumType = "{{ChecksumType}}";
+            ChecksumType64 = "{{ChecksumTypex64}}";
         }
 
 

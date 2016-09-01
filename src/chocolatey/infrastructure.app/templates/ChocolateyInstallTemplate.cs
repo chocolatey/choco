@@ -23,7 +23,6 @@ namespace chocolatey.infrastructure.app.templates
 #   gc $f | ? {$_ -notmatch ""^\s*#""} | % {$_ -replace '(^.*?)\s*?[^``]#.*','$1'} | Out-File $f+"".~"" -en utf8; mv -fo $f+"".~"" $f
 
 $ErrorActionPreference = 'Stop'; # stop on all errors
-
 [[AutomaticPackageNotesInstaller]]
 $packageName= '[[PackageName]]' # arbitrary name for the package, used in messages
 $toolsDir   = ""$(Split-Path -parent $MyInvocation.MyCommand.Definition)""
@@ -160,7 +159,8 @@ Install-ChocolateyPackage @packageArgs # https://chocolatey.org/docs/helpers-ins
 ";
 
         public static string AutomaticPackageNotes =
-            @"#Items that could be replaced based on what you call chocopkgup.exe with
+            @"
+#Items that could be replaced based on what you call chocopkgup.exe with
 #{{PackageName}} - Package Name (should be same as nuspec file and folder) |/p
 #{{PackageVersion}} - The updated version | /v
 #{{DownloadUrl}} - The url for the native file | /u
@@ -169,6 +169,8 @@ Install-ChocolateyPackage @packageArgs # https://chocolatey.org/docs/helpers-ins
 #{{DownloadUrlx64}} - The 64-bit url for the native file | /u64
 #{{Checksum}} - The checksum for the url | /c
 #{{Checksumx64}} - The checksum for the 64-bit url | /c64
+#{{ChecksumType}} - The checksum type for the url | /ct
+#{{ChecksumTypex64}} - The checksum type for the 64-bit url | /ct64
 ";
     }
 }
