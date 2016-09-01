@@ -177,7 +177,8 @@ param(
   [parameter(Mandatory=$true, Position=0)][string] $packageName,
   [parameter(Mandatory=$true, Position=1)][string] $fileFullPath,
   [parameter(Mandatory=$false, Position=2)][string] $url = '',
-  [parameter(Mandatory=$false, Position=3)][string] $url64bit = '',
+  [parameter(Mandatory=$false, Position=3)]
+  [alias("url64")][string] $url64bit = '',
   [parameter(Mandatory=$false)][string] $checksum = '',
   [parameter(Mandatory=$false)][string] $checksumType = '',
   [parameter(Mandatory=$false)][string] $checksum64 = '',
