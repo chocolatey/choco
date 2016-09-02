@@ -203,6 +203,13 @@ Pro / Business supports a single, ubiquitous install directory option.
   $silentArgs = $silentArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   $additionalInstallArgs = $additionalInstallArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
 
+  $workingDirectory = Get-Location
+  try {
+    $workingDirectory = [System.IO.Path]::GetDirectoryName($file)
+  } catch {
+    Write-Warning "Unable to set the working directory for installer to location of '$file'"
+  }
+
   try {
     # make sure any logging folder exists 
     $pattern = "(?:['`"])([a-zA-Z]\:\\[^'`"]+)(?:[`"'])|([a-zA-Z]\:\\[\S]+)"
@@ -227,15 +234,15 @@ Pro / Business supports a single, ubiquitous install directory option.
       $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
     }
 
-    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes
+    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
   }
 
   if ($fileType -like 'exe') {
     if ($overrideArguments) {
-      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes
       Write-Host "Overriding package arguments with '$additionalInstallArgs'";
+      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes -workingDirectory $workingDirectory
     } else {
-      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes
+      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes -workingDirectory $workingDirectory
     }
   }
 
@@ -247,7 +254,7 @@ Pro / Business supports a single, ubiquitous install directory option.
     } else {
       $msuArgs = "$file $silentArgs $additionalInstallArgs"
     }
-    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes
+    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
   }
 
   Write-Host "$packageName has been installed."
