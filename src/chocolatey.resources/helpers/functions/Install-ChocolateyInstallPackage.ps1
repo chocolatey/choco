@@ -144,7 +144,7 @@ param(
   [parameter(Mandatory=$false, Position=1)]
   [alias("installerType","installType")][string] $fileType = 'exe',
   [parameter(Mandatory=$false, Position=2)][string[]] $silentArgs = '',
-  [parameter(Mandatory=$true, Position=3)][string] $file,
+  [alias("fileFullPath")][parameter(Mandatory=$true, Position=3)][string] $file,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
   [parameter(Mandatory=$false)]
   [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
