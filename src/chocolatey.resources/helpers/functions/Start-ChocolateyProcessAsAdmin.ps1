@@ -53,6 +53,12 @@ should return instantly when it is complete.
 .PARAMETER ValidExitCodes
 Array of exit codes indicating success. Defaults to `@(0)`.
 
+.PARAMETER WorkingDirectory
+The working directory for the running process. Defaults to 
+`Get-Location`.
+
+Available in 0.10.1+.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -83,6 +89,7 @@ param(
   [parameter(Mandatory=$false)][switch] $minimized,
   [parameter(Mandatory=$false)][switch] $noSleep,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
+  [parameter(Mandatory=$false)][string] $workingDirectory = $(Get-Location),
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   [string]$statements = $statements -join ' '
@@ -186,7 +193,7 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   $process.StartInfo.RedirectStandardOutput = $true
   $process.StartInfo.RedirectStandardError = $true
   $process.StartInfo.UseShellExecute = $false
-  $process.StartInfo.WorkingDirectory = Get-Location
+  $process.StartInfo.WorkingDirectory = $workingDirectory
   if ([Environment]::OSVersion.Version -ge (New-Object 'Version' 6,0)){
     Write-Debug "Setting RunAs for elevation"
     $process.StartInfo.Verb = "RunAs"
