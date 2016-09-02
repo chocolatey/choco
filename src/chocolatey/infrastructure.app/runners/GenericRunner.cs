@@ -22,6 +22,7 @@ namespace chocolatey.infrastructure.app.runners
     using events;
     using filesystem;
     using infrastructure.events;
+    using infrastructure.registration;
     using infrastructure.tasks;
     using SimpleInjector;
     using adapters;
@@ -134,6 +135,8 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             }
 
             fail_when_license_is_missing_or_invalid_if_requested(config);
+
+            SecurityProtocol.set_protocol();
 
             EventManager.publish(new PreRunMessage(config));
 
