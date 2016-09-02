@@ -202,6 +202,7 @@ Pro / Business supports a single, ubiquitous install directory option.
   # remove \chocolatey\chocolatey\
   $silentArgs = $silentArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   $additionalInstallArgs = $additionalInstallArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+  $file = $file -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
 
   $workingDirectory = Get-Location
   try {
