@@ -144,7 +144,7 @@ param(
   [parameter(Mandatory=$false, Position=1)]
   [alias("installerType","installType")][string] $fileType = 'exe',
   [parameter(Mandatory=$false, Position=2)][string[]] $silentArgs = '',
-  [parameter(Mandatory=$true, Position=3)][string] $file,
+  [alias("fileFullPath")][parameter(Mandatory=$true, Position=3)][string] $file,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
   [parameter(Mandatory=$false)]
   [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
@@ -203,6 +203,13 @@ Pro / Business supports a single, ubiquitous install directory option.
   $silentArgs = $silentArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   $additionalInstallArgs = $additionalInstallArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
 
+  $workingDirectory = Get-Location
+  try {
+    $workingDirectory = [System.IO.Path]::GetDirectoryName($file)
+  } catch {
+    Write-Warning "Unable to set the working directory for installer to location of '$file'"
+  }
+
   try {
     # make sure any logging folder exists 
     $pattern = "(?:['`"])([a-zA-Z]\:\\[^'`"]+)(?:[`"'])|([a-zA-Z]\:\\[\S]+)"
@@ -221,33 +228,32 @@ Pro / Business supports a single, ubiquitous install directory option.
   if ($fileType -like 'msi') {
     $msiArgs = "/i `"$file`""
     if ($overrideArguments) {
+      Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
       $msiArgs = "$msiArgs $additionalInstallArgs";
-      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
     } else {
       $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
     }
 
-    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes
+    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
   }
 
   if ($fileType -like 'exe') {
     if ($overrideArguments) {
-      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes
-      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
+      Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
+      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes -workingDirectory $workingDirectory
     } else {
-      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes
+      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes -workingDirectory $workingDirectory
     }
   }
 
   if($fileType -like 'msu') {
-
     if ($overrideArguments) {
+      Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
       $msuArgs = "$file $additionalInstallArgs"
-      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
     } else {
       $msuArgs = "$file $silentArgs $additionalInstallArgs"
     }
-    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes
+    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
   }
 
   Write-Host "$packageName has been installed."
