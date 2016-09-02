@@ -228,8 +228,8 @@ Pro / Business supports a single, ubiquitous install directory option.
   if ($fileType -like 'msi') {
     $msiArgs = "/i `"$file`""
     if ($overrideArguments) {
+      Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
       $msiArgs = "$msiArgs $additionalInstallArgs";
-      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
     } else {
       $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
     }
@@ -239,7 +239,7 @@ Pro / Business supports a single, ubiquitous install directory option.
 
   if ($fileType -like 'exe') {
     if ($overrideArguments) {
-      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
+      Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
       $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes -workingDirectory $workingDirectory
     } else {
       $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes -workingDirectory $workingDirectory
@@ -247,10 +247,9 @@ Pro / Business supports a single, ubiquitous install directory option.
   }
 
   if($fileType -like 'msu') {
-
     if ($overrideArguments) {
+      Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
       $msuArgs = "$file $additionalInstallArgs"
-      Write-Host "Overriding package arguments with '$additionalInstallArgs'";
     } else {
       $msuArgs = "$file $silentArgs $additionalInstallArgs"
     }
