@@ -94,7 +94,7 @@ param(
 )
   [string]$statements = $statements -join ' '
   
-  Write-Debug "Running 'Start-ChocolateyProcessAsAdmin' with exeToRun:`'$exeToRun`', statements: `'$statements`' ";
+  Write-Debug "Running 'Start-ChocolateyProcessAsAdmin' with exeToRun:'$exeToRun', statements: '$statements', workingDirectory: '$workingDirectory' ";
 
   try{
     if ($exeToRun -ne $null) { $exeToRun = $exeToRun -replace "`0", "" }
