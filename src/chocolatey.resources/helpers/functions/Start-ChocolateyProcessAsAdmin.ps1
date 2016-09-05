@@ -225,7 +225,7 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   Write-Debug "Command [`"$exeToRun`" $wrappedStatements] exited with `'$exitCode`'."
   if ($validExitCodes -notcontains $exitCode) {
     Set-PowerShellExitCode $exitCode
-    throw "Running [`"$exeToRun`" $statements] was not successful. Exit code was '$exitCode'. See log for possible error messages."
+    throw "Running [`"$exeToRun`" $wrappedStatements] was not successful. Exit code was '$exitCode'. See log for possible error messages."
   } else {
     $chocoSuccessCodes = @(0, 1605, 1614, 1641, 3010)
     if ($chocoSuccessCodes -notcontains $exitCode) {
