@@ -59,6 +59,15 @@ The working directory for the running process. Defaults to
 
 Available in 0.10.1+.
 
+.PARAMETER SensitiveStatements
+Arguments to pass to  `ExeToRun` that are not logged. 
+
+Note that only licensed versions of Chocolatey provide a way to pass 
+those values completely through without having them in the install 
+script or on the system in some way.
+
+Available in 0.10.1+.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -90,6 +99,7 @@ param(
   [parameter(Mandatory=$false)][switch] $noSleep,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
   [parameter(Mandatory=$false)][string] $workingDirectory = $(Get-Location),
+  [parameter(Mandatory=$false)][string] $sensitiveStatements = '',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   [string]$statements = $statements -join ' '
@@ -186,6 +196,10 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   $psi.FileName = $exeToRun
   if ($wrappedStatements -ne '') {
     $psi.Arguments = "$wrappedStatements"
+  }
+  if ($sensitiveStatements -ne $null -and $sensitiveStatements -ne '') {
+    Write-Host "Sensitive arguments have been passed. Adding to arguments."
+    $psi.Arguments += " $sensitiveStatements"
   }
   $process.StartInfo =  $psi
 
