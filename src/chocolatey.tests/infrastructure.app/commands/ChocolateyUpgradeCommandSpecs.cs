@@ -205,6 +205,12 @@ namespace chocolatey.tests.infrastructure.app.commands
                 optionSet.Contains("p").ShouldBeTrue();
             }
 
+            [Fact]
+            public void should_add_includepre_to_the_option_set()
+            {
+                optionSet.Contains("includepre").ShouldBeTrue();
+            }
+
         }
 
         public class when_handling_additional_argument_parsing : ChocolateyUpgradeCommandSpecsBase

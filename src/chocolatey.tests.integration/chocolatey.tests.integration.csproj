@@ -373,6 +373,48 @@
     <None Include="context\upgradepackage\1.1.0\upgradepackage.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\upgradepackage\1.1.2-Beta\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.2-Beta\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.2-Beta\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.2-Beta\tools\console.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.2-Beta\tools\console.exe.config.install.xdt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.2-Beta\tools\graphical.exe.gui">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.2-Beta\upgradepackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-Beta\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-Beta\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-Beta\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-Beta\tools\console.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-Beta\tools\console.exe.config.install.xdt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-Beta\tools\graphical.exe.gui">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-Beta\upgradepackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -422,6 +464,18 @@
     <Content Include="context\exactpackage\exactpackage\1.0.0\tools\purpose.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="context\upgradepackage\1.1.1-Beta\tools\console.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-Beta\tools\graphical.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.2-Beta\tools\console.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.2-Beta\tools\graphical.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="infrastructure\filesystem\CopyMe.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
