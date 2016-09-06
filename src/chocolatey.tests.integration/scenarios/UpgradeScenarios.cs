@@ -2518,5 +2518,70 @@ namespace chocolatey.tests.integration.scenarios
                 upgradePackageResult.Count.ShouldEqual(0, "upgradepackage should not be in the results list");
             }
         }
+
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_package_with_pre_release_available_and_pre_not_specified : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "upgradepackage";
+                Configuration.Prerelease = true;
+                Scenario.install_package(Configuration, "upgradepackage", "1.1.1-Beta");
+                Configuration.Prerelease = false;
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_a_package_can_be_upgraded_with_includepre()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
+                {
+                    if (message.Contains("is newer than the most recent")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_upgrade_prerelease_packages_with_upgrades()
+            {
+                var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
+                upgradePackageResult.Count.ShouldEqual(1, "upgradepackage must be there once");
+                upgradePackageResult.First().Value.Version.ShouldEqual("1.1.0");
+            }
+        }
+
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_package_with_pre_release_available : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "upgradepackage";
+                Configuration.Prerelease = true;
+                Scenario.install_package(Configuration, "upgradepackage", "1.1.1-Beta");
+                Configuration.Prerelease = false;
+                Configuration.UpgradeCommand.IncludePreRelease = true;
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_upgrade_prerelease_packages_with_upgrades()
+            {
+                var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
+                upgradePackageResult.Count.ShouldEqual(1, "upgradepackage must be there once");
+                upgradePackageResult.First().Value.Version.ShouldEqual("1.1.2-Beta");
+            }
+        }
     }
 }
