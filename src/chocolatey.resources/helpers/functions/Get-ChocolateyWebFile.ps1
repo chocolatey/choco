@@ -341,6 +341,5 @@ param(
     Get-ChecksumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType -originalUrl $url
   }
   
-
   return $fileFullPath
 }
