@@ -171,6 +171,14 @@ OPTIONAL - Specify custom headers. Available in 0.9.10+.
 Do not allow choco to provide/merge additional silent arguments and only
 use the ones available with the package. Available in 0.9.10+.
 
+.PARAMETER UseOriginalLocation
+Do not download the resources. This is typically passed if Url/Url64bit
+are pointed to local files or files on a share and those files should
+be used in place. Available in 0.10.1+.
+
+NOTE: You can also use `Install-ChocolateyInstallPackage` for the same
+functionality (see links).
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -262,6 +270,7 @@ param(
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
   [parameter(Mandatory=$false)]
   [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
+  [switch]$useOriginalLocation,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   [string]$silentArgs = $silentArgs -join ' '
@@ -275,6 +284,20 @@ param(
   if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
   $file = Join-Path $tempDir "$($packageName)Install.$fileType"
 
-  $filePath = Get-ChocolateyWebFile $packageName $file $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
+  $filePath = $file
+  if ($useOriginalLocation) {
+    $filePath = $url
+    if (Get-ProcessorBits 64) {
+      $forceX86 = $env:chocolateyForceX86
+      if ($forceX86) {
+        Write-Debug "User specified '-x86' so forcing 32-bit"
+      } else {
+        $filePath = $url64bit
+      }
+    }
+  } else {
+    $filePath = Get-ChocolateyWebFile $packageName $file $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
+  }
+    
   Install-ChocolateyInstallPackage $packageName $fileType $silentArgs $filePath -validExitCodes $validExitCodes -UseOnlyPackageSilentArguments:$useOnlyPackageSilentArguments
 }
