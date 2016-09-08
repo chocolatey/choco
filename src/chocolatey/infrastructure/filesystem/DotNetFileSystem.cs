@@ -175,6 +175,11 @@ namespace chocolatey.infrastructure.filesystem
         public IEnumerable<string> get_files(string directoryPath, string pattern = "*.*", SearchOption option = SearchOption.TopDirectoryOnly)
         {
             if (string.IsNullOrWhiteSpace(directoryPath)) return new List<string>();
+            if (!directory_exists(directoryPath))
+            {
+                this.Log().Warn("Directory '{0}' does not exist.".format_with(directoryPath));
+                return new List<string>();
+            }
 
             return Directory.EnumerateFiles(directoryPath, pattern, option);
         }
