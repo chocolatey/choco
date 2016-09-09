@@ -43,11 +43,11 @@ namespace chocolatey.infrastructure.app.domain.installers
             SilentUninstall = "/s";
             // http://www.symantec.com/connect/blogs/wisescript-command-line-options
             OtherUninstallOptions = "\"{0}\\Uninstall.Log\"".format_with(InstallTokens.TEMP_LOCATION);
-            ValidInstallExitCodes = new List<int>
+            ValidInstallExitCodes = new List<long>
             {
                 0
             };
-            ValidUninstallExitCodes = new List<int>
+            ValidUninstallExitCodes = new List<long>
             {
                 0
             };

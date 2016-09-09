@@ -32,8 +32,8 @@ namespace chocolatey.infrastructure.app.domain.installers
         public string UninstallExecutable { get; protected set; }
         public string SilentUninstall { get; protected set; }
         public string OtherUninstallOptions { get; protected set; }
-        public IEnumerable<int> ValidInstallExitCodes { get; protected set; }
-        public IEnumerable<int> ValidUninstallExitCodes { get; protected set; }
+        public IEnumerable<long> ValidInstallExitCodes { get; protected set; }
+        public IEnumerable<long> ValidUninstallExitCodes { get; protected set; }
 
         public virtual string build_install_command_arguments(bool logFile, bool customInstallLocation, bool languageRequested)
         {

@@ -40,8 +40,8 @@ namespace chocolatey.infrastructure.app.domain.installers
             UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
             SilentUninstall = "/S";
             OtherUninstallOptions = "";
-            ValidInstallExitCodes = new List<int> { 0 };
-            ValidUninstallExitCodes = new List<int> { 0 };
+            ValidInstallExitCodes = new List<long> { 0 };
+            ValidUninstallExitCodes = new List<long> { 0 };
         }
 
         public override InstallerType InstallerType

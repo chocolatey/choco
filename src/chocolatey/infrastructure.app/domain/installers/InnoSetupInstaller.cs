@@ -38,8 +38,8 @@ namespace chocolatey.infrastructure.app.domain.installers
             SilentUninstall = "/VERYSILENT";
             OtherUninstallOptions = "/SUPPRESSMSGBOXES";
             // http://www.jrsoftware.org/ishelp/index.php?topic=setupexitcodes
-            ValidInstallExitCodes = new List<int> { 0, 3010 };
-            ValidUninstallExitCodes = new List<int> { 0 };
+            ValidInstallExitCodes = new List<long> { 0, 3010 };
+            ValidUninstallExitCodes = new List<long> { 0 };
         }
 
         public override InstallerType InstallerType
