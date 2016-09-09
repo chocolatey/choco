@@ -91,10 +91,12 @@
     <Compile Include="infrastructure.app\domain\installers\GhostInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\InstallForJInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\IzPackInstaller.cs" />
+    <Compile Include="infrastructure.app\domain\installers\MsiPatchInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\PackageForTheWebInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\QtInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\SetupFactoryInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\SquirrelInstaller.cs" />
+    <Compile Include="infrastructure.app\domain\installers\WindowsUpdateInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\WiseInstaller.cs" />
     <Compile Include="infrastructure.app\domain\RegistryHiveType.cs" />
     <Compile Include="infrastructure.app\domain\RegistryValueExtensions.cs" />
