@@ -31,6 +31,7 @@ namespace chocolatey.infrastructure.app.services
     using cryptography;
     using domain;
     using infrastructure.commands;
+    using infrastructure.registration;
     using logging;
     using NuGet;
     using powershell;
@@ -468,6 +469,8 @@ namespace chocolatey.infrastructure.app.services
                     Environment.SetEnvironmentVariable("CacheChecksumType_{0}".format_with(urlKey), "sha512");
                 }
             }
+
+            SecurityProtocol.set_protocol();
         }
 
         private ResolveEventHandler _handler = null;

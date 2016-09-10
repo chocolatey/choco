@@ -50,6 +50,20 @@ Choco prefers to use TLS v1.2 if it is available, but this client is
  For more information you should visit https://www.howsmyssl.com/");
 
             }
+
+            try
+            {
+                if (ServicePointManager.ServerCertificateValidationCallback != null)
+                {
+                    "chocolatey".Log().Warn("ServerCertificateValidationCallback was set to '{0}' Removing.".format_with(System.Net.ServicePointManager.ServerCertificateValidationCallback));
+                    ServicePointManager.ServerCertificateValidationCallback = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                "chocolatey".Log().Warn("Error resetting ServerCertificateValidationCallback: {0}".format_with(ex.Message));
+            }
+
         }
     }
 }
