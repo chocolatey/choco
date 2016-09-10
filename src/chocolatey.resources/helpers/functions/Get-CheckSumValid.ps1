@@ -164,9 +164,13 @@ param(
 
   if (!([System.IO.File]::Exists($file))) { throw "Unable to checksum a file that doesn't exist - Could not find file `'$file`'" }
 
+  if ($checksumType -eq $null -or $checksumType -eq ''){
+    $checksumType = 'md5'
+  }
+
   if ($checksumType -ne 'sha1' -and $checksumType -ne 'sha256' -and $checksumType -ne 'sha512' -and $checksumType -ne 'md5') {
     Write-Debug 'Setting checksumType to md5 due to non-set value or type is not specified correctly.'
-    $checksumType = 'md5'
+    throw "Checksum type '$checksumType' is unsupported. This type may be supported in a newer version of Chocolatey."
   }
 
   $checksumExe = Join-Path "$helpersPath" '..\tools\checksum.exe'
