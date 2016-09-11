@@ -131,7 +131,6 @@ param(
   }
 
   $headers = @{}
-
   try {
     $response = $request.GetResponse();
     Write-Debug "Response Headers:"
