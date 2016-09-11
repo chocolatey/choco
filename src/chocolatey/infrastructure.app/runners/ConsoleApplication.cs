@@ -28,17 +28,29 @@ namespace chocolatey.infrastructure.app.runners
     {
         public void run(string[] args, ChocolateyConfiguration config, Container container)
         {
-            if (Environment.CommandLine.contains("-install-arguments-sensitive") || Environment.CommandLine.contains("-package-parameters-sensitive"))
-            {
-                this.Log().Debug(() => "Command line not shown - sensitive arguments passed.");
+            var commandLine = Environment.CommandLine;
+            if (commandLine.contains("-install-arguments-sensitive")
+                || commandLine.contains("-package-parameters-sensitive")
+                || commandLine.contains("apikey ")
+                || commandLine.contains("config ")
+                || commandLine.contains("push ") // push can be passed w/out parameters, it's fine to log it then
+                || commandLine.contains("-p ") || commandLine.contains("-p=")
+                || commandLine.contains("-password")
+                || commandLine.contains("-cp ") || commandLine.contains("-cp=")
+                || commandLine.contains("-certpassword")
+                || commandLine.contains("-k ") || commandLine.contains("-k=")
+                || commandLine.contains("-key ") || commandLine.contains("-key=")
+                || commandLine.contains("-apikey") || commandLine.contains("-api-key")
+                || commandLine.contains("-apikey") || commandLine.contains("-api-key")
+            ) {
+                this.Log().Debug(() => "Command line not shown - sensitive arguments may have been passed.");
             }
             else
             {
-                this.Log().Debug(() => "Command line: {0}".format_with(Environment.CommandLine));
+                this.Log().Debug(() => "Command line: {0}".format_with(commandLine));
                 this.Log().Debug(() => "Received arguments: {0}".format_with(string.Join(" ", args)));    
             }
             
-
             IList<string> commandArgs = new List<string>();
             //shift the first arg off 
             int count = 0;
