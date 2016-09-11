@@ -16,6 +16,7 @@ Get-ChocolateyWebFile `
   [-ChecksumType64 <String>] `
   [-Options <Hashtable>] `
   [-GetOriginalFileName] `
+  [-ForceDownload] `
   [-IgnoredArguments <Object[]>] [<CommonParameters>]
 ~~~
 
@@ -149,14 +150,16 @@ parameter. Chocolatey will automatically determine if the user is
 running a 64 bit OS or not and adjust accordingly. Please note that
 the 32 bit url will be used in the absence of this. This parameter
 should only be used for 64 bit native software. If the original Url
-contains both (which is quite rare), set this to '$url' Otherwise remove
-this parameter.
+contains both (which is quite rare), set this to '$url' Otherwise 
+remove this parameter.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
+In 0.10.1+, `Url64` is an alias for Url64bit.
+
 Property               | Value
 ---------------------- | -----
-Aliases                | 
+Aliases                | url64
 Required?              | false
 Position?              | 4
 Default Value          | 
@@ -194,6 +197,8 @@ values are 'md5', 'sha1', 'sha256' or 'sha512' - defaults to 'md5'.
 MD5 is not recommended as certain organizations need to use FIPS
 compliant algorithms for hashing - see
 https://support.microsoft.com/en-us/kb/811833 for more details.
+
+The recommendation is to use at least SHA256.
 
 Property               | Value
 ---------------------- | -----
@@ -243,6 +248,8 @@ MD5 is not recommended as certain organizations need to use FIPS
 compliant algorithms for hashing - see
 https://support.microsoft.com/en-us/kb/811833 for more details.
 
+The recommendation is to use at least SHA256.
+
 Property               | Value
 ---------------------- | -------------
 Aliases                | 
@@ -264,7 +271,21 @@ Accept Pipeline Input? | false
  
 ###  -GetOriginalFileName
 OPTIONAL switch to allow Chocolatey to determine the original file name
-from the url resource.
+from the url resource. Available in 0.9.10+.
+
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | named
+Default Value          | False
+Accept Pipeline Input? | false
+ 
+###  -ForceDownload
+OPTIONAL switch to force download of file every time, even if the file
+already exists. 
+
+Available in 0.10.1+.
 
 Property               | Value
 ---------------------- | -----

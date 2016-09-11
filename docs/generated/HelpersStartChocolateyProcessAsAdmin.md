@@ -14,6 +14,8 @@ Start-ChocolateyProcessAsAdmin `
   [-Minimized] `
   [-NoSleep] `
   [-ValidExitCodes <Object>] `
+  [-WorkingDirectory <String>] `
+  [-SensitiveStatements <String>] `
   [-IgnoredArguments <Object[]>] [<CommonParameters>]
 ~~~
 
@@ -130,6 +132,37 @@ Aliases                |
 Required?              | false
 Position?              | named
 Default Value          | @(0)
+Accept Pipeline Input? | false
+ 
+###  -WorkingDirectory [&lt;String&gt;]
+The working directory for the running process. Defaults to 
+`Get-Location`.
+
+Available in 0.10.1+.
+
+Property               | Value
+---------------------- | ---------------
+Aliases                | 
+Required?              | false
+Position?              | named
+Default Value          | $(Get-Location)
+Accept Pipeline Input? | false
+ 
+###  -SensitiveStatements [&lt;String&gt;]
+Arguments to pass to  `ExeToRun` that are not logged. 
+
+Note that only [licensed versions](https://chocolatey.org/compare) of Chocolatey provide a way to pass 
+those values completely through without having them in the install 
+script or on the system in some way.
+
+Available in 0.10.1+.
+
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | named
+Default Value          | 
 Accept Pipeline Input? | false
  
 ###  -IgnoredArguments [&lt;Object[]&gt;]

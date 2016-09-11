@@ -128,8 +128,27 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        override. Available in 0.9.10+.
 
      --file=VALUE
-     Inspect a file (installer) to determine everything and create a package. 
-       Available in 0.9.10+. Business versions only.
+     Inspect a file (native installer or zip) to to completely create a 
+       package with proper silent arguments! Can be 32-bit or 64-bit 
+       architecture. Available in 0.9.10+. Business versions only. See 
+       https://chocolatey.org/docs/features-create-packages-from-installers 
+
+     --file64=VALUE
+     Optional - used when specifying both a 32-bit and a 64-bit file.  Can be 
+       an installer or a zip. Available in 0.9.10+. Business versions only.
+
+     --url=VALUE
+     Url to download a file from to inspect and create a package. Available 
+       in 0.9.10+. Business versions only.
+
+     --url64=VALUE
+     64 bit Url to download a file from. Inspects this file to create a 
+       package if url isn't also specified. Available in 0.9.10+. Business 
+       versions only.
+
+     --keepremote, --originallocation, --original-location, --useoriginallocation, --use-original-location, --useoriginalfileslocation, --use-original-files-location
+     Use Original Files Location - when using file or url, use the original 
+       location in packaging. Available in 0.9.10+. Business versions only.
 
 ~~~
 

@@ -7,6 +7,9 @@ Downloads a package from a source, optionally downloading remote
  existing package and makes it available without any internet 
  requirement.
 
+See https://chocolatey.org/docs/features-automatically-recompile-packages
+
+
 ## Usage
 
     choco download <pkg [<options/switches>]
@@ -14,7 +17,9 @@ Downloads a package from a source, optionally downloading remote
 ## Examples
 
     choco download sysinternals
-    choco download notepadplusplus.install --recompile --embed
+    choco download notepadplusplus.install --recompile
+    choco download notepadplusplus.install --recompile --resources-location \\server\share
+    choco download notepadplusplus.install --recompile --resources-location http://somewhere/internal
 
 ## See It In Action
 
