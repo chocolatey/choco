@@ -74,7 +74,6 @@ param(
 
   Write-Debug "Running 'Get-WebFileName' to determine name with url:'$url', defaultName:'$defaultName'";
 
-
   $originalFileName = $defaultName
   $fileName = $null
 
@@ -93,6 +92,11 @@ param(
     }
   } catch {
     #continue on
+  }
+
+  if ($url.StartsWith('ftp')) {
+    Write-Debug "Url is FTP, using default name."
+    return $originalFileName
   }
 
   $request = [System.Net.HttpWebRequest]::Create($url)
