@@ -275,7 +275,7 @@ param(
 )
   [string]$silentArgs = $silentArgs -join ' '
 
-  Write-Debug "Running 'Install-ChocolateyPackage' for $packageName with url:`'$url`', args: `'$silentArgs`', fileType: `'$fileType`', url64bit: `'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`', validExitCodes: `'$validExitCodes`' ";
+  Write-Debug "Running 'Install-ChocolateyPackage' for $packageName with url:'$url', args:'$silentArgs', fileType:'$fileType', url64bit:'$url64bit', checksum:'$checksum', checksumType:'$checksumType', checksum64:'$checksum64', checksumType64:'$checksumType64', validExitCodes:'$validExitCodes'";
 
   $chocTempDir = $env:TEMP
   $tempDir = Join-Path $chocTempDir "$($env:chocolateyPackageName)"
@@ -284,7 +284,7 @@ param(
   if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
   $file = Join-Path $tempDir "$($packageName)Install.$fileType"
 
-  $filePath = $file
+  [string]$filePath = $file
   if ($useOriginalLocation) {
     $filePath = $url
     if (Get-ProcessorBits 64) {
@@ -296,8 +296,22 @@ param(
       }
     }
   } else {
-    $filePath = Get-ChocolateyWebFile $packageName $file $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
+    $filePath = Get-ChocolateyWebFile -PackageName $packageName `
+                                      -FileFullPath $file `
+                                      -Url $url `
+                                      -Url64bit $url64bit `
+                                      -Checksum $checksum `
+                                      -ChecksumType $checksumType `
+                                      -Checksum64 $checksum64 `
+                                      -ChecksumType64 $checksumType64 `
+                                      -Options $options `
+                                      -GetOriginalFileName
   }
     
-  Install-ChocolateyInstallPackage $packageName $fileType $silentArgs $filePath -validExitCodes $validExitCodes -UseOnlyPackageSilentArguments:$useOnlyPackageSilentArguments
+  Install-ChocolateyInstallPackage -PackageName $packageName `
+                                   -FileType $fileType `
+                                   -SilentArgs $silentArgs `
+                                   -File $filePath `
+                                   -ValidExitCodes $validExitCodes `
+                                   -UseOnlyPackageSilentArguments:$useOnlyPackageSilentArguments
 }
