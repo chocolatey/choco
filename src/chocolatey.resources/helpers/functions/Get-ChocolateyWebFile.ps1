@@ -253,6 +253,18 @@ param(
     throw "This package does not support $bitWidth bit architecture."
   }
 
+  # determine if the url can be SSL/TLS
+  if ($url.StartsWith('http:')) {
+    try {
+      $httpsUrl = $url.Replace("http://", "https://")
+      Get-WebHeaders -Url $httpsUrl -ErrorAction "Stop" | Out-Null
+      $url = $httpsUrl
+      Write-Warning "Url has SSL/TLS available, switching to HTTPS for download"
+    } catch {
+      Write-Debug "Url does not have HTTPS available"
+    }
+  }
+
   if ($getOriginalFileName) {
     try {
       $fileDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
