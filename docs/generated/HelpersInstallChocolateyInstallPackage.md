@@ -165,8 +165,8 @@ you can get it to the path with
 `"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
 
 Property               | Value
----------------------- | -----
-Aliases                | 
+---------------------- | ------------
+Aliases                | fileFullPath
 Required?              | true
 Position?              | 4
 Default Value          | 

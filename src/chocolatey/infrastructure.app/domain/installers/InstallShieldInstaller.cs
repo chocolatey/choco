@@ -38,8 +38,8 @@ namespace chocolatey.infrastructure.app.domain.installers
             SilentUninstall = "/uninst /s";
             OtherUninstallOptions = "/sms";
             // http://helpnet.installshield.com/installshield18helplib/IHelpSetup_EXEErrors.htm
-            ValidInstallExitCodes = new List<int> {0, 1641, 3010};
-            ValidUninstallExitCodes = new List<int> { 0, 1605, 1614, 1641, 3010 };
+            ValidInstallExitCodes = new List<long> { 0, 1641, 3010 };
+            ValidUninstallExitCodes = new List<long> { 0, 1605, 1614, 1641, 3010 };
         }
 
         public override InstallerType InstallerType

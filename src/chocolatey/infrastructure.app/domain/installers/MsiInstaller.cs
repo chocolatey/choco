@@ -51,10 +51,10 @@ namespace chocolatey.infrastructure.app.domain.installers
             OtherUninstallOptions = "";
             // https://msdn.microsoft.com/en-us/library/aa376931.aspx
             // https://support.microsoft.com/en-us/kb/290158
-            ValidInstallExitCodes = new List<int> {0, 1641, 3010};
+            ValidInstallExitCodes = new List<long> { 0, 1641, 3010 };
             // we allow unknown 1605/1614 b/c it may have already been uninstalled 
             // and that's okay
-            ValidUninstallExitCodes = new List<int> {0, 1605, 1614, 1641, 3010};
+            ValidUninstallExitCodes = new List<long> { 0, 1605, 1614, 1641, 3010 };
         }
 
         public override InstallerType InstallerType

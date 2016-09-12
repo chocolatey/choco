@@ -20,7 +20,7 @@ in Pro / Business editions.
 
 ## Notes
 
-Only [licensed editions](https://chocolatey.org/compare) of [Chocolatey pro](https://chocolatey.org/compare)vide runtime malware protection.
+Only [licensed editions](https://chocolatey.org/compare) of Chocolatey provide runtime malware protection.
 
 ## Aliases
 

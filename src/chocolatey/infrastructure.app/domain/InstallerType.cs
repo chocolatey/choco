@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.domain
         Unknown,
         Custom,
         Msi,
+        MsiPatch,
         Nsis,
         InnoSetup,
         InstallShield,

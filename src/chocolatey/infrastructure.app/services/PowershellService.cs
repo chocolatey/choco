@@ -31,6 +31,7 @@ namespace chocolatey.infrastructure.app.services
     using cryptography;
     using domain;
     using infrastructure.commands;
+    using infrastructure.registration;
     using logging;
     using NuGet;
     using powershell;
@@ -403,20 +404,27 @@ namespace chocolatey.infrastructure.app.services
 
             // we only want to pass the following args to packages that would apply. 
             // like choco install git -params '' should pass those params to git.install, 
-            // but not another package
-            if (!package_is_a_dependency_not_a_virtual(configuration, package.Id))
+            // but not another package unless the switch apply-install-arguments-to-dependencies is used
+            if (!package_is_a_dependency_not_a_virtual(configuration, package.Id) || configuration.ApplyInstallArgumentsToDependencies)
             {
-                this.Log().Debug(ChocolateyLoggers.Verbose, "Setting installer args and package parameters for {0}".format_with(package.Id));
+                this.Log().Debug(ChocolateyLoggers.Verbose, "Setting installer args for {0}".format_with(package.Id));
                 Environment.SetEnvironmentVariable("installArguments", configuration.InstallArguments);
                 Environment.SetEnvironmentVariable("installerArguments", configuration.InstallArguments);
                 Environment.SetEnvironmentVariable("chocolateyInstallArguments", configuration.InstallArguments);
-                Environment.SetEnvironmentVariable("packageParameters", configuration.PackageParameters);
-                Environment.SetEnvironmentVariable("chocolateyPackageParameters", configuration.PackageParameters);
 
                 if (configuration.OverrideArguments)
                 {
                     Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
                 }
+            }
+
+            // we only want to pass package parameters to packages that would apply. 
+            // but not another package unless the switch apply-package-parameters-to-dependencies is used
+            if (!package_is_a_dependency_not_a_virtual(configuration, package.Id) || configuration.ApplyPackageParametersToDependencies)
+            {
+                this.Log().Debug(ChocolateyLoggers.Verbose, "Setting package parameters for {0}".format_with(package.Id));
+                Environment.SetEnvironmentVariable("packageParameters", configuration.PackageParameters);
+                Environment.SetEnvironmentVariable("chocolateyPackageParameters", configuration.PackageParameters);
             }
 
             if (!string.IsNullOrWhiteSpace(configuration.DownloadChecksum))
@@ -468,6 +476,8 @@ namespace chocolatey.infrastructure.app.services
                     Environment.SetEnvironmentVariable("CacheChecksumType_{0}".format_with(urlKey), "sha512");
                 }
             }
+
+            SecurityProtocol.set_protocol();
         }
 
         private ResolveEventHandler _handler = null;

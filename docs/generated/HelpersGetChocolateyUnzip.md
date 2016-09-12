@@ -64,9 +64,11 @@ This is the full path to the zip file. If embedding it in the package
 next to the install script, the path will be like
 `"$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\\file.zip"`
 
+In 0.10.1+, `File` is an alias for FileFullPath.
+
 Property               | Value
 ---------------------- | -----
-Aliases                | 
+Aliases                | file
 Required?              | true
 Position?              | 1
 Default Value          | 

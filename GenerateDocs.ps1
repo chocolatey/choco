@@ -19,9 +19,9 @@ $ErrorActionPreference = 'Stop'
 
 $thisDirectory = (Split-Path -parent $MyInvocation.MyCommand.Definition);
 $psModuleName = 'chocolateyInstaller'
-$psModuleLocation = [System.IO.Path]::GetFullPath("$thisDirectory\..\src\chocolatey.resources\helpers\chocolateyInstaller.psm1")
-$docsFolder = [System.IO.Path]::GetFullPath("$thisDirectory\..\docs\generated")
-$chocoExe = [System.IO.Path]::GetFullPath("$thisDirectory\..\code_drop\chocolatey\console\choco.exe")
+$psModuleLocation = [System.IO.Path]::GetFullPath("$thisDirectory\src\chocolatey.resources\helpers\chocolateyInstaller.psm1")
+$docsFolder = [System.IO.Path]::GetFullPath("$thisDirectory\docs\generated")
+$chocoExe = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\chocolatey\console\choco.exe")
 $lineFeed = "`r`n"
 $global:powerShellReferenceTOC = @'
 # PowerShell Functions aka Helpers Reference
@@ -107,7 +107,7 @@ function Replace-CommonItems($text) {
 
   $text = $text.Replace("`n",$lineFeed)
   $text = $text -replace '(community feed[s]?|community repository)', '[$1](https://chocolatey.org/packages)'
-  $text = $text -replace '(Chocolatey for Business|Chocolatey Pro[fessional]*)', '[$1](https://chocolatey.org/compare)'
+  $text = $text -replace '(Chocolatey for Business|Chocolatey Professional|Chocolatey Pro)(?=[^\w])', '[$1](https://chocolatey.org/compare)'
   $text = $text -replace '(Pro[fessional]\s?/\s?Business)', '[$1](https://chocolatey.org/compare)'
   $text = $text -replace '([Ll]icensed editions)', '[$1](https://chocolatey.org/compare)'
   $text = $text -replace '([Ll]icensed versions)', '[$1](https://chocolatey.org/compare)'
@@ -198,7 +198,7 @@ param(
   $commandText = $commandText -replace '^(.+):\s(.+.gif)$', '![$1]($2)'
   $commandText = $commandText -replace '^(\s+)\<\?xml', "~~~xml$lineFeed`$1<?xml"
   $commandText = $commandText -replace '^(\s+)</packages>', "`$1</packages>$lineFeed~~~"
-  $commandText = $commandText -replace '(Chocolatey for Business|Chocolatey Pro[fessional]*)', '[$1](https://chocolatey.org/compare)'
+  $commandText = $commandText -replace '(Chocolatey for Business|Chocolatey Professional|Chocolatey Pro)(?=[^\w])', '[$1](https://chocolatey.org/compare)'
   $commandText = $commandText -replace '(Pro[fessional]\s?/\s?Business)', '[$1](https://chocolatey.org/compare)'
   $commandText = $commandText -replace '([Ll]icensed editions)', '[$1](https://chocolatey.org/compare)'
   $commandText = $commandText -replace '([Ll]icensed versions)', '[$1](https://chocolatey.org/compare)'

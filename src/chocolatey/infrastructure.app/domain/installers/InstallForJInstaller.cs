@@ -39,11 +39,11 @@ namespace chocolatey.infrastructure.app.domain.installers
             UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
             SilentUninstall = "-q";
             OtherUninstallOptions = "";
-            ValidInstallExitCodes = new List<int>
+            ValidInstallExitCodes = new List<long>
             {
                 0
             };
-            ValidUninstallExitCodes = new List<int>
+            ValidUninstallExitCodes = new List<long>
             {
                 0
             };
