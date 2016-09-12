@@ -58,6 +58,12 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("params=|parameters=|pkgparameters=|packageparameters=|package-parameters=",
                      "PackageParameters - Parameters to pass to the package. Defaults to unspecified.",
                      option => configuration.PackageParameters = option.remove_surrounding_quotes())
+                .Add("apply-install-arguments-to-dependencies",
+                     "Apply Install Arguments To Dependencies  - Should install arguments be applied to dependent packages? Defaults to false.",
+                     option => configuration.ApplyInstallArgumentsToDependencies = option != null)
+                .Add("apply-package-parameters-to-dependencies",
+                     "Apply Package Parameters To Dependencies  - Should package parameters be applied to dependent packages? Defaults to false.",
+                     option => configuration.ApplyPackageParametersToDependencies = option != null)
                 .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
                      "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false.",
                      option => configuration.AllowMultipleVersions = option != null)

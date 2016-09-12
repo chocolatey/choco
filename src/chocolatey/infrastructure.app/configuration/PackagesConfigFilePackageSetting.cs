@@ -40,6 +40,12 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "packageParameters")]
         public string PackageParameters { get; set; }
 
+        [XmlAttribute(AttributeName = "applyPackageParametersToDependencies")]
+        public bool ApplyPackageParametersToDependencies { get; set; }
+
+        [XmlAttribute(AttributeName = "applyInstallArgumentsToDependencies")]
+        public bool ApplyInstallArgumentsToDependencies { get; set; }
+
         [XmlAttribute(AttributeName = "forceX86")]
         public bool ForceX86 { get; set; }
 

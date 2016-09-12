@@ -134,6 +134,18 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
+            public void should_add_applyPackageParametersToDependencies_to_the_option_set()
+            {
+                optionSet.Contains("apply-package-parameters-to-dependencies").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_applyInstallArgumentsToDependencies_to_the_option_set()
+            {
+                optionSet.Contains("apply-install-arguments-to-dependencies").ShouldBeTrue();
+            }
+
+            [Fact]
             public void should_add_forcedependencies_to_the_option_set()
             {
                 optionSet.Contains("forcedependencies").ShouldBeTrue();
