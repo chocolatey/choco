@@ -77,6 +77,8 @@ Full file path to native installer to run. If embedding in the package,
 you can get it to the path with
 `"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
 
+In 0.10.1+, `FileFullPath` is an alias for File.
+
 .PARAMETER ValidExitCodes
 Array of exit codes indicating success. Defaults to `@(0)`.
 
