@@ -133,3 +133,5 @@ This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -Err
 [[Function Reference|HelpersReference]]
 
 ***NOTE:*** This documentation has been automatically generated from `Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1" -Force; Get-Help Get-ChocolateyUnzip -Full`.
+
+View the source for [Get-ChocolateyUnzip](https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Get-ChocolateyUnzip.ps1)

@@ -114,3 +114,5 @@ This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -Err
 [[Function Reference|HelpersReference]]
 
 ***NOTE:*** This documentation has been automatically generated from `Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1" -Force; Get-Help Get-WebFileName -Full`.
+
+View the source for [Get-WebFileName](https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Get-WebFileName.ps1)
