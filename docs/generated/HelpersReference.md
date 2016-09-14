@@ -92,6 +92,7 @@ These are the functions from above as one list.
  * [[Write-ChocolateyFailure|HelpersWriteChocolateyFailure]]
  * [[Write-ChocolateySuccess|HelpersWriteChocolateySuccess]]
  * [[Write-FileUpdateLog|HelpersWriteFileUpdateLog]]
+
 ## Variables
 
 There are also a number of environment variables providing access to some values from the nuspec and other information that may be useful. They are accessed via `$env:variableName`.

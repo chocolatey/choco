@@ -64,7 +64,7 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 results = results.Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
             }
-
+           
             if (configuration.ListCommand.Exact)
             {
                 results = results.Where(p => p.Id.ToLower() == searchTerm);
@@ -99,7 +99,7 @@ namespace chocolatey.infrastructure.app.nuget
                 results = results.Where(p => (p.IsDownloadCacheAvailable && configuration.Information.IsLicensedVersion) || p.PackageTestResultStatus != "Failing");
             }
 
-            if (configuration.AllVersions)
+            if (configuration.AllVersions || !string.IsNullOrWhiteSpace(configuration.Version))
             {
                 if (isRemote)
                 {

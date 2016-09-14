@@ -40,3 +40,5 @@ None
 [[Function Reference|HelpersReference]]
 
 ***NOTE:*** This documentation has been automatically generated from `Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1" -Force; Get-Help Test-ProcessAdminRights -Full`.
+
+View the source for [Test-ProcessAdminRights](https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Test-ProcessAdminRights.ps1)

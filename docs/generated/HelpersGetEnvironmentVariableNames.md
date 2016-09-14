@@ -53,3 +53,5 @@ None
 [[Function Reference|HelpersReference]]
 
 ***NOTE:*** This documentation has been automatically generated from `Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1" -Force; Get-Help Get-EnvironmentVariableNames -Full`.
+
+View the source for [Get-EnvironmentVariableNames](https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Get-EnvironmentVariableNames.ps1)

@@ -110,7 +110,7 @@ namespace chocolatey.infrastructure.app.builders
         {
             // do not enable or disable the source, in case the user has disabled it
             var addOrUpdate = license.IsValid;
-            var sources = configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null().ToList();
+            var sources = configFileSettings.Sources.or_empty_list_if_null().ToList();
 
             var configSource = new ConfigFileSourceSetting
             {

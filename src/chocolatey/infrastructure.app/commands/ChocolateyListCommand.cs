@@ -53,7 +53,10 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.ListCommand.IncludeRegistryPrograms = option != null)
                 .Add("a|all|allversions|all-versions",
                      "AllVersions - include results from all versions.",
-                     option => configuration.AllVersions = option != null)
+                     option => configuration.AllVersions = option != null)              
+                .Add("version=",
+                     "Version - Specific version of a package to return.",
+                     option => configuration.Version = option.remove_surrounding_quotes())
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
                      option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())

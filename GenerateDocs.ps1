@@ -23,6 +23,7 @@ $psModuleLocation = [System.IO.Path]::GetFullPath("$thisDirectory\src\chocolatey
 $docsFolder = [System.IO.Path]::GetFullPath("$thisDirectory\docs\generated")
 $chocoExe = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\chocolatey\console\choco.exe")
 $lineFeed = "`r`n"
+$srcFunctions = 'https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions'
 $global:powerShellReferenceTOC = @'
 # PowerShell Functions aka Helpers Reference
 
@@ -309,6 +310,8 @@ $( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$line
 [[Function Reference|HelpersReference]]
 
 ***NOTE:*** This documentation has been automatically generated from ``Import-Module `"`$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1`" -Force; Get-Help $($_.Name) -Full``.
+
+View the source for [$($_.Name)]($srcFunctions/$($_.Name)`.ps1)
 "@  | Out-File $fileName -Encoding UTF8 -Force
   }
 
@@ -316,6 +319,7 @@ $( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$line
   $fileName = Join-Path $docsFolder 'HelpersReference.md'
 
   $global:powerShellReferenceTOC += @'
+
 
 ## Variables
 

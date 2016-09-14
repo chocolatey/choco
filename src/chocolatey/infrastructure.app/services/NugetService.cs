@@ -119,6 +119,11 @@ namespace chocolatey.infrastructure.app.services
             {
                 var package = pkg; // for lamda access
 
+                if (!string.IsNullOrWhiteSpace(config.Version))
+                {
+                    if (!pkg.Version.to_string().is_equal_to(config.Version)) continue;
+                }
+
                 if (!config.QuietOutput)
                 {
                     if (config.RegularOutput)

@@ -150,6 +150,14 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      PackageParameters - Parameters to pass to the package. Defaults to 
        unspecified.
 
+     --apply-install-arguments-to-dependencies
+     Apply Install Arguments To Dependencies  - Should install arguments be 
+       applied to dependent packages? Defaults to false.
+
+     --apply-package-parameters-to-dependencies
+     Apply Package Parameters To Dependencies  - Should package parameters be 
+       applied to dependent packages? Defaults to false.
+
  -m, --sxs, --sidebyside, --side-by-side, --allowmultiple, --allow-multiple, --allowmultipleversions, --allow-multiple-versions
      AllowMultipleVersions - Should multiple versions of a package be 
        installed? Defaults to false.

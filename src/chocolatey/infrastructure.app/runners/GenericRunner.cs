@@ -50,21 +50,22 @@ namespace chocolatey.infrastructure.app.runners
                 //todo add a search among other location/extensions for the command
                 if (!string.IsNullOrWhiteSpace(config.CommandName))
                 {
-                    throw new Exception("Could not find a command registered that meets '{0}'".format_with(config.CommandName));
+                    throw new Exception(@"Could not find a command registered that meets '{0}'. 
+ Try choco -? for command reference/help.".format_with(config.CommandName));
                 }
 
                 if (isConsole) Environment.ExitCode = 1;
             }
             else
             {
-                if (command.may_require_admin_access())
-                {
-                    warn_when_admin_needs_elevation(config);
-                }
-
                 if (parseArgs != null)
                 {
                     parseArgs.Invoke(command);
+                }
+
+                if (command.may_require_admin_access())
+                {
+                    warn_when_admin_needs_elevation(config);
                 }
 
                 set_source_type(config);
@@ -230,6 +231,8 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
         public void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
         {
+            if (config.HelpRequested) return;
+
             var shouldWarn = (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator)
                           || (!config.Information.IsUserAdministrator && ApplicationParameters.InstallLocation.is_equal_to(ApplicationParameters.CommonAppDataChocolatey));
 
