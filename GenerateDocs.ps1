@@ -317,6 +317,7 @@ $( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$line
 
   $global:powerShellReferenceTOC += @'
 
+
 ## Variables
 
 There are also a number of environment variables providing access to some values from the nuspec and other information that may be useful. They are accessed via `$env:variableName`.
