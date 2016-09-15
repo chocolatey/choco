@@ -159,7 +159,11 @@ param(
       if ($selection -eq 0) { return }
     }
     
-    throw "Empty checksums are no longer allowed by default for non-secure sources. Please ask the maintainer to add checksums to this package. In the meantime if you need this package to work correctly, please enable the feature allowEmptyChecksums or provide the runtime switch '--allowEmptyChecksums'. We strongly advise against allowing empty checksums for HTTP/FTP sources."
+    if ($originalUrl -ne $null -and $originalUrl.ToLower().StartsWith("https")) {
+      throw "This package downloads over HTTPS but does not yet have package checksums to verify the package. We recommend asking the maintainer to add checksums to this package. In the meantime if you need this package to work correctly, please enable the feature allowEmptyChecksumsSecure or provide the runtime switch '--allowEmptyChecksums'."
+    } else {
+      throw "Empty checksums are no longer allowed by default for non-secure sources. Please ask the maintainer to add checksums to this package. In the meantime if you need this package to work correctly, please enable the feature allowEmptyChecksums or provide the runtime switch '--allowEmptyChecksums'. It is strongly advised against allowing empty checksums for non-internal HTTP/FTP sources."
+    }
   }
 
   if (!([System.IO.File]::Exists($file))) { throw "Unable to checksum a file that doesn't exist - Could not find file `'$file`'" }
