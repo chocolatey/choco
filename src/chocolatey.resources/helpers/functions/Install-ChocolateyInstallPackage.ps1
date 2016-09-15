@@ -166,8 +166,8 @@ param(
     Write-Debug 'No FileType supplied. Using the file extension to determine FileType'
     $fileType = [System.IO.Path]::GetExtension("$file").Replace(".", "")
   }
-  $installerTypeLower = $fileType.ToLower()
 
+  $installerTypeLower = $fileType.ToLower()
   if ($installerTypeLower -ne 'msi' -and $installerTypeLower -ne 'exe' -and $installerTypeLower -ne 'msu') {
     Write-Warning "FileType '$fileType' is unrecognized, using 'exe' instead."
     $fileType = 'exe'
