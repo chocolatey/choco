@@ -52,6 +52,9 @@ recommended that it matches the package id.
 .PARAMETER FileType
 This is the extension of the file. This should be either exe or msi.
 
+If what is provided is empty or null, Chocolatey will use 'exe' 
+starting in 0.10.1.
+
 .PARAMETER SilentArgs
 OPTIONAL - These are the parameters to pass to the native uninstaller,
 including any arguments to make the uninstaller silent/unattended.
@@ -120,6 +123,13 @@ param(
   $additionalInstallArgs = $env:chocolateyInstallArguments;
   if ($additionalInstallArgs -eq $null) { $additionalInstallArgs = ''; }
   $overrideArguments = $env:chocolateyInstallOverride;
+    
+  if ($fileType -eq $null) { $fileType = '' }
+  $installerTypeLower = $fileType.ToLower()
+  if ($installerTypeLower -ne 'msi' -and $installerTypeLower -ne 'exe') {
+    Write-Warning "FileType '$fileType' is unrecognized, using 'exe' instead."
+    $fileType = 'exe'
+  }
 
   if ($fileType -like 'msi') {
     $msiArgs = "/x"
