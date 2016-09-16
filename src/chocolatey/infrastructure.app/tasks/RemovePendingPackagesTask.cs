@@ -72,6 +72,19 @@ namespace chocolatey.infrastructure.app.tasks
                     continue;
                 }
 
+                try
+                {
+                    //attempt to open the pending file. If it is locked, continue
+                    var file = _fileSystem.open_file_exclusive(pendingFile);
+                    file.Close();
+                    file.Dispose();
+                }
+                catch (Exception)
+                {
+                    this.Log().Debug("Pending file found for {0}, but the file is locked by another process.".format_with(packageFolderName));
+                    continue;
+                }
+
                 // wait for the file to be at least x seconds old
                 // this allows commands running from the package for configuring sources, etc
                 var fileInfo = _fileSystem.get_file_info_for(pendingFile);
