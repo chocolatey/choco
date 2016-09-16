@@ -382,6 +382,11 @@ namespace chocolatey.infrastructure.filesystem
             return File.OpenRead(filePath);
         }
 
+        public FileStream open_file_exclusive(string filePath)
+        {
+            return File.Open(filePath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);
+        }
+
         public void write_file(string filePath, string fileText)
         {
             write_file(filePath, fileText, file_exists(filePath) ? get_file_encoding(filePath) : Encoding.UTF8);
