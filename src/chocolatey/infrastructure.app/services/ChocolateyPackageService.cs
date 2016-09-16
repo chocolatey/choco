@@ -50,6 +50,8 @@ namespace chocolatey.infrastructure.app.services
         private readonly IAutomaticUninstallerService _autoUninstallerService;
         private readonly IXmlService _xmlService;
         private readonly IConfigTransformService _configTransformService;
+        private readonly IDictionary<string, FileStream> _pendingLocks = new Dictionary<string, FileStream>();
+
         private readonly IList<string> _proBusinessMessages = new List<string> {
 @"
 Are you ready for the ultimate experience? Check out Pro / Business! 
@@ -1158,6 +1160,7 @@ ATTENTION: You must take manual action to remove {1} from
 
             var pendingFile = _fileSystem.combine_paths(packageDirectory, ApplicationParameters.PackagePendingFileName);
             _fileSystem.write_file(pendingFile, "{0}".format_with(packageResult.Name));
+           _pendingLocks.Add(packageResult.Name.to_lower(), _fileSystem.open_file_exclusive(pendingFile));
         }
 
         public void remove_pending(PackageResult packageResult, ChocolateyConfiguration config)
@@ -1177,6 +1180,15 @@ ATTENTION: You must take manual action to remove {1} from
             }
 
             var pendingFile = _fileSystem.combine_paths(packageDirectory, ApplicationParameters.PackagePendingFileName);
+            var lockName = packageResult.Name.to_lower();
+            if (_pendingLocks.ContainsKey(lockName))
+            {
+                var fileLock = _pendingLocks[lockName];
+                _pendingLocks.Remove(lockName);
+                fileLock.Close();
+                fileLock.Dispose();
+            }
+
             if (_fileSystem.file_exists(pendingFile)) _fileSystem.delete_file(pendingFile);
         }
 

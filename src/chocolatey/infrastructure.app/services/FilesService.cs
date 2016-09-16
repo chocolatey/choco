@@ -17,6 +17,7 @@ namespace chocolatey.infrastructure.app.services
 {
     using System;
     using System.IO;
+    using System.Linq;
     using configuration;
     using cryptography;
     using domain;
@@ -117,7 +118,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Debug(() => "Capturing package files in '{0}'".format_with(directory));
             //gather all files in the folder 
             var files = _fileSystem.get_files(directory, pattern: "*.*", option: SearchOption.AllDirectories);
-            foreach (string file in files.or_empty_list_if_null())
+            foreach (string file in files.or_empty_list_if_null().Where(f => !f.EndsWith(ApplicationParameters.PackagePendingFileName)))
             {
                 packageFiles.Files.Add(get_package_file(file));
             }
