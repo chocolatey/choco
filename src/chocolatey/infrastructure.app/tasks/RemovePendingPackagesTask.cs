@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.app.tasks
             foreach (var pendingFile in pendingFiles.or_empty_list_if_null())
             {
                 var packageFolder = _fileSystem.get_directory_name(pendingFile);
-                var packageFolderName = _fileSystem.get_directory_info_for(packageFolder).Name;
+                string packageFolderName = _fileSystem.get_directory_info_for(packageFolder).Name;
 
                 var pendingSkipFiles = _fileSystem.get_files(packageFolder, PENDING_SKIP_FILE, SearchOption.AllDirectories).ToList();
                 if (pendingSkipFiles.Count != 0)
