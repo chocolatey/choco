@@ -63,12 +63,25 @@ namespace chocolatey.infrastructure.app.tasks
             foreach (var pendingFile in pendingFiles.or_empty_list_if_null())
             {
                 var packageFolder = _fileSystem.get_directory_name(pendingFile);
-                var packageFolderName = _fileSystem.get_directory_info_for(packageFolder).Name;
+                string packageFolderName = _fileSystem.get_directory_info_for(packageFolder).Name;
 
                 var pendingSkipFiles = _fileSystem.get_files(packageFolder, PENDING_SKIP_FILE, SearchOption.AllDirectories).ToList();
                 if (pendingSkipFiles.Count != 0)
                 {
                     this.Log().Warn("Pending file found for {0}, but a {1} file was also found. Skipping removal".format_with(packageFolderName, PENDING_SKIP_FILE));
+                    continue;
+                }
+
+                try
+                {
+                    //attempt to open the pending file. If it is locked, continue
+                    var file = _fileSystem.open_file_exclusive(pendingFile);
+                    file.Close();
+                    file.Dispose();
+                }
+                catch (Exception)
+                {
+                    this.Log().Debug("Pending file found for {0}, but the file is locked by another process.".format_with(packageFolderName));
                     continue;
                 }
 

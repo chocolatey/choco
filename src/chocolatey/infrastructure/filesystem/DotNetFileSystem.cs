@@ -40,6 +40,8 @@ namespace chocolatey.infrastructure.filesystem
     {
         private readonly int TIMES_TO_TRY_OPERATION = 3;
         private static Lazy<IEnvironment> environment_initializer = new Lazy<IEnvironment>(() => new Environment());
+        private const int MAX_PATH_FILE = 255;
+        private const int MAX_PATH_DIRECTORY = 248;
 
         private void allow_retries(Action action, bool isSilent = false)
         {
@@ -48,7 +50,7 @@ namespace chocolatey.infrastructure.filesystem
                 action,
                 waitDurationMilliseconds: 200,
                 increaseRetryByMilliseconds: 100,
-                isSilent:isSilent);
+                isSilent: isSilent);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -56,7 +58,7 @@ namespace chocolatey.infrastructure.filesystem
         {
             environment_initializer = environment;
         }
-        
+
         private static IEnvironment Environment
         {
             get { return environment_initializer.Value; }
@@ -71,14 +73,14 @@ namespace chocolatey.infrastructure.filesystem
                 var methodName = string.Empty;
                 var stackFrame = new System.Diagnostics.StackFrame(1);
                 if (stackFrame != null) methodName = stackFrame.GetMethod().Name;
-                throw new ApplicationException("Path to combine cannot be empty. Tried to combine null with '{0}'.{1}".format_with(string.Join(",", rightItems),string.IsNullOrWhiteSpace(methodName) ? string.Empty : " Method called from '{0}'".format_with(methodName)));
+                throw new ApplicationException("Path to combine cannot be empty. Tried to combine null with '{0}'.{1}".format_with(string.Join(",", rightItems), string.IsNullOrWhiteSpace(methodName) ? string.Empty : " Method called from '{0}'".format_with(methodName)));
             }
 
             var combinedPath = Platform.get_platform() == PlatformType.Windows ? leftItem : leftItem.Replace('\\', '/');
             foreach (var rightItem in rightItems)
             {
                 if (rightItem.Contains(":")) throw new ApplicationException("Cannot combine a path with ':' attempted to combine '{0}' with '{1}'".format_with(rightItem, combinedPath));
- 
+
                 var rightSide = Platform.get_platform() == PlatformType.Windows ? rightItem : rightItem.Replace('\\', '/');
                 if (rightSide.StartsWith(Path.DirectorySeparatorChar.to_string()) || rightSide.StartsWith(Path.AltDirectorySeparatorChar.to_string()))
                 {
@@ -97,7 +99,14 @@ namespace chocolatey.infrastructure.filesystem
         {
             if (string.IsNullOrWhiteSpace(path)) return path;
 
-            return Path.GetFullPath(path);
+            try
+            {
+                return Path.GetFullPath(path);
+            }
+            catch (IOException)
+            {
+                return Alphaleonis.Win32.Filesystem.Path.GetFullPath(path);
+            }
         }
 
         public string get_temp_path()
@@ -105,7 +114,7 @@ namespace chocolatey.infrastructure.filesystem
             var path = Path.GetTempPath();
 
             if (System.Environment.UserName.contains(ApplicationParameters.Environment.SystemUserName) || path.contains("config\\systemprofile\\appdata"))
-            { 
+            {
                 path = System.Environment.ExpandEnvironmentVariables(System.Environment.GetEnvironmentVariable(ApplicationParameters.Environment.Temp, EnvironmentVariableTarget.Machine).to_string());
             }
 
@@ -131,7 +140,7 @@ namespace chocolatey.infrastructure.filesystem
 
             if (get_file_name_without_extension(executableName).is_equal_to(executableName) && isWindows)
             {
-                var pathExtensions = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions).to_string().Split(new[] {ApplicationParameters.Environment.EnvironmentSeparator}, StringSplitOptions.RemoveEmptyEntries);
+                var pathExtensions = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions).to_string().Split(new[] { ApplicationParameters.Environment.EnvironmentSeparator }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var extension in pathExtensions.or_empty_list_if_null())
                 {
                     extensions.Add(extension.StartsWith(".") ? extension : ".{0}".format_with(extension));
@@ -167,7 +176,7 @@ namespace chocolatey.infrastructure.filesystem
         {
             return Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty);
         }
-    
+
         #endregion
 
         #region File
@@ -194,7 +203,14 @@ namespace chocolatey.infrastructure.filesystem
 
         public bool file_exists(string filePath)
         {
-            return File.Exists(filePath);
+            try
+            {
+                return File.Exists(filePath);
+            }
+            catch (IOException)
+            {
+                return Alphaleonis.Win32.Filesystem.File.Exists(filePath);
+            }
         }
 
         public string get_file_name(string filePath)
@@ -216,9 +232,21 @@ namespace chocolatey.infrastructure.filesystem
             return Path.GetExtension(filePath.Replace('\\', '/'));
         }
 
-        public FileInfo get_file_info_for(string filePath)
+        public dynamic get_file_info_for(string filePath)
         {
-            return new FileInfo(filePath);
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(filePath) && filePath.Length >= MAX_PATH_FILE)
+                {
+                    return new Alphaleonis.Win32.Filesystem.FileInfo(filePath);
+                }
+
+                return new FileInfo(filePath);
+            }
+            catch (IOException)
+            {
+                return new Alphaleonis.Win32.Filesystem.FileInfo(filePath);
+            }
         }
 
         public System.DateTime get_file_modified_date(string filePath)
@@ -236,65 +264,69 @@ namespace chocolatey.infrastructure.filesystem
             return FileVersionInfo.GetVersionInfo(get_full_path(filePath)).FileVersion;
         }
 
-        public bool is_system_file(FileInfo file)
+        public bool is_system_file(dynamic file)
         {
             bool isSystemFile = ((file.Attributes & FileAttributes.System) == FileAttributes.System);
             if (!isSystemFile)
             {
                 //check the directory to be sure
-                DirectoryInfo directoryInfo = get_directory_info_for(file.DirectoryName);
+                var directoryInfo = get_directory_info_for(file.DirectoryName);
                 isSystemFile = ((directoryInfo.Attributes & FileAttributes.System) == FileAttributes.System);
             }
             else
             {
-                this.Log().Debug(ChocolateyLoggers.Verbose, () => "File \"{0}\" is a system file.".format_with(file.FullName));
+                string fullName = file.FullName;
+                this.Log().Debug(ChocolateyLoggers.Verbose, () => "File \"{0}\" is a system file.".format_with(fullName));
             }
 
             return isSystemFile;
         }
 
-        public bool is_readonly_file(FileInfo file)
+        public bool is_readonly_file(dynamic file)
         {
             bool isReadOnlyFile = ((file.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly);
             if (!isReadOnlyFile)
             {
                 //check the directory to be sure
-                DirectoryInfo directoryInfo = get_directory_info_for(file.DirectoryName);
+                dynamic directoryInfo = get_directory_info_for(file.DirectoryName);
                 isReadOnlyFile = ((directoryInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly);
             }
             else
             {
-                this.Log().Debug(ChocolateyLoggers.Verbose, () => "File \"{0}\" is a readonly file.".format_with(file.FullName));
+                string fullName = file.FullName;
+                this.Log().Debug(ChocolateyLoggers.Verbose, () => "File \"{0}\" is a readonly file.".format_with(fullName));
             }
 
             return isReadOnlyFile;
         }
 
-        public bool is_hidden_file(FileInfo file)
+        public bool is_hidden_file(dynamic file)
         {
             bool isHiddenFile = ((file.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden);
             if (!isHiddenFile)
             {
                 //check the directory to be sure
-                DirectoryInfo directoryInfo = get_directory_info_for(file.DirectoryName);
+                var directoryInfo = get_directory_info_for(file.DirectoryName);
                 isHiddenFile = ((directoryInfo.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden);
             }
             else
             {
-                this.Log().Debug(ChocolateyLoggers.Verbose, () => "File \"{0}\" is a hidden file.".format_with(file.FullName));
+                string fullName = file.FullName;
+                this.Log().Debug(ChocolateyLoggers.Verbose, () => "File \"{0}\" is a hidden file.".format_with(fullName));
             }
 
             return isHiddenFile;
         }
 
-        public bool is_encrypted_file(FileInfo file)
+        public bool is_encrypted_file(dynamic file)
         {
             bool isEncrypted = ((file.Attributes & FileAttributes.Encrypted) == FileAttributes.Encrypted);
-            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Is file \"{0}\" an encrypted file? {1}".format_with(file.FullName, isEncrypted.to_string()));
+            string fullName = file.FullName;
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Is file \"{0}\" an encrypted file? {1}".format_with(fullName, isEncrypted.to_string()));
             return isEncrypted;
         }
 
-        public string get_file_date(FileInfo file)
+        public string get_file_date(dynamic file)
         {
             return file.CreationTime < file.LastWriteTime
                        ? file.CreationTime.Date.ToString("yyyyMMdd")
@@ -303,7 +335,18 @@ namespace chocolatey.infrastructure.filesystem
 
         public void move_file(string filePath, string newFilePath)
         {
-            allow_retries(() => File.Move(filePath, newFilePath));
+            allow_retries(
+                () =>
+                {
+                    try
+                    {
+                        File.Move(filePath, newFilePath);
+                    }
+                    catch (IOException)
+                    {
+                        Alphaleonis.Win32.Filesystem.File.Move(filePath, newFilePath);
+                    }
+                });
             //Thread.Sleep(10);
         }
 
@@ -312,7 +355,18 @@ namespace chocolatey.infrastructure.filesystem
             this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to copy \"{0}\"{1} to \"{2}\".".format_with(sourceFilePath, Environment.NewLine, destinationFilePath));
             create_directory_if_not_exists(get_directory_name(destinationFilePath), ignoreError: true);
 
-            allow_retries(() => File.Copy(sourceFilePath, destinationFilePath, overwriteExisting));
+            allow_retries(
+                () =>
+                {
+                    try
+                    {
+                        File.Copy(sourceFilePath, destinationFilePath, overwriteExisting);
+                    }
+                    catch (IOException)
+                    {
+                        Alphaleonis.Win32.Filesystem.File.Copy(sourceFilePath, destinationFilePath, overwriteExisting);
+                    }
+                });
         }
 
         public bool copy_file_unsafe(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
@@ -331,7 +385,7 @@ namespace chocolatey.infrastructure.filesystem
             //if (success == 0)
             //{
             //    var error = Marshal.GetLastWin32Error();
-                
+
             //}
             return success != 0;
         }
@@ -358,7 +412,18 @@ namespace chocolatey.infrastructure.filesystem
             this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to delete file \"{0}\".".format_with(filePath));
             if (file_exists(filePath))
             {
-                allow_retries(() => File.Delete(filePath));
+                allow_retries(
+                    () =>
+                    {
+                        try
+                        {
+                            File.Delete(filePath);
+                        }
+                        catch (IOException)
+                        {
+                            Alphaleonis.Win32.Filesystem.File.Delete(filePath);
+                        }
+                    });
             }
         }
 
@@ -369,7 +434,14 @@ namespace chocolatey.infrastructure.filesystem
 
         public string read_file(string filePath)
         {
-            return File.ReadAllText(filePath, get_file_encoding(filePath));
+            try
+            {
+                return File.ReadAllText(filePath, get_file_encoding(filePath));
+            }
+            catch (IOException)
+            {
+                return Alphaleonis.Win32.Filesystem.File.ReadAllText(filePath, get_file_encoding(filePath));
+            }
         }
 
         public byte[] read_file_bytes(string filePath)
@@ -380,6 +452,11 @@ namespace chocolatey.infrastructure.filesystem
         public FileStream open_file_readonly(string filePath)
         {
             return File.OpenRead(filePath);
+        }
+
+        public FileStream open_file_exclusive(string filePath)
+        {
+            return File.Open(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
         }
 
         public void write_file(string filePath, string fileText)
@@ -442,36 +519,92 @@ namespace chocolatey.infrastructure.filesystem
 
         public string get_directory_name(string filePath)
         {
-            if (Platform.get_platform() == PlatformType.Windows) return Path.GetDirectoryName(filePath);
-
-            return Path.GetDirectoryName(filePath.Replace('\\', '/'));
+            if (Platform.get_platform() != PlatformType.Windows && !string.IsNullOrWhiteSpace(filePath))
+            {
+                filePath = filePath.Replace('\\', '/');
+            }
+            
+            try
+            {
+                return Path.GetDirectoryName(filePath);
+            }
+            catch (IOException)
+            {
+                return Alphaleonis.Win32.Filesystem.Path.GetDirectoryName(filePath);
+            }
         }
 
-        public DirectoryInfo get_directory_info_for(string directoryPath)
+        public dynamic get_directory_info_for(string directoryPath)
         {
-            return new DirectoryInfo(directoryPath);
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(directoryPath) && directoryPath.Length >= MAX_PATH_DIRECTORY)
+                {
+                    return new Alphaleonis.Win32.Filesystem.DirectoryInfo(directoryPath);
+                }
+
+                return new DirectoryInfo(directoryPath);
+            }
+            catch (IOException)
+            {
+                return new Alphaleonis.Win32.Filesystem.DirectoryInfo(directoryPath);
+            }
         }
 
-        public DirectoryInfo get_directory_info_from_file_path(string filePath)
+        public dynamic get_directory_info_from_file_path(string filePath)
         {
-            return new DirectoryInfo(filePath).Parent;
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(filePath) && filePath.Length >= MAX_PATH_FILE)
+                {
+                    return new Alphaleonis.Win32.Filesystem.DirectoryInfo(filePath).Parent;
+                }
+
+                return new DirectoryInfo(filePath).Parent;
+            }
+            catch (IOException)
+            {
+                return new Alphaleonis.Win32.Filesystem.DirectoryInfo(filePath).Parent;
+            }
         }
 
         public void create_directory(string directoryPath)
         {
             this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to create directory \"{0}\".".format_with(get_full_path(directoryPath)));
-            allow_retries(() => Directory.CreateDirectory(directoryPath));
+            allow_retries(
+                () =>
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(directoryPath);
+                    }
+                    catch (IOException)
+                    {
+                        Alphaleonis.Win32.Filesystem.Directory.CreateDirectory(directoryPath);
+                    }
+                });
         }
 
         public void move_directory(string directoryPath, string newDirectoryPath)
         {
             if (string.IsNullOrWhiteSpace(directoryPath) || string.IsNullOrWhiteSpace(newDirectoryPath)) throw new ApplicationException("You must provide a directory to move from or to.");
-            if (combine_paths(directoryPath,"").is_equal_to(combine_paths(Environment.GetEnvironmentVariable("SystemDrive"),""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
+            if (combine_paths(directoryPath, "").is_equal_to(combine_paths(Environment.GetEnvironmentVariable("SystemDrive"), ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
 
             try
             {
                 this.Log().Debug(ChocolateyLoggers.Verbose, "Moving '{0}'{1} to '{2}'".format_with(directoryPath, Environment.NewLine, newDirectoryPath));
-                allow_retries(() => Directory.Move(directoryPath, newDirectoryPath));
+                allow_retries(
+                    () =>
+                    {
+                        try
+                        {
+                            Directory.Move(directoryPath, newDirectoryPath);
+                        }
+                        catch (IOException)
+                        {
+                            Alphaleonis.Win32.Filesystem.Directory.Move(directoryPath, newDirectoryPath);
+                        }
+                    });
             }
             catch (Exception ex)
             {
@@ -563,9 +696,19 @@ namespace chocolatey.infrastructure.filesystem
             }
 
             if (!isSilent) this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to delete directory \"{0}\".".format_with(get_full_path(directoryPath)));
-            allow_retries(() => Directory.Delete(directoryPath, recursive),isSilent: isSilent);
+            allow_retries(
+                () =>
+                {
+                    try
+                    {
+                        Directory.Delete(directoryPath, recursive);
+                    }
+                    catch (IOException)
+                    {
+                        Alphaleonis.Win32.Filesystem.Directory.Delete(directoryPath, recursive);
+                    }
+                }, isSilent: isSilent);
         }
-        
 
         public void delete_directory_if_exists(string directoryPath, bool recursive)
         {
