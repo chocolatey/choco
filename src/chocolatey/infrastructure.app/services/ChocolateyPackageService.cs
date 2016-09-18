@@ -1161,7 +1161,10 @@ ATTENTION: You must take manual action to remove {1} from
 
             var pendingFile = _fileSystem.combine_paths(packageDirectory, ApplicationParameters.PackagePendingFileName);
             _fileSystem.write_file(pendingFile, "{0}".format_with(packageResult.Name));
-           _pendingLocks.Add(packageResult.Name.to_lower(), _fileSystem.open_file_exclusive(pendingFile));
+            if (ApplicationParameters.LockTransactionalInstallFiles)
+            {
+                _pendingLocks.Add(packageResult.Name.to_lower(), _fileSystem.open_file_exclusive(pendingFile));
+            }
         }
 
         public void remove_pending(PackageResult packageResult, ChocolateyConfiguration config)

@@ -110,6 +110,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string HashProviderFileTooBig = "UnableToDetectChanges_FileTooBig";
         public static readonly string HashProviderFileLocked = "UnableToDetectChanges_FileLocked";
 
+        public static readonly bool LockTransactionalInstallFiles = true;
         public static readonly string PackagePendingFileName = ".chocolateyPending";
 
         public static class Tools
