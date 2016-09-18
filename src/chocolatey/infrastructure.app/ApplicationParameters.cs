@@ -45,7 +45,10 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyConfigFileResource = @"chocolatey.infrastructure.app.configuration.chocolatey.config";
         public static readonly string GlobalConfigFileLocation = _fileSystem.combine_paths(InstallLocation, "config", "chocolatey.config");
         public static readonly string LicenseFileLocation = _fileSystem.combine_paths(InstallLocation, "license", "chocolatey.license.xml");
-        public static readonly string UserLicenseFileLocation = _fileSystem.combine_paths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify), "chocolatey.license.xml");
+        public static readonly string UserProfilePath = !string.IsNullOrWhiteSpace(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)) ?
+              System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)
+            : CommonAppDataChocolatey;
+        public static readonly string UserLicenseFileLocation = _fileSystem.combine_paths(UserProfilePath, "chocolatey.license.xml");
         public static readonly string LicensedAssemblyLocation = _fileSystem.combine_paths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
         public static readonly string LicensedComponentRegistry = @"chocolatey.licensed.infrastructure.app.registration.ContainerBinding";
         public static readonly string LicensedConfigurationBuilder = @"chocolatey.licensed.infrastructure.app.builders.ConfigurationBuilder";
@@ -107,6 +110,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string HashProviderFileTooBig = "UnableToDetectChanges_FileTooBig";
         public static readonly string HashProviderFileLocked = "UnableToDetectChanges_FileLocked";
 
+        public static readonly bool LockTransactionalInstallFiles = true;
         public static readonly string PackagePendingFileName = ".chocolateyPending";
 
         public static class Tools

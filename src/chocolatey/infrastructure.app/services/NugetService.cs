@@ -938,13 +938,21 @@ spam/junk folder.");
         /// <param name="installedPackage">The installed package.</param>
         private void remove_nuget_cache_for_package(IPackage installedPackage)
         {
-            var nugetCachedFile = _fileSystem.combine_paths(Environment.GetEnvironmentVariable("LocalAppData"), "NuGet", "Cache", "{0}.{1}.nupkg".format_with(installedPackage.Id, installedPackage.Version.to_string()));
-            if (_fileSystem.file_exists(nugetCachedFile))
-            {
-                FaultTolerance.try_catch_with_logging_exception(
-                                       () => _fileSystem.delete_file(nugetCachedFile),
-                                       "Unable to removed cached NuGet package file");
-            }
+            var localAppData = Environment.GetEnvironmentVariable("LocalAppData");
+            if (string.IsNullOrWhiteSpace(localAppData)) return;
+
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                {
+                    var nugetCachedFile = _fileSystem.combine_paths(localAppData, "NuGet", "Cache", "{0}.{1}.nupkg".format_with(installedPackage.Id, installedPackage.Version.to_string()));
+                    if (_fileSystem.file_exists(nugetCachedFile))
+                    {
+
+                        _fileSystem.delete_file(nugetCachedFile);
+                    }
+                },
+                "Unable to removed cached NuGet package file");
+
         }
 
         public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)

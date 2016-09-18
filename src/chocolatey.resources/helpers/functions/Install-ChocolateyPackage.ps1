@@ -221,7 +221,7 @@ Install-ChocolateyPackage 'mono' 'exe' '/SILENT' `
 Install-ChocolateyPackage 'ruby.devkit' 'exe' '/SILENT' `
  'http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe' `
  'http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe' `
- -checksum '9383f12958aafc425923e322460a84de' -checksumType = 'md5' `
+ -checksum '9383f12958aafc425923e322460a84de' -checksumType 'md5' `
  -checksum64 'ce99d873c1acc8bffc639bd4e764b849'
 
 .EXAMPLE

@@ -206,7 +206,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void visible_file_should_now_be_hidden()
             {
-                (FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.Hidden).ShouldEqual(FileAttributes.Hidden);
+                ((FileAttributes)FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.Hidden).ShouldEqual(FileAttributes.Hidden);
             }
 
             public override void AfterObservations()
@@ -235,7 +235,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void readonly_file_should_no_longer_be_readonly()
             {
-                (FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.ReadOnly).ShouldNotEqual(FileAttributes.ReadOnly);
+                ((FileAttributes)FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.ReadOnly).ShouldNotEqual(FileAttributes.ReadOnly);
             }
         }  
         
