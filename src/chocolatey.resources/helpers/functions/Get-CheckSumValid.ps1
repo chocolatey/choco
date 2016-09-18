@@ -140,7 +140,7 @@ param(
       return
     }
 
-    Write-Warning "Missing package checksums are not allowed (by default for HTTP/FTP, `n HTTPS when feature 'allowEmptyChecksumsSecure' is disabled) for `n safety and security reasons. Although we strongly advise against it, `n if you need this functionality, please set the feature `n 'allowEmptyChecksums' ('choco feature enable -n `n allowEmptyChecksums') `n or pass in the option '--allow-empty-checksums'."
+    Write-Warning "Missing package checksums are not allowed (by default for HTTP/FTP, `n HTTPS when feature 'allowEmptyChecksumsSecure' is disabled) for `n safety and security reasons. Although we strongly advise against it, `n if you need this functionality, please set the feature `n 'allowEmptyChecksums' ('choco feature enable -n `n allowEmptyChecksums') `n or pass in the option '--allow-empty-checksums'. You can also pass `n checksums at runtime (recommended). See `choco install -?` for details."
     Write-Debug "If you are a maintainer attempting to determine the checksum for packaging purposes, please run `n 'choco install checksum' and run 'checksum -t sha256 -f $file' `n Ensure you do this for all remote resources."
 
     if ($env:ChocolateyPowerShellHost -eq 'true') { 
@@ -160,9 +160,9 @@ param(
     }
     
     if ($originalUrl -ne $null -and $originalUrl.ToLower().StartsWith("https")) {
-      throw "This package downloads over HTTPS but does not yet have package checksums to verify the package. We recommend asking the maintainer to add checksums to this package. In the meantime if you need this package to work correctly, please enable the feature allowEmptyChecksumsSecure or provide the runtime switch '--allowEmptyChecksums'."
+      throw "This package downloads over HTTPS but does not yet have package checksums to verify the package. We recommend asking the maintainer to add cheksums to this package. In the meantime if you need this package to work correctly, please enable the feature allowEmptyChecksumsSecure, provide the runtime switch '--allow-empty-checksums-secure', or pass in checksums at runtime (recommended - see 'choco install -?' / 'choco upgrade -?' for details)."
     } else {
-      throw "Empty checksums are no longer allowed by default for non-secure sources. Please ask the maintainer to add checksums to this package. In the meantime if you need this package to work correctly, please enable the feature allowEmptyChecksums or provide the runtime switch '--allowEmptyChecksums'. It is strongly advised against allowing empty checksums for non-internal HTTP/FTP sources."
+      throw "Empty checksums are no longer allowed by default for non-secure sources. Please ask the maintainer to add checksums to this package. In the meantime if you need this package to work correctly, please enable the feature allowEmptyChecksums, provide the runtime switch '--allow-empty-checksums', or pass in checksums at runtime (recommended - see 'choco install -?' / 'choco upgrade -?' for details). It is strongly advised against allowing empty checksums for non-internal HTTP/FTP sources."
     }
   }
 
