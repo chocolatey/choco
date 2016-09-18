@@ -80,8 +80,8 @@ An organization needed total software management life cycle automation.
  next!
  https://chocolatey.org/compare", 
 @"
-Did you know that Synchronizer and AutoUninstaller enhancements in 
- licensed versions provide up to 95% effectiveness at removing system 
+Did you know that Package Synchronizer and AutoUninstaller enhancements 
+ in licensed versions are up to 95% effective in removing system 
  installed software without an uninstall script? Find out more at
  https://chocolatey.org/compare", 
 @"
@@ -93,7 +93,8 @@ Did you know Chocolatey goes to eleven? And it turns great developers /
 };
         private const string PRO_BUSINESS_LIST_MESSAGE = @"
 Did you know Pro / Business automatically syncs with Programs and
- Features? Find out more at https://chocolatey.org/compare";
+ Features? Learn more about Package Synchronizer at 
+ https://chocolatey.org/compare";
 
         private readonly string _shutdownExe = Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\shutdown.exe");
 
