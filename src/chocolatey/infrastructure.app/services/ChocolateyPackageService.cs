@@ -412,6 +412,8 @@ Did you know Pro / Business automatically syncs with Programs and
             ensure_bad_package_path_is_clean(config, packageResult);
             EventManager.publish(new HandlePackageResultCompletedMessage(packageResult, config, commandName));
 
+            remove_pending(packageResult, config);
+
             if (!packageResult.Success)
             {
                 this.Log().Error(ChocolateyLoggers.Important, "The {0} of {1} was NOT successful.".format_with(commandName.to_string(), packageResult.Name));
@@ -421,9 +423,7 @@ Did you know Pro / Business automatically syncs with Programs and
             }
 
             remove_rollback_if_exists(packageResult);
-
-            if (packageResult.Success) remove_pending(packageResult, config);
-
+            
             this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".format_with(commandName.to_string(), packageResult.Name));
 
             var installLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation);
@@ -1193,7 +1193,7 @@ ATTENTION: You must take manual action to remove {1} from
                 fileLock.Dispose();
             }
 
-            if (_fileSystem.file_exists(pendingFile)) _fileSystem.delete_file(pendingFile);
+            if (packageResult.Success && _fileSystem.file_exists(pendingFile)) _fileSystem.delete_file(pendingFile);
         }
 
         private IEnumerable<GenericRegistryValue> get_environment_before(ChocolateyConfiguration config, bool allowLogging = true)

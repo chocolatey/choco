@@ -479,7 +479,7 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
 
-            SecurityProtocol.set_protocol();
+            SecurityProtocol.set_protocol(configuration, provideWarning:false);
         }
 
         private ResolveEventHandler _handler = null;
