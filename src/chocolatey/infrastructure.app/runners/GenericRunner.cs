@@ -136,7 +136,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
             fail_when_license_is_missing_or_invalid_if_requested(config);
 
-            SecurityProtocol.set_protocol();
+            SecurityProtocol.set_protocol(config, provideWarning:true);
 
             EventManager.publish(new PreRunMessage(config));
 

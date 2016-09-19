@@ -17,6 +17,7 @@ namespace chocolatey.infrastructure.registration
 {
     using System;
     using System.Net;
+    using app.configuration;
     using logging;
 
     public sealed class SecurityProtocol
@@ -24,7 +25,7 @@ namespace chocolatey.infrastructure.registration
         private const int TLS_1_1 = 768;
         private const int TLS_1_2 = 3072;
 
-        public static void set_protocol()
+        public static void set_protocol(ChocolateyConfiguration config, bool provideWarning)
         {
             try
             {
@@ -39,7 +40,10 @@ namespace chocolatey.infrastructure.registration
             catch (Exception)
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
-                "chocolatey".Log().Warn(ChocolateyLoggers.Important,
+                //todo: provide this warning with the ability to opt out of seeing it again so we can move it up to more prominent visibility and not just the verbose log
+                if (provideWarning)
+                {
+                "chocolatey".Log().Warn(ChocolateyLoggers.Verbose,
 @" !!WARNING!!
 Choco prefers to use TLS v1.2 if it is available, but this client is 
  running on .NET 4.0, which uses an older SSL. It's using TLS 1.0 or 
@@ -48,6 +52,7 @@ Choco prefers to use TLS v1.2 if it is available, but this client is
  Chaining. Upgrade to at least .NET 4.5 at your earliest convenience.
 
  For more information you should visit https://www.howsmyssl.com/");
+                }
 
             }
 
