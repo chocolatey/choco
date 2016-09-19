@@ -55,6 +55,53 @@ In that mess there is a link to the [PowerShell Chocolatey module reference](htt
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
 
+## 0.10.1
+
+We're dubbing this the "Shhh! Keep that secret please" release. We've found that when passing in passwords and other sensitive arguments, those items can end up in the logs in clear text. We've addressed this in [#948](https://github.com/chocolatey/choco/issues/948) and [#953](https://github.com/chocolatey/choco/issues/953). When it comes to passing sensitive arguments through to native installers, you can set up environment variables with those sensitive args and pass those arguments directly through to `Start-ChocolateyProcessAsAdmin`. If you prefer a better experience, the licensed version allows passing sensitive options directly through choco.exe as `--install-arguments-sensitive` and `--package-parameters-sensitive`. Read more in the [Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
+
+Perhaps the biggest improvement in this release is that Chocolatey will automatically look to see if it can download binaries over HTTPS when provided an HTTP url. If so, Chocolatey will switch to downloading the binaries over SSL. This provides better security in downloading and knowing you are getting the binary from the source location instead of a possible man in the middle location, especially when the package does not provide checksums for verification.
+
+Another improvement you may not even notice, but we think you will love is that Chocolatey now supports TLS v1.2 transport which presents a nice transparent increase in security. You will need to have at least .NET Framework 4.5 installed to take advantage of this feature.
+
+### FEATURES
+
+ * [Security] Support TLS v1.2 - see [#458](https://github.com/chocolatey/choco/issues/458)
+ * [Security] Attempt to download packages via HTTPS connection - see [#746](https://github.com/chocolatey/choco/issues/746)
+ * [Security] Pro/Business - Pass sensitive arguments to installers - see [#948](https://github.com/chocolatey/choco/issues/948)
+ * Search (and info) by version - see [#935](https://github.com/chocolatey/choco/issues/935)
+
+### BUG FIXES
+
+ * [Security] Fix - Passwords in command line options are logged in clear text - see [#953](https://github.com/chocolatey/choco/issues/953)
+ * [Security] Fix - For PowerShell v2 - if switch down to SSLv3 protocol fails, go back to original protocol - see [#958](https://github.com/chocolatey/choco/issues/958)
+ * Fix - Unzipping to ProgramFiles/System32 is Subject to File System Redirection - see [#960](https://github.com/chocolatey/choco/issues/960)
+ * Fix - Run without login - see [#945](https://github.com/chocolatey/choco/issues/945)
+ * Fix - Support Long Paths - see [#934](https://github.com/chocolatey/choco/issues/934)
+ * Fix - help should not issue warning about elevated command shell - see [#893](https://github.com/chocolatey/choco/issues/893)
+ * Fix - Licensed Feed cannot be disabled - see [#959](https://github.com/chocolatey/choco/issues/959)
+ * Fix - Choco with unknown command should show help menu - see [#938](https://github.com/chocolatey/choco/issues/938)
+ * Fix - Get-FtpFile error when file is missing (called through Get-ChocolateyWebFile) - see [#920](https://github.com/chocolatey/choco/issues/920)
+ * Fix - Skip Get-WebFileName for FTP - see [#957](https://github.com/chocolatey/choco/issues/957)
+ * Fix - Chocolatey-InstallChocolateyPackage fix for double chocolatey folder name is not also applied to the passed in file name - see [#908](https://github.com/chocolatey/choco/issues/908)
+ * Fix - Start-ProcessAsAdmin - working directory should be from the location of the executable - see [#937](https://github.com/chocolatey/choco/issues/937)
+ * [POSH Host] Fix - PowerShell Host - Package scripts setting values can affect packages that depend on them - see [#719](https://github.com/chocolatey/choco/issues/719)
+ * Fix - Transactional install - pending check may fail if the lib folder doesn't exist - see [#954](https://github.com/chocolatey/choco/issues/954)
+ * Fix - Start-ChocolateyProcessAsAdmin Module Import for PowerShell causes errors - see [#901](https://github.com/chocolatey/choco/issues/901)
+
+### IMPROVEMENTS
+
+ * Transactional Install - Improve concurrent operations (pending) - see [#943](https://github.com/chocolatey/choco/issues/943)
+ * Uninstall-ChocolateyPackage should set unrecognized fileType to exe - see [#964](https://github.com/chocolatey/choco/issues/964)
+ * Powershell functions - Allow access to package title, not only ID - see [#925](https://github.com/chocolatey/choco/issues/925)
+ * Option to apply package parameters / install arguments to dependent packages - see [#839](https://github.com/chocolatey/choco/issues/839)
+ * Get-ChocolateyWebFile download check enhancements - see [#952](https://github.com/chocolatey/choco/issues/952)
+ * Do not treat unknown checksum types as MD5 - see [#932](https://github.com/chocolatey/choco/issues/932)
+ * Pro/Business - Install-ChocolateyPackage - UseOriginalLocation - see [#950](https://github.com/chocolatey/choco/issues/950)
+ * Auto determine checksum type - see [#922](https://github.com/chocolatey/choco/issues/922)
+ * Ensure PowerShell functions have parameter name parity - see [#941](https://github.com/chocolatey/choco/issues/941)
+ * Output from installer should go to verbose log - see [#940](https://github.com/chocolatey/choco/issues/940)
+
+
 ## 0.10.0
 
 What was planned for 0.9.10.4 is now 0.10.0. This is due partly to a breaking change we are making for security purposes and a move to provide better a better versioning scheme for the remainder of the sub-v1 versions of Chocolatey. Instead of 0.y.z.0 being considered where major verions occur in the sub 1 series, 0.y.0 will now be considered where those major versions occur. We also are moving right along towards v1 (and hope to be there in 2017).
