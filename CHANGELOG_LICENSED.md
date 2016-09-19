@@ -1,6 +1,8 @@
 # Chocolatey Licensed CHANGELOG
 
-If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
+This covers changes for the "chocolatey.extension" package, where the licensed editions of Chocolatey get their enhanced functionality.
+
+**NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
 ## 1.6.1 (Sep 8, 2016)
 
