@@ -1,3 +1,9 @@
+# Chocolatey Open Source CHANGELOG
+
+This covers changes for the "chocolatey" and "chocolatey.lib" packages, which are available as FOSS.
+
+**NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
+
 ## [0.10.0](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.0+is%3Aclosed) (August 11, 2016)
 What was planned for 0.9.10.4 is now 0.10.0. This is due partly to a breaking change we are making for security purposes and a move to provide better a better versioning scheme for the remainder of the sub-v1 versions of Chocolatey. Instead of 0.y.z.0 being considered where major verions occur in the sub 1 series, 0.y.0 will now be considered where those major versions occur. We also are moving right along towards v1 (and hope to be there in 2017).
 
