@@ -448,6 +448,7 @@ You can pass options and switches in the following ways:
         private static void set_licensed_options(ChocolateyConfiguration config, ChocolateyLicense license, ConfigFileSettings configFileSettings)
         {
             config.Information.IsLicensedVersion = license.is_licensed_version();
+            config.Information.LicenseType = license.LicenseType.get_description_or_value();
 
             if (license.AssemblyLoaded)
             {
