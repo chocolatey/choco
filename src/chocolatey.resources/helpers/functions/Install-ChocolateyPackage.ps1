@@ -292,7 +292,9 @@ param(
       if ($forceX86) {
         Write-Debug "User specified '-x86' so forcing 32-bit"
       } else {
-        $filePath = $url64bit
+        if ($url64bit -ne $null -and $url64bit -ne '') {
+          $filePath = $url64bit
+        }
       }
     }
   } else {
