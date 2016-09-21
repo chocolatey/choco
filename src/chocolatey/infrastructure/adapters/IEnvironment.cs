@@ -65,6 +65,19 @@ namespace chocolatey.infrastructure.adapters
         string NewLine { get; }
 
         /// <summary>
+        /// Replaces the name of each environment variable embedded in the specified string with the string equivalent of the value of the variable, then returns the resulting string.
+        /// 
+        /// </summary>
+        /// 
+        /// <returns>
+        /// A string with each environment variable replaced by its value.
+        /// </returns>
+        /// <param name="name">A string containing the names of zero or more environment variables. Each environment variable is quoted with the percent sign character (%).</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.
+        /// </exception><filterpriority>1</filterpriority><PermissionSet><IPermission class="System.Security.Permissions.EnvironmentPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/></PermissionSet>
+        string ExpandEnvironmentVariables(string name);
+    
+        /// <summary>
         /// Gets the environment variable.
         /// </summary>
         /// <param name="variable">The variable.</param>
