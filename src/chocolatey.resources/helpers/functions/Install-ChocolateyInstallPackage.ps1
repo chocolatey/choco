@@ -173,13 +173,6 @@ param(
     $fileType = 'exe'
   }
 
-  $ignoreFile = $file + '.ignore'
-  try {
-    '' | out-file $ignoreFile
-  } catch {
-    Write-Warning "Unable to generate `'$ignoreFile`'"
-  }
-
   $env:ChocolateyInstallerType = $fileType
 
   $additionalInstallArgs = $env:chocolateyInstallArguments;
@@ -208,6 +201,13 @@ Pro / Business supports a single, ubiquitous install directory option.
   $updatedFilePath = $file -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   if ([System.IO.File]::Exists($updatedFilePath)) { 
     $file = $updatedFilePath
+  }
+
+  $ignoreFile = $file + '.ignore'
+  try {
+    '' | out-file $ignoreFile
+  } catch {
+    Write-Warning "Unable to generate `'$ignoreFile`'"
   }
 
   $workingDirectory = Get-Location
