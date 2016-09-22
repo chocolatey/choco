@@ -267,6 +267,7 @@ param(
 
   if ($getOriginalFileName) {
     try {
+      $fileFullPath = $fileFullPath -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
       $fileDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
       $originalFileName = [System.IO.Path]::GetFileName($fileFullPath)
       $fileFullPath = Get-WebFileName -Url $url -DefaultName $originalFileName
