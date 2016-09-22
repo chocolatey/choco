@@ -280,6 +280,7 @@ param(
   $chocTempDir = $env:TEMP
   $tempDir = Join-Path $chocTempDir "$($env:chocolateyPackageName)"
   if ($env:chocolateyPackageVersion -ne $null) {$tempDir = Join-Path $tempDir "$($env:chocolateyPackageVersion)"; }
+  $tempDir = $tempDir -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
 
   if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
   $file = Join-Path $tempDir "$($packageName)Install.$fileType"
@@ -292,7 +293,9 @@ param(
       if ($forceX86) {
         Write-Debug "User specified '-x86' so forcing 32-bit"
       } else {
-        $filePath = $url64bit
+        if ($url64bit -ne $null -and $url64bit -ne '') {
+          $filePath = $url64bit
+        }
       }
     }
   } else {

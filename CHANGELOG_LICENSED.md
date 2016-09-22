@@ -4,15 +4,25 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
-## 1.7.0 (unreleased)
+## 1.7.0 (Sep 22, 2016)
+
+### BUG FIXES
+
+ * Package Internalizer (Choco Download) - ensure logging does not incur log format exceptions
+ * install/upgrade - Look for downloaded file at old path if replaced 'chocolatey\chocolatey' path does not exist - see [#969](https://github.com/chocolatey/choco/issues/969)
 
 ### IMPROVEMENTS
 
  * Package Builder (Choco New):
-   * `--build-package` to build a package after Package Builder creates the package all in one go.
-   * `--pause-on-error` to pause the output when there are errors for closer inspection (useful when run from a batch file).
-   * Specify checksum and type - checksum will be verified against files/downloaded files.
-
+    * `--build-package` to build a package after Package Builder creates the package all in one go.
+    * `--pause-on-error` to pause the output when there are errors for closer inspection (useful when run from a batch file).
+    * Specify checksum and type - checksum will be verified against files/downloaded files.
+    * Loads of improvements in how package id and title are determined and cleaned up.
+    * Product versions and portions of product versions are removed from package id/title.
+ * Package Internalizer (Choco Download):
+    * Add `--internalize` as alias to `--recompile`.
+    * Warn of issue with `-UseOriginalLocation` when only using one file.
+    * Add `--append-useoriginallocation` and feature internalizeAppendUseOriginalLocation that makes the determination to add to the end of `Install-ChocolateyPackage` when using local resources.
 
 ## 1.6.3 (Sep 20, 2016)
 
@@ -35,11 +45,11 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 ## 1.6.1 (Sep 8, 2016)
 
-### BUG FIXESs
+### BUG FIXES
 
  * Package Builder (Choco New):
-   * Fix - Do not error on missing appsearch table in MSI.
-   * Fix - Do not add similarly named items from AppSearch table to template properties more than once
+    * Fix - Do not error on missing appsearch table in MSI.
+    * Fix - Do not add similarly named items from AppSearch table to template properties more than once
 
 
 ## 1.6.0 (Sep 8, 2016)
@@ -49,41 +59,41 @@ Some really big improvements are now available in v1.6.0. We are excited to shar
 ### FEATURES
 
  * Licensed Enhancements:
-   * install/upgrade - pass sensitive arguments that are not shown/logged in Chocolatey to an installer - useful when you want to pass passwords but don't want them logged. Need Chocolatey v0.10.1+.
-   * AutoUninstaller - determine type from original executable when FOSS is not able to detect installer type.
+    * install/upgrade - pass sensitive arguments that are not shown/logged in Chocolatey to an installer - useful when you want to pass passwords but don't want them logged. Need Chocolatey v0.10.1+.
+    * AutoUninstaller - determine type from original executable when FOSS is not able to detect installer type.
  * Package Builder (Choco New):
-   * Now supports downloading from url/url64 and determining whether to keep those files remote.
-   * Switch to use original file location instead of copying into package
-   * Specify both 32-bit/64-bit file
-   * Work with zip files
+    * Now supports downloading from url/url64 and determining whether to keep those files remote.
+    * Switch to use original file location instead of copying into package
+    * Specify both 32-bit/64-bit file
+    * Work with zip files
 
 ### BUG FIXES
 
  * Fix - changes related to working directory fixes for [#937](https://github.com/chocolatey/choco/issues/937)
  * Fix - double chocolatey folder name is not also applied to the passed in file name - see  [#908](https://github.com/chocolatey/choco/issues/908)
  * Package Builder (Choco New):
-   * Fix - remove parentheses from package names
-   * Fix - keep template updated
+    * Fix - remove parentheses from package names
+    * Fix - keep template updated
  * Package Internalizer (Choco Download):
-   * Fix - handle downloaded files with the same name Sometimes the file name is the same when the architecture is different. Handle that by using the url counter for all additional files with the same name.
+    * Fix - handle downloaded files with the same name Sometimes the file name is the same when the architecture is different. Handle that by using the url counter for all additional files with the same name.
 
 ### IMPROVEMENTS
 
  * Remind About Upcoming Expiration - when the license is expiring within a month's time, remind the user about renewal
  * Package Builder (Choco New):
-   * Handle -forcex86 with package creation
-   * Add shimgen ignore for exes
-   * Use ProductVersion when version 0.0.0.0
-   * Remove the word "installer" from package name
-   * Allow specifying name of the package
-   * Allow template override with warning
-   * Show MSI properties in install script (commented)
-   * Ensure `ALLUSERS=1` when an MSI is set to per user by default
-   * Automatically checksum files
-   * Allow files to stay remote - use remote helpers when files stay remote
+    * Handle -forcex86 with package creation
+    * Add shimgen ignore for exes
+    * Use ProductVersion when version 0.0.0.0
+    * Remove the word "installer" from package name
+    * Allow specifying name of the package
+    * Allow template override with warning
+    * Show MSI properties in install script (commented)
+    * Ensure `ALLUSERS=1` when an MSI is set to per user by default
+    * Automatically checksum files
+    * Allow files to stay remote - use remote helpers when files stay remote
  * Package Internalizer (Choco Download):
-   * handle variables in urls set like ${word}
-   * Append `-UseOriginalLocation` to the end of the arguments passed to Install-ChocolateyPackage. Work with splatting properly as well
+    * handle variables in urls set like ${word}
+    * Append `-UseOriginalLocation` to the end of the arguments passed to Install-ChocolateyPackage. Work with splatting properly as well
 
 
 ## 1.5.1 (Aug 9, 2016)
@@ -192,6 +202,7 @@ Some really big improvements are now available in v1.6.0. We are excited to shar
 
  * Virus scanning for Pro users! See the [post](https://www.kickstarter.com/projects/ferventcoder/chocolatey-the-alternative-windows-store-like-yum/posts/1518468) for details!
 
+
 ## 1.1.0 (February 12, 2016)
 
 ### IMPROVEMENTS
@@ -206,17 +217,20 @@ Some really big improvements are now available in v1.6.0. We are excited to shar
    * Messaging is clarified
    * Skip or run virus check with command options - see `choco install -h` for details.
 
+
 ## 1.0.2 (February 5, 2016)
 
 ### BUG FIXES
 
 * Fix - PowerShell 5 respects Cmdlet aliases, causing overrides on functions not ready (Install-ChocolateyPackage). See the [post](https://www.kickstarter.com/projects/ferventcoder/chocolatey-the-alternative-windows-store-like-yum/posts/1484093) for details.
 
+
 ## 1.0.1 (February 2, 2016)
 
 ### BUG FIXES
 
 * Fix - License location validation is incorrect.
+
 
 ## 1.0.0 (February 1, 2016)
 

@@ -40,6 +40,13 @@ namespace chocolatey.infrastructure.adapters
             get { return System.Environment.NewLine; }
         }
 
+        public string ExpandEnvironmentVariables(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return name;
+
+            return System.Environment.ExpandEnvironmentVariables(name);
+        }
+
         public string GetEnvironmentVariable(string variable)
         {
             return System.Environment.GetEnvironmentVariable(variable);
