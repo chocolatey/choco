@@ -8,6 +8,7 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 ### BUG FIXES
 
+ * Package Builder (Choco New) - Removed `fileFullPath` from install template - add back in when local zip only. Fixes an error as `file` and `fileFullPath` are aliases starting in 0.10.1.
  * Package Internalizer (Choco Download) - ensure logging does not incur log format exceptions
  * install/upgrade - Look for downloaded file at old path if replaced 'chocolatey\chocolatey' path does not exist - see [#969](https://github.com/chocolatey/choco/issues/969)
 
