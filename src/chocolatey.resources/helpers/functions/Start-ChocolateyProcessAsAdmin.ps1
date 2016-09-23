@@ -42,6 +42,11 @@ run.
 .PARAMETER ExeToRun
 The executable/application/installer to run. Defaults to `'powershell'`.
 
+.PARAMETER Elevated
+Indicate whether the process should run elevated.
+
+Available in 0.10.2+.
+
 .PARAMETER Minimized
 Switch indicating if a Windows pops up (if not called with a silent
 argument) that it should be minimized.
@@ -95,6 +100,7 @@ Install-ChocolateyInstallPackage
 param(
   [parameter(Mandatory=$false, Position=0)][string[]] $statements,
   [parameter(Mandatory=$false, Position=1)][string] $exeToRun = 'powershell',
+  [parameter(Mandatory=$false)][switch] $elevated = $true,
   [parameter(Mandatory=$false)][switch] $minimized,
   [parameter(Mandatory=$false)][switch] $noSleep,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
@@ -145,6 +151,12 @@ This may take a while, depending on the statements.
   {
     $dbgMessage = @"
 Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on the statements.
+"@
+  }
+
+  if (!$elevated) {
+  $dbgMessage = @"
+Running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on the statements.
 "@
   }
 
@@ -208,7 +220,9 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   $process.StartInfo.RedirectStandardError = $true
   $process.StartInfo.UseShellExecute = $false
   $process.StartInfo.WorkingDirectory = $workingDirectory
-  if ([Environment]::OSVersion.Version -ge (New-Object 'Version' 6,0)){
+
+  if ($elevated -and [Environment]::OSVersion.Version -ge (New-Object 'Version' 6,0)){
+    # this doesn't actually currently work - because we are not running under shell execute
     Write-Debug "Setting RunAs for elevation"
     $process.StartInfo.Verb = "RunAs"
   }
