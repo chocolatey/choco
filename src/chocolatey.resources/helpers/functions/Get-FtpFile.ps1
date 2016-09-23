@@ -1,4 +1,4 @@
-﻿## Get-FtpFile
+## Get-FtpFile
 ##############################################################################################################
 ## Downloads a file from ftp
 ## Some code from http://stackoverflow.com/questions/265339/whats-the-best-way-to-automate-secure-ftp-in-powershell
