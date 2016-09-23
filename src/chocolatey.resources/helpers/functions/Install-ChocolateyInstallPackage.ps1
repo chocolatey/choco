@@ -1,4 +1,4 @@
-﻿# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
+# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -154,7 +154,8 @@ param(
 )
   [string]$silentArgs = $silentArgs -join ' '
 
-  Write-Debug "Running 'Install-ChocolateyInstallPackage' for $packageName with file:`'$file`', args: `'$silentArgs`', fileType: `'$fileType`', validExitCodes: `'$validExitCodes`', useOnlyPackageSilentArguments: '$($useOnlyPackageSilentArguments.IsPresent)'";
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+
   $installMessage = "Installing $packageName..."
   Write-Host $installMessage
 
@@ -199,7 +200,7 @@ Pro / Business supports a single, ubiquitous install directory option.
   $silentArgs = $silentArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   $additionalInstallArgs = $additionalInstallArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   $updatedFilePath = $file -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
-  if ([System.IO.File]::Exists($updatedFilePath)) { 
+  if ([System.IO.File]::Exists($updatedFilePath)) {
     $file = $updatedFilePath
   }
 
@@ -218,9 +219,9 @@ Pro / Business supports a single, ubiquitous install directory option.
   }
 
   try {
-    # make sure any logging folder exists 
+    # make sure any logging folder exists
     $pattern = "(?:['`"])([a-zA-Z]\:\\[^'`"]+)(?:[`"'])|([a-zA-Z]\:\\[\S]+)"
-    $silentArgs, $additionalInstallArgs | %{ Select-String $pattern -input $_ -AllMatches } | 
+    $silentArgs, $additionalInstallArgs | %{ Select-String $pattern -input $_ -AllMatches } |
       % { $_.Matches } | % {
         $argDirectory = $_.Groups[1]
         if ($argDirectory -eq $null -or $argDirectory -eq '') { continue }

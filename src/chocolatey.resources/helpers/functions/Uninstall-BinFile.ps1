@@ -1,4 +1,4 @@
-﻿# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
+# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,7 +55,8 @@ param(
   [parameter(Mandatory=$false, Position=1)][string] $path,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Uninstall-BinFile' for $name with path:`'$path`'";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $nugetPath = [System.IO.Path]::GetFullPath((Join-Path "$helpersPath" '..\'))
   $nugetExePath = Join-Path "$nugetPath" 'bin'

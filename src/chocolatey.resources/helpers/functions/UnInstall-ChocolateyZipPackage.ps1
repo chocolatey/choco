@@ -1,4 +1,4 @@
-﻿# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
+# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,17 +58,18 @@ param(
   [parameter(Mandatory=$true, Position=1)][string] $zipFileName,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'UnInstall-ChocolateyZipPackage' for $packageName $zipFileName "
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $packagelibPath=$env:chocolateyPackageFolder
   $zipContentFile=(join-path $packagelibPath $zipFileName) + ".txt"
   if ((Test-Path -path $zipContentFile)) {
     $zipContentFile
     $zipContents=get-content $zipContentFile
-    foreach ($fileInZip in $zipContents) {   
+    foreach ($fileInZip in $zipContents) {
       if ($fileInZip -ne $null -and $fileInZip.Trim() -ne '') {
         Remove-Item -Path "$fileInZip" -ErrorAction SilentlyContinue -Recurse -Force
-      }   
+      }
     }
   }
 }

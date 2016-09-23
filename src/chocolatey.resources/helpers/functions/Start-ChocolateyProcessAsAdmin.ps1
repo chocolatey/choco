@@ -1,4 +1,4 @@
-﻿# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
+# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,9 @@ set the package exit code in the following ways:
 - 4 if the binary turns out to be a text file.
 - The same exit code returned from the process that is run. If a 3010 is returned, it will set 3010 for the package.
 
+Aliases `Start-ChocolateyProcess` and `Invoke-ChocolateyProcess`
+available in 0.10.2+.
+
 .INPUTS
 None
 
@@ -42,6 +45,11 @@ run.
 .PARAMETER ExeToRun
 The executable/application/installer to run. Defaults to `'powershell'`.
 
+.PARAMETER Elevated
+Indicate whether the process should run elevated.
+
+Available in 0.10.2+.
+
 .PARAMETER Minimized
 Switch indicating if a Windows pops up (if not called with a silent
 argument) that it should be minimized.
@@ -54,16 +62,16 @@ should return instantly when it is complete.
 Array of exit codes indicating success. Defaults to `@(0)`.
 
 .PARAMETER WorkingDirectory
-The working directory for the running process. Defaults to 
+The working directory for the running process. Defaults to
 `Get-Location`.
 
 Available in 0.10.1+.
 
 .PARAMETER SensitiveStatements
-Arguments to pass to  `ExeToRun` that are not logged. 
+Arguments to pass to  `ExeToRun` that are not logged.
 
-Note that only licensed versions of Chocolatey provide a way to pass 
-those values completely through without having them in the install 
+Note that only licensed versions of Chocolatey provide a way to pass
+those values completely through without having them in the install
 script or on the system in some way.
 
 Available in 0.10.1+.
@@ -95,6 +103,7 @@ Install-ChocolateyInstallPackage
 param(
   [parameter(Mandatory=$false, Position=0)][string[]] $statements,
   [parameter(Mandatory=$false, Position=1)][string] $exeToRun = 'powershell',
+  [parameter(Mandatory=$false)][switch] $elevated = $true,
   [parameter(Mandatory=$false)][switch] $minimized,
   [parameter(Mandatory=$false)][switch] $noSleep,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
@@ -103,8 +112,8 @@ param(
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   [string]$statements = $statements -join ' '
-  
-  Write-Debug "Running 'Start-ChocolateyProcessAsAdmin' with exeToRun:'$exeToRun', statements: '$statements', workingDirectory: '$workingDirectory' ";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   try{
     if ($exeToRun -ne $null) { $exeToRun = $exeToRun -replace "`0", "" }
@@ -119,7 +128,7 @@ param(
   if ($exeToRun -eq 'powershell') {
     $exeToRun = "$($env:SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe"
     $importChocolateyHelpers = ""
-    Get-ChildItem "$helpersPath" -Filter *.psm1 | ForEach-Object { $importChocolateyHelpers = "& import-module -name  `'$($_.FullName)`' | Out-Null;$importChocolateyHelpers" };
+    Get-ChildItem "$helpersPath" -Filter *.psm1 | ForEach-Object { $importChocolateyHelpers = "& import-module -name  `'$($_.FullName)`' | Out-Null; $importChocolateyHelpers" };
     $block = @"
       `$noSleep = `$$noSleep
       $importChocolateyHelpers
@@ -145,6 +154,12 @@ This may take a while, depending on the statements.
   {
     $dbgMessage = @"
 Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on the statements.
+"@
+  }
+
+  if (!$elevated) {
+  $dbgMessage = @"
+Running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on the statements.
 "@
   }
 
@@ -208,7 +223,9 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   $process.StartInfo.RedirectStandardError = $true
   $process.StartInfo.UseShellExecute = $false
   $process.StartInfo.WorkingDirectory = $workingDirectory
-  if ([Environment]::OSVersion.Version -ge (New-Object 'Version' 6,0)){
+
+  if ($elevated -and [Environment]::OSVersion.Version -ge (New-Object 'Version' 6,0)){
+    # this doesn't actually currently work - because we are not running under shell execute
     Write-Debug "Setting RunAs for elevation"
     $process.StartInfo.Verb = "RunAs"
   }
@@ -225,12 +242,12 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   # them to do so. Without this it never finishes.
   Unregister-Event -SourceIdentifier "LogOutput_ChocolateyProc"
   Unregister-Event -SourceIdentifier "LogErrors_ChocolateyProc"
-  
+
   # sometimes the process hasn't fully exited yet.
-  for ($loopCount=1; $loopCount -le 15; $loopCount++) { 
+  for ($loopCount=1; $loopCount -le 15; $loopCount++) {
     if ($process.HasExited) { break; }
-    Write-Debug "Waiting for process to exit - $loopCount/15 seconds"; 
-    Start-Sleep 1; 
+    Write-Debug "Waiting for process to exit - $loopCount/15 seconds";
+    Start-Sleep 1;
   }
 
   $exitCode = $process.ExitCode
@@ -252,3 +269,6 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
 
   return $exitCode
 }
+
+Set-Alias Start-ChocolateyProcess Start-ChocolateyProcessAsAdmin
+Set-Alias Invoke-ChocolateyProcess Start-ChocolateyProcessAsAdmin

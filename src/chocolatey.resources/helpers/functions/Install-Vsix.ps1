@@ -34,7 +34,7 @@ param (
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
-  Write-Debug "Running 'Install-Vsix' with installer:'$installer', installFile: '$installFile'";
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   if ($env:chocolateyPackageName -ne $null -and $env:chocolateyPackageName -eq $env:ChocolateyInstallDirectoryPackage) {
     Write-Warning "Install Directory override not available for VSIX packages."
@@ -46,5 +46,6 @@ param (
   $psi.Arguments="/q $installFile"
   $s = [System.Diagnostics.Process]::Start($psi)
   $s.WaitForExit()
+
   return $s.ExitCode
 }

@@ -1,4 +1,4 @@
-﻿# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
+# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -104,26 +104,26 @@ Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 Array of exit codes indicating success. Defaults to `@(0)`.
 
 .PARAMETER Checksum
-The checksum hash value of the Url resource. This allows a checksum to 
+The checksum hash value of the Url resource. This allows a checksum to
 be validated for files that are not local. The checksum type is covered
-by ChecksumType. 
+by ChecksumType.
 
-**NOTE:** Checksums in packages are meant as a measure to validate the 
+**NOTE:** Checksums in packages are meant as a measure to validate the
 originally intended file that was used in the creation of a package is
 the same file that is received at a future date. Since this is used for
-other steps in the process related to the community repository, it 
+other steps in the process related to the community repository, it
 ensures that the file a user receives is the same file a maintainer
-and a moderator (if applicable), plus any moderation review has 
-intended for you to receive with this package. If you are looking at a 
-remote source that uses the same url for updates, you will need to 
-ensure the package also stays updated in line with those remote 
-resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages) 
+and a moderator (if applicable), plus any moderation review has
+intended for you to receive with this package. If you are looking at a
+remote source that uses the same url for updates, you will need to
+ensure the package also stays updated in line with those remote
+resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages)
 to help provide that functionality.
 
-**NOTE:** To determine checksums, you can get that from the original 
-site if provided. You can also use the [checksum tool available on 
-the community feed](https://chocolatey.org/packages/checksum) (`choco install checksum`) 
-and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you 
+**NOTE:** To determine checksums, you can get that from the original
+site if provided. You can also use the [checksum tool available on
+the community feed](https://chocolatey.org/packages/checksum) (`choco install checksum`)
+and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you
 provide checksums for all remote resources used.
 
 .PARAMETER ChecksumType
@@ -141,16 +141,16 @@ OPTIONAL if no Url64bit - The checksum hash value of the Url64bit
 resource. This allows a checksum to be validated for files that are not
 local. The checksum type is covered by ChecksumType64.
 
-**NOTE:** Checksums in packages are meant as a measure to validate the 
+**NOTE:** Checksums in packages are meant as a measure to validate the
 originally intended file that was used in the creation of a package is
 the same file that is received at a future date. Since this is used for
-other steps in the process related to the community repository, it 
+other steps in the process related to the community repository, it
 ensures that the file a user receives is the same file a maintainer
-and a moderator (if applicable), plus any moderation review has 
-intended for you to receive with this package. If you are looking at a 
-remote source that uses the same url for updates, you will need to 
-ensure the package also stays updated in line with those remote 
-resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages) 
+and a moderator (if applicable), plus any moderation review has
+intended for you to receive with this package. If you are looking at a
+remote source that uses the same url for updates, you will need to
+ensure the package also stays updated in line with those remote
+resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages)
 to help provide that functionality.
 
 .PARAMETER ChecksumType64
@@ -275,7 +275,7 @@ param(
 )
   [string]$silentArgs = $silentArgs -join ' '
 
-  Write-Debug "Running 'Install-ChocolateyPackage' for $packageName with url:'$url', args:'$silentArgs', fileType:'$fileType', url64bit:'$url64bit', checksum:'$checksum', checksumType:'$checksumType', checksum64:'$checksum64', checksumType64:'$checksumType64', validExitCodes:'$validExitCodes'";
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $chocTempDir = $env:TEMP
   $tempDir = Join-Path $chocTempDir "$($env:chocolateyPackageName)"
@@ -310,7 +310,7 @@ param(
                                       -Options $options `
                                       -GetOriginalFileName
   }
-    
+
   Install-ChocolateyInstallPackage -PackageName $packageName `
                                    -FileType $fileType `
                                    -SilentArgs $silentArgs `

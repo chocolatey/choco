@@ -13,16 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Function Format-FileSize {
+function Write-FunctionCallLogMessage {
 <#
 .SYNOPSIS
 DO NOT USE. Not part of the public API.
 
 .DESCRIPTION
-Formats file size into a human readable format.
+Writes function call as a debug message.
 
 .NOTES
-Available in 0.9.10+.
+Available in 0.10.2+.
 
 This function is not part of the API.
 
@@ -30,34 +30,37 @@ This function is not part of the API.
 None
 
 .OUTPUTS
-Returns a string representation of the file size in a more friendly
-format based on the passed in bytes.
+None
 
-.PARAMETER Size
-The size of a file in bytes.
+.PARAMETER Invocation
+The invocation of the function (`$MyInvocation`)
+
+.PARAMETER Parameters
+The parameters passed to the function (`$PSBoundParameters`)
 
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
 .EXAMPLE
-Format-FileSize -Size $fileSizeBytes
+>
+# This is how this function should always be called
+Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-.LINK
-Get-WebFile
 #>
 param (
-  [Parameter(Mandatory=$true, Position=0)][double] $size,
+  $invocation,
+  $parameters,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-
-  # Do not log function call, it interrupts the single line download progress output.
-
-  Foreach ($unit in @('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB')) {
-    If ($size -lt 1024) {
-      return [string]::Format("{0:0.##} {1}", $size, $unit)
+  $argumentsPassed = ''
+  foreach ($param in $parameters.GetEnumerator()) {
+    if ($param.Key -eq 'ignoredArguments') { continue; }
+    $paramValue = $param.Value -Join ' '
+    if ($param.Key -eq 'sensitiveStatements' -or $param.Key -eq 'password') {
+      $paramValue = '[REDACTED]'
     }
-    $size /= 1024
+    $argumentsPassed += "-$($param.Key) '$paramValue' "
   }
 
-  return [string]::Format("{0:0.##} YB", $size)
+  Write-Debug "Running $($invocation.InvocationName) $argumentsPassed"
 }

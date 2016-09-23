@@ -53,7 +53,8 @@ param (
   [object[]] $argumentList,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Write-FileUpdateLog' with logFilePath:`'$logFilePath`'', locationToMonitor:$locationToMonitor, Operation: `'$scriptToRun`'";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   Write-Warning "Write-FileUpdateLog has been deprecated and will be removed in v1."
 

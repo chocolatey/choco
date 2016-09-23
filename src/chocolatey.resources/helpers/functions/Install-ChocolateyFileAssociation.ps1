@@ -57,7 +57,8 @@ param(
   [parameter(Mandatory=$true, Position=1)][string] $executable,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Install-ChocolateyFileAssociation' associating $extension with `'$executable`'";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
   if(-not(Test-Path $executable)){
     $errorMessage = "`'$executable`' does not exist, not able to create association"
     Write-Error $errorMessage

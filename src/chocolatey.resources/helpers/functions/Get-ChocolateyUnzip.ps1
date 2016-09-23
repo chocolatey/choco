@@ -21,7 +21,7 @@ Unzips an archive file and returns the location for further processing.
 This unzips files using the 7-zip command line tool 7z.exe.
 Supported archive formats are listed at:
 https://sevenzip.osdn.jp/chm/general/formats.htm
-Prior to 0.9.10.1, 7za.exe was used. Supported archive formats for 
+Prior to 0.9.10.1, 7za.exe was used. Supported archive formats for
 7za.exe are: 7z, lzma, cab, zip, gzip, bzip2, and tar.
 
 .INPUTS
@@ -84,7 +84,7 @@ param(
     $fileFullPath=join-path $fileFullPath $specificFolder
   }
 
-  Write-Debug "Running 'Get-ChocolateyUnzip' with fileFullPath:`'$fileFullPath`'', destination: `'$destination`', specificFolder: `'$specificFolder``, packageName: `'$packageName`'";
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   if ($packageName) {
     $packagelibPath = $env:ChocolateyPackageFolder
@@ -134,7 +134,7 @@ param(
     if ($EventArgs.Data -ne $null) {
       $line = $EventArgs.Data
       Write-Verbose "$line"
-      if ($line.StartsWith("- ")) { 
+      if ($line.StartsWith("- ")) {
         $global:zipFileList.AppendLine($global:zipDestinationFolder + "\" + $line.Substring(2))
       }
     }
@@ -169,10 +169,10 @@ param(
   Unregister-Event -SourceIdentifier "LogErrors_ChocolateyZipProc"
 
   # sometimes the process hasn't fully exited yet.
-  for ($loopCount=1; $loopCount -le 15; $loopCount++) { 
+  for ($loopCount=1; $loopCount -le 15; $loopCount++) {
     if ($process.HasExited) { break; }
-    Write-Debug "Waiting for 7z.exe process to exit - $loopCount/15 seconds"; 
-    Start-Sleep 1; 
+    Write-Debug "Waiting for 7z.exe process to exit - $loopCount/15 seconds";
+    Start-Sleep 1;
   }
 
   $exitCode = $process.ExitCode

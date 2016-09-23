@@ -1,4 +1,4 @@
-﻿## Get-FtpFile
+## Get-FtpFile
 ##############################################################################################################
 ## Downloads a file from ftp
 ## Some code from http://stackoverflow.com/questions/265339/whats-the-best-way-to-automate-secure-ftp-in-powershell
@@ -70,7 +70,7 @@ param(
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
-  Write-Debug "Running 'Get-FtpFile' for $fileName with url:'$url', userName: '$userName', password: '$password'";
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   if ($url -eq $null -or $url -eq '') {
     Write-Warning "Url parameter is empty, Get-FtpFile has nothing to do."

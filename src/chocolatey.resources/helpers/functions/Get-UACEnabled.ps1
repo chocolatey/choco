@@ -32,11 +32,11 @@ None
 System.Boolean
 #>
 
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+
   $uacRegPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
   $uacRegValue = "EnableLUA"
   $uacEnabled = $false
-
-  Write-Debug "Running 'Get-UACEnabled'"
 
   # http://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
   $osVersion = [Environment]::OSVersion.Version

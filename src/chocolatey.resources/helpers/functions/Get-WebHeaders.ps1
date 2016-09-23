@@ -55,7 +55,9 @@ param(
   [parameter(Mandatory=$false, Position=1)][string] $userAgent = 'chocolatey command line',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Get-WebHeaders' with url:`'$url`', userAgent: `'$userAgent`'";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+
   if ($url -eq '') { return @{} }
 
   $request = [System.Net.HttpWebRequest]::Create($url);

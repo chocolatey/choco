@@ -1,4 +1,4 @@
-﻿# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
+# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ recommended that it matches the package id.
 .PARAMETER FileType
 This is the extension of the file. This should be either exe or msi.
 
-If what is provided is empty or null, Chocolatey will use 'exe' 
+If what is provided is empty or null, Chocolatey will use 'exe'
 starting in 0.10.1.
 
 .PARAMETER SilentArgs
@@ -115,7 +115,7 @@ param(
 )
   [string]$silentArgs = $silentArgs -join ' '
 
-  Write-Debug "Running 'Uninstall-ChocolateyPackage' for $packageName with fileType:`'$fileType`', silentArgs: `'$silentArgs`', file: `'$file`'";
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $installMessage = "Uninstalling $packageName..."
   write-host $installMessage
@@ -123,7 +123,7 @@ param(
   $additionalInstallArgs = $env:chocolateyInstallArguments;
   if ($additionalInstallArgs -eq $null) { $additionalInstallArgs = ''; }
   $overrideArguments = $env:chocolateyInstallOverride;
-    
+
   if ($fileType -eq $null) { $fileType = '' }
   $installerTypeLower = $fileType.ToLower()
   if ($installerTypeLower -ne 'msi' -and $installerTypeLower -ne 'exe') {

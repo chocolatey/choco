@@ -61,7 +61,7 @@ param (
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
-	Write-Debug "Calling Set-EnvironmentVariable with `$Name = '$Name', `$Value = '$Value', `$Scope = '$Scope'"
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   if ($Scope -eq [System.EnvironmentVariableTarget]::Process -or $Value -eq $null -or $Value -eq '') {
     return [Environment]::SetEnvironmentVariable($Name, $Value, $Scope)
