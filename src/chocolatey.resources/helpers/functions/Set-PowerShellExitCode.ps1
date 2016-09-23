@@ -45,16 +45,18 @@ param (
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
+  # Do not log function call - can mess things up
+
   if ($exitCode -eq $null -or $exitCode -eq '') {
     Write-Debug '$exitCode was passed null'
     return
   }
 
   try {
-    $host.SetShouldExit($exitCode);  
+    $host.SetShouldExit($exitCode);
   } catch {
     Write-Warning "Unable to set host exit code"
   }
-  
+
   $env:ChocolateyExitCode = $exitCode;
 }

@@ -49,8 +49,8 @@ param (
   [Parameter(Mandatory=$true, Position=0)][double] $size,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  # This interrupts download progress, so ensure there is no output.
-  #Write-Debug "Running 'Format-FileSize' with size: '$size'";
+
+  # Do not log function call, it interrupts the single line download progress output.
 
   Foreach ($unit in @('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB')) {
     If ($size -lt 1024) {
