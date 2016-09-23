@@ -29,6 +29,9 @@ set the package exit code in the following ways:
 - 4 if the binary turns out to be a text file.
 - The same exit code returned from the process that is run. If a 3010 is returned, it will set 3010 for the package.
 
+Aliases `Start-ChocolateyProcess` and `Invoke-ChocolateyProcess`
+available in 0.10.2+.
+
 .INPUTS
 None
 
@@ -266,3 +269,6 @@ Running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on 
 
   return $exitCode
 }
+
+Set-Alias Start-ChocolateyProcess Start-ChocolateyProcessAsAdmin
+Set-Alias Invoke-ChocolateyProcess Start-ChocolateyProcessAsAdmin
