@@ -92,7 +92,8 @@ param(
   [System.EnvironmentVariableTarget] $variableType = [System.EnvironmentVariableTarget]::User,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Install-ChocolateyEnvironmentVariable' with variableName:`'$variableName`' and variableValue:`'$variableValue`'";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   if ($variableType -eq [System.EnvironmentVariableTarget]::Machine) {
     if (Test-ProcessAdminRights) {

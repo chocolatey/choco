@@ -46,5 +46,7 @@ param(
   [string] $packageName,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
   Write-Warning "Write-ChocolateySuccess is deprecated and will be removed in v2. If you are the maintainer, please remove it from your package file."
 }

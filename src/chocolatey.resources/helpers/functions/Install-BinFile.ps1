@@ -81,7 +81,8 @@ param(
   [parameter(Mandatory=$false)][string] $command = '',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Install-BinFile' for $name with path:`'$path`'|`$useStart:$useStart|`$command:$command";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $nugetPath = [System.IO.Path]::GetFullPath((Join-Path "$helpersPath" '..\'))
   $nugetExePath = Join-Path "$nugetPath" 'bin'

@@ -200,7 +200,8 @@ param(
   [parameter(Mandatory=$false)][switch] $forceDownload,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Get-ChocolateyWebFile' for $packageName with url:`'$url`', fileFullPath:`'$fileFullPath`', url64bit:`'$url64bit`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`'";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $url32bit = $url
 

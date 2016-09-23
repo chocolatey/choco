@@ -55,7 +55,8 @@ param(
   [parameter(Mandatory=$false, Position=1)][string] $path,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Uninstall-BinFile' for $name with path:`'$path`'";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $nugetPath = [System.IO.Path]::GetFullPath((Join-Path "$helpersPath" '..\'))
   $nugetExePath = Join-Path "$nugetPath" 'bin'

@@ -154,7 +154,8 @@ param(
 )
   [string]$silentArgs = $silentArgs -join ' '
 
-  Write-Debug "Running 'Install-ChocolateyInstallPackage' for $packageName with file:`'$file`', args: `'$silentArgs`', fileType: `'$fileType`', validExitCodes: `'$validExitCodes`', useOnlyPackageSilentArguments: '$($useOnlyPackageSilentArguments.IsPresent)'";
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+
   $installMessage = "Installing $packageName..."
   Write-Host $installMessage
 

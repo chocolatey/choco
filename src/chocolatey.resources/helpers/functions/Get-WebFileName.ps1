@@ -72,7 +72,7 @@ param(
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
-  Write-Debug "Running 'Get-WebFileName' to determine name with url:'$url', defaultName:'$defaultName'";
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $originalFileName = $defaultName
   $fileName = $null

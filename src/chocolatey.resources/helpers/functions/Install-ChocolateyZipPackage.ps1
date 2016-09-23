@@ -173,7 +173,8 @@ param(
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Install-ChocolateyZipPackage' for $packageName with url:`'$url`', unzipLocation: `'$unzipLocation`', url64bit: `'$url64bit`', specificFolder: `'$specificFolder`', checksum: `'$checksum`', checksumType: `'$checksumType`', checksum64: `'$checksum64`', checksumType64: `'$checksumType64`' ";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $fileType = 'zip'
 

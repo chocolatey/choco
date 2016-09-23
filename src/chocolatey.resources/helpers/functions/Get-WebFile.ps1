@@ -90,8 +90,8 @@ param(
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Get-WebFile' for $fileName with url:`'$url`', userAgent: `'$userAgent`' ";
-  #if ($url -eq '' return)
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   try {
     $uri = [System.Uri]$url

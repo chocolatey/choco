@@ -45,6 +45,8 @@ Get-EnvironmentVariable
 Set-EnvironmentVariable
 #>
 
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+
   # HKCU:\Environment may not exist in all Windows OSes (such as Server Core).
   switch ($Scope) {
     'User' { Get-Item 'HKCU:\Environment' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Property }

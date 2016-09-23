@@ -58,7 +58,8 @@ param(
   [parameter(Mandatory=$true, Position=1)][string] $zipFileName,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'UnInstall-ChocolateyZipPackage' for $packageName $zipFileName "
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $packagelibPath=$env:chocolateyPackageFolder
   $zipContentFile=(join-path $packagelibPath $zipFileName) + ".txt"

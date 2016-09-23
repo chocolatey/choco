@@ -76,7 +76,8 @@ param(
   [System.EnvironmentVariableTarget] $variableType = [System.EnvironmentVariableTarget]::User,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Uninstall-ChocolateyEnvironmentVariable' with variableName:'$variableName' and variableType:'$variableType'";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   if ($variableType -eq [System.EnvironmentVariableTarget]::Machine) {
     if (Test-ProcessAdminRights) {

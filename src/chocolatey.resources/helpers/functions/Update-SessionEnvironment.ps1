@@ -45,7 +45,8 @@ None
 None
 #>
 
-  Write-Debug "Running 'Update-SessionEnvironment'"
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+
   $refreshEnv = $false
   $invocation = $MyInvocation
   if ($invocation.InvocationName -eq 'refreshenv') {

@@ -42,7 +42,8 @@ depending on wether or not the bit width matches.
 param(
   $compare
 )
-  Write-Debug "Running 'Get-OSArchitectureWidth'"
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $bits = 64
   if (([System.IntPtr]::Size -eq 4) -and (Test-Path env:\PROCESSOR_ARCHITEW6432)) {

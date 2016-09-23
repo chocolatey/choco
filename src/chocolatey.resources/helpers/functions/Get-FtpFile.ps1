@@ -70,7 +70,7 @@ param(
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
-  Write-Debug "Running 'Get-FtpFile' for $fileName with url:'$url', userName: '$userName', password: '$password'";
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   if ($url -eq $null -or $url -eq '') {
     Write-Warning "Url parameter is empty, Get-FtpFile has nothing to do."

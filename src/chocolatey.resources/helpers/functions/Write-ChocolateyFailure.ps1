@@ -50,6 +50,8 @@ param(
   [string] $failureMessage,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
   Write-Warning "Write-ChocolateyFailure is deprecated and will be removed in v2. If you are the package maintainer, please use 'throw `$_.Exception' instead."
 
   $error | %{ $_.Exception | fl * | Out-String }

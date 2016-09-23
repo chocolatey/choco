@@ -103,8 +103,8 @@ param(
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   [string]$statements = $statements -join ' '
-  
-  Write-Debug "Running 'Start-ChocolateyProcessAsAdmin' with exeToRun:'$exeToRun', statements: '$statements', workingDirectory: '$workingDirectory' ";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   try{
     if ($exeToRun -ne $null) { $exeToRun = $exeToRun -replace "`0", "" }

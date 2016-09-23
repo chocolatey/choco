@@ -58,7 +58,8 @@ param(
   [parameter(Mandatory=$true, Position=0)][string] $targetFilePath,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Install-ChocolateyDesktopLink' with targetFilePath:`'$targetFilePath`'";
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   if (!$targetFilePath) {
     throw "Install-ChocolateyDesktopLink - `$targetFilePath can not be null."

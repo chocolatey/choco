@@ -91,9 +91,10 @@ param(
   [string] $softwareName,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Get-UninstallRegistryKey' for `'$env:ChocolateyPackageName`' with SoftwareName:`'$softwareName`'";
 
-  if ($softwareName -eq $null -or $softwareName -eq '') {   
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+
+  if ($softwareName -eq $null -or $softwareName -eq '') {
     throw "$SoftwareName cannot be empty for Get-UninstallRegistryKey"
   }
 

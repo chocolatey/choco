@@ -275,7 +275,7 @@ param(
 )
   [string]$silentArgs = $silentArgs -join ' '
 
-  Write-Debug "Running 'Install-ChocolateyPackage' for $packageName with url:'$url', args:'$silentArgs', fileType:'$fileType', url64bit:'$url64bit', checksum:'$checksum', checksumType:'$checksumType', checksum64:'$checksum64', checksumType64:'$checksumType64', validExitCodes:'$validExitCodes'";
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $chocTempDir = $env:TEMP
   $tempDir = Join-Path $chocTempDir "$($env:chocolateyPackageName)"

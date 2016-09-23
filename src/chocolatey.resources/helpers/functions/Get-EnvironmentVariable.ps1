@@ -61,6 +61,9 @@ param(
   [Parameter(Mandatory=$false)][switch] $PreserveVariables = $false,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
+
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+
   [string] $MACHINE_ENVIRONMENT_REGISTRY_KEY_NAME = "SYSTEM\CurrentControlSet\Control\Session Manager\Environment\";
   [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey($MACHINE_ENVIRONMENT_REGISTRY_KEY_NAME)
   if ($Scope -eq [System.EnvironmentVariableTarget]::User) {
