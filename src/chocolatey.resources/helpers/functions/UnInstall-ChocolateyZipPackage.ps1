@@ -66,10 +66,10 @@ param(
   if ((Test-Path -path $zipContentFile)) {
     $zipContentFile
     $zipContents=get-content $zipContentFile
-    foreach ($fileInZip in $zipContents) {   
+    foreach ($fileInZip in $zipContents) {
       if ($fileInZip -ne $null -and $fileInZip.Trim() -ne '') {
         Remove-Item -Path "$fileInZip" -ErrorAction SilentlyContinue -Recurse -Force
-      }   
+      }
     }
   }
 }

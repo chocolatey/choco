@@ -52,7 +52,7 @@ recommended that it matches the package id.
 .PARAMETER FileType
 This is the extension of the file. This should be either exe or msi.
 
-If what is provided is empty or null, Chocolatey will use 'exe' 
+If what is provided is empty or null, Chocolatey will use 'exe'
 starting in 0.10.1.
 
 .PARAMETER SilentArgs
@@ -123,7 +123,7 @@ param(
   $additionalInstallArgs = $env:chocolateyInstallArguments;
   if ($additionalInstallArgs -eq $null) { $additionalInstallArgs = ''; }
   $overrideArguments = $env:chocolateyInstallOverride;
-    
+
   if ($fileType -eq $null) { $fileType = '' }
   $installerTypeLower = $fileType.ToLower()
   if ($installerTypeLower -ne 'msi' -and $installerTypeLower -ne 'exe') {

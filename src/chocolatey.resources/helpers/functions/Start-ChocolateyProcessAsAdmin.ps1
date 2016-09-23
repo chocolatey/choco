@@ -54,16 +54,16 @@ should return instantly when it is complete.
 Array of exit codes indicating success. Defaults to `@(0)`.
 
 .PARAMETER WorkingDirectory
-The working directory for the running process. Defaults to 
+The working directory for the running process. Defaults to
 `Get-Location`.
 
 Available in 0.10.1+.
 
 .PARAMETER SensitiveStatements
-Arguments to pass to  `ExeToRun` that are not logged. 
+Arguments to pass to  `ExeToRun` that are not logged.
 
-Note that only licensed versions of Chocolatey provide a way to pass 
-those values completely through without having them in the install 
+Note that only licensed versions of Chocolatey provide a way to pass
+those values completely through without having them in the install
 script or on the system in some way.
 
 Available in 0.10.1+.
@@ -119,7 +119,7 @@ param(
   if ($exeToRun -eq 'powershell') {
     $exeToRun = "$($env:SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe"
     $importChocolateyHelpers = ""
-    Get-ChildItem "$helpersPath" -Filter *.psm1 | ForEach-Object { $importChocolateyHelpers = "& import-module -name  `'$($_.FullName)`' | Out-Null;$importChocolateyHelpers" };
+    Get-ChildItem "$helpersPath" -Filter *.psm1 | ForEach-Object { $importChocolateyHelpers = "& import-module -name  `'$($_.FullName)`' | Out-Null; $importChocolateyHelpers" };
     $block = @"
       `$noSleep = `$$noSleep
       $importChocolateyHelpers
@@ -225,12 +225,12 @@ Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may t
   # them to do so. Without this it never finishes.
   Unregister-Event -SourceIdentifier "LogOutput_ChocolateyProc"
   Unregister-Event -SourceIdentifier "LogErrors_ChocolateyProc"
-  
+
   # sometimes the process hasn't fully exited yet.
-  for ($loopCount=1; $loopCount -le 15; $loopCount++) { 
+  for ($loopCount=1; $loopCount -le 15; $loopCount++) {
     if ($process.HasExited) { break; }
-    Write-Debug "Waiting for process to exit - $loopCount/15 seconds"; 
-    Start-Sleep 1; 
+    Write-Debug "Waiting for process to exit - $loopCount/15 seconds";
+    Start-Sleep 1;
   }
 
   $exitCode = $process.ExitCode

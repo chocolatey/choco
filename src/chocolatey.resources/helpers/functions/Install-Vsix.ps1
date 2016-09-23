@@ -46,5 +46,6 @@ param (
   $psi.Arguments="/q $installFile"
   $s = [System.Diagnostics.Process]::Start($psi)
   $s.WaitForExit()
+
   return $s.ExitCode
 }

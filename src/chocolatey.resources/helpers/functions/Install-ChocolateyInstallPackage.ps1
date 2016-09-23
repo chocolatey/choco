@@ -200,7 +200,7 @@ Pro / Business supports a single, ubiquitous install directory option.
   $silentArgs = $silentArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   $additionalInstallArgs = $additionalInstallArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   $updatedFilePath = $file -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
-  if ([System.IO.File]::Exists($updatedFilePath)) { 
+  if ([System.IO.File]::Exists($updatedFilePath)) {
     $file = $updatedFilePath
   }
 
@@ -219,9 +219,9 @@ Pro / Business supports a single, ubiquitous install directory option.
   }
 
   try {
-    # make sure any logging folder exists 
+    # make sure any logging folder exists
     $pattern = "(?:['`"])([a-zA-Z]\:\\[^'`"]+)(?:[`"'])|([a-zA-Z]\:\\[\S]+)"
-    $silentArgs, $additionalInstallArgs | %{ Select-String $pattern -input $_ -AllMatches } | 
+    $silentArgs, $additionalInstallArgs | %{ Select-String $pattern -input $_ -AllMatches } |
       % { $_.Matches } | % {
         $argDirectory = $_.Groups[1]
         if ($argDirectory -eq $null -or $argDirectory -eq '') { continue }

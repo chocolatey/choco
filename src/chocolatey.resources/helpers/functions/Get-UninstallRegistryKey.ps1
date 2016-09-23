@@ -16,15 +16,15 @@
 function Get-UninstallRegistryKey {
 <#
 .SYNOPSIS
-Retrieve registry key(s) for system-installed applications from an 
+Retrieve registry key(s) for system-installed applications from an
 exact or wildcard search.
 
 .DESCRIPTION
 This function will attempt to retrieve a matching registry key for an
-already installed application, usually to be used with a 
+already installed application, usually to be used with a
 chocolateyUninstall.ps1 automation script.
 
-The function also prevents `Get-ItemProperty` from failing when 
+The function also prevents `Get-ItemProperty` from failing when
 handling wrongly encoded registry keys.
 
 .NOTES
@@ -41,10 +41,10 @@ Available in 0.9.10+. If you need to maintain compatibility with pre
 String
 
 .OUTPUTS
-This function searches registry objects and returns PSCustomObject of 
+This function searches registry objects and returns PSCustomObject of
 the matched key's properties.
-  
-Retrieve properties with dot notation, for example: 
+
+Retrieve properties with dot notation, for example:
 `$key.UninstallString`
 
 
@@ -52,7 +52,7 @@ Retrieve properties with dot notation, for example:
 Part or all of the Display Name as you see it in Programs and Features.
 It should be enough to be unique.
 
-If the display name contains a version number, such as "Launchy 2.5", 
+If the display name contains a version number, such as "Launchy 2.5",
 it is recommended you use a fuzzy search `"Launchy*"` (the wildcard `*`)
 as if the version is upgraded or autoupgraded, suddenly the uninstall
 script will stop working and it may not be clear as to what went wrong
@@ -71,7 +71,7 @@ $key.DisplayName
 $key.UninstallString
 
 .EXAMPLE
-> 
+>
 # Software name is "Mozilla Firefox"
 [array]$key = Get-UninstallRegistryKey -SoftwareName "Mozilla Firefox"
 $key.UninstallString
@@ -112,7 +112,7 @@ param(
   [int]$maxAttempts = 10
   for ([int]$attempt = 1; $attempt -le $maxAttempts; $attempt++) {
     [bool]$success = $FALSE
-    
+
     try {
       [array]$foundKey = Get-ItemProperty -Path $keys.PsPath `
                                           -ErrorAction SilentlyContinue `
@@ -126,10 +126,10 @@ param(
                                    -ErrorAction SilentlyContinue `
                      | Where-Object { $badKey -NotContains $_.PsPath }
     }
-    
+
     if ($success) { break; }
   }
-  
+
   return $foundKey
 }
 
