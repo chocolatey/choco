@@ -178,6 +178,22 @@ namespace chocolatey.infrastructure.app.commands
             {
                 throw new ApplicationException("Force dependencies can only be used with force also turned on.");
             }
+
+            if (!string.IsNullOrWhiteSpace(configuration.Input))
+            {
+                var unparsedOptionsAndPackages = configuration.Input.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                if (!configuration.Information.IsLicensedVersion)
+                {
+                    foreach (var argument in unparsedOptionsAndPackages.or_empty_list_if_null())
+                    {
+                        var arg = argument.to_lower();
+                        if (arg.StartsWith("-dir") || arg.StartsWith("--dir") || arg.StartsWith("-install") || arg.StartsWith("--install"))
+                        {
+                            throw new ApplicationException("It appears you are attempting to use options that may be only available in licensed versions of Chocolatey ('{0}'). Please remove and consult the documentation.".format_with(arg));
+                        }
+                    }
+                }
+            }
         }
 
         public virtual void help_message(ChocolateyConfiguration configuration)
