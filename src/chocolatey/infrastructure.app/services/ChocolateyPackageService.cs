@@ -332,6 +332,9 @@ Did you know Pro / Business automatically syncs with Programs and
         {
             EnvironmentSettings.reset_environment_variables(config);
             set_pending(packageResult, config);
+
+            this.Log().Info("{0} package files {1} is complete. Performing other installation steps.".format_with(packageResult.Name, commandName.to_string()));
+
             var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
             if (config.AllowMultipleVersions)
             {
@@ -1117,7 +1120,17 @@ ATTENTION: You must take manual action to remove {1} from
             this.Log().Debug("Attempting rollback");
 
             var rollback = true;
-            if (config.PromptForConfirmation)
+            var shouldPrompt = config.PromptForConfirmation;
+
+            // if user canceled, then automatically rollback without prompting.
+            //MSI ERROR_INSTALL_USEREXIT - 1602 - https://support.microsoft.com/en-us/kb/304888 / https://msdn.microsoft.com/en-us/library/aa376931.aspx
+            //ERROR_INSTALL_CANCEL - 15608 - https://msdn.microsoft.com/en-us/library/windows/desktop/ms681384.aspx
+            if (Environment.ExitCode == 15608 || Environment.ExitCode == 1602)
+            {
+                shouldPrompt = false;
+            }
+
+            if (shouldPrompt)
             {
                 var selection = InteractivePrompt.prompt_for_confirmation(
                     " Unsuccessful operation for {0}.{1}  Rollback to previous version (package files only)?".format_with(packageResult.Name, Environment.NewLine),
