@@ -80,6 +80,9 @@ namespace chocolatey.tests.infrastructure.app.services
                 fileSystem.Setup(f => f.directory_exists(registryKeys.FirstOrDefault().InstallLocation)).Returns(true);
                 registryService.Setup(r => r.installer_value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(true);
                 fileSystem.Setup(f => f.get_full_path(expectedUninstallString)).Returns(expectedUninstallString);
+
+                var field = typeof(ApplicationParameters).GetField("AllowPrompts");
+                field.SetValue(null, false);
             }
         }
 
