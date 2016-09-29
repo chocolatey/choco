@@ -203,6 +203,9 @@ param(
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
+  if ($url -ne $null) { $url = $url.Replace("//","/").Replace(":/","://") }
+  if ($url64bit -ne $null) { $url64bit = $url64bit.Replace("//","/").Replace(":/","://") }
+
   $url32bit = $url
 
   # allow user provided values for checksumming
