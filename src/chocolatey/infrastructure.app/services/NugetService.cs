@@ -814,7 +814,7 @@ spam/junk folder.");
 
             if (_fileSystem.directory_exists(pkgInstallPath))
             {
-                this.Log().Debug("Backing up existing {0} prior to upgrade.".format_with(installedPackage.Id));
+                this.Log().Debug("Backing up existing {0} prior to operation.".format_with(installedPackage.Id));
 
                 var backupLocation = pkgInstallPath.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
 
