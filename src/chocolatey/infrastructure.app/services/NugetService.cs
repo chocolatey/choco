@@ -1011,9 +1011,10 @@ spam/junk folder.");
                         return;
                     }
 
-                    // is this the latest version or have you passed --sxs? This is the only way you get through to the continue action.
+                    // is this the latest version, have you passed --sxs, or is this a side-by-side install? This is the only way you get through to the continue action.
                     var latestVersion = packageManager.LocalRepository.FindPackage(e.Package.Id);
-                    if (latestVersion.Version == pkg.Version || config.AllowMultipleVersions)
+                    var pkgInfo = _packageInfoService.get_package_information(e.Package);
+                    if (latestVersion.Version == pkg.Version || config.AllowMultipleVersions || (pkgInfo != null && pkgInfo.IsSideBySide))
                     {
                         packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
                         if (continueAction != null) continueAction.Invoke(packageResult);
