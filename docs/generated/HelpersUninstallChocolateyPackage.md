@@ -87,6 +87,9 @@ Accept Pipeline Input? | false
 ###  -FileType [&lt;String&gt;]
 This is the extension of the file. This should be either exe or msi.
 
+If what is provided is empty or null, Chocolatey will use 'exe'
+starting in 0.10.1.
+
 Property               | Value
 ---------------------- | -------------
 Aliases                | installerType

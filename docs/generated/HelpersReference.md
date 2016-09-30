@@ -92,6 +92,7 @@ These are the functions from above as one list.
  * [[Write-ChocolateyFailure|HelpersWriteChocolateyFailure]]
  * [[Write-ChocolateySuccess|HelpersWriteChocolateySuccess]]
  * [[Write-FileUpdateLog|HelpersWriteFileUpdateLog]]
+ * [[Write-FunctionCallLogMessage|HelpersWriteFunctionCallLogMessage]]
 
 ## Variables
 

@@ -11,6 +11,7 @@ specified, it is run with PowerShell.
 Start-ChocolateyProcessAsAdmin `
   [-Statements <String[]>] `
   [-ExeToRun <String>] `
+  [-Elevated] `
   [-Minimized] `
   [-NoSleep] `
   [-ValidExitCodes <Object>] `
@@ -30,9 +31,14 @@ set the package exit code in the following ways:
 - 4 if the binary turns out to be a text file.
 - The same exit code returned from the process that is run. If a 3010 is returned, it will set 3010 for the package.
 
+Aliases `Start-ChocolateyProcess` and `Invoke-ChocolateyProcess`
+available in 0.10.2+.
+
 ## Aliases
 
-None
+`Invoke-ChocolateyProcess`
+`Start-ChocolateyProcess`
+
 
 ## Examples
 
@@ -99,6 +105,19 @@ Position?              | 2
 Default Value          | powershell
 Accept Pipeline Input? | false
  
+###  -Elevated
+Indicate whether the process should run elevated.
+
+Available in 0.10.2+.
+
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | named
+Default Value          | True
+Accept Pipeline Input? | false
+ 
 ###  -Minimized
 Switch indicating if a Windows pops up (if not called with a silent
 argument) that it should be minimized.
@@ -135,7 +154,7 @@ Default Value          | @(0)
 Accept Pipeline Input? | false
  
 ###  -WorkingDirectory [&lt;String&gt;]
-The working directory for the running process. Defaults to 
+The working directory for the running process. Defaults to
 `Get-Location`.
 
 Available in 0.10.1+.
@@ -149,10 +168,10 @@ Default Value          | $(Get-Location)
 Accept Pipeline Input? | false
  
 ###  -SensitiveStatements [&lt;String&gt;]
-Arguments to pass to  `ExeToRun` that are not logged. 
+Arguments to pass to  `ExeToRun` that are not logged.
 
-Note that only [licensed versions](https://chocolatey.org/compare) of Chocolatey provide a way to pass 
-those values completely through without having them in the install 
+Note that only [licensed versions](https://chocolatey.org/compare) of Chocolatey provide a way to pass
+those values completely through without having them in the install
 script or on the system in some way.
 
 Available in 0.10.1+.

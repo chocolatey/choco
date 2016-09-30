@@ -75,6 +75,9 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
  -l, --lo, --localonly, --local-only
      LocalOnly - Only search against local machine items.
 
+     --version=VALUE
+     Version - Specific version of a package to return.
+
      --pre, --prerelease
      Prerelease - Include Prereleases? Defaults to false.
 

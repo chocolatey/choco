@@ -135,11 +135,11 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      PackageParameters - Parameters to pass to the package. Defaults to 
        unspecified.
 
-     --apply-install-arguments-to-dependencies
+     --argsglobal, --args-global, --installargsglobal, --install-args-global, --applyargstodependencies, --apply-args-to-dependencies, --apply-install-arguments-to-dependencies
      Apply Install Arguments To Dependencies  - Should install arguments be 
        applied to dependent packages? Defaults to false.
 
-     --apply-package-parameters-to-dependencies
+     --paramsglobal, --params-global, --packageparametersglobal, --package-parameters-global, --applyparamstodependencies, --apply-params-to-dependencies, --apply-package-parameters-to-dependencies
      Apply Package Parameters To Dependencies  - Should package parameters be 
        applied to dependent packages? Defaults to false.
 
@@ -246,49 +246,49 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      --sdc, --skipdownloadcache, --skip-download-cache
      Skip Download Cache - Use the original download even if a private CDN 
        cache is available for a package. Overrides the default feature 
-       'downloadCache' set to 'True'. Available in 0.9.10+. [Licensed versions](https://chocolatey.org/compare) 
+       'downloadCache' set to 'True'. Available in 0.9.10+. [Licensed editions](https://chocolatey.org/compare) 
        only. See https://chocolatey.org/docs/features-private-cdn 
 
      --dc, --downloadcache, --download-cache, --use-download-cache
      Use Download Cache - Use private CDN cache if available for a package. 
        Overrides the default feature 'downloadCache' set to 'True'. Available 
-       in 0.9.10+. [Licensed versions](https://chocolatey.org/compare) only. See https://chocolate-
+       in 0.9.10+. [Licensed editions](https://chocolatey.org/compare) only. See https://chocolate-
        y.org/docs/features-private-cdn 
 
      --svc, --skipvirus, --skip-virus, --skipviruscheck, --skip-virus-check
      Skip Virus Check - Skip the virus check for downloaded files on this ru-
        n. Overrides the default feature 'virusCheck' set to 'True'. Available 
-       in 0.9.10+. [Licensed versions](https://chocolatey.org/compare) only. See https://chocolate-
+       in 0.9.10+. [Licensed editions](https://chocolatey.org/compare) only. See https://chocolate-
        y.org/docs/features-virus-check 
 
      --virus, --viruscheck, --virus-check
      Virus Check - check downloaded files for viruses. Overrides the default 
        feature 'virusCheck' set to 'True'. Available in 0.9.10+. Licensed 
-       versions only. See https://chocolatey.org/docs/features-virus-check 
+       editions only. See https://chocolatey.org/docs/features-virus-check 
 
      --viruspositivesmin, --virus-positives-minimum=VALUE
      Virus Check Minimum Scan Result Positives - the minimum number of scan 
        result positives required to flag a package. Used when virusScannerType 
        is VirusTotal. Overrides the default configuration value 
        'virusCheckMinimumPositives' set to '5'. Available in 0.9.10+. Licensed 
-       versions only. See https://chocolatey.org/docs/features-virus-check 
+       editions only. See https://chocolatey.org/docs/features-virus-check 
 
      --install-arguments-sensitive=VALUE
      InstallArgumentsSensitive - Install Arguments to pass to the native 
        installer in the package that are sensitive and you do not want logged. 
-       Defaults to unspecified. Available in 0.10.1+. [Licensed versions](https://chocolatey.org/compare) only.
+       Defaults to unspecified. Available in 0.10.1+. [Licensed editions](https://chocolatey.org/compare) only.
 
      --package-parameters-sensitive=VALUE
      PackageParametersSensitive - Package Parameters to pass the package that 
        are sensitive and you do not want logged. Defaults to unspecified. 
-       Available in 0.10.1+. [Licensed versions](https://chocolatey.org/compare) only.
+       Available in 0.10.1+. [Licensed editions](https://chocolatey.org/compare) only.
 
      --dir, --directory, --installdir, --installdirectory, --install-dir, --install-directory=VALUE
      Install Directory Override - Override the default installation director-
        y. Chocolatey will automatically determine the type of installer and 
        pass the appropriate arguments to override the install directory. The 
        package must use Chocolatey install helpers and be installing an 
-       installer for software. Available in 0.9.10+. [Licensed versions](https://chocolatey.org/compare) only. 
+       installer for software. Available in 0.9.10+. [Licensed editions](https://chocolatey.org/compare) only. 
        See https://chocolatey.org/docs/features-install-directory-override 
 
 ~~~

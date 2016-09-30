@@ -126,6 +126,9 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
  -a, --all, --allversions, --all-versions
      AllVersions - include results from all versions.
 
+     --version=VALUE
+     Version - Specific version of a package to return.
+
  -u, --user=VALUE
      User - used with authenticated feeds. Defaults to empty.
 
