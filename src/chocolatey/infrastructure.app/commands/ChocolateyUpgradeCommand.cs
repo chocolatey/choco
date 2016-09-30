@@ -17,6 +17,7 @@ namespace chocolatey.infrastructure.app.commands
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using attributes;
     using commandline;
     using configuration;
@@ -162,7 +163,7 @@ namespace chocolatey.infrastructure.app.commands
         public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
-            configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments);
+            configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments.Where(arg => !arg.StartsWith("-")));
         }
 
         public virtual void handle_validation(ChocolateyConfiguration configuration)
@@ -170,6 +171,28 @@ namespace chocolatey.infrastructure.app.commands
             if (string.IsNullOrWhiteSpace(configuration.PackageNames))
             {
                 throw new ApplicationException("Package name is required. Please pass at least one package name to upgrade.");
+            }
+
+            if (configuration.ForceDependencies && !configuration.Force)
+            {
+                throw new ApplicationException("Force dependencies can only be used with force also turned on.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(configuration.Input))
+            {
+                var unparsedOptionsAndPackages = configuration.Input.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                if (!configuration.Information.IsLicensedVersion)
+                {
+                    foreach (var argument in unparsedOptionsAndPackages.or_empty_list_if_null())
+                    {
+                        var arg = argument.to_lower();
+                        if (arg.StartsWith("-dir") || arg.StartsWith("--dir") || arg.StartsWith("-install") || arg.StartsWith("--install"))
+                        {
+                            throw new ApplicationException(
+                                "It appears you are attempting to use options that may be only available in licensed versions of Chocolatey ('{0}'). Please remove and consult the documentation.".format_with(arg));
+                        }
+                    }
+                }
             }
         }
 

@@ -15,8 +15,10 @@
 
 namespace chocolatey.infrastructure.adapters
 {
+    using System;
     using System.IO;
     using System.Runtime.InteropServices;
+    using app;
     using commandline;
     using platforms;
 
@@ -27,21 +29,29 @@ namespace chocolatey.infrastructure.adapters
     {
         public string ReadLine()
         {
+            if (!ApplicationParameters.AllowPrompts) return string.Empty;
+
             return System.Console.ReadLine();
         }
 
         public string ReadLine(int timeoutMilliseconds)
         {
+            if (!ApplicationParameters.AllowPrompts) return string.Empty;
+
             return ReadLineTimeout.read(timeoutMilliseconds);
         }
 
         public System.ConsoleKeyInfo ReadKey(bool intercept)
         {
+            if (!ApplicationParameters.AllowPrompts) return new System.ConsoleKeyInfo('\0', ConsoleKey.Enter, false, false, false);
+
             return System.Console.ReadKey(intercept);
         }
 
         public System.ConsoleKeyInfo ReadKey(int timeoutMilliseconds)
         {
+            if (!ApplicationParameters.AllowPrompts) return new System.ConsoleKeyInfo('\0', ConsoleKey.Enter, false, false, false);
+
             return ReadKeyTimeout.read_key(timeoutMilliseconds);
         }
 

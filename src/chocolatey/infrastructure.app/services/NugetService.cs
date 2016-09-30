@@ -814,7 +814,7 @@ spam/junk folder.");
 
             if (_fileSystem.directory_exists(pkgInstallPath))
             {
-                this.Log().Debug("Backing up existing {0} prior to upgrade.".format_with(installedPackage.Id));
+                this.Log().Debug("Backing up existing {0} prior to operation.".format_with(installedPackage.Id));
 
                 var backupLocation = pkgInstallPath.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
 
@@ -1011,9 +1011,10 @@ spam/junk folder.");
                         return;
                     }
 
-                    // is this the latest version or have you passed --sxs? This is the only way you get through to the continue action.
+                    // is this the latest version, have you passed --sxs, or is this a side-by-side install? This is the only way you get through to the continue action.
                     var latestVersion = packageManager.LocalRepository.FindPackage(e.Package.Id);
-                    if (latestVersion.Version == pkg.Version || config.AllowMultipleVersions)
+                    var pkgInfo = _packageInfoService.get_package_information(e.Package);
+                    if (latestVersion.Version == pkg.Version || config.AllowMultipleVersions || (pkgInfo != null && pkgInfo.IsSideBySide))
                     {
                         packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
                         if (continueAction != null) continueAction.Invoke(packageResult);
@@ -1173,13 +1174,13 @@ spam/junk folder.");
                         {
                             using (packageManager.SourceRepository.StartOperation(
                                 RepositoryOperationNames.Install,
-                                packageName,
-                                version == null ? null : version.ToString()))
+                                packageVersion.Id, packageVersion.Version.to_string())
+                                )
                             {
                                 ensure_package_files_have_compatible_attributes(config, packageVersion, pkgInfo);
                                 rename_legacy_package_version(config, packageVersion, pkgInfo);
                                 backup_existing_version(config, packageVersion, pkgInfo);
-                                packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
+                                packageManager.UninstallPackage(packageVersion.Id, forceRemove: config.Force, removeDependencies: config.ForceDependencies, version: packageVersion.Version);
                                 ensure_nupkg_is_removed(packageVersion, pkgInfo);
                                 remove_installation_files(packageVersion, pkgInfo);
                                 remove_cache_for_package(config, packageVersion);

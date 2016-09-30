@@ -55,6 +55,32 @@ In that mess there is a link to the [PowerShell Chocolatey module reference](htt
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
 
+## 0.10.2
+
+We're dubbing this the "Every Joe" release in honor of a friend that just lost his fight with brain cancer. If you want to help further research, please make a donation to a cancer research association of your choosing (e.g. the [American Brain Tumor Assocation](http://www.abta.org/thank-you.html)).
+
+A couple of important fixes/enhancements in this release. Most of the improvements are about providing better feedback to you and fixing minor issues. The big one surrounds when packages set a download path for a file using `$env:TEMP`, choco will ensure that the file can still be found for later use.
+
+### BUG FIXES
+
+* Fix - Downloaded file is at old `$env:TEMP\chocolatey\chocolatey` location, but install calls with just `$env:TEMP\chocolatey\` location - see [#969](https://github.com/chocolatey/choco/issues/969)
+* Fix - [Pro/Business] UseOriginalLocation fails when there is no 64bit file - see [#972](https://github.com/chocolatey/choco/issues/972)
+* Fix - Do not use unparsed options as package names - see [#983](https://github.com/chocolatey/choco/issues/983)
+
+### IMPROVEMENTS
+
+* Start-ChocolateyProcessAsAdmin enhancements - see [#977](https://github.com/chocolatey/choco/issues/977)
+* Log PowerShell function calls better - see [#976](https://github.com/chocolatey/choco/issues/976)
+* Allow environment variables in some config settings - see [#971](https://github.com/chocolatey/choco/issues/971)
+* [Pro/Business] Provide license type to environment variables - see [#968](https://github.com/chocolatey/choco/issues/968)
+* Note that chocolateyUninstall.ps1 may no longer required in template - see [#982](https://github.com/chocolatey/choco/issues/982)
+* Provide guidance when licensed only options are passed to FOSS - see [#984](https://github.com/chocolatey/choco/issues/984)
+* Rollback automatically when a user cancels an operation - see [#985](https://github.com/chocolatey/choco/issues/985)
+* Explain how to workaround a failing uninstall - see [#573](https://github.com/chocolatey/choco/issues/573)
+* Remove extra forward slashes in url - see [#986](https://github.com/chocolatey/choco/issues/986)
+* Side by side uninstall enhancements - see [#992](https://github.com/chocolatey/choco/issues/992)
+
+
 ## 0.10.1
 
 We're dubbing this the "Shhh! Keep that secret please" release. We've found that when passing in passwords and other sensitive arguments, those items can end up in the logs in clear text. We've addressed this in [#948](https://github.com/chocolatey/choco/issues/948) and [#953](https://github.com/chocolatey/choco/issues/953). When it comes to passing sensitive arguments through to native installers, you can set up environment variables with those sensitive args and pass those arguments directly through to `Start-ChocolateyProcessAsAdmin`. If you prefer a better experience, the licensed version allows passing sensitive options directly through choco.exe as `--install-arguments-sensitive` and `--package-parameters-sensitive`. Read more in the [Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).

@@ -332,6 +332,9 @@ Did you know Pro / Business automatically syncs with Programs and
         {
             EnvironmentSettings.reset_environment_variables(config);
             set_pending(packageResult, config);
+
+            this.Log().Info("{0} package files {1} is complete. Performing other installation steps.".format_with(packageResult.Name, commandName.to_string()));
+
             var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
             if (config.AllowMultipleVersions)
             {
@@ -754,6 +757,26 @@ Would have determined packages that are out of date based on what is
                 Environment.ExitCode = 1;
             }
 
+            if (uninstallFailures != 0)
+            {
+                this.Log().Warn(@"
+If a package uninstall is failing and/or you've already uninstalled the
+ software outside of Chocolatey, you can attempt to run the command 
+ with `-n` to skip running a chocolateyUninstall script, additionally
+ adding `--skip-autouninstaller` to skip an attempt to automatically 
+ remove system-installed software. This will only remove the packaging 
+ files and not things like software installed to Programs and Features.
+
+If a package is failing because it is a dependency of another package
+ or packages, then you may first need to consider if it needs removed
+ as it is typically installed as a dependency for a reason. If you 
+ decide that you still want to remove it, head into 
+ `$env:ChocolateyInstall\lib` and find the package folder you want 
+ removed. Then delete the folder for the package. This option should
+ only be used as a last resort.
+ ");
+            }
+
             randomly_notify_about_pro_business(config);
 
             return packageUninstalls;
@@ -1117,7 +1140,17 @@ ATTENTION: You must take manual action to remove {1} from
             this.Log().Debug("Attempting rollback");
 
             var rollback = true;
-            if (config.PromptForConfirmation)
+            var shouldPrompt = config.PromptForConfirmation;
+
+            // if user canceled, then automatically rollback without prompting.
+            //MSI ERROR_INSTALL_USEREXIT - 1602 - https://support.microsoft.com/en-us/kb/304888 / https://msdn.microsoft.com/en-us/library/aa376931.aspx
+            //ERROR_INSTALL_CANCEL - 15608 - https://msdn.microsoft.com/en-us/library/windows/desktop/ms681384.aspx
+            if (Environment.ExitCode == 15608 || Environment.ExitCode == 1602)
+            {
+                shouldPrompt = false;
+            }
+
+            if (shouldPrompt)
             {
                 var selection = InteractivePrompt.prompt_for_confirmation(
                     " Unsuccessful operation for {0}.{1}  Rollback to previous version (package files only)?".format_with(packageResult.Name, Environment.NewLine),

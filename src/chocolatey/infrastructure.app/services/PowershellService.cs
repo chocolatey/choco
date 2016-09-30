@@ -234,8 +234,10 @@ namespace chocolatey.infrastructure.app.services
                     if (selection.is_equal_to("yes")) shouldRun = true;
                     if (selection.is_equal_to("no"))
                     {
-                        Environment.ExitCode = 1;
-                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, "User cancelled powershell portion of installation for '{0}'.{1} Specify -n to skip automated script actions.".format_with(chocoPowerShellScript, Environment.NewLine)));
+                        //MSI ERROR_INSTALL_USEREXIT - 1602 - https://support.microsoft.com/en-us/kb/304888 / https://msdn.microsoft.com/en-us/library/aa376931.aspx
+                        //ERROR_INSTALL_CANCEL - 15608 - https://msdn.microsoft.com/en-us/library/windows/desktop/ms681384.aspx
+                        Environment.ExitCode = 15608;
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, "User canceled powershell portion of installation for '{0}'.{1} Specify -n to skip automated script actions.".format_with(chocoPowerShellScript, Environment.NewLine)));
                     }
                 }
 
