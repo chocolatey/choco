@@ -1173,13 +1173,13 @@ spam/junk folder.");
                         {
                             using (packageManager.SourceRepository.StartOperation(
                                 RepositoryOperationNames.Install,
-                                packageName,
-                                version == null ? null : version.ToString()))
+                                packageVersion.Id, packageVersion.Version.to_string())
+                                )
                             {
                                 ensure_package_files_have_compatible_attributes(config, packageVersion, pkgInfo);
                                 rename_legacy_package_version(config, packageVersion, pkgInfo);
                                 backup_existing_version(config, packageVersion, pkgInfo);
-                                packageManager.UninstallPackage(packageVersion, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
+                                packageManager.UninstallPackage(packageVersion.Id, forceRemove: config.Force, removeDependencies: config.ForceDependencies, version: packageVersion.Version);
                                 ensure_nupkg_is_removed(packageVersion, pkgInfo);
                                 remove_installation_files(packageVersion, pkgInfo);
                                 remove_cache_for_package(config, packageVersion);
