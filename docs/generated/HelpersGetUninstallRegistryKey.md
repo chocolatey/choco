@@ -1,6 +1,6 @@
 ﻿# Get-UninstallRegistryKey
 
-Retrieve registry key(s) for system-installed applications from an 
+Retrieve registry key(s) for system-installed applications from an
 exact or wildcard search.
 
 ## Syntax
@@ -14,10 +14,10 @@ Get-UninstallRegistryKey `
 ## Description
 
 This function will attempt to retrieve a matching registry key for an
-already installed application, usually to be used with a 
+already installed application, usually to be used with a
 chocolateyUninstall.ps1 automation script.
 
-The function also prevents `Get-ItemProperty` from failing when 
+The function also prevents `Get-ItemProperty` from failing when
 handling wrongly encoded registry keys.
 
 ## Notes
@@ -79,7 +79,7 @@ None
 Part or all of the Display Name as you see it in Programs and Features.
 It should be enough to be unique.
 
-If the display name contains a version number, such as "Launchy 2.5", 
+If the display name contains a version number, such as "Launchy 2.5",
 it is recommended you use a fuzzy search `"Launchy*"` (the wildcard `*`)
 as if the version is upgraded or autoupgraded, suddenly the uninstall
 script will stop working and it may not be clear as to what went wrong

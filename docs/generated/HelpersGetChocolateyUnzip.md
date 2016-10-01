@@ -18,7 +18,7 @@ Get-ChocolateyUnzip `
 This unzips files using the 7-zip command line tool 7z.exe.
 Supported archive formats are listed at:
 https://sevenzip.osdn.jp/chm/general/formats.htm
-Prior to 0.9.10.1, 7za.exe was used. Supported archive formats for 
+Prior to 0.9.10.1, 7za.exe was used. Supported archive formats for
 7za.exe are: 7z, lzma, cab, zip, gzip, bzip2, and tar.
 
 ## Notes

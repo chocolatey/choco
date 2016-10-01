@@ -1,6 +1,7 @@
 ﻿# Download Command (choco download)
 
-[Chocolatey for Business](https://chocolatey.org/compare) starting at 0.9.10+.
+Package Internalizer / Package Copy / Package Download
+[Chocolatey for Business](https://chocolatey.org/compare) starting at licensed version 1.5.0.
 
 Downloads a package from a source, optionally downloading remote 
  resources and recompiling it to internal resources. This takes an
@@ -12,14 +13,14 @@ See https://chocolatey.org/docs/features-automatically-recompile-packages
 
 ## Usage
 
-    choco download <pkg [<options/switches>]
+    choco download <pkg> [<options/switches>]
 
 ## Examples
 
     choco download sysinternals
     choco download notepadplusplus.install --recompile
     choco download notepadplusplus.install --recompile --resources-location \\server\share
-    choco download notepadplusplus.install --recompile --resources-location http://somewhere/internal
+    choco download notepadplusplus.install --recompile --resources-location http://somewhere/internal --append-useoriginallocation
 
 ## See It In Action
 
@@ -115,9 +116,9 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Certificate Password - the client certificate's password to the source. 
        Defaults to empty.
 
-     --recompile
-     Recompile - Download all external resources and recompile the package to 
-       use the local resources instead.
+     --recompile, --internalize
+     Recompile / Internalize - Download all external resources and recompile 
+       the package to use the local resources instead.
 
      --resources-location=VALUE
      Resources Location - When recompiling, use this location for resources 
@@ -126,6 +127,14 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      --outputdirectory=VALUE
      OutputDirectory - Specifies the directory for the downloaded Chocolatey 
        package file. If not specified, uses the current directory.
+
+     --append-useoriginallocation, --append-use-original-location
+     Append -UseOriginalLocation - When `Install-ChocolateyPackage` is 
+       internalized, append the `-UseOriginalLocation` parameter to the 
+       function. Business editions only (licensed version 1.7.0+). Requires at 
+       least Chocolatey v0.10.1 for `Install-ChocolateyPacakge` to recognize 
+       the switch appropriately. Overrides the feature 
+       'internalizeAppendUseOriginalLocation' set to by default to 'False'.
 
 ~~~
 

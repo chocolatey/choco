@@ -38,6 +38,13 @@ With auto uninstaller turned off, a chocolateyUninstall.ps1 is required
  Programs and Features, ensuring manually removed apps are 
  automatically removed from Chocolatey's repository.
 
+**NOTE:** Synchronizer and AutoUninstaller enhancements in licensed 
+ versions of Chocolatey ensure that Autouninstaller is up to 95% 
+ effective at removing software without an uninstall script. This is 
+ because synchronizer ensures the registry snapshot stays up to date 
+ and licensed enhancements have the ability to inspect more locations
+ to determine how to automatically uninstall software.
+
 ## Usage
 
     choco uninstall <pkg|all> [pkg2 pkgN] [options/switches]
@@ -150,11 +157,11 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      PackageParameters - Parameters to pass to the package. Defaults to 
        unspecified.
 
-     --apply-install-arguments-to-dependencies
+     --argsglobal, --args-global, --installargsglobal, --install-args-global, --applyargstodependencies, --apply-args-to-dependencies, --apply-install-arguments-to-dependencies
      Apply Install Arguments To Dependencies  - Should install arguments be 
        applied to dependent packages? Defaults to false.
 
-     --apply-package-parameters-to-dependencies
+     --paramsglobal, --params-global, --packageparametersglobal, --package-parameters-global, --applyparamstodependencies, --apply-params-to-dependencies, --apply-package-parameters-to-dependencies
      Apply Package Parameters To Dependencies  - Should package parameters be 
        applied to dependent packages? Defaults to false.
 

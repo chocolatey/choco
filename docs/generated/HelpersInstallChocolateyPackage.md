@@ -109,7 +109,7 @@ Install-ChocolateyPackage 'mono' 'exe' '/SILENT' `
 Install-ChocolateyPackage 'ruby.devkit' 'exe' '/SILENT' `
  'http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe' `
  'http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe' `
- -checksum '9383f12958aafc425923e322460a84de' -checksumType = 'md5' `
+ -checksum '9383f12958aafc425923e322460a84de' -checksumType 'md5' `
  -checksum64 'ce99d873c1acc8bffc639bd4e764b849'
 ~~~
 
@@ -248,26 +248,26 @@ Default Value          | @(0)
 Accept Pipeline Input? | false
  
 ###  -Checksum [&lt;String&gt;]
-The checksum hash value of the Url resource. This allows a checksum to 
+The checksum hash value of the Url resource. This allows a checksum to
 be validated for files that are not local. The checksum type is covered
-by ChecksumType. 
+by ChecksumType.
 
-**NOTE:** Checksums in packages are meant as a measure to validate the 
+**NOTE:** Checksums in packages are meant as a measure to validate the
 originally intended file that was used in the creation of a package is
 the same file that is received at a future date. Since this is used for
-other steps in the process related to the [community repository](https://chocolatey.org/packages), it 
+other steps in the process related to the [community repository](https://chocolatey.org/packages), it
 ensures that the file a user receives is the same file a maintainer
-and a moderator (if applicable), plus any moderation review has 
-intended for you to receive with this package. If you are looking at a 
-remote source that uses the same url for updates, you will need to 
-ensure the package also stays updated in line with those remote 
-resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages) 
+and a moderator (if applicable), plus any moderation review has
+intended for you to receive with this package. If you are looking at a
+remote source that uses the same url for updates, you will need to
+ensure the package also stays updated in line with those remote
+resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages)
 to help provide that functionality.
 
-**NOTE:** To determine checksums, you can get that from the original 
-site if provided. You can also use the [checksum tool available on 
-the [community feed](https://chocolatey.org/packages)](https://chocolatey.org/packages/checksum) (`choco install checksum`) 
-and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you 
+**NOTE:** To determine checksums, you can get that from the original
+site if provided. You can also use the [checksum tool available on
+the [community feed](https://chocolatey.org/packages)](https://chocolatey.org/packages/checksum) (`choco install checksum`)
+and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you
 provide checksums for all remote resources used.
 
 Property               | Value
@@ -301,16 +301,16 @@ OPTIONAL if no Url64bit - The checksum hash value of the Url64bit
 resource. This allows a checksum to be validated for files that are not
 local. The checksum type is covered by ChecksumType64.
 
-**NOTE:** Checksums in packages are meant as a measure to validate the 
+**NOTE:** Checksums in packages are meant as a measure to validate the
 originally intended file that was used in the creation of a package is
 the same file that is received at a future date. Since this is used for
-other steps in the process related to the [community repository](https://chocolatey.org/packages), it 
+other steps in the process related to the [community repository](https://chocolatey.org/packages), it
 ensures that the file a user receives is the same file a maintainer
-and a moderator (if applicable), plus any moderation review has 
-intended for you to receive with this package. If you are looking at a 
-remote source that uses the same url for updates, you will need to 
-ensure the package also stays updated in line with those remote 
-resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages) 
+and a moderator (if applicable), plus any moderation review has
+intended for you to receive with this package. If you are looking at a
+remote source that uses the same url for updates, you will need to
+ensure the package also stays updated in line with those remote
+resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages)
 to help provide that functionality.
 
 Property               | Value
