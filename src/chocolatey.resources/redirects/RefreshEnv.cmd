@@ -9,7 +9,7 @@
 :: environment every time you want environment changes to propagate
 
 ::echo "RefreshEnv.cmd only works from cmd.exe, please install the Chocolatey Profile to take advantage of refreshenv from PowerShell"
-echo | set /p dummy="Refreshing environment variables from registry for cmd.exe. Please wait... "
+echo | set /p dummy="Refreshing environment variables from registry for cmd.exe. Please wait..."
 
 goto main
 
@@ -52,5 +52,5 @@ goto main
     :: Set these variables
     call "%TEMP%\_env.cmd"
 
-    echo | set /p dummy="Done"
+    echo | set /p dummy="Finished."
     echo .

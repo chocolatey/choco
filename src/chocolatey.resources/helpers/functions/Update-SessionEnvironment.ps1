@@ -54,7 +54,7 @@ None
   }
 
   if ($refreshEnv) {
-    Write-Output "Refreshing environment variables from the registry..."
+    Write-Output "Refreshing environment variables from the registry for powershell.exe. Please wait..."
   } else {
     Write-Verbose "Refreshing environment variables from the registry."
   }
