@@ -706,7 +706,10 @@ Would have determined packages that are out of date based on what is
 
         private void before_package_modify(PackageResult packageResult, ChocolateyConfiguration config)
         {
-            _powershellService.before_modify(config, packageResult);
+            if (!config.SkipPackageInstallProvider)
+            {
+                _powershellService.before_modify(config, packageResult);
+            }
         }
 
         public void uninstall_noop(ChocolateyConfiguration config)
