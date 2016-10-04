@@ -1258,7 +1258,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-
         [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_has_nonterminating_errors_with_fail_on_stderr : ScenariosBase
         {
