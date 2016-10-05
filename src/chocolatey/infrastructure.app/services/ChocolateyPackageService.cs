@@ -690,8 +690,7 @@ Would have determined packages that are out of date based on what is
 
             get_environment_before(config, allowLogging: true);
 
-            var beforeUpgradeAction = new Action<PackageResult>(packageResult => before_package_upgrade(packageResult, config));
-
+            var beforeUpgradeAction = new Action<PackageResult>(packageResult => before_package_modify(packageResult, config));
             var packageUpgrades = perform_source_runner_function(config, r => r.upgrade_run(config, action, beforeUpgradeAction));
             
             var upgradeFailures = report_action_summary(packageUpgrades, "upgraded");
@@ -705,9 +704,12 @@ Would have determined packages that are out of date based on what is
             return packageUpgrades;
         }
 
-        private void before_package_upgrade(PackageResult packageResult, ChocolateyConfiguration config)
+        private void before_package_modify(PackageResult packageResult, ChocolateyConfiguration config)
         {
-            _powershellService.before_modify(config, packageResult);
+            if (!config.SkipPackageInstallProvider)
+            {
+                _powershellService.before_modify(config, packageResult);
+            }
         }
 
         public void uninstall_noop(ChocolateyConfiguration config)
@@ -743,8 +745,8 @@ Would have determined packages that are out of date based on what is
             }
 
             var environmentBefore = get_environment_before(config);
-
-            var packageUninstalls = perform_source_runner_function(config, r => r.uninstall_run(config, action));
+            var beforeUninstallAction = new Action<PackageResult>(packageResult => before_package_modify(packageResult, config));
+            var packageUninstalls = perform_source_runner_function(config, r => r.uninstall_run(config, action, beforeUninstallAction));
 
             // not handled in the uninstall handler
             IEnumerable<GenericRegistryValue> environmentChanges;
@@ -858,11 +860,6 @@ The recent package changes indicate a reboot is necessary.
             if (!_fileSystem.directory_exists(packageResult.InstallLocation))
             {
                 packageResult.InstallLocation += ".{0}".format_with(packageResult.Package.Version.to_string());
-            }
-
-            if (!config.SkipPackageInstallProvider)
-            {
-                _powershellService.before_modify(config, packageResult);
             }
 
             _shimgenService.uninstall(config, packageResult);

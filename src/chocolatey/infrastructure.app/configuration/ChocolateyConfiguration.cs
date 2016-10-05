@@ -354,6 +354,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IgnoreInvalidOptionsSwitches { get; set; }
         public bool UsePackageExitCodes { get; set; }
         public bool UseFipsCompliantChecksums { get; set; }
+        //todo remove in 0.11.0
+        public bool ScriptsCheckLastExitCode { get; set; }
     }
 
     //todo: retrofit other command configs this way

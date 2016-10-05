@@ -254,7 +254,7 @@ namespace chocolatey.infrastructure.app.services
             return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction)
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction = null)
         {
             throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
         }
@@ -264,7 +264,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement uninstall".format_with(APP_NAME));
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUninstallAction = null)
         {
             throw new NotImplementedException("{0} does not implement uninstall".format_with(APP_NAME));
         }

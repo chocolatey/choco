@@ -389,9 +389,6 @@ spam/junk folder.");
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
                 //todo: get smarter about realizing multiple versions have been installed before and allowing that
-
-                remove_rollback_directory_if_exists(packageName);
-
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
                 if (installedPackage != null && (version == null || version == installedPackage.Version) && !config.Force)
@@ -433,7 +430,8 @@ spam/junk folder.");
                 {
                     var forcedResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
                     forcedResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
-
+                    
+                    remove_rollback_directory_if_exists(packageName);
                     backup_existing_version(config, installedPackage, _packageInfoService.get_package_information(installedPackage));
 
                     try
@@ -543,8 +541,6 @@ spam/junk folder.");
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                remove_rollback_directory_if_exists(packageName);
-
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
                 if (installedPackage == null)
@@ -717,14 +713,15 @@ spam/junk folder.");
                                 packageName,
                                 version == null ? null : version.ToString()))
                             {
-                                ensure_package_files_have_compatible_attributes(config, installedPackage, pkgInfo);
-                                rename_legacy_package_version(config, installedPackage, pkgInfo);
                                 if (beforeUpgradeAction != null)
                                 {
                                     var currentPackageResult = new PackageResult(installedPackage, get_install_directory(config, installedPackage));
                                     beforeUpgradeAction(currentPackageResult);
                                 }
 
+                                remove_rollback_directory_if_exists(packageName);
+                                ensure_package_files_have_compatible_attributes(config, installedPackage, pkgInfo);
+                                rename_legacy_package_version(config, installedPackage, pkgInfo);
                                 backup_existing_version(config, installedPackage, pkgInfo);
                                 remove_shim_directors(config, installedPackage, pkgInfo);
                                 if (config.Force && (installedPackage.Version == availablePackage.Version))
@@ -965,12 +962,12 @@ spam/junk folder.");
             }
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUninstallAction = null)
         {
-            return uninstall_run(config, continueAction, performAction: true);
+            return uninstall_run(config, continueAction, performAction: true, beforeUninstallAction: beforeUninstallAction);
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, bool performAction)
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, bool performAction, Action<PackageResult> beforeUninstallAction = null)
         {
             var packageUninstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -1089,8 +1086,6 @@ spam/junk folder.");
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                remove_rollback_directory_if_exists(packageName);
-
                 IList<IPackage> installedPackageVersions = new List<IPackage>();
                 if (string.IsNullOrWhiteSpace(config.Version))
                 {
@@ -1177,8 +1172,16 @@ spam/junk folder.");
                                 packageVersion.Id, packageVersion.Version.to_string())
                                 )
                             {
+                                if (beforeUninstallAction != null)
+                                {
+                                    // guessing this is not added so that it doesn't fail the action if an error is recorded?
+                                    //var currentPackageResult = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageVersion, get_install_directory(config, packageVersion)));
+                                    var currentPackageResult = new PackageResult(packageVersion, get_install_directory(config, packageVersion));
+                                    beforeUninstallAction(currentPackageResult);
+                                }
                                 ensure_package_files_have_compatible_attributes(config, packageVersion, pkgInfo);
                                 rename_legacy_package_version(config, packageVersion, pkgInfo);
+                                remove_rollback_directory_if_exists(packageName);
                                 backup_existing_version(config, packageVersion, pkgInfo);
                                 packageManager.UninstallPackage(packageVersion.Id, forceRemove: config.Force, removeDependencies: config.ForceDependencies, version: packageVersion.Version);
                                 ensure_nupkg_is_removed(packageVersion, pkgInfo);
