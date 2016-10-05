@@ -93,6 +93,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string ChocolateyIgnoreChecksums = "ChocolateyIgnoreChecksums";
             public static readonly string ChocolateyAllowEmptyChecksums = "ChocolateyAllowEmptyChecksums";
             public static readonly string ChocolateyAllowEmptyChecksumsSecure = "ChocolateyAllowEmptyChecksumsSecure";
+            public static readonly string ChocolateyCheckLastExitCode = "ChocolateyCheckLastExitCode";
             public static readonly string ChocolateyPowerShellHost = "ChocolateyPowerShellHost";
             public static readonly string ChocolateyForce = "ChocolateyForce";
         }
@@ -154,6 +155,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string IgnoreInvalidOptionsSwitches = "ignoreInvalidOptionsSwitches";
             public static readonly string UsePackageExitCodes = "usePackageExitCodes";
             public static readonly string UseFipsCompliantChecksums = "useFipsCompliantChecksums";
+            public static readonly string ScriptsCheckLastExitCode = "scriptsCheckLastExitCode";
         }
 
         public static class Messages
