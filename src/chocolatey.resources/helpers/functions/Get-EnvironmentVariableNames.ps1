@@ -45,7 +45,7 @@ Get-EnvironmentVariable
 Set-EnvironmentVariable
 #>
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+  # Do not log function call
 
   # HKCU:\Environment may not exist in all Windows OSes (such as Server Core).
   switch ($Scope) {
