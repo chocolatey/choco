@@ -55,6 +55,24 @@ In that mess there is a link to the [PowerShell Chocolatey module reference](htt
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
 
+## 0.10.3
+
+### BREAKING CHANGES
+
+ * Fix - Do Not Check `$LastExitCode` - Only error a package install if script errors or set a different exit code when it is specifically set - see [#1000](https://github.com/chocolatey/choco/issues/1000)
+
+Starting in v0.9.10, Chocolatey started checking `$LASTEXITCODE` in addition to the script command success as a way to be more helpful in determining package failures. This meant it offered the ability to capture when a script exited with `Exit 1` and handle that accordingly. However that really has never been a recommended scenario for returning errors from scripts and is not seen in the wild anywhere so it is believed that those that may be affected are very few.
+
+Checking `$LastExitCode` checks the last executable's exit code when the script specifically does not call `Exit` (which is . This can lead to very perplexing failures, such as running a successful xcopy that exits with `2` and seeing package failures without understanding why. Since it is not typically recommended to call `Exit` to return a value from PowerShell because of issues with different hosts, it's less of a concern to only look at explicit failures. For folks that may need it, allow failing a package again by the last external command exit code or `exit` from a PowerShell script. Note that it is not recommended to use exit with a number to return from PowerShell scripts. Instead you should use `$env:ChocolateyExitCode` or `Set-PowerShellExitCode` (first available in v0.9.10) to ensure proper setting of the exit code.
+
+If you need the prior behavior, please turn on the feature `scriptsCheckLastExitCode`.
+
+### BUG FIXES
+
+ * Fix - chocolateybeforemodify runs after modifying (moving) chocolatey lib package files - see [#995](https://github.com/chocolatey/choco/issues/995)
+ * Fix - The refreshenv command throws an error about Write-FunctionCallLogMessage when ran in PowerShell on 0.10.2 - see [#996](https://github.com/chocolatey/choco/issues/996)
+
+
 ## 0.10.2
 
 We're dubbing this the "Every Joe" release in honor of a friend that just lost his fight with brain cancer. If you want to help further research, please make a donation to a cancer research association of your choosing (e.g. the [American Brain Tumor Assocation](http://www.abta.org/thank-you.html)).
