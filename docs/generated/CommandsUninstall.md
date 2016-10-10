@@ -29,6 +29,10 @@ With auto uninstaller turned off, a chocolateyUninstall.ps1 is required
  Chocolatey but does not remove the software from your system (unless
  in the package directory).
 
+**NOTE:** A package with a failing uninstall can be removed with the
+`-n --skipautouninstaller` flags. This will remove the package from
+chocolatey without attempting to uninstall the program.
+
 **NOTE:** Starting in 0.9.10+, the Automatic Uninstaller (AutoUninstaller)
  is turned on by default. To turn it off, run the following command:
 
