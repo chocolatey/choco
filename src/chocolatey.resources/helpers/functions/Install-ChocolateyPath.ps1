@@ -17,7 +17,7 @@ function Install-ChocolateyPath {
 .SYNOPSIS
 **NOTE:** Administrative Access Required when `-PathType 'Machine'.`
 
-This puts a directory to the PATH environment variable.
+This puts a directory to the PATH environment variable of the requested scope (Machine or User).
 
 .DESCRIPTION
 Looks at both PATH environment variables to ensure a path variable
@@ -65,28 +65,23 @@ Set-EnvironmentVariable
 Get-ToolsLocation
 #>
 param(
-  [parameter(Mandatory=$true, Position=0)][string] $pathToInstall,
-  [parameter(Mandatory=$false, Position=1)][System.EnvironmentVariableTarget] $pathType = [System.EnvironmentVariableTarget]::User,
+  [parameter(Mandatory=$true, Position=0)][alias("Path")][string] $pathToInstall,
+  [parameter(Mandatory=$false, Position=1)][alias("Scope")][ValidateSet('User','Machine')][System.EnvironmentVariableTarget] $pathType = [System.EnvironmentVariableTarget]::User,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Install-ChocolateyPath' with pathToInstall:`'$pathToInstall`'";
+  Write-Output "Only evaluating and updating path scope `"$pathType`", path will not be assessed nor added for other scope, so path may exist in other scope as well."
+  $pathToInstall = $pathToInstall.trimend('\')
   $originalPathToInstall = $pathToInstall
-
-  #get the PATH variable
-  Update-SessionEnvironment
-  $envPath = $env:PATH
-  if (!$envPath.ToLower().Contains($pathToInstall.ToLower()))
+  #array drops blanks (one of which is always created by final semi-colon)
+  $actualPathArray = (Get-EnvironmentVariable -Name 'Path' -Scope $pathType -PreserveVariables).split(';',[System.StringSplitOptions]::RemoveEmptyEntries)
+  #checks for match with and without trailing slash
+  if (($actualpathArray -inotcontains $pathToInstall.ToLower()) -AND ($actualpathArray -inotcontains "$(($pathToInstall + '\').ToLower())"))
   {
-    Write-Host "PATH environment variable does not have $pathToInstall in it. Adding..."
-    $actualPath = Get-EnvironmentVariable -Name 'Path' -Scope $pathType -PreserveVariables
+    Write-Host "PATH environment variable for scope `"$pathType`" does not contain `"$pathToInstall`". Adding..."
 
-    $statementTerminator = ";"
-    #does the path end in ';'?
-    $hasStatementTerminator = $actualPath -ne $null -and $actualPath.EndsWith($statementTerminator)
-    # if the last digit is not ;, then we are adding it
-    If (!$hasStatementTerminator -and $actualPath -ne $null) {$pathToInstall = $statementTerminator + $pathToInstall}
-    if (!$pathToInstall.EndsWith($statementTerminator)) {$pathToInstall = $pathToInstall + $statementTerminator}
-    $actualPath = $actualPath + $pathToInstall
+    $actualPathArray += $pathToInstall
+    $actualPath = ($actualPathArray -join(';')) + ';'
 
     if ($pathType -eq [System.EnvironmentVariableTarget]::Machine) {
       if (Test-ProcessAdminRights) {
@@ -100,9 +95,10 @@ param(
     }
 
     #add it to the local path as well so users will be off and running
-    $envPSPath = $env:PATH
-    $env:Path = $envPSPath + $statementTerminator + $pathToInstall
+    Update-SessionEnvironment
+  }
+  else
+  {
+    Write-Host "PATH environment variable for scope `"$pathType`" already contains `"$pathToInstall`". NOT Adding..."
   }
 }
-
-# [System.Text.RegularExpressions.Regex]::Match($Path,[System.Text.RegularExpressions.Regex]::Escape('locationtoMatch') + '(?>;)?', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
