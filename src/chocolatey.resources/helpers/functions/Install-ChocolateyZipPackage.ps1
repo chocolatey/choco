@@ -132,6 +132,11 @@ https://support.microsoft.com/en-us/kb/811833 for more details.
 
 The recommendation is to use at least SHA256.
 
+.PARAMETER Credential
+OPTIONAL - A System.Net.ICredentials object that contains credentials to
+use to authenticate to the URL server. This is just ultimately passed
+onto System.Net.HttpWebRequest Crentials property. Available in 0.9.11+
+
 .PARAMETER Options
 OPTIONAL - Specify custom headers. Available in 0.9.10+.
 
@@ -172,6 +177,7 @@ param(
   [parameter(Mandatory=$false)][string] $checksumType = '',
   [parameter(Mandatory=$false)][string] $checksum64 = '',
   [parameter(Mandatory=$false)][string] $checksumType64 = '',
+  [parameter(Mandatory=$false)][object] $credential = $null,
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
@@ -188,6 +194,6 @@ param(
   if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir) | Out-Null}
   $file = Join-Path $tempDir "$($packageName)Install.$fileType"
 
-  $filePath = Get-ChocolateyWebFile $packageName $file $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
+  $filePath = Get-ChocolateyWebFile $packageName $file $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -Credential $credential -options $options -getOriginalFileName
   Get-ChocolateyUnzip "$filePath" $unzipLocation $specificFolder $packageName
 }

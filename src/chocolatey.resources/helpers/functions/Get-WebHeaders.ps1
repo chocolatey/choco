@@ -40,6 +40,11 @@ This is the url to get a request/response from.
 The user agent to use as part of the request. Defaults to 'chocolatey
 command line'.
 
+.PARAMETER Credential
+OPTIONAL - A System.Net.ICredentials object that contains credentials to
+use to authenticate to the URL server. This is just ultimately passed
+onto System.Net.HttpWebRequest Crentials property. Available in 0.10.4+
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -55,6 +60,7 @@ Get-WebFile
 param(
   [parameter(Mandatory=$false, Position=0)][string] $url = '',
   [parameter(Mandatory=$false, Position=1)][string] $userAgent = 'chocolatey command line',
+  [parameter(Mandatory=$false)][Object] $credential = $null,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
@@ -64,7 +70,9 @@ param(
 
   $request = [System.Net.HttpWebRequest]::Create($url);
   $defaultCreds = [System.Net.CredentialCache]::DefaultCredentials
-  if ($defaultCreds -ne $null) {
+  if ($credential -ne $null) {
+    $request.Credentials = $credential
+  } elseif ($defaultCreds -ne $null) {
     $request.Credentials = $defaultCreds
   }
 

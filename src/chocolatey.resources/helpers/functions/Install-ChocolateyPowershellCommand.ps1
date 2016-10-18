@@ -131,6 +131,11 @@ https://support.microsoft.com/en-us/kb/811833 for more details.
 
 The recommendation is to use at least SHA256.
 
+.PARAMETER Credential
+OPTIONAL - A System.Net.ICredentials object that contains credentials to
+use to authenticate to the URL server. This is just ultimately passed
+onto System.Net.HttpWebRequest Crentials property. Available in 0.9.11+
+
 .PARAMETER Options
 OPTIONAL - Specify custom headers. Available in 0.9.10+.
 
@@ -184,13 +189,14 @@ param(
   [parameter(Mandatory=$false)][string] $checksumType = '',
   [parameter(Mandatory=$false)][string] $checksum64 = '',
   [parameter(Mandatory=$false)][string] $checksumType64 = '',
+  [parameter(Mandatory=$false)][object] $credential = $null,
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   Write-Debug "Running 'Install-ChocolateyPowershellCommand' for $packageName with psFileFullPath:`'$psFileFullPath`', url: `'$url`', url64bit:`'$url64bit`', checkSum: `'$checksum`', checksumType: `'$checksumType`', checkSum64: `'$checksum64`', checksumType64: `'$checksumType64`' ";
 
   if ($url -ne '') {
-    Get-ChocolateyWebFile $packageName $psFileFullPath $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -Options $options
+    Get-ChocolateyWebFile $packageName $psFileFullPath $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -Credential $credential -Options $options
   }
 
   if ($env:chocolateyPackageName -ne $null -and $env:chocolateyPackageName -eq $env:ChocolateyInstallDirectoryPackage) {

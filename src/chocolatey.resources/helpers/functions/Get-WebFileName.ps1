@@ -54,6 +54,11 @@ from the url response.
 The user agent to use as part of the request. Defaults to 'chocolatey
 command line'.
 
+.PARAMETER Credential
+OPTIONAL - A System.Net.ICredentials object that contains credentials to
+use to authenticate to the URL server. This is just ultimately passed
+onto System.Net.HttpWebRequest Crentials property. Available in 0.10.4+
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -70,6 +75,7 @@ param(
   [parameter(Mandatory=$false, Position=0)][string] $url = '',
   [parameter(Mandatory=$true, Position=1)][string] $defaultName,
   [parameter(Mandatory=$false)][string] $userAgent = 'chocolatey command line',
+  [parameter(Mandatory=$false)][Object] $credential = $null,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
@@ -107,7 +113,9 @@ param(
   }
 
   $defaultCreds = [System.Net.CredentialCache]::DefaultCredentials
-  if ($defaultCreds -ne $null) {
+  if ($credential -ne $null) {
+    $req.Credentials = $credential
+  } elseif ($defaultCreds -ne $null) {
     $request.Credentials = $defaultCreds
   }
 

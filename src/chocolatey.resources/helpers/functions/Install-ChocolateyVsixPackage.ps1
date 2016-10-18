@@ -98,6 +98,11 @@ https://support.microsoft.com/en-us/kb/811833 for more details.
 
 The recommendation is to use at least SHA256.
 
+.PARAMETER Credential
+OPTIONAL - A System.Net.ICredentials object that contains credentials to
+use to authenticate to the URL server. This is just ultimately passed
+onto System.Net.HttpWebRequest Crentials property. Available in 0.9.11+
+
 .PARAMETER Options
 OPTIONAL - Specify custom headers. Available in 0.9.10+.
 
@@ -136,6 +141,7 @@ param(
   [alias("visualStudioVersion")][parameter(Mandatory=$false, Position=2)][int] $vsVersion = 0,
   [parameter(Mandatory=$false)][string] $checksum = '',
   [parameter(Mandatory=$false)][string] $checksumType = '',
+  [parameter(Mandatory=$false)][object] $credential = $null,
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
@@ -180,7 +186,7 @@ param(
     if ($installer) {
         $download="$env:TEMP\$($packageName.Replace(' ','')).vsix"
         try{
-            Get-ChocolateyWebFile $packageName $download $vsixUrl -checksum $checksum -checksumType $checksumType -Options $options
+            Get-ChocolateyWebFile $packageName $download $vsixUrl -checksum $checksum -checksumType $checksumType -Credential $credential -Options $options
         }
         catch {
             throw "There were errors attempting to retrieve the vsix from $vsixUrl. The error message was '$_'."
