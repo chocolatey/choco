@@ -80,9 +80,6 @@ param(
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   $zipfileFullPath=$fileFullPath
-  if ($specificfolder) {
-    $fileFullPath=join-path $fileFullPath $specificFolder
-  }
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
@@ -123,6 +120,9 @@ param(
   }
 
   $params = "x -aoa -bd -bb1 -o`"$destinationNoRedirection`" -y `"$fileFullPathNoRedirection`""
+  if ($specificfolder) {
+    $params += " `"$specificfolder`""
+  }
   Write-Debug "Executing command ['$7zip' $params]"
 
   # Capture 7z's output into a StringBuilder and write it out in blocks, to improve I/O performance.
