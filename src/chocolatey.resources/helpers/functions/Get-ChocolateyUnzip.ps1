@@ -80,17 +80,11 @@ param(
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   $zipfileFullPath=$fileFullPath
-  if ($specificfolder) {
-    $fileFullPath=join-path $fileFullPath $specificFolder
-  }
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   if ($packageName) {
     $packagelibPath = $env:ChocolateyPackageFolder
-    if (!(Test-Path -path $packagelibPath)) {
-      New-Item $packagelibPath -type directory
-    }
 
     $zipFilename=split-path $zipfileFullPath -Leaf
     $zipExtractLogFullPath= Join-Path $packagelibPath $zipFilename`.txt
@@ -122,7 +116,13 @@ param(
     $destinationNoRedirection = $destination
   }
 
-  $params = "x -aoa -bd -bb1 -o`"$destinationNoRedirection`" -y `"$fileFullPathNoRedirection`""
+  if ($specificfolder) {
+    $params = "x -aoa -bd -bb1 -o`"$destinationNoRedirection`" -y `"$fileFullPathNoRedirection`" `"$specificfolder`""
+  }
+  else
+  {
+    $params = "x -aoa -bd -bb1 -o`"$destinationNoRedirection`" -y `"$fileFullPathNoRedirection`""
+  }
   Write-Debug "Executing command ['$7zip' $params]"
 
   # Capture 7z's output into a StringBuilder and write it out in blocks, to improve I/O performance.
