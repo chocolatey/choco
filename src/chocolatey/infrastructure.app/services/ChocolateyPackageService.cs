@@ -559,7 +559,7 @@ Would have determined packages that are out of date based on what is
             if (config.RegularOutput)
             {
                 var upgradeWarnings = oudatedPackages.Count(p => p.Value.Warning);
-                this.Log().Warn(() => @"{0}{1} has determined {2} package(s) are outdated. {3}.".format_with(
+                this.Log().Warn(() => @"{0}{1} has determined {2} package(s) are outdated. {3}".format_with(
                     Environment.NewLine,
                     ApplicationParameters.Name,
                     oudatedPackages.Count(p => p.Value.Success && !p.Value.Inconclusive),
