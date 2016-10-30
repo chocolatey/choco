@@ -77,6 +77,7 @@ param(
   [parameter(Mandatory=$true, Position=1)][string] $destination,
   [parameter(Mandatory=$false, Position=2)][string] $specificFolder,
   [parameter(Mandatory=$false, Position=3)][string] $packageName,
+  [parameter(Mandatory=$false, Position=4)][switch] $recursivecall,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   $zipfileFullPath=$fileFullPath
@@ -196,6 +197,31 @@ param(
     default { throw "7-Zip signalled an unknown error (code $exitCode)" }
   }
 
-  $env:ChocolateyPackageInstallLocation = $destination
-  return $destination
+  if ((test-path variable:url) -AND (@($url).count -gt 0))
+  {
+    # If our unzip resulted in a .tar file that matches our input zip file without it's extensions, unzip it
+    # does not work with archive names that contain a '.' before the extensions
+    $matchingtarname = "$destinationNoRedirection\$((split-path -leaf $url).split('.')[0]).tar"
+    Write-Debug "Checking to see if we have a flie called $matchingtarname"
+    If ((Test-path $matchingtarname) -AND (!$RecursiveCall))
+    {
+      Write-Debug "Automatically detected this archive contained a .tar matching the original archive name, unzipping `"$matchingtarname`" ..."
+      Get-ChocolateyUnzip -fileFullPath "$matchingtarname" -destination "$destination" -specificFolder "$specificFolder" -packagename "$packagename" -recursivecall
+      remove-item $matchingtarname -force
+    }
+    else
+    {
+      Write-Debug "The archive file processed did not contain a tar archive."
+    }
+  }
+  else
+  {
+    Write-Debug "This package does did not process an archive file."
+  }
+
+  If (!$RecursiveCall)
+    {
+      $env:ChocolateyPackageInstallLocation = $destination
+      return $destination
+    }
 }
