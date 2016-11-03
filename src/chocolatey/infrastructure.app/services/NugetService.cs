@@ -299,8 +299,8 @@ to the email and ask for status or use contact site admins on the
 package page to contact moderators.
 
 Please ensure your registered email address is correct and emails from
-chocolateywebadmin at googlegroups dot com are not being sent to your
-spam/junk folder.");
+noreply at chocolatey dot org are not being sent to your spam/junk 
+folder.");
             }
         }
 
