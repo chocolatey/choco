@@ -195,7 +195,7 @@ param(
 
   $defaultInstallPath = "$env:SystemDrive\ProgramData\chocolatey"
   try {
-    $defaultInstallPath = Join-Path [Environment]::GetFolderPath("CommonApplicationData") 'chocolatey'
+    $defaultInstallPath = Join-Path ([Environment]::GetFolderPath("CommonApplicationData")) 'chocolatey'
   } catch {
       # keep first setting
   }
