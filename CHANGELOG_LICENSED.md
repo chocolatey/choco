@@ -4,6 +4,49 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
+## 1.8.0 (November 16, 2016)
+
+Package Builder has some major improvements in this release, including a new UI! See https://chocolatey.org/blog/package-builder-announcements for details! While building some of the features for the enhancements for this release, we've made quite a few tweaks and fixes to Package Builder and we think you are going to like the results. Being able to generate packages from the installed software on a reference system is huge (`choco new --from-programs-and-features`)!
+
+Pro users now have the ability to download packages (minus internalization). This is fantastic if you want to pull down a lot of packages quickly from a remote source. Or pull down packages and push them up to an internal source.
+
+### FEATURES
+
+ * Package Downloader comes to Pro+ Licenses - minus internalizer, you can now download a package using an easy command `choco download`.
+ * Package Builder (Choco New):
+    * Package Builder now has a UI - see https://youtu.be/qJNKR_PEQqY for details.
+    * Right click on an exe, msi, zip (or other supported types) and click "Create Package..."
+    * Package Builder - generate packages from installed software (Programs and Features) - see https://youtu.be/Mw_ReipnskI for details.
+
+### BUG FIXES
+
+ * Package Builder (Choco New):
+    * Fix - silent arguments for MSU/MSP should not include the file itself.
+    * Fix - remove comma if found.
+    * Fix - remove trailing period.
+    * Fix - Remove the entire word surrounding a version.
+ * Package Internalizer (Choco Download):
+    * Fix - mixed line endings were causing "Index was outside the bounds of the array" errors.
+ * Package Synchronizer:
+    * Fix - sync location should not be in the extensions folder, causes extension loading issues - a similar fix will be in open source to ignore the old sync location in v0.10.4 (see [#1041](https://github.com/chocolatey/choco/issues/1041)).
+    * Fix - sync over an existing synced package without error.
+
+### IMPROVEMENTS
+
+ * Uninstall - Uninstall software not managed with Chocolatey. Use something like `choco uninstall 7-zip* --from-programs-and-features` to ensure removal from Programs and Features directly.
+ * VirusTotal - When a user cancels a virus check, set the proper exit code so that rollback occurs automatically - see [#985](https://github.com/chocolatey/choco/issues/985).
+ * Package Builder (Choco New):
+    * Return a TODO list when there are more things to do to finish packaging.
+    * Set values to replace if they are not set.
+    * Use company name for nuspec copyright if copyright is not available.
+    * Provide more verbose logging when necessary.
+    * Remove more installer wording - "setup", "remove only".
+    * If we exhaust all other options for determining name and version, use the file name and split version from name.
+    * Add or remove architecture from the package id - `choco new --include-architecture-in-name` and `choco new --remove-architecture-from-name`, respectively.
+ * Package Synchronizer:
+    * Synchronize to a new location per package version.
+
+
 ## 1.7.0 (Sep 22, 2016)
 
 ### BUG FIXES
@@ -24,6 +67,7 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
     * Add `--internalize` as alias to `--recompile`.
     * Warn of issue with `-UseOriginalLocation` when only using one file.
     * Add `--append-useoriginallocation` and feature internalizeAppendUseOriginalLocation that makes the determination to add to the end of `Install-ChocolateyPackage` when using local resources.
+
 
 ## 1.6.3 (Sep 20, 2016)
 
