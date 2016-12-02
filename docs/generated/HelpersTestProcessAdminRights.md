@@ -1,5 +1,7 @@
 ﻿# Test-ProcessAdminRights
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Test-ProcessAdminRights.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 Tests whether the current process is running with administrative rights.
 
 ## Syntax

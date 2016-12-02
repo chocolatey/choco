@@ -1,5 +1,7 @@
 ﻿# Get-ChocolateyUnzip
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Get-ChocolateyUnzip.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 Unzips an archive file and returns the location for further processing.
 
 ## Syntax

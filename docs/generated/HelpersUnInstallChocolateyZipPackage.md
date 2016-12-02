@@ -1,5 +1,7 @@
 ﻿# Uninstall-ChocolateyZipPackage
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Uninstall-ChocolateyZipPackage.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 Uninstalls a previous installed zip package, may not be necessary.
 
 ## Syntax

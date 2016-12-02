@@ -1,5 +1,7 @@
 ﻿# Get-WebFileName
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Get-WebFileName.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 Gets the original file name from a url. Used by Get-WebFile to determine
 the original file name for a file.
 

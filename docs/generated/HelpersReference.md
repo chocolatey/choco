@@ -1,5 +1,6 @@
 ﻿# PowerShell Functions aka Helpers Reference
 
+<!-- This documentation file is automatically generated from the files at $sourceFunctions using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
 ## Main Functions
 
 These functions call other functions and many times may be the only thing you need in your [[chocolateyInstall.ps1 file|ChocolateyInstallPS1]].

@@ -1,5 +1,7 @@
 ﻿# Get-UninstallRegistryKey
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Get-UninstallRegistryKey.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 Retrieve registry key(s) for system-installed applications from an
 exact or wildcard search.
 

@@ -1,5 +1,7 @@
 ﻿# Start-ChocolateyProcessAsAdmin
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Start-ChocolateyProcessAsAdmin.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 **NOTE:** Administrative Access Required.
 
 Runs a process with administrative privileges. If `-ExeToRun` is not
