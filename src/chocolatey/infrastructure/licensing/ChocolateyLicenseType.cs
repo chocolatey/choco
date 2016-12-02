@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.licensing
         Foss,
         Professional,
         BusinessTrial,
+        Architect,
         ManagedServiceProvider,
         Educational,
         Business,
