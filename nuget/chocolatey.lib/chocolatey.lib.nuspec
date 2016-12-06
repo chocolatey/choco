@@ -22,7 +22,10 @@ This is the core package which allows Chocolatey to be embedded in your applicat
     <tags>apt-get yum machine repository chocolatey</tags>
     <iconUrl>https://raw.githubusercontent.com/chocolatey/choco/master/docs/logo/chocolateyicon.gif</iconUrl>
     <dependencies>
-      <dependency id="log4net" version="[2.0.3]" />
+      <group targetFramework="net40">
+        <dependency id="AlphaFS" version="2.0.1" />
+        <dependency id="log4net" version="[2.0.3]" />
+      </group>
     </dependencies>
   </metadata>
 </package>
