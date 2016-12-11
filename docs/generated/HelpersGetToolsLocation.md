@@ -1,5 +1,7 @@
 ﻿# Get-ToolsLocation
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Get-ToolsLocation.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 Gets the top level location for tools/software installed outside of
 package folders.
 

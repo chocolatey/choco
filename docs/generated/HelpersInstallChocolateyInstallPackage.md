@@ -1,5 +1,7 @@
 ﻿# Install-ChocolateyInstallPackage
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Install-ChocolateyInstallPackage.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 **NOTE:** Administrative Access Required.
 
 Installs software into "Programs and Features". Use

@@ -4,6 +4,21 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
+## 1.8.1 (November 27, 2016)
+
+### BUG FIXES
+
+ * AutoUninstaller - Fix - do not fail on auto-detection of type when uninstall executable is not in the correct format.
+ * Package Builder (Choco New):
+    * Fix - Programs and Features - do not fail on auto-detection of type based on uninstall string
+
+### IMPROVEMENTS
+
+ * Package Builder (Choco New):
+    * version - always set to 3 segments (x.y.z)
+    * version - remove extra version segments when more than 4 segments are returned
+
+
 ## 1.8.0 (November 16, 2016)
 
 Package Builder has some major improvements in this release, including a new UI! See https://chocolatey.org/blog/package-builder-announcements for details! While building some of the features for the enhancements for this release, we've made quite a few tweaks and fixes to Package Builder and we think you are going to like the results. Being able to generate packages from the installed software on a reference system is huge (`choco new --from-programs-and-features`)!
@@ -33,7 +48,7 @@ Pro users now have the ability to download packages (minus internalization). Thi
 
 ### IMPROVEMENTS
 
- * Uninstall - Uninstall software not managed with Chocolatey. Use something like `choco uninstall 7-zip* --from-programs-and-features` to ensure removal from Programs and Features directly.
+ * Uninstall - Uninstall software not managed with Chocolatey. Use something like `choco uninstall 7-zip* --from-programs-and-features` to ensure removal from Programs and Features directly. Also requires Chocolatey v0.10.4.
  * VirusTotal - When a user cancels a virus check, set the proper exit code so that rollback occurs automatically - see [#985](https://github.com/chocolatey/choco/issues/985).
  * Package Builder (Choco New):
     * Return a TODO list when there are more things to do to finish packaging.
@@ -94,7 +109,7 @@ Pro users now have the ability to download packages (minus internalization). Thi
 
  * Package Builder (Choco New):
     * Fix - Do not error on missing appsearch table in MSI.
-    * Fix - Do not add similarly named items from AppSearch table to template properties more than once
+    * Fix - Do not add similarly named items from AppSearch table to template properties more than once.
 
 
 ## 1.6.0 (Sep 8, 2016)

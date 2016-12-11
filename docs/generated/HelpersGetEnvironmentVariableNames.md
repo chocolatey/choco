@@ -1,5 +1,7 @@
 ﻿# Get-EnvironmentVariableNames
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Get-EnvironmentVariableNames.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 Gets all environment variable names.
 
 ## Syntax
