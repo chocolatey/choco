@@ -89,6 +89,10 @@ namespace chocolatey.console
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.is_licensed_version() ? " {0}".format_with(license.LicenseType) : string.Empty));
                     }
 #endif
+                    if (args.Length == 0)
+                    {
+                        "chocolatley".Log().Info(ChocolateyLoggers.Important, () => "Please run 'choco -?' or 'choco <command> -?' for help menu.");
+                    }
                 }
 
                 if (warnings.Count != 0 && config.RegularOutput)
