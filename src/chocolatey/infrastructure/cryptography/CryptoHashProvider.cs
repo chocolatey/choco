@@ -1,4 +1,4 @@
-// Copyright © 2011 - Present RealDimensions Software, LLC
+// Copyright ï¿½ 2011 - Present RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -105,6 +105,20 @@ namespace chocolatey.infrastructure.cryptography
                 //IO.IO_FileTooLong2GB (over Int32.MaxValue)
                 return ApplicationParameters.HashProviderFileTooBig;
             }
+        }
+
+        public string hash_byte_array(byte[] buffer)
+        {                
+            var hash = _hashAlgorithm.ComputeHash(buffer);
+
+            return BitConverter.ToString(hash).Replace("-", string.Empty);
+        }
+
+        public string hash_stream(Stream inputStream)
+        {                
+            var hash = _hashAlgorithm.ComputeHash(inputStream);
+
+            return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
 
         private static bool file_is_locked(Exception exception)
