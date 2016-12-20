@@ -102,15 +102,32 @@ namespace chocolatey.infrastructure.services
                 () =>
                 {
                     var xmlSerializer = new XmlSerializer(typeof(XmlType));
+
+                    // Write the updated file to memory
                     using(var memoryStream = new MemoryStream())                        
-                    using(var textWriter = new StreamWriter(memoryStream, encoding: new UTF8Encoding(encoderShouldEmitUTF8Identifier: true)))
+                    using(var streamWriter = new StreamWriter(memoryStream, encoding: new UTF8Encoding(encoderShouldEmitUTF8Identifier: true)))
                     {
-                        xmlSerializer.Serialize(textWriter, xmlType);
-                        textWriter.Flush();
+                        xmlSerializer.Serialize(streamWriter, xmlType);
+                        streamWriter.Flush();
 
                         memoryStream.Position = 0;
-                        if (!_hashProvider.hash_file(xmlFilePath).is_equal_to(_hashProvider.hash_stream(memoryStream)))
+                        
+                        // Grab the hash of both files and compare them.
+                        var originalFileHash = _hashProvider.hash_file(xmlFilePath);
+                        if (!originalFileHash.is_equal_to(_hashProvider.hash_stream(memoryStream)))
                         {
+                            // If there wasn't a file there in the first place, just write the new one out directly.
+                            if(string.IsNullOrEmpty(originalFileHash))
+                            {
+                                using(var updateFileStream = _fileSystem.create_file(xmlFilePath))
+                                {
+                                    memoryStream.Position = 0;
+                                    memoryStream.CopyTo(updateFileStream);
+                                    return;
+                                }
+                            }
+
+                            // Otherwise, create an update file, and resiliently move it into place.
                             var tempUpdateFile = xmlFilePath + ".update";
                             using(var updateFileStream = _fileSystem.create_file(tempUpdateFile))
                             {
