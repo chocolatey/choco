@@ -390,6 +390,25 @@ namespace chocolatey.infrastructure.filesystem
             return success != 0;
         }
 
+        
+        public void replace_file(string sourceFilePath, string destinationFilePath, string backupFilePath)
+        {
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to replace \"{0}\"{1} with \"{2}\". Backup placed at \"{3}\".".format_with(destinationFilePath, Environment.NewLine, sourceFilePath, backupFilePath));
+
+            allow_retries(
+                () =>
+                {
+                    try
+                    {
+                        File.Replace(sourceFilePath, destinationFilePath, backupFilePath);
+                    }
+                    catch (IOException)
+                    {
+                        Alphaleonis.Win32.Filesystem.File.Replace(sourceFilePath, destinationFilePath, backupFilePath);
+                    }
+                });
+        }
+
         // ReSharper disable InconsistentNaming
 
         // http://msdn.microsoft.com/en-us/library/windows/desktop/aa363851.aspx
