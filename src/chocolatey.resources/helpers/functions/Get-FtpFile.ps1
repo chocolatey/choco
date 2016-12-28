@@ -148,8 +148,7 @@ param(
 
     # create the target file on the local system and the download buffer
     $writer = New-Object IO.FileStream ($fileName,[IO.FileMode]::Create)
-
-    [byte[]]$buffer = New-Object byte[] 1024
+    [byte[]]$buffer = New-Object byte[] 1048576
     [long]$total = [long]$count = 0
 
     $originalEAP = $ErrorActionPreference
