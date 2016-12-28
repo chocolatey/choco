@@ -133,7 +133,7 @@ param(
   try {
     # send the ftp request to the server
     $ftpresponse = $ftprequest.GetResponse()
-    [int]$goal = $ftpresponse.ContentLength
+    [long]$goal = $ftpresponse.ContentLength
     $goalFormatted = Format-FileSize $goal
 
     # get a download stream from the server response
@@ -141,8 +141,9 @@ param(
 
     # create the target file on the local system and the download buffer
     $writer = New-Object IO.FileStream ($fileName,[IO.FileMode]::Create)
+
     [byte[]]$buffer = New-Object byte[] 1024
-    [int]$total = [int]$count = 0
+    [long]$total = [long]$count = 0
 
     $originalEAP = $ErrorActionPreference
     $ErrorActionPreference = 'Stop'
