@@ -58,8 +58,8 @@ Are you ready for the ultimate experience? Check out Pro / Business!
  https://chocolatey.org/compare"       
 , 
 @"
-You use Chocolatey? You are amazing! Are you ready to take the next 
- step and look even smarter with more awesome features?
+Enjoy using Chocolatey? Explore more amazing features to take your 
+experience to the next level at
  https://chocolatey.org/compare"       
 , 
 @"
