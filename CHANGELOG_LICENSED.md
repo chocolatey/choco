@@ -4,6 +4,58 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
+## 1.8.3 (December 21, 2016)
+
+### FEATURES
+
+ * Package Downloader/Internalizer (Choco Download):
+    * Internalize package dependencies
+    * Allow download to separate location than where package will edit for internal resources (`--download-location`)
+
+### BUG FIXES
+
+ * Fix - Directory Override - ensure override switch is passed to .install/.portable package when passing switch to meta package.
+ * Fix - Ensure web requests don't time out / are configurable - see  [#732](https://github.com/chocolatey/choco/issues/732)
+ * Package Builder (Choco New):
+    * Fix - Cannot bind parameter because parameter 'fileType' is specified more than once for `--keep-remote`
+    * Fix - UNC paths with `--use-original-location` should not use `Install-ChocolateyPackage`
+    * Fix - Escape double quotes in PowerShell strings
+ * Package Downloader/Internalizer (Choco Download):
+    * Fix - Ignore commented out urls
+    * Fix - Do not download from a url more than once even if a package has it listed more than once
+    * Fix - Do not timeout for larger files
+
+### IMPROVEMENTS
+
+ * Directory Override - if MSI properties include INSTALLDIR or INSTALLLOCATION, use that instead of TARGETDIR
+ * Package Builder (Choco New):
+    * MSI Properties generated are cleaned up, duplicates removed from chocolateyInstall.ps1 comments
+    * Generate from Programs and Features is faster, does not repeat for Uninstaller keys in both 32bit/64bit registry hives
+    * Show downloaded file progress
+ * Package Downloader/Internalizer (Choco Download):
+    * When chocolateyInstall.ps1 uses other ps1 files, ensure those are loaded for token replacement
+    * Show downloaded file progress
+
+
+## 1.8.2 (December 12, 2016)
+
+### BUG FIXES
+
+ * Package Builder (Choco New):
+    * Fix - Ignore first argument for name if not a name. This will also be fixed in Chocolatey v0.10.4 with [#1085](https://github.com/chocolatey/choco/issues/1085)
+    * Fix - PackageBuilder UI will request administrative permissions when run by admin.
+    * Fix - Urls should be set when using original location.
+ * Package Downloader/Internalizer (Choco Download):
+    * Fix - Do not use unparsed options as package names. Similar to [#983](https://github.com/chocolatey/choco/issues/983).
+ * Countdown days counting in incorrect direction
+
+### IMPROVEMENTS
+
+ * Package Builder (Choco New):
+    * version - add TODO if version is 0.0.0.0
+    * outputdirectory option has more aliases.
+
+
 ## 1.8.1 (November 27, 2016)
 
 ### BUG FIXES

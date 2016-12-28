@@ -650,8 +650,8 @@ param(
   $NetFxArch = "Framework"
   if ([IntPtr]::Size -eq 8) {$NetFxArch="Framework64" }
 
-  $NetFx4ClientUrl = 'http://download.microsoft.com/download/5/6/2/562A10F9-C9F4-4313-A044-9C94E0A8FAC8/dotNetFx40_Client_x86_x64.exe'
-  $NetFx4FullUrl = 'http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe'
+  $NetFx4ClientUrl = 'https://download.microsoft.com/download/5/6/2/562A10F9-C9F4-4313-A044-9C94E0A8FAC8/dotNetFx40_Client_x86_x64.exe'
+  $NetFx4FullUrl = 'https://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe'
   $NetFx4Url = $NetFx4FullUrl
   $NetFx4Path = "$tempDir"
   $NetFx4InstallerFile = 'dotNetFx40_Full_x86_x64.exe'
