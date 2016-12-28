@@ -65,7 +65,7 @@ experience to the next level at
 @"
 Did you know the proceeds of Pro (and some proceeds from other 
  licensed editions) go into bettering the community infrastructure?
- Your support ensures an active community, keeping Chocolatey tip top,
+ Your support ensures an active community, keeps Chocolatey tip top,
  plus it nets you some awesome features! 
  https://chocolatey.org/compare", 
 @"
