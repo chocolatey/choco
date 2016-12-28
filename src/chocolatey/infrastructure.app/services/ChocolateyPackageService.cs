@@ -65,7 +65,7 @@ experience to the next level at
 @"
 Did you know the proceeds of Pro (and some proceeds from other 
  licensed editions) go into bettering the community infrastructure?
- Your support ensures an active community, it makes you look smarter,
+ Your support ensures an active community, keeping Chocolatey tip top,
  plus it nets you some awesome features! 
  https://chocolatey.org/compare", 
 @"
@@ -87,8 +87,7 @@ Did you know that Package Synchronizer and AutoUninstaller enhancements
 @"
 Did you know Chocolatey goes to eleven? And it turns great developers /
  system admins into something amazing! Singlehandedly solve your 
- organization's struggles with software management and look uber cool 
- while doing so.
+ organization's struggles with software management and save the day!
  https://chocolatey.org/compare"
 };
         private const string PRO_BUSINESS_LIST_MESSAGE = @"
