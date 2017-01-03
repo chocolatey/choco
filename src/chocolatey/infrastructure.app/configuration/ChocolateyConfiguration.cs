@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System.Collections.Generic;
     using System.Reflection;
     using System.Text;
+    using commands;
     using domain;
     using logging;
     using platforms;
@@ -46,7 +47,8 @@ namespace chocolatey.infrastructure.app.configuration
             ApiKeyCommand = new ApiKeyCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
             PinCommand = new PinCommandConfiguration();
-            Proxy = new ProxyConfiguration();
+            OutdatedCommand = new OutdatedCommandConfiguration();
+            Proxy = new ProxyConfiguration();            
 #if DEBUG
             AllowUnofficialBuild = true;
 #endif
@@ -111,7 +113,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         }
 
         private const int MAX_CONSOLE_LINE_LENGTH = 72;
-        private int _currentLineLength = 0;
+        private int _currentLineLength = 0;        
 
         private void append_output(StringBuilder propertyValues, string append)
         {
@@ -309,8 +311,16 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public PinCommandConfiguration PinCommand { get; set; }     
-        
+        public PinCommandConfiguration PinCommand { get; set; }
+
+        /// <summary>
+        /// Configuration related specifically to Outdated command
+        /// </summary>
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public OutdatedCommandConfiguration OutdatedCommand { get; set; }
+
         /// <summary>
         /// Configuration related specifically to proxies.
         /// </summary>
@@ -450,6 +460,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         public string Name { get; set; }
         public PinCommandType Command { get; set; }
+    }
+
+    [Serializable]
+    public sealed class OutdatedCommandConfiguration
+    {
+        public bool IgnorePinned { get; set; }
     }
 
     [Serializable]
