@@ -122,7 +122,7 @@ namespace chocolatey.infrastructure.app.configuration
                 {
                     if (config.RegularOutput) "chocolatey".Log().Warn(
                         ChocolateyLoggers.Important, @"Unable to set licensed environment settings. Please upgrade to a newer
- licensed version.");
+ licensed version (choco upgrade chocolatey.extension).");
                     return;
                 }
                 try

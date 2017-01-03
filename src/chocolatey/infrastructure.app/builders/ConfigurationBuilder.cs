@@ -459,7 +459,7 @@ You can pass options and switches in the following ways:
                 {
                     if (config.RegularOutput) "chocolatey".Log().Warn(ChocolateyLoggers.Important, 
                         @"Unable to set licensed configuration. Please upgrade to a newer 
- licensed version.");
+ licensed version (choco upgrade chocolatey.extension).");
                     return;
                 }
                 try
