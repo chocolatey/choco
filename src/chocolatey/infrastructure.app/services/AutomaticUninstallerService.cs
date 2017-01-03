@@ -101,8 +101,14 @@ namespace chocolatey.infrastructure.app.services
             uninstallExe = uninstallExe.remove_surrounding_quotes();
             this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
 
+            if (uninstallExe.contains("\\") || uninstallExe.contains("/"))
+            {
+                if (!_fileSystem.file_exists(uninstallExe))
                 {
+                    this.Log().Info(" Skipping auto uninstaller - The uninstaller file no longer exists. \"{0}\"".format_with(uninstallExe));
+                    return;
                 }
+            }
 
             IInstaller installer = get_installer_type(key, uninstallExe, uninstallArgs);
             this.Log().Debug(() => " Installer type is '{0}'".format_with(installer.GetType().Name));
