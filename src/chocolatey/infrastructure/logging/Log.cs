@@ -31,22 +31,24 @@ namespace chocolatey.infrastructure.logging
         ///   Sets up logging to be with a certain type
         /// </summary>
         /// <typeparam name="T">The type of ILog for the application to use</typeparam>
-        public static void InitializeWith<T>() where T : ILog, new()
+        /// <param name="resetLoggers">Should other loggers be reset?</param>
+        public static void InitializeWith<T>(bool resetLoggers = true) where T : ILog, new()
         {
             _logType = typeof (T);
-            LogExtensions.ResetLoggers();
+            if (resetLoggers) LogExtensions.ResetLoggers();
         }
 
         /// <summary>
         ///   Sets up logging to be with a certain instance. The other method is preferred.
         /// </summary>
         /// <param name="loggerType">Type of the logger.</param>
+        /// <param name="resetLoggers">Should other loggers be reset?</param>
         /// <remarks>This is mostly geared towards testing</remarks>
-        public static void InitializeWith(ILog loggerType)
+        public static void InitializeWith(ILog loggerType, bool resetLoggers = true)
         {
             _logType = loggerType.GetType();
             _logger = loggerType;
-            LogExtensions.ResetLoggers();
+            if (resetLoggers) LogExtensions.ResetLoggers();
         }
 
         /// <summary>

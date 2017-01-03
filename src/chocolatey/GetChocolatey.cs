@@ -106,7 +106,7 @@ namespace chocolatey
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
         public GetChocolatey SetCustomLogging(ILog logger)
         {
-            Log.InitializeWith(logger);
+            Log.InitializeWith(logger, resetLoggers: false);
             return this;
         }
 
