@@ -176,7 +176,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool AcceptLicense { get; set; }
         public bool AllowUnofficialBuild { get; set; }
 
-
         /// <summary>
         ///   Usually related to unparsed arguments.
         /// </summary>
@@ -262,7 +261,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </remarks>
         public SourcesCommandConfiguration SourceCommand { get;  set; }        
         
-
         /// <summary>
         ///   Default Machine Sources Configuration
         /// </summary>

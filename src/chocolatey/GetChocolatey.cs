@@ -118,9 +118,9 @@ namespace chocolatey
         public GetChocolatey Set(Action<ChocolateyConfiguration> propConfig)
         {
             _propConfig = propConfig;
-            return this;
+           return this;
         }
-
+ 
         /// <summary>
         /// Registers a container component. Does not require a dependency on Simple Injector.
         /// Will override existing component if registered.
@@ -131,7 +131,6 @@ namespace chocolatey
         public GetChocolatey RegisterContainerComponent(Type service, Type implementation)
         {
             _container.Register(service,implementation,Lifestyle.Singleton);
-
             return this;
         }
 
@@ -163,7 +162,6 @@ namespace chocolatey
             where Implementation : class, Service
         {
             _container.Register<Service,Implementation>(lifestyle);
-
             return this;
         }
 
@@ -178,7 +176,6 @@ namespace chocolatey
              where Service : class
         {
             _container.Register(implementationCreator,Lifestyle.Singleton);
-
             return this;
         }
 
@@ -270,6 +267,7 @@ namespace chocolatey
             {
                 _propConfig.Invoke(configuration);
             }
+
             return configuration;
         }
 
