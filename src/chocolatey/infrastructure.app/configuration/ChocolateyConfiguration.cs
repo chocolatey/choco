@@ -47,6 +47,7 @@ namespace chocolatey.infrastructure.app.configuration
             ApiKeyCommand = new ApiKeyCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
             PinCommand = new PinCommandConfiguration();
+            OutdatedCommand = new OutdatedCommandConfiguration();
             Proxy = new ProxyConfiguration();
 #if DEBUG
             AllowUnofficialBuild = true;
@@ -313,8 +314,16 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public PinCommandConfiguration PinCommand { get; set; }     
-        
+        public PinCommandConfiguration PinCommand { get; set; }
+
+        /// <summary>
+        /// Configuration related specifically to Outdated command
+        /// </summary>
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public OutdatedCommandConfiguration OutdatedCommand { get; set; }
+
         /// <summary>
         /// Configuration related specifically to proxies.
         /// </summary>
@@ -473,6 +482,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         public string Name { get; set; }
         public PinCommandType Command { get; set; }
+    }
+
+    [Serializable]
+    public sealed class OutdatedCommandConfiguration
+    {
+        public bool IgnorePinned { get; set; }
     }
 
     [Serializable]
