@@ -168,17 +168,11 @@ param(
       } while ($count -ne 0)
       Write-Host ""
       Write-Host "Download of $([System.IO.Path]::GetFileName($fileName)) ($goalFormatted) completed."
-    } catch {
-      throw $_.Exception
     } finally {
         $ErrorActionPreference = $originalEAP
     }
 
-    $reader.Close()
-    if ($fileName) {
-      $writer.Flush()
-      $writer.Close()
-    }
+    $writer.Flush() # closed in finally block
 
   } catch {
     if ($ftprequest -ne $null) {
@@ -197,8 +191,17 @@ param(
        throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"
     }
   } finally {
+
+    if ($reader -ne $null) {
+      try { $reader.Close(); } catch {}
+    }
+
+    if ($writer -ne $null) {
+      try { $writer.Close(); } catch {}
+    }
+
     if ($ftpresponse -ne $null) {
-      $ftpresponse.Close()
+      try { $ftpresponse.Close(); } catch {}
     }
 
     Start-Sleep 1
