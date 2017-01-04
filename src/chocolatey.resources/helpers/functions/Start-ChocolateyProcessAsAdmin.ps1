@@ -130,6 +130,8 @@ param(
     $importChocolateyHelpers = "& import-module -name '$helpersPath\chocolateyInstaller.psm1' -Verbose:`$false | Out-Null;"
     $block = @"
       `$noSleep = `$$noSleep
+      #`$env:ChocolateyEnvironmentDebug='false'
+      #`$env:ChocolateyEnvironmentVerbose='false'
       $importChocolateyHelpers
       try{
         `$progressPreference="SilentlyContinue"
