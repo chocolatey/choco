@@ -203,6 +203,12 @@ param(
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
+  # url overrides
+  $urlOverride = $env:ChocolateyUrlOverride
+  $url64bitOverride = $env:ChocolateyUrl64bitOverride
+  if ($urlOverride -ne $null -and $urlOverride -ne '') { $url = $urlOverride }
+  if ($url64bitOverride -ne $null -and $url64bitOverride -ne '') { $url64bit = $url64bitOverride }
+
   if ($url -ne $null) { $url = $url.Replace("//","/").Replace(":/","://") }
   if ($url64bit -ne $null) { $url64bit = $url64bit.Replace("//","/").Replace(":/","://") }
 
