@@ -115,7 +115,17 @@ param(
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  try{
+  $alreadyElevated = $false
+  if (Test-ProcessAdminRights) {
+    $alreadyElevated = $true  
+  }
+
+  $dbMessagePrepend = "Elevating permissions and running"
+  if (!$elevated) {
+    $dbMessagePrepend = "Running"
+  }
+
+  try {
     if ($exeToRun -ne $null) { $exeToRun = $exeToRun -replace "`0", "" }
     if ($statements -ne $null) { $statements = $statements -replace "`0", "" }
   } catch {
@@ -126,6 +136,24 @@ param(
   if ($wrappedStatements -eq $null) { $wrappedStatements = ''}
 
   if ($exeToRun -eq 'powershell') {
+  if ($alreadyElevated) {
+        $block = @"
+      try {
+        $statements
+      } catch {
+       throw
+      }
+"@
+  
+      & $block
+      $scriptSuccess = $?
+      if (-not $scriptSuccess) {
+        return 1
+      }
+
+      return 0
+    }
+
     $exeToRun = "$($env:SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe"
     $importChocolateyHelpers = "& import-module -name '$helpersPath\chocolateyInstaller.psm1' -Verbose:`$false | Out-Null;"
     $block = @"
@@ -144,23 +172,18 @@ param(
       }
 "@
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($block))
-    $wrappedStatements = "-NoProfile -ExecutionPolicy bypass -EncodedCommand $encoded"
+    $wrappedStatements = "-NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -InputFormat Text -OutputFormat Text -EncodedCommand $encoded"
     $dbgMessage = @"
-Elevating Permissions and running powershell block:
+$dbMessagePrepend powershell block:
 $block
 This may take a while, depending on the statements.
 "@
+
   }
   else
   {
     $dbgMessage = @"
-Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on the statements.
-"@
-  }
-
-  if (!$elevated) {
-  $dbgMessage = @"
-Running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on the statements.
+$dbMessagePrepend [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on the statements.
 "@
   }
 
@@ -225,7 +248,7 @@ Running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on 
   $process.StartInfo.UseShellExecute = $false
   $process.StartInfo.WorkingDirectory = $workingDirectory
 
-  if ($elevated -and [Environment]::OSVersion.Version -ge (New-Object 'Version' 6,0)){
+  if ($elevated -and -not $alreadyElevated -and [Environment]::OSVersion.Version -ge (New-Object 'Version' 6,0)){
     # this doesn't actually currently work - because we are not running under shell execute
     Write-Debug "Setting RunAs for elevation"
     $process.StartInfo.Verb = "RunAs"
@@ -266,7 +289,7 @@ Running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on 
     }
   }
 
-  Write-Debug "Finishing 'Start-ChocolateyProcessAsAdmin'"
+  Write-Debug "Finishing '$($MyInvocation.InvocationName)'"
 
   return $exitCode
 }
