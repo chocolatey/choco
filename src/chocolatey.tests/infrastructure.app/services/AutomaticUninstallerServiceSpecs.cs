@@ -80,6 +80,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 fileSystem.Setup(f => f.directory_exists(registryKeys.FirstOrDefault().InstallLocation)).Returns(true);
                 registryService.Setup(r => r.installer_value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(true);
                 fileSystem.Setup(f => f.get_full_path(expectedUninstallString)).Returns(expectedUninstallString);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(true);
 
                 var field = typeof(ApplicationParameters).GetField("AllowPrompts");
                 field.SetValue(null, false);
@@ -177,6 +178,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 base.Context();
                 fileSystem.ResetCalls();
                 fileSystem.Setup(f => f.directory_exists(registryKeys.FirstOrDefault().InstallLocation)).Returns(false);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(true);
             }
 
             public override void Because()
@@ -212,6 +214,7 @@ namespace chocolatey.tests.infrastructure.app.services
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat"
                     });
                 packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(true);
             }
 
             public override void Because()
@@ -267,6 +270,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 base.Context();
                 fileSystem.ResetCalls();
                 fileSystem.Setup(f => f.directory_exists(registryKeys.FirstOrDefault().InstallLocation)).Returns(false);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(true);
                 registryService.ResetCalls();
                 registryService.Setup(r => r.installer_value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(false);
             }
@@ -280,6 +284,36 @@ namespace chocolatey.tests.infrastructure.app.services
             public void should_log_why_it_skips_auto_uninstaller()
             {
                 MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
+            }
+
+            [Fact]
+            public void should_not_call_command_executor()
+            {
+                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+            }
+        }
+
+        public class when_uninstall_exe_does_not_exist : AutomaticUninstallerServiceSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                fileSystem.ResetCalls();
+                fileSystem.Setup(f => f.directory_exists(registryKeys.FirstOrDefault().InstallLocation)).Returns(true);
+                fileSystem.Setup(f => f.get_full_path(expectedUninstallString)).Returns(expectedUninstallString);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(false);
+            }
+
+            public override void Because()
+            {
+                MockLogger.LogMessagesToConsole = true;
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The uninstaller file no longer exists. \"" + expectedUninstallString +"\""), Times.Once);
             }
 
             [Fact]

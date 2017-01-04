@@ -176,7 +176,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool AcceptLicense { get; set; }
         public bool AllowUnofficialBuild { get; set; }
 
-
         /// <summary>
         ///   Usually related to unparsed arguments.
         /// </summary>
@@ -262,7 +261,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </remarks>
         public SourcesCommandConfiguration SourceCommand { get;  set; }        
         
-
         /// <summary>
         ///   Default Machine Sources Configuration
         /// </summary>
@@ -354,6 +352,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IgnoreInvalidOptionsSwitches { get; set; }
         public bool UsePackageExitCodes { get; set; }
         public bool UseFipsCompliantChecksums { get; set; }
+        public bool ShowNonElevatedWarnings { get; set; }
         //todo remove in 0.11.0
         public bool ScriptsCheckLastExitCode { get; set; }
     }

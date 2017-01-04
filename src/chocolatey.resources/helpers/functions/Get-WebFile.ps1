@@ -279,7 +279,7 @@ param(
             $totalFormatted = Format-FileSize $total
             if($goal -gt 0 -and ++$iterLoop%10 -eq 0) {
               $percentComplete = [Math]::Truncate(($total/$goal)*100)
-              Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete $percentComplete
+              Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted" -id 0 -percentComplete $percentComplete
             }
 
             if ($total -eq $goal -and $count -eq 0) {
