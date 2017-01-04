@@ -50,7 +50,7 @@ if (Test-Path($extensionsPath)) {
   Get-ChildItem $extensionsPath -recurse -filter "*.psm1" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }
   Get-ChildItem $extensionsPath -recurse -filter "*.dll" | Select -ExpandProperty FullName | % {
     $path = $_;
-    if ($path.Contains("extensions\chocolatey\lib-synced") { continue }
+    if ($path.Contains("extensions\chocolatey\lib-synced")) { continue }
 
     try {
       Write-Debug "Importing '$path'";
