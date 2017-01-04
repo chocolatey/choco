@@ -513,6 +513,11 @@ namespace chocolatey.infrastructure.app.services
 
             requestedAssembly.Version = version;
 
+            if (requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase) && requestedAssembly.CultureInfo.Name.is_equal_to("en-US"))
+            {
+                return null;
+            }
+
             try
             {
                 return System.Reflection.Assembly.Load(requestedAssembly);
