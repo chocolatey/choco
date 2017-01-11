@@ -684,35 +684,41 @@ Would have determined packages that are out of date based on what is
 
         public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config)
         {
-            this.Log().Info(@"Upgrading the following packages:");
+            this.Log().Info(is_packages_config_file(config.PackageNames) ? @"Upgrading from config file:" : @"Upgrading the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
+
+            var packageUpgrades = new ConcurrentDictionary<string, PackageResult>();
 
             if (string.IsNullOrWhiteSpace(config.Sources))
             {
                 this.Log().Error(ChocolateyLoggers.Important, @"Upgrading was NOT successful. There are no sources enabled for 
  packages and none were passed as arguments.");
                 Environment.ExitCode = 1;
-                return new ConcurrentDictionary<string, PackageResult>();
+                return packageUpgrades;
             }
 
             this.Log().Info(@"By upgrading you accept licenses for the packages.");
 
-            foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.EndsWith(".config")).ToList())
-            {
-                throw new ApplicationException("A packages.config file is only used with installs.");
-            }
-
-            Action<PackageResult> action = null;
-            if (config.SourceType == SourceType.normal)
-            {
-                action = (packageResult) => handle_package_result(packageResult, config, CommandNameType.upgrade);
-            }
-
             get_environment_before(config, allowLogging: true);
 
-            var beforeUpgradeAction = new Action<PackageResult>(packageResult => before_package_modify(packageResult, config));
-            var packageUpgrades = perform_source_runner_function(config, r => r.upgrade_run(config, action, beforeUpgradeAction));
-            
+            foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, packageUpgrades).or_empty_list_if_null())
+            {
+                Action<PackageResult> action = null;
+                if (config.SourceType == SourceType.normal)
+                {
+                    action = (packageResult) => handle_package_result(packageResult, packageConfig, CommandNameType.upgrade);
+                }
+
+
+                var beforeUpgradeAction = new Action<PackageResult>(packageResult => before_package_modify(packageResult, packageConfig));
+                var results = perform_source_runner_function(config, r => r.upgrade_run(packageConfig, action, beforeUpgradeAction));
+
+                foreach (var result in results)
+                {
+                    packageUpgrades.GetOrAdd(result.Key, result.Value);
+                }
+            }
+
             var upgradeFailures = report_action_summary(packageUpgrades, "upgraded");
             if (upgradeFailures != 0 && Environment.ExitCode == 0)
             {

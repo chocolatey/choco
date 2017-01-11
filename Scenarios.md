@@ -649,7 +649,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 36 Scenario(s), 295 Observation(s) ]
+### ChocolateyUpgradeCommand [ 36 Scenario(s), 305 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -1052,4 +1052,14 @@
 
 #### when upgrading packages with packages config
 
- * should throw an error that it is not allowed
+ * should contain a message that upgradepackage with an expected specified version was not installed
+ * should contain a warning message that it upgraded 3 out of 6 packages successfully
+ * should have a successful package result for all but expected missing package
+ * should install expected packages in the lib directory
+ * should install the dependency in the lib directory
+ * should install where install location reports
+ * should not have a successful package result for missing package
+ * should not have inconclusive package result for all but expected install and upgrade packages
+ * should not have warning package result
+ * should print out package from config file in message
+ * should specify config file is being used in message

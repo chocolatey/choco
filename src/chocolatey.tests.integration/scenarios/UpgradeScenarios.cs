@@ -18,6 +18,7 @@ namespace chocolatey.tests.integration.scenarios
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Threading;
@@ -1204,17 +1205,136 @@ namespace chocolatey.tests.integration.scenarios
                 base.Context();
                 var packagesConfig = "{0}\\context\\testing.packages.config".format_with(Scenario.get_top_level());
                 Configuration.PackageNames = Configuration.Input = packagesConfig;
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "upgradepackage*" + Constants.PackageExtension);
+                Configuration.UpgradeCommand.FailOnNotInstalled = false;
             }
 
             public override void Because()
             {
+                Results = Service.upgrade_run(Configuration);
             }
 
             [Fact]
-            [ExpectedException(typeof(ApplicationException))]
-            public void should_throw_an_error_that_it_is_not_allowed()
+            public void should_install_where_install_location_reports()
             {
-                Results = Service.upgrade_run(Configuration);
+                foreach (var packageResult in Results)
+                {
+                    if (packageResult.Value.Name.is_equal_to("missingpackage")) continue;
+                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_install_expected_packages_in_the_lib_directory()
+            {
+                var packagesExpected = new List<string> { "installpackage", "hasdependency", "isdependency", "upgradepackage" };
+                foreach (var package in packagesExpected)
+                {
+                    var packageDir = Path.Combine(Scenario.get_top_level(), "lib", package);
+                    Directory.Exists(packageDir).ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_install_the_dependency_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_3_out_of_6_packages_successfully()
+            {
+                bool upgradedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("3/6")) upgradedSuccessfully = true;
+                }
+
+                upgradedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_upgradepackage_with_an_expected_specified_version_was_not_installed()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgradepackage v1.0.0 is the latest version available based on your source")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result_for_all_but_expected_missing_package()
+            {
+                foreach (var packageResult in Results)
+                {
+                    if (packageResult.Value.Name.is_equal_to("missingpackage")) continue;
+
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_a_successful_package_result_for_missing_package()
+            {
+                foreach (var packageResult in Results)
+                {
+                    if (!packageResult.Value.Name.is_equal_to("missingpackage")) continue;
+
+                    packageResult.Value.Success.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result_for_all_but_expected_install_and_upgrade_packages()
+            {
+                foreach (var packageResult in Results)
+                {
+                    // These two packages don't upgrade because there is no newer version available
+                    if (packageResult.Value.Name.is_equal_to("installpackage") || packageResult.Value.Name.is_equal_to("upgradepackage"))
+                        packageResult.Value.Inconclusive.ShouldBeTrue();
+                    else
+                        packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_specify_config_file_is_being_used_in_message()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
+                {
+                    if (message.Contains("Upgrading from config file:")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_print_out_package_from_config_file_in_message()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
+                {
+                    if (message.Contains("installpackage")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
             }
         }
 
