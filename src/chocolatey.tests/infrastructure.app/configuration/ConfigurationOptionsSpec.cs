@@ -312,6 +312,26 @@ namespace chocolatey.tests.infrastructure.app.configuration
                 config.Debug.ShouldBeFalse();
                 helpMessageContents.ToString().ShouldNotBeEmpty();
             }
+
+            [Fact]
+            public void should_successfully_parse_help_option()
+            {
+                args.Add("-h");
+
+                because();
+
+                config.UnsuccessfulParsing.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_parse_unknown_option()
+            {
+                args.Add("-unknown");
+
+                because();
+
+                config.UnsuccessfulParsing.ShouldBeTrue();
+            }
         }
     }
 }
