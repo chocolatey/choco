@@ -368,6 +368,7 @@ namespace chocolatey.infrastructure.app.builders
                         {
                             // save help for next menu
                             config.HelpRequested = false;
+                            config.UnsuccessfulParsing = false;
                         }
                     },
                 () => { },

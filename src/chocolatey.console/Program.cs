@@ -99,10 +99,10 @@ namespace chocolatey.console
                     }
                 }
 
-                if (config.HelpRequested)
+                if (config.HelpRequested || config.UnsuccessfulParsing)
                 {
                     pause_execution_if_debug();
-                    Environment.Exit(-1);
+                    Environment.Exit(config.UnsuccessfulParsing?1:0);
                 }
 
                 Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug, excludeLoggerName: "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()));
