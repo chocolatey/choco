@@ -3,7 +3,7 @@ You can just call me choco.
 
 ![Chocolatey Logo](https://cdn.rawgit.com/chocolatey/choco/14a627932c78c8baaba6bef5f749ebfa1957d28d/docs/logo/chocolateyicon.gif "Chocolatey")
 
-[![](http://img.shields.io/chocolatey/dt/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/chocolatey/v/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/gittip/Chocolatey.svg)](https://www.gittip.com/Chocolatey/)
+[![](https://img.shields.io/chocolatey/dt/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](https://img.shields.io/chocolatey/v/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](https://img.shields.io/gittip/Chocolatey.svg)](https://www.gittip.com/Chocolatey/)
 
 [![Issue Stats](http://issuestats.com/github/Chocolatey/choco/badge/pr)](http://issuestats.com/github/Chocolatey/choco)
 
@@ -13,7 +13,7 @@ You can just call me choco.
 
 TeamCity  | AppVeyor | Travis
 ------------- | ------------- | -------------
-[![TeamCity Build Status](http://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/jfxywa3xuwowt20w/branch/master?svg=true)](https://ci.appveyor.com/project/ferventcoder/choco/branch/master) | [![Travis Build Status](https://travis-ci.org/chocolatey/choco.svg?branch=master)](https://travis-ci.org/chocolatey/choco)
+[![TeamCity Build Status](https://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/jfxywa3xuwowt20w/branch/master?svg=true)](https://ci.appveyor.com/project/ferventcoder/choco/branch/master) | [![Travis Build Status](https://travis-ci.org/chocolatey/choco.svg?branch=master)](https://travis-ci.org/chocolatey/choco)
 
 ## Chat Room
 
@@ -48,9 +48,9 @@ When requesting support, try to remember that we are all volunteers that have li
 
  * [Chocolatey site](https://chocolatey.org)
  * [Community Package Repository aka Chocolatey.org](https://chocolatey.org/packages)
- * [Mailing List/Forum](http://groups.google.com/group/chocolatey)
+ * [Mailing List/Forum](https://groups.google.com/group/chocolatey)
  * [Twitter](https://twitter.com/chocolateynuget)
- * [Build Status Email List](http://groups.google.com/group/chocolatey-build-status)
+ * [Build Status Email List](https://groups.google.com/group/chocolatey-build-status)
  * Join the [newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&id=73b018498d) and stay up to date with the latest happenings!
 
 ### Documentation
@@ -82,7 +82,7 @@ Prerequisites:
  * The issue has to do with choco itself and is not a package or website issue.
  * Please check to see if your issue already exists with a quick search of the issues. Start with one relevant term and then add if you get too many results.
  * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) guidelines.
- * You are not submitting a question - questions are better served as [emails](http://groups.google.com/group/chocolatey) or [gitter chat questions](https://gitter.im/chocolatey/choco).
+ * You are not submitting a question - questions are better served as [emails](https://groups.google.com/group/chocolatey) or [gitter chat questions](https://gitter.im/chocolatey/choco).
  * Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
 Submitting a ticket:
