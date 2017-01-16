@@ -142,6 +142,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ContainsLegacyPackageInstalls { get; set; }
         public int CommandExecutionTimeoutSeconds { get; set; }
         public int WebRequestTimeoutSeconds { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether system proxy settings should be ignored.
+        /// This supports the --ignore-proxy parameter or ignoreProxy feature.
+        /// </summary>
+        public bool IgnoreProxy { get; set; }
 
         /// <summary>
         ///   One or more source locations set by configuration or by command line. Separated by semi-colon
