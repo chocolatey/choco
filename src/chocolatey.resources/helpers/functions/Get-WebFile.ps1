@@ -133,7 +133,7 @@ param(
 	Write-Host "Using explicit proxy server '$explicitProxy'."
     $req.Proxy = $proxy
 
-  } elseif (!$webclient.Proxy.IsBypassed($url))
+  } elseif ($webclient.Proxy -and !$webclient.Proxy.IsBypassed($url))
   {
 	# system proxy (pass through)
     $creds = [net.CredentialCache]::DefaultCredentials
