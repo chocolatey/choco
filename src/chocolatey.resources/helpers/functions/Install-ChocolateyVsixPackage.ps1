@@ -43,16 +43,25 @@ None
 The name of the package - while this is an arbitrary value, it's
 recommended that it matches the package id.
 
+In 0.10.4+, `Name` is an alias for PackageName.
+
 .PARAMETER VsixUrl
 The URL of the package to be installed.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
+In 0.10.4+, `Url` is an alias for VsixUrl.
+
 .PARAMETER VsVersion
-The Major version number of Visual Studio where the
+The major version number of Visual Studio where the
 package should be installed. This is optional. If not
 specified, the most recent Visual Studio installation
 will be targetted.
+
+NOTE: For Visual Studio 2015, the VsVersion is 14. It can be determined
+by looking at the folders under Program Files / Program Files (x86).
+
+In 0.10.4+, `VisualStudioVersion` is an alias for VsVersion.
 
 .PARAMETER Checksum
 The checksum hash value of the Url resource. This allows a checksum to 
@@ -120,9 +129,9 @@ Install-ChocolateyInstallPackage
 Install-ChocolateyZipPackage
 #>
 param(
-  [parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [parameter(Mandatory=$false, Position=1)][string] $vsixUrl,
-  [parameter(Mandatory=$false, Position=2)][int] $vsVersion = 0,
+  [alias("name")][parameter(Mandatory=$true, Position=0)][string] $packageName,
+  [alias("url")][parameter(Mandatory=$false, Position=1)][string] $vsixUrl,
+  [alias("visualStudioVersion")][parameter(Mandatory=$false, Position=2)][int] $vsVersion = 0,
   [parameter(Mandatory=$false)][string] $checksum = '',
   [parameter(Mandatory=$false)][string] $checksumType = '',
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
