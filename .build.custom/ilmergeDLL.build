@@ -52,6 +52,7 @@
           <include name="${dirs.merge.from}${path.separator}Rhino.Licensing.dll" />
           <include name="${dirs.merge.from}${path.separator}System.Reactive*.dll" />
           <include name="${dirs.merge.from}${path.separator}SimpleInjector.dll" />
+          <include name="${dirs.merge.from}${path.separator}AlphaFS.dll" />
           <!-- <exclude name="${dirs.merge.from}${path.separator}*" /> -->
         </items>
       </in>
