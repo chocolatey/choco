@@ -23,6 +23,7 @@ namespace chocolatey.infrastructure.app.services
     using configuration;
     using filesystem;
     using infrastructure.commands;
+    using logging;
     using platforms;
 
     public class FileTypeDetectorService : IFileTypeDetectorService
@@ -91,7 +92,6 @@ namespace chocolatey.infrastructure.app.services
         //    }
         //}
 
-
         public string scan_file(string filePath)
         {
             if (Platform.get_platform() != PlatformType.Windows)
@@ -141,7 +141,7 @@ namespace chocolatey.infrastructure.app.services
                     },
                     (s, e) =>
                     {
-                        this.Log().Warn("{0}".format_with(e.Data));
+                        if (!string.IsNullOrWhiteSpace(e.Data)) this.Log().Warn("{0}".format_with(e.Data));
                     }, 
                     false, 
                     false);

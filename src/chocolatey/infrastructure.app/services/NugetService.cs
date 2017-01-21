@@ -256,7 +256,7 @@ namespace chocolatey.infrastructure.app.services
             string outputFile = builder.Id + "." + builder.Version + Constants.PackageExtension;
             string outputPath = _fileSystem.combine_paths(config.OutputDirectory ?? _fileSystem.get_current_directory(), outputFile);
 
-            this.Log().Info(() => "Attempting to build package from '{0}'.".format_with(_fileSystem.get_file_name(nuspecFilePath)));
+            this.Log().Info(config.QuietOutput ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Normal, () => "Attempting to build package from '{0}'.".format_with(_fileSystem.get_file_name(nuspecFilePath)));
 
             IPackage package = NugetPack.BuildPackage(builder, _fileSystem, outputPath);
             // package.Validate().Any(v => v.Level == PackageIssueLevel.Error)
@@ -270,7 +270,7 @@ namespace chocolatey.infrastructure.app.services
             //    AnalyzePackage(package);
             //}
 
-            this.Log().Info(ChocolateyLoggers.Important, () => "Successfully created package '{0}'".format_with(outputPath));
+            this.Log().Info(config.QuietOutput ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, () => "Successfully created package '{0}'".format_with(outputPath));
         }
 
         public void push_noop(ChocolateyConfiguration config)

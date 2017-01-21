@@ -43,6 +43,9 @@ namespace chocolatey.infrastructure.app.services
 
         public void generate(ChocolateyConfiguration configuration)
         {
+            var logger = ChocolateyLoggers.Normal;
+            if (configuration.QuietOutput) logger = ChocolateyLoggers.LogFileOnly;
+
             var packageLocation = _fileSystem.combine_paths(configuration.OutputDirectory ?? _fileSystem.get_current_directory(), configuration.NewCommand.Name);
             if (_fileSystem.directory_exists(packageLocation) && !configuration.Force)
             {
@@ -50,7 +53,7 @@ namespace chocolatey.infrastructure.app.services
                     "The location for the template already exists. You can:{0} 1. Remove '{1}'{0} 2. Use --force{0} 3. Specify a different name".format_with(Environment.NewLine, packageLocation));
             }
 
-            if (configuration.RegularOutput) this.Log().Info(() => "Creating a new package specification at {0}".format_with(packageLocation));
+            if (configuration.RegularOutput) this.Log().Info(logger, () => "Creating a new package specification at {0}".format_with(packageLocation));
             try
             {
                 _fileSystem.delete_directory_if_exists(packageLocation, recursive: true);
@@ -109,7 +112,7 @@ namespace chocolatey.infrastructure.app.services
                 var templatePath = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.NewCommand.TemplateName);
                 if (!_fileSystem.directory_exists(templatePath)) throw new ApplicationException("Unable to find path to requested template '{0}'. Path should be '{1}'".format_with(configuration.NewCommand.TemplateName, templatePath));
 
-                this.Log().Info(ChocolateyLoggers.Important, "Generating package from custom template at '{0}'.".format_with(templatePath));
+                this.Log().Info(configuration.QuietOutput ? logger : ChocolateyLoggers.Important, "Generating package from custom template at '{0}'.".format_with(templatePath));
                 foreach (var file in _fileSystem.get_files(templatePath, "*.*", SearchOption.AllDirectories))
                 {
                     var packageFileLocation = file.Replace(templatePath, packageLocation);
@@ -118,8 +121,7 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
 
-            this.Log().Info(
-                ChocolateyLoggers.Important,
+            this.Log().Info(configuration.QuietOutput ? logger : ChocolateyLoggers.Important,
                 "Successfully generated {0}{1} package specification files{2} at '{3}'".format_with(
                     configuration.NewCommand.Name, configuration.NewCommand.AutomaticPackage ? " (automatic)" : string.Empty, Environment.NewLine, packageLocation));
         }
