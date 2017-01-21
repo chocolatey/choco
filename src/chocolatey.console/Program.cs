@@ -127,18 +127,7 @@ namespace chocolatey.console
             }
             catch (Exception ex)
             {
-                var debug = false;
-                // no access to the good stuff here, need to go a bit primitive in parsing args
-                foreach (var arg in args.or_empty_list_if_null())
-                {
-                    if (arg.Contains("debug") || arg.is_equal_to("-d") || arg.is_equal_to("/d"))
-                    {
-                        debug = true;
-                        break;
-                    }
-                }
-
-                if (debug)
+                if (ApplicationParameters.is_debug_mode_cli_primitive())
                 {
                     "chocolatey".Log().Error(() => "{0} had an error occur:{1}{2}".format_with(
                         ApplicationParameters.Name,

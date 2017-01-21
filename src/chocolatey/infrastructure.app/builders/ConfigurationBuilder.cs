@@ -477,12 +477,21 @@ You can pass options and switches in the following ways:
                 }
                 catch (Exception ex)
                 {
+                    var isDebug = ApplicationParameters.is_debug_mode_cli_primitive();
+                    if (config.Debug) isDebug = true;
+                    var message = isDebug ? ex.ToString() : ex.Message;
+
+                    if (isDebug && ex.InnerException != null)
+                    {
+                        message += "{0}{1}".format_with(Environment.NewLine, ex.ToString());
+                    }
+
                     "chocolatey".Log().Error(
                         ChocolateyLoggers.Important,
                         @"Error when setting configuration for '{0}':{1} {2}".format_with(
                             licensedConfigBuilder.FullName,
                             Environment.NewLine,
-                            ex.Message
+                            message
                             ));
                 }
             }
