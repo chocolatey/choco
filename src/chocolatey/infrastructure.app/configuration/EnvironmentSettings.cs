@@ -139,12 +139,21 @@ namespace chocolatey.infrastructure.app.configuration
                 }
                 catch (Exception ex)
                 {
+                    var isDebug = ApplicationParameters.is_debug_mode_cli_primitive();
+                    if (config.Debug) isDebug = true;
+                    var message = isDebug ? ex.ToString() : ex.Message;
+
+                    if (isDebug && ex.InnerException != null)
+                    {
+                        message += "{0}{1}".format_with(Environment.NewLine, ex.ToString());
+                    }
+
                     "chocolatey".Log().Error(
                         ChocolateyLoggers.Important,
                         @"Error when setting environment for '{0}':{1} {2}".format_with(
                             licensedEnvironmentSettings.FullName,
                             Environment.NewLine,
-                            ex.Message
+                            message
                             ));
                 }
             }

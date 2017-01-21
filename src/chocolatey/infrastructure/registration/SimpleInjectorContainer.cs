@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.registration
     using System;
     using System.Collections.Generic;
     using System.Reflection;
+    using app;
     using app.registration;
     using logging;
     using SimpleInjector;
@@ -100,12 +101,20 @@ namespace chocolatey.infrastructure.registration
             }
             catch (Exception ex)
             {
+                var isDebug = ApplicationParameters.is_debug_mode_cli_primitive();
+                var message = isDebug ? ex.ToString() : ex.Message;
+
+                if (isDebug && ex.InnerException != null)
+                {
+                    message += "{0}{1}".format_with(Environment.NewLine, ex.ToString());
+                }
+
                 "chocolatey".Log().Error(
                     ChocolateyLoggers.Important,
                     @"Error when registering components for '{0}':{1} {2}".format_with(
                         componentRegistry.FullName,
                         Environment.NewLine,
-                        ex.Message
+                        message
                         ));
             }
         }

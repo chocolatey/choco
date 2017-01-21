@@ -177,6 +177,23 @@ namespace chocolatey.infrastructure.app
             }
         }
 
+        public static bool is_debug_mode_cli_primitive()
+        {
+            var args = System.Environment.GetCommandLineArgs();
+            var isDebug = false;
+            // no access to the good stuff here, need to go a bit primitive in parsing args
+            foreach (var arg in args.or_empty_list_if_null())
+            {
+                if (arg.contains("-debug") || arg.is_equal_to("-d") || arg.is_equal_to("/d"))
+                {
+                    isDebug = true;
+                    break;
+                }
+            }
+
+            return isDebug;
+        }
+
         ///// <summary>
         /////   Are we in Debug Mode?
         ///// </summary>

@@ -189,14 +189,10 @@ $dbMessagePrepend [`"$exeToRun`" $wrappedStatements]. This may take a while, dep
 
   Write-Debug $dbgMessage
 
-  try {
-    $exeIsTextFile = [System.IO.Path]::GetFullPath($exeToRun) + ".istext"
-    if (([System.IO.File]::Exists($exeIsTextFile))) {
-      Set-PowerShellExitCode 4
-      throw "The file was a text file but is attempting to be run as an executable - '$exeToRun'"
-    }
-  } catch {
-    Write-Debug "Unable to detect whether the file is a text file or not - $($_.Exception.Message)"
+  $exeIsTextFile = [System.IO.Path]::GetFullPath($exeToRun) + ".istext"
+  if ([System.IO.File]::Exists($exeIsTextFile)) {
+    Set-PowerShellExitCode 4
+    throw "The file was a text file but is attempting to be run as an executable - '$exeToRun'"
   }
 
   if ($exeToRun -eq 'msiexec' -or $exeToRun -eq 'msiexec.exe') {
