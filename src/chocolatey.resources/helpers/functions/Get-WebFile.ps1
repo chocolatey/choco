@@ -197,12 +197,15 @@ param(
         }
       }
 
+      $binaryIsTextCheckFile = "$fileName.istext"
+      if (Test-Path($binaryIsTextCheckFile)) { Remove-Item $binaryIsTextCheckFile -Force -EA SilentlyContinue; }
+
       if ($headers.ContainsKey("Content-Type")) {
         $contentType = $headers['Content-Type']
         if ($contentType -ne $null) {
           if ($contentType.ToLower().Contains("text/html") -or $contentType.ToLower().Contains("text/plain")) {
             Write-Warning "$fileName is of content type $contentType"
-            Set-Content -Path "$fileName.istext" -Value "$fileName has content type $contentType" -Encoding UTF8 -Force
+            Set-Content -Path $binaryIsTextCheckFile -Value "$fileName has content type $contentType" -Encoding UTF8 -Force
           }
         }
       }
