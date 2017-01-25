@@ -194,21 +194,13 @@ namespace chocolatey.infrastructure.app.builders
                 config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
             }
 
-            var originalCommandTimeout = configFileSettings.CommandExecutionTimeoutSeconds;
-            var commandExecutionTimeoutSeconds = -1;
-            int.TryParse(
-                set_config_item(
-                    ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds,
-                    configFileSettings,
-                    originalCommandTimeout == 0 ?
-                        ApplicationParameters.DefaultWaitForExitInSeconds.to_string()
-                        : originalCommandTimeout.to_string(),
-                    "Default timeout for command execution."),
-                out commandExecutionTimeoutSeconds);
-            config.CommandExecutionTimeoutSeconds = commandExecutionTimeoutSeconds;
-            if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
+            if (configFileSettings.CommandExecutionTimeoutSeconds > 0)
             {
-                set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, ApplicationParameters.DefaultWaitForExitInSeconds.to_string(), "Default timeout for command execution.", forceSettingValue: true);
+                config.CommandExecutionTimeoutSeconds = configFileSettings.CommandExecutionTimeoutSeconds;
+            }
+            else
+            {
+                set_config_item(ApplicationParameters.DefaultWaitForExitInSeconds.to_string(), configFileSettings, ApplicationParameters.DefaultWaitForExitInSeconds.to_string(), "Default timeout for command execution.", forceSettingValue: true);
                 config.CommandExecutionTimeoutSeconds = ApplicationParameters.DefaultWaitForExitInSeconds;
             }
 
