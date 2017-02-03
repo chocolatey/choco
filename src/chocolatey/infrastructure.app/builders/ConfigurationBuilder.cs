@@ -416,6 +416,9 @@ You can pass options and switches in the following ways:
    (`` `""value`"" ``) or apostrophes (`'value'`). Using the combination
    allows for both shells to work without issue, except for when the next
    section applies.
+ * **Periods in PowerShell**: If you need to pass a period as part of a 
+   value or a path, PowerShell doesn't always handle it well. Please 
+   quote those values using ""Quote Values"" section above.
  * **Pass quotes in arguments**: When you need to pass quoted values to
    to something like a native installer, you are in for a world of fun. In
    cmd.exe you must pass it like this: `-ia ""/yo=""""Spaces spaces""""""`. In
