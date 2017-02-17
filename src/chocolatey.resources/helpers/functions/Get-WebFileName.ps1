@@ -130,7 +130,7 @@ param(
     Write-Debug "Using explicit proxy server '$explicitProxy'."
     $request.Proxy = $proxy
 
-  } elseif (!$client.Proxy.IsBypassed($url))
+  } elseif ($client.Proxy -and !$client.Proxy.IsBypassed($url))
   {
     # system proxy (pass through)
     $creds = [Net.CredentialCache]::DefaultCredentials
