@@ -80,12 +80,21 @@ namespace chocolatey.infrastructure.app.nuget
             {
 
                 var source = sourceValue;
-                if (configuration.MachineSources.Any(m => m.Name.is_equal_to(source)))
+                var bypassProxy = false;
+                if (configuration.MachineSources.Any(m => m.Name.is_equal_to(source) || m.Key.is_equal_to(source)))
                 {
-                    "chocolatey".Log().Debug("Switching source name {0} to actual source value.".format_with(sourceValue));
+
                     try
                     {
-                        source = configuration.MachineSources.FirstOrDefault(m => m.Name.is_equal_to(source)).Key;
+                        var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Key.is_equal_to(source));
+                        if (machineSource == null)
+                        {
+                            machineSource = configuration.MachineSources.FirstOrDefault(m => m.Name.is_equal_to(source));
+                            "chocolatey".Log().Debug("Switching source name {0} to actual source value '{1}'.".format_with(sourceValue, machineSource.Key.to_string()));
+                            source = machineSource.Key;
+                        }
+
+                        if (machineSource != null) bypassProxy = machineSource.BypassProxy;
                     }
                     catch (Exception ex)
                     {
@@ -104,7 +113,7 @@ namespace chocolatey.infrastructure.app.nuget
                     }
                     else
                     {
-                      repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri)));
+                        repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri, bypassProxy)));
                     }
                 }
                 catch (Exception)

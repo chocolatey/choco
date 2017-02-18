@@ -118,7 +118,8 @@ namespace chocolatey.infrastructure.app.builders
                 Value = ApplicationParameters.ChocolateyLicensedFeedSource,
                 UserName = "customer",
                 Password = NugetEncryptionUtility.EncryptString(license.Id),
-                Priority = 10
+                Priority = 10,
+                BypassProxy = false,
             };
 
             if (addOrUpdate && !sources.Any(s =>
@@ -180,7 +181,8 @@ namespace chocolatey.infrastructure.app.builders
                         EncryptedPassword = source.Password,
                         Certificate = source.Certificate,
                         EncryptedCertificatePassword = source.CertificatePassword,
-                        Priority = source.Priority
+                        Priority = source.Priority,
+                        BypassProxy = source.BypassProxy,
                     });
             }
         }

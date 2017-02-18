@@ -415,6 +415,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public int Priority { get; set; }
         public string Certificate { get; set; }
         public string CertificatePassword { get; set; }
+        public bool BypassProxy { get; set; }
     }
 
     [Serializable]
@@ -427,6 +428,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public int Priority { get; set; }
         public string Certificate { get; set; }
         public string EncryptedCertificatePassword { get; set; }
+        public bool BypassProxy { get; set; }
     }
 
     [Serializable]
@@ -470,5 +472,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string Location { get; set; }
         public string User { get; set; }
         public string EncryptedPassword { get; set; }
+        public string BypassList { get; set; }
     }
 }
