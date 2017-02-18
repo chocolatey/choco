@@ -119,19 +119,23 @@ param(
   $explicitProxy = $env:chocolateyProxyLocation
   $explicitProxyUser = $env:chocolateyProxyUser
   $explicitProxyPassword = $env:chocolateyProxyPassword
+  $explicitProxyBypassList = $env:chocolateyProxyBypassList
   if ($explicitProxy -ne $null) {
     # explicit proxy
     $proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
     if ($explicitProxyPassword -ne $null) {
-    $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
-    $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
-  }
+      $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
+      $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
+    }
+
+    if ($explicitProxyBypassList -ne $null -and $explicitProxyBypassList -ne '') {
+      $proxy.BypassList =  $explicitProxyBypassList.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)
+    }
 
     Write-Debug "Using explicit proxy server '$explicitProxy'."
     $request.Proxy = $proxy
 
-  } elseif ($client.Proxy -and !$client.Proxy.IsBypassed($url))
-  {
+  } elseif ($client.Proxy -and !$client.Proxy.IsBypassed($url)) {
     # system proxy (pass through)
     $creds = [Net.CredentialCache]::DefaultCredentials
     if ($creds -eq $null) {

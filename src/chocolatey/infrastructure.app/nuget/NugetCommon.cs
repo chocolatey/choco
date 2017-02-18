@@ -71,7 +71,12 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     proxy.Credentials = new NetworkCredential(configuration.Proxy.User, NugetEncryptionUtility.DecryptString(configuration.Proxy.EncryptedPassword));
                 }
-                
+
+                if (!string.IsNullOrWhiteSpace(configuration.Proxy.BypassList))
+                {
+                    proxy.BypassList = configuration.Proxy.BypassList.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                }
+
                 ProxyCache.Instance.Override(proxy);
             }
 

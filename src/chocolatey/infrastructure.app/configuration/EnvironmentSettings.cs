@@ -97,8 +97,10 @@ namespace chocolatey.infrastructure.app.configuration
                 }
 
                 Environment.SetEnvironmentVariable("http_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
-                Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
+                Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location)); 
                 Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
+
+                if (!string.IsNullOrWhiteSpace(config.Proxy.BypassList)) Environment.SetEnvironmentVariable("chocolateyProxyBypassList", config.Proxy.BypassList);
             }
 
             if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, "true");

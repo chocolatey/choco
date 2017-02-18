@@ -122,20 +122,23 @@ param(
   $explicitProxy = $env:chocolateyProxyLocation
   $explicitProxyUser = $env:chocolateyProxyUser
   $explicitProxyPassword = $env:chocolateyProxyPassword
+  $explicitProxyBypassList = $env:chocolateyProxyBypassList
   if ($explicitProxy -ne $null) {
     # explicit proxy
-	$proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
-	if ($explicitProxyPassword -ne $null) {
-	  $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
-	  $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
-	}
+	  $proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
+	  if ($explicitProxyPassword -ne $null) {
+      $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
+	    $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
+	  }
+    
+    if ($explicitProxyBypassList -ne $null -and $explicitProxyBypassList -ne '') {
+      $proxy.BypassList =  $explicitProxyBypassList.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)
+    }
 
-	Write-Host "Using explicit proxy server '$explicitProxy'."
+ 	  Write-Host "Using explicit proxy server '$explicitProxy'."
     $req.Proxy = $proxy
-
-  } elseif ($webclient.Proxy -and !$webclient.Proxy.IsBypassed($url))
-  {
-	# system proxy (pass through)
+  } elseif ($webclient.Proxy -and !$webclient.Proxy.IsBypassed($url)) {
+	  # system proxy (pass through)
     $creds = [net.CredentialCache]::DefaultCredentials
     if ($creds -eq $null) {
       Write-Debug "Default credentials were null. Attempting backup method"
