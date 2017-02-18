@@ -115,37 +115,12 @@ param(
     $client.Credentials = $defaultCreds
   }
 
-  # check if a proxy is required
-  $explicitProxy = $env:chocolateyProxyLocation
-  $explicitProxyUser = $env:chocolateyProxyUser
-  $explicitProxyPassword = $env:chocolateyProxyPassword
-  if ($explicitProxy -ne $null) {
-    # explicit proxy
-    $proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
-    if ($explicitProxyPassword -ne $null) {
-    $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
-    $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
-  }
-
-    Write-Debug "Using explicit proxy server '$explicitProxy'."
-    $request.Proxy = $proxy
-
-  } elseif ($client.Proxy -and !$client.Proxy.IsBypassed($url))
+  $configureProxy, $proxy = Configure-Proxy $client.Proxy $url
+  if ($configureProxy)
   {
-    # system proxy (pass through)
-    $creds = [Net.CredentialCache]::DefaultCredentials
-    if ($creds -eq $null) {
-      Write-Debug "Default credentials were null. Attempting backup method"
-      $cred = Get-Credential
-      $creds = $cred.GetNetworkCredential();
-    }
-    $proxyAddress = $client.Proxy.GetProxy($url).Authority
-    Write-Debug "Using system proxy server '$proxyaddress'."
-    $proxy = New-Object System.Net.WebProxy($proxyAddress)
-    $proxy.Credentials = $creds
     $request.Proxy = $proxy
   }
-
+  
   $request.Method = "GET"
   $request.Accept = '*/*'
   $request.AllowAutoRedirect = $true

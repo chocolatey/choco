@@ -99,19 +99,9 @@ param(
   # Create a FTPWebRequest object to handle the connection to the ftp server
   $ftprequest = [System.Net.FtpWebRequest]::create($url)
 
-  # check if a proxy is required
-  $explicitProxy = $env:chocolateyProxyLocation
-  $explicitProxyUser = $env:chocolateyProxyUser
-  $explicitProxyPassword = $env:chocolateyProxyPassword
-  if ($explicitProxy -ne $null) {
-    # explicit proxy
-	  $proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
-	  if ($explicitProxyPassword -ne $null) {
-	    $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
-	    $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
-	  }
-
-  	Write-Host "Using explicit proxy server '$explicitProxy'."
+  $configureProxy, $proxy = Configure-Proxy
+  if ($configureProxy)
+  {
     $ftprequest.Proxy = $proxy
   }
 

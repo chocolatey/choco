@@ -83,12 +83,16 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
             Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
 
-            if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
+            if (config.IgnoreProxy)
+            {
+                Environment.SetEnvironmentVariable("chocolateyIgnoreProxy", "true");
+            }
+            else if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
                 var proxyCreds = string.Empty;
                 if (!string.IsNullOrWhiteSpace(config.Proxy.User) &&
                     !string.IsNullOrWhiteSpace(config.Proxy.EncryptedPassword)
-                    )
+                )
                 {
                     proxyCreds = "{0}:{1}@".format_with(config.Proxy.User, NugetEncryptionUtility.DecryptString(config.Proxy.EncryptedPassword));
 
