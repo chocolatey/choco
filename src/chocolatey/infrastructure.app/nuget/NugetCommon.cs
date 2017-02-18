@@ -62,7 +62,12 @@ namespace chocolatey.infrastructure.app.nuget
             // ensure credentials can be grabbed from configuration
             HttpClient.DefaultCredentialProvider = new ChocolateyNugetCredentialProvider(configuration);
             HttpClient.DefaultCertificateProvider = new ChocolateyClientCertificateProvider(configuration);
-            if (!string.IsNullOrWhiteSpace(configuration.Proxy.Location))
+            if (configuration.IgnoreProxy)
+            {
+                "chocolatey".Log().Debug("Ignoring proxy settings");
+                ProxyCache.Instance.Override(null);
+            }
+            else if (!string.IsNullOrWhiteSpace(configuration.Proxy.Location))
             {
                 "chocolatey".Log().Debug("Using proxy server '{0}'.".format_with(configuration.Proxy.Location));
                 var proxy = new WebProxy(configuration.Proxy.Location, true);

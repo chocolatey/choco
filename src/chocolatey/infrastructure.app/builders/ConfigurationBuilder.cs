@@ -275,6 +275,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.ShowNonElevatedWarnings = set_feature_flag(ApplicationParameters.Features.ShowNonElevatedWarnings, configFileSettings, defaultEnabled: true, description: "Show Non-Elevated Warnings - Display non-elevated warnings. Available in 0.10.4+.");
             config.Features.ScriptsCheckLastExitCode = set_feature_flag(ApplicationParameters.Features.ScriptsCheckLastExitCode, configFileSettings, defaultEnabled: false, description: "Scripts Check $LastExitCode (external commands) - Leave this off unless you absolutely need it while you fix your package scripts  to use `throw 'error message'` or `Set-PowerShellExitCode #` instead of `exit #`. This behavior started in 0.9.10 and produced hard to find bugs. If the last external process exits successfully but with an exit code of not zero, this could cause hard to detect package failures. Available in 0.10.3+. Will be removed in 0.11.0.");
             config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
+            config.IgnoreProxy = set_feature_flag(ApplicationParameters.Features.IgnoreProxy, configFileSettings, defaultEnabled: false, description: "Ignore proxy settings from system internet options.");
         }
 
         private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings, bool defaultEnabled, string description)
@@ -361,6 +362,9 @@ namespace chocolatey.infrastructure.app.builders
                             .Add("use-system-powershell",
                                  "UseSystemPowerShell - Execute PowerShell using an external process instead of the built-in PowerShell host. Should only be used when internal host is failing. Available in 0.9.10+.",
                                  option => config.Features.UsePowerShellHost = option == null)
+                            .Add("ignore-proxy",
+                                 "IgnoreProxy - Ignore system proxy settings.",
+                                 option => config.IgnoreProxy = option != null)
                             ;
                     },
                 (unparsedArgs) =>

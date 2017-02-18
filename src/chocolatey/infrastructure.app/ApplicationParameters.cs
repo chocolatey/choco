@@ -157,6 +157,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string UseFipsCompliantChecksums = "useFipsCompliantChecksums";
             public static readonly string ScriptsCheckLastExitCode = "scriptsCheckLastExitCode";
             public static readonly string ShowNonElevatedWarnings = "showNonElevatedWarnings";
+            public static readonly string IgnoreProxy = "ignoreProxy";
         }
 
         public static class Messages
