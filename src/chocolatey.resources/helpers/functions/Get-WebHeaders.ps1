@@ -77,6 +77,7 @@ param(
   $explicitProxyUser = $env:chocolateyProxyUser
   $explicitProxyPassword = $env:chocolateyProxyPassword
   $explicitProxyBypassList = $env:chocolateyProxyBypassList
+  $explicitProxyBypassOnLocal = $env:chocolateyProxyBypassOnLocal
   if ($explicitProxy -ne $null) {
     # explicit proxy
     $proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
@@ -88,6 +89,7 @@ param(
     if ($explicitProxyBypassList -ne $null -and $explicitProxyBypassList -ne '') {
       $proxy.BypassList =  $explicitProxyBypassList.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)
     }
+    if ($explicitProxyBypassOnLocal -eq 'true') { $proxy.BypassProxyOnLocal = $true; }
 
     Write-Host "Using explicit proxy server '$explicitProxy'."
     $request.Proxy = $proxy
@@ -104,6 +106,7 @@ param(
     Write-Host "Using system proxy server '$proxyaddress'."
     $proxy = New-Object System.Net.WebProxy($proxyAddress)
     $proxy.Credentials = $creds
+    $proxy.BypassProxyOnLocal = $true
     $request.Proxy = $proxy
   }
 

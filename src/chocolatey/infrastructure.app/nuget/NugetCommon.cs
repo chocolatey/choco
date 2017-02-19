@@ -77,6 +77,8 @@ namespace chocolatey.infrastructure.app.nuget
                     proxy.BypassList = configuration.Proxy.BypassList.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 }
 
+                proxy.BypassProxyOnLocal = configuration.Proxy.BypassOnLocal;
+
                 ProxyCache.Instance.Override(proxy);
             }
 

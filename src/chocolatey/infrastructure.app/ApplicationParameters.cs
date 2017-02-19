@@ -137,6 +137,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string ProxyUser = "proxyUser";
             public static readonly string ProxyPassword = "proxyPassword";
             public static readonly string ProxyBypassList = "proxyBypassList";
+            public static readonly string ProxyBypassOnLocal = "proxyBypassOnLocal";
             public static readonly string WebRequestTimeoutSeconds = "webRequestTimeoutSeconds";
         }
         

@@ -473,5 +473,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string User { get; set; }
         public string EncryptedPassword { get; set; }
         public string BypassList { get; set; }
+        public bool BypassOnLocal { get; set; }
     }
 }

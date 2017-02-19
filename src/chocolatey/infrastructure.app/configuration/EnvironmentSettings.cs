@@ -55,6 +55,10 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, null);
+
+            Environment.SetEnvironmentVariable("chocolateyProxyLocation", null);
+            Environment.SetEnvironmentVariable("chocolateyProxyBypassList", null);
+            Environment.SetEnvironmentVariable("chocolateyProxyBypassOnLocal", null);
         }
 
         public static void set_environment_variables(ChocolateyConfiguration config)
@@ -101,6 +105,7 @@ namespace chocolatey.infrastructure.app.configuration
                 Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
 
                 if (!string.IsNullOrWhiteSpace(config.Proxy.BypassList)) Environment.SetEnvironmentVariable("chocolateyProxyBypassList", config.Proxy.BypassList);
+                if (config.Proxy.BypassOnLocal) Environment.SetEnvironmentVariable("chocolateyProxyBypassOnLocal", "true");
             }
 
             if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, "true");
