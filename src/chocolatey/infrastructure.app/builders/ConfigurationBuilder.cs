@@ -135,6 +135,9 @@ namespace chocolatey.infrastructure.app.builders
             {
                 configFileSettings.Sources.RemoveWhere(s => s.Id.is_equal_to(configSource.Id));
             }
+
+            // ensure only one licensed source - helpful when moving between licenses
+            configFileSettings.Sources.RemoveWhere(s => s.Id.is_equal_to(configSource.Id) && !NugetEncryptionUtility.DecryptString(s.Password).is_equal_to(license.Id));
         }
 
         private static void set_file_configuration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem, Action<string> notifyWarnLoggingAction)
