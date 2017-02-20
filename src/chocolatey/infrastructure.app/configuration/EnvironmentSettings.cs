@@ -87,6 +87,11 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
             Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
 
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("https_proxy"))) Environment.SetEnvironmentVariable("chocolateyProxyLocation", Environment.GetEnvironmentVariable("https_proxy"));
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("http_proxy")) && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("chocolateyProxyLocation"))) Environment.SetEnvironmentVariable("chocolateyProxyLocation", Environment.GetEnvironmentVariable("http_proxy"));
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("no_proxy"))) Environment.SetEnvironmentVariable("chocolateyProxyBypassList", Environment.GetEnvironmentVariable("no_proxy"));
+
             if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
                 var proxyCreds = string.Empty;
