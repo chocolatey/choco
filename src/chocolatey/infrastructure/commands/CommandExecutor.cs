@@ -123,7 +123,7 @@ namespace chocolatey.infrastructure.commands
 
             "chocolatey".Log().Debug(() => "Calling command ['\"{0}\" {1}']".format_with(process.escape_curly_braces(), arguments.escape_curly_braces()));
 
-            var psi = new ProcessStartInfo(process, arguments)
+            var psi = new ProcessStartInfo(process.remove_surrounding_quotes(), arguments)
                 {
                     UseShellExecute = false,
                     WorkingDirectory = workingDirectory,
