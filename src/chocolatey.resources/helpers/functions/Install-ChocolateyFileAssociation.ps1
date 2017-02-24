@@ -42,6 +42,13 @@ The file extension to be associated.
 .PARAMETER Executable
 The path to the application's executable to be associated.
 
+.PARAMETER PassedArguments
+Specifies how the file name and CLI arguments are passed to the executable.
+Default value is `"%1" "%*"`; another example: `-o "%1"`, if executable
+requires it. Use `%1`, `%2`, `%3`, etc. to refer to first, second, third,
+etc. arguments. `%*` refers to all arguments, `$~n` refers to all arguments
+starting with argument n (2 <= n <= 9).
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -57,6 +64,7 @@ Install-ChocolateyFileAssociation ".txt" $sublimeExe
 param(
   [parameter(Mandatory=$true, Position=0)][string] $extension,
   [parameter(Mandatory=$true, Position=1)][string] $executable,
+  [parameter(Mandatory=$false, Position=2)][string] $passedArguments = '"%1" "%*"',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
@@ -75,7 +83,7 @@ param(
   $fileType = $fileType.Replace(" ","_")
   $elevated = @"
     cmd /c "assoc $extension=$fileType"
-    cmd /c 'ftype $fileType="$executable" "%1" "%*"'
+    cmd /c 'ftype $fileType="$executable" $passedArguments'
     New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
     Set-ItemProperty -Path "HKCR:\$fileType" -Name "(Default)" -Value "$fileType file" -ErrorAction Stop
 "@
