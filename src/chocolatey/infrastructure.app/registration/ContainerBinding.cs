@@ -57,6 +57,7 @@ namespace chocolatey.infrastructure.app.registration
             //nuget
             container.Register<ILogger, ChocolateyNugetLogger>(Lifestyle.Singleton);
             container.Register<INugetService, NugetService>(Lifestyle.Singleton);
+            container.Register<IPackageDownloader, PackageDownloader>(Lifestyle.Singleton);
             container.Register<IPowershellService, PowershellService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageInformationService, ChocolateyPackageInformationService>(Lifestyle.Singleton);
             container.Register<IShimGenerationService, ShimGenerationService>(Lifestyle.Singleton);

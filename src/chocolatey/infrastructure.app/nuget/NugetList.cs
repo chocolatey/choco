@@ -38,7 +38,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         private static IQueryable<IPackage> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
-            var packageRepository = NugetCommon.GetRemoteRepository(configuration, nugetLogger);
+            var packageRepository = NugetCommon.GetRemoteRepository(configuration, nugetLogger, new PackageDownloader());
             var searchTerm = configuration.Input.to_lower();
 
             // Whether or not the package is remote determines two things:
