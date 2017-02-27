@@ -43,6 +43,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly ILogger _nugetLogger;
         private readonly IChocolateyPackageInformationService _packageInfoService;
         private readonly IFilesService _filesService;
+        private readonly IPackageDownloader _packageDownloader;
         private readonly Lazy<IDateTime> datetime_initializer = new Lazy<IDateTime>(() => new DateTime());
 
         private IDateTime DateTime
@@ -57,12 +58,14 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="nugetLogger">The nuget logger</param>
         /// <param name="packageInfoService">Package information service</param>
         /// <param name="filesService">The files service</param>
-        public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService, IFilesService filesService)
+        /// <param name="packageDownloader">The downloader used to download packages</param>
+        public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService, IFilesService filesService, IPackageDownloader packageDownloader)
         {
             _fileSystem = fileSystem;
             _nugetLogger = nugetLogger;
             _packageInfoService = packageInfoService;
             _filesService = filesService;
+            _packageDownloader = packageDownloader;
         }
 
         public SourceType SourceType
@@ -372,7 +375,7 @@ folder.");
             }
 
             var packageManager = NugetCommon.GetPackageManager(
-                config, _nugetLogger,
+                config, _nugetLogger, _packageDownloader,
                 installSuccessAction: (e) =>
                     {
                         var pkg = e.Package;
@@ -522,7 +525,8 @@ folder.");
 
             var packageManager = NugetCommon.GetPackageManager(
                 config,
-                _nugetLogger,
+                _nugetLogger, 
+                _packageDownloader,
                 installSuccessAction: (e) =>
                     {
                         var pkg = e.Package;
@@ -972,7 +976,7 @@ folder.");
             var packageUninstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
-            var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
+            var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger, _packageDownloader,
                                                                installSuccessAction: null,
                                                                uninstallSuccessAction: (e) =>
                                                                    {

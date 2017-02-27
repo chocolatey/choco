@@ -25,6 +25,8 @@ namespace chocolatey.infrastructure.app.configuration
 
         public bool Authenticated { get; set; }
 
+        public bool BypassProxy { get; set; }
+
         public int Priority { get; set; }
     }
 }

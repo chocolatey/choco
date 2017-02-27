@@ -126,6 +126,7 @@ This is especially helpful when running `choco upgrade` for all
         public virtual void run(ChocolateyConfiguration configuration)
         {
             var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
+                                                               new PackageDownloader(), 
                                                                installSuccessAction: null,
                                                                uninstallSuccessAction: null,
                                                                addUninstallHandler: false);

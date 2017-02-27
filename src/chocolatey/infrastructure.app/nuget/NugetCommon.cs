@@ -53,8 +53,18 @@ namespace chocolatey.infrastructure.app.nuget
             return localRepository;
         }
 
-        public static IPackageRepository GetRemoteRepository(ChocolateyConfiguration configuration, ILogger nugetLogger)
+        public static IPackageRepository GetRemoteRepository(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader)
         {
+            packageDownloader.ProgressAvailable += (sender, e) =>
+            {
+                // http://stackoverflow.com/a/888569/18475
+                Console.Write("\rProgress: {0} {1}%".format_with(e.Operation, e.PercentComplete.to_string()).PadRight(Console.WindowWidth));
+                if (e.PercentComplete == 100)
+                {
+                    Console.WriteLine("");
+                }
+            };
+
             IEnumerable<string> sources = configuration.Sources.Split(new[] {";", ","}, StringSplitOptions.RemoveEmptyEntries);
 
             IList<IPackageRepository> repositories = new List<IPackageRepository>();
@@ -71,7 +81,14 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     proxy.Credentials = new NetworkCredential(configuration.Proxy.User, NugetEncryptionUtility.DecryptString(configuration.Proxy.EncryptedPassword));
                 }
-                
+
+                if (!string.IsNullOrWhiteSpace(configuration.Proxy.BypassList))
+                {
+                    proxy.BypassList = configuration.Proxy.BypassList.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                }
+
+                proxy.BypassProxyOnLocal = configuration.Proxy.BypassOnLocal;
+
                 ProxyCache.Instance.Override(proxy);
             }
 
@@ -80,12 +97,21 @@ namespace chocolatey.infrastructure.app.nuget
             {
 
                 var source = sourceValue;
-                if (configuration.MachineSources.Any(m => m.Name.is_equal_to(source)))
+                var bypassProxy = false;
+                if (configuration.MachineSources.Any(m => m.Name.is_equal_to(source) || m.Key.is_equal_to(source)))
                 {
-                    "chocolatey".Log().Debug("Switching source name {0} to actual source value.".format_with(sourceValue));
+
                     try
                     {
-                        source = configuration.MachineSources.FirstOrDefault(m => m.Name.is_equal_to(source)).Key;
+                        var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Key.is_equal_to(source));
+                        if (machineSource == null)
+                        {
+                            machineSource = configuration.MachineSources.FirstOrDefault(m => m.Name.is_equal_to(source));
+                            "chocolatey".Log().Debug("Switching source name {0} to actual source value '{1}'.".format_with(sourceValue, machineSource.Key.to_string()));
+                            source = machineSource.Key;
+                        }
+
+                        if (machineSource != null) bypassProxy = machineSource.BypassProxy;
                     }
                     catch (Exception ex)
                     {
@@ -104,7 +130,7 @@ namespace chocolatey.infrastructure.app.nuget
                     }
                     else
                     {
-                      repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri)));
+                        repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri, bypassProxy), packageDownloader));
                     }
                 }
                 catch (Exception)
@@ -129,11 +155,11 @@ namespace chocolatey.infrastructure.app.nuget
             return repository;
         }
 
-        public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
+        public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
         {
             IFileSystem nugetPackagesFileSystem = GetNuGetFileSystem(configuration, nugetLogger);
             IPackagePathResolver pathResolver = GetPathResolver(configuration, nugetPackagesFileSystem);
-            var packageManager = new PackageManager(GetRemoteRepository(configuration, nugetLogger), pathResolver, nugetPackagesFileSystem, GetLocalRepository(pathResolver, nugetPackagesFileSystem))
+            var packageManager = new PackageManager(GetRemoteRepository(configuration, nugetLogger, packageDownloader), pathResolver, nugetPackagesFileSystem, GetLocalRepository(pathResolver, nugetPackagesFileSystem))
                 {
                     DependencyVersion = DependencyVersion.Highest,
                 };

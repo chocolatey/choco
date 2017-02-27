@@ -118,7 +118,8 @@ namespace chocolatey.infrastructure.app.builders
                 Value = ApplicationParameters.ChocolateyLicensedFeedSource,
                 UserName = "customer",
                 Password = NugetEncryptionUtility.EncryptString(license.Id),
-                Priority = 10
+                Priority = 10,
+                BypassProxy = false,
             };
 
             if (addOrUpdate && !sources.Any(s =>
@@ -134,6 +135,9 @@ namespace chocolatey.infrastructure.app.builders
             {
                 configFileSettings.Sources.RemoveWhere(s => s.Id.is_equal_to(configSource.Id));
             }
+
+            // ensure only one licensed source - helpful when moving between licenses
+            configFileSettings.Sources.RemoveWhere(s => s.Id.is_equal_to(configSource.Id) && !NugetEncryptionUtility.DecryptString(s.Password).is_equal_to(license.Id));
         }
 
         private static void set_file_configuration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem, Action<string> notifyWarnLoggingAction)
@@ -180,7 +184,8 @@ namespace chocolatey.infrastructure.app.builders
                         EncryptedPassword = source.Password,
                         Certificate = source.Certificate,
                         EncryptedCertificatePassword = source.CertificatePassword,
-                        Priority = source.Priority
+                        Priority = source.Priority,
+                        BypassProxy = source.BypassProxy,
                     });
             }
         }
@@ -231,6 +236,8 @@ namespace chocolatey.infrastructure.app.builders
             config.Proxy.Location = set_config_item(ApplicationParameters.ConfigSettings.Proxy, configFileSettings, string.Empty, "Explicit proxy location.");
             config.Proxy.User = set_config_item(ApplicationParameters.ConfigSettings.ProxyUser, configFileSettings, string.Empty, "Optional proxy user.");
             config.Proxy.EncryptedPassword = set_config_item(ApplicationParameters.ConfigSettings.ProxyPassword, configFileSettings, string.Empty, "Optional proxy password. Encrypted.");
+            config.Proxy.BypassList = set_config_item(ApplicationParameters.ConfigSettings.ProxyBypassList, configFileSettings, string.Empty, "Optional proxy bypass list. Comma separated. Available in 0.10.4+.");
+            config.Proxy.BypassOnLocal = set_config_item(ApplicationParameters.ConfigSettings.ProxyBypassOnLocal, configFileSettings, "true", "Bypass proxy for local connections. Available in 0.10.4+.").is_equal_to(bool.TrueString);
         }
 
         private static string set_config_item(string configName, ConfigFileSettings configFileSettings, string defaultValue, string description, bool forceSettingValue = false)

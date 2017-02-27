@@ -37,6 +37,7 @@ namespace chocolatey.tests.infrastructure.app.services
             protected Mock<ILogger> nugetLogger = new Mock<ILogger>();
             protected Mock<IFilesService> filesService = new Mock<IFilesService>();
             protected Mock<IPackage> package = new Mock<IPackage>();
+            protected Mock<IPackageDownloader> packageDownloader = new Mock<IPackageDownloader>();
 
             public override void Context()
             {
@@ -46,7 +47,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 filesService.ResetCalls();
                 package.ResetCalls();
 
-                service = new NugetService(fileSystem.Object, nugetLogger.Object, packageInfoService.Object, filesService.Object);
+                service = new NugetService(fileSystem.Object, nugetLogger.Object, packageInfoService.Object, filesService.Object, packageDownloader.Object);
             }
         }
 

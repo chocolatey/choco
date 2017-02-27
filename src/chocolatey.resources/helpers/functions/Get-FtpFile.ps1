@@ -103,6 +103,8 @@ param(
   $explicitProxy = $env:chocolateyProxyLocation
   $explicitProxyUser = $env:chocolateyProxyUser
   $explicitProxyPassword = $env:chocolateyProxyPassword
+  $explicitProxyBypassList = $env:chocolateyProxyBypassList
+  $explicitProxyBypassOnLocal = $env:chocolateyProxyBypassOnLocal
   if ($explicitProxy -ne $null) {
     # explicit proxy
 	  $proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
@@ -110,6 +112,11 @@ param(
 	    $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
 	    $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
 	  }
+
+    if ($explicitProxyBypassList -ne $null -and $explicitProxyBypassList -ne '') {
+      $proxy.BypassList =  $explicitProxyBypassList.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)
+    }
+    if ($explicitProxyBypassOnLocal -eq 'true') { $proxy.BypassProxyOnLocal = $true; }
 
   	Write-Host "Using explicit proxy server '$explicitProxy'."
     $ftprequest.Proxy = $proxy

@@ -55,6 +55,10 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, null);
+
+            Environment.SetEnvironmentVariable("chocolateyProxyLocation", null);
+            Environment.SetEnvironmentVariable("chocolateyProxyBypassList", null);
+            Environment.SetEnvironmentVariable("chocolateyProxyBypassOnLocal", null);
         }
 
         public static void set_environment_variables(ChocolateyConfiguration config)
@@ -83,6 +87,11 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
             Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
 
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("https_proxy"))) Environment.SetEnvironmentVariable("chocolateyProxyLocation", Environment.GetEnvironmentVariable("https_proxy"));
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("http_proxy")) && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("chocolateyProxyLocation"))) Environment.SetEnvironmentVariable("chocolateyProxyLocation", Environment.GetEnvironmentVariable("http_proxy"));
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("no_proxy"))) Environment.SetEnvironmentVariable("chocolateyProxyBypassList", Environment.GetEnvironmentVariable("no_proxy"));
+
             if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
                 var proxyCreds = string.Empty;
@@ -97,8 +106,11 @@ namespace chocolatey.infrastructure.app.configuration
                 }
 
                 Environment.SetEnvironmentVariable("http_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
-                Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
+                Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location)); 
                 Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
+
+                if (!string.IsNullOrWhiteSpace(config.Proxy.BypassList)) Environment.SetEnvironmentVariable("chocolateyProxyBypassList", config.Proxy.BypassList);
+                if (config.Proxy.BypassOnLocal) Environment.SetEnvironmentVariable("chocolateyProxyBypassOnLocal", "true");
             }
 
             if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, "true");
