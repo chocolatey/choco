@@ -31,13 +31,7 @@ namespace chocolatey.infrastructure.app.nuget
     {
         public static IFileSystem GetNuGetFileSystem(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
-            var fileSystem = new ChocolateyPhysicalFileSystem(ApplicationParameters.PackagesLocation);
-            if (configuration.Debug)
-            {
-                fileSystem.Logger = nugetLogger;
-            }
-
-            return fileSystem;
+            return new ChocolateyPhysicalFileSystem(ApplicationParameters.PackagesLocation) { Logger = nugetLogger };
         }
 
         public static IPackagePathResolver GetPathResolver(ChocolateyConfiguration configuration, IFileSystem nugetPackagesFileSystem)
@@ -45,12 +39,10 @@ namespace chocolatey.infrastructure.app.nuget
             return new ChocolateyPackagePathResolver(nugetPackagesFileSystem, configuration.AllowMultipleVersions);
         }
 
-        public static IPackageRepository GetLocalRepository(IPackagePathResolver pathResolver, IFileSystem nugetPackagesFileSystem)
+        public static IPackageRepository GetLocalRepository(IPackagePathResolver pathResolver, IFileSystem nugetPackagesFileSystem, ILogger nugetLogger)
         {
-            IPackageRepository localRepository = new ChocolateyLocalPackageRepository(pathResolver, nugetPackagesFileSystem);
-            localRepository.PackageSaveMode = PackageSaveModes.Nupkg | PackageSaveModes.Nuspec;
-
-            return localRepository;
+            return new ChocolateyLocalPackageRepository(pathResolver, nugetPackagesFileSystem) 
+                       { Logger = nugetLogger, PackageSaveMode = PackageSaveModes.Nupkg | PackageSaveModes.Nuspec };
         }
 
         public static IPackageRepository GetRemoteRepository(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader)
@@ -126,16 +118,16 @@ namespace chocolatey.infrastructure.app.nuget
                     var uri = new Uri(source);
                     if (uri.IsFile || uri.IsUnc)
                     {
-                        repositories.Add(new ChocolateyLocalPackageRepository(uri.LocalPath));
+                        repositories.Add(new ChocolateyLocalPackageRepository(uri.LocalPath){ Logger = nugetLogger });
                     }
                     else
                     {
-                        repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri, bypassProxy), packageDownloader));
+                        repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri, bypassProxy) { UserAgent = "Chocolatey Core" }, packageDownloader) { Logger = nugetLogger });
                     }
                 }
                 catch (Exception)
                 {
-                    repositories.Add(new ChocolateyLocalPackageRepository(source));
+                    repositories.Add(new ChocolateyLocalPackageRepository(source){ Logger = nugetLogger });
                 }
             }
 
@@ -145,29 +137,25 @@ namespace chocolatey.infrastructure.app.nuget
             }
 
             //todo well that didn't work on failing repos... grrr
-            var repository = new AggregateRepository(repositories) {IgnoreFailingRepositories = true};
-            repository.ResolveDependenciesVertically = true;
-            if (configuration.Debug)
+            var repository = new AggregateRepository(repositories)
             {
-                repository.Logger = nugetLogger;
-            }
+                IgnoreFailingRepositories = true,
+                Logger = nugetLogger,
+                ResolveDependenciesVertically = true
+            };
 
             return repository;
         }
-
+        
         public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
         {
             IFileSystem nugetPackagesFileSystem = GetNuGetFileSystem(configuration, nugetLogger);
             IPackagePathResolver pathResolver = GetPathResolver(configuration, nugetPackagesFileSystem);
-            var packageManager = new PackageManager(GetRemoteRepository(configuration, nugetLogger, packageDownloader), pathResolver, nugetPackagesFileSystem, GetLocalRepository(pathResolver, nugetPackagesFileSystem))
+            var packageManager = new PackageManager(GetRemoteRepository(configuration, nugetLogger, packageDownloader), pathResolver, nugetPackagesFileSystem, GetLocalRepository(pathResolver, nugetPackagesFileSystem, nugetLogger))
                 {
                     DependencyVersion = DependencyVersion.Highest,
+                    Logger = nugetLogger,
                 };
-
-            if (configuration.Debug)
-            {
-                packageManager.Logger = nugetLogger;
-            }
 
             //NOTE DO NOT EVER use this method - packageManager.PackageInstalling += (s, e) =>
             packageManager.PackageInstalled += (s, e) =>
