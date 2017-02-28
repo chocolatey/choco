@@ -34,7 +34,7 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
 
 $script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','pack','push','-h','--help','pin','source','config','feature','apikey')
 
-$allcommands = " --debug --verbose --force --noop --help --accept-license --confirm --limit-output --execution-timeout= --cache-location='' --fail-on-error-output --use-system-powershell"
+$allcommands = " --debug --verbose --force --noop --help --accept-license --confirm --limit-output --no-progress --execution-timeout= --cache-location='' --proxy='' --proxy-user= --proxy-password= --proxy-bypass-list='' --proxy-bypass-on-local --fail-on-error-output --use-system-powershell"
 $proInstallUpgradeOptions = " --install-directory='Pro/Biz editions' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum="
 $proNewOptions = " --file=<biz>"
 
