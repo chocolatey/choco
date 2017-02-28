@@ -41,8 +41,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         public static IPackageRepository GetLocalRepository(IPackagePathResolver pathResolver, IFileSystem nugetPackagesFileSystem, ILogger nugetLogger)
         {
-            return new ChocolateyLocalPackageRepository(pathResolver, nugetPackagesFileSystem) 
-                       { Logger = nugetLogger, PackageSaveMode = PackageSaveModes.Nupkg | PackageSaveModes.Nuspec };
+            return new ChocolateyLocalPackageRepository(pathResolver, nugetPackagesFileSystem) { Logger = nugetLogger, PackageSaveMode = PackageSaveModes.Nupkg | PackageSaveModes.Nuspec };
         }
 
         public static IPackageRepository GetRemoteRepository(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader)
@@ -121,7 +120,7 @@ namespace chocolatey.infrastructure.app.nuget
                     var uri = new Uri(source);
                     if (uri.IsFile || uri.IsUnc)
                     {
-                        repositories.Add(new ChocolateyLocalPackageRepository(uri.LocalPath){ Logger = nugetLogger });
+                        repositories.Add(new ChocolateyLocalPackageRepository(uri.LocalPath) { Logger = nugetLogger });
                     }
                     else
                     {
@@ -130,7 +129,7 @@ namespace chocolatey.infrastructure.app.nuget
                 }
                 catch (Exception)
                 {
-                    repositories.Add(new ChocolateyLocalPackageRepository(source){ Logger = nugetLogger });
+                    repositories.Add(new ChocolateyLocalPackageRepository(source) { Logger = nugetLogger });
                 }
             }
 
@@ -149,7 +148,7 @@ namespace chocolatey.infrastructure.app.nuget
 
             return repository;
         }
-        
+
         public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
         {
             IFileSystem nugetPackagesFileSystem = GetNuGetFileSystem(configuration, nugetLogger);
@@ -165,9 +164,9 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     var pkg = e.Package;
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".format_with(
-                        Environment.NewLine, 
-                        pkg.Id, 
-                        pkg.Version.to_string(), 
+                        Environment.NewLine,
+                        pkg.Id,
+                        pkg.Version.to_string(),
                         configuration.Force ? " (forced)" : string.Empty,
                         pkg.IsApproved ? " [Approved]" : string.Empty,
                         pkg.PackageTestResultStatus == "Failing" && pkg.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : pkg.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
