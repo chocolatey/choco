@@ -78,6 +78,7 @@ namespace chocolatey.infrastructure.app.nuget
 
                 if (!string.IsNullOrWhiteSpace(configuration.Proxy.BypassList))
                 {
+                    "chocolatey".Log().Debug("Proxy has a bypass list of {0}");
                     proxy.BypassList = configuration.Proxy.BypassList.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 }
 
@@ -104,7 +105,11 @@ namespace chocolatey.infrastructure.app.nuget
                             source = machineSource.Key;
                         }
 
-                        if (machineSource != null) bypassProxy = machineSource.BypassProxy;
+                        if (machineSource != null)
+                        {
+                            "chocolatey".Log().Debug("Source '{0}' is configured to bypass proxies.".format_with(source));
+                            bypassProxy = machineSource.BypassProxy;
+                        }
                     }
                     catch (Exception ex)
                     {
