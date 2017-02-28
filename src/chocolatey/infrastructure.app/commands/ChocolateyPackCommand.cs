@@ -39,7 +39,7 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("version=",
                      "Version - The version you would like to insert into the package.",
                      option => configuration.Version = option.remove_surrounding_quotes())
-                .Add("outputdirectory=",
+                .Add("out=|outdir=|outputdirectory=|output-directory=",
                      "OutputDirectory - Specifies the directory for the created Chocolatey package file. If not specified, uses the current directory.",
                      option => configuration.OutputDirectory = option)
                 ;

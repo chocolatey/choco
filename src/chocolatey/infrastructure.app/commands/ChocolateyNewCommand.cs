@@ -58,7 +58,7 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("maintainer=",
                      "Maintainer - the name of the maintainer. Can also be passed as the property MaintainerName=somevalue",
                      option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.MaintainerPropertyName, option.remove_surrounding_quotes()))
-                .Add("outputdirectory=",
+                .Add("out=|outdir=|outputdirectory=|output-directory=",
                     "OutputDirectory - Specifies the directory for the created Chocolatey package file. If not specified, uses the current directory. Available in 0.9.10+.",
                     option => configuration.OutputDirectory = option)
                 .Add("built-in|built-in-template|originaltemplate|original-template|use-original-template|use-built-in-template",
