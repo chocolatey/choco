@@ -64,7 +64,7 @@ namespace chocolatey.infrastructure.app.runners
 
                 commandArgs.Add(arg);
             }
-
+            
             var runner = new GenericRunner();
             runner.run(config, container, isConsole: true, parseArgs: command =>
                 {
@@ -89,6 +89,7 @@ namespace chocolatey.infrastructure.app.runners
                                     if (unparsedArg.StartsWith("-") || unparsedArg.StartsWith("/"))
                                     {
                                         config.HelpRequested = true;
+                                        config.UnsuccessfulParsing = true;
                                     }
                                 }
                             }
