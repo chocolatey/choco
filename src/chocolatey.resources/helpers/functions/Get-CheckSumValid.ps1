@@ -202,7 +202,7 @@ param(
   Write-Debug "Command [`'$checksumExe`' $params] exited with `'$exitCode`'."
 
   if ($exitCode -ne 0) {
-    throw "Checksum for '$file' did not meet '$checksum' for checksum type '$checksumType'. Consider passing --ignore-checksums if necessary."
+    throw "Checksum for '$file' did not meet '$checksum' for checksum type '$checksumType'. Consider passing the actual checksums through with `--checksum --checksum64` once you validate the checksums are appropriate. A less secure option is to pass `--ignore-checksums` if necessary."
   }
 
   #$fileCheckSumActual = $md5Output.Split(' ')[0]
