@@ -94,7 +94,6 @@ namespace chocolatey.infrastructure.app.nuget
                 var bypassProxy = false;
                 if (configuration.MachineSources.Any(m => m.Name.is_equal_to(source) || m.Key.is_equal_to(source)))
                 {
-
                     try
                     {
                         var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Key.is_equal_to(source));
