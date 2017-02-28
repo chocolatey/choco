@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Net;
     using NuGet;
     using adapters;
     using commandline;
@@ -468,7 +469,15 @@ folder.");
                 }
                 catch (Exception ex)
                 {
-                    var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
+                    var message = ex.Message;
+                    var webException = ex as System.Net.WebException;
+                    if (webException != null)
+                    {
+                        var response = webException.Response as HttpWebResponse;
+                        if (response != null && !string.IsNullOrWhiteSpace(response.StatusDescription)) message += " {0}".format_with(response.StatusDescription);
+                    }
+
+                    var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, message);
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     var errorResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                     errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -748,7 +757,15 @@ folder.");
                         }
                         catch (Exception ex)
                         {
-                            var logMessage = "{0} not upgraded. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
+                            var message = ex.Message;
+                            var webException = ex as System.Net.WebException;
+                            if (webException != null)
+                            {
+                                var response = webException.Response as HttpWebResponse;
+                                if (response != null && !string.IsNullOrWhiteSpace(response.StatusDescription)) message += " {0}".format_with(response.StatusDescription);
+                            }
+
+                            var logMessage = "{0} not upgraded. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, message);
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
                             packageResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                             if (packageResult.ExitCode == 0) packageResult.ExitCode = 1;

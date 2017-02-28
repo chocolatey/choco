@@ -31,13 +31,7 @@ namespace chocolatey.infrastructure.app.nuget
     {
         public static IFileSystem GetNuGetFileSystem(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
-            var fileSystem = new ChocolateyPhysicalFileSystem(ApplicationParameters.PackagesLocation);
-            if (configuration.Debug)
-            {
-                fileSystem.Logger = nugetLogger;
-            }
-
-            return fileSystem;
+            return new ChocolateyPhysicalFileSystem(ApplicationParameters.PackagesLocation) { Logger = nugetLogger };
         }
 
         public static IPackagePathResolver GetPathResolver(ChocolateyConfiguration configuration, IFileSystem nugetPackagesFileSystem)
@@ -45,27 +39,27 @@ namespace chocolatey.infrastructure.app.nuget
             return new ChocolateyPackagePathResolver(nugetPackagesFileSystem, configuration.AllowMultipleVersions);
         }
 
-        public static IPackageRepository GetLocalRepository(IPackagePathResolver pathResolver, IFileSystem nugetPackagesFileSystem)
+        public static IPackageRepository GetLocalRepository(IPackagePathResolver pathResolver, IFileSystem nugetPackagesFileSystem, ILogger nugetLogger)
         {
-            IPackageRepository localRepository = new ChocolateyLocalPackageRepository(pathResolver, nugetPackagesFileSystem);
-            localRepository.PackageSaveMode = PackageSaveModes.Nupkg | PackageSaveModes.Nuspec;
-
-            return localRepository;
+            return new ChocolateyLocalPackageRepository(pathResolver, nugetPackagesFileSystem) { Logger = nugetLogger, PackageSaveMode = PackageSaveModes.Nupkg | PackageSaveModes.Nuspec };
         }
 
         public static IPackageRepository GetRemoteRepository(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader)
         {
-            packageDownloader.ProgressAvailable += (sender, e) =>
+            if (configuration.Features.ShowDownloadProgress)
             {
-                // http://stackoverflow.com/a/888569/18475
-                Console.Write("\rProgress: {0} {1}%".format_with(e.Operation, e.PercentComplete.to_string()).PadRight(Console.WindowWidth));
-                if (e.PercentComplete == 100)
+                packageDownloader.ProgressAvailable += (sender, e) =>
                 {
-                    Console.WriteLine("");
-                }
-            };
-
-            IEnumerable<string> sources = configuration.Sources.Split(new[] {";", ","}, StringSplitOptions.RemoveEmptyEntries);
+                    // http://stackoverflow.com/a/888569/18475
+                    Console.Write("\rProgress: {0} {1}%".format_with(e.Operation, e.PercentComplete.to_string()).PadRight(Console.WindowWidth));
+                    if (e.PercentComplete == 100)
+                    {
+                        Console.WriteLine("");
+                    }
+                };
+            }
+            
+            IEnumerable<string> sources = configuration.Sources.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
 
             IList<IPackageRepository> repositories = new List<IPackageRepository>();
 
@@ -126,16 +120,16 @@ namespace chocolatey.infrastructure.app.nuget
                     var uri = new Uri(source);
                     if (uri.IsFile || uri.IsUnc)
                     {
-                        repositories.Add(new ChocolateyLocalPackageRepository(uri.LocalPath));
+                        repositories.Add(new ChocolateyLocalPackageRepository(uri.LocalPath) { Logger = nugetLogger });
                     }
                     else
                     {
-                        repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri, bypassProxy), packageDownloader));
+                        repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri, bypassProxy) { UserAgent = "Chocolatey Core" }, packageDownloader) { Logger = nugetLogger });
                     }
                 }
                 catch (Exception)
                 {
-                    repositories.Add(new ChocolateyLocalPackageRepository(source));
+                    repositories.Add(new ChocolateyLocalPackageRepository(source) { Logger = nugetLogger });
                 }
             }
 
@@ -145,12 +139,12 @@ namespace chocolatey.infrastructure.app.nuget
             }
 
             //todo well that didn't work on failing repos... grrr
-            var repository = new AggregateRepository(repositories) {IgnoreFailingRepositories = true};
-            repository.ResolveDependenciesVertically = true;
-            if (configuration.Debug)
+            var repository = new AggregateRepository(repositories)
             {
-                repository.Logger = nugetLogger;
-            }
+                IgnoreFailingRepositories = true,
+                Logger = nugetLogger,
+                ResolveDependenciesVertically = true
+            };
 
             return repository;
         }
@@ -159,24 +153,20 @@ namespace chocolatey.infrastructure.app.nuget
         {
             IFileSystem nugetPackagesFileSystem = GetNuGetFileSystem(configuration, nugetLogger);
             IPackagePathResolver pathResolver = GetPathResolver(configuration, nugetPackagesFileSystem);
-            var packageManager = new PackageManager(GetRemoteRepository(configuration, nugetLogger, packageDownloader), pathResolver, nugetPackagesFileSystem, GetLocalRepository(pathResolver, nugetPackagesFileSystem))
+            var packageManager = new PackageManager(GetRemoteRepository(configuration, nugetLogger, packageDownloader), pathResolver, nugetPackagesFileSystem, GetLocalRepository(pathResolver, nugetPackagesFileSystem, nugetLogger))
                 {
                     DependencyVersion = DependencyVersion.Highest,
+                    Logger = nugetLogger,
                 };
-
-            if (configuration.Debug)
-            {
-                packageManager.Logger = nugetLogger;
-            }
 
             //NOTE DO NOT EVER use this method - packageManager.PackageInstalling += (s, e) =>
             packageManager.PackageInstalled += (s, e) =>
                 {
                     var pkg = e.Package;
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".format_with(
-                        Environment.NewLine, 
-                        pkg.Id, 
-                        pkg.Version.to_string(), 
+                        Environment.NewLine,
+                        pkg.Id,
+                        pkg.Version.to_string(),
                         configuration.Force ? " (forced)" : string.Empty,
                         pkg.IsApproved ? " [Approved]" : string.Empty,
                         pkg.PackageTestResultStatus == "Failing" && pkg.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : pkg.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
