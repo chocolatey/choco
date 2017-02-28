@@ -280,6 +280,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.UsePackageExitCodes = set_feature_flag(ApplicationParameters.Features.UsePackageExitCodes, configFileSettings, defaultEnabled: true, description: "Use Package Exit Codes - Package scripts can provide exit codes. With this on, package exit codes will be what choco uses for exit when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. With this feature off, choco will exit with a 0 or a 1 (matching previous behavior). Available in 0.9.10+.");
             config.Features.UseFipsCompliantChecksums = set_feature_flag(ApplicationParameters.Features.UseFipsCompliantChecksums, configFileSettings, defaultEnabled: false, description: "Use FIPS Compliant Checksums - Ensure checksumming done by choco uses FIPS compliant algorithms. Not recommended unless required by FIPS Mode. Enabling on an existing installation could have unintended consequences related to upgrades/uninstalls. Available in 0.9.10+.");
             config.Features.ShowNonElevatedWarnings = set_feature_flag(ApplicationParameters.Features.ShowNonElevatedWarnings, configFileSettings, defaultEnabled: true, description: "Show Non-Elevated Warnings - Display non-elevated warnings. Available in 0.10.4+.");
+            config.Features.ShowDownloadProgress = set_feature_flag(ApplicationParameters.Features.ShowDownloadProgress, configFileSettings, defaultEnabled: true, description: "Show Download Progress - Show download progress percentages in the CLI. Available in 0.10.4+.");
             config.Features.ScriptsCheckLastExitCode = set_feature_flag(ApplicationParameters.Features.ScriptsCheckLastExitCode, configFileSettings, defaultEnabled: false, description: "Scripts Check $LastExitCode (external commands) - Leave this off unless you absolutely need it while you fix your package scripts  to use `throw 'error message'` or `Set-PowerShellExitCode #` instead of `exit #`. This behavior started in 0.9.10 and produced hard to find bugs. If the last external process exits successfully but with an exit code of not zero, this could cause hard to detect package failures. Available in 0.10.3+. Will be removed in 0.11.0.");
             config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
         }
@@ -368,6 +369,9 @@ namespace chocolatey.infrastructure.app.builders
                             .Add("use-system-powershell",
                                  "UseSystemPowerShell - Execute PowerShell using an external process instead of the built-in PowerShell host. Should only be used when internal host is failing. Available in 0.9.10+.",
                                  option => config.Features.UsePowerShellHost = option == null)
+                            .Add("no-progress",
+                                 "Do Not Show Progress - Do not show download progress percentages. Available in 0.10.4+.",
+                                 option => config.Features.ShowDownloadProgress = option == null)
                             ;
                     },
                 (unparsedArgs) =>

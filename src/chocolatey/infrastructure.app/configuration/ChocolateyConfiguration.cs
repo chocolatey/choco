@@ -353,6 +353,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool UsePackageExitCodes { get; set; }
         public bool UseFipsCompliantChecksums { get; set; }
         public bool ShowNonElevatedWarnings { get; set; }
+        public bool ShowDownloadProgress { get; set; }
         //todo remove in 0.11.0
         public bool ScriptsCheckLastExitCode { get; set; }
     }

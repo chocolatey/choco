@@ -47,17 +47,20 @@ namespace chocolatey.infrastructure.app.nuget
 
         public static IPackageRepository GetRemoteRepository(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader)
         {
-            packageDownloader.ProgressAvailable += (sender, e) =>
+            if (configuration.Features.ShowDownloadProgress)
             {
-                // http://stackoverflow.com/a/888569/18475
-                Console.Write("\rProgress: {0} {1}%".format_with(e.Operation, e.PercentComplete.to_string()).PadRight(Console.WindowWidth));
-                if (e.PercentComplete == 100)
+                packageDownloader.ProgressAvailable += (sender, e) =>
                 {
-                    Console.WriteLine("");
-                }
-            };
-
-            IEnumerable<string> sources = configuration.Sources.Split(new[] {";", ","}, StringSplitOptions.RemoveEmptyEntries);
+                    // http://stackoverflow.com/a/888569/18475
+                    Console.Write("\rProgress: {0} {1}%".format_with(e.Operation, e.PercentComplete.to_string()).PadRight(Console.WindowWidth));
+                    if (e.PercentComplete == 100)
+                    {
+                        Console.WriteLine("");
+                    }
+                };
+            }
+            
+            IEnumerable<string> sources = configuration.Sources.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
 
             IList<IPackageRepository> repositories = new List<IPackageRepository>();
 
