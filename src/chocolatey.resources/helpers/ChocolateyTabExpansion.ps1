@@ -32,7 +32,7 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
       where { $_ -like "$filter*" }
 }
 
-$script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','pack','push','-h','--help','pin','source','config','feature','apikey')
+$script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','pack','push','sync','-h','--help','pin','source','config','feature','apikey')
 
 $allcommands = " --debug --verbose --force --noop --help --accept-license --confirm --limit-output --no-progress --execution-timeout= --cache-location='' --proxy='' --proxy-user= --proxy-password= --proxy-bypass-list='' --proxy-bypass-on-local --fail-on-error-output --use-system-powershell"
 $proInstallUpgradeOptions = " --install-directory='Pro/Biz editions' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum="
@@ -47,14 +47,15 @@ $commandOptions = @{
   outdated = "-? --source='' --user= --password=" + $allcommands
   upgrade = "-y -whatif -? --pre --version= --except='' --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user= --password= --prerelease --forcex86 --not-silent --package-parameters='' --allow-downgrade --allow-multiple-versions --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --fail-on-unfound --fail-on-not-installed --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64=''" + $allcommands + $proInstallUpgradeOptions
   uninstall = "-y -whatif -? --force-dependencies --remove-dependencies --all-versions --source='windowsfeatures' --source='webpi' --version= --uninstall-arguments='' --override-arguments --not-silent --params='' --package-parameters='' --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --use-autouninstaller --skip-autouninstaller --fail-on-autouninstaller --ignore-autouninstaller-failure" + $allcommands
-  new = "--template-name= --file='Biz editions only' --automaticpackage --version= --maintainer='' packageversion= maintainername='' maintainerrepo='' installertype= url='' url64='' silentargs='' --use-built-in-template -?" + $allcommands
+  new = "--template-name= --file='Biz editions only' --from-programs-and-features='Biz editions only' --output-directory='' --automaticpackage --version= --maintainer='' packageversion= maintainername='' maintainerrepo='' installertype= url='' url64='' silentargs='' --use-built-in-template --keep-remote --use-original-location --checksum --checksum64 --build-package -?" + $allcommands
   pack = "--version= -?" + $allcommands
   push = "--source='' --api-key= --timeout= -?" + $allcommands
   source = "--name= --source='' --user= --password= --priority= -?" + $allcommands
   config = "--name= --value= -?" + $allcommands
   feature = "--name= -?" + $allcommands
   apikey = "--source='' --api-key= -?" + $allcommands
-  download = "--recompile --resources-location --outputdirectory -?" + $allcommands
+  download = "--internalize --ignore-dependencies --resources-location= --download-location= --outputdirectory= --source='' --version='' --prerelease --user= --password= --cert='' --certpassword= -?" + $allcommands
+  sync = "--output-directory= -?" + $allcommands
 }
 
 try {
