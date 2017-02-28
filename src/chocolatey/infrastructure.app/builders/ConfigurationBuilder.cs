@@ -474,6 +474,21 @@ You can pass options and switches in the following ways:
             config.Information.IsInteractive = Environment.UserInteractive;
             config.Information.IsUserAdministrator = ProcessInformation.user_is_administrator();
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("https_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
+            {
+                config.Proxy.Location = Environment.GetEnvironmentVariable("https_proxy");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("http_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
+            {
+                config.Proxy.Location = Environment.GetEnvironmentVariable("http_proxy");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("no_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.BypassList))
+            {
+                config.Proxy.BypassList = Environment.GetEnvironmentVariable("no_proxy");
+            }
         }
 
         private static void set_licensed_options(ChocolateyConfiguration config, ChocolateyLicense license, ConfigFileSettings configFileSettings)
