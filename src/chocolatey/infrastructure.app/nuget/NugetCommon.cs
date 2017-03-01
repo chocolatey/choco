@@ -78,6 +78,7 @@ namespace chocolatey.infrastructure.app.nuget
 
                 if (!string.IsNullOrWhiteSpace(configuration.Proxy.BypassList))
                 {
+                    "chocolatey".Log().Debug("Proxy has a bypass list of '{0}'.");
                     proxy.BypassList = configuration.Proxy.BypassList.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 }
 
@@ -94,7 +95,6 @@ namespace chocolatey.infrastructure.app.nuget
                 var bypassProxy = false;
                 if (configuration.MachineSources.Any(m => m.Name.is_equal_to(source) || m.Key.is_equal_to(source)))
                 {
-
                     try
                     {
                         var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Key.is_equal_to(source));
@@ -105,7 +105,11 @@ namespace chocolatey.infrastructure.app.nuget
                             source = machineSource.Key;
                         }
 
-                        if (machineSource != null) bypassProxy = machineSource.BypassProxy;
+                        if (machineSource != null)
+                        {
+                            bypassProxy = machineSource.BypassProxy;
+                            if (bypassProxy) "chocolatey".Log().Debug("Source '{0}' is configured to bypass proxies.".format_with(source));
+                        }
                     }
                     catch (Exception ex)
                     {
