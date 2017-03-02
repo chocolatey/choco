@@ -153,9 +153,10 @@ namespace chocolatey.infrastructure.app.nuget
             return repository;
         }
 
+        // keep this here for the licensed edition for now
         public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler) 
         {
-            return GetPackageManager(configuration,nugetLogger,new PackageDownloader(), installSuccessAction, uninstallSuccessAction, addUninstallHandler);
+            return GetPackageManager(configuration, nugetLogger, new PackageDownloader(), installSuccessAction, uninstallSuccessAction, addUninstallHandler);
         }
 
         public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
