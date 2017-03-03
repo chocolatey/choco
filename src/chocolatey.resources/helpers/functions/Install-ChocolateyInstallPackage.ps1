@@ -257,9 +257,9 @@ Pro / Business supports a single, ubiquitous install directory option.
   if($fileType -like 'msu') {
     if ($overrideArguments) {
       Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
-      $msuArgs = "$file $additionalInstallArgs"
+      $msuArgs = "`"$file`" $additionalInstallArgs"
     } else {
-      $msuArgs = "$file $silentArgs $additionalInstallArgs"
+      $msuArgs = "`"$file`" $silentArgs $additionalInstallArgs"
     }
     $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
   }
