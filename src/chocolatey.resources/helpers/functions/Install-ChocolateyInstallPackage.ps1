@@ -205,10 +205,12 @@ Pro / Business supports a single, ubiquitous install directory option.
   }
 
   $ignoreFile = $file + '.ignore'
-  try {
-    '' | out-file $ignoreFile
-  } catch {
-    Write-Warning "Unable to generate `'$ignoreFile`'"
+  if ($env:ChocolateyInstall -and $ignoreFile -match "$env:ChocolateyInstall") {
+    try {
+      '' | out-file $ignoreFile
+    } catch {
+      Write-Warning "Unable to generate `'$ignoreFile`'"
+    }
   }
 
   $workingDirectory = Get-Location
