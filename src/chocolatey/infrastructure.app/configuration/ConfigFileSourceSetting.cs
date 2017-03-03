@@ -37,6 +37,9 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "bypassProxy")]
         public bool BypassProxy { get; set; }
 
+        [XmlAttribute(AttributeName = "selfService")]
+        public bool AllowSelfService { get; set; }
+
         [XmlAttribute(AttributeName = "user")]
         public string UserName { get; set; }
 

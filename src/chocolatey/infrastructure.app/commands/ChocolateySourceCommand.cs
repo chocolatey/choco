@@ -63,9 +63,12 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("priority=",
                      "Priority - The priority order of this source as compared to other sources, lower is better. Defaults to 0 (no priority). All priorities above 0 will be evaluated first, then zero-based values will be evaluated in config file order. Available in 0.9.9.9+.",
                      option => configuration.SourceCommand.Priority = int.Parse(option.remove_surrounding_quotes())) 
-                 .Add("bypassProxy",
-                     "BypassProxy - Should this source explicitly bypass any explicitly or system configured proxies? Defaults to false. Available in 0.10.4+.",
+                 .Add("bypassproxy|bypass-proxy",
+                     "Bypass Proxy - Should this source explicitly bypass any explicitly or system configured proxies? Defaults to false. Available in 0.10.4+.",
                      option => configuration.SourceCommand.BypassProxy = option != null)
+                 .Add("allowselfservice|allow-self-service",
+                     "Allow Self-Service - Should this source be allowed to be used with self-service? Requires business edition. Defaults to false. Available in 0.10.4+.",
+                     option => configuration.SourceCommand.AllowSelfService = option != null)
                 ;
         }
 

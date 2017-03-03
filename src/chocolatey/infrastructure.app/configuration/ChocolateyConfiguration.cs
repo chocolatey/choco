@@ -417,6 +417,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string Certificate { get; set; }
         public string CertificatePassword { get; set; }
         public bool BypassProxy { get; set; }
+        public bool AllowSelfService { get; set; }
     }
 
     [Serializable]
@@ -430,6 +431,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string Certificate { get; set; }
         public string EncryptedCertificatePassword { get; set; }
         public bool BypassProxy { get; set; }
+        public bool AllowSelfService { get; set; }
     }
 
     [Serializable]

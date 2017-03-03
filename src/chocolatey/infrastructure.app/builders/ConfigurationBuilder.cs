@@ -120,6 +120,7 @@ namespace chocolatey.infrastructure.app.builders
                 Password = NugetEncryptionUtility.EncryptString(license.Id),
                 Priority = 10,
                 BypassProxy = false,
+                AllowSelfService = false,
             };
 
             if (addOrUpdate && !sources.Any(s =>
@@ -186,6 +187,7 @@ namespace chocolatey.infrastructure.app.builders
                         EncryptedCertificatePassword = source.CertificatePassword,
                         Priority = source.Priority,
                         BypassProxy = source.BypassProxy,
+                        AllowSelfService = source.AllowSelfService,
                     });
             }
         }
