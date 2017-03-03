@@ -111,6 +111,7 @@ namespace chocolatey.console
 
                 Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug, excludeLoggerName: "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()));
                 Log4NetAppenderConfiguration.set_verbose_logger_when_verbose(config.Verbose, config.Debug, "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()));
+                Log4NetAppenderConfiguration.set_trace_logger_when_trace(config.Trace, "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Trace.to_string()));
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.Information.PlatformType, config.Information.PlatformVersion.to_string()));
                 //"chocolatey".Log().Debug(() => "Command Line: {0}".format_with(Environment.CommandLine));
 

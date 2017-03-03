@@ -327,8 +327,11 @@ namespace chocolatey.infrastructure.app.builders
                              "Debug - Show debug messaging.",
                              option => config.Debug = option != null)
                         .Add("v|verbose",
-                             "Verbose - Show verbose messaging.",
+                             "Verbose - Show verbose messaging. Very verbose messaging, avoid using under normal circumstances.",
                              option => config.Verbose = option != null)
+                        .Add("trace",
+                             "Trace - Show trace messaging. Very, very verbose trace messaging. Avoid except when needing super low-level .NET Framework debugging. Available in 0.10.4+.",
+                             option => config.Trace = option != null)
                         .Add("acceptlicense|accept-license",
                              "AcceptLicense - Accept license dialogs automatically. Reserved for future use.",
                              option => config.AcceptLicense = option != null)

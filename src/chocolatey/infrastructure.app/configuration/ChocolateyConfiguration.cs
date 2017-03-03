@@ -153,6 +153,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         public bool Debug { get; set; }
         public bool Verbose { get; set; }
+        public bool Trace { get; set; }
         public bool Force { get; set; }
         public bool Noop { get; set; }
         public bool HelpRequested { get; set; }
