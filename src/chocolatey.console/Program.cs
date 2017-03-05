@@ -74,6 +74,8 @@ namespace chocolatey.console
 
                 trap_exit_scenarios(config);
 
+                warn_on_nuspec_or_nupkg_usage(args, config);
+
                 if (config.RegularOutput)
                 {
                     "LogFileOnly".Log().Info(() => "".PadRight(60, '='));
@@ -155,6 +157,14 @@ namespace chocolatey.console
                 pause_execution_if_debug();
                 Bootstrap.shutdown();
                 Environment.Exit(Environment.ExitCode);
+            }
+        }
+
+        private static void warn_on_nuspec_or_nupkg_usage(string[] args, ChocolateyConfiguration config)
+        {
+            if (args.Any(a => a.contains(".nupkg") || a.contains(".nuspec")))
+            {
+                if (config.RegularOutput) "chocolatey".Log().Warn("The use of .nupkg or .nuspec in for package name or source is known to cause issues. Please use the package id from the nuspec `<id />` with `-s .` (for local folder where nupkg is found).");
             }
         }
 
