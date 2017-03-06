@@ -162,7 +162,7 @@ namespace chocolatey.console
 
         private static void warn_on_nuspec_or_nupkg_usage(string[] args, ChocolateyConfiguration config)
         {
-            if (args.Any(a => a.contains(".nupkg") || a.contains(".nuspec")))
+            if (!args.Any(a => a.contains("pack") || a.contains("push")) && args.Any(a => a.contains(".nupkg") || a.contains(".nuspec")))
             {
                 if (config.RegularOutput) "chocolatey".Log().Warn("The use of .nupkg or .nuspec in for package name or source is known to cause issues. Please use the package id from the nuspec `<id />` with `-s .` (for local folder where nupkg is found).");
             }
