@@ -79,6 +79,18 @@ you can get it to the path with
 
 In 0.10.1+, `FileFullPath` is an alias for File.
 
+This can be a 32-bit or 64-bit file. This is mandatory in earlier versions
+of Chocolatey, but optional if File64 has been provided.
+
+.PARAMETER File64
+Full file path to a 64-bit native installer to run. Available in 0.10.4+.
+If embedding in the package, you can get it to the path with
+`"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
+
+Provide this when you want to provide both 32-bit and 64-bit
+installers or explicitly only a 64-bit installer (which will cause a package 
+install failure on 32-bit systems).
+
 .PARAMETER ValidExitCodes
 Array of exit codes indicating success. Defaults to `@(0)`.
 
@@ -146,7 +158,8 @@ param(
   [parameter(Mandatory=$false, Position=1)]
   [alias("installerType","installType")][string] $fileType = 'exe',
   [parameter(Mandatory=$false, Position=2)][string[]] $silentArgs = '',
-  [alias("fileFullPath")][parameter(Mandatory=$true, Position=3)][string] $file,
+  [alias("fileFullPath")][parameter(Mandatory=$false, Position=3)][string] $file,
+  [alias("fileFullPath64")][parameter(Mandatory=$false)][string] $file64,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
   [parameter(Mandatory=$false)]
   [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
@@ -156,16 +169,25 @@ param(
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  $installMessage = "Installing $packageName..."
-  Write-Host $installMessage
-
-  if ($file -eq '' -or $file -eq $null) {
-    throw 'Package parameters incorrect, File cannot be empty.'
+  $bitnessMessage = ''
+  $fileFullPath = $file
+  if ((Get-ProcessorBits 32) -or $env:ChocolateyForceX86 -eq 'true') {
+    if (!$file) { throw "32-bit installation is not supported for $packageName"; }
+    if ($file64) { $bitnessMessage = '32-bit '; }
+  } elseif ($file64) {
+    $fileFullPath = $file64
+    $bitnessMessage = '64-bit '
   }
-
+  
+  if ($fileFullPath -eq '' -or $fileFullPath -eq $null) {
+    throw 'Package parameters incorrect, either File or File64 must be specified.'
+  }
+  
+  Write-Host "Installing $bitnessMessage$packageName..."
+  
   if ($fileType -eq '' -or $fileType -eq $null) {
     Write-Debug 'No FileType supplied. Using the file extension to determine FileType'
-    $fileType = [System.IO.Path]::GetExtension("$file").Replace(".", "")
+    $fileType = [System.IO.Path]::GetExtension("$fileFullPath").Replace(".", "")
   }
 
   $installerTypeLower = $fileType.ToLower()
@@ -199,12 +221,12 @@ Pro / Business supports a single, ubiquitous install directory option.
   # might be a slight issue here if the download path is the older
   $silentArgs = $silentArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   $additionalInstallArgs = $additionalInstallArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
-  $updatedFilePath = $file -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+  $updatedFilePath = $fileFullPath -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   if ([System.IO.File]::Exists($updatedFilePath)) {
-    $file = $updatedFilePath
+    $fileFullPath = $updatedFilePath
   }
 
-  $ignoreFile = $file + '.ignore'
+  $ignoreFile = $fileFullPath + '.ignore'
   if ($env:ChocolateyInstall -and $ignoreFile -match "$env:ChocolateyInstall") {
     try {
       '' | out-file $ignoreFile
@@ -215,9 +237,9 @@ Pro / Business supports a single, ubiquitous install directory option.
 
   $workingDirectory = Get-Location
   try {
-    $workingDirectory = [System.IO.Path]::GetDirectoryName($file)
+    $workingDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
   } catch {
-    Write-Warning "Unable to set the working directory for installer to location of '$file'"
+    Write-Warning "Unable to set the working directory for installer to location of '$fileFullPath'"
   }
 
   try {
@@ -236,7 +258,7 @@ Pro / Business supports a single, ubiquitous install directory option.
   }
 
   if ($fileType -like 'msi') {
-    $msiArgs = "/i `"$file`""
+    $msiArgs = "/i `"$fileFullPath`""
     if ($overrideArguments) {
       Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
       $msiArgs = "$msiArgs $additionalInstallArgs";
@@ -250,18 +272,18 @@ Pro / Business supports a single, ubiquitous install directory option.
   if ($fileType -like 'exe') {
     if ($overrideArguments) {
       Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
-      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes -workingDirectory $workingDirectory
+      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $fileFullPath -validExitCodes $validExitCodes -workingDirectory $workingDirectory
     } else {
-      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes -workingDirectory $workingDirectory
+      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $fileFullPath -validExitCodes $validExitCodes -workingDirectory $workingDirectory
     }
   }
 
   if($fileType -like 'msu') {
     if ($overrideArguments) {
       Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
-      $msuArgs = "`"$file`" $additionalInstallArgs"
+      $msuArgs = "`"$fileFullPath`" $additionalInstallArgs"
     } else {
-      $msuArgs = "`"$file`" $silentArgs $additionalInstallArgs"
+      $msuArgs = "`"$fileFullPath`" $silentArgs $additionalInstallArgs"
     }
     $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
   }
