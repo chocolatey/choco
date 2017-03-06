@@ -159,6 +159,7 @@ param(
   $req.AllowAutoRedirect = $true
   $req.MaximumAutomaticRedirections = 20
   #$req.KeepAlive = $true
+  $req.AutomaticDecompression = [System.Net.DecompressionMethods]::GZip -bor [System.Net.DecompressionMethods]::Deflate
   $req.Timeout = 30000
   if ($env:chocolateyRequestTimeout -ne $null -and $env:chocolateyRequestTimeout -ne '') {
     Write-Debug "Setting request timeout to  $env:chocolateyRequestTimeout"
