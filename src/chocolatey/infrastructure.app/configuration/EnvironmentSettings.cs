@@ -72,7 +72,8 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable("OS_VERSION", config.Information.PlatformVersion.to_string());
             Environment.SetEnvironmentVariable("OS_NAME", config.Information.PlatformName.to_string());
             // experimental until we know if this value returns correctly based on the OS and not the current process.
-            Environment.SetEnvironmentVariable("OS_IS64BIT", config.Information.Is64Bit ? "true" : "false");
+            Environment.SetEnvironmentVariable("OS_IS64BIT", config.Information.Is64BitOperatingSystem ? "true" : "false");
+            Environment.SetEnvironmentVariable("PROCESS_IS64BIT", config.Information.Is64BitProcess ? "true" : "false");
             Environment.SetEnvironmentVariable("IS_ADMIN", config.Information.IsUserAdministrator ? "true" : "false");
             Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", config.Information.IsProcessElevated ? "true" : "false");
             Environment.SetEnvironmentVariable("TEMP", config.CacheLocation);
