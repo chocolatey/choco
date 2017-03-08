@@ -565,7 +565,15 @@ You can pass options and switches in the following ways:
                             "chocolatey".Log().Warn(ChocolateyLoggers.Important, @"
 FIPS Mode detected - run 'choco feature enable -n {0}' 
  to use Chocolatey.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
-                            throw new ApplicationException("When FIPS Mode is enabled, Chocolatey requires {0} feature also be enabled.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
+
+                            var errorMessage = "When FIPS Mode is enabled, Chocolatey requires {0} feature also be enabled.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums);
+                            if (string.IsNullOrWhiteSpace(config.CommandName))
+                            {
+                                "chocolatey".Log().Error(errorMessage);
+                                return;
+                            }
+
+                            throw new ApplicationException(errorMessage);
                         }
 
                         throw;
