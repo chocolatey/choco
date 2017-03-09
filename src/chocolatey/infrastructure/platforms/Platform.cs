@@ -118,8 +118,11 @@ namespace chocolatey.infrastructure.platforms
             string majorMinor = version.Major + "." + version.Minor;
             switch (majorMinor)
             {
+                case "10.0":
+                    name = isServer ? "Windows Server 2016" : "Windows 10";
+                    break;
                 case "6.4":
-                    name = isServer ? "Windows Server 2016 (?)" : "Windows 10";
+                    name = isServer ? "Windows Server 2016" : "Windows 10";
                     break;
                 case "6.3":
                     name = isServer ? "Windows Server 2012 R2" : "Windows 8.1";

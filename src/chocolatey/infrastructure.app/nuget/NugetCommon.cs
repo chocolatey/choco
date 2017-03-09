@@ -17,18 +17,35 @@ namespace chocolatey.infrastructure.app.nuget
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Net;
     using System.Text;
+    using adapters;
     using infrastructure.configuration;
     using NuGet;
     using configuration;
     using logging;
+    using Console = adapters.Console;
+    using Environment = adapters.Environment;
 
     // ReSharper disable InconsistentNaming
 
     public sealed class NugetCommon
     {
+        private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IConsole> console)
+        {
+            _console = console;
+        }
+
+        private static IConsole Console
+        {
+            get { return _console.Value; }
+        }
+
         public static IFileSystem GetNuGetFileSystem(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
             return new ChocolateyPhysicalFileSystem(ApplicationParameters.PackagesLocation) { Logger = nugetLogger };
@@ -78,7 +95,7 @@ namespace chocolatey.infrastructure.app.nuget
 
                 if (!string.IsNullOrWhiteSpace(configuration.Proxy.BypassList))
                 {
-                    "chocolatey".Log().Debug("Proxy has a bypass list of '{0}'.");
+                    "chocolatey".Log().Debug("Proxy has a bypass list of '{0}'.".format_with(configuration.Proxy.BypassList.escape_curly_braces()));
                     proxy.BypassList = configuration.Proxy.BypassList.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 }
 
@@ -113,7 +130,7 @@ namespace chocolatey.infrastructure.app.nuget
                     }
                     catch (Exception ex)
                     {
-                        "chocolatey".Log().Warn("Attempted to use a source name {0} to get default source but failed:{1} {2}".format_with(sourceValue, Environment.NewLine, ex.Message));
+                        "chocolatey".Log().Warn("Attempted to use a source name {0} to get default source but failed:{1} {2}".format_with(sourceValue, System.Environment.NewLine, ex.Message));
                     }
                 }
 
@@ -153,6 +170,12 @@ namespace chocolatey.infrastructure.app.nuget
             return repository;
         }
 
+        // keep this here for the licensed edition for now
+        public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler) 
+        {
+            return GetPackageManager(configuration, nugetLogger, new PackageDownloader(), installSuccessAction, uninstallSuccessAction, addUninstallHandler);
+        }
+
         public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
         {
             IFileSystem nugetPackagesFileSystem = GetNuGetFileSystem(configuration, nugetLogger);
@@ -168,7 +191,7 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     var pkg = e.Package;
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".format_with(
-                        Environment.NewLine,
+                        System.Environment.NewLine,
                         pkg.Id,
                         pkg.Version.to_string(),
                         configuration.Force ? " (forced)" : string.Empty,

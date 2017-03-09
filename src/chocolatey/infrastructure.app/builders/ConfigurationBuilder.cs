@@ -120,6 +120,7 @@ namespace chocolatey.infrastructure.app.builders
                 Password = NugetEncryptionUtility.EncryptString(license.Id),
                 Priority = 10,
                 BypassProxy = false,
+                AllowSelfService = false,
             };
 
             if (addOrUpdate && !sources.Any(s =>
@@ -186,6 +187,7 @@ namespace chocolatey.infrastructure.app.builders
                         EncryptedCertificatePassword = source.CertificatePassword,
                         Priority = source.Priority,
                         BypassProxy = source.BypassProxy,
+                        AllowSelfService = source.AllowSelfService,
                     });
             }
         }
@@ -325,8 +327,11 @@ namespace chocolatey.infrastructure.app.builders
                              "Debug - Show debug messaging.",
                              option => config.Debug = option != null)
                         .Add("v|verbose",
-                             "Verbose - Show verbose messaging.",
+                             "Verbose - Show verbose messaging. Very verbose messaging, avoid using under normal circumstances.",
                              option => config.Verbose = option != null)
+                        .Add("trace",
+                             "Trace - Show trace messaging. Very, very verbose trace messaging. Avoid except when needing super low-level .NET Framework debugging. Available in 0.10.4+.",
+                             option => config.Trace = option != null)
                         .Add("acceptlicense|accept-license",
                              "AcceptLicense - Accept license dialogs automatically. Reserved for future use.",
                              option => config.AcceptLicense = option != null)
@@ -470,7 +475,8 @@ You can pass options and switches in the following ways:
             config.Information.ChocolateyVersion = VersionInformation.get_current_assembly_version();
             config.Information.ChocolateyProductVersion = VersionInformation.get_current_informational_version();
             config.Information.FullName = Assembly.GetExecutingAssembly().FullName;
-            config.Information.Is64Bit = Environment.Is64BitOperatingSystem;
+            config.Information.Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;
+            config.Information.Is64BitProcess = (IntPtr.Size == 8);
             config.Information.IsInteractive = Environment.UserInteractive;
             config.Information.IsUserAdministrator = ProcessInformation.user_is_administrator();
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
@@ -559,7 +565,15 @@ You can pass options and switches in the following ways:
                             "chocolatey".Log().Warn(ChocolateyLoggers.Important, @"
 FIPS Mode detected - run 'choco feature enable -n {0}' 
  to use Chocolatey.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
-                            throw new ApplicationException("When FIPS Mode is enabled, Chocolatey requires {0} feature also be enabled.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
+
+                            var errorMessage = "When FIPS Mode is enabled, Chocolatey requires {0} feature also be enabled.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums);
+                            if (string.IsNullOrWhiteSpace(config.CommandName))
+                            {
+                                "chocolatey".Log().Error(errorMessage);
+                                return;
+                            }
+
+                            throw new ApplicationException(errorMessage);
                         }
 
                         throw;
