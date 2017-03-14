@@ -215,7 +215,7 @@ namespace chocolatey.infrastructure.app.builders
             config.CommandExecutionTimeoutSeconds = commandExecutionTimeoutSeconds;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
             {
-                set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, ApplicationParameters.DefaultWaitForExitInSeconds.to_string(), "Default timeout for command execution.", forceSettingValue: true);
+                set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, ApplicationParameters.DefaultWaitForExitInSeconds.to_string(), "Default timeout for command execution. '0' for infinite (starting in 0.10.4).", forceSettingValue: true);
                 config.CommandExecutionTimeoutSeconds = ApplicationParameters.DefaultWaitForExitInSeconds;
             }
 
@@ -352,7 +352,7 @@ namespace chocolatey.infrastructure.app.builders
                              "LimitOutput - Limit the output to essential information",
                              option => config.RegularOutput = option == null)
                         .Add("timeout=|execution-timeout=",
-                             "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
+                             "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds. '0' for infinite starting in 0.10.4.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
                             option =>
                             {
                                 int timeout = 0;
