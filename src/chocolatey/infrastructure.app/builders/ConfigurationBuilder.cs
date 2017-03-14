@@ -194,23 +194,14 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void set_config_items(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
-
-            var originalCommandTimeout = configFileSettings.CommandExecutionTimeoutSeconds;
-            var commandExecutionTimeoutSeconds = -1;
-            int.TryParse(
-                set_config_item(
-                    ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds,
-                    configFileSettings,
-                    originalCommandTimeout == 0 ?
-                        ApplicationParameters.DefaultWaitForExitInSeconds.to_string()
-                        : originalCommandTimeout.to_string(),
-                    "Default timeout for command execution."),
-                out commandExecutionTimeoutSeconds);
             config.CacheLocation = Environment.ExpandEnvironmentVariables(set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder."));
             if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.combine_paths(fileSystem.get_temp_path(), "chocolatey"); // System.Environment.GetEnvironmentVariable("TEMP");
             // if it is still empty, use temp in the Chocolatey install directory.
             if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
             
+            var commandExecutionTimeoutSeconds = 0;
+            var commandExecutionTimeout = set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CommandExecutionTimeoutSeconds.to_string()) ? ApplicationParameters.DefaultWaitForExitInSeconds.to_string() : configFileSettings.CommandExecutionTimeoutSeconds.to_string(), "Default timeout for command execution. '0' for infinite (starting in 0.10.4).");
+            int.TryParse(commandExecutionTimeout, out commandExecutionTimeoutSeconds);
             config.CommandExecutionTimeoutSeconds = commandExecutionTimeoutSeconds;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
             {
