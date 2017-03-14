@@ -194,12 +194,6 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void set_config_items(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
-            var cacheLocation = set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder.");
-            config.CacheLocation = !string.IsNullOrWhiteSpace(cacheLocation) ? Environment.ExpandEnvironmentVariables(cacheLocation) : fileSystem.combine_paths(fileSystem.get_temp_path(), "chocolatey"); // System.Environment.GetEnvironmentVariable("TEMP");
-            if (string.IsNullOrWhiteSpace(config.CacheLocation))
-            {
-                config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
-            }
 
             var originalCommandTimeout = configFileSettings.CommandExecutionTimeoutSeconds;
             var commandExecutionTimeoutSeconds = -1;
@@ -212,6 +206,11 @@ namespace chocolatey.infrastructure.app.builders
                         : originalCommandTimeout.to_string(),
                     "Default timeout for command execution."),
                 out commandExecutionTimeoutSeconds);
+            config.CacheLocation = Environment.ExpandEnvironmentVariables(set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder."));
+            if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.combine_paths(fileSystem.get_temp_path(), "chocolatey"); // System.Environment.GetEnvironmentVariable("TEMP");
+            // if it is still empty, use temp in the Chocolatey install directory.
+            if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
+            
             config.CommandExecutionTimeoutSeconds = commandExecutionTimeoutSeconds;
             if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
             {
