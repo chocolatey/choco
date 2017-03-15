@@ -28,7 +28,7 @@ namespace chocolatey.infrastructure.app.nuget
             var timeout = TimeSpan.FromSeconds(Math.Abs(config.CommandExecutionTimeoutSeconds));
             if (timeout.Seconds <= 0)
             {
-                timeout = TimeSpan.FromMinutes(5); // Default to 5 minutes
+                timeout = TimeSpan.FromMinutes(300); // Default to 5 hours if there is a zero (infinite) timeout
             }
             const bool disableBuffering = false;
 

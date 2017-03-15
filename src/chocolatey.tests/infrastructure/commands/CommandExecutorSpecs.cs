@@ -138,7 +138,7 @@ namespace chocolatey.tests.infrastructure.commands
 
             public override void Because()
             {
-                result = commandExecutor.execute("bob", "args", waitForExitInSeconds: 0);
+                result = commandExecutor.execute("bob", "args", waitForExitInSeconds: 0, workingDirectory:null, stdOutAction: null, stdErrAction: null, updateProcessPath:false, allowUseWindow: true, waitForExit: false);
             }
 
             [Fact]

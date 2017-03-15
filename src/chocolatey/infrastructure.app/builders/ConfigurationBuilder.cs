@@ -194,28 +194,18 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void set_config_items(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
-            var cacheLocation = set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder.");
-            config.CacheLocation = !string.IsNullOrWhiteSpace(cacheLocation) ? Environment.ExpandEnvironmentVariables(cacheLocation) : fileSystem.combine_paths(fileSystem.get_temp_path(), "chocolatey"); // System.Environment.GetEnvironmentVariable("TEMP");
-            if (string.IsNullOrWhiteSpace(config.CacheLocation))
-            {
-                config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
-            }
-
-            var originalCommandTimeout = configFileSettings.CommandExecutionTimeoutSeconds;
-            var commandExecutionTimeoutSeconds = -1;
-            int.TryParse(
-                set_config_item(
-                    ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds,
-                    configFileSettings,
-                    originalCommandTimeout == 0 ?
-                        ApplicationParameters.DefaultWaitForExitInSeconds.to_string()
-                        : originalCommandTimeout.to_string(),
-                    "Default timeout for command execution."),
-                out commandExecutionTimeoutSeconds);
+            config.CacheLocation = Environment.ExpandEnvironmentVariables(set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder."));
+            if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.combine_paths(fileSystem.get_temp_path(), "chocolatey"); // System.Environment.GetEnvironmentVariable("TEMP");
+            // if it is still empty, use temp in the Chocolatey install directory.
+            if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
+            
+            var commandExecutionTimeoutSeconds = 0;
+            var commandExecutionTimeout = set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CommandExecutionTimeoutSeconds.to_string()) ? ApplicationParameters.DefaultWaitForExitInSeconds.to_string() : configFileSettings.CommandExecutionTimeoutSeconds.to_string(), "Default timeout for command execution. '0' for infinite (starting in 0.10.4).");
+            int.TryParse(commandExecutionTimeout, out commandExecutionTimeoutSeconds);
             config.CommandExecutionTimeoutSeconds = commandExecutionTimeoutSeconds;
-            if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
+            if (commandExecutionTimeout != "0" && commandExecutionTimeoutSeconds <= 0)
             {
-                set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, ApplicationParameters.DefaultWaitForExitInSeconds.to_string(), "Default timeout for command execution.", forceSettingValue: true);
+                set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, ApplicationParameters.DefaultWaitForExitInSeconds.to_string(), "Default timeout for command execution. '0' for infinite (starting in 0.10.4).", forceSettingValue: true);
                 config.CommandExecutionTimeoutSeconds = ApplicationParameters.DefaultWaitForExitInSeconds;
             }
 
@@ -352,7 +342,7 @@ namespace chocolatey.infrastructure.app.builders
                              "LimitOutput - Limit the output to essential information",
                              option => config.RegularOutput = option == null)
                         .Add("timeout=|execution-timeout=",
-                             "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
+                             "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds. '0' for infinite starting in 0.10.4.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
                             option =>
                             {
                                 int timeout = 0;
