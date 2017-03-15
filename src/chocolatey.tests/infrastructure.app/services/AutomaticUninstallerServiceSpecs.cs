@@ -306,7 +306,6 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                MockLogger.LogMessagesToConsole = true;
                 service.run(packageResult, config);
             }
 
