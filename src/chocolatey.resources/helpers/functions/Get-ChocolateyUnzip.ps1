@@ -108,9 +108,10 @@ param(
   $7zip = [System.IO.Path]::GetFullPath($7zip)
   Write-Debug "7zip found at `'$7zip`'"
 
-  # 32-bit 7z.exe would not find C:\Windows\System32\config\systemprofile\AppData\Local\Temp,
+  # 32-bit 7z would not find C:\Windows\System32\config\systemprofile\AppData\Local\Temp,
   # because it gets translated to C:\Windows\SysWOW64\... by the WOW redirection layer.
   # Replace System32 with sysnative, which does not get redirected.
+  # 32-bit 7z is required so it can see both architectures
   if ([IntPtr]::Size -ne 4) {
     $fileFullPathNoRedirection = $fileFullPath -ireplace ([regex]::Escape([Environment]::GetFolderPath('System'))),(Join-Path $Env:SystemRoot 'SysNative')
     $destinationNoRedirection = $destination -ireplace ([regex]::Escape([Environment]::GetFolderPath('System'))),(Join-Path $Env:SystemRoot 'SysNative')
