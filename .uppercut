@@ -26,8 +26,8 @@
   <property name="sign.project_with_key" value="true" overwrite="false" />
 
   <!-- Build Features Overrides -->
-  <property name="microsoft.framework" value="net-4.0" overwrite="false" />
-  <property name="nant.settings.currentframework" value="net-4.0" overwrite="false" />
+  <property name="microsoft.framework" value="net-4.0" overwrite="false" if="${platform::is-windows()}" />
+  <property name="nant.settings.currentframework" value="net-4.0" overwrite="false" if="${platform::is-windows()}" />
   <property name="test.framework" value="nunit" overwrite="false" />
   <property name="cover.framework" value="opencover" overwrite="false" />
 
