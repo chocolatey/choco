@@ -157,6 +157,9 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("except=",
                      "Except - a comma-separated list of package names that should not be upgraded when upgrading 'all'. Defaults to empty. Available in 0.9.10+.",
                      option => configuration.UpgradeCommand.PackageNamesToSkip = option.remove_surrounding_quotes())
+                 .Add("includepre|UpgradeToLatestPre",
+                     "IncludePre - Include prerelease package upgrades if package is already newer than most recent.",
+                     option => configuration.UpgradeCommand.IncludePreRelease = option != null)
                 ;
         }
 

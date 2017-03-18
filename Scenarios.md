@@ -647,7 +647,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 29 Scenario(s), 226 Observation(s) ]
+### ChocolateyUpgradeCommand [ 30 Scenario(s), 227 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -957,6 +957,10 @@
  * should upgrade a package in the lib directory
  * should upgrade the package
  * should upgrade where install location reports
+
+#### when upgrading package with pre release available
+
+ * should upgrade packages with upgrades
 
 #### when upgrading packages with packages config
 
