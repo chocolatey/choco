@@ -27,7 +27,7 @@
 
   <!-- Build Features Overrides -->
   <property name="microsoft.framework" value="net-4.0" overwrite="false" />
-  <property name="nant.settings.currentframework" value="net-4.0"/>
+  <property name="nant.settings.currentframework" value="net-4.0" overwrite="false" />
   <property name="test.framework" value="nunit" overwrite="false" />
   <property name="cover.framework" value="opencover" overwrite="false" />
 
