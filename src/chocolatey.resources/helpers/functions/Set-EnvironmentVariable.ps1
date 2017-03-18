@@ -78,7 +78,10 @@ param (
 
   [Microsoft.Win32.RegistryValueKind]$registryType = [Microsoft.Win32.RegistryValueKind]::String
   try {
-    $registryType = $win32RegistryKey.GetValueKind($Name)
+    if ($win32RegistryKey.GetValueNames() -contains $Name)
+    {
+      $registryType = $win32RegistryKey.GetValueKind($Name)
+    }
   } catch {
     # the value doesn't yet exist
     # move along, nothing to see here
