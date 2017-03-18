@@ -108,7 +108,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 optionSet.Contains("p").ShouldBeTrue();
             }
-      
+
+            [Fact]
+            public void should_add_ignore_pinned_to_the_option_set()
+            {
+                optionSet.Contains("ignore-pinned").ShouldBeTrue();
+            }
         }
         
         public class when_noop_is_called : ChocolateyOutdatedCommandSpecsBase

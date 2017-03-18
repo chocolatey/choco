@@ -591,6 +591,14 @@ folder.");
                     continue;
                 }
 
+                var pkgInfo = _packageInfoService.get_package_information(installedPackage);
+                bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
+
+                if (isPinned && config.OutdatedCommand.IgnorePinned)
+                {
+                    continue;
+                }
+
                 if (version != null && version < installedPackage.Version && !config.AllowMultipleVersions && !config.AllowDowngrade)
                 {
                     string logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to upgrade to older versions, or use side by side to allow multiple versions.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
@@ -598,11 +606,7 @@ folder.");
                     nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     continue;
-                }
-
-                var pkgInfo = _packageInfoService.get_package_information(installedPackage);
-                bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
-
+                }                
 
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                 if (availablePackage == null)

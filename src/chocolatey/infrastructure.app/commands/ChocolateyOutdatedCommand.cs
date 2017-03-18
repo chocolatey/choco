@@ -50,7 +50,10 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.SourceCommand.Certificate = option.remove_surrounding_quotes())
                 .Add("cp=|certpassword=",
                      "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
-                     option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
+                     option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())                
+                .Add("ignore-pinned",
+                     "IgnorePinned - Ignore pinned packages. Defaults to false.",
+                     option => configuration.OutdatedCommand.IgnorePinned = option != null)
                 ;
         }
 
