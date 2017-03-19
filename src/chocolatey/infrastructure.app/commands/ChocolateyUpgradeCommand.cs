@@ -162,6 +162,10 @@ namespace chocolatey.infrastructure.app.commands
                      "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
                      )
+                 .Add("exclude-pre|exclude-prerelease|exclude-prereleases",
+                     "Exclude Prerelease - Should prerelease be ignored for upgrades? Will be ignored if you pass `--pre`. Available in 0.10.4+.",
+                     option => configuration.UpgradeCommand.ExcludePrerelease = option != null
+                     )
                 ;
         }
 

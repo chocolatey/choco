@@ -603,8 +603,17 @@ folder.");
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
 
+                // if we have a prerelease installed, we want to have it upgrade based on newer prereleases
+                var originalPrerelease = config.Prerelease;
+                if (!string.IsNullOrWhiteSpace(installedPackage.Version.SpecialVersion) && !config.UpgradeCommand.ExcludePrerelease)
+                {
+                    // this is a prerelease - opt in for newer prereleases.
+                    config.Prerelease = true;
+                }
 
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+                config.Prerelease = originalPrerelease;
+
                 if (availablePackage == null)
                 {
                     string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"; Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
