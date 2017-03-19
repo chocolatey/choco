@@ -49,8 +49,16 @@ goto main
     del /f /q "%TEMP%\_envset.tmp" 2>nul
     del /f /q "%TEMP%\_envget.tmp" 2>nul
 
+    :: capture user / architecture
+    SET "OriginalUserName=%USERNAME%"
+    SET "OriginalArchitecture=%PROCESSOR_ARCHITECTURE%"
+
     :: Set these variables
     call "%TEMP%\_env.cmd"
+
+    :: reset user / architecture
+    SET "USERNAME=%OriginalUserName%"
+    SET "PROCESSOR_ARCHITECTURE=%OriginalArchitecture%"
 
     echo | set /p dummy="Finished."
     echo .
