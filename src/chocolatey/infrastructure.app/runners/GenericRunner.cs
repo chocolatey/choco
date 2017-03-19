@@ -75,13 +75,13 @@ namespace chocolatey.infrastructure.app.runners
                 this.Log().Debug(() => "Configuration: {0}".format_with(config.ToString()));
 
 
-                if (isConsole && config.HelpRequested)
+                if (isConsole && (config.HelpRequested || config.UnsuccessfulParsing))
                 {
 #if DEBUG
                     Console.WriteLine("Press enter to continue...");
                     Console.ReadKey();
 #endif
-                    Environment.Exit(1);
+                    Environment.Exit(config.UnsuccessfulParsing? 1 : 0);
                 }
 
                 var token = Assembly.GetExecutingAssembly().get_public_key_token();
