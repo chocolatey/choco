@@ -94,7 +94,13 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Debug - Show debug messaging.
 
  -v, --verbose
-     Verbose - Show verbose messaging.
+     Verbose - Show verbose messaging. Very verbose messaging, avoid using 
+       under normal circumstances.
+
+     --trace
+     Trace - Show trace messaging. Very, very verbose trace messaging. Avoid 
+       except when needing super low-level .NET Framework debugging. Available 
+       in 0.10.4+.
 
      --acceptlicense, --accept-license
      AcceptLicense - Accept license dialogs automatically. Reserved for 
@@ -117,7 +123,7 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      --timeout, --execution-timeout=VALUE
      CommandExecutionTimeout (in seconds) - The time to allow a command to 
        finish before timing out. Overrides the default execution timeout in the 
-       configuration of 2700 seconds.
+       configuration of 2700 seconds. '0' for infinite starting in 0.10.4.
 
  -c, --cache, --cachelocation, --cache-location=VALUE
      CacheLocation - Location for download cache, defaults to %TEMP% or value 
@@ -136,6 +142,38 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      UseSystemPowerShell - Execute PowerShell using an external process 
        instead of the built-in PowerShell host. Should only be used when 
        internal host is failing. Available in 0.9.10+.
+
+     --no-progress
+     Do Not Show Progress - Do not show download progress percentages. 
+       Available in 0.10.4+.
+
+     --proxy=VALUE
+     Proxy Location - Explicit proxy location. Overrides the default proxy 
+       location of ''. Available for config settings in 0.9.9.9+, this CLI 
+       option available in 0.10.4+.
+
+     --proxy-user=VALUE
+     Proxy User Name - Explicit proxy user (optional). Requires explicity 
+       proxy (`--proxy` or config setting). Overrides the default proxy user of 
+       '123'. Available for config settings in 0.9.9.9+, this CLI option 
+       available in 0.10.4+.
+
+     --proxy-password=VALUE
+     Proxy Password - Explicit proxy password (optional) to be used with 
+       username. Requires explicity proxy (`--proxy` or config setting) and 
+       user name.  Overrides the default proxy password (encrypted in settings 
+       if set). Available for config settings in 0.9.9.9+, this CLI option 
+       available in 0.10.4+.
+
+     --proxy-bypass-list=VALUE
+     ProxyBypassList - Comma separated list of regex locations to bypass on 
+       proxy. Requires explicity proxy (`--proxy` or config setting). Overrides 
+       the default proxy bypass list of ''. Available in 0.10.4+.
+
+     --proxy-bypass-on-local
+     Proxy Bypass On Local - Bypass proxy for local connections. Requires 
+       explicity proxy (`--proxy` or config setting). Overrides the default 
+       proxy bypass on local setting of 'True'. Available in 0.10.4+.
 
  -s, --source=VALUE
      Source - The source to find the package(s) to install. Special sources 
@@ -214,6 +252,18 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Ignore Auto Uninstaller Failure - Do not fail the package if auto 
        uninstaller reports an error. Overrides the default feature 
        'failOnAutoUninstaller' set to 'False'. Available in 0.9.10+.
+
+     --stoponfirstfailure, --stop-on-first-failure, --stop-on-first-package-failure
+     Stop On First Package Failure - stop running install, upgrade or 
+       uninstall on first package failure instead of continuing with others. 
+       Overrides the default feature 'stopOnFirstPackageFailure' set to 'False-
+       '. Available in 0.10.4+.
+
+     --fromprograms, --from-programs, --fromprogramsandfeatures, --from-programs-and-features
+     From Programs and Features - Uninstalls a program from programs and 
+       features. Name used for package must be a match or a wildcard (*). 
+       Available in [licensed editions](https://chocolatey.org/compare) only (licensed version 1.8.0+) and 
+       requires v0.10.4+.
 
 ~~~
 

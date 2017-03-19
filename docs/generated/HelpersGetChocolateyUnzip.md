@@ -8,10 +8,11 @@ Unzips an archive file and returns the location for further processing.
 
 ~~~powershell
 Get-ChocolateyUnzip `
-  -FileFullPath <String> `
+  [-FileFullPath <String>] `
   -Destination <String> `
   [-SpecificFolder <String>] `
   [-PackageName <String>] `
+  [-FileFullPath64 <String>] `
   [-IgnoredArguments <Object[]>] [<CommonParameters>]
 ~~~
 
@@ -61,17 +62,20 @@ None
 
 ## Parameters
 
-###  -FileFullPath &lt;String&gt;
+###  -FileFullPath [&lt;String&gt;]
 This is the full path to the zip file. If embedding it in the package
 next to the install script, the path will be like
 `"$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\\file.zip"`
 
 In 0.10.1+, `File` is an alias for FileFullPath.
 
+This can be a 32-bit or 64-bit file. This is mandatory in earlier versions
+of Chocolatey, but optional if FileFullPath64 has been provided.
+
 Property               | Value
 ---------------------- | -----
 Aliases                | file
-Required?              | true
+Required?              | false
 Position?              | 1
 Default Value          | 
 Accept Pipeline Input? | false
@@ -108,6 +112,23 @@ Property               | Value
 Aliases                | 
 Required?              | false
 Position?              | 4
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -FileFullPath64 [&lt;String&gt;]
+Full file path to a 64-bit native installer to run. Available in 0.10.4+.
+If embedding in the package, you can get it to the path with
+`"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
+
+Provide this when you want to provide both 32-bit and 64-bit
+installers or explicitly only a 64-bit installer (which will cause a package 
+install failure on 32-bit systems).
+
+Property               | Value
+---------------------- | ------
+Aliases                | file64
+Required?              | false
+Position?              | named
 Default Value          | 
 Accept Pipeline Input? | false
  

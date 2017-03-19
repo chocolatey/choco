@@ -2,21 +2,23 @@
 
 # Download Command (choco download)
 
-Package Internalizer
+### Package Copy / Package Downloader
+
+[Chocolatey Professional](https://chocolatey.org/compare) and up starting in version 1.7.1.
+
+Downloads a package from a source and unpacks it.
+
+### Package Internalizer
 
 [Chocolatey for Business](https://chocolatey.org/compare) starting at licensed version 1.5.0.
 
-Downloads a package from a source, optionally downloading remote 
- resources and recompiling the package to use internal resources. This 
- takes an existing package and makes it available without any internet 
+Downloads a package from a source, optionally downloading remote
+ resources and recompiling the package to use internal resources. This
+ takes an existing package and makes it available without any internet
  requirement.
 
 See https://chocolatey.org/docs/features-automatically-recompile-packages
 
-Package Copy / Package Downloader
-[Chocolatey Professional](https://chocolatey.org/compare) and up starting in version 1.7.1.
-
-Downloads a package from a source and unpacks it. 
 
 ## Usage
 
@@ -58,7 +60,13 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Debug - Show debug messaging.
 
  -v, --verbose
-     Verbose - Show verbose messaging.
+     Verbose - Show verbose messaging. Very verbose messaging, avoid using 
+       under normal circumstances.
+
+     --trace
+     Trace - Show trace messaging. Very, very verbose trace messaging. Avoid 
+       except when needing super low-level .NET Framework debugging. Available 
+       in 0.10.4+.
 
      --acceptlicense, --accept-license
      AcceptLicense - Accept license dialogs automatically. Reserved for 
@@ -81,7 +89,7 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      --timeout, --execution-timeout=VALUE
      CommandExecutionTimeout (in seconds) - The time to allow a command to 
        finish before timing out. Overrides the default execution timeout in the 
-       configuration of 2700 seconds.
+       configuration of 2700 seconds. '0' for infinite starting in 0.10.4.
 
  -c, --cache, --cachelocation, --cache-location=VALUE
      CacheLocation - Location for download cache, defaults to %TEMP% or value 
@@ -100,6 +108,38 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      UseSystemPowerShell - Execute PowerShell using an external process 
        instead of the built-in PowerShell host. Should only be used when 
        internal host is failing. Available in 0.9.10+.
+
+     --no-progress
+     Do Not Show Progress - Do not show download progress percentages. 
+       Available in 0.10.4+.
+
+     --proxy=VALUE
+     Proxy Location - Explicit proxy location. Overrides the default proxy 
+       location of ''. Available for config settings in 0.9.9.9+, this CLI 
+       option available in 0.10.4+.
+
+     --proxy-user=VALUE
+     Proxy User Name - Explicit proxy user (optional). Requires explicity 
+       proxy (`--proxy` or config setting). Overrides the default proxy user of 
+       '123'. Available for config settings in 0.9.9.9+, this CLI option 
+       available in 0.10.4+.
+
+     --proxy-password=VALUE
+     Proxy Password - Explicit proxy password (optional) to be used with 
+       username. Requires explicity proxy (`--proxy` or config setting) and 
+       user name.  Overrides the default proxy password (encrypted in settings 
+       if set). Available for config settings in 0.9.9.9+, this CLI option 
+       available in 0.10.4+.
+
+     --proxy-bypass-list=VALUE
+     ProxyBypassList - Comma separated list of regex locations to bypass on 
+       proxy. Requires explicity proxy (`--proxy` or config setting). Overrides 
+       the default proxy bypass list of ''. Available in 0.10.4+.
+
+     --proxy-bypass-on-local
+     Proxy Bypass On Local - Bypass proxy for local connections. Requires 
+       explicity proxy (`--proxy` or config setting). Overrides the default 
+       proxy bypass on local setting of 'True'. Available in 0.10.4+.
 
  -s, --source=VALUE
      Source - The source to find the package(s) to download. Defaults to 
@@ -125,23 +165,39 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Certificate Password - the client certificate's password to the source. 
        Defaults to empty.
 
-     --outputdirectory=VALUE
+     --out, --outdir, --outputdirectory, --output-directory=VALUE
      OutputDirectory - Specifies the directory for the downloaded Chocolatey 
        package file. If not specified, uses the current directory.
 
+ -i, --ignoredependencies, --ignore-dependencies
+     IgnoreDependencies - Ignore dependencies when installing package(s). 
+       [Licensed editions](https://chocolatey.org/compare) v1.9.0+ Defaults to false.
+
      --recompile, --internalize
      Recompile / Internalize - Download all external resources and recompile 
-       the package to use the local resources instead.
+       the package to use the local resources instead. Business editions only 
+       (licensed version 1.5.0+).
 
      --resources-location=VALUE
-     Resources Location - When recompiling, use this location for resources 
-       instead of embedding the downloaded resources into the package.
+     Resources Location - When internalizing, use this location for resources 
+       instead of embedding the downloaded resources into the package. Can be a 
+       file share or an internal url location. When it is a file share, it will 
+       attempt to download to that location. When it is an internal url, it 
+       will download locally and give further instructions on where it should 
+       be uploaded to match package edits. Business editions only (licensed 
+       version 1.5.1+).
+
+     --download-location=VALUE
+     Download Location - OPTIONAL - when internalizing, download the 
+       resources to this location. Used with Resources Location (and defaults 
+       to Resources Location when not set). Business editions only (licensed 
+       version 1.8.3+). 
 
      --append-useoriginallocation, --append-use-original-location
      Append -UseOriginalLocation - When `Install-ChocolateyPackage` is 
        internalized, append the `-UseOriginalLocation` parameter to the 
        function. Business editions only (licensed version 1.7.0+). Requires at 
-       least Chocolatey v0.10.1 for `Install-ChocolateyPacakge` to recognize 
+       least Chocolatey v0.10.1 for `Install-ChocolateyPackage` to recognize 
        the switch appropriately. Overrides the feature 
        'internalizeAppendUseOriginalLocation' set to by default to 'False'.
 
