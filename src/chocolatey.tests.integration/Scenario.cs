@@ -143,11 +143,13 @@ namespace chocolatey.tests.integration
             config.ForceX86 = false;
             config.HelpRequested = false;
             config.UnsuccessfulParsing = false;
+            config.UnsuccessfulParsing = false;
             config.IgnoreDependencies = false;
             config.InstallArguments = string.Empty;
             config.Noop = false;
             config.OverrideArguments = false;
             config.Prerelease = false;
+            config.UpgradeCommand.ExcludePrerelease = false;
             config.PromptForConfirmation = false;
             config.RegularOutput = true;
             config.SkipPackageInstallProvider = false;
@@ -163,6 +165,7 @@ namespace chocolatey.tests.integration
             config.Features.AutoUninstaller = true;
             config.Features.ChecksumFiles = true;
             config.OutputDirectory = null;
+            config.Features.StopOnFirstPackageFailure = false;
 
             return config;
         }
