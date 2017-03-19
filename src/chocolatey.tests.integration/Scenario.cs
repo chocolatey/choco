@@ -142,6 +142,7 @@ namespace chocolatey.tests.integration
             config.ForceDependencies = false;
             config.ForceX86 = false;
             config.HelpRequested = false;
+            config.UnsuccessfulParsing = false;
             config.IgnoreDependencies = false;
             config.InstallArguments = string.Empty;
             config.Noop = false;

@@ -157,6 +157,10 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool Force { get; set; }
         public bool Noop { get; set; }
         public bool HelpRequested { get; set; }
+        /// <summary>
+        ///   Gets or sets a value indicating whether parsing was successful (everything parsed) or not.
+        /// </summary>
+        public bool UnsuccessfulParsing { get; set; }
 
         // TODO: Should look into using mutually exclusive output levels - Debug, Info (Regular), Error (Quiet)
         // Verbose and Important are not part of the levels at all
