@@ -22,8 +22,8 @@ This is a listing of all of the different things you can pass to choco.
  * [[config|CommandsConfig]] - Retrieve and configure config file settings
  * [[feature|CommandsFeature]] - view and configure choco features
  * [[features|CommandsFeatures]] - view and configure choco features (alias for feature)
- * [[setapikey|CommandsSetapikey]] - retrieves or saves an apikey for a particular source (alias for apikey)
  * [[apikey|CommandsApikey]] - retrieves or saves an apikey for a particular source
+ * [[setapikey|CommandsSetapikey]] - retrieves or saves an apikey for a particular source (alias for apikey)
  * [[unpackself|CommandsUnpackself]] - have chocolatey set it self up
  * [[version|CommandsVersion]] - [DEPRECATED] will be removed in v1 - use [[`choco outdated`|Commandsoutdated]] or `cup <pkg|all> -whatif` instead
  * [[update|CommandsUpdate]] - [DEPRECATED] RESERVED for future use (you are looking for upgrade, these are not the droids you are looking for)
@@ -56,6 +56,9 @@ You can pass options and switches in the following ways:
    (`` `"value`" ``) or apostrophes (`'value'`). Using the combination
    allows for both shells to work without issue, except for when the next
    section applies.
+ * **Periods in PowerShell**: If you need to pass a period as part of a 
+   value or a path, PowerShell doesn't always handle it well. Please 
+   quote those values using "Quote Values" section above.
  * **Pass quotes in arguments**: When you need to pass quoted values to
    to something like a native installer, you are in for a world of fun. In
    cmd.exe you must pass it like this: `-ia "/yo=""Spaces spaces"""`. In
@@ -90,7 +93,13 @@ You can pass options and switches in the following ways:
      Debug - Show debug messaging.
 
  -v, --verbose
-     Verbose - Show verbose messaging.
+     Verbose - Show verbose messaging. Very verbose messaging, avoid using 
+       under normal circumstances.
+
+     --trace
+     Trace - Show trace messaging. Very, very verbose trace messaging. Avoid 
+       except when needing super low-level .NET Framework debugging. Available 
+       in 0.10.4+.
 
      --acceptlicense, --accept-license
      AcceptLicense - Accept license dialogs automatically. Reserved for 
@@ -113,7 +122,7 @@ You can pass options and switches in the following ways:
      --timeout, --execution-timeout=VALUE
      CommandExecutionTimeout (in seconds) - The time to allow a command to 
        finish before timing out. Overrides the default execution timeout in the 
-       configuration of 2700 seconds.
+       configuration of 2700 seconds. '0' for infinite starting in 0.10.4.
 
  -c, --cache, --cachelocation, --cache-location=VALUE
      CacheLocation - Location for download cache, defaults to %TEMP% or value 
@@ -132,6 +141,38 @@ You can pass options and switches in the following ways:
      UseSystemPowerShell - Execute PowerShell using an external process 
        instead of the built-in PowerShell host. Should only be used when 
        internal host is failing. Available in 0.9.10+.
+
+     --no-progress
+     Do Not Show Progress - Do not show download progress percentages. 
+       Available in 0.10.4+.
+
+     --proxy=VALUE
+     Proxy Location - Explicit proxy location. Overrides the default proxy 
+       location of ''. Available for config settings in 0.9.9.9+, this CLI 
+       option available in 0.10.4+.
+
+     --proxy-user=VALUE
+     Proxy User Name - Explicit proxy user (optional). Requires explicity 
+       proxy (`--proxy` or config setting). Overrides the default proxy user of 
+       '123'. Available for config settings in 0.9.9.9+, this CLI option 
+       available in 0.10.4+.
+
+     --proxy-password=VALUE
+     Proxy Password - Explicit proxy password (optional) to be used with 
+       username. Requires explicity proxy (`--proxy` or config setting) and 
+       user name.  Overrides the default proxy password (encrypted in settings 
+       if set). Available for config settings in 0.9.9.9+, this CLI option 
+       available in 0.10.4+.
+
+     --proxy-bypass-list=VALUE
+     ProxyBypassList - Comma separated list of regex locations to bypass on 
+       proxy. Requires explicity proxy (`--proxy` or config setting). Overrides 
+       the default proxy bypass list of ''. Available in 0.10.4+.
+
+     --proxy-bypass-on-local
+     Proxy Bypass On Local - Bypass proxy for local connections. Requires 
+       explicity proxy (`--proxy` or config setting). Overrides the default 
+       proxy bypass on local setting of 'True'. Available in 0.10.4+.
 
 ~~~
 

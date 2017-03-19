@@ -421,6 +421,11 @@ Did you know Pro / Business automatically syncs with Programs and
                 this.Log().Error(ChocolateyLoggers.Important, "The {0} of {1} was NOT successful.".format_with(commandName.to_string(), packageResult.Name));
                 handle_unsuccessful_operation(config, packageResult, movePackageToFailureLocation: true, attemptRollback: true);
 
+                if (config.Features.StopOnFirstPackageFailure)
+                {
+                    throw new ApplicationException("Stopping further execution as {0} has failed {1}.".format_with(packageResult.Name, commandName.to_string()));
+                }
+
                 return;
             }
 

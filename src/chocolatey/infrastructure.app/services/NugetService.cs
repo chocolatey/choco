@@ -603,8 +603,17 @@ folder.");
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
 
+                // if we have a prerelease installed, we want to have it upgrade based on newer prereleases
+                var originalPrerelease = config.Prerelease;
+                if (!string.IsNullOrWhiteSpace(installedPackage.Version.SpecialVersion) && !config.UpgradeCommand.ExcludePrerelease)
+                {
+                    // this is a prerelease - opt in for newer prereleases.
+                    config.Prerelease = true;
+                }
 
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+                config.Prerelease = originalPrerelease;
+
                 if (availablePackage == null)
                 {
                     string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"; Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
@@ -1217,6 +1226,10 @@ folder.");
                             var result = packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, packageVersion.Id)));
                             result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                             if (result.ExitCode == 0) result.ExitCode = 1;
+                            if (config.Features.StopOnFirstPackageFailure)
+                            {
+                                throw new ApplicationException("Stopping further execution as {0} has failed uninstallation".format_with(packageVersion.Id.to_lower()));
+                            }
                             // do not call continueAction - will result in multiple passes
                         }
                     }

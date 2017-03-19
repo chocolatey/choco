@@ -25,11 +25,12 @@ handling wrongly encoded registry keys.
 ## Notes
 
 Available in 0.9.10+. If you need to maintain compatibility with pre
-0.9.10, please add the following to your nuspec:
+0.9.10, please add the following to your nuspec (check for minimum
+version):
 
 ~~~xml
 <dependencies>
-  <dependency id="chocolatey-uninstall.extension" />
+  <dependency id="chocolatey-core.extension" version="1.1.0" />
 </dependencies>
 ~~~
 
@@ -44,16 +45,16 @@ Available in 0.9.10+. If you need to maintain compatibility with pre
 
 ~~~powershell
 
-# Software name in Programs and Features is "Gpg4Win (2.3.0)"
-[array]$key = Get-UninstallRegistryKey -SoftwareName "Gpg4win*"
-$key.DisplayName
+# Version match: Software name is "Gpg4Win (2.3.0)"
+[array]$key = Get-UninstallRegistryKey -SoftwareName "Gpg4win (*)"
+$key.UninstallString
 ~~~
 
 **EXAMPLE 2**
 
 ~~~powershell
 
-# Software name is "Launchy 2.5"
+# Fuzzy match: Software name is "Launchy 2.5"
 [array]$key = Get-UninstallRegistryKey -SoftwareName "Launchy*"
 $key.UninstallString
 ~~~
@@ -62,8 +63,18 @@ $key.UninstallString
 
 ~~~powershell
 
-# Software name is "Mozilla Firefox"
-[array]$key = Get-UninstallRegistryKey -SoftwareName "Mozilla Firefox"
+# Exact match: Software name in Programs and Features is "VLC media player"
+[array]$key = Get-UninstallRegistryKey -SoftwareName "VLC media player"
+$key.UninstallString
+~~~
+
+**EXAMPLE 4**
+
+~~~powershell
+
+#  Version match: Software name is "SketchUp 2016"
+# Note that the similar software name "SketchUp Viewer" would not be matched.
+[array]$key = Get-UninstallRegistryKey -SoftwareName "SketchUp [0-9]*"
 $key.UninstallString
 ~~~ 
 
@@ -80,12 +91,20 @@ None
 ###  -SoftwareName &lt;String&gt;
 Part or all of the Display Name as you see it in Programs and Features.
 It should be enough to be unique.
+The syntax follows the rules of the PowerShell `-like` operator, so the
+`*` character is interpreted as a wildcard, which matches any (zero or
+more) characters.
 
-If the display name contains a version number, such as "Launchy 2.5",
-it is recommended you use a fuzzy search `"Launchy*"` (the wildcard `*`)
-as if the version is upgraded or autoupgraded, suddenly the uninstall
-script will stop working and it may not be clear as to what went wrong
-at first.
+If the display name contains a version number, such as "Launchy (2.5)",
+it is recommended you use a fuzzy search `"Launchy (*)"` (the wildcard
+`*`) so if Launchy auto-updates or is updated outside of Chocolatey, the
+uninstall script will not fail.
+
+Take care not to abuse fuzzy/glob pattern searches. Be conscious of
+programs that may have shared or common root words to prevent
+overmatching. For example, "SketchUp*" would match two keys with
+software names "SketchUp 2016" and "SketchUp Viewer" that are different
+programs released by the same company.
 
 Property               | Value
 ---------------------- | --------------
@@ -96,6 +115,8 @@ Default Value          |
 Accept Pipeline Input? | true (ByValue)
  
 ###  -IgnoredArguments [&lt;Object[]&gt;]
+Allows splatting with arguments that do not apply. Do not use directly.
+
 Property               | Value
 ---------------------- | -----
 Aliases                | 

@@ -140,6 +140,10 @@ param(
     Write-Debug "Removing null characters resulted in an error - $($_.Exception.Message)"
   }
 
+  if ($exeToRun -ne $null) {
+    $exeToRun = $exeToRun.Trim().Trim("'").Trim('"')
+  }
+
   $wrappedStatements = $statements
   if ($wrappedStatements -eq $null) { $wrappedStatements = ''}
 
@@ -236,10 +240,6 @@ $dbMessagePrepend [`"$exeToRun`" $wrappedStatements]. This may take a while, dep
   # in case empty args makes a difference, try to be compatible with the older
   # version
   $psi = New-Object System.Diagnostics.ProcessStartInfo
-  
-  if ($exeToRun -ne $null) {
-    $exeToRun = $exeToRun.Trim().Trim("'").Trim('"')
-  }
 
   $psi.FileName = $exeToRun
   if ($wrappedStatements -ne '') {

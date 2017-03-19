@@ -59,6 +59,8 @@ None
     Write-Verbose "Refreshing environment variables from the registry."
   }
 
+  $userName = $env:USERNAME
+  $architecture = $env:PROCESSOR_ARCHITECTURE
   $psModulePath = $env:PSModulePath
 
   #ordering is important here, $user comes after so we can override $machine
@@ -81,6 +83,10 @@ None
 
   # PSModulePath is almost always updated by process, so we want to preserve it.
   $env:PSModulePath = $psModulePath
+
+  # reset user and architecture
+  if ($userName) { $env:USERNAME = $userName; }
+  if ($architecture) { $env:PROCESSOR_ARCHITECTURE = $architecture; }
 
   if ($refreshEnv) {
     Write-Output "Finished"

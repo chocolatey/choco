@@ -356,6 +356,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool UseFipsCompliantChecksums { get; set; }
         public bool ShowNonElevatedWarnings { get; set; }
         public bool ShowDownloadProgress { get; set; }
+        public bool StopOnFirstPackageFailure { get; set; }
+
         //todo remove in 0.11.0
         public bool ScriptsCheckLastExitCode { get; set; }
     }
@@ -391,6 +393,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool FailOnNotInstalled { get; set; }
         public bool NotifyOnlyAvailableUpgrades { get; set; }
         public string PackageNamesToSkip { get; set; }
+        public bool ExcludePrerelease { get; set; }
     }
 
     [Serializable]

@@ -78,9 +78,11 @@ None
 The name of the package - while this is an arbitrary value, it's
 recommended that it matches the package id.
 
+In 0.10.4+, `Name` is an alias for PackageName.
+
 Property               | Value
 ---------------------- | -----
-Aliases                | 
+Aliases                | name
 Required?              | true
 Position?              | 1
 Default Value          | 
@@ -91,23 +93,30 @@ The URL of the package to be installed.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
+In 0.10.4+, `Url` is an alias for VsixUrl.
+
 Property               | Value
 ---------------------- | -----
-Aliases                | 
+Aliases                | url
 Required?              | false
 Position?              | 2
 Default Value          | 
 Accept Pipeline Input? | false
  
 ###  -VsVersion [&lt;Int32&gt;]
-The Major version number of Visual Studio where the
+The major version number of Visual Studio where the
 package should be installed. This is optional. If not
 specified, the most recent Visual Studio installation
 will be targetted.
 
+NOTE: For Visual Studio 2015, the VsVersion is 14. It can be determined
+by looking at the folders under Program Files / Program Files (x86).
+
+In 0.10.4+, `VisualStudioVersion` is an alias for VsVersion.
+
 Property               | Value
----------------------- | -----
-Aliases                | 
+---------------------- | -------------------
+Aliases                | visualStudioVersion
 Required?              | false
 Position?              | 3
 Default Value          | 0

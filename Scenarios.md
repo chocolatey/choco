@@ -647,7 +647,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 29 Scenario(s), 226 Observation(s) ]
+### ChocolateyUpgradeCommand [ 35 Scenario(s), 286 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -938,6 +938,20 @@
  * should report for all non skipped packages
  * should skip packages in except list
 
+#### when upgrading all packages with prereleases installed
+
+ * should report for all installed packages
+ * should skip packages without upgrades
+ * should upgrade packages with upgrades
+ * should upgrade upgradepackage
+
+#### when upgrading all packages with prereleases installed with excludeprerelease specified
+
+ * should not upgrade upgradepackage
+ * should report for all installed packages
+ * should skip packages without upgrades
+ * should upgrade packages with upgrades
+
 #### when upgrading an existing package happy path
 
  * config should match package result name
@@ -950,6 +964,70 @@
  * should have executed chocolateyBeforeModify script for original package
  * should have executed chocolateyInstall script for new package
  * should match the upgrade version of one dot one dot zero
+ * should not have executed chocolateyBeforeModify script for new package
+ * should not have executed chocolateyUninstall script for original package
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should upgrade a package in the lib directory
+ * should upgrade the package
+ * should upgrade where install location reports
+
+#### when upgrading an existing package with prerelease available and prerelease specified
+
+ * config should match package result name
+ * should contain a warning message that it upgraded successfully
+ * should contain a warning message with old and new versions
+ * should contain newer version in directory
+ * should delete the rollback
+ * should have a successful package result
+ * should have executed chocolateyBeforeModify before chocolateyInstall
+ * should have executed chocolateyBeforeModify script for original package
+ * should have executed chocolateyInstall script for new package
+ * should match the upgrade version of the new beta
+ * should not have executed chocolateyBeforeModify script for new package
+ * should not have executed chocolateyUninstall script for original package
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should upgrade a package in the lib directory
+ * should upgrade the package
+ * should upgrade where install location reports
+
+#### when upgrading an existing package with prerelease available without prerelease specified
+
+ * should be the same version of the package
+ * should contain a message that no packages were upgraded
+ * should contain a message that you have the latest version available
+ * should have a successful package result
+ * should have inconclusive package result
+ * should match the original package version
+ * should not create a rollback
+ * should not have warning package result
+ * should not remove the package from the lib directory
+
+#### when upgrading an existing prerelease package with prerelease available with excludeprelease and without prerelease specified
+
+ * should be the same version of the package
+ * should contain a message that no packages were upgraded
+ * should contain a message that you have the latest version available
+ * should have a successful package result
+ * should have inconclusive package result
+ * should not create a rollback
+ * should not have warning package result
+ * should not remove the package from the lib directory
+ * should only find the last stable version
+
+#### when upgrading an existing prerelease package without prerelease specified
+
+ * config should match package result name
+ * should contain a warning message that it upgraded successfully
+ * should contain a warning message with old and new versions
+ * should contain newer version in directory
+ * should delete the rollback
+ * should have a successful package result
+ * should have executed chocolateyBeforeModify before chocolateyInstall
+ * should have executed chocolateyBeforeModify script for original package
+ * should have executed chocolateyInstall script for new package
+ * should match the upgrade version of the new beta
  * should not have executed chocolateyBeforeModify script for new package
  * should not have executed chocolateyUninstall script for original package
  * should not have inconclusive package result
