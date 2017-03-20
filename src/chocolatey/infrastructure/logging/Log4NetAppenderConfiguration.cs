@@ -155,7 +155,7 @@ namespace chocolatey.infrastructure.logging
         }
 
         /// <summary>
-        ///   Sets a named verbose logger to Info Level when enableVerbose is true.
+        ///   Sets a named verbose logger to Info Level (or Debug Level) when enableVerbose is true.
         /// </summary>
         /// <param name="enableVerbose">
         ///   if set to <c>true</c> [enable verbose].
@@ -169,12 +169,38 @@ namespace chocolatey.infrastructure.logging
                 ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
                 foreach (var append in logRepository.GetAppenders())
                 {
-
                     var appender = append as AppenderSkeleton;
                     if (appender != null && appender.Name.is_equal_to(verboseLoggerName))
                     {
                         appender.ClearFilters();
                         var minLevel = enableDebug ? Level.Debug : Level.Info;
+                        appender.AddFilter(new log4net.Filter.LevelRangeFilter { LevelMin = minLevel, LevelMax = Level.Fatal });
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets a named trace logger to Debug level when enable trace is true.
+        /// </summary>
+        /// <param name="enableTrace">if set to <c>true</c> [enable trace].</param>
+        /// <param name="traceLoggerName">Name of the trace logger.</param>
+        public static void set_trace_logger_when_trace(bool enableTrace, string traceLoggerName)
+        {
+            if (enableTrace)
+            {
+                System.Diagnostics.Trace.Listeners.Clear();
+                System.Diagnostics.Trace.AutoFlush = true;
+                System.Diagnostics.Trace.Listeners.Add(new TraceLog());
+
+                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
+                foreach (var append in logRepository.GetAppenders())
+                {
+                    var appender = append as AppenderSkeleton;
+                    if (appender != null && appender.Name.is_equal_to(traceLoggerName))
+                    {
+                        appender.ClearFilters();
+                        var minLevel = Level.Debug;
                         appender.AddFilter(new log4net.Filter.LevelRangeFilter { LevelMin = minLevel, LevelMax = Level.Fatal });
                     }
                 }

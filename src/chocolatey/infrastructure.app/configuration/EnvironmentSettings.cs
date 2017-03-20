@@ -55,6 +55,10 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, null);
+
+            Environment.SetEnvironmentVariable("chocolateyProxyLocation", null);
+            Environment.SetEnvironmentVariable("chocolateyProxyBypassList", null);
+            Environment.SetEnvironmentVariable("chocolateyProxyBypassOnLocal", null);
         }
 
         public static void set_environment_variables(ChocolateyConfiguration config)
@@ -68,7 +72,8 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable("OS_VERSION", config.Information.PlatformVersion.to_string());
             Environment.SetEnvironmentVariable("OS_NAME", config.Information.PlatformName.to_string());
             // experimental until we know if this value returns correctly based on the OS and not the current process.
-            Environment.SetEnvironmentVariable("OS_IS64BIT", config.Information.Is64Bit ? "true" : "false");
+            Environment.SetEnvironmentVariable("OS_IS64BIT", config.Information.Is64BitOperatingSystem ? "true" : "false");
+            Environment.SetEnvironmentVariable("PROCESS_IS64BIT", config.Information.Is64BitProcess ? "true" : "false");
             Environment.SetEnvironmentVariable("IS_ADMIN", config.Information.IsUserAdministrator ? "true" : "false");
             Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", config.Information.IsProcessElevated ? "true" : "false");
             Environment.SetEnvironmentVariable("TEMP", config.CacheLocation);
@@ -82,7 +87,7 @@ namespace chocolatey.infrastructure.app.configuration
             if (config.Features.ScriptsCheckLastExitCode) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyCheckLastExitCode, "true");
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
             Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
-
+       
             if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
                 var proxyCreds = string.Empty;
@@ -97,8 +102,17 @@ namespace chocolatey.infrastructure.app.configuration
                 }
 
                 Environment.SetEnvironmentVariable("http_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
-                Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
+                Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location)); 
                 Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
+
+                if (!string.IsNullOrWhiteSpace(config.Proxy.BypassList))
+                {
+                    Environment.SetEnvironmentVariable("chocolateyProxyBypassList", config.Proxy.BypassList);
+                    Environment.SetEnvironmentVariable("no_proxy", config.Proxy.BypassList);
+
+                }
+
+                if (config.Proxy.BypassOnLocal) Environment.SetEnvironmentVariable("chocolateyProxyBypassOnLocal", "true");
             }
 
             if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, "true");
@@ -122,7 +136,7 @@ namespace chocolatey.infrastructure.app.configuration
                 {
                     if (config.RegularOutput) "chocolatey".Log().Warn(
                         ChocolateyLoggers.Important, @"Unable to set licensed environment settings. Please upgrade to a newer
- licensed version.");
+ licensed version (choco upgrade chocolatey.extension).");
                     return;
                 }
                 try
@@ -139,12 +153,21 @@ namespace chocolatey.infrastructure.app.configuration
                 }
                 catch (Exception ex)
                 {
+                    var isDebug = ApplicationParameters.is_debug_mode_cli_primitive();
+                    if (config.Debug) isDebug = true;
+                    var message = isDebug ? ex.ToString() : ex.Message;
+
+                    if (isDebug && ex.InnerException != null)
+                    {
+                        message += "{0}{1}".format_with(Environment.NewLine, ex.ToString());
+                    }
+
                     "chocolatey".Log().Error(
                         ChocolateyLoggers.Important,
                         @"Error when setting environment for '{0}':{1} {2}".format_with(
                             licensedEnvironmentSettings.FullName,
                             Environment.NewLine,
-                            ex.Message
+                            message
                             ));
                 }
             }

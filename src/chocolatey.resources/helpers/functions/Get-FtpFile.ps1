@@ -103,6 +103,8 @@ param(
   $explicitProxy = $env:chocolateyProxyLocation
   $explicitProxyUser = $env:chocolateyProxyUser
   $explicitProxyPassword = $env:chocolateyProxyPassword
+  $explicitProxyBypassList = $env:chocolateyProxyBypassList
+  $explicitProxyBypassOnLocal = $env:chocolateyProxyBypassOnLocal
   if ($explicitProxy -ne $null) {
     # explicit proxy
 	  $proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
@@ -110,6 +112,11 @@ param(
 	    $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
 	    $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
 	  }
+
+    if ($explicitProxyBypassList -ne $null -and $explicitProxyBypassList -ne '') {
+      $proxy.BypassList =  $explicitProxyBypassList.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)
+    }
+    if ($explicitProxyBypassOnLocal -eq 'true') { $proxy.BypassProxyOnLocal = $true; }
 
   	Write-Host "Using explicit proxy server '$explicitProxy'."
     $ftprequest.Proxy = $proxy
@@ -133,7 +140,7 @@ param(
   try {
     # send the ftp request to the server
     $ftpresponse = $ftprequest.GetResponse()
-    [int]$goal = $ftpresponse.ContentLength
+    [long]$goal = $ftpresponse.ContentLength
     $goalFormatted = Format-FileSize $goal
 
     # get a download stream from the server response
@@ -141,8 +148,8 @@ param(
 
     # create the target file on the local system and the download buffer
     $writer = New-Object IO.FileStream ($fileName,[IO.FileMode]::Create)
-    [byte[]]$buffer = New-Object byte[] 1024
-    [int]$total = [int]$count = 0
+    [byte[]]$buffer = New-Object byte[] 1048576
+    [long]$total = [long]$count = 0
 
     $originalEAP = $ErrorActionPreference
     $ErrorActionPreference = 'Stop'
@@ -167,17 +174,11 @@ param(
       } while ($count -ne 0)
       Write-Host ""
       Write-Host "Download of $([System.IO.Path]::GetFileName($fileName)) ($goalFormatted) completed."
-    } catch {
-      throw $_.Exception
     } finally {
         $ErrorActionPreference = $originalEAP
     }
 
-    $reader.Close()
-    if ($fileName) {
-      $writer.Flush()
-      $writer.Close()
-    }
+    $writer.Flush() # closed in finally block
 
   } catch {
     if ($ftprequest -ne $null) {
@@ -196,8 +197,17 @@ param(
        throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"
     }
   } finally {
+
+    if ($reader -ne $null) {
+      try { $reader.Close(); } catch {}
+    }
+
+    if ($writer -ne $null) {
+      try { $writer.Close(); } catch {}
+    }
+
     if ($ftpresponse -ne $null) {
-      $ftpresponse.Close()
+      try { $ftpresponse.Close(); } catch {}
     }
 
     Start-Sleep 1

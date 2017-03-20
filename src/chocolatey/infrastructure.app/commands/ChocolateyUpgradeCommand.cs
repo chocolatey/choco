@@ -156,7 +156,16 @@ namespace chocolatey.infrastructure.app.commands
                      )
                  .Add("except=",
                      "Except - a comma-separated list of package names that should not be upgraded when upgrading 'all'. Defaults to empty. Available in 0.9.10+.",
-                     option => configuration.UpgradeCommand.PackageNamesToSkip = option.remove_surrounding_quotes())
+                     option => configuration.UpgradeCommand.PackageNamesToSkip = option.remove_surrounding_quotes()
+                     )
+                 .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
+                     "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
+                     option => configuration.Features.StopOnFirstPackageFailure = option != null
+                     )
+                 .Add("exclude-pre|exclude-prerelease|exclude-prereleases",
+                     "Exclude Prerelease - Should prerelease be ignored for upgrades? Will be ignored if you pass `--pre`. Available in 0.10.4+.",
+                     option => configuration.UpgradeCommand.ExcludePrerelease = option != null
+                     )
                 ;
         }
 

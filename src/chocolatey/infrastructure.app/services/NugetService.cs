@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Net;
     using NuGet;
     using adapters;
     using commandline;
@@ -43,6 +44,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly ILogger _nugetLogger;
         private readonly IChocolateyPackageInformationService _packageInfoService;
         private readonly IFilesService _filesService;
+        private readonly IPackageDownloader _packageDownloader;
         private readonly Lazy<IDateTime> datetime_initializer = new Lazy<IDateTime>(() => new DateTime());
 
         private IDateTime DateTime
@@ -57,12 +59,14 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="nugetLogger">The nuget logger</param>
         /// <param name="packageInfoService">Package information service</param>
         /// <param name="filesService">The files service</param>
-        public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService, IFilesService filesService)
+        /// <param name="packageDownloader">The downloader used to download packages</param>
+        public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService, IFilesService filesService, IPackageDownloader packageDownloader)
         {
             _fileSystem = fileSystem;
             _nugetLogger = nugetLogger;
             _packageInfoService = packageInfoService;
             _filesService = filesService;
+            _packageDownloader = packageDownloader;
         }
 
         public SourceType SourceType
@@ -256,7 +260,7 @@ namespace chocolatey.infrastructure.app.services
             string outputFile = builder.Id + "." + builder.Version + Constants.PackageExtension;
             string outputPath = _fileSystem.combine_paths(config.OutputDirectory ?? _fileSystem.get_current_directory(), outputFile);
 
-            this.Log().Info(() => "Attempting to build package from '{0}'.".format_with(_fileSystem.get_file_name(nuspecFilePath)));
+            this.Log().Info(config.QuietOutput ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Normal, () => "Attempting to build package from '{0}'.".format_with(_fileSystem.get_file_name(nuspecFilePath)));
 
             IPackage package = NugetPack.BuildPackage(builder, _fileSystem, outputPath);
             // package.Validate().Any(v => v.Level == PackageIssueLevel.Error)
@@ -270,7 +274,7 @@ namespace chocolatey.infrastructure.app.services
             //    AnalyzePackage(package);
             //}
 
-            this.Log().Info(ChocolateyLoggers.Important, () => "Successfully created package '{0}'".format_with(outputPath));
+            this.Log().Info(config.QuietOutput ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, () => "Successfully created package '{0}'".format_with(outputPath));
         }
 
         public void push_noop(ChocolateyConfiguration config)
@@ -372,7 +376,7 @@ folder.");
             }
 
             var packageManager = NugetCommon.GetPackageManager(
-                config, _nugetLogger,
+                config, _nugetLogger, _packageDownloader,
                 installSuccessAction: (e) =>
                     {
                         var pkg = e.Package;
@@ -465,7 +469,15 @@ folder.");
                 }
                 catch (Exception ex)
                 {
-                    var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
+                    var message = ex.Message;
+                    var webException = ex as System.Net.WebException;
+                    if (webException != null)
+                    {
+                        var response = webException.Response as HttpWebResponse;
+                        if (response != null && !string.IsNullOrWhiteSpace(response.StatusDescription)) message += " {0}".format_with(response.StatusDescription);
+                    }
+
+                    var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, message);
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     var errorResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                     errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -522,7 +534,8 @@ folder.");
 
             var packageManager = NugetCommon.GetPackageManager(
                 config,
-                _nugetLogger,
+                _nugetLogger, 
+                _packageDownloader,
                 installSuccessAction: (e) =>
                     {
                         var pkg = e.Package;
@@ -590,8 +603,17 @@ folder.");
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
 
+                // if we have a prerelease installed, we want to have it upgrade based on newer prereleases
+                var originalPrerelease = config.Prerelease;
+                if (!string.IsNullOrWhiteSpace(installedPackage.Version.SpecialVersion) && !config.UpgradeCommand.ExcludePrerelease)
+                {
+                    // this is a prerelease - opt in for newer prereleases.
+                    config.Prerelease = true;
+                }
 
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+                config.Prerelease = originalPrerelease;
+
                 if (availablePackage == null)
                 {
                     string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"; Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
@@ -744,7 +766,15 @@ folder.");
                         }
                         catch (Exception ex)
                         {
-                            var logMessage = "{0} not upgraded. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
+                            var message = ex.Message;
+                            var webException = ex as System.Net.WebException;
+                            if (webException != null)
+                            {
+                                var response = webException.Response as HttpWebResponse;
+                                if (response != null && !string.IsNullOrWhiteSpace(response.StatusDescription)) message += " {0}".format_with(response.StatusDescription);
+                            }
+
+                            var logMessage = "{0} not upgraded. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, message);
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
                             packageResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                             if (packageResult.ExitCode == 0) packageResult.ExitCode = 1;
@@ -972,7 +1002,7 @@ folder.");
             var packageUninstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
-            var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger,
+            var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger, _packageDownloader,
                                                                installSuccessAction: null,
                                                                uninstallSuccessAction: (e) =>
                                                                    {
@@ -1196,6 +1226,10 @@ folder.");
                             var result = packageUninstalls.GetOrAdd(packageVersion.Id.to_lower() + "." + packageVersion.Version.to_string(), new PackageResult(packageVersion, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, packageVersion.Id)));
                             result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                             if (result.ExitCode == 0) result.ExitCode = 1;
+                            if (config.Features.StopOnFirstPackageFailure)
+                            {
+                                throw new ApplicationException("Stopping further execution as {0} has failed uninstallation".format_with(packageVersion.Id.to_lower()));
+                            }
                             // do not call continueAction - will result in multiple passes
                         }
                     }

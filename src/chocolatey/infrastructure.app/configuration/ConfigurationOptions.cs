@@ -85,6 +85,7 @@ namespace chocolatey.infrastructure.app.configuration
             catch (OptionException)
             {
                 show_help(_optionSet, helpMessage);
+                configuration.UnsuccessfulParsing = true;
             }
 
             // the command argument
@@ -102,6 +103,7 @@ namespace chocolatey.infrastructure.app.configuration
                 else
                 {
                     configuration.HelpRequested = true;
+                    configuration.UnsuccessfulParsing = true;
                 }
             }
 

@@ -15,6 +15,7 @@
 
 namespace chocolatey.infrastructure.app.nuget
 {
+    using logging;
     using NuGet;
 
     // ReSharper disable InconsistentNaming
@@ -41,7 +42,13 @@ namespace chocolatey.infrastructure.app.nuget
                     break;
                 case MessageLevel.Error:
                     this.Log().Error("[NuGet] " + message, args);
-                    break;
+                    break; 
+                //todo: case MessageLevel.Fatal:
+                //    this.Log().Fatal("[NuGet] " + message, args);
+                //    break;
+                //case MessageLevel.Verbose:
+                //    this.Log().Info(ChocolateyLoggers.Verbose,"[NuGet] " + message, args);
+                //    break;
             }
         }
     }

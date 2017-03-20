@@ -3004,7 +3004,6 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                //MockLogger.LogMessagesToConsole = true;
                 Results = Service.install_run(Configuration);
             }
 

@@ -80,9 +80,13 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
       <dependency id="""" version=""[_MIN_VERSION_INCLUSIVE, MAX_VERSION_INCLUSIVE]"" />
       <dependency id="""" version=""[_MIN_VERSION_INCLUSIVE, MAX_VERSION_EXCLUSIVE)"" />
       <dependency id="""" />
-      <dependency id=""chocolatey-uninstall.extension"" />
+      <dependency id=""chocolatey-core.extension"" version=""1.1.0"" />
     </dependencies>-->
-    <!-- chocolatey-uninstall.extension - If supporting 0.9.9.x (or below) and including a chocolateyUninstall.ps1 file to uninstall an EXE/MSI, you probably want to include chocolatey-uninstall.extension as a dependency. Please verify whether you are using a helper function from that package. -->
+    <!-- chocolatey-core.extension - https://chocolatey.org/packages/chocolatey-core.extension
+         - You want to use Get-UninstallRegistryKey on less than 0.9.10 (in chocolateyUninstall.ps1)
+         - You want to use Get-PackageParameters and on less than 0.11.0
+         - You want to take advantage of other functions in the core community maintainer's team extension package
+    -->
 
     <!--<provides>NOT YET IMPLEMENTED</provides>-->
     <!--<conflicts>NOT YET IMPLEMENTED</conflicts>-->

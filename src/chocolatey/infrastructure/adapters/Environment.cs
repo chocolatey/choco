@@ -30,6 +30,11 @@ namespace chocolatey.infrastructure.adapters
             get { return System.Environment.Is64BitOperatingSystem; }
         }
 
+        public bool Is64BitProcess
+        {
+            get { return (IntPtr.Size == 8); }
+        }
+
         public bool UserInteractive
         {
             get { return System.Environment.UserInteractive; }

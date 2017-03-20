@@ -136,6 +136,8 @@ namespace chocolatey.infrastructure.app
             public static readonly string Proxy = "proxy";
             public static readonly string ProxyUser = "proxyUser";
             public static readonly string ProxyPassword = "proxyPassword";
+            public static readonly string ProxyBypassList = "proxyBypassList";
+            public static readonly string ProxyBypassOnLocal = "proxyBypassOnLocal";
             public static readonly string WebRequestTimeoutSeconds = "webRequestTimeoutSeconds";
         }
         
@@ -156,6 +158,9 @@ namespace chocolatey.infrastructure.app
             public static readonly string UsePackageExitCodes = "usePackageExitCodes";
             public static readonly string UseFipsCompliantChecksums = "useFipsCompliantChecksums";
             public static readonly string ScriptsCheckLastExitCode = "scriptsCheckLastExitCode";
+            public static readonly string ShowNonElevatedWarnings = "showNonElevatedWarnings";
+            public static readonly string ShowDownloadProgress = "showDownloadProgress";
+            public static readonly string StopOnFirstPackageFailure = "stopOnFirstPackageFailure";
         }
 
         public static class Messages
@@ -174,6 +179,23 @@ namespace chocolatey.infrastructure.app
             {
                 return defaultValue;
             }
+        }
+
+        public static bool is_debug_mode_cli_primitive()
+        {
+            var args = System.Environment.GetCommandLineArgs();
+            var isDebug = false;
+            // no access to the good stuff here, need to go a bit primitive in parsing args
+            foreach (var arg in args.or_empty_list_if_null())
+            {
+                if (arg.contains("-debug") || arg.is_equal_to("-d") || arg.is_equal_to("/d"))
+                {
+                    isDebug = true;
+                    break;
+                }
+            }
+
+            return isDebug;
         }
 
         ///// <summary>

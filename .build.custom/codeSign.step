@@ -34,7 +34,7 @@
 C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\signtool.exe sign /t http://timestamp.digicert.com /fd SHA1 /f %CHOCOLATEY_OFFICIAL_CERT% /p [INSERT] /a "code_drop\chocolatey\console\choco.exe"
 -->
 
-  <target name="sign_assemblies" description="Signs the final choco.exe assembly prior to packaging it up." if="${file::exists(app.signtool) and property::exists('path.code.cert')}">
+  <target name="sign_assemblies" description="Signs the final assembly prior to packaging it up." if="${file::exists(app.signtool) and property::exists('path.code.cert')}">
     <echo level="Warning" message="Signing the assemblies using ${app.signtool}." />
     <property name="app.choco" value="${dirs.drop}${path.separator}chocolatey${path.separator}console${path.separator}choco.exe" />
     <property name="lib.choco" value="${dirs.drop}${path.separator}chocolatey${path.separator}lib${path.separator}chocolatey.dll" />

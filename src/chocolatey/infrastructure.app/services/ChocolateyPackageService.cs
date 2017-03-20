@@ -58,14 +58,14 @@ Are you ready for the ultimate experience? Check out Pro / Business!
  https://chocolatey.org/compare"       
 , 
 @"
-You use Chocolatey? You are amazing! Are you ready to take the next 
- step and look even smarter with more awesome features?
+Enjoy using Chocolatey? Explore more amazing features to take your 
+experience to the next level at
  https://chocolatey.org/compare"       
 , 
 @"
 Did you know the proceeds of Pro (and some proceeds from other 
  licensed editions) go into bettering the community infrastructure?
- Your support ensures an active community, it makes you look smarter,
+ Your support ensures an active community, keeps Chocolatey tip top,
  plus it nets you some awesome features! 
  https://chocolatey.org/compare", 
 @"
@@ -87,8 +87,7 @@ Did you know that Package Synchronizer and AutoUninstaller enhancements
 @"
 Did you know Chocolatey goes to eleven? And it turns great developers /
  system admins into something amazing! Singlehandedly solve your 
- organization's struggles with software management and look uber cool 
- while doing so.
+ organization's struggles with software management and save the day!
  https://chocolatey.org/compare"
 };
         private const string PRO_BUSINESS_LIST_MESSAGE = @"
@@ -422,6 +421,11 @@ Did you know Pro / Business automatically syncs with Programs and
                 this.Log().Error(ChocolateyLoggers.Important, "The {0} of {1} was NOT successful.".format_with(commandName.to_string(), packageResult.Name));
                 handle_unsuccessful_operation(config, packageResult, movePackageToFailureLocation: true, attemptRollback: true);
 
+                if (config.Features.StopOnFirstPackageFailure)
+                {
+                    throw new ApplicationException("Stopping further execution as {0} has failed {1}.".format_with(packageResult.Name, commandName.to_string()));
+                }
+
                 return;
             }
 
@@ -561,7 +565,7 @@ Would have determined packages that are out of date based on what is
             if (config.RegularOutput)
             {
                 var upgradeWarnings = oudatedPackages.Count(p => p.Value.Warning);
-                this.Log().Warn(() => @"{0}{1} has determined {2} package(s) are outdated. {3}.".format_with(
+                this.Log().Warn(() => @"{0}{1} has determined {2} package(s) are outdated. {3}".format_with(
                     Environment.NewLine,
                     ApplicationParameters.Name,
                     oudatedPackages.Count(p => p.Value.Success && !p.Value.Inconclusive),

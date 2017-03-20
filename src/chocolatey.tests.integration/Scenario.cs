@@ -127,7 +127,7 @@ namespace chocolatey.tests.integration
             config.Information.ChocolateyVersion = "1.2.3";
             config.Information.ChocolateyProductVersion = "1.2.3";
             config.Information.FullName = "choco something something";
-            config.Information.Is64Bit = true;
+            config.Information.Is64BitOperatingSystem = true;
             config.Information.IsInteractive = false;
             config.Information.IsUserAdministrator = true;
             config.Information.IsProcessElevated = true;
@@ -142,6 +142,7 @@ namespace chocolatey.tests.integration
             config.ForceDependencies = false;
             config.ForceX86 = false;
             config.HelpRequested = false;
+            config.UnsuccessfulParsing = false;
             config.IgnoreDependencies = false;
             config.InstallArguments = string.Empty;
             config.Noop = false;

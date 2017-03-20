@@ -1,5 +1,7 @@
 ﻿# Install-ChocolateyInstallPackage
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Install-ChocolateyInstallPackage.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 **NOTE:** Administrative Access Required.
 
 Installs software into "Programs and Features". Use
@@ -12,7 +14,8 @@ Install-ChocolateyInstallPackage `
   -PackageName <String> `
   [-FileType <String>] `
   [-SilentArgs <String[]>] `
-  -File <String> `
+  [-File <String>] `
+  [-File64 <String>] `
   [-ValidExitCodes <Object>] `
   [-UseOnlyPackageSilentArguments] `
   [-IgnoredArguments <Object[]>] [<CommonParameters>]
@@ -159,18 +162,38 @@ Position?              | 3
 Default Value          | 
 Accept Pipeline Input? | false
  
-###  -File &lt;String&gt;
+###  -File [&lt;String&gt;]
 Full file path to native installer to run. If embedding in the package,
 you can get it to the path with
 `"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
 
 In 0.10.1+, `FileFullPath` is an alias for File.
 
+This can be a 32-bit or 64-bit file. This is mandatory in earlier versions
+of Chocolatey, but optional if File64 has been provided.
+
 Property               | Value
 ---------------------- | ------------
 Aliases                | fileFullPath
-Required?              | true
+Required?              | false
 Position?              | 4
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -File64 [&lt;String&gt;]
+Full file path to a 64-bit native installer to run. Available in 0.10.4+.
+If embedding in the package, you can get it to the path with
+`"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
+
+Provide this when you want to provide both 32-bit and 64-bit
+installers or explicitly only a 64-bit installer (which will cause a package 
+install failure on 32-bit systems).
+
+Property               | Value
+---------------------- | --------------
+Aliases                | fileFullPath64
+Required?              | false
+Position?              | named
 Default Value          | 
 Accept Pipeline Input? | false
  

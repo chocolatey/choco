@@ -85,7 +85,7 @@ namespace chocolatey.infrastructure.app.builders
             set_config_file_settings(configFileSettings, xmlService, config);
             set_hash_provider(config, container);
         }
-        
+
         private static ConfigFileSettings get_config_file_settings(IFileSystem fileSystem, IXmlService xmlService)
         {
             var globalConfigPath = ApplicationParameters.GlobalConfigFileLocation;
@@ -118,7 +118,9 @@ namespace chocolatey.infrastructure.app.builders
                 Value = ApplicationParameters.ChocolateyLicensedFeedSource,
                 UserName = "customer",
                 Password = NugetEncryptionUtility.EncryptString(license.Id),
-                Priority = 10
+                Priority = 10,
+                BypassProxy = false,
+                AllowSelfService = false,
             };
 
             if (addOrUpdate && !sources.Any(s =>
@@ -134,6 +136,9 @@ namespace chocolatey.infrastructure.app.builders
             {
                 configFileSettings.Sources.RemoveWhere(s => s.Id.is_equal_to(configSource.Id));
             }
+
+            // ensure only one licensed source - helpful when moving between licenses
+            configFileSettings.Sources.RemoveWhere(s => s.Id.is_equal_to(configSource.Id) && !NugetEncryptionUtility.DecryptString(s.Password).is_equal_to(license.Id));
         }
 
         private static void set_file_configuration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem, Action<string> notifyWarnLoggingAction)
@@ -144,7 +149,7 @@ namespace chocolatey.infrastructure.app.builders
             if (configFileSettings.Sources.Any(s => s.Priority > 0))
             {
                 defaultSourcesInOrder = configFileSettings.Sources.Where(s => !s.Disabled && s.Priority != 0).OrderBy(s => s.Priority).or_empty_list_if_null().ToList();
-                defaultSourcesInOrder.AddRange(configFileSettings.Sources.Where(s => !s.Disabled && s.Priority == 0 ).or_empty_list_if_null().ToList());
+                defaultSourcesInOrder.AddRange(configFileSettings.Sources.Where(s => !s.Disabled && s.Priority == 0).or_empty_list_if_null().ToList());
             }
 
             foreach (var source in defaultSourcesInOrder)
@@ -180,35 +185,27 @@ namespace chocolatey.infrastructure.app.builders
                         EncryptedPassword = source.Password,
                         Certificate = source.Certificate,
                         EncryptedCertificatePassword = source.CertificatePassword,
-                        Priority = source.Priority
+                        Priority = source.Priority,
+                        BypassProxy = source.BypassProxy,
+                        AllowSelfService = source.AllowSelfService,
                     });
             }
         }
 
         private static void set_config_items(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
-            var cacheLocation = set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder.");
-            config.CacheLocation = !string.IsNullOrWhiteSpace(cacheLocation) ? Environment.ExpandEnvironmentVariables(cacheLocation) : fileSystem.combine_paths(fileSystem.get_temp_path(), "chocolatey"); // System.Environment.GetEnvironmentVariable("TEMP");
-            if (string.IsNullOrWhiteSpace(config.CacheLocation))
-            {
-                config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
-            }
-
-            var originalCommandTimeout = configFileSettings.CommandExecutionTimeoutSeconds;
-            var commandExecutionTimeoutSeconds = -1;
-            int.TryParse(
-                set_config_item(
-                    ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds,
-                    configFileSettings,
-                    originalCommandTimeout == 0 ?
-                        ApplicationParameters.DefaultWaitForExitInSeconds.to_string()
-                        : originalCommandTimeout.to_string(),
-                    "Default timeout for command execution."),
-                out commandExecutionTimeoutSeconds);
+            config.CacheLocation = Environment.ExpandEnvironmentVariables(set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder."));
+            if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.combine_paths(fileSystem.get_temp_path(), "chocolatey"); // System.Environment.GetEnvironmentVariable("TEMP");
+            // if it is still empty, use temp in the Chocolatey install directory.
+            if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
+            
+            var commandExecutionTimeoutSeconds = 0;
+            var commandExecutionTimeout = set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CommandExecutionTimeoutSeconds.to_string()) ? ApplicationParameters.DefaultWaitForExitInSeconds.to_string() : configFileSettings.CommandExecutionTimeoutSeconds.to_string(), "Default timeout for command execution. '0' for infinite (starting in 0.10.4).");
+            int.TryParse(commandExecutionTimeout, out commandExecutionTimeoutSeconds);
             config.CommandExecutionTimeoutSeconds = commandExecutionTimeoutSeconds;
-            if (configFileSettings.CommandExecutionTimeoutSeconds <= 0)
+            if (commandExecutionTimeout != "0" && commandExecutionTimeoutSeconds <= 0)
             {
-                set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, ApplicationParameters.DefaultWaitForExitInSeconds.to_string(), "Default timeout for command execution.", forceSettingValue: true);
+                set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, ApplicationParameters.DefaultWaitForExitInSeconds.to_string(), "Default timeout for command execution. '0' for infinite (starting in 0.10.4).", forceSettingValue: true);
                 config.CommandExecutionTimeoutSeconds = ApplicationParameters.DefaultWaitForExitInSeconds;
             }
 
@@ -223,14 +220,16 @@ namespace chocolatey.infrastructure.app.builders
             if (webRequestTimeoutSeconds <= 0)
             {
                 webRequestTimeoutSeconds = ApplicationParameters.DefaultWebRequestTimeoutInSeconds;
-                set_config_item(ApplicationParameters.ConfigSettings.WebRequestTimeoutSeconds,configFileSettings, ApplicationParameters.DefaultWebRequestTimeoutInSeconds.to_string(),"Default timeout for web requests. Available in 0.9.10+.", forceSettingValue: true);
+                set_config_item(ApplicationParameters.ConfigSettings.WebRequestTimeoutSeconds, configFileSettings, ApplicationParameters.DefaultWebRequestTimeoutInSeconds.to_string(), "Default timeout for web requests. Available in 0.9.10+.", forceSettingValue: true);
             }
             config.WebRequestTimeoutSeconds = webRequestTimeoutSeconds;
 
             config.ContainsLegacyPackageInstalls = set_config_item(ApplicationParameters.ConfigSettings.ContainsLegacyPackageInstalls, configFileSettings, "true", "Install has packages installed prior to 0.9.9 series.").is_equal_to(bool.TrueString);
-            config.Proxy.Location = set_config_item(ApplicationParameters.ConfigSettings.Proxy, configFileSettings, string.Empty, "Explicit proxy location.");
-            config.Proxy.User = set_config_item(ApplicationParameters.ConfigSettings.ProxyUser, configFileSettings, string.Empty, "Optional proxy user.");
-            config.Proxy.EncryptedPassword = set_config_item(ApplicationParameters.ConfigSettings.ProxyPassword, configFileSettings, string.Empty, "Optional proxy password. Encrypted.");
+            config.Proxy.Location = set_config_item(ApplicationParameters.ConfigSettings.Proxy, configFileSettings, string.Empty, "Explicit proxy location. Available in 0.9.9.9+.");
+            config.Proxy.User = set_config_item(ApplicationParameters.ConfigSettings.ProxyUser, configFileSettings, string.Empty, "Optional proxy user. Available in 0.9.9.9+.");
+            config.Proxy.EncryptedPassword = set_config_item(ApplicationParameters.ConfigSettings.ProxyPassword, configFileSettings, string.Empty, "Optional proxy password. Encrypted. Available in 0.9.9.9+.");
+            config.Proxy.BypassList = set_config_item(ApplicationParameters.ConfigSettings.ProxyBypassList, configFileSettings, string.Empty, "Optional proxy bypass list. Comma separated. Available in 0.10.4+.");
+            config.Proxy.BypassOnLocal = set_config_item(ApplicationParameters.ConfigSettings.ProxyBypassOnLocal, configFileSettings, "true", "Bypass proxy for local connections. Available in 0.10.4+.").is_equal_to(bool.TrueString);
         }
 
         private static string set_config_item(string configName, ConfigFileSettings configFileSettings, string defaultValue, string description, bool forceSettingValue = false)
@@ -272,6 +271,9 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.IgnoreInvalidOptionsSwitches = set_feature_flag(ApplicationParameters.Features.IgnoreInvalidOptionsSwitches, configFileSettings, defaultEnabled: true, description: "Ignore Invalid Options/Switches - If a switch or option is passed that is not recognized, should choco fail? Available in 0.9.10+.");
             config.Features.UsePackageExitCodes = set_feature_flag(ApplicationParameters.Features.UsePackageExitCodes, configFileSettings, defaultEnabled: true, description: "Use Package Exit Codes - Package scripts can provide exit codes. With this on, package exit codes will be what choco uses for exit when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. With this feature off, choco will exit with a 0 or a 1 (matching previous behavior). Available in 0.9.10+.");
             config.Features.UseFipsCompliantChecksums = set_feature_flag(ApplicationParameters.Features.UseFipsCompliantChecksums, configFileSettings, defaultEnabled: false, description: "Use FIPS Compliant Checksums - Ensure checksumming done by choco uses FIPS compliant algorithms. Not recommended unless required by FIPS Mode. Enabling on an existing installation could have unintended consequences related to upgrades/uninstalls. Available in 0.9.10+.");
+            config.Features.ShowNonElevatedWarnings = set_feature_flag(ApplicationParameters.Features.ShowNonElevatedWarnings, configFileSettings, defaultEnabled: true, description: "Show Non-Elevated Warnings - Display non-elevated warnings. Available in 0.10.4+.");
+            config.Features.ShowDownloadProgress = set_feature_flag(ApplicationParameters.Features.ShowDownloadProgress, configFileSettings, defaultEnabled: true, description: "Show Download Progress - Show download progress percentages in the CLI. Available in 0.10.4+.");
+            config.Features.StopOnFirstPackageFailure = set_feature_flag(ApplicationParameters.Features.StopOnFirstPackageFailure, configFileSettings, defaultEnabled: false, description: "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. As this will affect upgrade all, it is normally recommended to leave this off. Available in 0.10.4+.");
             config.Features.ScriptsCheckLastExitCode = set_feature_flag(ApplicationParameters.Features.ScriptsCheckLastExitCode, configFileSettings, defaultEnabled: false, description: "Scripts Check $LastExitCode (external commands) - Leave this off unless you absolutely need it while you fix your package scripts  to use `throw 'error message'` or `Set-PowerShellExitCode #` instead of `exit #`. This behavior started in 0.9.10 and produced hard to find bugs. If the last external process exits successfully but with an exit code of not zero, this could cause hard to detect package failures. Available in 0.10.3+. Will be removed in 0.11.0.");
             config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
         }
@@ -310,91 +312,113 @@ namespace chocolatey.infrastructure.app.builders
                 args,
                 config,
                 (option_set) =>
-                    {
-                        option_set
-                            .Add("d|debug",
-                                 "Debug - Show debug messaging.",
-                                 option => config.Debug = option != null)
-                            .Add("v|verbose",
-                                 "Verbose - Show verbose messaging.",
-                                 option => config.Verbose = option != null)
-                            .Add("acceptlicense|accept-license",
-                                 "AcceptLicense - Accept license dialogs automatically. Reserved for future use.",
-                                 option => config.AcceptLicense = option != null)
-                            .Add("y|yes|confirm",
-                                 "Confirm all prompts - Chooses affirmative answer instead of prompting. Implies --accept-license",
-                                 option =>
-                                     {
-                                         config.PromptForConfirmation = option == null;
-                                         config.AcceptLicense = option != null;
-                                     })
-                            .Add("f|force",
-                                 "Force - force the behavior. Do not use force during normal operation - it subverts some of the smart behavior for commands.",
-                                 option => config.Force = option != null)
-                            .Add("noop|whatif|what-if",
-                                 "NoOp / WhatIf - Don't actually do anything.",
-                                 option => config.Noop = option != null)
-                            .Add("r|limitoutput|limit-output",
-                                 "LimitOutput - Limit the output to essential information",
-                                 option => config.RegularOutput = option == null)
-                            .Add("timeout=|execution-timeout=",
-                                 "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
-                                option =>
+                {
+                    option_set
+                        .Add("d|debug",
+                             "Debug - Show debug messaging.",
+                             option => config.Debug = option != null)
+                        .Add("v|verbose",
+                             "Verbose - Show verbose messaging. Very verbose messaging, avoid using under normal circumstances.",
+                             option => config.Verbose = option != null)
+                        .Add("trace",
+                             "Trace - Show trace messaging. Very, very verbose trace messaging. Avoid except when needing super low-level .NET Framework debugging. Available in 0.10.4+.",
+                             option => config.Trace = option != null)
+                        .Add("acceptlicense|accept-license",
+                             "AcceptLicense - Accept license dialogs automatically. Reserved for future use.",
+                             option => config.AcceptLicense = option != null)
+                        .Add("y|yes|confirm",
+                             "Confirm all prompts - Chooses affirmative answer instead of prompting. Implies --accept-license",
+                             option =>
+                             {
+                                 config.PromptForConfirmation = option == null;
+                                 config.AcceptLicense = option != null;
+                             })
+                        .Add("f|force",
+                             "Force - force the behavior. Do not use force during normal operation - it subverts some of the smart behavior for commands.",
+                             option => config.Force = option != null)
+                        .Add("noop|whatif|what-if",
+                             "NoOp / WhatIf - Don't actually do anything.",
+                             option => config.Noop = option != null)
+                        .Add("r|limitoutput|limit-output",
+                             "LimitOutput - Limit the output to essential information",
+                             option => config.RegularOutput = option == null)
+                        .Add("timeout=|execution-timeout=",
+                             "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds. '0' for infinite starting in 0.10.4.".format_with(config.CommandExecutionTimeoutSeconds.to_string()),
+                            option =>
+                            {
+                                int timeout = 0;
+                                int.TryParse(option.remove_surrounding_quotes(), out timeout);
+                                if (timeout > 0)
                                 {
-                                    int timeout = 0;
-                                    int.TryParse(option.remove_surrounding_quotes(), out timeout);
-                                    if (timeout > 0)
-                                    {
-                                        config.CommandExecutionTimeoutSeconds = timeout;
-                                    }
-                                })
-                            .Add("c=|cache=|cachelocation=|cache-location=",
-                                 "CacheLocation - Location for download cache, defaults to %TEMP% or value in chocolatey.config file.",
-                                 option => config.CacheLocation = option.remove_surrounding_quotes())
-                            .Add("allowunofficial|allow-unofficial|allowunofficialbuild|allow-unofficial-build",
-                                 "AllowUnofficialBuild - When not using the official build you must set this flag for choco to continue.",
-                                 option => config.AllowUnofficialBuild = option != null)
-                            .Add("failstderr|failonstderr|fail-on-stderr|fail-on-standard-error|fail-on-error-output",
-                                 "FailOnStandardError - Fail on standard error output (stderr), typically received when running external commands during install providers. This overrides the feature failOnStandardError.",
-                                 option => config.Features.FailOnStandardError = option != null)
-                            .Add("use-system-powershell",
-                                 "UseSystemPowerShell - Execute PowerShell using an external process instead of the built-in PowerShell host. Should only be used when internal host is failing. Available in 0.9.10+.",
-                                 option => config.Features.UsePowerShellHost = option == null)
-                            ;
-                    },
+                                    config.CommandExecutionTimeoutSeconds = timeout;
+                                }
+                            })
+                        .Add("c=|cache=|cachelocation=|cache-location=",
+                             "CacheLocation - Location for download cache, defaults to %TEMP% or value in chocolatey.config file.",
+                             option => config.CacheLocation = option.remove_surrounding_quotes())
+                        .Add("allowunofficial|allow-unofficial|allowunofficialbuild|allow-unofficial-build",
+                             "AllowUnofficialBuild - When not using the official build you must set this flag for choco to continue.",
+                             option => config.AllowUnofficialBuild = option != null)
+                        .Add("failstderr|failonstderr|fail-on-stderr|fail-on-standard-error|fail-on-error-output",
+                             "FailOnStandardError - Fail on standard error output (stderr), typically received when running external commands during install providers. This overrides the feature failOnStandardError.",
+                             option => config.Features.FailOnStandardError = option != null)
+                        .Add("use-system-powershell",
+                             "UseSystemPowerShell - Execute PowerShell using an external process instead of the built-in PowerShell host. Should only be used when internal host is failing. Available in 0.9.10+.",
+                             option => config.Features.UsePowerShellHost = option == null)
+                        .Add("no-progress",
+                             "Do Not Show Progress - Do not show download progress percentages. Available in 0.10.4+.",
+                             option => config.Features.ShowDownloadProgress = option == null)
+                        .Add("proxy=",
+                            "Proxy Location - Explicit proxy location. Overrides the default proxy location of '{0}'. Available for config settings in 0.9.9.9+, this CLI option available in 0.10.4+.".format_with(config.Proxy.Location),
+                            option => config.Proxy.Location = option.remove_surrounding_quotes())
+                        .Add("proxy-user=",
+                            "Proxy User Name - Explicit proxy user (optional). Requires explicity proxy (`--proxy` or config setting). Overrides the default proxy user of '{0}'. Available for config settings in 0.9.9.9+, this CLI option available in 0.10.4+.".format_with(config.Proxy.User),
+                            option => config.Proxy.User = option.remove_surrounding_quotes())
+                        .Add("proxy-password=",
+                            "Proxy Password - Explicit proxy password (optional) to be used with username. Requires explicity proxy (`--proxy` or config setting) and user name.  Overrides the default proxy password (encrypted in settings if set). Available for config settings in 0.9.9.9+, this CLI option available in 0.10.4+.",
+                            option => config.Proxy.EncryptedPassword = NugetEncryptionUtility.EncryptString(option.remove_surrounding_quotes()))
+                        .Add("proxy-bypass-list=",
+                             "ProxyBypassList - Comma separated list of regex locations to bypass on proxy. Requires explicity proxy (`--proxy` or config setting). Overrides the default proxy bypass list of '{0}'. Available in 0.10.4+.".format_with(config.Proxy.BypassList),
+                             option => config.Proxy.BypassList = option.remove_surrounding_quotes())
+                        .Add("proxy-bypass-on-local",
+                             "Proxy Bypass On Local - Bypass proxy for local connections. Requires explicity proxy (`--proxy` or config setting). Overrides the default proxy bypass on local setting of '{0}'. Available in 0.10.4+.".format_with(config.Proxy.BypassOnLocal),
+                             option => config.Proxy.BypassOnLocal = option != null)
+                        ;
+                },
                 (unparsedArgs) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(config.CommandName))
                     {
-                        if (!string.IsNullOrWhiteSpace(config.CommandName))
-                        {
-                            // save help for next menu
-                            config.HelpRequested = false;
-                        }
-                    },
+                        // save help for next menu
+                        config.HelpRequested = false;
+                        config.UnsuccessfulParsing = false;
+                    }
+                },
                 () => { },
                 () =>
+                {
+                    var commandsLog = new StringBuilder();
+                    IEnumerable<ICommand> commands = container.GetAllInstances<ICommand>();
+                    foreach (var command in commands.or_empty_list_if_null())
                     {
-                        var commandsLog = new StringBuilder();
-                        IEnumerable<ICommand> commands = container.GetAllInstances<ICommand>();
-                        foreach (var command in commands.or_empty_list_if_null())
+                        var attributes = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>();
+                        foreach (var attribute in attributes.or_empty_list_if_null())
                         {
-                            var attributes = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>();
-                            foreach (var attribute in attributes.or_empty_list_if_null())
-                            {
-                                commandsLog.AppendFormat(" * {0} - {1}\n", attribute.CommandName, attribute.Description);
-                            }
+                            commandsLog.AppendFormat(" * {0} - {1}\n", attribute.CommandName, attribute.Description);
                         }
+                    }
 
-                        "chocolatey".Log().Info(@"This is a listing of all of the different things you can pass to choco.
+                    "chocolatey".Log().Info(@"This is a listing of all of the different things you can pass to choco.
 ");
-                        "chocolatey".Log().Info(ChocolateyLoggers.Important, "Commands");
-                        "chocolatey".Log().Info(@"
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, "Commands");
+                    "chocolatey".Log().Info(@"
 {0}
 
 Please run chocolatey with `choco command -help` for specific help on
  each command.
 ".format_with(commandsLog.ToString()));
-                        "chocolatey".Log().Info(ChocolateyLoggers.Important, @"How To Pass Options / Switches");
-                        "chocolatey".Log().Info(@"
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, @"How To Pass Options / Switches");
+                    "chocolatey".Log().Info(@"
 You can pass options and switches in the following ways:
 
  * Unless stated otherwise, an option/switch should only be passed one
@@ -415,6 +439,9 @@ You can pass options and switches in the following ways:
    (`` `""value`"" ``) or apostrophes (`'value'`). Using the combination
    allows for both shells to work without issue, except for when the next
    section applies.
+ * **Periods in PowerShell**: If you need to pass a period as part of a 
+   value or a path, PowerShell doesn't always handle it well. Please 
+   quote those values using ""Quote Values"" section above.
  * **Pass quotes in arguments**: When you need to pass quoted values to
    to something like a native installer, you are in for a world of fun. In
    cmd.exe you must pass it like this: `-ia ""/yo=""""Spaces spaces""""""`. In
@@ -428,8 +455,8 @@ You can pass options and switches in the following ways:
    package passed. So please split out multiple package calls when
    wanting to pass specific options.
 ");
-                        "chocolatey".Log().Info(ChocolateyLoggers.Important, "Default Options and Switches");
-                    });
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, "Default Options and Switches");
+                });
         }
 
         private static void set_environment_options(ChocolateyConfiguration config)
@@ -440,10 +467,26 @@ You can pass options and switches in the following ways:
             config.Information.ChocolateyVersion = VersionInformation.get_current_assembly_version();
             config.Information.ChocolateyProductVersion = VersionInformation.get_current_informational_version();
             config.Information.FullName = Assembly.GetExecutingAssembly().FullName;
-            config.Information.Is64Bit = Environment.Is64BitOperatingSystem;
+            config.Information.Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;
+            config.Information.Is64BitProcess = (IntPtr.Size == 8);
             config.Information.IsInteractive = Environment.UserInteractive;
             config.Information.IsUserAdministrator = ProcessInformation.user_is_administrator();
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("https_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
+            {
+                config.Proxy.Location = Environment.GetEnvironmentVariable("https_proxy");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("http_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
+            {
+                config.Proxy.Location = Environment.GetEnvironmentVariable("http_proxy");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("no_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.BypassList))
+            {
+                config.Proxy.BypassList = Environment.GetEnvironmentVariable("no_proxy");
+            }
         }
 
         private static void set_licensed_options(ChocolateyConfiguration config, ChocolateyLicense license, ConfigFileSettings configFileSettings)
@@ -457,9 +500,9 @@ You can pass options and switches in the following ways:
 
                 if (licensedConfigBuilder == null)
                 {
-                    if (config.RegularOutput) "chocolatey".Log().Warn(ChocolateyLoggers.Important, 
+                    if (config.RegularOutput) "chocolatey".Log().Warn(ChocolateyLoggers.Important,
                         @"Unable to set licensed configuration. Please upgrade to a newer 
- licensed version.");
+ licensed version (choco upgrade chocolatey.extension).");
                     return;
                 }
                 try
@@ -476,12 +519,21 @@ You can pass options and switches in the following ways:
                 }
                 catch (Exception ex)
                 {
+                    var isDebug = ApplicationParameters.is_debug_mode_cli_primitive();
+                    if (config.Debug) isDebug = true;
+                    var message = isDebug ? ex.ToString() : ex.Message;
+
+                    if (isDebug && ex.InnerException != null)
+                    {
+                        message += "{0}{1}".format_with(Environment.NewLine, ex.ToString());
+                    }
+
                     "chocolatey".Log().Error(
                         ChocolateyLoggers.Important,
                         @"Error when setting configuration for '{0}':{1} {2}".format_with(
                             licensedConfigBuilder.FullName,
                             Environment.NewLine,
-                            ex.Message
+                            message
                             ));
                 }
             }
@@ -505,7 +557,15 @@ You can pass options and switches in the following ways:
                             "chocolatey".Log().Warn(ChocolateyLoggers.Important, @"
 FIPS Mode detected - run 'choco feature enable -n {0}' 
  to use Chocolatey.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
-                            throw new ApplicationException("When FIPS Mode is enabled, Chocolatey requires {0} feature also be enabled.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
+
+                            var errorMessage = "When FIPS Mode is enabled, Chocolatey requires {0} feature also be enabled.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums);
+                            if (string.IsNullOrWhiteSpace(config.CommandName))
+                            {
+                                "chocolatey".Log().Error(errorMessage);
+                                return;
+                            }
+
+                            throw new ApplicationException(errorMessage);
                         }
 
                         throw;

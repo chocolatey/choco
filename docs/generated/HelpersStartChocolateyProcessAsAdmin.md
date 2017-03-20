@@ -1,5 +1,7 @@
 ﻿# Start-ChocolateyProcessAsAdmin
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Start-ChocolateyProcessAsAdmin.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 **NOTE:** Administrative Access Required.
 
 Runs a process with administrative privileges. If `-ExeToRun` is not
@@ -70,6 +72,17 @@ Start-ChocolateyProcessAsAdmin -Statements "$silentArgs" -ExeToRun $file -ValidE
 # Run PowerShell statements
 $psFile = Join-Path "$(Split-Path -parent $MyInvocation.MyCommand.Definition)" 'someInstall.ps1'
 Start-ChocolateyProcessAsAdmin "& `'$psFile`'"
+~~~
+
+**EXAMPLE 5**
+
+~~~powershell
+# This also works for cmd and is required if you have any spaces in the paths within your command
+$appPath = "$env:ProgramFiles\myapp"
+$cmdBatch = "/c `"$appPath\bin\installmyappservice.bat`""
+Start-ChocolateyProcessAsAdmin $cmdBatch cmd 
+# or more explicitly
+Start-ChocolateyProcessAsAdmin -Statements $cmdBatch -ExeToRun "cmd.exe"
 ~~~ 
 
 ## Inputs

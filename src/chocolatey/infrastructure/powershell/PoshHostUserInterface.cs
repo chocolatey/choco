@@ -128,8 +128,11 @@ namespace chocolatey.infrastructure.powershell
                 this.Log().Debug(record.Activity.escape_curly_braces());
             }
 
-            // http://stackoverflow.com/a/888569/18475
-            Console.Write("\rProgress: {0}% - {1}".format_with(record.PercentComplete.to_string(), record.StatusDescription).PadRight(Console.WindowWidth));
+            if (_configuration.Features.ShowDownloadProgress)
+            {
+                // http://stackoverflow.com/a/888569/18475
+                Console.Write("\rProgress: {0}% - {1}".format_with(record.PercentComplete.to_string(), record.StatusDescription).PadRight(Console.WindowWidth));
+            }
         }
 
         public override void WriteVerboseLine(string message)

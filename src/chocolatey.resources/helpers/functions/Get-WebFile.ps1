@@ -122,20 +122,25 @@ param(
   $explicitProxy = $env:chocolateyProxyLocation
   $explicitProxyUser = $env:chocolateyProxyUser
   $explicitProxyPassword = $env:chocolateyProxyPassword
+  $explicitProxyBypassList = $env:chocolateyProxyBypassList
+  $explicitProxyBypassOnLocal = $env:chocolateyProxyBypassOnLocal
   if ($explicitProxy -ne $null) {
     # explicit proxy
-	$proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
-	if ($explicitProxyPassword -ne $null) {
-	  $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
-	  $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
-	}
+	  $proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
+	  if ($explicitProxyPassword -ne $null) {
+      $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
+	    $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
+	  }
+    
+    if ($explicitProxyBypassList -ne $null -and $explicitProxyBypassList -ne '') {
+      $proxy.BypassList =  $explicitProxyBypassList.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)
+    }
+    if ($explicitProxyBypassOnLocal -eq 'true') { $proxy.BypassProxyOnLocal = $true; }
 
-	Write-Host "Using explicit proxy server '$explicitProxy'."
+ 	  Write-Host "Using explicit proxy server '$explicitProxy'."
     $req.Proxy = $proxy
-
-  } elseif (!$webclient.Proxy.IsBypassed($url))
-  {
-	# system proxy (pass through)
+  } elseif ($webclient.Proxy -and !$webclient.Proxy.IsBypassed($url)) {
+	  # system proxy (pass through)
     $creds = [net.CredentialCache]::DefaultCredentials
     if ($creds -eq $null) {
       Write-Debug "Default credentials were null. Attempting backup method"
@@ -146,6 +151,7 @@ param(
     Write-Host "Using system proxy server '$proxyaddress'."
     $proxy = New-Object System.Net.WebProxy($proxyaddress)
     $proxy.Credentials = $creds
+    $proxy.BypassProxyOnLocal = $true
     $req.Proxy = $proxy
   }
 
@@ -153,6 +159,7 @@ param(
   $req.AllowAutoRedirect = $true
   $req.MaximumAutomaticRedirections = 20
   #$req.KeepAlive = $true
+  $req.AutomaticDecompression = [System.Net.DecompressionMethods]::GZip -bor [System.Net.DecompressionMethods]::Deflate
   $req.Timeout = 30000
   if ($env:chocolateyRequestTimeout -ne $null -and $env:chocolateyRequestTimeout -ne '') {
     Write-Debug "Setting request timeout to  $env:chocolateyRequestTimeout"
@@ -197,12 +204,15 @@ param(
         }
       }
 
+      $binaryIsTextCheckFile = "$fileName.istext"
+      if (Test-Path($binaryIsTextCheckFile)) { Remove-Item $binaryIsTextCheckFile -Force -EA SilentlyContinue; }
+
       if ($headers.ContainsKey("Content-Type")) {
         $contentType = $headers['Content-Type']
         if ($contentType -ne $null) {
           if ($contentType.ToLower().Contains("text/html") -or $contentType.ToLower().Contains("text/plain")) {
             Write-Warning "$fileName is of content type $contentType"
-            Set-Content -Path "$fileName.istext" -Value "$fileName has content type $contentType" -Encoding UTF8 -Force
+            Set-Content -Path $binaryIsTextCheckFile -Value "$fileName has content type $contentType" -Encoding UTF8 -Force
           }
         }
       }
@@ -279,7 +289,7 @@ param(
             $totalFormatted = Format-FileSize $total
             if($goal -gt 0 -and ++$iterLoop%10 -eq 0) {
               $percentComplete = [Math]::Truncate(($total/$goal)*100)
-              Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted ($total/$goal)" -id 0 -percentComplete $percentComplete
+              Write-Progress "Downloading $url to $fileName" "Saving $totalFormatted of $goalFormatted" -id 0 -percentComplete $percentComplete
             }
 
             if ($total -eq $goal -and $count -eq 0) {

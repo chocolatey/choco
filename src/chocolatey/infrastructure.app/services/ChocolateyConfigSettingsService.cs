@@ -52,19 +52,38 @@ namespace chocolatey.infrastructure.app.services
             foreach (var source in configFileSettings.Sources)
             {
                 if (!configuration.QuietOutput) {
-                    this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}.".format_with(
+                    if (configuration.RegularOutput)
+                    {
+                        this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}|Bypass Proxy - {5}|Self-Service - {6}.".format_with(
                         source.Id,
                         source.Disabled ? " [Disabled]" : string.Empty,
                         source.Value,
                         (string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)) ? string.Empty : "(Authenticated)",
-                        source.Priority));
+                        source.Priority,
+                        source.BypassProxy.to_string(),
+                        source.AllowSelfService.to_string()));
+                    }
+                    else
+                    {
+                        this.Log().Info(() => "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}".format_with(
+                        source.Id,
+                        source.Value,
+                        source.Disabled.to_string(),
+                        source.UserName,
+                        source.Certificate,
+                        source.Priority,
+                        source.BypassProxy.to_string(),
+                        source.AllowSelfService.to_string()));
+                    }
+                    
                 }
                 list.Add(new ChocolateySource {
                     Id = source.Id,
                     Value = source.Value,
                     Disabled = source.Disabled,
                     Authenticated = !(string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)),
-                    Priority = source.Priority
+                    Priority = source.Priority,
+                    BypassProxy = source.BypassProxy,
                 });
             }
             return list;
@@ -83,7 +102,9 @@ namespace chocolatey.infrastructure.app.services
                     Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password),
                     Certificate = configuration.SourceCommand.Certificate,
                     CertificatePassword = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.CertificatePassword),
-                    Priority = configuration.SourceCommand.Priority
+                    Priority = configuration.SourceCommand.Priority,
+                    BypassProxy = configuration.SourceCommand.BypassProxy,
+                    AllowSelfService = configuration.SourceCommand.AllowSelfService,
                 };
                 configFileSettings.Sources.Add(source);
 
@@ -99,7 +120,9 @@ namespace chocolatey.infrastructure.app.services
                     configuration.SourceCommand.Username.is_equal_to(source.UserName) &&
                     configuration.SourceCommand.Password.is_equal_to(currentPassword) &&
                     configuration.SourceCommand.CertificatePassword.is_equal_to(currentCertificatePassword) &&
-                    configuration.SourceCommand.Certificate.is_equal_to(source.Certificate)
+                    configuration.SourceCommand.Certificate.is_equal_to(source.Certificate) &&
+                    configuration.SourceCommand.BypassProxy == source.BypassProxy && 
+                    configuration.SourceCommand.AllowSelfService == source.AllowSelfService
                     )
                 {
                     if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
@@ -112,6 +135,8 @@ namespace chocolatey.infrastructure.app.services
                     source.Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password);
                     source.CertificatePassword = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.CertificatePassword);
                     source.Certificate = configuration.SourceCommand.Certificate;
+                    source.BypassProxy = configuration.SourceCommand.BypassProxy;
+                    source.AllowSelfService = configuration.SourceCommand.AllowSelfService;
 
                     _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                     if (!configuration.QuietOutput) this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));

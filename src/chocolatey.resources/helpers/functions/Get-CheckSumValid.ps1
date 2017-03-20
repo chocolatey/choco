@@ -162,7 +162,7 @@ param(
     }
 
     if ($originalUrl -ne $null -and $originalUrl.ToLower().StartsWith("https")) {
-      throw "This package downloads over HTTPS but does not yet have package checksums to verify the package. We recommend asking the maintainer to add cheksums to this package. In the meantime if you need this package to work correctly, please enable the feature allowEmptyChecksumsSecure, provide the runtime switch '--allow-empty-checksums-secure', or pass in checksums at runtime (recommended - see 'choco install -?' / 'choco upgrade -?' for details)."
+      throw "This package downloads over HTTPS but does not yet have package checksums to verify the package. We recommend asking the maintainer to add checksums to this package. In the meantime if you need this package to work correctly, please enable the feature allowEmptyChecksumsSecure, provide the runtime switch '--allow-empty-checksums-secure', or pass in checksums at runtime (recommended - see 'choco install -?' / 'choco upgrade -?' for details)."
     } else {
       throw "Empty checksums are no longer allowed by default for non-secure sources. Please ask the maintainer to add checksums to this package. In the meantime if you need this package to work correctly, please enable the feature allowEmptyChecksums, provide the runtime switch '--allow-empty-checksums', or pass in checksums at runtime (recommended - see 'choco install -?' / 'choco upgrade -?' for details). It is strongly advised against allowing empty checksums for non-internal HTTP/FTP sources."
     }
@@ -202,7 +202,7 @@ param(
   Write-Debug "Command [`'$checksumExe`' $params] exited with `'$exitCode`'."
 
   if ($exitCode -ne 0) {
-    throw "Checksum for '$file' did not meet '$checksum' for checksum type '$checksumType'. Consider passing --ignore-checksums if necessary."
+    throw "Checksum for '$file' did not meet '$checksum' for checksum type '$checksumType'. Consider passing the actual checksums through with `--checksum --checksum64` once you validate the checksums are appropriate. A less secure option is to pass `--ignore-checksums` if necessary."
   }
 
   #$fileCheckSumActual = $md5Output.Split(' ')[0]

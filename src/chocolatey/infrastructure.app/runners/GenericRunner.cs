@@ -75,13 +75,13 @@ namespace chocolatey.infrastructure.app.runners
                 this.Log().Debug(() => "Configuration: {0}".format_with(config.ToString()));
 
 
-                if (isConsole && config.HelpRequested)
+                if (isConsole && (config.HelpRequested || config.UnsuccessfulParsing))
                 {
 #if DEBUG
                     Console.WriteLine("Press enter to continue...");
                     Console.ReadKey();
 #endif
-                    Environment.Exit(1);
+                    Environment.Exit(config.UnsuccessfulParsing? 1 : 0);
                 }
 
                 var token = Assembly.GetExecutingAssembly().get_public_key_token();
@@ -121,7 +121,10 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
         public void fail_when_license_is_missing_or_invalid_if_requested(ChocolateyConfiguration config)
         {
-            if (!config.Features.FailOnInvalidOrMissingLicense) return;
+            if (!config.Features.FailOnInvalidOrMissingLicense ||
+                config.CommandName.trim_safe().is_equal_to("feature") ||
+                config.CommandName.trim_safe().is_equal_to("features")
+            ) return;
 
             if (!config.Information.IsLicensedVersion) throw new ApplicationException("License is missing or invalid.");
         }
@@ -232,6 +235,9 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
         public void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
         {
             if (config.HelpRequested) return;
+               
+            // skip when commands will set or for background mode
+            if (!config.Features.ShowNonElevatedWarnings) return;
 
             var shouldWarn = (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator)
                           || (!config.Information.IsUserAdministrator && ApplicationParameters.InstallLocation.is_equal_to(ApplicationParameters.CommonAppDataChocolatey));

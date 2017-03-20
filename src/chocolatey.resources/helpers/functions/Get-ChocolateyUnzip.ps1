@@ -49,6 +49,18 @@ next to the install script, the path will be like
 
 In 0.10.1+, `File` is an alias for FileFullPath.
 
+This can be a 32-bit or 64-bit file. This is mandatory in earlier versions
+of Chocolatey, but optional if FileFullPath64 has been provided.
+
+.PARAMETER FileFullPath64
+Full file path to a 64-bit native installer to run. Available in 0.10.4+.
+If embedding in the package, you can get it to the path with
+`"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
+
+Provide this when you want to provide both 32-bit and 64-bit
+installers or explicitly only a 64-bit installer (which will cause a package 
+install failure on 32-bit systems).
+
 .PARAMETER Destination
 This is a directory where you would like the unzipped files to end up.
 If it does not exist, it will be created.
@@ -73,19 +85,30 @@ Get-ChocolateyUnzip -FileFullPath "c:\someFile.zip" -Destination $toolsDir
 Install-ChocolateyZipPackage
 #>
 param(
-  [alias("file")][parameter(Mandatory=$true, Position=0)][string] $fileFullPath,
+  [alias("file")][parameter(Mandatory=$false, Position=0)][string] $fileFullPath,
   [parameter(Mandatory=$true, Position=1)][string] $destination,
   [parameter(Mandatory=$false, Position=2)][string] $specificFolder,
   [parameter(Mandatory=$false, Position=3)][string] $packageName,
+  [alias("file64")][parameter(Mandatory=$false)][string] $fileFullPath64,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  $zipfileFullPath=$fileFullPath
-  if ($specificfolder) {
-    $fileFullPath=join-path $fileFullPath $specificFolder
-  }
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
+   $bitnessMessage = ''
+    $zipfileFullPath=$fileFullPath
+  if ((Get-ProcessorBits 32) -or $env:ChocolateyForceX86 -eq 'true') {
+    if (!$fileFullPath) { throw "32-bit archive is not supported for $packageName"; }
+    if ($fileFullPath64) { $bitnessMessage = '32-bit '; }
+  } elseif ($fileFullPath64) {
+    $zipfileFullPath = $fileFullPath64
+    $bitnessMessage = '64-bit '
+  }
+  
+  if ($zipfileFullPath -eq '' -or $zipfileFullPath -eq $null) {
+    throw 'Package parameters incorrect, either FileFullPath or FileFullPath64 must be specified.'
+  }
+  
   if ($packageName) {
     $packagelibPath = $env:ChocolateyPackageFolder
     if (!(Test-Path -path $packagelibPath)) {
@@ -100,7 +123,7 @@ param(
     Write-Warning "Install Directory override not available for zip packages at this time.`n If this package also runs a native installer using Chocolatey`n functions, the directory will be honored."
   }
 
-  Write-Host "Extracting $fileFullPath to $destination..."
+  Write-Host "Extracting $bitnessMessage$zipfileFullPath to $destination..."
   if (![System.IO.Directory]::Exists($destination)) { [System.IO.Directory]::CreateDirectory($destination) | Out-Null }
 
   $7zip = Join-Path "$helpersPath" '..\tools\7z.exe'
@@ -111,18 +134,22 @@ param(
   $7zip = [System.IO.Path]::GetFullPath($7zip)
   Write-Debug "7zip found at `'$7zip`'"
 
-  # 32-bit 7z.exe would not find C:\Windows\System32\config\systemprofile\AppData\Local\Temp,
+  # 32-bit 7z would not find C:\Windows\System32\config\systemprofile\AppData\Local\Temp,
   # because it gets translated to C:\Windows\SysWOW64\... by the WOW redirection layer.
   # Replace System32 with sysnative, which does not get redirected.
+  # 32-bit 7z is required so it can see both architectures
   if ([IntPtr]::Size -ne 4) {
-    $fileFullPathNoRedirection = $fileFullPath -ireplace ([regex]::Escape([Environment]::GetFolderPath('System'))),(Join-Path $Env:SystemRoot 'SysNative')
+    $fileFullPathNoRedirection = $zipfileFullPath -ireplace ([regex]::Escape([Environment]::GetFolderPath('System'))),(Join-Path $Env:SystemRoot 'SysNative')
     $destinationNoRedirection = $destination -ireplace ([regex]::Escape([Environment]::GetFolderPath('System'))),(Join-Path $Env:SystemRoot 'SysNative')
   } else {
-    $fileFullPathNoRedirection = $fileFullPath
+    $fileFullPathNoRedirection = $zipfileFullPath
     $destinationNoRedirection = $destination
   }
 
   $params = "x -aoa -bd -bb1 -o`"$destinationNoRedirection`" -y `"$fileFullPathNoRedirection`""
+  if ($specificfolder) {
+    $params += " `"$specificfolder`""
+  }
   Write-Debug "Executing command ['$7zip' $params]"
 
   # Capture 7z's output into a StringBuilder and write it out in blocks, to improve I/O performance.

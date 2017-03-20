@@ -153,9 +153,14 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         public bool Debug { get; set; }
         public bool Verbose { get; set; }
+        public bool Trace { get; set; }
         public bool Force { get; set; }
         public bool Noop { get; set; }
         public bool HelpRequested { get; set; }
+        /// <summary>
+        ///   Gets or sets a value indicating whether parsing was successful (everything parsed) or not.
+        /// </summary>
+        public bool UnsuccessfulParsing { get; set; }
 
         // TODO: Should look into using mutually exclusive output levels - Debug, Info (Regular), Error (Quiet)
         // Verbose and Important are not part of the levels at all
@@ -175,7 +180,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool PromptForConfirmation { get; set; }
         public bool AcceptLicense { get; set; }
         public bool AllowUnofficialBuild { get; set; }
-
 
         /// <summary>
         ///   Usually related to unparsed arguments.
@@ -262,7 +266,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </remarks>
         public SourcesCommandConfiguration SourceCommand { get;  set; }        
         
-
         /// <summary>
         ///   Default Machine Sources Configuration
         /// </summary>
@@ -330,7 +333,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string ChocolateyVersion { get; set; }
         public string ChocolateyProductVersion { get; set; }
         public string FullName { get; set; }
-        public bool Is64Bit { get; set; }
+        public bool Is64BitOperatingSystem { get; set; }
+        public bool Is64BitProcess { get; set; }
         public bool IsInteractive { get; set; }
         public bool IsUserAdministrator { get; set; }
         public bool IsProcessElevated { get; set; }
@@ -354,6 +358,10 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IgnoreInvalidOptionsSwitches { get; set; }
         public bool UsePackageExitCodes { get; set; }
         public bool UseFipsCompliantChecksums { get; set; }
+        public bool ShowNonElevatedWarnings { get; set; }
+        public bool ShowDownloadProgress { get; set; }
+        public bool StopOnFirstPackageFailure { get; set; }
+
         //todo remove in 0.11.0
         public bool ScriptsCheckLastExitCode { get; set; }
     }
@@ -389,6 +397,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool FailOnNotInstalled { get; set; }
         public bool NotifyOnlyAvailableUpgrades { get; set; }
         public string PackageNamesToSkip { get; set; }
+        public bool ExcludePrerelease { get; set; }
     }
 
     [Serializable]
@@ -416,6 +425,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public int Priority { get; set; }
         public string Certificate { get; set; }
         public string CertificatePassword { get; set; }
+        public bool BypassProxy { get; set; }
+        public bool AllowSelfService { get; set; }
     }
 
     [Serializable]
@@ -428,6 +439,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public int Priority { get; set; }
         public string Certificate { get; set; }
         public string EncryptedCertificatePassword { get; set; }
+        public bool BypassProxy { get; set; }
+        public bool AllowSelfService { get; set; }
     }
 
     [Serializable]
@@ -471,5 +484,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string Location { get; set; }
         public string User { get; set; }
         public string EncryptedPassword { get; set; }
+        public string BypassList { get; set; }
+        public bool BypassOnLocal { get; set; }
     }
 }

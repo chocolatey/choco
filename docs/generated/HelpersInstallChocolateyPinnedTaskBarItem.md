@@ -1,5 +1,7 @@
 ﻿# Install-ChocolateyPinnedTaskBarItem
 
+<!-- This documentation is automatically generated from https://github.com/chocolatey/choco/tree/stable/src/chocolatey.resources/helpers/functions/Install-ChocolateyPinnedTaskBarItem.ps1 using https://github.com/chocolatey/choco/tree/stable/GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+
 Creates an item in the task bar linking to the provided path.
 
 ## Syntax

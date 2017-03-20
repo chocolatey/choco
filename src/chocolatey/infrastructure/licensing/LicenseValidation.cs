@@ -61,28 +61,26 @@ namespace chocolatey.infrastructure.licensing
                     "chocolatey".Log().Error("A license was found for a licensed version of Chocolatey, but is invalid:{0} {1}".format_with(Environment.NewLine, e.Message));
                 }
 
-                switch (license.LicenseType)
+                var chocolateyLicenseType = ChocolateyLicenseType.Unknown;
+                try
                 {
-                    case LicenseType.Professional :
-                        chocolateyLicense.LicenseType = ChocolateyLicenseType.Professional;
-                        break;
-                    case LicenseType.Trial:
-                        chocolateyLicense.LicenseType = ChocolateyLicenseType.BusinessTrial;
-                        break;
-                    case LicenseType.ManagedServiceProvider:
-                        chocolateyLicense.LicenseType = ChocolateyLicenseType.ManagedServiceProvider;
-                        break;
-                    case LicenseType.Education:
-                        chocolateyLicense.LicenseType = ChocolateyLicenseType.Educational;
-                        break;
-                    case LicenseType.Business :
-                        chocolateyLicense.LicenseType = ChocolateyLicenseType.Business;
-                        break;
-                    case LicenseType.Enterprise :
-                        chocolateyLicense.LicenseType = ChocolateyLicenseType.Enterprise;
-                        break;
+                    Enum.TryParse(license.LicenseType.to_string(), true, out chocolateyLicenseType);
+                }
+                catch (Exception)
+                {
+                    chocolateyLicenseType = ChocolateyLicenseType.Unknown;
                 }
 
+                if (license.LicenseType == LicenseType.Trial)
+                {
+                    chocolateyLicenseType = ChocolateyLicenseType.BusinessTrial;
+                }
+                else if (license.LicenseType == LicenseType.Education)
+                {
+                    chocolateyLicenseType = ChocolateyLicenseType.Educational;
+                }
+
+                chocolateyLicense.LicenseType = chocolateyLicenseType;
                 chocolateyLicense.ExpirationDate = license.ExpirationDate;
                 chocolateyLicense.Name = license.Name;
                 chocolateyLicense.Id = license.UserId.to_string();

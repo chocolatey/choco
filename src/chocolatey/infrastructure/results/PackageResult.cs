@@ -54,7 +54,7 @@ namespace chocolatey.infrastructure.results
             }
 
             var rp = Package as DataServicePackage;
-            if (rp != null)
+            if (rp != null && rp.DownloadUrl != null)
             {
                 SourceUri = rp.DownloadUrl.ToString();
                 Source = sources.FirstOrDefault(uri => uri.IsBaseOf(rp.DownloadUrl)).to_string();

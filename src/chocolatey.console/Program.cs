@@ -74,6 +74,8 @@ namespace chocolatey.console
 
                 trap_exit_scenarios(config);
 
+                warn_on_nuspec_or_nupkg_usage(args, config);
+
                 if (config.RegularOutput)
                 {
                     "LogFileOnly".Log().Info(() => "".PadRight(60, '='));
@@ -89,6 +91,10 @@ namespace chocolatey.console
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.is_licensed_version() ? " {0}".format_with(license.LicenseType) : string.Empty));
                     }
 #endif
+                    if (args.Length == 0)
+                    {
+                        "chocolatley".Log().Info(ChocolateyLoggers.Important, () => "Please run 'choco -?' or 'choco <command> -?' for help menu.");
+                    }
                 }
 
                 if (warnings.Count != 0 && config.RegularOutput)
@@ -99,14 +105,15 @@ namespace chocolatey.console
                     }
                 }
 
-                if (config.HelpRequested)
+                if (config.HelpRequested || config.UnsuccessfulParsing)
                 {
                     pause_execution_if_debug();
-                    Environment.Exit(-1);
+                    Environment.Exit(config.UnsuccessfulParsing? 1 : 0);
                 }
 
                 Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug, excludeLoggerName: "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()));
                 Log4NetAppenderConfiguration.set_verbose_logger_when_verbose(config.Verbose, config.Debug, "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()));
+                Log4NetAppenderConfiguration.set_trace_logger_when_trace(config.Trace, "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Trace.to_string()));
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.Information.PlatformType, config.Information.PlatformVersion.to_string()));
                 //"chocolatey".Log().Debug(() => "Command Line: {0}".format_with(Environment.CommandLine));
 
@@ -127,18 +134,7 @@ namespace chocolatey.console
             }
             catch (Exception ex)
             {
-                var debug = false;
-                // no access to the good stuff here, need to go a bit primitive in parsing args
-                foreach (var arg in args.or_empty_list_if_null())
-                {
-                    if (arg.Contains("debug") || arg.is_equal_to("-d") || arg.is_equal_to("/d"))
-                    {
-                        debug = true;
-                        break;
-                    }
-                }
-
-                if (debug)
+                if (ApplicationParameters.is_debug_mode_cli_primitive())
                 {
                     "chocolatey".Log().Error(() => "{0} had an error occur:{1}{2}".format_with(
                         ApplicationParameters.Name,
@@ -161,6 +157,14 @@ namespace chocolatey.console
                 pause_execution_if_debug();
                 Bootstrap.shutdown();
                 Environment.Exit(Environment.ExitCode);
+            }
+        }
+
+        private static void warn_on_nuspec_or_nupkg_usage(string[] args, ChocolateyConfiguration config)
+        {
+            if (!args.Any(a => a.contains("pack") || a.contains("push")) && args.Any(a => a.contains(".nupkg") || a.contains(".nuspec")))
+            {
+                if (config.RegularOutput) "chocolatey".Log().Warn("The use of .nupkg or .nuspec in for package name or source is known to cause issues. Please use the package id from the nuspec `<id />` with `-s .` (for local folder where nupkg is found).");
             }
         }
 

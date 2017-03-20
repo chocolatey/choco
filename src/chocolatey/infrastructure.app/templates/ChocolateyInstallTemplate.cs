@@ -111,6 +111,12 @@ Install-ChocolateyPackage @packageArgs # https://chocolatey.org/docs/helpers-ins
 ## - https://chocolatey.org/docs/helpers-start-chocolatey-process-as-admin
 #Start-ChocolateyProcessAsAdmin 'STATEMENTS_TO_RUN' 'Optional_Application_If_Not_PowerShell' -validExitCodes $validExitCodes
 
+## To avoid quoting issues, you can also assemble your -Statements in another variable and pass it in
+#$appPath = ""$env:ProgramFiles\appname""
+##Will resolve to C:\Program Files\appname
+#$statementsToRun = ""/C `""$appPath\bin\installservice.bat`""""
+#Start-ChocolateyProcessAsAdmin $statementsToRun cmd -validExitCodes $validExitCodes
+    
 ## add specific folders to the path - any executables found in the chocolatey package 
 ## folder will already be on the path. This is used in addition to that or for cases 
 ## when a native installer doesn't add things to the path.

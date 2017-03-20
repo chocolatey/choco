@@ -94,6 +94,14 @@ Start-ChocolateyProcessAsAdmin -Statements "$silentArgs" -ExeToRun $file -ValidE
 $psFile = Join-Path "$(Split-Path -parent $MyInvocation.MyCommand.Definition)" 'someInstall.ps1'
 Start-ChocolateyProcessAsAdmin "& `'$psFile`'"
 
+.EXAMPLE
+# This also works for cmd and is required if you have any spaces in the paths within your command
+$appPath = "$env:ProgramFiles\myapp"
+$cmdBatch = "/c `"$appPath\bin\installmyappservice.bat`""
+Start-ChocolateyProcessAsAdmin $cmdBatch cmd 
+# or more explicitly
+Start-ChocolateyProcessAsAdmin -Statements $cmdBatch -ExeToRun "cmd.exe"
+
 .LINK
 Install-ChocolateyPackage
 
@@ -115,22 +123,55 @@ param(
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  try{
+  $alreadyElevated = $false
+  if (Test-ProcessAdminRights) {
+    $alreadyElevated = $true  
+  }
+
+  $dbMessagePrepend = "Elevating permissions and running"
+  if (!$elevated) {
+    $dbMessagePrepend = "Running"
+  }
+
+  try {
     if ($exeToRun -ne $null) { $exeToRun = $exeToRun -replace "`0", "" }
     if ($statements -ne $null) { $statements = $statements -replace "`0", "" }
   } catch {
     Write-Debug "Removing null characters resulted in an error - $($_.Exception.Message)"
   }
 
+  if ($exeToRun -ne $null) {
+    $exeToRun = $exeToRun.Trim().Trim("'").Trim('"')
+  }
+
   $wrappedStatements = $statements
   if ($wrappedStatements -eq $null) { $wrappedStatements = ''}
 
   if ($exeToRun -eq 'powershell') {
+  if ($alreadyElevated) {
+        $block = @"
+      try {
+        $statements
+      } catch {
+       throw
+      }
+"@
+  
+      & $block
+      $scriptSuccess = $?
+      if (-not $scriptSuccess) {
+        return 1
+      }
+
+      return 0
+    }
+
     $exeToRun = "$($env:SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe"
-    $importChocolateyHelpers = ""
-    Get-ChildItem "$helpersPath" -Filter *.psm1 | ForEach-Object { $importChocolateyHelpers = "& import-module -name  `'$($_.FullName)`' | Out-Null; $importChocolateyHelpers" };
+    $importChocolateyHelpers = "& import-module -name '$helpersPath\chocolateyInstaller.psm1' -Verbose:`$false | Out-Null;"
     $block = @"
       `$noSleep = `$$noSleep
+      #`$env:ChocolateyEnvironmentDebug='false'
+      #`$env:ChocolateyEnvironmentVerbose='false'
       $importChocolateyHelpers
       try{
         `$progressPreference="SilentlyContinue"
@@ -143,36 +184,27 @@ param(
       }
 "@
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($block))
-    $wrappedStatements = "-NoProfile -ExecutionPolicy bypass -EncodedCommand $encoded"
+    $wrappedStatements = "-NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -InputFormat Text -OutputFormat Text -EncodedCommand $encoded"
     $dbgMessage = @"
-Elevating Permissions and running powershell block:
+$dbMessagePrepend powershell block:
 $block
 This may take a while, depending on the statements.
 "@
+
   }
   else
   {
     $dbgMessage = @"
-Elevating Permissions and running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on the statements.
-"@
-  }
-
-  if (!$elevated) {
-  $dbgMessage = @"
-Running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on the statements.
+$dbMessagePrepend [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on the statements.
 "@
   }
 
   Write-Debug $dbgMessage
 
-  try {
-    $exeIsTextFile = [System.IO.Path]::GetFullPath($exeToRun) + ".istext"
-    if (([System.IO.File]::Exists($exeIsTextFile))) {
-      Set-PowerShellExitCode 4
-      throw "The file was a text file but is attempting to be run as an executable - '$exeToRun'"
-    }
-  } catch {
-    Write-Debug "Unable to detect whether the file is a text file or not - $($_.Exception.Message)"
+  $exeIsTextFile = [System.IO.Path]::GetFullPath($exeToRun) + ".istext"
+  if ([System.IO.File]::Exists($exeIsTextFile)) {
+    Set-PowerShellExitCode 4
+    throw "The file was a text file but is attempting to be run as an executable - '$exeToRun'"
   }
 
   if ($exeToRun -eq 'msiexec' -or $exeToRun -eq 'msiexec.exe') {
@@ -208,6 +240,7 @@ Running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on 
   # in case empty args makes a difference, try to be compatible with the older
   # version
   $psi = New-Object System.Diagnostics.ProcessStartInfo
+
   $psi.FileName = $exeToRun
   if ($wrappedStatements -ne '') {
     $psi.Arguments = "$wrappedStatements"
@@ -224,7 +257,7 @@ Running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on 
   $process.StartInfo.UseShellExecute = $false
   $process.StartInfo.WorkingDirectory = $workingDirectory
 
-  if ($elevated -and [Environment]::OSVersion.Version -ge (New-Object 'Version' 6,0)){
+  if ($elevated -and -not $alreadyElevated -and [Environment]::OSVersion.Version -ge (New-Object 'Version' 6,0)){
     # this doesn't actually currently work - because we are not running under shell execute
     Write-Debug "Setting RunAs for elevation"
     $process.StartInfo.Verb = "RunAs"
@@ -265,7 +298,7 @@ Running [`"$exeToRun`" $wrappedStatements]. This may take a while, depending on 
     }
   }
 
-  Write-Debug "Finishing 'Start-ChocolateyProcessAsAdmin'"
+  Write-Debug "Finishing '$($MyInvocation.InvocationName)'"
 
   return $exitCode
 }

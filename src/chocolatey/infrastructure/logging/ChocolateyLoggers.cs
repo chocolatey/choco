@@ -22,5 +22,7 @@ namespace chocolatey.infrastructure.logging
         Important,
         // Used to output prompt results in log file, but not in the console
         LogFileOnly,
+        //trace logging for detailed information
+        Trace,
     }
 }
