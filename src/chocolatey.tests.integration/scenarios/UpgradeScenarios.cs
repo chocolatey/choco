@@ -730,6 +730,7 @@ namespace chocolatey.tests.integration.scenarios
                 Configuration.Prerelease = false;
                 Configuration.UpgradeCommand.ExcludePrerelease = true;
             }
+    
             public override void Because()
             {
                 Results = Service.upgrade_run(Configuration);
