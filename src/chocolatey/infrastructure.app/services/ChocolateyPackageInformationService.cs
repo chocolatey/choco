@@ -34,6 +34,7 @@ namespace chocolatey.infrastructure.app.services
         private const string SIDE_BY_SIDE_FILE = ".sxs";
         private const string PIN_FILE = ".pin";
         private const string ARGS_FILE = ".arguments";
+        private const string VERSION_OVERRIDE_FILE = ".version";
 
         public ChocolateyPackageInformationService(IFileSystem fileSystem, IRegistryService registryService, IFilesService filesService)
         {
@@ -83,6 +84,21 @@ namespace chocolatey.infrastructure.app.services
             var argsFile = _fileSystem.combine_paths(pkgStorePath, ARGS_FILE);
             if (_fileSystem.file_exists(argsFile)) packageInformation.Arguments = _fileSystem.read_file(argsFile);
 
+            var versionOverrideFile = _fileSystem.combine_paths(pkgStorePath, VERSION_OVERRIDE_FILE);
+            if (_fileSystem.file_exists(versionOverrideFile))
+            {
+
+                FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                    {
+                        packageInformation.VersionOverride = new SemanticVersion(_fileSystem.read_file(versionOverrideFile).trim_safe());
+                    }, 
+                    "Unable to read version override file", 
+                    throwError: false, 
+                    logWarningInsteadOfError: true
+                 );
+            }
+
             return packageInformation;
         }
 
@@ -114,7 +130,22 @@ namespace chocolatey.infrastructure.app.services
             {
                 var argsFile = _fileSystem.combine_paths(pkgStorePath, ARGS_FILE);
                 if (_fileSystem.file_exists(argsFile)) _fileSystem.delete_file(argsFile);
-                _fileSystem.write_file(argsFile,packageInformation.Arguments);
+                _fileSystem.write_file(argsFile, packageInformation.Arguments);
+            }
+            else
+            {
+                _fileSystem.delete_file(_fileSystem.combine_paths(pkgStorePath, ARGS_FILE));
+            }  
+            
+            if (packageInformation.VersionOverride != null)
+            {
+                var versionOverrideFile = _fileSystem.combine_paths(pkgStorePath, VERSION_OVERRIDE_FILE);
+                if (_fileSystem.file_exists(versionOverrideFile)) _fileSystem.delete_file(versionOverrideFile);
+                _fileSystem.write_file(versionOverrideFile, packageInformation.VersionOverride.to_string());
+            }
+            else
+            {
+                _fileSystem.delete_file(_fileSystem.combine_paths(pkgStorePath, VERSION_OVERRIDE_FILE));
             }
 
             if (packageInformation.HasSilentUninstall)
@@ -137,7 +168,7 @@ namespace chocolatey.infrastructure.app.services
             else
             {
                 _fileSystem.delete_file(_fileSystem.combine_paths(pkgStorePath, PIN_FILE));
-            }
+            } 
         }
 
         public void remove_package_information(IPackage package)
