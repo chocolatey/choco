@@ -376,6 +376,7 @@ folder.");
                     else
                     {
                         var packageFile = new OptimizedZipPackage(_fileSystem.get_full_path(packageName));
+                        version = packageFile.Version;
                         packageNames.Add(packageFile.Id);
                     }
                 }
