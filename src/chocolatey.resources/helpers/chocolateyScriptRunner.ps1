@@ -1,4 +1,4 @@
-﻿param(
+param(
   [alias("ia","installArgs")][string] $installArguments = '',
   [alias("o","override","overrideArguments","notSilent")]
   [switch] $overrideArgs = $false,

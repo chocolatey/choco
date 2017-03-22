@@ -119,6 +119,7 @@ namespace chocolatey.console
 
                 remove_old_chocolatey_exe(fileSystem);
 
+                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(Program)), ApplicationParameters.InstallLocation, new List<string>(), "chocolatey.console");
                 //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
                 IList<string> folders = new List<string>
                     {
