@@ -74,8 +74,9 @@
   <PropertyGroup>
     <StartupObject>chocolatey.console.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AlphaFS, Version=2.0.0.0, Culture=neutral, PublicKeyToken=4d31a58f7d7ad5c9, processorArchitecture=MSIL">
@@ -116,9 +117,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.manifest">
+    <EmbeddedResource Include="choco.exe.manifest">
       <SubType>Designer</SubType>
-    </None>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="targets\Microsoft.Application.targets" />
   </ItemGroup>

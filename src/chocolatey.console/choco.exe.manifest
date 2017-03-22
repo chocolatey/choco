@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <assemblyIdentity version="1.0.0.0" name="MyApplication.app"/>
+  <assemblyIdentity version="1.0.0.0" name="choco.app"/>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
@@ -8,9 +8,9 @@
             If you want to change the Windows User Account Control level replace the 
             requestedExecutionLevel node with one of the following.
 
-        <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
-        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
-        <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
+            <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
+            <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
+            <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
 
             Specifying requestedExecutionLevel node will disable file and registry virtualization.
             If you want to utilize File and Registry Virtualization for backward 
@@ -23,7 +23,7 @@
   
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
     <application>
-      <!-- Windows 10 -->
+      <!-- Windows 10 / Windows Server 2016 -->
       <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" />
       <!-- Windows 8.1 / Windows Server 2012 R2 -->
       <supportedOS Id="{1f676c76-80e1-4239-95bb-83d0f6d0da78}"/>
