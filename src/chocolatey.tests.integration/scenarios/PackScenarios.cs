@@ -70,6 +70,12 @@ namespace chocolatey.tests.integration.scenarios
 
                 File.Exists(package_path).ShouldBeTrue();
             }
+
+            [Fact]
+            public void sources_should_be_set_to_current_directory()
+            {
+                Configuration.Sources.ShouldEqual(Scenario.get_top_level());                
+            }
         }
 
         [Concern(typeof(ChocolateyPackCommand))]
@@ -99,6 +105,12 @@ namespace chocolatey.tests.integration.scenarios
                 infos[1].ShouldEqual(string.Concat("Successfully created package '", package_path, "'"));
 
                 File.Exists(package_path).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void sources_should_be_set_to_specified_output_directory()
+            {
+                Configuration.Sources.ShouldEqual("PackageOutput");
             }
         }
 
