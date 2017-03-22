@@ -42,6 +42,12 @@ Get-Item $helpersPath\functions\*.ps1 |
 	  #Export-ModuleMember -Function $_.BaseName
     }
 
+# Export built-in functions prior to loading extensions so that 
+# extension-specific loading behavior can be used based on built-in
+# functions. This allows those overrides to be much more deterministic
+# This behavior was broken from v0.9.9.5 - v0.10.3.
+Export-ModuleMember -Function * -Alias * -Cmdlet *
+
 # load extensions if they exist
 $extensionsPath = Join-Path "$helpersPath" '..\extensions'
 if (Test-Path($extensionsPath)) {
