@@ -212,7 +212,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
             var count = 0;
             var machineInstalled = _registryService.get_installer_keys().RegistryKeys.
-                                                Where((p) => p.is_in_programs_and_features() && !itemsToRemoveFromMachine.Contains(p.DisplayName)).
+                                                Where((p) => p.is_in_programs_and_features() && !itemsToRemoveFromMachine.Contains(p.DisplayName) && !p.KeyPath.contains("choco-")).
                                                 OrderBy((p) => p.DisplayName).Distinct();
             this.Log().Info(() => "");
             foreach (var key in machineInstalled)

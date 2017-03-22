@@ -67,7 +67,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Bypass Proxy - Should this source explicitly bypass any explicitly or system configured proxies? Defaults to false. Available in 0.10.4+.",
                      option => configuration.SourceCommand.BypassProxy = option != null)
                  .Add("allowselfservice|allow-self-service",
-                     "Allow Self-Service - Should this source be allowed to be used with self-service? Requires business edition. Defaults to false. Available in 0.10.4+.",
+                     "Allow Self-Service - Should this source be allowed to be used with self-service? Requires business edition (v1.10.0+) with feature 'useBackgroundServiceWithSelfServiceSourcesOnly' turned on. Defaults to false. Available in 0.10.4+.",
                      option => configuration.SourceCommand.AllowSelfService = option != null)
                 ;
         }

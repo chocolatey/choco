@@ -112,13 +112,15 @@ In order to save your API key for {0},
             {
                 _configSettingsService.get_api_key(configuration, (key) =>
                     {
+                        string authenticatedString = string.IsNullOrWhiteSpace(key.Key) ? string.Empty : "(Authenticated)";
+
                         if (configuration.RegularOutput)
                         {
-                            this.Log().Info(() => "{0} - {1}".format_with(key.Source, key.Key));
+                            this.Log().Info(() => "{0} - {1}".format_with(key.Source, authenticatedString));
                         }
                         else
                         {
-                            this.Log().Info(() => "{0}|{1}".format_with(key.Source, key.Key));
+                            this.Log().Info(() => "{0}|{1}".format_with(key.Source, authenticatedString));
                         }
                     });
             }
