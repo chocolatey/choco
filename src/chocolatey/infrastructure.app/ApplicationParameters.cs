@@ -161,6 +161,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string ShowNonElevatedWarnings = "showNonElevatedWarnings";
             public static readonly string ShowDownloadProgress = "showDownloadProgress";
             public static readonly string StopOnFirstPackageFailure = "stopOnFirstPackageFailure";
+            public static readonly string UseRememberedArgumentsForUpgrades = "useRememberedArgumentsForUpgrades";
         }
 
         public static class Messages

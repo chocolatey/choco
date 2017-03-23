@@ -361,6 +361,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ShowNonElevatedWarnings { get; set; }
         public bool ShowDownloadProgress { get; set; }
         public bool StopOnFirstPackageFailure { get; set; }
+        public bool UseRememberedArgumentsForUpgrades { get; set; }
 
         //todo remove in 0.11.0
         public bool ScriptsCheckLastExitCode { get; set; }

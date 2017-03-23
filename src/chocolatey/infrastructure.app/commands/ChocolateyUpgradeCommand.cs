@@ -166,6 +166,18 @@ namespace chocolatey.infrastructure.app.commands
                      "Exclude Prerelease - Should prerelease be ignored for upgrades? Will be ignored if you pass `--pre`. Available in 0.10.4+.",
                      option => configuration.UpgradeCommand.ExcludePrerelease = option != null
                      )
+                 .Add("userememberedargs|userememberedarguments|userememberedoptions|use-remembered-args|use-remembered-arguments|use-remembered-options",
+                     "Use Remembered Options for Upgrade - use the arguments and options used during install for upgrade. Does not override arguments being passed at runtime. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configuration.Features.UseRememberedArgumentsForUpgrades.to_string()),
+                    option =>
+                    {
+                        if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = true;
+                    })
+                 .Add("ignorerememberedargs|ignorerememberedarguments|ignorerememberedoptions|ignore-remembered-args|ignore-remembered-arguments|ignore-remembered-options",
+                     "Ignore Remembered Options for Upgrade - ignore the arguments and options used during install for upgrade. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configuration.Features.UseRememberedArgumentsForUpgrades.to_string()),
+                    option =>
+                    {
+                        if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = false;
+                    })
                 ;
         }
 
