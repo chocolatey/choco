@@ -205,6 +205,14 @@ namespace chocolatey.infrastructure.filesystem
         bool copy_file_unsafe(string sourceFilePath, string destinationFilePath, bool overwriteExisting);
 
         /// <summary>
+        ///   Replace an existing file.
+        /// </summary>
+        /// <param name="sourceFilePath">Where is the file now?</param>
+        /// <param name="destinationFilePath">Where would you like it to go?</param>
+        /// <param name="backupFilePath">Where should the existing file be placed? Null if nowhere.</param>
+        void replace_file(string sourceFilePath, string destinationFilePath, string backupFilePath);
+
+        /// <summary>
         ///   Deletes the specified file.
         /// </summary>
         /// <param name="filePath">The name of the file to be deleted. Wildcard characters are not supported.</param>
