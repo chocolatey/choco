@@ -46,6 +46,11 @@ namespace chocolatey.infrastructure.app.configuration
 
         private static readonly OptionSet _optionSet = new OptionSet();
 
+        public static OptionSet OptionSet
+        {
+            get { return _optionSet; }
+        }
+
         /// <summary>
         ///   Parses arguments and updates the configuration
         /// </summary>
