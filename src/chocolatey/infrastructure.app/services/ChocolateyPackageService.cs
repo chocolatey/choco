@@ -489,7 +489,11 @@ Did you know Pro / Business automatically syncs with Programs and
             //arguments.Append(config.Features.UsePackageExitCodes ? " --use-package-exit-codes" : " --ignore-package-exit-codes");
 
             //global options
-            arguments.Append(" --execution-timeout=\"'{0}'\"".format_with(config.CommandExecutionTimeoutSeconds));
+            if (config.CommandExecutionTimeoutSeconds != ApplicationParameters.DefaultWaitForExitInSeconds)
+            {
+                arguments.Append(" --execution-timeout=\"'{0}'\"".format_with(config.CommandExecutionTimeoutSeconds));
+            }
+
             if (!string.IsNullOrWhiteSpace(config.CacheLocation)) arguments.Append(" --cache-location=\"'{0}'\"".format_with(config.CacheLocation));
             if (config.Features.FailOnStandardError) arguments.Append(" --fail-on-standard-error");
             if (!config.Features.UsePowerShellHost) arguments.Append(" --use-system-powershell");
