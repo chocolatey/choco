@@ -320,8 +320,8 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
             }
-        }
-
+        }        
+        
         public class when_AutomaticUninstallerService_is_run_normally : AutomaticUninstallerServiceSpecsBase
         {
             public override void Because()
@@ -339,6 +339,43 @@ namespace chocolatey.tests.infrastructure.app.services
             public void should_call_command_executor()
             {
                 commandExecutor.Verify(c => c.execute(expectedUninstallString, installerType.build_uninstall_command_arguments().trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
+            }
+        }
+
+        public class when_uninstall_string_is_split_by_quotes : AutomaticUninstallerServiceSpecsBase
+        {
+            private string uninstallStringWithQuoteSeparation = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe"" ""WinDir Stat""";
+            
+            public override void Context()
+            {
+                base.Context();
+                registryKeys.Clear();
+                 registryKeys.Add(new RegistryApplicationKey
+                    {
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = uninstallStringWithQuoteSeparation,
+                        HasQuietUninstall = true,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                        InstallerType = installerType.InstallerType,
+                    });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_call_get_package_information()
+            {
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_call_command_executor()
+            {
+                commandExecutor.Verify(c => c.execute(expectedUninstallString, "\"WinDir Stat\"".trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
             }
         }
 
