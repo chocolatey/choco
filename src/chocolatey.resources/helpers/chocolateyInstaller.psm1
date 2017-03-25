@@ -72,4 +72,5 @@ if (Test-Path($extensionsPath)) {
   }
 }
 
+# todo: explore removing this for a future version
 Export-ModuleMember -Function * -Alias * -Cmdlet *
