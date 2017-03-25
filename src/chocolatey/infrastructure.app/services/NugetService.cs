@@ -452,7 +452,7 @@ folder.");
                 {
                     var forcedResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
                     forcedResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
-                    
+
                     remove_rollback_directory_if_exists(packageName);
                     backup_existing_version(config, installedPackage, _packageInfoService.get_package_information(installedPackage));
 
@@ -552,7 +552,7 @@ folder.");
 
             var packageManager = NugetCommon.GetPackageManager(
                 config,
-                _nugetLogger, 
+                _nugetLogger,
                 _packageDownloader,
                 installSuccessAction: (e) =>
                     {
