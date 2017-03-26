@@ -227,7 +227,7 @@ Pro / Business supports a single, ubiquitous install directory option.
   }
 
   $ignoreFile = $fileFullPath + '.ignore'
-  if ($env:ChocolateyInstall -and $ignoreFile -match "$env:ChocolateyInstall") {
+  if ($env:ChocolateyInstall -and $ignoreFile -match [System.Text.RegularExpressions.Regex]::Escape($env:ChocolateyInstall)) {
     try {
       '' | out-file $ignoreFile
     } catch {
