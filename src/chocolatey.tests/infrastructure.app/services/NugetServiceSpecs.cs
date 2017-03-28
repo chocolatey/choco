@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,13 +20,13 @@ namespace chocolatey.tests.infrastructure.app.services
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Moq;
-    using NuGet;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
-    using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+    using Moq;
+    using NuGet;
     using Should;
+    using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
     public class NugetServiceSpecs
     {
@@ -79,42 +80,63 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 Context();
 
-                var packageFile = new PackageFile { Path = filePath, Checksum = "1234" };
+                var packageFile = new PackageFile
+                {
+                    Path = filePath,
+                    Checksum = "1234"
+                };
                 packageFiles.Files.Add(packageFile);
                 packageInfo.FilesSnapshot = packageFiles;
 
-                var fileSystemFiles = new List<string>() { filePath };
+                var fileSystemFiles = new List<string>()
+                {
+                    filePath
+                };
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
-                filesService.Setup(x => x.capture_package_files(It.IsAny<string>(),config)).Returns(packageFiles);
+                filesService.Setup(x => x.capture_package_files(It.IsAny<string>(), config)).Returns(packageFiles);
 
                 because();
 
-                fileSystem.Verify(x => x.copy_file(It.IsAny<string>(),It.IsAny<string>(),It.IsAny<bool>()),Times.Never);
-            }   
-            
+                fileSystem.Verify(x => x.copy_file(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
+            }
+
             [Fact]
             public void should_backup_a_changed_file()
             {
                 Context();
 
-                var packageFile = new PackageFile { Path = filePath, Checksum = "1234" };
+                var packageFile = new PackageFile
+                {
+                    Path = filePath,
+                    Checksum = "1234"
+                };
                 packageFiles.Files.Add(packageFile);
                 packageInfo.FilesSnapshot = packageFiles;
 
-                var packageFileWithUpdatedChecksum = new PackageFile { Path = filePath, Checksum = "4321" };
+                var packageFileWithUpdatedChecksum = new PackageFile
+                {
+                    Path = filePath,
+                    Checksum = "4321"
+                };
 
-                var fileSystemFiles = new List<string>() { filePath };
+                var fileSystemFiles = new List<string>()
+                {
+                    filePath
+                };
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
                 var updatedPackageFiles = new PackageFiles();
-                updatedPackageFiles.Files = new List<PackageFile>{packageFileWithUpdatedChecksum};
+                updatedPackageFiles.Files = new List<PackageFile>
+                {
+                    packageFileWithUpdatedChecksum
+                };
                 filesService.Setup(x => x.capture_package_files(It.IsAny<string>(), config)).Returns(updatedPackageFiles);
 
                 because();
 
                 fileSystem.Verify(x => x.copy_file(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
-            }  
-        } 
-        
+            }
+        }
+
         public class when_NugetService_removes_installation_files_on_uninstall : NugetServiceSpecsBase
         {
             private Action because;
@@ -144,70 +166,105 @@ namespace chocolatey.tests.infrastructure.app.services
                 fileSystem.ResetCalls();
                 fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns(false);
 
-                var packageFile = new PackageFile { Path = filePath, Checksum = "1234" };
+                var packageFile = new PackageFile
+                {
+                    Path = filePath,
+                    Checksum = "1234"
+                };
                 packageFiles.Add(packageFile);
                 packageInfo.FilesSnapshot.Files = packageFiles.ToList();
 
-                var fileSystemFiles = new List<string>() { filePath };
+                var fileSystemFiles = new List<string>()
+                {
+                    filePath
+                };
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
                 filesService.Setup(x => x.get_package_file(It.IsAny<string>())).Returns(packageFile);
 
                 because();
 
                 filesService.Verify(x => x.get_package_file(It.IsAny<string>()), Times.Never);
-                fileSystem.Verify(x => x.delete_file(filePath),Times.Never);
-            }   
-      
+                fileSystem.Verify(x => x.delete_file(filePath), Times.Never);
+            }
+
             [Fact]
             public void should_remove_an_unchanged_file()
             {
                 Context();
 
-                var packageFile = new PackageFile { Path = filePath, Checksum = "1234" };
+                var packageFile = new PackageFile
+                {
+                    Path = filePath,
+                    Checksum = "1234"
+                };
                 packageFiles.Add(packageFile);
                 packageInfo.FilesSnapshot.Files = packageFiles.ToList();
 
-                var fileSystemFiles = new List<string>() { filePath };
+                var fileSystemFiles = new List<string>()
+                {
+                    filePath
+                };
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
                 filesService.Setup(x => x.get_package_file(It.IsAny<string>())).Returns(packageFile);
 
                 because();
 
                 fileSystem.Verify(x => x.delete_file(filePath));
-            }   
-            
+            }
+
             [Fact]
             public void should_not_delete_a_changed_file()
             {
                 Context();
 
-                var packageFile = new PackageFile { Path = filePath, Checksum = "1234" };
-                var packageFileWithUpdatedChecksum = new PackageFile { Path = filePath, Checksum = "4321" };
+                var packageFile = new PackageFile
+                {
+                    Path = filePath,
+                    Checksum = "1234"
+                };
+                var packageFileWithUpdatedChecksum = new PackageFile
+                {
+                    Path = filePath,
+                    Checksum = "4321"
+                };
                 packageFiles.Add(packageFile);
                 packageInfo.FilesSnapshot.Files = packageFiles.ToList();
 
-                var fileSystemFiles = new List<string>() { filePath };
+                var fileSystemFiles = new List<string>()
+                {
+                    filePath
+                };
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
                 filesService.Setup(x => x.get_package_file(It.IsAny<string>())).Returns(packageFileWithUpdatedChecksum);
 
                 because();
 
-                fileSystem.Verify(x => x.delete_file(filePath),Times.Never);
-            }  
-            
+                fileSystem.Verify(x => x.delete_file(filePath), Times.Never);
+            }
+
             [Fact]
             public void should_not_delete_an_unfound_file()
             {
                 Context();
 
-                var packageFile = new PackageFile { Path = filePath, Checksum = "1234" };
-                var packageFileNotInOriginal = new PackageFile { Path ="c:\\files", Checksum = "4321" };
+                var packageFile = new PackageFile
+                {
+                    Path = filePath,
+                    Checksum = "1234"
+                };
+                var packageFileNotInOriginal = new PackageFile
+                {
+                    Path = "c:\\files",
+                    Checksum = "4321"
+                };
                 packageFiles.Add(packageFile);
 
                 packageInfo.FilesSnapshot.Files = packageFiles.ToList();
 
-                var fileSystemFiles = new List<string>() { filePath };
-
+                var fileSystemFiles = new List<string>()
+                {
+                    filePath
+                };
 
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
 
@@ -215,7 +272,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 because();
 
-                fileSystem.Verify(x => x.delete_file(filePath),Times.Never);
+                fileSystem.Verify(x => x.delete_file(filePath), Times.Never);
             }
         }
 

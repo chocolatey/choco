@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,13 +16,13 @@
 
 namespace chocolatey.tests.integration.scenarios
 {
-    using Should;
     using System;
     using System.IO;
     using bdddoc.core;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
+    using Should;
 
     public class PackScenarios
     {
@@ -74,7 +75,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void sources_should_be_set_to_current_directory()
             {
-                Configuration.Sources.ShouldEqual(Scenario.get_top_level());                
+                Configuration.Sources.ShouldEqual(Scenario.get_top_level());
             }
         }
 

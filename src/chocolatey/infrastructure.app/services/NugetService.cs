@@ -113,6 +113,10 @@ namespace chocolatey.infrastructure.app.services
         {
             int count = 0;
 
+            var sources = config.Sources;
+            var prerelease = config.Prerelease;
+            var includeVersionOverrides = config.ListCommand.IncludeVersionOverrides;
+
             if (config.ListCommand.LocalOnly)
             {
                 config.Sources = ApplicationParameters.PackagesLocation;
@@ -214,6 +218,10 @@ namespace chocolatey.infrastructure.app.services
             {
                 this.Log().Warn(() => @"{0} packages {1}.".format_with(count, config.ListCommand.LocalOnly ? "installed" : "found"));
             }
+
+            config.Sources = sources;
+            config.Prerelease = prerelease;
+            config.ListCommand.IncludeVersionOverrides = includeVersionOverrides;
         }
 
         public void pack_noop(ChocolateyConfiguration config)
@@ -668,7 +676,7 @@ folder.");
 
                 var packageResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
 
-                if (installedPackage.Version > availablePackage.Version && !config.AllowDowngrade)
+                if (installedPackage.Version > availablePackage.Version && (!config.AllowDowngrade || (config.AllowDowngrade && version == null)))
                 {
                     string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
                     packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
@@ -1134,7 +1142,7 @@ folder.");
             if (!config.ForceDependencies)
             {
                 // if you find an install of an .install / .portable / .commandline, allow adding it to the list               
-                var installedPackages = get_all_intalled_packages(config).Select(p => p.Name).ToList().@join(ApplicationParameters.PackageNamesSeparator);
+                var installedPackages = get_all_installed_packages(config).Select(p => p.Name).ToList().@join(ApplicationParameters.PackageNamesSeparator);
                 foreach (var packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
                 {
                     var installerExists = installedPackages.contains("{0}.install".format_with(packageName));
@@ -1373,7 +1381,7 @@ folder.");
             }
         }
 
-        private IEnumerable<PackageResult> get_all_intalled_packages(ChocolateyConfiguration config)
+        private IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config)
         {
             //todo : move to deep copy for get all installed
             //var listConfig = config.deep_copy();
@@ -1420,7 +1428,7 @@ folder.");
         {
             if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
             {
-                var packagesToUpdate = get_all_intalled_packages(config).Select(p => p.Name).ToList();
+                var packagesToUpdate = get_all_installed_packages(config).Select(p => p.Name).ToList();
 
                 if (!string.IsNullOrWhiteSpace(config.UpgradeCommand.PackageNamesToSkip))
                 {

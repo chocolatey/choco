@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +18,14 @@ namespace chocolatey.tests.integration.scenarios
 {
     using System.Collections.Generic;
     using System.Linq;
-    using NuGet;
-    using Should;
     using bdddoc.core;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.results;
+    using NuGet;
+    using Should;
 
     public class ListScenarios
     {
@@ -344,7 +345,6 @@ namespace chocolatey.tests.integration.scenarios
         [Concern(typeof(ChocolateyListCommand))]
         public class when_listing_packages_with_no_sources_enabled : ScenariosBase
         {
-
             public override void Context()
             {
                 base.Context();
@@ -367,8 +367,7 @@ namespace chocolatey.tests.integration.scenarios
             public void should_not_list_any_packages()
             {
                 Results.Count().ShouldEqual(0);
-            }  
-
+            }
         }
 
         [Concern(typeof(ChocolateyListCommand))]

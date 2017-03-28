@@ -1,16 +1,32 @@
-﻿namespace chocolatey.tests.infrastructure.app.commands
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.tests.infrastructure.app.commands
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
+    using Moq;
+    using Should;
 
     public class ChocolateyFeatureCommandSpecs
     {
@@ -33,20 +49,20 @@
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void should_implement_feature()
             {
                 results.ShouldContain("feature");
-            } 
-            
+            }
+
             [Fact]
             public void should_implement_features()
             {
                 results.ShouldContain("features");
-            } 
+            }
         }
 
         public class when_configurating_the_argument_parser : ChocolateyFeatureCommandSpecsBase
@@ -128,7 +144,7 @@
                 error.ShouldBeType<ApplicationException>();
                 error.Message.ShouldContain("A single features command must be listed");
             }
-            
+
             [Fact]
             public void should_accept_enable_as_the_subcommand()
             {
@@ -212,7 +228,6 @@
                 error.Message.ShouldEqual("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.FeatureCommand.Command.to_string()));
             }
 
-
             [Fact]
             public void should_continue_when_command_is_list_and_name_is_not_set()
             {
@@ -260,7 +275,7 @@
                 because();
                 configSettingsService.Verify(c => c.feature_list(configuration), Times.Once);
             }
-            
+
             [Fact]
             public void should_call_service_source_disable_when_command_is_disable()
             {

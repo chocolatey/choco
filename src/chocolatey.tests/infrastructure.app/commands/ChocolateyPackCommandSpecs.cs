@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +18,13 @@ namespace chocolatey.tests.infrastructure.app.commands
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
+    using Moq;
+    using Should;
 
     public class ChocolateyPackCommandSpecs
     {
@@ -46,7 +46,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]

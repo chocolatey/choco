@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,12 +19,12 @@ namespace chocolatey.tests.infrastructure.cryptography
     using System;
     using System.IO;
     using System.Security.Cryptography;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.adapters;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.cryptography;
     using chocolatey.infrastructure.filesystem;
+    using Moq;
+    using Should;
 
     public class CrytpoHashProviderSpecs
     {
@@ -41,8 +42,8 @@ namespace chocolatey.tests.infrastructure.cryptography
         public class when_HashProvider_provides_a_hash : CrytpoHashProviderSpecsBase
         {
             private string result;
-            private string filePath = "c:\\path\\does\\not\\matter.txt";
-            private readonly byte[] byteArray = new byte[] {23, 25, 27};
+            private readonly string filePath = "c:\\path\\does\\not\\matter.txt";
+            private readonly byte[] byteArray = new byte[] { 23, 25, 27 };
 
             public override void Context()
             {
@@ -63,15 +64,15 @@ namespace chocolatey.tests.infrastructure.cryptography
 
                 result.ShouldEqual(expected);
             }
-        }    
-        
+        }
+
         public class when_HashProvider_attempts_to_provide_a_hash_for_a_file_over_2GB : CrytpoHashProviderSpecsBase
         {
             private string result;
-            private string filePath = "c:\\path\\does\\not\\matter.txt";
+            private readonly string filePath = "c:\\path\\does\\not\\matter.txt";
             private readonly byte[] byteArray = new byte[] { 23, 25, 27 };
             private readonly Mock<IHashAlgorithm> _hashAlgorithm = new Mock<IHashAlgorithm>();
-          
+
             public override void Context()
             {
                 base.Context();

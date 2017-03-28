@@ -1,4 +1,5 @@
-// Copyright � 2011 - Present RealDimensions Software, LLC
+// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -136,7 +137,7 @@ namespace chocolatey.tests.infrastructure.app.commands
         public class when_handling_additional_argument_parsing : ChocolateyInfoCommandSpecsBase
         {
             private readonly IList<string> unparsedArgs = new List<string>();
-            private string source = "https://somewhereoutthere";
+            private readonly string source = "https://somewhereoutthere";
             private Action because;
 
             public override void Context()
@@ -173,8 +174,8 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.ListCommand.Exact = false;
                 because();
                 configuration.ListCommand.Exact.ShouldBeTrue();
-            } 
-            
+            }
+
             [Fact]
             public void should_set_verbose_to_true()
             {

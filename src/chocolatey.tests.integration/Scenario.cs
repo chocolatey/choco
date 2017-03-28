@@ -1,4 +1,5 @@
-// Copyright � 2011 - Present RealDimensions Software, LLC
+// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +17,7 @@
 namespace chocolatey.tests.integration
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
@@ -24,7 +26,6 @@ namespace chocolatey.tests.integration
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.platforms;
-    using System.Collections.Generic;
 
     public class Scenario
     {
@@ -89,11 +90,11 @@ namespace chocolatey.tests.integration
                 _service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
             }
             var installConfig = config.deep_copy();
-          
+
             installConfig.PackageNames = packageId;
             installConfig.Version = version;
             _service.install_run(installConfig);
-          
+
             NUnitSetup.MockLogger.Messages.Clear();
         }
 
@@ -108,11 +109,12 @@ namespace chocolatey.tests.integration
                 _fileSystem.write_file(file.Item1, file.Item2);
             }
         }
-        
+
         public static void create_directory(string directoryPath)
         {
             _fileSystem.create_directory(directoryPath);
         }
+
         private static ChocolateyConfiguration baseline_configuration()
         {
             // note that this does not mean an empty configuration. It does get influenced by
@@ -122,7 +124,7 @@ namespace chocolatey.tests.integration
             config.Information.PlatformType = PlatformType.Windows;
             config.Information.IsInteractive = false;
             config.Information.ChocolateyVersion = "1.2.3";
-            config.Information.PlatformVersion = new Version(6,1,0,0);
+            config.Information.PlatformVersion = new Version(6, 1, 0, 0);
             config.Information.PlatformName = "Windows 7 SP1";
             config.Information.ChocolateyVersion = "1.2.3";
             config.Information.ChocolateyProductVersion = "1.2.3";
@@ -166,6 +168,13 @@ namespace chocolatey.tests.integration
             config.Features.ChecksumFiles = true;
             config.OutputDirectory = null;
             config.Features.StopOnFirstPackageFailure = false;
+            config.UpgradeCommand.PackageNamesToSkip = string.Empty;
+            config.AllowDowngrade = false;
+            config.Features.FailOnStandardError = false;
+            config.ListCommand.IncludeVersionOverrides = false;
+            config.UpgradeCommand.FailOnNotInstalled = false;
+            config.PinCommand.Name = string.Empty;
+            config.PinCommand.Command = PinCommandType.unknown;
 
             return config;
         }

@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +19,14 @@ namespace chocolatey.tests.infrastructure.app.commands
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.app.templates;
     using chocolatey.infrastructure.commandline;
+    using Moq;
+    using Should;
 
     public class ChocolateyNewCommandSpecs
     {
@@ -47,7 +48,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
@@ -359,7 +360,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 templateService.Verify(c => c.generate(configuration), Times.Once);
             }
         }
-        
+
         public class when_handling_arguments_parsing : ChocolateyNewCommandSpecsBase
         {
             private OptionSet optionSet;
@@ -373,7 +374,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                optionSet.Parse(new[] { "--name", "Bob", "--automaticpackage", "--template-name", "custom", "--version", "0.42.0", "--maintainer" , "Loyd", "--outputdirectory", "c:\\packages" });
+                optionSet.Parse(new[] { "--name", "Bob", "--automaticpackage", "--template-name", "custom", "--version", "0.42.0", "--maintainer", "Loyd", "--outputdirectory", "c:\\packages" });
             }
 
             [Fact]
