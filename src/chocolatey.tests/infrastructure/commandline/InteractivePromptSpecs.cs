@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +18,10 @@ namespace chocolatey.tests.infrastructure.commandline
 {
     using System;
     using System.Collections.Generic;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.adapters;
     using chocolatey.infrastructure.commandline;
+    using Moq;
+    using Should;
 
     public class InteractivePromptSpecs
     {
@@ -101,7 +102,10 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void should_error_when_the_prompt_input_is_null()
             {
-                choices = new List<string> {"bob"};
+                choices = new List<string>
+                {
+                    "bob"
+                };
                 prompt_value = null;
                 bool errored = false;
                 console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
@@ -121,7 +125,10 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void should_error_when_the_default_choice_is_not_in_list()
             {
-                choices = new List<string> {"bob"};
+                choices = new List<string>
+                {
+                    "bob"
+                };
                 default_choice = "maybe";
                 bool errored = false;
                 string errorMessage = string.Empty;
@@ -173,8 +180,8 @@ namespace chocolatey.tests.infrastructure.commandline
                 console.Setup(c => c.ReadLine()).Returns("1");
                 var result = prompt();
                 result.ShouldEqual(choices[0]);
-            } 
-            
+            }
+
             [Fact]
             public void should_return_first_choice_when_value_of_choice_is_given()
             {
@@ -445,7 +452,7 @@ namespace chocolatey.tests.infrastructure.commandline
             public override void Because()
             {
                 console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
-                prompt = () => InteractivePrompt.prompt_for_confirmation(prompt_value, choices, defaultChoice: null, requireAnswer:true, shortPrompt: true);
+                prompt = () => InteractivePrompt.prompt_for_confirmation(prompt_value, choices, defaultChoice: null, requireAnswer: true, shortPrompt: true);
             }
 
             [Fact]
@@ -492,7 +499,10 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void should_error_when_the_prompt_input_is_null()
             {
-                choices = new List<string> { "bob" };
+                choices = new List<string>
+                {
+                    "bob"
+                };
                 prompt_value = null;
                 bool errored = false;
                 string errorMessage = string.Empty;
@@ -515,7 +525,11 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void should_error_when_the_choicelist_contains_empty_values()
             {
-                choices = new List<string> { "bob", "" };
+                choices = new List<string>
+                {
+                    "bob",
+                    ""
+                };
                 bool errored = false;
                 string errorMessage = string.Empty;
                 console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
@@ -537,7 +551,11 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void should_error_when_the_choicelist_has_multiple_items_with_same_first_letter()
             {
-                choices = new List<string> {"sally", "suzy"};
+                choices = new List<string>
+                {
+                    "sally",
+                    "suzy"
+                };
                 bool errored = false;
                 string errorMessage = string.Empty;
                 console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed

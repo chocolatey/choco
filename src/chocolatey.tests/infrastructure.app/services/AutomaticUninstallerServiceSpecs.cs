@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,16 +21,16 @@ namespace chocolatey.tests.infrastructure.app.services
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
-    using chocolatey.infrastructure.app.domain.installers;
-    using Moq;
-    using NuGet;
     using chocolatey.infrastructure.adapters;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
+    using chocolatey.infrastructure.app.domain.installers;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.results;
+    using Moq;
+    using NuGet;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
     public class AutomaticUninstallerServiceSpecs
@@ -65,7 +66,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 package.Setup(p => p.Version).Returns(new SemanticVersion("1.2.0"));
                 packageResult = new PackageResult(package.Object, null);
                 packageInformation = new ChocolateyPackageInformation(package.Object);
-                registryKeys.Add(new RegistryApplicationKey
+                registryKeys.Add(
+                    new RegistryApplicationKey
                     {
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
                         UninstallString = originalUninstallString,
@@ -115,7 +117,9 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -141,7 +145,9 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -167,7 +173,9 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -195,7 +203,9 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -206,7 +216,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 base.Context();
                 fileSystem.ResetCalls();
                 registryKeys.Clear();
-                registryKeys.Add(new RegistryApplicationKey
+                registryKeys.Add(
+                    new RegistryApplicationKey
                     {
                         InstallLocation = string.Empty,
                         UninstallString = originalUninstallString,
@@ -232,7 +243,9 @@ namespace chocolatey.tests.infrastructure.app.services
             public void should_call_command_executor()
             {
                 var args = installerType.build_uninstall_command_arguments().trim_safe();
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, args, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
+                commandExecutor.Verify(
+                    c => c.execute(expectedUninstallString, args, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Once);
             }
         }
 
@@ -259,7 +272,9 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -289,7 +304,9 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -312,16 +329,18 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The uninstaller file no longer exists. \"" + expectedUninstallString +"\""), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The uninstaller file no longer exists. \"" + expectedUninstallString + "\""), Times.Once);
             }
 
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
-        }        
-        
+        }
+
         public class when_AutomaticUninstallerService_is_run_normally : AutomaticUninstallerServiceSpecsBase
         {
             public override void Because()
@@ -338,19 +357,29 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, installerType.build_uninstall_command_arguments().trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallString,
+                            installerType.build_uninstall_command_arguments().trim_safe(),
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
             }
         }
 
         public class when_uninstall_string_is_split_by_quotes : AutomaticUninstallerServiceSpecsBase
         {
-            private string uninstallStringWithQuoteSeparation = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe"" ""WinDir Stat""";
-            
+            private readonly string uninstallStringWithQuoteSeparation = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe"" ""WinDir Stat""";
+
             public override void Context()
             {
                 base.Context();
                 registryKeys.Clear();
-                 registryKeys.Add(new RegistryApplicationKey
+                registryKeys.Add(
+                    new RegistryApplicationKey
                     {
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
                         UninstallString = uninstallStringWithQuoteSeparation,
@@ -375,7 +404,16 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, "\"WinDir Stat\"".trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallString,
+                            "\"WinDir Stat\"".trim_safe(),
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
             }
         }
 
@@ -386,7 +424,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 base.Context();
                 registryKeys.Clear();
                 commandExecutor.ResetCalls();
-                registryKeys.Add(new RegistryApplicationKey
+                registryKeys.Add(
+                    new RegistryApplicationKey
                     {
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
                         UninstallString = "{0} {1}".format_with(originalUninstallString, "/bob"),
@@ -414,7 +453,9 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -439,7 +480,8 @@ namespace chocolatey.tests.infrastructure.app.services
             private void test_installertype(IInstaller installer, bool hasQuietUninstallString)
             {
                 reset();
-                registryKeys.Add(new RegistryApplicationKey
+                registryKeys.Add(
+                    new RegistryApplicationKey
                     {
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
                         UninstallString = "{0} {1}".format_with(originalUninstallString, registryUninstallArgs),
@@ -456,7 +498,16 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var uninstallArgs = !hasQuietUninstallString ? registryUninstallArgs.trim_safe() + " " + installerTypeArgs : registryUninstallArgs.trim_safe();
 
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, uninstallArgs.trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallString,
+                            uninstallArgs.trim_safe(),
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
             }
 
             //[Fact]

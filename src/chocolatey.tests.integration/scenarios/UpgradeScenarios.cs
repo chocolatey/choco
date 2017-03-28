@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,15 +22,15 @@ namespace chocolatey.tests.integration.scenarios
     using System.Linq;
     using System.Threading;
     using System.Xml.XPath;
-    using NUnit.Framework;
-    using NuGet;
-    using Should;
     using bdddoc.core;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.results;
+    using NuGet;
+    using NUnit.Framework;
+    using Should;
 
     public class UpgradeScenarios
     {
@@ -57,7 +58,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_noop_upgrading_a_package_that_has_available_upgrades : ScenariosBase
         {
             public override void Context()
@@ -112,7 +113,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_noop_upgrading_a_package_that_does_not_have_available_upgrades : ScenariosBase
         {
             public override void Context()
@@ -160,7 +161,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_noop_upgrading_a_package_that_does_not_exist : ScenariosBase
         {
             public override void Context()
@@ -200,7 +201,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_an_existing_package_happy_path : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -337,7 +338,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_an_existing_package_with_prerelease_available_without_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -427,7 +428,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_an_existing_package_with_prerelease_available_and_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -570,8 +571,8 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("upgradepackage 1.1.1-beta2 Installed", LogLevel.Info).ShouldBeTrue();
             }
         }
-   
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_an_existing_prerelease_package_without_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -730,7 +731,7 @@ namespace chocolatey.tests.integration.scenarios
                 Configuration.Prerelease = false;
                 Configuration.UpgradeCommand.ExcludePrerelease = true;
             }
-    
+
             public override void Because()
             {
                 Results = Service.upgrade_run(Configuration);
@@ -810,7 +811,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_force_upgrading_a_package : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -920,7 +921,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_that_does_not_have_available_upgrades : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1010,7 +1011,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_force_upgrading_a_package_that_does_not_have_available_upgrades : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1101,7 +1102,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_packages_with_packages_config : ScenariosBase
         {
             public override void Context()
@@ -1116,7 +1117,7 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            [ExpectedException(typeof (ApplicationException))]
+            [ExpectedException(typeof(ApplicationException))]
             public void should_throw_an_error_that_it_is_not_allowed()
             {
                 Results = Service.upgrade_run(Configuration);
@@ -1127,7 +1128,6 @@ namespace chocolatey.tests.integration.scenarios
         public class when_upgrading_a_package_with_readonly_files : ScenariosBase
         {
             private PackageResult _packageResult;
-
 
             public override void Context()
             {
@@ -1224,7 +1224,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1331,7 +1331,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1432,7 +1432,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_added_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1511,7 +1511,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1590,7 +1590,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_that_does_not_exist : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1671,7 +1671,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 errorFound.ShouldBeTrue();
             }
-            
+
             [Fact]
             public void should_have_expected_error_in_package_result()
             {
@@ -1686,7 +1686,6 @@ namespace chocolatey.tests.integration.scenarios
 
                 errorFound.ShouldBeTrue();
             }
-
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
@@ -1758,8 +1757,8 @@ namespace chocolatey.tests.integration.scenarios
             {
                 _packageResult.Warning.ShouldBeFalse();
             }
-        }     
-        
+        }
+
         [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_that_is_not_installed_and_failing_on_not_installed : ScenariosBase
         {
@@ -1786,7 +1785,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 Directory.Exists(packageDir).ShouldBeFalse();
             }
-            
+
             [Fact]
             public void should_contain_a_warning_message_that_it_was_unable_to_upgrade_a_package()
             {
@@ -1848,7 +1847,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1966,7 +1965,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_dependencies_happy : ScenariosBase
         {
             public override void Context()
@@ -2049,7 +2048,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_unavailable_dependencies : ScenariosBase
         {
             public override void Context()
@@ -2170,7 +2169,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_unavailable_dependencies_ignoring_dependencies : ScenariosBase
         {
             public override void Context()
@@ -2254,7 +2253,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_dependency_happy : ScenariosBase
         {
             public override void Context()
@@ -2337,7 +2336,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_dependency_legacy_folder_version : ScenariosBase
         {
             public override void Context()
@@ -2478,7 +2477,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_dependency_with_parent_that_depends_on_a_range_less_than_upgrade_version : ScenariosBase
         {
             public override void Context()
@@ -2561,7 +2560,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUpgradeCommand))]
+        [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_legacy_folder_dependency_with_parent_that_depends_on_a_range_less_than_upgrade_version : ScenariosBase
         {
             public override void Context()
@@ -2706,7 +2705,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                
+
                 _xmlFilePath = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe.config");
             }
 
@@ -2718,7 +2717,7 @@ namespace chocolatey.tests.integration.scenarios
                 var xmlDocument = new XPathDocument(_xmlFilePath);
                 _xPathNavigator = xmlDocument.CreateNavigator();
             }
-            
+
             [Fact]
             public void should_upgrade_the_package()
             {
@@ -2790,8 +2789,8 @@ namespace chocolatey.tests.integration.scenarios
             {
                 _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insertNew']/@value").TypedValue.to_string().ShouldEqual("1.1.0");
             }
-        } 
-        
+        }
+
         [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_config_transforms_when_config_was_edited : ScenariosBase
         {
@@ -2803,9 +2802,9 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                
+
                 _xmlFilePath = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe.config");
-                
+
                 File.WriteAllText(_xmlFilePath, File.ReadAllText(_xmlFilePath) + COMMENT_ADDED);
             }
 
@@ -2817,7 +2816,7 @@ namespace chocolatey.tests.integration.scenarios
                 var xmlDocument = new XPathDocument(_xmlFilePath);
                 _xPathNavigator = xmlDocument.CreateNavigator();
             }
-            
+
             [Fact]
             public void should_upgrade_the_package()
             {
@@ -2882,8 +2881,8 @@ namespace chocolatey.tests.integration.scenarios
             public void should_not_change_the_insert_value_in_the_config_due_to_upgrade_and_XDT_InsertIfMissing()
             {
                 _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insert']/@value").TypedValue.to_string().ShouldEqual("1.0.0");
-            } 
-            
+            }
+
             [Fact]
             public void should_add_the_insertNew_value_in_the_config_due_to_XDT_InsertIfMissing()
             {
@@ -2900,7 +2899,6 @@ namespace chocolatey.tests.integration.scenarios
         [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_no_sources_enabled : ScenariosBase
         {
-
             public override void Context()
             {
                 base.Context();
@@ -2916,13 +2914,13 @@ namespace chocolatey.tests.integration.scenarios
             public void should_have_no_sources_enabled_result()
             {
                 MockLogger.contains_message("Upgrading was NOT successful. There are no sources enabled for", LogLevel.Error).ShouldBeTrue();
-            }  
+            }
 
             [Fact]
             public void should_not_have_any_packages_upgraded()
             {
                 Results.Count().ShouldEqual(0);
-            }  
+            }
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
@@ -2960,8 +2958,8 @@ namespace chocolatey.tests.integration.scenarios
                 installPackageResult.Count.ShouldEqual(1, "installpackage must be there once");
                 installPackageResult.First().Value.Version.ShouldEqual("1.0.0");
             }
-        } 
-        
+        }
+
         [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_all_packages_with_prereleases_installed : ScenariosBase
         {
@@ -2992,7 +2990,7 @@ namespace chocolatey.tests.integration.scenarios
                 upgradePackageResult.Count.ShouldEqual(1, "upgradepackage must be there once");
                 upgradePackageResult.First().Value.Version.ShouldEqual("1.1.1-beta2");
             }
-            
+
             [Fact]
             public void should_upgrade_upgradepackage()
             {
@@ -3008,8 +3006,8 @@ namespace chocolatey.tests.integration.scenarios
                 installPackageResult.Count.ShouldEqual(1, "installpackage must be there once");
                 installPackageResult.First().Value.Version.ShouldEqual("1.0.0");
             }
-        }  
-        
+        }
+
         [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_all_packages_with_prereleases_installed_with_excludeprerelease_specified : ScenariosBase
         {
@@ -3019,7 +3017,7 @@ namespace chocolatey.tests.integration.scenarios
                 Configuration.Prerelease = true;
                 Scenario.install_package(Configuration, "upgradepackage", "1.1.1-beta");
                 Configuration.Prerelease = false;
-                
+
                 Configuration.PackageNames = Configuration.Input = "all";
                 Configuration.UpgradeCommand.ExcludePrerelease = true;
             }

@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +19,6 @@ namespace chocolatey.tests.integration.scenarios
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using NuGet;
-    using Should;
     using bdddoc.core;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.attributes;
@@ -28,6 +27,8 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.results;
+    using NuGet;
+    using Should;
 
     public class PinScenarios
     {
@@ -124,7 +125,7 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("upgradepackage|1.0.0").ShouldBeTrue();
             }
         }
-       
+
         [Concern(typeof(ChocolateyPinCommand))]
         public class when_listing_pins_with_existing_pins : ScenariosBase
         {

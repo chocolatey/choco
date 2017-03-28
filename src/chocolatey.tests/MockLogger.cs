@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +19,8 @@ namespace chocolatey.tests
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using Moq;
     using chocolatey.infrastructure.logging;
+    using Moq;
 
     public enum LogLevel
     {
@@ -52,7 +53,7 @@ namespace chocolatey.tests
         {
             return contains_message_count(expectedMessage, level) != 0;
         }
-        
+
         public int contains_message_count(string expectedMessage)
         {
             int messageCount = 0;
@@ -102,7 +103,7 @@ namespace chocolatey.tests
             list.Add(message);
             if (LogMessagesToConsole)
             {
-                System.Console.WriteLine("[{0}] {1}".format_with(logLevel.to_string(),message));
+                Console.WriteLine("[{0}] {1}".format_with(logLevel.to_string(), message));
             }
         }
 
@@ -122,7 +123,6 @@ namespace chocolatey.tests
         {
             Object.Info(message.format_with(formatting));
             LogMessage(LogLevel.Info, message.format_with(formatting));
-           
         }
 
         public void Info(Func<string> message)

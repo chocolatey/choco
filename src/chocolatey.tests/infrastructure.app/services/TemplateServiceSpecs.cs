@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,21 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 namespace chocolatey.tests.infrastructure.app.services
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Moq;
+    using System.Text;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
-    using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
-    using Should;
     using chocolatey.infrastructure.app.templates;
-    using System.Text;
+    using chocolatey.infrastructure.filesystem;
+    using Moq;
+    using Should;
 
     public class TemplateServiceSpecs
     {
@@ -96,7 +95,7 @@ namespace chocolatey.tests.infrastructure.app.services
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
             private readonly TemplateValues templateValues = new TemplateValues();
-            private string template = "[[PackageName]]";
+            private readonly string template = "[[PackageName]]";
             private const string fileLocation = "c:\\packages\\bob.nuspec";
             private string fileContent;
 
@@ -106,7 +105,6 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 fileSystem.Setup(x => x.write_file(It.Is((string fl) => fl == fileLocation), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => this.fileContent = fileContent);
-
 
                 templateValues.PackageName = "Bob";
             }
@@ -160,8 +158,13 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
                 fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
-                   .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
-                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(x => { verifiedDirectoryPath = x; return true; });
+                    .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
+                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(
+                    x =>
+                    {
+                        verifiedDirectoryPath = x;
+                        return true;
+                    });
 
                 config.NewCommand.Name = "Bob";
             }
@@ -225,8 +228,8 @@ namespace chocolatey.tests.infrastructure.app.services
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
-            private List<string> files = new List<string>();
-            private HashSet<string> directoryCreated = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            private readonly List<string> files = new List<string>();
+            private readonly HashSet<string> directoryCreated = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
             public override void Context()
             {
@@ -234,25 +237,27 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
                 fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
-                   .Returns((string a, string[] b) => 
-                   {
-                       if(a.EndsWith("templates") && b[0] == "default")
-                       {
-                           return "templates\\default";
-                       }
-                       return a + "\\" + b[0];
-                   });
+                    .Returns(
+                        (string a, string[] b) =>
+                        {
+                            if (a.EndsWith("templates") && b[0] == "default")
+                            {
+                                return "templates\\default";
+                            }
+                            return a + "\\" + b[0];
+                        });
                 fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\default"));
                 fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
                 fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
-                fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback((string directory) =>
-                {
-                    if (!string.IsNullOrWhiteSpace(directory))
+                fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback(
+                    (string directory) =>
                     {
-                        directoryCreated.Add(directory);
-                    }
-                });
+                        if (!string.IsNullOrWhiteSpace(directory))
+                        {
+                            directoryCreated.Add(directory);
+                        }
+                    });
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories)).Returns(new[] { "templates\\default\\template.nuspec", "templates\\default\\random.txt" });
                 fileSystem.Setup(x => x.get_directory_name(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
                 fileSystem.Setup(x => x.get_file_extension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
@@ -308,14 +313,14 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 MockLogger.MessagesFor(LogLevel.Info).Last().ShouldEqual(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
             }
-        }   
-        
+        }
+
         public class when_generate_is_called_with_nested_folders : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
-            private List<string> files = new List<string>();
-            private HashSet<string> directoryCreated = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            private readonly List<string> files = new List<string>();
+            private readonly HashSet<string> directoryCreated = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
             public override void Context()
             {
@@ -323,26 +328,29 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
                 fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
-                   .Returns((string a, string[] b) => 
-                   {
-                       if (a.EndsWith("templates") && b[0] == "test")
-                       {
-                           return "templates\\test";
-                       }
-                       return a + "\\" + b[0];
-                   });
+                    .Returns(
+                        (string a, string[] b) =>
+                        {
+                            if (a.EndsWith("templates") && b[0] == "test")
+                            {
+                                return "templates\\test";
+                            }
+                            return a + "\\" + b[0];
+                        });
                 fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
                 fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
                 fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
-                fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories)).Returns(new[] { "templates\\test\\template.nuspec", "templates\\test\\random.txt", "templates\\test\\tools\\chocolateyInstall.ps1", "templates\\test\\tools\\lower\\another.ps1" });
-                fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback((string directory) =>
-                {
-                    if (!string.IsNullOrWhiteSpace(directory))
+                fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
+                    .Returns(new[] { "templates\\test\\template.nuspec", "templates\\test\\random.txt", "templates\\test\\tools\\chocolateyInstall.ps1", "templates\\test\\tools\\lower\\another.ps1" });
+                fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback(
+                    (string directory) =>
                     {
-                        directoryCreated.Add(directory);
-                    }
-                });
+                        if (!string.IsNullOrWhiteSpace(directory))
+                        {
+                            directoryCreated.Add(directory);
+                        }
+                    });
                 fileSystem.Setup(x => x.get_directory_name(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
                 fileSystem.Setup(x => x.get_file_extension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
                 fileSystem.Setup(x => x.read_file(It.IsAny<string>())).Returns(string.Empty);

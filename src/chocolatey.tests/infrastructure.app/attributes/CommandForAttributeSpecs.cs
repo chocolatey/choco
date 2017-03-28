@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +16,8 @@
 
 namespace chocolatey.tests.infrastructure.app.attributes
 {
-    using Should;
     using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.domain;
+    using Should;
 
     public class CommandForAttributeSpecs
     {
@@ -32,7 +32,7 @@ namespace chocolatey.tests.infrastructure.app.attributes
 
             public override void Context()
             {
-                attribute = new CommandForAttribute("bob","");
+                attribute = new CommandForAttribute("bob", "");
             }
 
             public override void Because()

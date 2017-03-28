@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +17,9 @@
 namespace chocolatey.tests.infrastructure.tolerance
 {
     using System;
+    using chocolatey.infrastructure.tolerance;
     using NUnit.Framework;
     using Should;
-    using chocolatey.infrastructure.tolerance;
 
     public class FaultToleranceSpecs
     {
@@ -41,16 +42,21 @@ namespace chocolatey.tests.infrastructure.tolerance
             }
 
             [Fact]
-            [ExpectedException(typeof (ApplicationException))]
+            [ExpectedException(typeof(ApplicationException))]
             public void should_not_allow_the_number_of_retries_to_be_zero()
             {
                 reset();
 
-                FaultTolerance.retry(0, () => { var dude = 1; });
+                FaultTolerance.retry(
+                    0,
+                    () =>
+                    {
+                        var dude = 1;
+                    });
             }
 
             [Fact]
-            [ExpectedException(typeof (Exception))]
+            [ExpectedException(typeof(Exception))]
             public void should_throw_an_error_if_retries_are_reached()
             {
                 reset();
@@ -83,12 +89,14 @@ namespace chocolatey.tests.infrastructure.tolerance
                 var i = 0;
                 try
                 {
-                    FaultTolerance.retry(10, () =>
+                    FaultTolerance.retry(
+                        10,
+                        () =>
                         {
                             i += 1;
                             throw new Exception("YIKES");
                         },
-                                         waitDurationMilliseconds: 0);
+                        waitDurationMilliseconds: 0);
                 }
                 catch
                 {
@@ -124,7 +132,7 @@ namespace chocolatey.tests.infrastructure.tolerance
                 reset();
 
                 FaultTolerance.try_catch_with_logging_exception(
-                    () => { throw new Exception("This is the message");},
+                    () => { throw new Exception("This is the message"); },
                     "You have an error"
                 );
 
@@ -150,10 +158,10 @@ namespace chocolatey.tests.infrastructure.tolerance
                 reset();
 
                 FaultTolerance.try_catch_with_logging_exception(
-                    () => { throw new Exception("This is the message");},
+                    () => { throw new Exception("This is the message"); },
                     "You have an error",
                     logWarningInsteadOfError: true
-                    );
+                );
 
                 MockLogger.MessagesFor(LogLevel.Warn).Count.ShouldEqual(1);
             }
@@ -165,10 +173,10 @@ namespace chocolatey.tests.infrastructure.tolerance
                 reset();
 
                 FaultTolerance.try_catch_with_logging_exception(
-                  () => { throw new Exception("This is the message"); },
-                  "You have an error", 
-                  throwError: true
-              );
+                    () => { throw new Exception("This is the message"); },
+                    "You have an error",
+                    throwError: true
+                );
             }
 
             [Fact]
@@ -178,11 +186,11 @@ namespace chocolatey.tests.infrastructure.tolerance
                 reset();
 
                 FaultTolerance.try_catch_with_logging_exception(
-                  () => { throw new Exception("This is the message"); },
-                  "You have an error", 
-                  logWarningInsteadOfError: true,
-                  throwError: true
-              );
+                    () => { throw new Exception("This is the message"); },
+                    "You have an error",
+                    logWarningInsteadOfError: true,
+                    throwError: true
+                );
             }
         }
     }

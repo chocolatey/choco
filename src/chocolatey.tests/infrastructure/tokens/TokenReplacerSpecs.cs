@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +17,9 @@
 namespace chocolatey.tests.infrastructure.tokens
 {
     using System.Collections.Generic;
-    using Should;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.tokens;
+    using Should;
 
     public class TokenReplacerSpecs
     {
@@ -67,8 +68,8 @@ namespace chocolatey.tests.infrastructure.tokens
             public void when_given_brace_brace_COMMANDNAME_brace_brace_should_replace_with_the_Name_from_the_configuration()
             {
                 TokenReplacer.replace_tokens(configuration, "Hi! My name is [[COMMANDNAME]]").ShouldEqual("Hi! My name is " + name);
-            }          
-            
+            }
+
             [Fact]
             public void when_given_brace_brace_cOMmAnDnAMe_brace_brace_should_replace_with_the_Name_from_the_configuration()
             {
@@ -109,8 +110,7 @@ namespace chocolatey.tests.infrastructure.tokens
         public class when_using_TokenReplacer_with_a_Dictionary : TokenReplacerSpecsBase
         {
             public Dictionary<string, string> tokens = new Dictionary<string, string>();
-            private string value = "sweet";
-
+            private readonly string value = "sweet";
 
             public override void Because()
             {
@@ -122,7 +122,6 @@ namespace chocolatey.tests.infrastructure.tokens
             {
                 TokenReplacer.replace_tokens(tokens, "Hi! My name is [[dude]]").ShouldEqual("Hi! My name is " + value);
             }
-
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,17 +22,16 @@ namespace chocolatey.tests.integration
     using System.Linq;
     using System.Reflection;
     using System.Threading;
-    using chocolatey.infrastructure.licensing;
-    using NUnit.Framework;
-    using SimpleInjector;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.builders;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.filesystem;
+    using chocolatey.infrastructure.licensing;
     using chocolatey.infrastructure.platforms;
     using chocolatey.infrastructure.registration;
-    using chocolatey.infrastructure.services;
+    using NUnit.Framework;
+    using SimpleInjector;
 
     // ReSharper disable InconsistentNaming
 
@@ -51,13 +51,13 @@ namespace chocolatey.tests.integration
             // don't have to worry about issues using it
             var config = Container.GetInstance<ChocolateyConfiguration>().deep_copy();
             config.Information.PlatformType = PlatformType.Windows;
-            config.Information.IsInteractive = false; 
+            config.Information.IsInteractive = false;
             config.PromptForConfirmation = false;
             config.Force = true;
             unpack_self(Container, config);
             build_packages(Container, config);
 
-            ConfigurationBuilder.set_up_configuration(new List<string>(), config, Container, new ChocolateyLicense(),  null);
+            ConfigurationBuilder.set_up_configuration(new List<string>(), config, Container, new ChocolateyLicense(), null);
 
             MockLogger.reset();
         }
