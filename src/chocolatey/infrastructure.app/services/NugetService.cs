@@ -1142,7 +1142,7 @@ folder.");
             if (!config.ForceDependencies)
             {
                 // if you find an install of an .install / .portable / .commandline, allow adding it to the list               
-                var installedPackages = get_all_intalled_packages(config).Select(p => p.Name).ToList().@join(ApplicationParameters.PackageNamesSeparator);
+                var installedPackages = get_all_installed_packages(config).Select(p => p.Name).ToList().@join(ApplicationParameters.PackageNamesSeparator);
                 foreach (var packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
                 {
                     var installerExists = installedPackages.contains("{0}.install".format_with(packageName));
@@ -1381,7 +1381,7 @@ folder.");
             }
         }
 
-        private IEnumerable<PackageResult> get_all_intalled_packages(ChocolateyConfiguration config)
+        private IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config)
         {
             //todo : move to deep copy for get all installed
             //var listConfig = config.deep_copy();
@@ -1428,7 +1428,7 @@ folder.");
         {
             if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
             {
-                var packagesToUpdate = get_all_intalled_packages(config).Select(p => p.Name).ToList();
+                var packagesToUpdate = get_all_installed_packages(config).Select(p => p.Name).ToList();
 
                 if (!string.IsNullOrWhiteSpace(config.UpgradeCommand.PackageNamesToSkip))
                 {
