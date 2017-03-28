@@ -113,6 +113,10 @@ namespace chocolatey.infrastructure.app.services
         {
             int count = 0;
 
+            var sources = config.Sources;
+            var prerelease = config.Prerelease;
+            var includeVersionOverrides = config.ListCommand.IncludeVersionOverrides;
+
             if (config.ListCommand.LocalOnly)
             {
                 config.Sources = ApplicationParameters.PackagesLocation;
@@ -214,6 +218,10 @@ namespace chocolatey.infrastructure.app.services
             {
                 this.Log().Warn(() => @"{0} packages {1}.".format_with(count, config.ListCommand.LocalOnly ? "installed" : "found"));
             }
+
+            config.Sources = sources;
+            config.Prerelease = prerelease;
+            config.ListCommand.IncludeVersionOverrides = includeVersionOverrides;
         }
 
         public void pack_noop(ChocolateyConfiguration config)
