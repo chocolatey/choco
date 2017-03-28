@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,6 +36,7 @@ namespace chocolatey.infrastructure.app.services
     using DateTime = adapters.DateTime;
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
+    using chocolatey.infrastructure.app.utility;
 
     //todo - this monolith is too large. Refactor once test coverage is up.
 
@@ -451,7 +453,7 @@ folder.");
                 {
                     var forcedResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
                     forcedResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
-                    
+
                     remove_rollback_directory_if_exists(packageName);
                     backup_existing_version(config, installedPackage, _packageInfoService.get_package_information(installedPackage));
 
@@ -551,7 +553,7 @@ folder.");
 
             var packageManager = NugetCommon.GetPackageManager(
                 config,
-                _nugetLogger, 
+                _nugetLogger,
                 _packageDownloader,
                 installSuccessAction: (e) =>
                     {
@@ -743,6 +745,8 @@ folder.");
                         continue;
                     }
 
+                    var originalConfig = set_package_config_for_upgrade(config, pkgInfo);
+
                     if (performAction)
                     {
                         try
@@ -798,10 +802,65 @@ folder.");
                             if (continueAction != null) continueAction.Invoke(packageResult);
                         }
                     }
+
+                    // set original config back
+                    config = originalConfig;
                 }
             }
 
             return packageInstalls;
+        }
+
+        /// <summary>
+        /// Sets the configuration for the package upgrade
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="packageInfo">The package information.</param>
+        /// <returns>The original unmodified configuration, so it can be reset after upgrade</returns>
+        private ChocolateyConfiguration set_package_config_for_upgrade(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
+        {
+            if (!config.Features.UseRememberedArgumentsForUpgrades) return config;
+
+            var packageArgumentsUnencrypted = packageInfo.Arguments.contains(" --") && packageInfo.Arguments.to_string().Length > 4 ? packageInfo.Arguments : NugetEncryptionUtility.DecryptString(packageInfo.Arguments);
+
+            var sensitiveArgs = true;
+            if (!ArgumentsUtility.arguments_contain_sensitive_information(packageArgumentsUnencrypted))
+            {
+                sensitiveArgs = false;
+                this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding remembered arguments for upgrade: {1}".format_with(packageInfo.Package.Id, packageArgumentsUnencrypted.escape_curly_braces()));
+            }
+
+            var packageArgumentsSplit = packageArgumentsUnencrypted.Split(new[] { " --" }, StringSplitOptions.RemoveEmptyEntries);
+            var packageArguments = new List<string>();
+            foreach (var packageArgument in packageArgumentsSplit.or_empty_list_if_null())
+            {
+                var packageArgumentSplit = packageArgument.Split(new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                var optionName = packageArgumentSplit[0].to_string();
+                var optionValue = string.Empty;
+                if (packageArgumentSplit.Length == 2)
+                {
+                    optionValue = packageArgumentSplit[1].to_string().remove_surrounding_quotes();
+                    if (optionValue.StartsWith("'")) optionValue.remove_surrounding_quotes();
+                }
+
+                if (sensitiveArgs)
+                {
+                    this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding '{1}' to upgrade arguments. Values not shown due to detected sensitive arguments".format_with(packageInfo.Package.Id, optionName.escape_curly_braces()));
+                }
+                packageArguments.Add("--{0}{1}".format_with(optionName, string.IsNullOrWhiteSpace(optionValue) ? string.Empty : "=" + optionValue));
+            }
+
+            var originalConfig = config.deep_copy();
+            // this changes config globally
+            ConfigurationOptions.OptionSet.Parse(packageArguments);
+
+            // there may be overrides from the user running upgrade
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Username)) config.SourceCommand.Username = originalConfig.SourceCommand.Username;
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Password)) config.SourceCommand.Username = originalConfig.SourceCommand.Password;
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Certificate)) config.SourceCommand.Username = originalConfig.SourceCommand.Certificate;
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword)) config.SourceCommand.Username = originalConfig.SourceCommand.CertificatePassword;
+
+            return originalConfig;
         }
 
         private string get_install_directory(ChocolateyConfiguration config, IPackage installedPackage)

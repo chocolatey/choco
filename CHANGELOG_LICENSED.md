@@ -4,6 +4,167 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
+## 1.9.7 (March 20, 2017)
+
+### BUG FIXES 
+
+ * Fix - Support automatic decompression on downloads - see [#1056](https://github.com/chocolatey/choco/issues/1056)
+ * Fix - Package Builder - Restrict Get-UninstallRegistryKey params in chocolateyUninstall.ps1
+ * Fix - Package Internalizer - exit non-zero when variable replacement fails
+
+### IMPROVEMENTS
+
+ * Ensure PowerShell scripts use CRLF so authenticode verification doesn't fail
+ * Install Directory should see `INSTALLFOLDER` MSI Property
+ * Virus Scanner - provide context for other answers (No/Skip)
+ * Allow both 32bit and 64bit file parameters with Install-ChocolateyInstallPackage - see [#1187](https://github.com/chocolatey/choco/issues/1187)
+
+
+## 1.9.6 (March 3, 2017)
+
+### BUG FIXES
+
+ * Fix - Ensure silent args in logs are escaped
+ * Fix - Package Internalizer - use console adapter for downloading
+
+### IMPROVEMENTS
+
+ * Ensure proxy values are used with Chocolatey v0.10.4+ - see [#1141](https://github.com/chocolatey/choco/issues/1141) and [#1165](https://github.com/chocolatey/choco/issues/1165)
+ * Install - do not create a `.ignore` file outside Chocolatey directories - same as [#1180](https://github.com/chocolatey/choco/issues/1180)
+ * Package Synchronizer (Choco Sync):
+    * Use local directory for outputting created packages by default.
+    * Specify output directory for created packages.
+
+
+## 1.9.5 (January 31, 2017)
+
+### BUG FIXES
+
+ * Fix - Error when running Install-ChocolateyInstallPackage without specifying silent arguments
+ * Remove *.istext file before the content-type check that creates file - see [#1012](https://github.com/chocolatey/choco/issues/1012)
+
+### IMPROVEMENTS
+
+ * Package Builder (Choco New):
+    * Right click - create a package without bringing up the GUI.
+ * Package Internalizer (Choco Download)
+    * Don't delete the download directory unless `--force`
+ * Set user modes for terminal services (`change user /install` | `change user /execute`)
+
+
+## 1.9.4 (January 19, 2017)
+
+### BUG FIXES
+
+ * Fix - enabling preview features has no effect.
+
+
+## 1.9.3 (January 17, 2017)
+
+### BUG FIXES
+
+ * Fix - trial users unable to use Business version of Package Builder UI.
+
+
+## 1.9.2 (January 17, 2017)
+
+### BUG FIXES
+
+ * Fix - virus scanner not working properly
+
+
+## 1.9.1 (January 16, 2017)
+
+### BUG FIXES
+
+ * Fix - Ensure Pro users can call Package Builder from the command line ("packagebuilder") after install
+ * Fix - Correct title of package to "Chocolatey Licensed Edition"
+
+
+## 1.9.0 (January 15, 2017)
+
+This release brings the coveted PackageBuilder UI to the Pro+ license (minus auto detection) and adds a tabbed interface that allows you to fill out the entire nuspec. Package Synchronizer now has `choco sync` to compliment the automatic synchronization. The sync command brings all unmanaged software in Programs and Features under Chocolatey management.
+
+### FEATURES
+
+ * Package Synchronizer v2 - `choco sync` to associate existing packages with unmanaged software - see https://chocolatey.org/docs/features-synchronize#sync-command
+ * Package Builder UI:
+    * Starts at Professional edition (minus autodetection)
+    * Tabbed interface
+    * Tab for entire Nuspec
+    * [Business] Tab to generate from Programs and Features
+
+### BUG FIXES
+
+ * Self-Service / Background Mode:
+    * Fix - Add a line after progress is complete
+ * Fix - Automatic creation of ignore file in Install-ChocolateyInstallPackage throws errors when it fails - see [#380](https://github.com/chocolatey/chocolatey/issues/380) for original issue.
+ * Package Builder (Choco New):
+    * Fix - remove "version/ver" if next to version number in DisplayName
+    * Fix - todo / logging need to escape curly braces to properly format
+    * Fix - continue on error
+
+### IMPROVEMENTS
+
+ * User can turn on Preview Features - `choco feature enable -n allowPreviewFeatures`
+ * InstallDirectory switch added to Install-ChocolateyInstallPackage
+ * Package Internalizer (Choco Download)
+    * option to ignore dependencies `--ignore-dependencies`
+ * Package Builder (Choco New)
+    * Generates package arguments with install directory override
+    * Add optional scripts - beforeModify/uninstall
+    * Add other template files
+    * Remove any version number from package id
+    * allow for quiet logging
+    * auto detection fills out more fields for MSIs
+ * Self-Service / Background Mode Enhancements
+    * Do not warn if command is `choco feature`
+    * Provide user context when background service not available
+
+
+## 1.8.4 (January 5, 2017)
+
+### FEATURES
+
+ * Support Self-Service Install / Background Mode - see https://chocolatey.org/docs/features-agent-service
+ * Manage Windows Services
+
+ We've introduced some service management functions to the business edition. `Install-ChocolateyWindowsService`, `Uninstall-ChocolateyWindowsService`, `Start-ChocolateyWindowsService`, and `Stop-ChocolateyWindowsService`. Those will be documented soon enough. For now some example code should suffice.
+
+~~~powershell
+$toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
+$serviceExe = Join-Path $toolsDir 'service\chocolatey-agent.exe'
+
+$packageArgs = @{
+  Name                  = 'chocolatey-agent'
+  DisplayName           = 'Chocolatey Agent'
+  Description           = 'Chocolatey Agent is a backgound service for Chocolatey.'
+  StartupType           = 'Automatic'
+  ServiceExecutablePath = $serviceExe
+}
+
+#Username, Password, -DoNotStartService are also considered
+
+Install-ChocolateyWindowsService @packageArgs
+
+# The other three methods simply take the service name.
+Start-ChocolateyWindowsService -Name 'chocolatey-agent'
+Stop-ChocolateyWindowsService -Name 'chocolatey-agent'
+Uninstall-ChocolateyWindowsService -Name 'chocolatey-agent'
+~~~
+
+### BUG FIXES
+
+ * Package Synchronizer - Do not run automatic sync when non-elevated. It fails in weird ways
+ * Package Builder (Choco New):
+    * Fix - fix "(Install)" - append space in nuspec Title.
+
+### IMPROVEMENTS
+
+ * Downloading remote files - don't show bytes, only formatted values
+ * Authenticode sign licensed binaries
+
+
 ## 1.8.3 (December 21, 2016)
 
 ### FEATURES

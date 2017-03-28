@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -361,6 +362,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ShowNonElevatedWarnings { get; set; }
         public bool ShowDownloadProgress { get; set; }
         public bool StopOnFirstPackageFailure { get; set; }
+        public bool UseRememberedArgumentsForUpgrades { get; set; }
 
         //todo remove in 0.11.0
         public bool ScriptsCheckLastExitCode { get; set; }

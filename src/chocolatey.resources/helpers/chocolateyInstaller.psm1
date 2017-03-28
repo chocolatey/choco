@@ -1,4 +1,6 @@
-#  Copyright © 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
+# Copyright © 2017 Chocolatey Software, Inc.
+# Copyright © 2015 - 2017 RealDimensions Software, LLC
+# Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -72,4 +74,5 @@ if (Test-Path($extensionsPath)) {
   }
 }
 
+# todo: explore removing this for a future version
 Export-ModuleMember -Function * -Alias * -Cmdlet *

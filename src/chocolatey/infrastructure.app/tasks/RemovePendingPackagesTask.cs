@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -93,7 +94,7 @@ namespace chocolatey.infrastructure.app.tasks
                     this.Log().Debug("Pending file found for {0}, but the file is not {1} seconds old yet.".format_with(packageFolderName, PENDING_FILE_AGE_SECONDS));
                     continue;
                 }
-                
+
                 this.Log().Warn("[Pending] Removing incomplete install for '{0}'".format_with(packageFolderName));
                 FaultTolerance.retry(2, () => _fileSystem.delete_directory_if_exists(packageFolder, recursive: true, overrideAttributes: true, isSilent: true), 500, isSilent: true);
             }

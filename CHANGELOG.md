@@ -4,6 +4,103 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
+## [0.10.4](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.4+is%3Aclosed) (March 23, 2017)
+
+We're dubbing this the "10-4 good buddy" release. We've added some major functionality and fixes we think you are going to find top notch - dare we say as smooth as really expensive chocolate? A lot of work for this release has been provided by the community. Remember that Chocolatey is only as good as the support that comes from the community! Be sure to thank other community members for the awesome that is Chocolatey and Chocolatey 10-4. We've closed over 30 bugs and added 39 enhancements!
+
+Proxy support just got some major enhancements with the ability to not only [specify proxy information at runtime](https://github.com/chocolatey/choco/issues/1173), but also to [set bypass lists and bypassing on local connections](https://github.com/chocolatey/choco/issues/1165). A major issue with [changing command execution timeout](https://github.com/chocolatey/choco/issues/1059) was just fixed. And there used to be a tiny chance you might [corrupt the choco config when running multiple choco processes](https://github.com/chocolatey/choco/issues/1047) - which is now fixed.
+
+We've also made [package itself display download progress](https://github.com/chocolatey/choco/issues/1134), which is great when software binaries are embedded in packages. For you folks looking to remove any progress (like when using Vagrant), now you can use [`--no-progress`](https://github.com/chocolatey/choco/issues/917). When NuGet.Core has issues, those issues will have more visibility into why things are failing without needing a debugging log. Speaking of some extreme visibility, see network traffic with [`--trace`](https://github.com/chocolatey/choco/issues/1182).
+
+We've got two possible breaking changes that could affect you, see what we've written about them below.
+
+### BREAKING CHANGES 
+
+ * Run with highestAvailable Execution Level by default - see [#1054](https://github.com/chocolatey/choco/issues/1054)
+
+    One longstanding request with Chocolatey was to have it always request admin privileges before running. This has been a hope that it would cut down on the accidental runs of Chocolatey in a command shell that is not elevated and needing to open one that is elevated. This UAC (User account control) setting is handled by something called an application manifest (app.manifest). We had it set to "asInvoker", or run with the context of the user that ran the command. We've moved this to "highestAvailable", which means if you are a non-admin, it will just run under your context, but if you are an admin in a non-elevated shell, it will ask for elevated permissions to run. There is also "requireAdministrator", which locks execution down to administrators only. 
+
+    Moving to "highestAvailable" allows for that asking of privileges that you are used to, up front before it runs. However one additional thing we did here was give you more control over this setting now. We used to embed the app manifest into choco.exe. We now set it next to choco.exe (base install under `$env:ChocolateyInstall`, you will find `choco.exe.manifest`) so you have more freedom to adjust those execution levels as you see fit. There is one catch, you will need to do it on every install/upgrade of Chocolatey until [#1206](https://github.com/chocolatey/choco/issues/1206) is implemented.
+
+ * When a prerelease is installed, it should upgrade to latest prerelease unless excluded - typically seen in choco upgrade all - see [#686](https://github.com/chocolatey/choco/issues/686)
+
+    When you run `choco upgrade all`, it never catches the prereleases. However if you run `choco upgrade all --pre`, it may upgrade some of your stable installs to prereleases. Neither of these situations are desirable. So by default, we've made it so that `choco upgrade all` just does the right thing, which is to upgrade your stable releases to the latest stable release and your prerelease packages will upgrade to the absolute latest available, whether that be stable or prerelease. If you need to change the behavior back to the old way for upgrade all, simply add the `--exclude-prerelease` option.
+
+### FEATURES 
+
+ * Show download progress for the packages themselves - see [#1134](https://github.com/chocolatey/choco/issues/1134)
+ * Set Explicit Proxy Bypass List / Bypass On Local - see [#1165](https://github.com/chocolatey/choco/issues/1165)
+ * Option/feature to stop installation when a package fails - see [#1151](https://github.com/chocolatey/choco/issues/1151)
+ * Add File64 to Install-ChocolateyInstallPackage and Get-ChocolateyUnzip - see [#1187](https://github.com/chocolatey/choco/issues/1187)
+
+### BUG FIXES
+
+ * [Security] Fix - PowerShell sees authenticode hash as changed in scripts that were signed with Unix Line Endings (`LF`) - unable to use `AllSigned` - see [#1203](https://github.com/chocolatey/choco/issues/1203)
+ * [Security] Fix - chocolatey setup - Use https for downloading .NET Framework 4x if not installed - see [#1112](https://github.com/chocolatey/choco/issues/1112)
+ * Fix - chocolatey.config gets corrupted when multiple processes access simultaneously - see [#1047](https://github.com/chocolatey/choco/issues/1047)
+ * Fix - "commandExecutionTimeoutSeconds" always reverts to 2700 when deprecated config setting is 0 - see [#1059](https://github.com/chocolatey/choco/issues/1059)
+ * Fix - Allow Chocolatey version check with FIPS - see [#1193](https://github.com/chocolatey/choco/issues/1193)
+ * Fix - Chocolatey doesn't always decompress downloads appropriately (support automatic decompression) - see [#1056](https://github.com/chocolatey/choco/issues/1056)
+ * Fix - Load built-in Chocolatey functions, then load extensions - see [#1200](https://github.com/chocolatey/choco/issues/1200)
+ * Fix - Use provided checksum type - see [#1018](https://github.com/chocolatey/choco/issues/1018)
+ * Fix - MSU fails to install with space in path - see [#1177](https://github.com/chocolatey/choco/issues/1177)
+ * Fix - Unable to disable failOnInvalidOrMissingLicense feature - see [#1069](https://github.com/chocolatey/choco/issues/1069)
+ * Fix - PowerShell (Start-ChocolateyProcessAsAdmin) should only import the installerModule and not the profile - see [#1013](https://github.com/chocolatey/choco/issues/1013)
+ * Fix - Automatic Uninstaller should skip when uninstaller executable does not exist - see [#1035](https://github.com/chocolatey/choco/issues/1035)
+ * Fix - Package installation often fails with ERROR: You cannot call a method on a null-valued expression - see [#1141](https://github.com/chocolatey/choco/issues/1141)
+ * Fix - Text file determination fails to throw an error because it catches it - see [#1010](https://github.com/chocolatey/choco/issues/1010)
+ * Fix - Delete the .istext file before the content-type check - see [#1012](https://github.com/chocolatey/choco/issues/1012)
+ * Fix - new command - don't add unparsed options as the name - see [#1085](https://github.com/chocolatey/choco/issues/1085)
+ * Fix - Proxy settings ignored for local connections - see [#497](https://github.com/chocolatey/choco/issues/497)
+ * Fix - RefreshEnv / Update-SessionEnvironment changes current user to SYSTEM - see [#902](https://github.com/chocolatey/choco/issues/902)
+ * Fix - Set-EnvironmentVariable writes an error when installing Chocolatey as SYSTEM - see [#1043](https://github.com/chocolatey/choco/issues/1043)
+ * Fix - Get-FtpFile fails with integer overflow when downloading file more than 2gb in size - see [#1098](https://github.com/chocolatey/choco/issues/1098)
+ * Fix - Uninstall-ChocolateyPackage prints out warning if the passed file path starts and ends with quotes - see [#1039](https://github.com/chocolatey/choco/issues/1039)
+ * Fix - Get-UninstallRegistryKey fixes/improvements - see [#815](https://github.com/chocolatey/choco/issues/815)
+ * Fix - Unzip specific folder feature is broken after introducing 7zip - see [#676](https://github.com/chocolatey/choco/issues/676)
+ * Fix - Join-Path error when installing Chocolatey as SYSTEM - see [#1042](https://github.com/chocolatey/choco/issues/1042)
+ * Fix - `$env:OS_NAME` is 'Windows' for Windows 10 - see [#1178](https://github.com/chocolatey/choco/issues/1178)
+ * Fix - choco install relativepath/to/some.nuspec fails - see [#906](https://github.com/chocolatey/choco/issues/906)
+ * Fix - When pointing to a nupkg, choco should use only that nupkg to install and not a newer version in the same directory - see [#523](https://github.com/chocolatey/choco/issues/523)
+ * [API] Fix - lib should merge the AlphaFS dependency - see [#1148](https://github.com/chocolatey/choco/issues/1148)
+ * [API] Fix - don't reset loggers on setting custom automatically - see [#1121](https://github.com/chocolatey/choco/issues/1121)
+ * Fix - Pro/Business - Chocolatey Licensed Feed May Show Up More Than Once - see [#1166](https://github.com/chocolatey/choco/issues/1166)
+ * Fix - Pro/Business - Synchronized packages with DLLs are attempted to be imported by Chocolatey's PowerShell Extensions Loader - see [#1041](https://github.com/chocolatey/choco/issues/1041)
+
+### IMPROVEMENTS
+
+ * [Security] Username and password for `choco apikey` not encrypted in output - see [#1106](https://github.com/chocolatey/choco/issues/1106)
+ * Setting commandExecutionTimeout to 0 means never time out - see [#1202](https://github.com/chocolatey/choco/issues/1202) 
+ * Set proxy information at runtime - see [#1173](https://github.com/chocolatey/choco/issues/1173)
+ * Start-ChocolateyProcessAsAdmin should not elevate when already elevated - see [#1126](https://github.com/chocolatey/choco/issues/1126)
+ * Add `--no-progress` cli switch for hidding progress bars - see [#917](https://github.com/chocolatey/choco/issues/917)
+ * Note web status errors on package install failures - see [#1172](https://github.com/chocolatey/choco/issues/1172)
+ * Always let Nuget.Core log - see [#1095](https://github.com/chocolatey/choco/issues/1095)
+ * Make choco get its proxy settings also from environment variables - see [#605](https://github.com/chocolatey/choco/issues/605)
+ * Remove quotes in process passed to Start-ChocolateyProcessAsAdmin / CommandExecutor - see [#1167](https://github.com/chocolatey/choco/issues/1167)
+ * Increase download buffer size in Get-FtpFile to speed up downloads - see [#1099](https://github.com/chocolatey/choco/issues/1099)
+ * Trace network traffic - see [#1182](https://github.com/chocolatey/choco/issues/1182)
+ * Upgrade 7Zip to 16.04 - see [#1184](https://github.com/chocolatey/choco/issues/1184)
+ * Do not create .ignore file if outside of Chocolatey location - see [#1180](https://github.com/chocolatey/choco/issues/1180)
+ * Help should exit zero if called with the help switch, otherwise non-zero on bad commands - see [#473](https://github.com/chocolatey/choco/issues/473) 
+ * "Licensed messages" may address users in a somewhat unprofessional manner - see [#1111](https://github.com/chocolatey/choco/issues/1111)
+ * Show the entire text to turn on the allowGlobalConfirmation flag - see [#1053](https://github.com/chocolatey/choco/issues/1053)
+ * Running `choco` should produce name/version and further instructions - see [#1083](https://github.com/chocolatey/choco/issues/1083)
+ * Typo in Install-ChocolateyPowershellCommand - see [#1088](https://github.com/chocolatey/choco/issues/1088)
+ * Update `choco new pkg` template to give example of handling nested quoted paths - see [#1067](https://github.com/chocolatey/choco/issues/1067)
+ * Add Aliases for Install-ChocolateyVsixPackage - see [#1146](https://github.com/chocolatey/choco/issues/1146)
+ * Pro/Business - Feature to Disable Non-Elevated Warnings - see [#1118](https://github.com/chocolatey/choco/issues/1118)
+ * Pro/Business - Bitrate limit packages and downloads (support) - see [#454](https://github.com/chocolatey/choco/issues/454)
+ * Pro/Business - Allow version overrides for local packages - see [#942](https://github.com/chocolatey/choco/issues/942)
+ * Pro/Business - List include programs should not show items from Package Synchronizer's Programs and Features Package Sync - see [#1205](https://github.com/chocolatey/choco/issues/1205)
+ * Pro/Business - Show better messaging when unable to load licensed assembly - see [#1145](https://github.com/chocolatey/choco/issues/1145)
+ * Pro/Business - PowerShell Functions should allow overriding urls - see [#1117](https://github.com/chocolatey/choco/issues/1117)
+ * Pro/Business - Automatic Uninstaller - allow remove directly - see [#1119](https://github.com/chocolatey/choco/issues/1119)
+ * Pro/Business - Add Chocolatey Architect edition license SKU - see [#1075](https://github.com/chocolatey/choco/issues/1075)
+ * Pro/Business - Ensure sync command can be machine parseable - quiet logging - see [#1147](https://github.com/chocolatey/choco/issues/1147)
+ * Pro/Business - Configure a source to be allowed for self-service - see [#1181](https://github.com/chocolatey/choco/issues/1181)
+
+
 ## [0.10.3](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.3+is%3Aclosed) (October 7, 2016)
 
 ### BREAKING CHANGES

@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +21,7 @@ namespace chocolatey.infrastructure.app.runners
     using SimpleInjector;
     using configuration;
     using logging;
+    using utility;
 
     /// <summary>
     ///   Console application responsible for running chocolatey
@@ -29,20 +31,9 @@ namespace chocolatey.infrastructure.app.runners
         public void run(string[] args, ChocolateyConfiguration config, Container container)
         {
             var commandLine = Environment.CommandLine;
-            if (commandLine.contains("-install-arguments-sensitive")
-                || commandLine.contains("-package-parameters-sensitive")
-                || commandLine.contains("apikey ")
-                || commandLine.contains("config ")
-                || commandLine.contains("push ") // push can be passed w/out parameters, it's fine to log it then
-                || commandLine.contains("-p ") || commandLine.contains("-p=")
-                || commandLine.contains("-password")
-                || commandLine.contains("-cp ") || commandLine.contains("-cp=")
-                || commandLine.contains("-certpassword")
-                || commandLine.contains("-k ") || commandLine.contains("-k=")
-                || commandLine.contains("-key ") || commandLine.contains("-key=")
-                || commandLine.contains("-apikey") || commandLine.contains("-api-key")
-                || commandLine.contains("-apikey") || commandLine.contains("-api-key")
-            ) {
+
+            if (ArgumentsUtility.arguments_contain_sensitive_information(commandLine))
+            {
                 this.Log().Debug(() => "Command line not shown - sensitive arguments may have been passed.");
             }
             else

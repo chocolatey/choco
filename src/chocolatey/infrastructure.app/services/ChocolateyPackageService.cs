@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -455,36 +456,51 @@ Did you know Pro / Business automatically syncs with Programs and
             var arguments = new StringBuilder();
 
             // use the config to reconstruct
-            arguments.Append(" --source=\"'{0}'\"".format_with(config.Sources));
+
+            //bug:sources are unable to be used - it's late in the process when a package is known
+            //arguments.Append(" --source=\"'{0}'\"".format_with(config.Sources));
+
             if (config.Prerelease) arguments.Append(" --prerelease");
+            if (config.IgnoreDependencies) arguments.Append(" --ignore-dependencies");
             if (config.ForceX86) arguments.Append(" --forcex86");
+            
             if (!string.IsNullOrWhiteSpace(config.InstallArguments)) arguments.Append(" --install-arguments=\"'{0}'\"".format_with(config.InstallArguments));
             if (config.OverrideArguments) arguments.Append(" --override-arguments");
+            if (config.ApplyInstallArgumentsToDependencies) arguments.Append(" --apply-install-arguments-to-dependencies");
+
             if (!string.IsNullOrWhiteSpace(config.PackageParameters)) arguments.Append(" --package-parameters=\"'{0}'\"".format_with(config.PackageParameters));
             if (config.ApplyPackageParametersToDependencies) arguments.Append(" --apply-package-parameters-to-dependencies");
-            if (config.ApplyInstallArgumentsToDependencies) arguments.Append(" --apply-install-arguments-to-dependencies");
+            
             if (config.AllowDowngrade) arguments.Append(" --allow-downgrade");
             if (config.AllowMultipleVersions) arguments.Append(" --allow-multiple-versions");
-            if (config.IgnoreDependencies) arguments.Append(" --ignore-dependencies");
-            if (config.SkipPackageInstallProvider) arguments.Append(" --skip-automation-scripts");
-            if (config.UpgradeCommand.FailOnUnfound) arguments.Append(" --fail-on-unfound");
+            
+            // most times folks won't want to skip automation scripts on upgrade
+            //if (config.SkipPackageInstallProvider) arguments.Append(" --skip-automation-scripts");
+            //if (config.UpgradeCommand.FailOnUnfound) arguments.Append(" --fail-on-unfound");
+            
             if (!string.IsNullOrWhiteSpace(config.SourceCommand.Username)) arguments.Append(" --user=\"'{0}'\"".format_with(config.SourceCommand.Username));
-            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Password)) arguments.Append(" --password=\"'{0}'\"".format_with(NugetEncryptionUtility.EncryptString(config.SourceCommand.Password)));    
+            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Password)) arguments.Append(" --password=\"'{0}'\"".format_with(config.SourceCommand.Password));    
             if (!string.IsNullOrWhiteSpace(config.SourceCommand.Certificate)) arguments.Append(" --cert=\"'{0}'\"".format_with(config.SourceCommand.Certificate));
-            if (!string.IsNullOrWhiteSpace(config.SourceCommand.CertificatePassword)) arguments.Append(" --certpassword=\"'{0}'\"".format_with(NugetEncryptionUtility.EncryptString(config.SourceCommand.CertificatePassword)));
-            if (!config.Features.ChecksumFiles) arguments.Append(" --ignore-checksums");
-            if (!config.Features.AllowEmptyChecksums) arguments.Append(" --allow-empty-checksums");
-            if (!config.Features.AllowEmptyChecksumsSecure) arguments.Append(" --allow-empty-checksums-secure");
-            arguments.Append(config.Features.UsePackageExitCodes ? " --use-package-exit-codes" : " --ignore-package-exit-codes");
+            if (!string.IsNullOrWhiteSpace(config.SourceCommand.CertificatePassword)) arguments.Append(" --certpassword=\"'{0}'\"".format_with(config.SourceCommand.CertificatePassword));
+            
+            // this should likely be limited
+            //if (!config.Features.ChecksumFiles) arguments.Append(" --ignore-checksums");
+            //if (!config.Features.AllowEmptyChecksums) arguments.Append(" --allow-empty-checksums");
+            //if (!config.Features.AllowEmptyChecksumsSecure) arguments.Append(" --allow-empty-checksums-secure");
+            //arguments.Append(config.Features.UsePackageExitCodes ? " --use-package-exit-codes" : " --ignore-package-exit-codes");
 
             //global options
-            arguments.Append(" --execution-timeout=\"'{0}'\"".format_with(config.CommandExecutionTimeoutSeconds));
+            if (config.CommandExecutionTimeoutSeconds != ApplicationParameters.DefaultWaitForExitInSeconds)
+            {
+                arguments.Append(" --execution-timeout=\"'{0}'\"".format_with(config.CommandExecutionTimeoutSeconds));
+            }
+
             if (!string.IsNullOrWhiteSpace(config.CacheLocation)) arguments.Append(" --cache-location=\"'{0}'\"".format_with(config.CacheLocation));
-            if (config.Features.FailOnStandardError) arguments.Append(" --fail-on-error-output");
+            if (config.Features.FailOnStandardError) arguments.Append(" --fail-on-standard-error");
             if (!config.Features.UsePowerShellHost) arguments.Append(" --use-system-powershell");
 
 
-            return arguments.to_string();
+            return NugetEncryptionUtility.EncryptString(arguments.to_string());
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
