@@ -1,9 +1,9 @@
 Shim Generator - shimgen.exe
-Copyright (C) 2013-Present RealDimensions Software, LLC ("RDS")
+Copyright (C) 2013 - Present RealDimensions Software, LLC ("RDS")
 ===================================================================
 Grant of License
 ===================================================================
-You may use Shim Generator ("shimgen.exe") only with the official chocolatey client.
+You may use Shim Generator ("shimgen.exe") only with the official Chocolatey client.
 
 The use of shimgen.exe for any other reason is strictly prohibited.
 

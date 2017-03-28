@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,7 +59,6 @@ namespace chocolatey.infrastructure.app.templates
             ChecksumType64 = "{{ChecksumTypex64}}";
         }
 
-
         public string PackageName { get; set; }
 
         public string PackageNameLower
@@ -84,6 +84,5 @@ namespace chocolatey.infrastructure.app.templates
         public static readonly string NamePropertyName = "PackageName";
         public static readonly string VersionPropertyName = "PackageVersion";
         public static readonly string MaintainerPropertyName = "MaintainerName";
-
     }
 }
