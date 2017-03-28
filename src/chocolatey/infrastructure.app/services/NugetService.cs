@@ -676,7 +676,7 @@ folder.");
 
                 var packageResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
 
-                if (installedPackage.Version > availablePackage.Version && !config.AllowDowngrade)
+                if (installedPackage.Version > availablePackage.Version && (!config.AllowDowngrade || (config.AllowDowngrade && version == null)))
                 {
                     string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
                     packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
