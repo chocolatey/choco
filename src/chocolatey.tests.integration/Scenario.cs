@@ -168,6 +168,13 @@ namespace chocolatey.tests.integration
             config.Features.ChecksumFiles = true;
             config.OutputDirectory = null;
             config.Features.StopOnFirstPackageFailure = false;
+            config.UpgradeCommand.PackageNamesToSkip = string.Empty;
+            config.AllowDowngrade = false;
+            config.Features.FailOnStandardError = false;
+            config.ListCommand.IncludeVersionOverrides = false;
+            config.UpgradeCommand.FailOnNotInstalled = false;
+            config.PinCommand.Name = string.Empty;
+            config.PinCommand.Command = PinCommandType.unknown;
 
             return config;
         }
