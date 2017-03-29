@@ -52,7 +52,7 @@ $commandOptions = @{
   new = "--template-name= --output-directory='' --automaticpackage --version= --maintainer='' packageversion= maintainername='' maintainerrepo='' installertype= url='' url64='' silentargs='' --use-built-in-template -?" + $proNewOptions + $allcommands
   pack = "--version= -?" + $allcommands
   push = "--source='' --api-key= --timeout= -?" + $allcommands
-  source = "--name= --source='' --user= --password= --priority= -?" + $allcommands
+  source = "--name= --source='' --user= --password= --priority= --bypass-proxy --allow-self-service -?" + $allcommands
   config = "--name= --value= -?" + $allcommands
   feature = "--name= -?" + $allcommands
   apikey = "--source='' --api-key= -?" + $allcommands
