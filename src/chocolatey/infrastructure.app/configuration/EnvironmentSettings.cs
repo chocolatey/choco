@@ -87,8 +87,12 @@ namespace chocolatey.infrastructure.app.configuration
             if (config.Features.AllowEmptyChecksumsSecure) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, "true");
             if (config.Features.ScriptsCheckLastExitCode) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyCheckLastExitCode, "true");
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
-            Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
-       
+
+            if (config.CommandExecutionTimeoutSeconds != 0)
+            {
+                Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
+            }
+            
             if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
                 var proxyCreds = string.Empty;
