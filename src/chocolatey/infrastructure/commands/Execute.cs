@@ -102,7 +102,16 @@ namespace chocolatey.infrastructure.commands
             var cancelToken = new CancellationTokenSource();
             cancelToken.Token.ThrowIfCancellationRequested();
             var task = Task.Factory.StartNew(action, cancelToken.Token);
-            task.Wait(_timespan);
+            if (_timespan.TotalSeconds < 1d)
+            {
+                // 0 means infinite
+                task.Wait();
+            }
+            else
+            {
+                task.Wait(_timespan);                
+            }
+
             completed = task.IsCompleted;
 
             if (!completed)
