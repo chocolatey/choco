@@ -150,19 +150,6 @@ param(
   if ($wrappedStatements -eq $null) { $wrappedStatements = ''}
 
   if ($exeToRun -eq 'powershell') {
-    if ($alreadyElevated) {
-      $block = { $statements }
-  
-      Invoke-Command $block
-      $scriptSuccess = $?
-	  $exitCode = 0
-      if (-not $scriptSuccess) {
-        $exitCode = 1
-      }
-
-      return $exitCode
-    }
-
     $exeToRun = "$($env:SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe"
     $importChocolateyHelpers = "& import-module -name '$helpersPath\chocolateyInstaller.psm1' -Verbose:`$false | Out-Null;"
     $block = @"
