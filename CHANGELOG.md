@@ -4,11 +4,11 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
-## [0.10.4](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.4+is%3Aclosed) (unreleased)
+## [0.10.4](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.4+is%3Aclosed) (March 30, 2017)
 
 We're dubbing this the "10-4 good buddy" release. We've added some major functionality and fixes we think you are going to find top notch - dare we say as smooth as really expensive chocolate? A lot of work for this release has been provided by the community. Remember that Chocolatey is only as good as the support that comes from the community! Be sure to thank other community members for the awesome that is Chocolatey and Chocolatey 10-4. We've closed over 30 bugs and added 39 enhancements!
 
-Proxy support just got some major enhancements with the ability to not only [specify proxy information at runtime](https://github.com/chocolatey/choco/issues/1173), but also to [set bypass lists and bypassing on local connections](https://github.com/chocolatey/choco/issues/1165). A major issue with [changing command execution timeout](https://github.com/chocolatey/choco/issues/1059) was just fixed. And there used to be a tiny chance you might [corrupt the choco config when running multiple choco processes](https://github.com/chocolatey/choco/issues/1047) - which is now fixed.
+Proxy support just got some major enhancements with the ability to not only [specify proxy information at runtime](https://github.com/chocolatey/choco/issues/1173), but also to [set bypass lists and bypassing on local connections](https://github.com/chocolatey/choco/issues/1165) and [configure source repositories to bypass proxies](https://github.com/chocolatey/choco/issues/262). A major issue with [changing command execution timeout](https://github.com/chocolatey/choco/issues/1059) was just fixed. And there used to be a tiny chance you might [corrupt the choco config when running multiple choco processes](https://github.com/chocolatey/choco/issues/1047) -but now that is much better handled.
 
 We've also made [package itself display download progress](https://github.com/chocolatey/choco/issues/1134), which is great when software binaries are embedded in packages. For you folks looking to remove any progress (like when using Vagrant), now you can use [`--no-progress`](https://github.com/chocolatey/choco/issues/917). When NuGet.Core has issues, those issues will have more visibility into why things are failing without needing a debugging log. Speaking of some extreme visibility, see network traffic with [`--trace`](https://github.com/chocolatey/choco/issues/1182).
 
@@ -84,6 +84,7 @@ Another major feature released in preview is [using remembered arguments on upgr
  * [Security] Username and password for `choco apikey` not encrypted in output - see [#1106](https://github.com/chocolatey/choco/issues/1106)
  * [Security] Sign Binaries / Authenticode Signatures with Chocolatey Software digital certificate - see [#1214](https://github.com/chocolatey/choco/issues/1214)
  * Setting commandExecutionTimeout to 0 means never time out - see [#1202](https://github.com/chocolatey/choco/issues/1202)
+ * Configure sources to skip proxy - see [#262](https://github.com/chocolatey/choco/issues/262)
  * Set proxy information at runtime - see [#1173](https://github.com/chocolatey/choco/issues/1173)
  * Start-ChocolateyProcessAsAdmin should not elevate when already elevated - see [#1126](https://github.com/chocolatey/choco/issues/1126)
  * Add `--no-progress` cli switch for hidding progress bars - see [#917](https://github.com/chocolatey/choco/issues/917)
