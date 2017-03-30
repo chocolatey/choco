@@ -8,7 +8,8 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 ### BUG FIXES
 
- * Fix: Start-ChocolateyProcessAsAdmin errors when running PowerShell scripts - see [#1220](https://github.com/chocolatey/choco/issues/1220)
+ * Fix - Start-ChocolateyProcessAsAdmin errors when running PowerShell scripts - see [#1220](https://github.com/chocolatey/choco/issues/1220)
+ * Fix - Chocolatey timed out immediately when execution timeout was infinite - see [#1224](https://github.com/chocolatey/choco/issues/1224)
 
 ### IMPROVEMENTS
 
