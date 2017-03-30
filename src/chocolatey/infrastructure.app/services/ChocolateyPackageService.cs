@@ -564,7 +564,7 @@ Would have determined packages that are out of date based on what is
                 return;
             }
 
-            this.Log().Info(ChocolateyLoggers.Important, @"Outdated Packages
+            if (config.RegularOutput) this.Log().Info(ChocolateyLoggers.Important, @"Outdated Packages
  Output is package name | current version | available version | pinned?
 ");
 
