@@ -649,7 +649,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 35 Scenario(s), 286 Observation(s) ]
+### ChocolateyUpgradeCommand [ 36 Scenario(s), 295 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -1005,6 +1005,18 @@
  * should not create a rollback
  * should not have warning package result
  * should not remove the package from the lib directory
+
+#### when upgrading an existing prerelease package with allow downgrade with excludeprelease and without prerelease specified
+
+ * should be the same version of the package
+ * should contain a message that no packages were upgraded
+ * should contain a message that you have the latest version available
+ * should have a successful package result
+ * should have inconclusive package result
+ * should not create a rollback
+ * should not have warning package result
+ * should not remove the package from the lib directory
+ * should only find the last stable version
 
 #### when upgrading an existing prerelease package with prerelease available with excludeprelease and without prerelease specified
 
