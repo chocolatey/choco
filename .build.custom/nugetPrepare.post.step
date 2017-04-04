@@ -12,7 +12,7 @@
   <property name="build.step.path" value="${project::get-buildfile-path()}" />
   <!-- build step customizations below this -->
 
-  <target name="go" depends="prep_nuget, unpack_files" />
+  <target name="go" depends="prep_nuget, unpack_files, copy_legal" />
 
   <target name="prep_nuget">
     <echo level="Warning" message="Moving ${dirs.drop.nuget}${path.separator}lib${path.separator}console to ${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall." />
@@ -39,5 +39,19 @@
     <exec program="${app.choco}"
           workingdir="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall"
           commandline="${args.choco}" if="${platform::is-windows()}" />
+  </target>
+  
+  <target name="copy_legal">
+    <echo level="Warning" message="Copying LICENSE from '${dirs.current}${path.separator}LICENSE' to nuget packages"/>
+    <copy file="${dirs.current}${path.separator}LICENSE" tofile="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}LICENSE.txt" failonerror="true" />
+    <copy file="${dirs.current}${path.separator}LICENSE" tofile="${dirs.drop.nuget}${path.separator}chocolatey.lib${path.separator}lib${path.separator}LICENSE.txt" failonerror="true" />
+    
+    <echo level="Warning" message="Copying NOTICE from '${dirs.current}${path.separator}NOTICE' to nuget packages"/>
+    <copy file="${dirs.current}${path.separator}NOTICE" tofile="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}NOTICE.txt" failonerror="true" />
+    <copy file="${dirs.current}${path.separator}NOTICE" tofile="${dirs.drop.nuget}${path.separator}chocolatey.lib${path.separator}lib${path.separator}NOTICE.txt" failonerror="true" />
+    
+    <echo level="Warning" message="Copying Credits from '${dirs.current}${path.separator}${folder.documentation}${path.separator}legal${path.separator}CREDITS.md' to nuget packages"/>
+    <copy file="${dirs.current}${path.separator}${folder.documentation}${path.separator}legal${path.separator}CREDITS.md" tofile="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}CREDITS.txt" failonerror="true" />
+    <copy file="${dirs.current}${path.separator}${folder.documentation}${path.separator}legal${path.separator}CREDITS.md" tofile="${dirs.drop.nuget}${path.separator}chocolatey.lib${path.separator}lib${path.separator}CREDITS.txt" failonerror="true" />
   </target>
 </project>
