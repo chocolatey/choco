@@ -42,14 +42,6 @@
   </target>
   
   <target name="copy_legal">
-    <echo level="Warning" message="Copying LICENSE from '${dirs.current}${path.separator}LICENSE' to nuget packages"/>
-    <copy file="${dirs.current}${path.separator}LICENSE" tofile="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}LICENSE.txt" failonerror="true" />
-    <copy file="${dirs.current}${path.separator}LICENSE" tofile="${dirs.drop.nuget}${path.separator}chocolatey.lib${path.separator}lib${path.separator}LICENSE.txt" failonerror="true" />
-    
-    <echo level="Warning" message="Copying NOTICE from '${dirs.current}${path.separator}NOTICE' to nuget packages"/>
-    <copy file="${dirs.current}${path.separator}NOTICE" tofile="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}NOTICE.txt" failonerror="true" />
-    <copy file="${dirs.current}${path.separator}NOTICE" tofile="${dirs.drop.nuget}${path.separator}chocolatey.lib${path.separator}lib${path.separator}NOTICE.txt" failonerror="true" />
-    
     <echo level="Warning" message="Copying Credits from '${dirs.current}${path.separator}${folder.documentation}${path.separator}legal${path.separator}CREDITS.md' to nuget packages"/>
     <copy file="${dirs.current}${path.separator}${folder.documentation}${path.separator}legal${path.separator}CREDITS.md" tofile="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}CREDITS.txt" failonerror="true" />
     <copy file="${dirs.current}${path.separator}${folder.documentation}${path.separator}legal${path.separator}CREDITS.md" tofile="${dirs.drop.nuget}${path.separator}chocolatey.lib${path.separator}lib${path.separator}CREDITS.txt" failonerror="true" />
