@@ -44,6 +44,8 @@ namespace chocolatey.infrastructure.logging
         /// <param name="outputDirectory">The output directory.</param>
         public static void configure(string outputDirectory = null)
         {
+            GlobalContext.Properties["pid"] = System.Diagnostics.Process.GetCurrentProcess().Id;
+
             var assembly = Assembly.GetExecutingAssembly();
             var resource = ApplicationParameters.Log4NetConfigurationResource;
             if (Platform.get_platform() != PlatformType.Windows)
@@ -75,7 +77,7 @@ namespace chocolatey.infrastructure.logging
 
                 var layout = new PatternLayout
                     {
-                        ConversionPattern = "%date [%-5level] - %message%newline"
+                        ConversionPattern = "%date %property{pid} [%-5level] - %message%newline"
                     };
                 layout.ActivateOptions();
 
