@@ -22,13 +22,15 @@ This is a listing of all of the different things you can pass to choco.
  * [[config|CommandsConfig]] - Retrieve and configure config file settings
  * [[feature|CommandsFeature]] - view and configure choco features
  * [[features|CommandsFeatures]] - view and configure choco features (alias for feature)
- * [[apikey|CommandsApikey]] - retrieves or saves an apikey for a particular source
  * [[setapikey|CommandsSetapikey]] - retrieves or saves an apikey for a particular source (alias for apikey)
+ * [[apikey|CommandsApikey]] - retrieves or saves an apikey for a particular source
  * [[unpackself|CommandsUnpackself]] - have chocolatey set it self up
  * [[version|CommandsVersion]] - [DEPRECATED] will be removed in v1 - use [[`choco outdated`|Commandsoutdated]] or `cup <pkg|all> -whatif` instead
  * [[update|CommandsUpdate]] - [DEPRECATED] RESERVED for future use (you are looking for upgrade, these are not the droids you are looking for)
  * [[support|CommandsSupport]] - provides support information
  * [[download|CommandsDownload]] - downloads packages - optionally internalizing all remote resources
+ * [[synchronize|CommandsSynchronize]] - synchronizes against system installed software - generates missing packages
+ * [[sync|CommandsSync]] - synchronizes against system installed software - generates missing packages
 
 
 Please run chocolatey with `choco command -help` for specific help on

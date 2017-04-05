@@ -160,8 +160,9 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
 
      --allowselfservice, --allow-self-service
      Allow Self-Service - Should this source be allowed to be used with self-
-       service? Requires business edition. Defaults to false. Available in 0.1-
-       0.4+.
+       service? Requires business edition (v1.10.0+) with feature 
+       'useBackgroundServiceWithSelfServiceSourcesOnly' turned on. Defaults to 
+       false. Available in 0.10.4+.
 
 ~~~
 
