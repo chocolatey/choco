@@ -213,6 +213,7 @@ namespace chocolatey.console
             {
                 "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0}".format_with(config.Information.ChocolateyProductVersion));
                 pause_execution_if_debug();
+                "chocolatey".Log().Debug(() => "Exiting with 0");
                 Environment.Exit(0);
             }
         }
