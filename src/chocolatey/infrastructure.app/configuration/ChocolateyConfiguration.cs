@@ -380,6 +380,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         // list
         public bool LocalOnly { get; set; }
+        public bool IdOnly { get; set; }
         public bool IncludeRegistryPrograms { get; set; }
         public int? Page { get; set; }
         public int PageSize { get; set; }

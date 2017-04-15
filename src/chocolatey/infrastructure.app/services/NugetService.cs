@@ -149,16 +149,29 @@ namespace chocolatey.infrastructure.app.services
 
                 if (!config.QuietOutput)
                 {
+                    var logger = config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal;
+
                     if (config.RegularOutput)
                     {
-                        this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0} {1}{2}{3}{4}".format_with(
-                            package.Id,
-                            package.Version.to_string(),
-                            package.IsApproved ? " [Approved]" : string.Empty,
-                            package.IsDownloadCacheAvailable ? " Downloads cached for licensed users" : string.Empty,
-                            package.PackageTestResultStatus == "Failing" && package.IsDownloadCacheAvailable ? " - Possibly broken for FOSS users (due to original download location changes by vendor)" : package.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
-                            )
-                        );
+                        if (config.ListCommand.IdOnly)
+                        {
+                            this.Log().Info(logger, () => "{0}".format_with(
+                                    package.Id
+                                )
+                            );
+                        }
+                        else
+                        {
+                            this.Log().Info(logger, () => "{0} {1}{2}{3}{4}".format_with(
+                                    package.Id,
+                                    package.Version.to_string(),
+                                    package.IsApproved ? " [Approved]" : string.Empty,
+                                    package.IsDownloadCacheAvailable ? " Downloads cached for licensed users" : string.Empty,
+                                    package.PackageTestResultStatus == "Failing" && package.IsDownloadCacheAvailable ? " - Possibly broken for FOSS users (due to original download location changes by vendor)" : package.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
+                                )
+                            );
+                        }
+
                         if (config.Verbose) this.Log().Info(() =>
                             @" Title: {0} | Published: {1}{2}{3}
  Number of Downloads: {4} | Downloads for this version: {5}
@@ -201,7 +214,14 @@ namespace chocolatey.infrastructure.app.services
                     }
                     else
                     {
-                        this.Log().Info(config.Verbose ? ChocolateyLoggers.Important : ChocolateyLoggers.Normal, () => "{0}|{1}".format_with(package.Id, package.Version.to_string()));
+                        if (config.ListCommand.IdOnly)
+                        {
+                            this.Log().Info(logger, () => "{0}".format_with(package.Id));
+                        }
+                        else
+                        {
+                            this.Log().Info(logger, () => "{0}|{1}".format_with(package.Id, package.Version.to_string()));
+                        }
                     }
                 }
                 else
