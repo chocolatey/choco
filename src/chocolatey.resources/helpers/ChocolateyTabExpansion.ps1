@@ -41,7 +41,7 @@ $proNewOptions = " --file='' --build-package --file64='' --from-programs-and-fea
 $proUninstallOptions = " --from-programs-and-features"
 
 $commandOptions = @{
-  list = "--lo --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
+  list = "--lo --id-only --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
   search = "--pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
   info = "--pre --lo --source='' --user= --password= --local-only --prerelease" + $allcommands
   install = "-y -whatif -? --pre --version= --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user= --password= --prerelease --forcex86 --not-silent --package-parameters='' --allow-downgrade --force-dependencies --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --allow-multiple-versions --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --stop-on-first-package-failure" + $proInstallUpgradeOptions + $allcommands

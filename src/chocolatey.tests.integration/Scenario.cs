@@ -175,6 +175,7 @@ namespace chocolatey.tests.integration
             config.UpgradeCommand.FailOnNotInstalled = false;
             config.PinCommand.Name = string.Empty;
             config.PinCommand.Command = PinCommandType.unknown;
+            config.ListCommand.IdOnly = false;
 
             return config;
         }
