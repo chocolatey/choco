@@ -434,7 +434,8 @@ folder.");
 
                 if (installedPackage != null && (version == null || version == installedPackage.Version) && config.Force)
                 {
-                    this.Log().Debug(() => "{0} v{1} already installed. Forcing reinstall.".format_with(installedPackage.Id, installedPackage.Version));
+                    this.Log().Warn(ChocolateyLoggers.Important, () => @"{0} v{1} already installed. Forcing reinstall of version '{1}'. 
+ Please use upgrade if you meant to upgrade to a new version.".format_with(installedPackage.Id, installedPackage.Version));
                     version = installedPackage.Version;
                 }
 
