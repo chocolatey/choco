@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.guards
+namespace chocolatey.infrastructure.synchronization
 {
 	using System;
 	using System.Collections.Generic;
@@ -26,10 +26,16 @@ namespace chocolatey.infrastructure.guards
 	using System.Security.AccessControl;
 	using System.Security.Principal;
 
-	class SingleGlobalMutex : IDisposable
+	/// <summary>
+  ///   global mutex used for synchronizing multiple processes based on appguid
+  /// </summary>
+  /// <remarks>
+	///   Based on http://stackoverflow.com/a/7810107/2279385
+  /// </remarks>
+	public class GlobalMutex : IDisposable
 	{
 		public bool hasHandle = false;
-		Mutex mutex;
+		private Mutex mutex;
 
 		private void InitMutex()
 		{
@@ -43,18 +49,24 @@ namespace chocolatey.infrastructure.guards
 			mutex.SetAccessControl(securitySettings);
 		}
 
-		public SingleGlobalMutex(int timeOut)
+		public GlobalMutex(int timeOut)
 		{
 			InitMutex();
 			try
 			{
 				if (timeOut < 0)
+				{
 					hasHandle = mutex.WaitOne(Timeout.Infinite, false);
+				}
 				else
+				{
 					hasHandle = mutex.WaitOne(timeOut, false);
+				}
 
 				if (hasHandle == false)
+				{
 					throw new TimeoutException("Timeout waiting for exclusive access on SingleInstance");
+				}
 			}
 			catch (AbandonedMutexException)
 			{
@@ -68,7 +80,9 @@ namespace chocolatey.infrastructure.guards
 			if (mutex != null)
 			{
 				if (hasHandle)
+				{
 					mutex.ReleaseMutex();
+				}
 				mutex.Dispose();
 			}
 		}

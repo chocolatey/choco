@@ -109,7 +109,7 @@
     <Compile Include="infrastructure.app\services\FileTypeDetectorService.cs" />
     <Compile Include="infrastructure.app\services\IFileTypeDetectorService.cs" />
     <Compile Include="infrastructure.app\utility\ArgumentsUtility.cs" />
-    <Compile Include="infrastructure\guards\SingleGlobalMutex.cs" />
+    <Compile Include="infrastructure\synchronization\GlobalMutex.cs" />
     <Compile Include="infrastructure\logging\TraceLog.cs" />
     <Compile Include="infrastructure\registration\SecurityProtocol.cs" />
     <Compile Include="infrastructure\results\PowerShellExecutionResults.cs" />

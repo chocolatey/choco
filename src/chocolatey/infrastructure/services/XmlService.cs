@@ -24,7 +24,7 @@ namespace chocolatey.infrastructure.services
     using cryptography;
     using filesystem;
     using tolerance;
-		using chocolatey.infrastructure.guards;
+		using chocolatey.infrastructure.synchronization;
 
     /// <summary>
     ///   XML interaction
@@ -42,7 +42,7 @@ namespace chocolatey.infrastructure.services
 
         public XmlType deserialize<XmlType>(string xmlFilePath)
         {
-					using (new SingleGlobalMutex(1000))
+					using (new GlobalMutex(1000))
 					{
 						return FaultTolerance.try_catch_with_logging_exception(
 								() =>
@@ -104,7 +104,7 @@ namespace chocolatey.infrastructure.services
 				public void serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent)
 				{
 					_fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(xmlFilePath));
-					using (new SingleGlobalMutex(1000))
+					using (new GlobalMutex(1000))
 					{
 						FaultTolerance.try_catch_with_logging_exception(
 								() =>
