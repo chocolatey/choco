@@ -164,7 +164,7 @@ namespace chocolatey.infrastructure.app.configuration
 
                     if (isDebug && ex.InnerException != null)
                     {
-                        message += "{0}{1}".format_with(Environment.NewLine, ex.ToString());
+                        message += "{0}{1}".format_with(Environment.NewLine, ex.InnerException.ToString());
                     }
 
                     "chocolatey".Log().Error(

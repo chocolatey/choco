@@ -535,7 +535,7 @@ You can pass options and switches in the following ways:
 
                     if (isDebug && ex.InnerException != null)
                     {
-                        message += "{0}{1}".format_with(Environment.NewLine, ex.ToString());
+                        message += "{0}{1}".format_with(Environment.NewLine, ex.InnerException.ToString());
                     }
 
                     "chocolatey".Log().Error(
