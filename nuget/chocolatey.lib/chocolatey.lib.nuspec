@@ -4,7 +4,7 @@
     <id>chocolatey.lib</id>
     <title>Chocolatey Core [PREVIEW]</title>
     <version>0.9.9</version>
-    <authors>Rob Reynolds, The Chocolatey Team</authors>
+    <authors>Chocolatey Software, Inc</authors>
     <owners>Rob Reynolds</owners>
     <summary>Chocolatey is your machine level NuGet repository. Think apt-get for Windows (executables/application packages), not library packages.</summary>
     <description>

@@ -6,7 +6,7 @@
     <!--<packageSourceUrl>https://github.com/chocolatey/choco</packageSourceUrl> Need to move build to use choco to pack instead of nuget-->
     <owners>Rob Reynolds</owners>
     <title>Chocolatey</title>
-    <authors>Rob Reynolds, The Chocolatey Team</authors>
+    <authors>Chocolatey Software, Inc</authors>
     <projectUrl>https://github.com/chocolatey/choco</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/chocolatey/choco/master/docs/logo/chocolateyicon.gif</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
