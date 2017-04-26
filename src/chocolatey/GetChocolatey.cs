@@ -272,6 +272,11 @@ namespace chocolatey
             return configuration;
         }
 
+        public ChocolateyConfiguration GetConfiguration()
+        {
+            return create_configuration(new List<string>());
+        }
+
         private void extract_resources()
         {
             //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
