@@ -358,7 +358,6 @@ Did you know Pro / Business automatically syncs with Programs and
                     var installersDifferences = _registryService.get_installer_key_differences(installersBefore, _registryService.get_installer_keys());
                     if (installersDifferences.RegistryKeys.Count != 0)
                     {
-                        //todo v1 - determine the installer type and write it to the snapshot
                         //todo v1 - note keys passed in 
                         pkgInfo.RegistrySnapshot = installersDifferences;
 
@@ -366,6 +365,11 @@ Did you know Pro / Business automatically syncs with Programs and
                         if (key != null && key.HasQuietUninstall)
                         {
                             pkgInfo.HasSilentUninstall = true;
+                            this.Log().Info("  {0} can be automatically uninstalled.".format_with(packageResult.Name));
+                        }
+                        else if (key != null)
+                        {
+                            this.Log().Info("  {0} may be able to be automatically uninstalled.".format_with(packageResult.Name));
                         }
                     }
 
