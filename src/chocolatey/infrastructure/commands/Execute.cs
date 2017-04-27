@@ -68,7 +68,16 @@ namespace chocolatey.infrastructure.commands
             cancelToken.Token.ThrowIfCancellationRequested();
             var task = Task<T>.Factory.StartNew(function, cancelToken.Token); //,TaskCreationOptions.LongRunning| TaskCreationOptions.AttachedToParent);
            
-            task.Wait(_timespan);
+            if (_timespan.TotalSeconds < 1d)
+            {
+                // 0 means infinite
+                task.Wait();
+            }
+            else
+            {
+                task.Wait(_timespan);
+            }
+
             if (task.IsCompleted) return task.Result;
 
             cancelToken.Cancel();

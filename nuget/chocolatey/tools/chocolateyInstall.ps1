@@ -1,4 +1,4 @@
-$toolsPath = (Split-Path -parent $MyInvocation.MyCommand.Definition)
+﻿$toolsPath = (Split-Path -parent $MyInvocation.MyCommand.Definition)
 
 # ensure module loading preference is on
 $PSModuleAutoLoadingPreference = "All";
