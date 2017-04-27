@@ -337,7 +337,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool Is64BitOperatingSystem { get; set; }
         public bool Is64BitProcess { get; set; }
         public bool IsInteractive { get; set; }
+        public string UserName { get; set; }
+        public string UserDomainName { get; set; }
         public bool IsUserAdministrator { get; set; }
+        public bool IsUserSystemAccount { get; set; }
+        public bool IsUserRemoteDesktop { get; set; }
+        public bool IsUserRemote { get; set; }
         public bool IsProcessElevated { get; set; }
         public bool IsLicensedVersion { get; set; }
         public string LicenseType { get; set; }

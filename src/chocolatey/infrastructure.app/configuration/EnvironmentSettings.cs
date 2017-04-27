@@ -75,7 +75,12 @@ namespace chocolatey.infrastructure.app.configuration
             // experimental until we know if this value returns correctly based on the OS and not the current process.
             Environment.SetEnvironmentVariable("OS_IS64BIT", config.Information.Is64BitOperatingSystem ? "true" : "false");
             Environment.SetEnvironmentVariable("PROCESS_IS64BIT", config.Information.Is64BitProcess ? "true" : "false");
+            Environment.SetEnvironmentVariable("USER_NAME", config.Information.UserName);
+            Environment.SetEnvironmentVariable("USER_DOMAIN", config.Information.UserDomainName);
             Environment.SetEnvironmentVariable("IS_ADMIN", config.Information.IsUserAdministrator ? "true" : "false");
+            Environment.SetEnvironmentVariable("IS_SYSTEM", config.Information.IsUserSystemAccount ? "true" : "false");
+            Environment.SetEnvironmentVariable("IS_REMOTEDESKTOP", config.Information.IsUserRemoteDesktop ? "true" : "false");
+            Environment.SetEnvironmentVariable("IS_REMOTE", config.Information.IsUserRemote ? "true" : "false");
             Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", config.Information.IsProcessElevated ? "true" : "false");
             Environment.SetEnvironmentVariable("TEMP", config.CacheLocation);
             Environment.SetEnvironmentVariable("TMP", config.CacheLocation);

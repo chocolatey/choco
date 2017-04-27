@@ -96,7 +96,11 @@ The following are more advanced settings:
  * OS_PLATFORM - Like Windows, OSX, Linux. (0.9.9+)
  * OS_VERSION - The version of OS, like 6.1 something something for Windows. (0.9.9+)
  * OS_NAME - The reported name of the OS. (0.9.9+)
+ * USER_NAME = The user name (0.10.6+)
+ * USER_DOMAIN = The user domain name (could also be local computer name) (0.10.6+)
  * IS_PROCESSELEVATED = Is the process elevated? (0.9.9+)
+ * IS_SYSTEM = Is the user the system account? (0.10.6+)
+ * IS_REMOTEDESKTOP = Is the user in a terminal services session? (0.10.6+)
  * ChocolateyToolsLocation - formerly 'ChocolateyBinRoot' ('ChocolateyBinRoot' will be removed with Chocolatey v2.0.0), this is where tools being installed outside of Chocolatey packaging will go. (0.9.10+)
 
 #### Set By Options and Configuration
@@ -116,6 +120,7 @@ Some environment variables are set based on options that are passed, configurati
  * ChocolateyPackageParametersSensitive - Package parameters passed from command line `--package-parameters-senstivite` that are not logged anywhere.  (0.10.1+ and licensed editions 1.6.0+)
  * ChocolateyLicensedVersion - What version is the licensed edition on? 
  * ChocolateyLicenseType - What edition / type of the licensed edition is installed?
+ * USER_CONTEXT - The original user context - different when self-service is used (Licensed v1.10.0+)
  
 #### Experimental Environment Variables
 The following are experimental or use not recommended:
@@ -123,6 +128,7 @@ The following are experimental or use not recommended:
  * OS_IS64BIT = This may not return correctly - it may depend on the process the app is running under (0.9.9+)
  * CHOCOLATEY_VERSION_PRODUCT = the version of Choco that may match CHOCOLATEY_VERSION but may be different (0.9.9+) - based on git describe
  * IS_ADMIN = Is the user an administrator? But doesn't tell you if the process is elevated. (0.9.9+)
+ * IS_REMOTE = Is the user in a remote session? (0.10.6+)
 
 #### Not Useful Or Anti-Pattern If Used
 

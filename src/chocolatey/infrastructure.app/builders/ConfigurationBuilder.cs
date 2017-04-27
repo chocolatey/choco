@@ -480,9 +480,14 @@ You can pass options and switches in the following ways:
             config.Information.Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;
             config.Information.Is64BitProcess = (IntPtr.Size == 8);
             config.Information.IsInteractive = Environment.UserInteractive;
+            config.Information.UserName = System.Environment.UserName;
+            config.Information.UserDomainName = System.Environment.UserDomainName;
             config.Information.IsUserAdministrator = ProcessInformation.user_is_administrator();
+            config.Information.IsUserSystemAccount = ProcessInformation.user_is_system();
+            config.Information.IsUserRemoteDesktop = ProcessInformation.user_is_terminal_services();
+            config.Information.IsUserRemote = ProcessInformation.user_is_remote();
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
-
+            
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("https_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
                 config.Proxy.Location = Environment.GetEnvironmentVariable("https_proxy");
