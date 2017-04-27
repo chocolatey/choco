@@ -166,8 +166,8 @@ namespace chocolatey.infrastructure.app.services
  Chocolatey Package Source: {6}{7}
  Tags: {8}
  Software Site: {9}
- Software License: {10}{11}{12}{13}{14}
- Description: {15} 
+ Software License: {10}{11}{12}{13}{14}{15}
+ Description: {16}{17}
 ".format_with(
                                 package.Title.escape_curly_braces(),
                                 package.Published.GetValueOrDefault().UtcDateTime.ToShortDateString(),
@@ -196,7 +196,9 @@ namespace chocolatey.infrastructure.app.services
                                 package.DocsUrl != null && !string.IsNullOrWhiteSpace(package.DocsUrl.to_string()) ? "{0} Documentation: {1}".format_with(Environment.NewLine, package.DocsUrl.to_string()) : string.Empty,
                                 package.MailingListUrl != null && !string.IsNullOrWhiteSpace(package.MailingListUrl.to_string()) ? "{0} Mailing List: {1}".format_with(Environment.NewLine, package.MailingListUrl.to_string()) : string.Empty,
                                 package.BugTrackerUrl != null && !string.IsNullOrWhiteSpace(package.BugTrackerUrl.to_string()) ? "{0} Issues: {1}".format_with(Environment.NewLine, package.BugTrackerUrl.to_string()) : string.Empty,
-                                package.Description.escape_curly_braces().Replace("\n    ", "\n").Replace("\n", "\n  ")
+                                package.Summary != null && !string.IsNullOrWhiteSpace(package.Summary.to_string()) ? "{0} Summary: {1}".format_with(Environment.NewLine, package.Summary.escape_curly_braces().to_string()) : string.Empty,
+                                package.Description.escape_curly_braces().Replace("\n    ", "\n").Replace("\n", "\n  "),
+                                package.ReleaseNotes != null && !string.IsNullOrWhiteSpace(package.ReleaseNotes.to_string()) ? "{0} Release Notes: {1}".format_with(Environment.NewLine, package.ReleaseNotes.escape_curly_braces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty
                         ));
                     }
                     else
