@@ -132,7 +132,7 @@ namespace chocolatey.infrastructure.app.nuget
 
             results = configuration.ListCommand.OrderByPopularity ? 
                  results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Id)
-                 : results.OrderBy(p => p.Id) ;
+                 : results;
 
             return results;
         } 
