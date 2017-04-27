@@ -100,7 +100,7 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
-        public void list_noop(ChocolateyConfiguration config)
+        public virtual void list_noop(ChocolateyConfiguration config)
         {
             this.Log().Info("{0} would have searched for '{1}' against the following source(s) :\"{2}\"".format_with(
                 ApplicationParameters.Name,
@@ -109,7 +109,7 @@ namespace chocolatey.infrastructure.app.services
                                 ));
         }
 
-        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
+        public virtual IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
             int count = 0;
 
