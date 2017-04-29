@@ -1,6 +1,6 @@
-# Copyright Â© 2017 Chocolatey Software, Inc.
-# Copyright Â© 2015 - 2017 RealDimensions Software, LLC
-# Copyright Â© 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
+# Copyright © 2017 Chocolatey Software, Inc.
+# Copyright © 2015 - 2017 RealDimensions Software, LLC
+# Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,6 +54,9 @@ Install-ChocolateyPath -PathToInstall "$($env:SystemDrive)\tools\gittfs"
 .EXAMPLE
 Install-ChocolateyPath "$($env:SystemDrive)\Program Files\MySQL\MySQL Server 5.5\bin" -PathType 'Machine'
 
+.EXAMPLE
+Install-ChocolateyPath "%ANDROID_HOME%\Tools" -PathType 'Machine'
+
 .LINK
 Install-ChocolateyEnvironmentVariable
 
@@ -69,42 +72,38 @@ Get-ToolsLocation
 param(
   [parameter(Mandatory=$true, Position=0)][string] $pathToInstall,
   [parameter(Mandatory=$false, Position=1)][System.EnvironmentVariableTarget] $pathType = [System.EnvironmentVariableTarget]::User,
+  [parameter(Mandatory=$false, Position=2)][switch] $Force = $false,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-  Write-Debug "Running 'Install-ChocolateyPath' with pathToInstall:`'$pathToInstall`'";
-  $originalPathToInstall = $pathToInstall
+  Set-StrictMode -Version 2
+  #start over as admin as needed
+  if (($pathType -eq [System.EnvironmentVariableTarget]::Machine) -and (-not (Test-ProcessAdminRights))) {
+    $psArgs = "Install-ChocolateyPath -pathToInstall `'$pathToInstall`' -pathType `'$pathType`'"
+    Start-ChocolateyProcessAsAdmin "$psArgs"
+  }
 
-  #get the PATH variable
-  Update-SessionEnvironment
-  $envPath = $env:PATH
-  if (!$envPath.ToLower().Contains($pathToInstall.ToLower()))
+  #$pathToInstall is not an existing directory
+  $pathToInstall_ExpandedNormalized = [System.Environment]::ExpandEnvironmentVariables($pathToInstall).TrimEnd([System.IO.Path]::DirectorySeparatorChar)
+  if (![System.IO.Directory]::Exists($pathToInstall_ExpandedNormalized) -and (!$Force)) {
+      Write-Debug "$pathToInstall is not an existing directory.  Exiting. (use -Force to add anyway)"
+      return
+  }
+
+  Write-Host "Running 'Install-ChocolateyPath' with pathToInstall:`'$pathToInstall`'";
+
+  #
+  $envPATH = Get-EnvironmentVariable -Name "PATH" -Scope ([System.EnvironmentVariableTarget]::Process) -PreserveVariables $false
+  #bug in get-Environmentvariable (for process) forces me to expand myself.  Also, Get-Env can return null.
+  $envPATH = [System.Environment]::ExpandEnvironmentVariables("" + $envPATH) 
+  #envPATH with fully expanded variables and no traling PathSeparators
+  $envPATH_ExpandedNormalized = @($envPATH.Split([System.IO.Path]::PathSeparator).ForEach({$_.TrimEnd([System.IO.Path]::DirectorySeparatorChar)}))
+  #is pathToInstall already in the environment PATH variable?
+  if ($pathToInstall_ExpandedNormalized -notin $envPATH_ExpandedNormalized)
   {
     Write-Host "PATH environment variable does not have $pathToInstall in it. Adding..."
-    $actualPath = Get-EnvironmentVariable -Name 'Path' -Scope $pathType -PreserveVariables
-
-    $statementTerminator = ";"
-    #does the path end in ';'?
-    $hasStatementTerminator = $actualPath -ne $null -and $actualPath.EndsWith($statementTerminator)
-    # if the last digit is not ;, then we are adding it
-    If (!$hasStatementTerminator -and $actualPath -ne $null) {$pathToInstall = $statementTerminator + $pathToInstall}
-    if (!$pathToInstall.EndsWith($statementTerminator)) {$pathToInstall = $pathToInstall + $statementTerminator}
-    $actualPath = $actualPath + $pathToInstall
-
-    if ($pathType -eq [System.EnvironmentVariableTarget]::Machine) {
-      if (Test-ProcessAdminRights) {
-        Set-EnvironmentVariable -Name 'Path' -Value $actualPath -Scope $pathType
-      } else {
-        $psArgs = "Install-ChocolateyPath -pathToInstall `'$originalPathToInstall`' -pathType `'$pathType`'"
-        Start-ChocolateyProcessAsAdmin "$psArgs"
-      }
-    } else {
-      Set-EnvironmentVariable -Name 'Path' -Value $actualPath -Scope $pathType
-    }
-
-    #add it to the local path as well so users will be off and running
-    $envPSPath = $env:PATH
-    $env:Path = $envPSPath + $statementTerminator + $pathToInstall
+    $newPath = $pathToInstall + [System.IO.Path]::PathSeparator + (Get-EnvironmentVariable -Name 'Path' -Scope $pathType)
+    
+    Set-EnvironmentVariable -Name 'PATH' -Value $newPath -Scope $pathType
+    Update-SessionEnvironment
   }
 }
-
-# [System.Text.RegularExpressions.Regex]::Match($Path,[System.Text.RegularExpressions.Regex]::Escape('locationtoMatch') + '(?>;)?', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
