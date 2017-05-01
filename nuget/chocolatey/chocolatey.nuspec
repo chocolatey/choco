@@ -6,7 +6,7 @@
     <!--<packageSourceUrl>https://github.com/chocolatey/choco</packageSourceUrl> Need to move build to use choco to pack instead of nuget-->
     <owners>Rob Reynolds</owners>
     <title>Chocolatey</title>
-    <authors>Rob Reynolds, The Chocolatey Team</authors>
+    <authors>Chocolatey Software, Inc</authors>
     <projectUrl>https://github.com/chocolatey/choco</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/chocolatey/choco/master/docs/logo/chocolateyicon.gif</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
@@ -60,7 +60,6 @@ See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
 ### BUG FIXES
 
  * Fix - Start-ChocolateyProcessAsAdmin errors when running PowerShell scripts - see [#1220](https://github.com/chocolatey/choco/issues/1220)
- * Fix - Chocolatey timed out immediately when execution timeout was infinite - see [#1224](https://github.com/chocolatey/choco/issues/1224)
 
 ### IMPROVEMENTS
 

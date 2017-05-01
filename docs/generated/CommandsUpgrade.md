@@ -289,9 +289,20 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        Overrides the default feature 'stopOnFirstPackageFailure' set to 'False-
        '. Available in 0.10.4+.
 
-     --exclude-prerelease
+     --exclude-pre, --exclude-prerelease, --exclude-prereleases
      Exclude Prerelease - Should prerelease be ignored for upgrades? Will be 
        ignored if you pass `--pre`. Available in 0.10.4+.
+
+     --userememberedargs, --userememberedarguments, --userememberedoptions, --use-remembered-args, --use-remembered-arguments, --use-remembered-options
+     Use Remembered Options for Upgrade - use the arguments and options used 
+       during install for upgrade. Does not override arguments being passed at 
+       runtime. Overrides the default feature 
+       'useRememberedArgumentsForUpgrades' set to 'False'. Available in 0.10.4+.
+
+     --ignorerememberedargs, --ignorerememberedarguments, --ignorerememberedoptions, --ignore-remembered-args, --ignore-remembered-arguments, --ignore-remembered-options
+     Ignore Remembered Options for Upgrade - ignore the arguments and options 
+       used during install for upgrade. Overrides the default feature 
+       'useRememberedArgumentsForUpgrades' set to 'False'. Available in 0.10.4+.
 
      --sdc, --skipdownloadcache, --skip-download-cache
      Skip Download Cache - Use the original download even if a private CDN 

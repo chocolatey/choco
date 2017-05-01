@@ -1,4 +1,4 @@
-# http://poshcode.org/417
+﻿# http://poshcode.org/417
 ## Get-WebFile (aka wget for PowerShell)
 ##############################################################################################################
 ## Downloads a file or page from the web

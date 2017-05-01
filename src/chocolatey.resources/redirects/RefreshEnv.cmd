@@ -17,7 +17,7 @@ goto main
 :SetFromReg
     "%WinDir%\System32\Reg" QUERY "%~1" /v "%~2" > "%TEMP%\_envset.tmp" 2>NUL
     for /f "usebackq skip=2 tokens=2,*" %%A IN ("%TEMP%\_envset.tmp") do (
-        echo/set %~3=%%B
+        echo/set "%~3=%%B"
     )
     goto :EOF
 
@@ -43,7 +43,7 @@ goto main
     call :SetFromReg "HKCU\Environment" Path Path_HKCU >> "%TEMP%\_env.cmd"
 
     :: Caution: do not insert space-chars before >> redirection sign
-    echo/set Path=%%Path_HKLM%%;%%Path_HKCU%% >> "%TEMP%\_env.cmd"
+    echo/set "Path=%%Path_HKLM%%;%%Path_HKCU%%" >> "%TEMP%\_env.cmd"
 
     :: Cleanup
     del /f /q "%TEMP%\_envset.tmp" 2>nul

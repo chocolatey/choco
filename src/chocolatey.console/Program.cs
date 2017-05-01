@@ -57,6 +57,8 @@ namespace chocolatey.console
                 var license = License.validate_license();
                 var container = SimpleInjectorContainer.Container;
 
+                "LogFileOnly".Log().Info(() => "".PadRight(60, '='));
+
                 var config = container.GetInstance<ChocolateyConfiguration>();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
@@ -79,7 +81,6 @@ namespace chocolatey.console
 
                 if (config.RegularOutput)
                 {
-                    "LogFileOnly".Log().Info(() => "".PadRight(60, '='));
 #if DEBUG
                     "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2} (DEBUG BUILD)".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.is_licensed_version() ? " {0}".format_with(license.LicenseType) : string.Empty));
 #else
@@ -212,6 +213,7 @@ namespace chocolatey.console
             {
                 "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0}".format_with(config.Information.ChocolateyProductVersion));
                 pause_execution_if_debug();
+                "chocolatey".Log().Debug(() => "Exiting with 0");
                 Environment.Exit(0);
             }
         }

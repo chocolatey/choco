@@ -60,7 +60,6 @@ namespace chocolatey.infrastructure.app.nuget
 
             IQueryable<IPackage> results = packageRepository.Search(searchTermLower, configuration.Prerelease);
 
-
             if (configuration.ListCommand.Page.HasValue)
             {
                 results = results.Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
@@ -68,7 +67,7 @@ namespace chocolatey.infrastructure.app.nuget
            
             if (configuration.ListCommand.Exact)
             {
-                results = results.Where(p => p.Id.ToLower() == searchTermLower);
+                results = packageRepository.FindPackagesById(searchTermLower).AsQueryable();
             }
 
             if (configuration.ListCommand.ByIdOnly)
@@ -133,7 +132,7 @@ namespace chocolatey.infrastructure.app.nuget
 
             results = configuration.ListCommand.OrderByPopularity ? 
                  results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Id)
-                 : results.OrderBy(p => p.Id) ;
+                 : results;
 
             return results;
         } 

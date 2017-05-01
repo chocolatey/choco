@@ -1,4 +1,5 @@
-# Copyright © 2011 - Present RealDimensions Software, LLC
+# Copyright © 2017 Chocolatey Software, Inc
+# Copyright © 2011 - 2017 RealDimensions Software, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -379,6 +380,8 @@ Install-ChocolateyZipPackage '$env:chocolateyPackageName' $url $binRoot
   Generate-CommandReference('Version')
   Generate-CommandReference('Download')
   Generate-CommandReference('Support')
+  Generate-CommandReference('Sync')
+  Generate-CommandReference('Synchronize')
   Generate-TopLevelCommandReference
 
   Exit 0

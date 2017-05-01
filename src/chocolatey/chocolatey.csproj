@@ -33,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <DebugSymbols>true</DebugSymbols>
+    <DocumentationFile>bin\Release\chocolatey.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>..\..\docs\logo\chocolatey.ico</ApplicationIcon>

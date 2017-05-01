@@ -33,5 +33,6 @@ namespace chocolatey.infrastructure.app.domain
         public bool HasSilentUninstall { get; set; }
         public bool IsSideBySide { get; set; }
         public bool IsPinned { get; set; }
+        public string ExtraInformation { get; set; }
     }
 }

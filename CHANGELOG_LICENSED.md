@@ -4,6 +4,20 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
+## 1.9.8 (March 25, 2017)
+
+### BUG FIXES
+
+ * Fix - Ensure Chocolatey Licensed is compatible with Chocolatey v0.10.4.
+ * Fix - AutoUninstaller - ensure uninstallExe is split by quotes when necessary - see [#1208](https://github.com/chocolatey/choco/issues/1208)
+ * Package Synchronizer (Choco Sync):
+    * Fix - Ensure template properties are cleared, even when skipping due to errors
+ * Package Builder (Choco New):
+    * Fix - Ensure authors is never empty
+    * Fix - Before setting properties from registry, ensure they have a value.
+    * Fix - Replace invalid ".-" in package id
+
+
 ## 1.9.7 (March 20, 2017)
 
 ### BUG FIXES 

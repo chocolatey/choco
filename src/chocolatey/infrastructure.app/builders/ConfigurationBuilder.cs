@@ -199,8 +199,8 @@ namespace chocolatey.infrastructure.app.builders
                 config.CacheLocation = fileSystem.get_temp_path(); // System.Environment.GetEnvironmentVariable("TEMP");
                 // TEMP gets set in EnvironmentSettings, so it may already have 
                 // chocolatey in the path when it installs the next package from
-                // the API. 
-                if(!config.CacheLocation.EndsWith("chocolatey")) {
+                // the API.
+                if(!String.Equals(fileSystem.get_directory_info_for(config.CacheLocation).Name, "chocolatey", StringComparison.OrdinalIgnoreCase)) {
                     config.CacheLocation = fileSystem.combine_paths(fileSystem.get_temp_path(), "chocolatey");
                 }
             }
@@ -480,9 +480,14 @@ You can pass options and switches in the following ways:
             config.Information.Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;
             config.Information.Is64BitProcess = (IntPtr.Size == 8);
             config.Information.IsInteractive = Environment.UserInteractive;
+            config.Information.UserName = System.Environment.UserName;
+            config.Information.UserDomainName = System.Environment.UserDomainName;
             config.Information.IsUserAdministrator = ProcessInformation.user_is_administrator();
+            config.Information.IsUserSystemAccount = ProcessInformation.user_is_system();
+            config.Information.IsUserRemoteDesktop = ProcessInformation.user_is_terminal_services();
+            config.Information.IsUserRemote = ProcessInformation.user_is_remote();
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
-
+            
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("https_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
                 config.Proxy.Location = Environment.GetEnvironmentVariable("https_proxy");
@@ -535,7 +540,7 @@ You can pass options and switches in the following ways:
 
                     if (isDebug && ex.InnerException != null)
                     {
-                        message += "{0}{1}".format_with(Environment.NewLine, ex.ToString());
+                        message += "{0}{1}".format_with(Environment.NewLine, ex.InnerException.ToString());
                     }
 
                     "chocolatey".Log().Error(
