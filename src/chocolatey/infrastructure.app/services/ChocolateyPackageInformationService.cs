@@ -35,6 +35,7 @@ namespace chocolatey.infrastructure.app.services
         private const string SIDE_BY_SIDE_FILE = ".sxs";
         private const string PIN_FILE = ".pin";
         private const string ARGS_FILE = ".arguments";
+        private const string EXTRA_FILE = ".extra";
         private const string VERSION_OVERRIDE_FILE = ".version";
 
         public ChocolateyPackageInformationService(IFileSystem fileSystem, IRegistryService registryService, IFilesService filesService)
@@ -84,6 +85,8 @@ namespace chocolatey.infrastructure.app.services
             packageInformation.IsPinned = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, PIN_FILE));
             var argsFile = _fileSystem.combine_paths(pkgStorePath, ARGS_FILE);
             if (_fileSystem.file_exists(argsFile)) packageInformation.Arguments = _fileSystem.read_file(argsFile);
+            var extraInfoFile = _fileSystem.combine_paths(pkgStorePath, EXTRA_FILE);
+            if (_fileSystem.file_exists(extraInfoFile)) packageInformation.ExtraInformation = _fileSystem.read_file(extraInfoFile);
 
             var versionOverrideFile = _fileSystem.combine_paths(pkgStorePath, VERSION_OVERRIDE_FILE);
             if (_fileSystem.file_exists(versionOverrideFile))
@@ -136,7 +139,18 @@ namespace chocolatey.infrastructure.app.services
             else
             {
                 _fileSystem.delete_file(_fileSystem.combine_paths(pkgStorePath, ARGS_FILE));
-            }  
+            }   
+            
+            if (!string.IsNullOrWhiteSpace(packageInformation.ExtraInformation))
+            {
+                var extraFile = _fileSystem.combine_paths(pkgStorePath, EXTRA_FILE);
+                if (_fileSystem.file_exists(extraFile)) _fileSystem.delete_file(extraFile);
+                _fileSystem.write_file(extraFile, packageInformation.ExtraInformation);
+            }
+            else
+            {
+                _fileSystem.delete_file(_fileSystem.combine_paths(pkgStorePath, EXTRA_FILE));
+            }
             
             if (packageInformation.VersionOverride != null)
             {

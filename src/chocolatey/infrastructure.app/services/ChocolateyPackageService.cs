@@ -415,7 +415,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 if (key != null) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, key.InstallLocation, EnvironmentVariableTarget.Process);
             }
 
-            _packageInfoService.save_package_information(pkgInfo);
+            update_package_information(pkgInfo);
             ensure_bad_package_path_is_clean(config, packageResult);
             EventManager.publish(new HandlePackageResultCompletedMessage(packageResult, config, commandName));
 
@@ -453,6 +453,11 @@ Did you know Pro / Business automatically syncs with Programs and
                 this.Log().Info(ChocolateyLoggers.Important, @"  Software install location not explicitly set, could be in package or 
   default install location if installer.");
             }
+        }
+
+        protected virtual void update_package_information(ChocolateyPackageInformation pkgInfo)
+        {
+            _packageInfoService.save_package_information(pkgInfo);
         }
 
         private string capture_arguments(ChocolateyConfiguration config, PackageResult packageResult)
