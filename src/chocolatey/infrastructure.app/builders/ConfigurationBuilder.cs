@@ -199,8 +199,8 @@ namespace chocolatey.infrastructure.app.builders
                 config.CacheLocation = fileSystem.get_temp_path(); // System.Environment.GetEnvironmentVariable("TEMP");
                 // TEMP gets set in EnvironmentSettings, so it may already have 
                 // chocolatey in the path when it installs the next package from
-                // the API. 
-                if(!config.CacheLocation.EndsWith("chocolatey")) {
+                // the API.
+                if(!String.Equals(fileSystem.get_directory_info_for(config.CacheLocation).Name, "chocolatey", StringComparison.OrdinalIgnoreCase)) {
                     config.CacheLocation = fileSystem.combine_paths(fileSystem.get_temp_path(), "chocolatey");
                 }
             }
