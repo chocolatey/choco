@@ -72,7 +72,11 @@ param(
     [string] $USER_ENVIRONMENT_REGISTRY_KEY_NAME = "Environment";
     [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($USER_ENVIRONMENT_REGISTRY_KEY_NAME)
   } elseif ($Scope -eq [System.EnvironmentVariableTarget]::Process) {
-    return [Environment]::GetEnvironmentVariable($Name, $Scope)
+    $processVariable = [Environment]::GetEnvironmentVariable($Name, $Scope)
+    if (-not $PreserveVariables) {
+        $processVariable = [Environment]::ExpandEnvironmentVariables($processVariable)
+    }
+    return $processVariable
   }
 
   [Microsoft.Win32.RegistryValueOptions] $registryValueOptions = [Microsoft.Win32.RegistryValueOptions]::None
