@@ -83,6 +83,7 @@ namespace chocolatey
     /// <summary>
     /// The place where all the magic happens.
     /// </summary>
+    /// <remarks>Chocolatey - the most magical place on Windows</remarks>
     public class GetChocolatey
     {
         private readonly Container _container;
@@ -129,9 +130,12 @@ namespace chocolatey
         /// <param name="service">The service.</param>
         /// <param name="implementation">The implementation.</param>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
+        /// <remarks>
+        /// This requires you to use ILMerged SimpleInjector. If you use SimpleInjector in your codebase, you must now use Chocolatey's version. This is required to not be internalized so licensed code will work appropriately.
+        /// </remarks>
         public GetChocolatey RegisterContainerComponent(Type service, Type implementation)
         {
-            _container.Register(service,implementation,Lifestyle.Singleton);
+            _container.Register(service, implementation, Lifestyle.Singleton);
             return this;
         }
 
@@ -142,8 +146,11 @@ namespace chocolatey
         /// <typeparam name="Service">The type of the service.</typeparam>
         /// <typeparam name="Implementation">The type of the Implementation.</typeparam>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
-        public GetChocolatey RegisterContainerComponent<Service,Implementation>() 
-            where Service : class 
+        /// <remarks>
+        /// This requires you to use ILMerged SimpleInjector. If you use SimpleInjector in your codebase, you must now use Chocolatey's version. This is required to not be internalized so licensed code will work appropriately.
+        /// </remarks>
+        public GetChocolatey RegisterContainerComponent<Service, Implementation>()
+            where Service : class
             where Implementation : class, Service
         {
             return RegisterContainerComponent<Service, Implementation>(Lifestyle.Singleton);
@@ -152,14 +159,16 @@ namespace chocolatey
         /// <summary>
         /// Registers a container component. 
         /// Will override existing component if registered.
-        /// NOTE: This requires you take a dependency on SimpleInjector.
         /// </summary>
         /// <typeparam name="Service">The type of the service.</typeparam>
         /// <typeparam name="Implementation">The type of the Implementation.</typeparam>
         /// <param name="lifestyle">The lifestyle.</param>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
-        public GetChocolatey RegisterContainerComponent<Service,Implementation>(Lifestyle lifestyle) 
-            where Service : class 
+        /// <remarks>
+        /// This requires you to use ILMerged SimpleInjector. If you use SimpleInjector in your codebase, you must now use Chocolatey's version. This is required to not be internalized so licensed code will work appropriately.
+        /// </remarks>
+        public GetChocolatey RegisterContainerComponent<Service, Implementation>(Lifestyle lifestyle)
+            where Service : class
             where Implementation : class, Service
         {
             _container.Register<Service, Implementation>(lifestyle);
@@ -173,6 +182,9 @@ namespace chocolatey
         /// <typeparam name="Service">The type of the ervice.</typeparam>
         /// <param name="implementationCreator">The implementation creator.</param>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
+        /// <remarks>
+        /// This requires you to use ILMerged SimpleInjector. If you use SimpleInjector in your codebase, you must now use Chocolatey's version. This is required to not be internalized so licensed code will work appropriately.
+        /// </remarks>
         public GetChocolatey RegisterContainerComponent<Service>(Func<Service> implementationCreator)
              where Service : class
         {
@@ -183,10 +195,12 @@ namespace chocolatey
         /// <summary>
         /// Register container components when you need to do multiple setups and want to work with the container directly. 
         /// Will override existing components if registered.
-        /// NOTE: This requires you take a dependency on SimpleInjector.
         /// </summary>
         /// <param name="containerSetup">The container setup.</param>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
+        /// <remarks>
+        /// This requires you to use ILMerged SimpleInjector. If you use SimpleInjector in your codebase, you must now use Chocolatey's version. This is required to not be internalized so licensed code will work appropriately.
+        /// </remarks>
         public GetChocolatey RegisterContainerComponents(Action<Container> containerSetup)
         {
             if (containerSetup != null)
