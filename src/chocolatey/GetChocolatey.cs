@@ -54,10 +54,10 @@ namespace chocolatey
             {
                 var requestedAssembly = new AssemblyName(args.Name);
                 if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
-                    && !requestedAssembly.Name.is_equal_to("chocolatey.licensed") 
+                    && !requestedAssembly.Name.is_equal_to("chocolatey.licensed")
                     && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
                 {
-                     return typeof(Lets).Assembly;
+                    return typeof(Lets).Assembly;
                 }
 
                 try
@@ -86,8 +86,8 @@ namespace chocolatey
     public class GetChocolatey
     {
         private readonly Container _container;
+        private readonly ChocolateyLicense _license;
         private Action<ChocolateyConfiguration> _propConfig;
-        private ChocolateyLicense _license;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GetChocolatey"/> class.
@@ -119,9 +119,9 @@ namespace chocolatey
         public GetChocolatey Set(Action<ChocolateyConfiguration> propConfig)
         {
             _propConfig = propConfig;
-           return this;
+            return this;
         }
- 
+
         /// <summary>
         /// Registers a container component. Does not require a dependency on Simple Injector.
         /// Will override existing component if registered.
@@ -162,7 +162,7 @@ namespace chocolatey
             where Service : class 
             where Implementation : class, Service
         {
-            _container.Register<Service,Implementation>(lifestyle);
+            _container.Register<Service, Implementation>(lifestyle);
             return this;
         }
 
@@ -176,7 +176,7 @@ namespace chocolatey
         public GetChocolatey RegisterContainerComponent<Service>(Func<Service> implementationCreator)
              where Service : class
         {
-            _container.Register(implementationCreator,Lifestyle.Singleton);
+            _container.Register(implementationCreator, Lifestyle.Singleton);
             return this;
         }
 
@@ -254,10 +254,10 @@ namespace chocolatey
         {
             var configuration = new ChocolateyConfiguration();
             ConfigurationBuilder.set_up_configuration(
-                args, 
-                configuration, 
-                _container, 
-                _license, 
+                args,
+                configuration,
+                _container,
+                _license,
                 null);
             
             Config.initialize_with(configuration);

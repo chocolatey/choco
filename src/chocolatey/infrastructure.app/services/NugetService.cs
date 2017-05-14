@@ -321,7 +321,6 @@ namespace chocolatey.infrastructure.app.services
 
             if (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) && config.RegularOutput)
             {
-
                 this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
 Your package may be subject to moderation. A moderator will review the
