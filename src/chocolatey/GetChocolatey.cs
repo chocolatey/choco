@@ -226,6 +226,7 @@ namespace chocolatey
 
         /// <summary>
         /// Call this method to run Chocolatey after you have set the options.
+        /// WARNING: Once this is called, you will not be able to register additional container components.
         /// </summary>
         public void Run()
         {
@@ -237,8 +238,9 @@ namespace chocolatey
 
         /// <summary>
         ///   Call this method to run chocolatey after you have set the options.
-        /// <param name="args">Commandline arguments to add to configuration.</param>
+        /// WARNING: Once this is called, you will not be able to register additional container components.
         /// </summary>
+        /// <param name="args">Commandline arguments to add to configuration.</param>
         public void RunConsole(string[] args)
         {
             extract_resources();
@@ -249,6 +251,7 @@ namespace chocolatey
 
         /// <summary>
         ///    Run chocolatey after setting the options, and list the results.
+        /// WARNING: Once this is called, you will not be able to register additional container components.
         /// </summary>
         /// <typeparam name="T">The typer of results you're expecting back.</typeparam>
         public IEnumerable<T> List<T>()
@@ -263,6 +266,7 @@ namespace chocolatey
         /// <summary>
         ///    Run chocolatey after setting the options,
         ///    and get the count of items that would be returned if you listed the results.
+        /// WARNING: Once this is called, you will not be able to register additional container components.
         /// </summary>
         /// <remarks>
         ///    Is intended to be more efficient then simply calling <see cref="List{T}">List</see> and then Count() on the returned list.
@@ -299,6 +303,11 @@ namespace chocolatey
             return configuration;
         }
 
+        /// <summary>
+        /// Gets the configuration.
+        /// </summary>
+        /// <returns>The configuration for Chocolatey</returns>
+        /// <remarks>Only call this once you have registered all container components with Chocolatey</remarks>
         public ChocolateyConfiguration GetConfiguration()
         {
             return create_configuration(new List<string>());
