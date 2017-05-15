@@ -230,6 +230,7 @@ namespace chocolatey
         /// </summary>
         public void Run()
         {
+            ensure_environment();
             extract_resources();
             
             ensure_original_configuration(new List<string>(),
@@ -251,6 +252,7 @@ namespace chocolatey
         /// <param name="args">Commandline arguments to add to configuration.</param>
         public void RunConsole(string[] args)
         {
+            ensure_environment();
             extract_resources();
             
             ensure_original_configuration(new List<string>(args),
@@ -269,6 +271,7 @@ namespace chocolatey
         /// <typeparam name="T">The typer of results you're expecting back.</typeparam>
         public IEnumerable<T> List<T>()
         {
+            ensure_environment();
             extract_resources();
             
             return ensure_original_configuration(new List<string>(),
@@ -291,6 +294,7 @@ namespace chocolatey
         /// </remarks>
         public int ListCount()
         {
+            ensure_environment();
             extract_resources();
 
             return ensure_original_configuration(new List<string>(),
@@ -368,7 +372,29 @@ namespace chocolatey
         /// <remarks>Only call this once you have registered all container components with Chocolatey</remarks>
         public ChocolateyConfiguration GetConfiguration()
         {
+            ensure_environment();
+
             return create_configuration(new List<string>());
+        }
+
+        private void ensure_environment()
+        {
+            string chocolateyInstall = string.Empty;
+
+#if !DEBUG
+            chocolateyInstall = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, EnvironmentVariableTarget.Machine);
+            if (string.IsNullOrWhiteSpace(chocolateyInstall))
+            {
+                chocolateyInstall = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, EnvironmentVariableTarget.User);
+            }
+#endif
+
+            if (string.IsNullOrWhiteSpace(chocolateyInstall))
+            {
+                chocolateyInstall = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName);
+            }
+
+            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, chocolateyInstall);
         }
 
         private void extract_resources()
