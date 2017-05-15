@@ -231,9 +231,17 @@ namespace chocolatey
         public void Run()
         {
             extract_resources();
-            var configuration = create_configuration(new List<string>());
-            var runner = new GenericRunner();
-            runner.run(configuration, _container, isConsole: false, parseArgs: null);
+            
+            ensure_original_configuration(new List<string>(),
+                (config) =>
+                {
+                    config.RegularOutput = true;
+                    var runner = new GenericRunner();
+                    runner.run(config, _container, isConsole: false, parseArgs: command =>
+                    {
+                        command.handle_validation(config);
+                    });
+                });
         }
 
         /// <summary>
@@ -244,9 +252,14 @@ namespace chocolatey
         public void RunConsole(string[] args)
         {
             extract_resources();
-            var configuration = create_configuration(new List<string>(args));
-            var runner = new ConsoleApplication();
-            runner.run(args, configuration, _container);
+            
+            ensure_original_configuration(new List<string>(args),
+              (config) =>
+              {
+                  var runner = new ConsoleApplication();
+                  runner.run(args, config, _container);
+              });
+
         }
 
         /// <summary>
@@ -257,10 +270,14 @@ namespace chocolatey
         public IEnumerable<T> List<T>()
         {
             extract_resources();
-            var configuration = create_configuration(new List<string>());
-            configuration.RegularOutput = true;
-            var runner = new GenericRunner();
-            return runner.list<T>(configuration, _container, isConsole: false, parseArgs: null);
+            
+            return ensure_original_configuration(new List<string>(),
+                (config) =>
+                {
+                    config.RegularOutput = true;
+                    var runner = new GenericRunner();
+                    return runner.list<T>(config, _container, isConsole: false, parseArgs: null);        
+                });
         }
 
         /// <summary>
@@ -275,23 +292,64 @@ namespace chocolatey
         public int ListCount()
         {
             extract_resources();
-            var configuration = create_configuration(new List<string>());
-            configuration.RegularOutput = true;
-            var runner = new GenericRunner();
-            return runner.count(configuration, _container, isConsole: false, parseArgs: null);
+
+            return ensure_original_configuration(new List<string>(),
+               (config) =>
+               {
+                   config.RegularOutput = true;
+                   var runner = new GenericRunner();
+                   return runner.count(config, _container, isConsole: false, parseArgs: null);
+               });
         }
 
+        private void ensure_original_configuration(IList<string> args, Action<ChocolateyConfiguration> action)
+        {
+            var success = ensure_original_configuration(args,
+                (config) =>
+                {
+                    if (action != null) action.Invoke(config);
+                    return true;
+                });
+        }
+
+        private T ensure_original_configuration<T>(IList<string> args, Func<ChocolateyConfiguration, T> function)
+        {
+            var originalConfig = Config.get_configuration_settings().deep_copy();
+            var configuration = create_configuration(args);
+            var returnValue = default(T);
+            try
+            {
+                if (function != null)
+                {
+                    returnValue = function.Invoke(configuration);
+                }
+            }
+            finally
+            {
+                // reset that configuration each time
+                configuration = originalConfig;
+                Config.initialize_with(originalConfig);
+            }
+            
+            return returnValue;
+        }
+
+        /// <summary>
+        /// Creates the configuration.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <returns>The configuration for Chocolatey</returns>
         private ChocolateyConfiguration create_configuration(IList<string> args)
         {
-            var configuration = new ChocolateyConfiguration();
+            // get or create a ChocolateyConfiguration. This maps directly
+            // to the same thing that is loaded into the container
+            var configuration = Config.get_configuration_settings();
             ConfigurationBuilder.set_up_configuration(
                 args,
                 configuration,
                 _container,
                 _license,
                 null);
-            
-            Config.initialize_with(configuration);
 
             configuration.PromptForConfirmation = false;
             configuration.AcceptLicense = true;
@@ -304,7 +362,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Gets the configuration.
+        /// Gets the configuration. Should be used purely for informational purposes
         /// </summary>
         /// <returns>The configuration for Chocolatey</returns>
         /// <remarks>Only call this once you have registered all container components with Chocolatey</remarks>
