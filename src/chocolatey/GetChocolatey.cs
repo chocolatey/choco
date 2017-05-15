@@ -212,7 +212,20 @@ namespace chocolatey
         }
 
         /// <summary>
-        ///   Call this method to run chocolatey after you have set the options.
+        /// Returns the Chocolatey container. 
+        /// WARNING: Once you call GetInstance of any kind, no more items can be registered on the container
+        /// </summary>
+        /// <returns>The IoC Container (implemented as a SimpleInjector.Container)</returns>
+        /// <remarks>
+        /// This requires you to use ILMerged SimpleInjector. If you use SimpleInjector in your codebase, you must now use Chocolatey's version. This is required to not be internalized so licensed code will work appropriately.
+        /// </remarks>
+        public Container Container()
+        {
+            return _container;
+        }
+
+        /// <summary>
+        /// Call this method to run Chocolatey after you have set the options.
         /// </summary>
         public void Run()
         {
