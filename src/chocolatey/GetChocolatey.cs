@@ -408,7 +408,15 @@ namespace chocolatey
                 "tools"
             };
 
-            AssemblyFileExtractor.extract_all_resources_to_relative_directory(_container.GetInstance<IFileSystem>(), Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
+            try
+            {
+                AssemblyFileExtractor.extract_all_resources_to_relative_directory(_container.GetInstance<IFileSystem>(), Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
+            }
+            catch (Exception ex)
+            {
+                this.Log().Error("Unable to extract resources. Please ensure the ChocolateyInstall environment variable is set properly. Details:{0} {1}".format_with(Environment.NewLine,ex.ToString()));
+            }
+
         }
     }
 
