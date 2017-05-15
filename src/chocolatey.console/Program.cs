@@ -59,7 +59,7 @@ namespace chocolatey.console
 
                 "LogFileOnly".Log().Info(() => "".PadRight(60, '='));
 
-                var config = container.GetInstance<ChocolateyConfiguration>();
+                var config = Config.get_configuration_settings();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
                 var warnings = new List<string>();
@@ -71,7 +71,6 @@ namespace chocolatey.console
                      license,
                      warning => { warnings.Add(warning); }
                      );
-                Config.initialize_with(config);
 
                 report_version_and_exit_if_requested(args, config);
 
