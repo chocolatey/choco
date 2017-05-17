@@ -236,6 +236,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
         public int count(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
         {
             fail_when_license_is_missing_or_invalid_if_requested(config);
+            SecurityProtocol.set_protocol(config, provideWarning: true);
 
             var command = find_command(config, container, isConsole, parseArgs) as IListCommand;
             if (command == null)
