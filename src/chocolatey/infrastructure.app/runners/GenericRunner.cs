@@ -193,21 +193,43 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
         public IEnumerable<T> list<T>(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
         {
-            fail_when_license_is_missing_or_invalid_if_requested(config);
-
-            var command = find_command(config, container, isConsole, parseArgs) as IListCommand<T>;
-            if (command == null)
+            var tasks = container.GetAllInstances<ITask>();
+            foreach (var task in tasks)
             {
-                if (!string.IsNullOrWhiteSpace(config.CommandName))
-                {
-                    throw new Exception("The implementation of '{0}' does not support listing '{1}'".format_with(config.CommandName, typeof(T).Name));
-                }
-                return new List<T>();
+                task.initialize();
             }
-            else
+
+            fail_when_license_is_missing_or_invalid_if_requested(config);
+            SecurityProtocol.set_protocol(config, provideWarning: true);
+            EventManager.publish(new PreRunMessage(config));
+
+            try
             {
-                this.Log().Debug("_ {0}:{1} - Normal List Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
-                return command.list(config);
+                var command = find_command(config, container, isConsole, parseArgs) as IListCommand<T>;
+                if (command == null)
+                {
+                    if (!string.IsNullOrWhiteSpace(config.CommandName))
+                    {
+                        throw new Exception("The implementation of '{0}' does not support listing '{1}'".format_with(config.CommandName, typeof(T).Name));
+                    }
+                    return new List<T>();
+                }
+                else
+                {
+                    this.Log().Debug("_ {0}:{1} - Normal List Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                    return command.list(config);
+                }
+            }
+            finally
+            {
+                EventManager.publish(new PostRunMessage(config));
+
+                foreach (var task in tasks.or_empty_list_if_null())
+                {
+                    task.shutdown();
+                }
+
+                remove_nuget_cache(container);
             }
         }
 
