@@ -61,7 +61,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <projectUrl>https://_Software_Location_REMOVE_OR_FILL_OUT_</projectUrl>
     <!--<iconUrl>http://cdn.rawgit.com/[[MaintainerRepo]]/master/icons/[[PackageNameLower]].png</iconUrl>-->
     <!-- <copyright>Year Software Vendor</copyright> -->
-    <!-- If there is a license Url available, it is is required for the community feed -->
+    <!-- If there is a license Url available, it is required for the community feed -->
     <!-- <licenseUrl>Software License Location __REMOVE_OR_FILL_OUT__</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>-->
     <!--<projectSourceUrl>Software Source Location - is the software FOSS somewhere? Link to it with this</projectSourceUrl>-->
