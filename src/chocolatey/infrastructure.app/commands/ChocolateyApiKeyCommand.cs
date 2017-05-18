@@ -103,7 +103,7 @@ https://bit.ly/nexus2apikey).
 
 ");
 
-            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Connecting to Chocolatey.org");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Connecting to Chocolatey.org (Community Package Repository)");
             "chocolatey".Log().Info(() => @"
 In order to save your API key for {0}, 
  log in (or register, confirm and then log in) to
