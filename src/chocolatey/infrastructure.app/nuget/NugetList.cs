@@ -77,6 +77,11 @@ namespace chocolatey.infrastructure.app.nuget
                   : results.Where(p => p.Id.contains(searchTermLower, StringComparison.OrdinalIgnoreCase));
             }
 
+            if (configuration.ListCommand.ByTagOnly)
+            {
+                results = results.Where(p => Array.Exists(p.Tags.Split(new char[]{' '}), x => x.Equals(searchTerm, StringComparison.OrdinalIgnoreCase)));
+            }
+
             if (configuration.ListCommand.IdStartsWith)
             {
                 results = isRemote ?
