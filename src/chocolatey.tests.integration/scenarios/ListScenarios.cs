@@ -290,6 +290,36 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyListCommand))]
+        public class when_listing_local_packages_with_id_only : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.ListCommand.LocalOnly = true;
+                Configuration.ListCommand.IdOnly = true;
+                Configuration.Sources = ApplicationParameters.PackagesLocation;
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+            [Fact]
+            public void should_contain_package_name()
+            {
+                MockLogger.contains_message("upgradepackage").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_contain_any_version_number()
+            {
+                MockLogger.contains_message(".0").ShouldBeFalse();
+            }
+        }
+
+        [Concern(typeof(ChocolateyListCommand))]
         public class when_listing_local_packages_limiting_output : ScenariosBase
         {
             public override void Context()
@@ -339,6 +369,44 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("Running list with the following filter", LogLevel.Debug).ShouldBeFalse();
                 MockLogger.contains_message("Start of List", LogLevel.Debug).ShouldBeFalse();
                 MockLogger.contains_message("End of List", LogLevel.Debug).ShouldBeFalse();
+            }
+        }
+
+        [Concern(typeof(ChocolateyListCommand))]
+        public class when_listing_local_packages_limiting_output_with_id_only : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration.ListCommand.LocalOnly = true;
+                Configuration.ListCommand.IdOnly = true;
+                Configuration.Sources = ApplicationParameters.PackagesLocation;
+                Configuration.RegularOutput = false;
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+            [Fact]
+            public void should_contain_packages_id()
+            {
+                MockLogger.contains_message("upgradepackage").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_contain_any_version_number()
+            {
+                MockLogger.contains_message(".0").ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_contain_pipe()
+            {
+                MockLogger.contains_message("|").ShouldBeFalse();
             }
         }
 

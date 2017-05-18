@@ -46,6 +46,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("l|lo|localonly|local-only",
                      "LocalOnly - Only search against local machine items.",
                      option => configuration.ListCommand.LocalOnly = option != null)
+                .Add("io|idonly|id-only",
+                     "IdOnly - Only return package ids in the list.",
+                     option => configuration.ListCommand.IdOnly = option != null)
                 .Add("pre|prerelease",
                      "Prerelease - Include Prereleases? Defaults to false.",
                      option => configuration.Prerelease = option != null)
