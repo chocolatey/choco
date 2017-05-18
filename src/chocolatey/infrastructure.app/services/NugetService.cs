@@ -319,9 +319,8 @@ namespace chocolatey.infrastructure.app.services
             NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath));
 
 
-            if (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) && config.RegularOutput)
+            if (config.RegularOutput && (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) ||config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)))
             {
-
                 this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
 Your package may be subject to moderation. A moderator will review the

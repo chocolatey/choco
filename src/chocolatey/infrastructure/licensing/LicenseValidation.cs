@@ -40,6 +40,7 @@ namespace chocolatey.infrastructure.licensing
             //no IFileSystem at this point
             if (File.Exists(licenseFile))
             {
+                "chocolatey".Log().Debug("Evaluating license file found at '{0}'".format_with(licenseFile));
                 var license = new LicenseValidator(PUBLIC_KEY, licenseFile);
 
                 try
