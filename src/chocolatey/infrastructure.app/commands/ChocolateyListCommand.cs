@@ -93,6 +93,9 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("by-id-only",
                      "ByIdOnly - Only return packages where the id contains the search filter. Available in 0.9.10+.",
                      option => configuration.ListCommand.ByIdOnly = option != null)
+                 .Add("by-tag-only|by-tags-only",
+                     "ByTagOnly - Only return packages where the search filter matches on the tags. Available in 0.10.6+.",
+                     option => configuration.ListCommand.ByTagOnly = option != null)
                  .Add("id-starts-with",
                      "IdStartsWith - Only return packages where the id starts with the search filter. Available in 0.9.10+.",
                      option => configuration.ListCommand.IdStartsWith = option != null)
