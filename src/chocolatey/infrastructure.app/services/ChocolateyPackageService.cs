@@ -820,13 +820,13 @@ If a package is failing because it is a dependency of another package
             var warnings = packageResults.Count(p => p.Value.Warning);
             var rebootPackages = packageResults.Count(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode));
             this.Log().Warn(
-                () => @"{0}{1} {2} {3}/{4} packages. {5} packages failed.{0} See the log for details ({6}).".format_with(
+                () => @"{0}{1} {2} {3}/{4} packages. {5}{0} See the log for details ({6}).".format_with(
                     Environment.NewLine,
                     ApplicationParameters.Name,
                     actionName,
                     successes.Count(),
                     packageResults.Count,
-                    failures,
+                    (failures > 0) ? failures + " packages failed.": string.Empty,
                     _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
                     ));
 
