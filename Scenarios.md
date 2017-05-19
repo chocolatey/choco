@@ -400,7 +400,7 @@
  * should not have inconclusive package result
  * should not have warning package result
 
-### ChocolateyListCommand [ 8 Scenario(s), 36 Observation(s) ]
+### ChocolateyListCommand [ 10 Scenario(s), 41 Observation(s) ]
 
 #### when listing local packages
 
@@ -416,6 +416,17 @@
  * should not contain debugging messages
  * should not contain packages and versions with a space between them
  * should only have messages related to package information
+
+#### when listing local packages limiting output with id only
+
+ * should contain packages id
+ * should not contain any version number
+ * should not contain pipe
+
+#### when listing local packages with id only
+
+ * should contain package name
+ * should not contain any version number
 
 #### when listing packages with no sources enabled
 
