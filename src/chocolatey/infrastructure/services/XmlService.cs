@@ -33,7 +33,7 @@ namespace chocolatey.infrastructure.services
     {
         private readonly IFileSystem _fileSystem;
         private readonly IHashProvider _hashProvider;
-        private const int MUTEX_TIMEOUT = 1000;
+        private const int MUTEX_TIMEOUT = 2000;
 
         public XmlService(IFileSystem fileSystem, IHashProvider hashProvider)
         {
@@ -96,7 +96,9 @@ namespace chocolatey.infrastructure.services
                     "Error deserializing response of type {0}".format_with(typeof(XmlType)),
                     throwError: true);
 
-                }, MUTEX_TIMEOUT));
+                }, MUTEX_TIMEOUT),
+                waitDurationMilliseconds: 200,
+                increaseRetryByMilliseconds: 200);
         }
 
         public void serialize<XmlType>(XmlType xmlType, string xmlFilePath)
@@ -156,7 +158,9 @@ namespace chocolatey.infrastructure.services
                     "Error serializing type {0}".format_with(typeof(XmlType)),
                     throwError: true,
                     isSilent: isSilent);
-                }, MUTEX_TIMEOUT));
+                }, MUTEX_TIMEOUT),
+                waitDurationMilliseconds: 200,
+                increaseRetryByMilliseconds: 200);
         }
     }
 }
