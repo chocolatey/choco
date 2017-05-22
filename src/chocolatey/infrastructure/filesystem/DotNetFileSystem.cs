@@ -390,7 +390,6 @@ namespace chocolatey.infrastructure.filesystem
             //}
             return success != 0;
         }
-
         
         public void replace_file(string sourceFilePath, string destinationFilePath, string backupFilePath)
         {
