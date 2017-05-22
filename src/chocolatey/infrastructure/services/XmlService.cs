@@ -131,26 +131,19 @@ namespace chocolatey.infrastructure.services
                             var originalFileHash = _hashProvider.hash_file(xmlFilePath);
                             if (!originalFileHash.is_equal_to(_hashProvider.hash_stream(memoryStream)))
                             {
+                                memoryStream.Position = 0;
+
                                 // If there wasn't a file there in the first place, just write the new one out directly.
                                 if (string.IsNullOrEmpty(originalFileHash))
                                 {
-                                    using (var updateFileStream = _fileSystem.create_file(xmlFilePath))
-                                    {
-                                        memoryStream.Position = 0;
-                                        memoryStream.CopyTo(updateFileStream);
-                                        _fileSystem.write_file(xmlFilePath, () => memoryStream);
+                                    _fileSystem.write_file(xmlFilePath, () => memoryStream);
 
-                                        return;
-                                    }
+                                    return;
                                 }
 
                                 // Otherwise, create an update file, and resiliently move it into place.
                                 var tempUpdateFile = xmlFilePath + ".update";
-                                using (var updateFileStream = _fileSystem.create_file(tempUpdateFile))
-                                {
-                                    memoryStream.Position = 0;
-                                    memoryStream.CopyTo(updateFileStream);
-                                }
+                                _fileSystem.write_file(tempUpdateFile, () => memoryStream);
                                 _fileSystem.replace_file(tempUpdateFile, xmlFilePath, xmlFilePath + ".backup");
                             }
                         }
