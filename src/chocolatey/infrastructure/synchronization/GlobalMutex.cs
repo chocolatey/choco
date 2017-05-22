@@ -20,6 +20,8 @@ namespace chocolatey.infrastructure.synchronization
     using System.Security.AccessControl;
     using System.Security.Principal;
     using System.Threading;
+    using logging;
+    using platforms;
 
     /// <summary>
     ///   global mutex used for synchronizing multiple processes based on appguid
@@ -35,6 +37,7 @@ namespace chocolatey.infrastructure.synchronization
 
         private void init_mutex()
         {
+            this.Log().Debug(ChocolateyLoggers.Trace, "Initializing global mutex");
             var mutexId = "Global\\{{{0}}}".format_with(APP_GUID);
             _mutex = new Mutex(initiallyOwned: false, name: mutexId);
 
@@ -44,11 +47,17 @@ namespace chocolatey.infrastructure.synchronization
             _mutex.SetAccessControl(securitySettings);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GlobalMutex"/> class.
+        /// </summary>
+        /// <param name="timeOut">The time out in milliseconds.</param>
+        /// <exception cref="System.TimeoutException">Timeout waiting for exclusive access to value.</exception>
         private GlobalMutex(int timeOut)
         {
             init_mutex();
             try
             {
+                this.Log().Debug(ChocolateyLoggers.Trace, "Waiting on the mutext handle for {0} milliseconds".format_with(timeOut));
                 _hasHandle = _mutex.WaitOne(timeOut < 0 ? Timeout.Infinite : timeOut, exitContext: false);
 
                 if (_hasHandle == false)
@@ -62,6 +71,11 @@ namespace chocolatey.infrastructure.synchronization
             }
         }
 
+        /// <summary>
+        /// Enters the Global Mutex
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        /// <param name="timeout">The timeout in seconds.</param>
         public static void enter(Action action, int timeout)
         {
             using (new GlobalMutex(timeout))
@@ -70,6 +84,14 @@ namespace chocolatey.infrastructure.synchronization
             }
         } 
         
+
+        /// <summary>
+        /// Enters the Global Mutext
+        /// </summary>
+        /// <typeparam name="T">The return type</typeparam>
+        /// <param name="func">The function to perform.</param>
+        /// <param name="timeout">The timeout in seconds.</param>
+        /// <returns></returns>
         public static T enter<T>(Func<T> func, int timeout)
         {
             var returnValue = default(T);
