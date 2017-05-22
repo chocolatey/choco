@@ -78,12 +78,19 @@ namespace chocolatey.infrastructure.synchronization
         /// <param name="timeout">The timeout in seconds.</param>
         public static void enter(Action action, int timeout)
         {
-            using (new GlobalMutex(timeout))
+
+            if (Platform.get_platform() == PlatformType.Windows)
+            {
+                using (new GlobalMutex(timeout))
+                {
+                    if (action != null) action.Invoke();
+                }
+            }
+            else
             {
                 if (action != null) action.Invoke();
             }
-        } 
-        
+        }
 
         /// <summary>
         /// Enters the Global Mutext
@@ -96,11 +103,18 @@ namespace chocolatey.infrastructure.synchronization
         {
             var returnValue = default(T);
 
-            using (new GlobalMutex(timeout))
+            if (Platform.get_platform() == PlatformType.Windows)
+            {
+                using (new GlobalMutex(timeout))
+                {
+                    if (func != null) returnValue = func.Invoke();
+                }
+            }
+            else
             {
                 if (func != null) returnValue = func.Invoke();
             }
-
+            
             return returnValue;
         }
 
