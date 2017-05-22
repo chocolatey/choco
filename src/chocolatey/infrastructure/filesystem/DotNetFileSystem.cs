@@ -502,7 +502,7 @@ namespace chocolatey.infrastructure.filesystem
         public void write_file(string filePath, Func<Stream> getStream)
         {
             using (Stream incomingStream = getStream())
-            using (Stream fileStream = File.Create(filePath))
+            using (Stream fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
             {
                 incomingStream.CopyTo(fileStream);
                 fileStream.Close();
