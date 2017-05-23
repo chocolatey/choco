@@ -17,6 +17,7 @@
 namespace chocolatey.infrastructure.services
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Text;
     using System.Xml;
@@ -24,7 +25,7 @@ namespace chocolatey.infrastructure.services
     using cryptography;
     using filesystem;
     using tolerance;
-    using chocolatey.infrastructure.synchronization;
+    using synchronization;
 
     /// <summary>
     ///   XML interaction
@@ -91,6 +92,18 @@ namespace chocolatey.infrastructure.services
 
                                 throw;
                             }
+                            finally
+                            {
+                                foreach (var updateFile in _fileSystem.get_files(_fileSystem.get_directory_name(xmlFilePath), "*.update").or_empty_list_if_null())
+                                {
+                                    FaultTolerance.try_catch_with_logging_exception(
+                                        () => _fileSystem.delete_file(updateFile), 
+                                        errorMessage: "Unable to remove update file",
+                                        logDebugInsteadOfError: true,
+                                        isSilent: true
+                                        );
+                                }
+                            }
                         }
                     },
                     "Error deserializing response of type {0}".format_with(typeof(XmlType)),
@@ -142,13 +155,13 @@ namespace chocolatey.infrastructure.services
                                 }
 
                                 // Otherwise, create an update file, and resiliently move it into place.
-                                var tempUpdateFile = xmlFilePath + ".update";
+                                var tempUpdateFile = xmlFilePath + "." + Process.GetCurrentProcess().Id + ".update";
                                 _fileSystem.write_file(tempUpdateFile, () => memoryStream);
                                 _fileSystem.replace_file(tempUpdateFile, xmlFilePath, xmlFilePath + ".backup");
                             }
                         }
                     },
-                    "Error serializing type {0}".format_with(typeof(XmlType)),
+                    errorMessage: "Error serializing type {0}".format_with(typeof(XmlType)),
                     throwError: true,
                     isSilent: isSilent);
                 }, MUTEX_TIMEOUT),
