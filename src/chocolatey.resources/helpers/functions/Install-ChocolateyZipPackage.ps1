@@ -54,6 +54,13 @@ a 32 bit installation on a 64 bit system.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
+In 0.10.6+, `File` and `FileFullPath` are aliases for Url. These 
+aliases, if used in earlier versions of Chocolatey, may produce `ERROR: 
+Cannot bind parameter because parameter 'fileType' is specified more 
+than once.` See https://github.com/chocolatey/choco/issues/1284. Do not
+use these aliases with the community package repository until January
+2018.
+
 .PARAMETER Url64bit
 OPTIONAL - If there is a 64 bit resource available, use this
 parameter. Chocolatey will automatically determine if the user is
@@ -64,6 +71,13 @@ contains both (which is quite rare), set this to '$url' Otherwise remove
 this parameter.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
+
+In 0.10.6+, `File64` and `FileFullPath64` are aliases for Url64Bit. 
+These aliases, if used in earlier versions of Chocolatey, may produce 
+`ERROR: Cannot bind parameter because parameter 'fileType' is specified
+more than once.` See https://github.com/chocolatey/choco/issues/1284. 
+Do not use these aliases with the community package repository until 
+January 2018.
 
 .PARAMETER UnzipLocation
 This is the full path to a location to unzip the contents to, most
@@ -162,11 +176,11 @@ Get-ChocolateyUnzip
 #>
 param(
   [parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [parameter(Mandatory=$false, Position=1)][string] $url = '',
+  [alias("file","fileFullPath")][parameter(Mandatory=$false, Position=1)][string] $url = '',
   [parameter(Mandatory=$true, Position=2)]
   [alias("destination")][string] $unzipLocation,
   [parameter(Mandatory=$false, Position=3)]
-  [alias("url64")][string] $url64bit = '',
+  [alias("url64","file64","fileFullPath64")][string] $url64bit = '',
   [parameter(Mandatory=$false)][string] $specificFolder ='',
   [parameter(Mandatory=$false)][string] $checksum = '',
   [parameter(Mandatory=$false)][string] $checksumType = '',

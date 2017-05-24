@@ -95,7 +95,8 @@ In 0.10.6+, `File` and `FileFullPath` are aliases for Url. These
 aliases, if used in earlier versions of Chocolatey, produce `ERROR: 
 Cannot bind parameter because parameter 'fileType' is specified more 
 than once.` See https://github.com/chocolatey/choco/issues/1284. Do not
-use these aliases with the community package repository until 2018.
+use these aliases with the community package repository until January
+2018.
 
 .PARAMETER Url64bit
 OPTIONAL - If there is a 64 bit resource available, use this
@@ -113,7 +114,7 @@ These aliases, if used in earlier versions of Chocolatey, produce
 `ERROR: Cannot bind parameter because parameter 'fileType' is specified
 more than once.` See https://github.com/chocolatey/choco/issues/1284. 
 Do not use these aliases with the community package repository until 
-2018.
+January 2018.
 
 .PARAMETER ValidExitCodes
 Array of exit codes indicating success. Defaults to `@(0)`.

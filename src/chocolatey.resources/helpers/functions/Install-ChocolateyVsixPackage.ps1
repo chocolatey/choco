@@ -54,6 +54,13 @@ Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
 In 0.10.4+, `Url` is an alias for VsixUrl.
 
+In 0.10.6+, `File` and `FileFullPath` are aliases for VsixUrl. These 
+aliases, if used in earlier versions of Chocolatey, may produce `ERROR: 
+Cannot bind parameter because parameter 'fileType' is specified more 
+than once.` See https://github.com/chocolatey/choco/issues/1284. Do not
+use these aliases with the community package repository until January
+2018.
+
 .PARAMETER VsVersion
 The major version number of Visual Studio where the
 package should be installed. This is optional. If not
@@ -132,7 +139,7 @@ Install-ChocolateyZipPackage
 #>
 param(
   [alias("name")][parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [alias("url")][parameter(Mandatory=$false, Position=1)][string] $vsixUrl,
+  [alias("url","file","fileFullPath")][parameter(Mandatory=$false, Position=1)][string] $vsixUrl,
   [alias("visualStudioVersion")][parameter(Mandatory=$false, Position=2)][int] $vsVersion = 0,
   [parameter(Mandatory=$false)][string] $checksum = '',
   [parameter(Mandatory=$false)][string] $checksumType = '',
