@@ -393,7 +393,7 @@ namespace chocolatey.infrastructure.filesystem
         
         public void replace_file(string sourceFilePath, string destinationFilePath, string backupFilePath)
         {
-            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to replace \"{0}\"{1} with \"{2}\". Backup placed at \"{3}\".".format_with(destinationFilePath, Environment.NewLine, sourceFilePath, backupFilePath));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to replace \"{0}\"{1} with \"{2}\".{1} Backup placed at \"{3}\".".format_with(destinationFilePath, Environment.NewLine, sourceFilePath, backupFilePath));
 
             allow_retries(
                 () =>
