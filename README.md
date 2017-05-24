@@ -3,11 +3,8 @@ You can just call me choco.
 
 ![Chocolatey Logo](https://cdn.rawgit.com/chocolatey/choco/14a627932c78c8baaba6bef5f749ebfa1957d28d/docs/logo/chocolateyicon.gif "Chocolatey")
 
-[![](http://img.shields.io/chocolatey/dt/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/chocolatey/v/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](http://img.shields.io/gittip/Chocolatey.svg)](https://www.gittip.com/Chocolatey/)
+[![](https://img.shields.io/chocolatey/dt/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](https://img.shields.io/chocolatey/v/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](https://img.shields.io/gratipay/Chocolatey.svg)](https://www.gratipay.com/Chocolatey/) [![Project Stats](https://www.openhub.net/p/chocolatey/widgets/project_thin_badge.gif)](https://www.openhub.net/p/chocolatey)
 
-[![Issue Stats](http://issuestats.com/github/Chocolatey/choco/badge/pr)](http://issuestats.com/github/Chocolatey/choco)
-
-[![Issue Stats](http://issuestats.com/github/Chocolatey/choco/badge/issue)](http://issuestats.com/github/Chocolatey/choco)
 
 ## Build Status
 
@@ -27,8 +24,8 @@ Please make sure you've read over and agree with the [etiquette regarding commun
 
 ## Support Chocolatey!
 
- * Purchase [Chocolatey Pro / Chocolatey for Business](https://chocolatey.org/compare)
- * [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=E8ZPVL5PNTABW)
+ * Purchase [Chocolatey Pro / Chocolatey for Business](https://chocolatey.org/pricing#compare)
+ * Donate [![](https://img.shields.io/gratipay/Chocolatey.svg)](https://www.gratipay.com/Chocolatey/)
 
 ## See Chocolatey In Action
 
@@ -46,17 +43,16 @@ When requesting support, try to remember that we are all volunteers that have li
 
 ## Information
 
- * [Chocolatey site](https://chocolatey.org)
- * [Community Package Repository aka Chocolatey.org](https://chocolatey.org/packages)
- * [Mailing List/Forum](http://groups.google.com/group/chocolatey)
- * [Twitter](https://twitter.com/chocolateynuget)
- * [Build Status Email List](http://groups.google.com/group/chocolatey-build-status)
- * Join the [newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&id=73b018498d) and stay up to date with the latest happenings!
+ * [Chocolatey Website and Community Package Repository](https://chocolatey.org)
+ * [Mailing List](http://groups.google.com/group/chocolatey) / [Release Announcements Only Mailing List](https://groups.google.com/group/chocolatey-announce) / [Build Status Mailing List](http://groups.google.com/group/chocolatey-build-status)
+ * [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [Github](https://github.com/chocolatey)
+ * [Blog](https://chocolatey.org/blog) / [Newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&id=73b018498d)
+ * [Documentation](https://chocolatey.org/docs) / [Support](https://chocolatey.org/support)
 
 ### Documentation
 Please see the [docs](https://chocolatey.org/docs)
 
-Give `choco.exe /?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
+Give `choco.exe -?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
 
 ### Requirements
 * .NET Framework 4.0
