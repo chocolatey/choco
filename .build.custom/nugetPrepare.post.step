@@ -39,6 +39,7 @@
     <exec program="${app.choco}"
           workingdir="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall"
           commandline="${args.choco}" if="${platform::is-windows()}" />
+    <delete file="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}tools${path.separator}detector.zip" failonerror="false" />
   </target>
   
   <target name="copy_legal">

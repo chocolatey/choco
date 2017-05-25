@@ -86,7 +86,11 @@ NOTE: This command should only be used when installing Chocolatey, not
         public virtual void run(ChocolateyConfiguration configuration)
         {
             this.Log().Info("{0} is unpacking required files for use. Overwriting? {1}".format_with(ApplicationParameters.Name, configuration.Force));
-            //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
+            // refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
+
+            // unpack the manifest file as well
+            AssemblyFileExtractor.extract_all_resources_to_relative_directory(_fileSystem, Assembly.GetAssembly(typeof(ChocolateyUnpackSelfCommand)), _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path()), new List<string>(), "chocolatey.console");
+
             IList<string> folders = new List<string>
                 {
                     "helpers",
