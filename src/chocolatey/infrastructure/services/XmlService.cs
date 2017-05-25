@@ -97,7 +97,7 @@ namespace chocolatey.infrastructure.services
                                 foreach (var updateFile in _fileSystem.get_files(_fileSystem.get_directory_name(xmlFilePath), "*.update").or_empty_list_if_null())
                                 {
                                     FaultTolerance.try_catch_with_logging_exception(
-                                        () => _fileSystem.delete_file(updateFile), 
+                                        () => _fileSystem.delete_file(updateFile),
                                         errorMessage: "Unable to remove update file",
                                         logDebugInsteadOfError: true,
                                         isSilent: true
