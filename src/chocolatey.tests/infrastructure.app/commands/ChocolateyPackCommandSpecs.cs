@@ -25,6 +25,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.commandline;
     using Moq;
     using Should;
+    using System;
 
     public class ChocolateyPackCommandSpecs
     {
@@ -93,6 +94,11 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 base.Context();
                 unparsedArgs.Add(nuspecPath);
+                unparsedArgs.Add("foo=1");
+                unparsedArgs.Add("bar='baz'");
+
+                // Make sure we storing only the first property name specified regardless of case.
+                unparsedArgs.Add("Foo=2");
             }
 
             public override void Because()
@@ -104,6 +110,26 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_allow_a_path_to_the_nuspec_to_be_passed_in()
             {
                 configuration.Input.ShouldEqual(nuspecPath);
+            }
+
+            [Fact]
+            public void should_property_foo_equal_1()
+            {
+                configuration.PackCommand.Properties["foo"].ShouldEqual("1");
+            }
+
+            [Fact]
+            public void should_property_bar_equal_baz()
+            {
+                configuration.PackCommand.Properties["bar"].ShouldEqual("baz");
+            }
+
+            [Fact]
+            public void should_log_warning_on_duplicate_foo()
+            {
+                var warnings = MockLogger.MessagesFor(LogLevel.Warn);
+                warnings.Count.ShouldEqual(1);
+                warnings[0].ShouldEqual("A value for 'foo' has already been added with the value '1'. Ignoring foo='2'.", StringComparer.OrdinalIgnoreCase);
             }
         }
 

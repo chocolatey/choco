@@ -115,6 +115,54 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Concern(typeof(ChocolateyPackCommand))]
+        public class when_packing_with_properties : ScenariosBase
+        {
+            private readonly string package_path = Path.Combine(Scenario.get_top_level(), "test-package.0.1.0.nupkg");
+
+            public override void Context()
+            {
+                base.Context();
+
+                Scenario.reset(Configuration);
+
+                Configuration.Version = "0.1.0";
+                Configuration.PackCommand.Properties.Add("commitId", "1234abcd");
+                Scenario.add_files(new[] { new Tuple<string, string>("myPackage.nuspec", NuspecContentWithVariables) });
+
+                if (File.Exists(package_path))
+                {
+                    File.Delete(package_path);
+                }
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Service.pack_run(Configuration);
+            }
+
+            [Fact]
+            public void generated_package_should_be_in_current_directory()
+            {
+                var infos = MockLogger.MessagesFor(LogLevel.Info);
+                infos.Count.ShouldEqual(2);
+                infos[0].ShouldEqual("Attempting to build package from 'myPackage.nuspec'.");
+                infos[1].ShouldEqual(string.Concat("Successfully created package '", package_path, "'"));
+
+                File.Exists(package_path).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void property_settings_should_be_logged_as_debug_messages()
+            {
+                var messages = MockLogger.MessagesFor(LogLevel.Debug);
+                messages.Count.ShouldEqual(2);
+                messages.Contains("Setting property 'commitId': 1234abcd");
+                messages.Contains("Setting property 'version': 0.1.0");
+            }
+        }
+
         private const string NuspecContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
   <metadata>
@@ -128,6 +176,24 @@ namespace chocolatey.tests.integration.scenarios
     <tags>test admin</tags>
     <copyright></copyright>
     <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+  </metadata>
+</package>";
+
+        private const string NuspecContentWithVariables = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>$version$</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>https://github.com/chocolatey/choco/tree/$commitId$/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
   </metadata>
