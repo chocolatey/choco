@@ -257,14 +257,29 @@ namespace chocolatey.infrastructure.app.services
 
         public void pack_run(ChocolateyConfiguration config)
         {
-            string nuspecFilePath = validate_and_return_package_file(config, Constants.ManifestExtension);
+            var nuspecFilePath = validate_and_return_package_file(config, Constants.ManifestExtension);
             var nuspecDirectory = _fileSystem.get_full_path(_fileSystem.get_directory_name(nuspecFilePath));
             if (string.IsNullOrWhiteSpace(nuspecDirectory)) nuspecDirectory = _fileSystem.get_current_directory();
 
-            IDictionary<string, string> properties = new Dictionary<string, string>();
+            // Use case-insensitive properties like "nuget pack".
+            var properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            // Add any other properties passed to the pack command overriding any present.
+            foreach (var property in config.PackCommand.Properties)
+            {
+                this.Log().Debug(() => "Setting property '{0}': {1}".format_with(
+                    property.Key,
+                    property.Value));
+
+                properties[property.Key] = property.Value;
+            }
+
             // Set the version property if the flag is set
             if (!string.IsNullOrWhiteSpace(config.Version))
             {
+                this.Log().Debug(() => "Setting property 'version': {0}".format_with(
+                    config.Version));
+
                 properties["version"] = config.Version;
             }
 

@@ -16,7 +16,9 @@
 
 namespace chocolatey.infrastructure.app.commands
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
     using attributes;
     using commandline;
     using configuration;
@@ -48,7 +50,27 @@ namespace chocolatey.infrastructure.app.commands
 
         public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
-            configuration.Input = string.Join(" ", unparsedArguments);
+            // First non-switch argument that is not a name=value pair will be treated as the nuspec file to pack.
+            configuration.Input = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault(arg => !arg.StartsWith("-") && !arg.contains("="));
+
+            foreach (var unparsedArgument in unparsedArguments.or_empty_list_if_null())
+            {
+                var property = unparsedArgument.Split(new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                if (property.Length == 2)
+                {
+                    var propName = property[0].trim_safe();
+                    var propValue = property[1].trim_safe().remove_surrounding_quotes();
+
+                    if (configuration.PackCommand.Properties.ContainsKey(propName))
+                    {
+                        this.Log().Warn(() => "A value for '{0}' has already been added with the value '{1}'. Ignoring {0}='{2}'.".format_with(propName, configuration.PackCommand.Properties[propName], propValue));
+                    }
+                    else
+                    {
+                        configuration.PackCommand.Properties.Add(propName, propValue);
+                    }
+                }
+            }
         }
 
         public virtual void handle_validation(ChocolateyConfiguration configuration)
@@ -67,6 +89,9 @@ NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
  and switches with one dash (`-`). For more details, see 
  the command reference (`choco -?`).
 
+NOTE: You can pass arbitrary property value pairs through to nuspecs.
+ These will replace variables formatted as `$property$` with the value passed.
+
 NOTE: `cpack` has been deprecated as it has a name collision with CMake. Please 
  use `choco pack` instead. The shortcut will be removed in v1.
 
@@ -74,14 +99,14 @@ NOTE: `cpack` has been deprecated as it has a name collision with CMake. Please
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco pack [<path to nuspec>] [<options/switches>]
+    choco pack [<path to nuspec>] [<options/switches>] [<property=value>]
     cpack [<path to nuspec>] [<options/switches>] (DEPRECATED)
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
     choco pack
-    choco pack --version 1.2.3
+    choco pack --version 1.2.3 configuration=release
     choco pack path/to/nuspec
     choco pack --outputdirectory build
 

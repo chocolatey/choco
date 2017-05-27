@@ -473,12 +473,17 @@
  * should contain tags
  * should not contain packages and versions with a pipe between them
 
-### ChocolateyPackCommand [ 2 Scenario(s), 4 Observation(s) ]
+### ChocolateyPackCommand [ 3 Scenario(s), 6 Observation(s) ]
 
 #### when packing with an output directory
 
  * generated package should be in specified output directory
  * sources should be set to specified output directory
+
+#### when packing with properties
+
+ * generated package should be in current directory
+ * property settings should be logged as debug messages
 
 #### when packing without specifying an output directory
 
