@@ -413,14 +413,14 @@ namespace chocolatey.infrastructure.filesystem
                         {
                             try
                             {
-                                this.Log().Debug(ChocolateyLoggers.Trace, "Backing up '{0}' to '{1}'.".format_with(destinationFilePath, backupFilePath));
+                                this.Log().Trace("Backing up '{0}' to '{1}'.".format_with(destinationFilePath, backupFilePath));
 
                                 if (file_exists(backupFilePath))
                                 {
-                                    this.Log().Debug(ChocolateyLoggers.Trace, "Deleting existing backup file at '{0}'.".format_with(backupFilePath));
+                                    this.Log().Trace("Deleting existing backup file at '{0}'.".format_with(backupFilePath));
                                     delete_file(backupFilePath);
                                 }
-                                this.Log().Debug(ChocolateyLoggers.Trace, "Moving '{0}' to '{1}'.".format_with(destinationFilePath, backupFilePath));
+                                this.Log().Trace("Moving '{0}' to '{1}'.".format_with(destinationFilePath, backupFilePath));
                                 move_file(destinationFilePath, backupFilePath);
                             }
                             catch (Exception ex)
@@ -430,13 +430,13 @@ namespace chocolatey.infrastructure.filesystem
                         }
 
                         // copy source file to destination
-                        this.Log().Debug(ChocolateyLoggers.Trace, "Copying '{0}' to '{1}'.".format_with(sourceFilePath, destinationFilePath));
+                        this.Log().Trace("Copying '{0}' to '{1}'.".format_with(sourceFilePath, destinationFilePath));
                         copy_file(sourceFilePath, destinationFilePath, overwriteExisting: true);
                         
                         // delete source file
                         try
                         {
-                            this.Log().Debug(ChocolateyLoggers.Trace, "Removing '{0}'".format_with(sourceFilePath));
+                            this.Log().Trace("Removing '{0}'".format_with(sourceFilePath));
                             delete_file(sourceFilePath);
                         }
                         catch (Exception ex)

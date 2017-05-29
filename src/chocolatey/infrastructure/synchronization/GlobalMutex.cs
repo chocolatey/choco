@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.synchronization
 
         private void init_mutex()
         {
-            this.Log().Debug(ChocolateyLoggers.Trace, "Initializing global mutex");
+            this.Log().Trace("Initializing global mutex");
             var mutexId = "Global\\{{{0}}}".format_with(APP_GUID);
             _mutex = new Mutex(initiallyOwned: false, name: mutexId);
 
@@ -57,7 +57,7 @@ namespace chocolatey.infrastructure.synchronization
             init_mutex();
             try
             {
-                this.Log().Debug(ChocolateyLoggers.Trace, "Waiting on the mutext handle for {0} milliseconds".format_with(timeOut));
+                this.Log().Trace("Waiting on the mutext handle for {0} milliseconds".format_with(timeOut));
                 _hasHandle = _mutex.WaitOne(timeOut < 0 ? Timeout.Infinite : timeOut, exitContext: false);
 
                 if (_hasHandle == false)
