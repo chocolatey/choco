@@ -160,6 +160,7 @@ namespace chocolatey.tests.integration
             config.Debug = true;
             config.AllVersions = false;
             config.Verbose = false;
+            config.Trace = false;
             config.Input = config.PackageNames = string.Empty;
             config.ListCommand.LocalOnly = false;
             config.ListCommand.Exact = false;

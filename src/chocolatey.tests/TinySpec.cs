@@ -38,6 +38,8 @@ namespace chocolatey.tests
             Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, string.Empty);
             MockLogger = new MockLogger();
             Log.InitializeWith(MockLogger);
+            // do not log trace messages
+            ILogExtensions.LogTraceMessages = false;
         }
 
         public virtual void before_everything()
