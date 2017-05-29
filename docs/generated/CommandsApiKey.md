@@ -15,18 +15,34 @@ Anything that doesn't contain source and key will list api keys.
 ## Examples
 
     choco apikey
-    choco apikey -s"https://somewhere/out/there"
-    choco apikey -s"https://somewhere/out/there/" -k="value"
-    choco apikey -s"https://chocolatey.org/" -k="123-123123-123"
+    choco apikey -s https://somewhere/out/there
+    choco apikey -s="https://somewhere/out/there/" -k="value"
+    choco apikey -s "https://push.chocolatey.org/" -k="123-123123-123"
+    choco apikey -s "http://internal_nexus" -k="user:password"
 
-## Connecting to Chocolatey.org
+For source location, this can be a folder/file share or an 
+http location. When it comes to urls, they can be different from the packages 
+url (where packages are searched and installed from). As an example, for 
+Chocolatey's community package package repository, the package url is 
+https://chocolatey.org/api/v2, but the push url is https://push.chocolatey.org 
+(and the deprecated https://chocolatey.org/ as a push url). Check the 
+documentation for your choice of repository to learn what the push url is. 
 
-In order to save your API key for https://chocolatey.org/, 
+For the key, this can be an apikey that is provided by your source repository. 
+With some sources, like Nexus, this can be a NuGet API key or it could be a 
+user name and password specified as 'user:password' for the API key. Please see 
+your repository's documentation (for Nexus, please see 
+https://bit.ly/nexus2apikey).
+
+
+## Connecting to Chocolatey.org (Community Package Repository)
+
+In order to save your API key for https://push.chocolatey.org/, 
  log in (or register, confirm and then log in) to
- https://chocolatey.org/, go to https://chocolatey.org/account, 
+ https://push.chocolatey.org/, go to https://push.chocolatey.org/account, 
  copy the API Key, and then use it in the following command:
 
-    choco apikey -k <your key here> -s https://chocolatey.org/
+    choco apikey -k <your key here> -s https://push.chocolatey.org/
 
 
 ## Options and Switches
@@ -133,7 +149,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Source [REQUIRED] - The source location for the key
 
  -k, --key, --apikey, --api-key=VALUE
-     ApiKey - The api key for the source.
+     ApiKey - The API key for the source. This is the authentication that 
+       identifies you and allows you to push to a source. With some sources 
+       this is either a key or it could be a user name and password specified 
+       as 'user:password'.
 
 ~~~
 

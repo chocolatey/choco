@@ -155,6 +155,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
  -l, --lo, --localonly, --local-only
      LocalOnly - Only search against local machine items.
 
+     --idonly, --id-only
+     Id Only - Only return Package Ids in the list results. Available in 0.1-
+       0.6+.
+
      --pre, --prerelease
      Prerelease - Include Prereleases? Defaults to false.
 
@@ -197,6 +201,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      --by-id-only
      ByIdOnly - Only return packages where the id contains the search filter. 
        Available in 0.9.10+.
+
+     --by-tag-only, --by-tags-only
+     ByTagOnly - Only return packages where the search filter matches on the 
+       tags. Available in 0.10.6+.
 
      --id-starts-with
      IdStartsWith - Only return packages where the id starts with the search 

@@ -19,12 +19,18 @@ Chocolatey will allow you to interact with sources.
 
     choco source
     choco source list
-    choco source add -n=bob -s"https://somewhere/out/there/api/v2/"
-    choco source add -n=bob -s"'https://somewhere/out/there/api/v2/'" -cert=\Users\bob\bob.pfx
-    choco source add -n=bob -s"'https://somewhere/out/there/api/v2/'" -u=bob -p=12345
+    choco source add -n=bob -s="https://somewhere/out/there/api/v2/"
+    choco source add -n=bob -s "'https://somewhere/out/there/api/v2/'" -cert=\Users\bob\bob.pfx
+    choco source add -n=bob -s "'https://somewhere/out/there/api/v2/'" -u=bob -p=12345
     choco source disable -n=bob
     choco source enable -n=bob
     choco source remove -n=bob
+
+When it comes to the source location, this can be a folder/file share or an http
+location. If it is a url, it will be a location you can go to in a browser and 
+it returns OData with something that says Packages in the browser, similar to 
+what you see when you go to https://chocolatey.org/api/v2/.
+
 
 ## Options and Switches
 
@@ -131,7 +137,11 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        empty.
 
  -s, --source=VALUE
-     Source - The source. Defaults to empty.
+     Source - The source. This can be a folder/file share or an http locatio-
+       n. If it is a url, it will be a location you can go to in a browser and 
+       it returns OData with something that says Packages in the browser, 
+       similar to what you see when you go to https://chocolatey.org/api/v2/. 
+       Defaults to empty.
 
  -u, --user=VALUE
      User - used with authenticated feeds. Defaults to empty.
