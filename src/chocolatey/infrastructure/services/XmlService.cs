@@ -133,30 +133,39 @@ namespace chocolatey.infrastructure.services
 
                         // Write the updated file to memory
                         using (var memoryStream = new MemoryStream())
-                        using (var streamWriter = new StreamWriter(memoryStream, encoding: new UTF8Encoding(encoderShouldEmitUTF8Identifier: true)))
+                        using (var streamWriter = new StreamWriter(memoryStream, encoding: new UTF8Encoding(encoderShouldEmitUTF8Identifier: true))
                         {
+                            AutoFlush = true
+                        }
+                        ){
                             xmlSerializer.Serialize(streamWriter, xmlType);
                             streamWriter.Flush();
 
-                            memoryStream.Position = 0;
-
                             // Grab the hash of both files and compare them.
                             var originalFileHash = _hashProvider.hash_file(xmlFilePath);
+                            memoryStream.Position = 0;
                             if (!originalFileHash.is_equal_to(_hashProvider.hash_stream(memoryStream)))
                             {
-                                memoryStream.Position = 0;
-
                                 // If there wasn't a file there in the first place, just write the new one out directly.
                                 if (string.IsNullOrEmpty(originalFileHash))
                                 {
+                                    memoryStream.Position = 0;
                                     _fileSystem.write_file(xmlFilePath, () => memoryStream);
+
+                                    memoryStream.Close();
+                                    streamWriter.Close();
 
                                     return;
                                 }
 
                                 // Otherwise, create an update file, and resiliently move it into place.
                                 var tempUpdateFile = xmlFilePath + "." + Process.GetCurrentProcess().Id + ".update";
+                                memoryStream.Position = 0;
                                 _fileSystem.write_file(tempUpdateFile, () => memoryStream);
+
+                                memoryStream.Close();
+                                streamWriter.Close();
+
                                 _fileSystem.replace_file(tempUpdateFile, xmlFilePath, xmlFilePath + ".backup");
                             }
                         }
