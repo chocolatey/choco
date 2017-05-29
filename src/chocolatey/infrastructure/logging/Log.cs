@@ -44,7 +44,7 @@ namespace chocolatey.infrastructure.logging
         /// </summary>
         /// <param name="loggerType">Type of the logger.</param>
         /// <param name="resetLoggers">Should other loggers be reset?</param>
-        /// <remarks>This is mostly geared towards testing</remarks>
+        /// <remarks>Resetting the loggers is mostly geared towards testing</remarks>
         public static void InitializeWith(ILog loggerType, bool resetLoggers = true)
         {
             _logType = loggerType.GetType();
