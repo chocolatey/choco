@@ -95,7 +95,7 @@ namespace chocolatey
         /// </summary>
         public GetChocolatey()
         {
-            Log4NetAppenderConfiguration.configure();
+            Log4NetAppenderConfiguration.configure(null, excludeLoggerNames: ChocolateyLoggers.Trace.to_string());
             Bootstrap.initialize();
             _license = License.validate_license();
             _container = SimpleInjectorContainer.Container;

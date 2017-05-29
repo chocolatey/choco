@@ -399,7 +399,7 @@ param(
   Copy-Item $chocoExe $chocoExeDest -force
 
   Write-Debug "Copying the contents of `'$chocInstallFolder`' to `'$chocolateyPath`'."
-  Copy-Item $chocInstallFolder\* $chocolateyPath -recurse -force
+  Copy-Item $chocInstallFolder\* $chocolateyPath -Recurse -Force
 }
 
 function Ensure-ChocolateyLibFiles {

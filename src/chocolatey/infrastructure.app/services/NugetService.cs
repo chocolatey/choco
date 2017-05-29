@@ -125,7 +125,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             if (config.RegularOutput) this.Log().Debug(() => "Running list with the following filter = '{0}'".format_with(config.Input));
-            if (config.RegularOutput) this.Log().Debug(() => "--- Start of List ---");
+            if (config.RegularOutput) this.Log().Debug(ChocolateyLoggers.Verbose, () => "--- Start of List ---");
             foreach (var pkg in NugetList.GetPackages(config, _nugetLogger))
             {
                 var package = pkg; // for lamda access
@@ -217,7 +217,7 @@ namespace chocolatey.infrastructure.app.services
                 yield return new PackageResult(package, null, config.Sources);
             }
 
-            if (config.RegularOutput) this.Log().Debug(() => "--- End of List ---");
+            if (config.RegularOutput) this.Log().Debug(ChocolateyLoggers.Verbose, () => "--- End of List ---");
             if (config.RegularOutput && !config.QuietOutput)
             {
                 this.Log().Warn(() => @"{0} packages {1}.".format_with(count, config.ListCommand.LocalOnly ? "installed" : "found"));

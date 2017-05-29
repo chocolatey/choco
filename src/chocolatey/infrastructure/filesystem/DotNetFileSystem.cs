@@ -336,6 +336,8 @@ namespace chocolatey.infrastructure.filesystem
 
         public void move_file(string filePath, string newFilePath)
         {
+            create_directory_if_not_exists(get_directory_name(newFilePath), ignoreError: true);
+
             allow_retries(
                 () =>
                 {
@@ -391,17 +393,56 @@ namespace chocolatey.infrastructure.filesystem
             return success != 0;
         }
 
-        
         public void replace_file(string sourceFilePath, string destinationFilePath, string backupFilePath)
         {
-            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to replace \"{0}\"{1} with \"{2}\". Backup placed at \"{3}\".".format_with(destinationFilePath, Environment.NewLine, sourceFilePath, backupFilePath));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to replace \"{0}\"{1} with \"{2}\".{1} Backup placed at \"{3}\".".format_with(destinationFilePath, Environment.NewLine, sourceFilePath, backupFilePath));
 
             allow_retries(
                 () =>
                 {
                     try
                     {
-                        File.Replace(sourceFilePath, destinationFilePath, backupFilePath);
+                        // File.Replace is very sensitive to issues with file access
+                        // the docs mention that using a backup fixes this, but this
+                        // has not been the case with choco - the backup file has been
+                        // the most sensitive to issues with file locking
+                        //File.Replace(sourceFilePath, destinationFilePath, backupFilePath);
+
+                        // move existing file to backup location
+                        if (!string.IsNullOrEmpty(backupFilePath) && file_exists(destinationFilePath))
+                        {
+                            try
+                            {
+                                this.Log().Debug(ChocolateyLoggers.Trace, "Backing up '{0}' to '{1}'.".format_with(destinationFilePath, backupFilePath));
+
+                                if (file_exists(backupFilePath))
+                                {
+                                    this.Log().Debug(ChocolateyLoggers.Trace, "Deleting existing backup file at '{0}'.".format_with(backupFilePath));
+                                    delete_file(backupFilePath);
+                                }
+                                this.Log().Debug(ChocolateyLoggers.Trace, "Moving '{0}' to '{1}'.".format_with(destinationFilePath, backupFilePath));
+                                move_file(destinationFilePath, backupFilePath);
+                            }
+                            catch (Exception ex)
+                            {
+                                this.Log().Debug("Error capturing backup of '{0}':{1} {2}".format_with(destinationFilePath, Environment.NewLine, ex.Message));
+                            }
+                        }
+
+                        // copy source file to destination
+                        this.Log().Debug(ChocolateyLoggers.Trace, "Copying '{0}' to '{1}'.".format_with(sourceFilePath, destinationFilePath));
+                        copy_file(sourceFilePath, destinationFilePath, overwriteExisting: true);
+                        
+                        // delete source file
+                        try
+                        {
+                            this.Log().Debug(ChocolateyLoggers.Trace, "Removing '{0}'".format_with(sourceFilePath));
+                            delete_file(sourceFilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.Log().Debug("Error removing '{0}':{1} {2}".format_with(sourceFilePath, Environment.NewLine, ex.Message));
+                        }
                     }
                     catch (IOException)
                     {
@@ -502,7 +543,7 @@ namespace chocolatey.infrastructure.filesystem
         public void write_file(string filePath, Func<Stream> getStream)
         {
             using (Stream incomingStream = getStream())
-            using (Stream fileStream = File.Create(filePath))
+            using (Stream fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
             {
                 incomingStream.CopyTo(fileStream);
                 fileStream.Close();
@@ -543,7 +584,7 @@ namespace chocolatey.infrastructure.filesystem
             {
                 filePath = filePath.Replace('\\', '/');
             }
-            
+
             try
             {
                 return Path.GetDirectoryName(filePath);
