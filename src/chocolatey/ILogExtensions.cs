@@ -26,6 +26,21 @@ namespace chocolatey
     /// </summary>
     public static class ILogExtensions
     {
+        /// <summary>
+        /// This is changed for testing only
+        /// </summary>
+        public static bool LogTraceMessages = true;
+
+        public static void Trace(this ILog logger, string message, params object[] formatting)
+        {
+           if (LogTraceMessages) ChocolateyLoggers.Trace.to_string().Log().Debug(message, formatting);
+        }
+
+        public static void Trace(this ILog logger, Func<string> message)
+        {
+            if (LogTraceMessages) ChocolateyLoggers.Trace.to_string().Log().Debug(message);
+        }
+
         public static void Debug(this ILog logger, ChocolateyLoggers logType, string message, params object[] formatting)
         {
             switch (logType)
@@ -33,6 +48,9 @@ namespace chocolatey
                 case ChocolateyLoggers.Normal:
 
                     logger.Debug(message, formatting);
+                    break;
+                case ChocolateyLoggers.Trace:
+                    Trace(logger,message,formatting);
                     break;
                 default:
                     logType.to_string().Log().Debug(message, formatting);
@@ -47,6 +65,9 @@ namespace chocolatey
                 case ChocolateyLoggers.Normal:
                     logger.Debug(message);
                     break;
+                case ChocolateyLoggers.Trace:
+                    Trace(logger, message);
+                    break;
                 default:
                     logType.to_string().Log().Debug(message);
                     break;
@@ -58,8 +79,10 @@ namespace chocolatey
             switch (logType)
             {
                 case ChocolateyLoggers.Normal:
-
                     logger.Info(message, formatting);
+                    break;
+                case ChocolateyLoggers.Trace:
+                    Trace(logger, message, formatting);
                     break;
                 default:
                     logType.to_string().Log().Info(message, formatting);
@@ -74,6 +97,9 @@ namespace chocolatey
                 case ChocolateyLoggers.Normal:
                     logger.Info(message);
                     break;
+                case ChocolateyLoggers.Trace:
+                    Trace(logger, message);
+                    break;
                 default:
                     logType.to_string().Log().Info(message);
                     break;
@@ -85,8 +111,10 @@ namespace chocolatey
             switch (logType)
             {
                 case ChocolateyLoggers.Normal:
-
                     logger.Warn(message, formatting);
+                    break;
+                case ChocolateyLoggers.Trace:
+                    Trace(logger, message, formatting);
                     break;
                 default:
                     logType.to_string().Log().Warn(message, formatting);
@@ -101,6 +129,9 @@ namespace chocolatey
                 case ChocolateyLoggers.Normal:
                     logger.Warn(message);
                     break;
+                case ChocolateyLoggers.Trace:
+                    Trace(logger, message);
+                    break;
                 default:
                     logType.to_string().Log().Warn(message);
                     break;
@@ -112,8 +143,10 @@ namespace chocolatey
             switch (logType)
             {
                 case ChocolateyLoggers.Normal:
-
                     logger.Error(message, formatting);
+                    break;
+                case ChocolateyLoggers.Trace:
+                    Trace(logger, message, formatting);
                     break;
                 default:
                     logType.to_string().Log().Error(message, formatting);
@@ -128,6 +161,9 @@ namespace chocolatey
                 case ChocolateyLoggers.Normal:
                     logger.Error(message);
                     break;
+                case ChocolateyLoggers.Trace:
+                    Trace(logger, message);
+                    break;
                 default:
                     logType.to_string().Log().Error(message);
                     break;
@@ -139,8 +175,10 @@ namespace chocolatey
             switch (logType)
             {
                 case ChocolateyLoggers.Normal:
-
                     logger.Fatal(message, formatting);
+                    break;
+                case ChocolateyLoggers.Trace:
+                    Trace(logger, message, formatting);
                     break;
                 default:
                     logType.to_string().Log().Fatal(message, formatting);
@@ -154,6 +192,9 @@ namespace chocolatey
             {
                 case ChocolateyLoggers.Normal:
                     logger.Fatal(message);
+                    break;
+                case ChocolateyLoggers.Trace:
+                    Trace(logger, message);
                     break;
                 default:
                     logType.to_string().Log().Fatal(message);
