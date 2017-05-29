@@ -5,15 +5,35 @@ You can just call me choco.
 
 [![](https://img.shields.io/chocolatey/dt/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](https://img.shields.io/chocolatey/v/chocolatey.svg)](https://chocolatey.org/packages/chocolatey) [![](https://img.shields.io/gratipay/Chocolatey.svg)](https://www.gratipay.com/Chocolatey/) [![Project Stats](https://www.openhub.net/p/chocolatey/widgets/project_thin_badge.gif)](https://www.openhub.net/p/chocolatey)
 
+<!-- TOC -->
+
+- [Build Status](#build-status)
+- [Chat Room](#chat-room)
+- [Support Chocolatey!](#support-chocolatey)
+- [See Chocolatey In Action](#see-chocolatey-in-action)
+- [Etiquette Regarding Communication](#etiquette-regarding-communication)
+- [Information](#information)
+  - [Documentation](#documentation)
+  - [Requirements](#requirements)
+  - [License / Credits](#license--credits)
+- [Submitting Issues](#submitting-issues)
+- [Contributing](#contributing)
+- [Committers](#committers)
+  - [Compiling / Building Source](#compiling--building-source)
+    - [Windows](#windows)
+    - [Other Platforms](#other-platforms)
+      - [Prerequisites:](#prerequisites)
+      - [Build Process:](#build-process)
+- [Credits](#credits)
+
+<!-- /TOC -->
 
 ## Build Status
-
 TeamCity  | AppVeyor | Travis
 ------------- | ------------- | -------------
 [![TeamCity Build Status](http://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/jfxywa3xuwowt20w/branch/master?svg=true)](https://ci.appveyor.com/project/ferventcoder/choco/branch/master) | [![Travis Build Status](https://travis-ci.org/chocolatey/choco.svg?branch=master)](https://travis-ci.org/chocolatey/choco)
 
 ## Chat Room
-
 Come join in the conversation about Chocolatey in our Gitter Chat Room
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chocolatey/choco?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -23,12 +43,10 @@ Or, you can find us in IRC at #chocolatey on freenode. IRC is not as often check
 Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
 ## Support Chocolatey!
-
  * Purchase [Chocolatey Pro / Chocolatey for Business](https://chocolatey.org/pricing#compare)
  * Donate [![](https://img.shields.io/gratipay/Chocolatey.svg)](https://www.gratipay.com/Chocolatey/)
 
 ## See Chocolatey In Action
-
 Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update environment variables without restarting your shell):
 
 ![install](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_install.gif "Wat? Tab completion and updating environment variables!")
@@ -38,11 +56,9 @@ Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update
 ![install w/pro](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/chocopro_install_stopped.gif "Chocolatey Pro availability now! A great option for individuals looking for that community PLUS option.")
 
 ## Etiquette Regarding Communication
-
 When requesting support, try to remember that we are all volunteers that have lives outside of open source and none of us are paid to ensure things work for you, so please be considerate of others' time when you are asking for things. Many of us have families that also need time as well and only have so much time to give on a daily basis. In the future we hope that some of us are paid to do this full time and can provide better support when folks are running into issues, but until then a little consideration and patience can go a long way. After all, you are using a pretty good tool without cost. It may not be perfect (yet), and we know that.
 
 ## Information
-
  * [Chocolatey Website and Community Package Repository](https://chocolatey.org)
  * [Mailing List](http://groups.google.com/group/chocolatey) / [Release Announcements Only Mailing List](https://groups.google.com/group/chocolatey-announce) / [Build Status Mailing List](http://groups.google.com/group/chocolatey-build-status)
  * [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [Github](https://github.com/chocolatey)
@@ -67,9 +83,13 @@ Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICEN
 
  * If you are having issue with a package, please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://chocolatey.org/docs/package-triage-process).
  * If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://chocolatey.org/docs/package-triage-process#package-request-package-missing).
- * If it is an issue with the website (the community feed aka https://chocolatey.org), please submit the issue to the [Chocolatey.org repo](https://github.com/chocolatey/chocolatey.org).
- * If you have found an issue with the GUI (Chocolatey GUI), please see [the ChocolateyGUI repository](https://github.com/chocolatey/ChocolateyGUI#submitting-issues).
- * If you have found an issue with the client (choco.exe), you are in the right place. Keep reading below.
+
+ 1. Start with [Troubleshooting](https://github.com/chocolatey/choco/wiki/Troubleshooting) and the [FAQ](https://github.com/chocolatey/choco/wiki/ChocolateyFAQs) to see if your question or issue already has an answer.
+ 1. If not found or resolved, please follow one of the following avenues:
+    * If you are a licensed customer, please see [support](https://chocolatey.org/support). You can also log an issue to [Licensed Issues](https://github.com/chocolatey/chocolatey-licensed-issues) and we will submit issues to all other places on your behalf. Another avenue is to use email support to have us submit tickets and other avenues on your behalf (allowing you to maintain privacy).
+    * If it is an enhancement request or issue with the website (the community package repository aka [https://chocolatey.org](https://chocolatey.org)), please submit the issue to the [Chocolatey.org repo](https://github.com/chocolatey/chocolatey.org).
+    * If you have found an issue with the GUI (Chocolatey GUI) or you want to submit an enhancement, please see [the ChocolateyGUI repository](https://github.com/chocolatey/ChocolateyGUI#submitting-issues).
+    * If you have found an issue with the client (choco.exe), you are in the right place. Keep reading below.
 
 Observe the following help for submitting an issue:
 
@@ -92,19 +112,15 @@ Submitting a ticket:
  * Include screenshots and/or animated gifs whenever possible, they help show us exactly what the problem is.
 
 ## Contributing
-
 If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md).
 
 ## Committers
-
 Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey/choco/blob/master/COMMITTERS.md).
 
 ### Compiling / Building Source
-
 There is a `build.bat`/`build.sh` file that creates a necessary generated file named `SolutionVersion.cs`. It must be run at least once before Visual Studio will build.
 
 #### Windows
-
 Prerequisites:
 
  * .NET Framework 4+
@@ -118,7 +134,6 @@ Build Process:
 Running the build on Windows should produce an artifact that is tested and ready to be used.
 
 #### Other Platforms
-
 ##### Prerequisites:
 
  * Install and configure Mono 3.12.0 (3.8.0 should also work).
@@ -184,5 +199,4 @@ chmod +x zip.sh
 Running the build on Mono produces an artifact similar to Windows but may have more rough edges. You may get a failure or two in the build script that can be safely ignored.
 
 ## Credits
-
 Chocolatey is brought to you by quite a few people and frameworks. See [CREDITS](https://github.com/chocolatey/choco/blob/master/docs/legal/CREDITS.md) (just LEGAL/Credits.md in the zip folder)

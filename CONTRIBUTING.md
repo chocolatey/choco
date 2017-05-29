@@ -1,29 +1,64 @@
-# Reporting an Issue/Bug?
+# Contributing
+The Chocolatey team has very explicit information here regarding the process for contributions, and we will be sticklers about the way you write your commit messages (yes, really), so to save yourself some rework, please make sure you read over this entire document prior to contributing.
+
+<!-- TOC -->
+
+- [Are You In the Right Place?](#are-you-in-the-right-place)
+  - [Reporting an Issue/Bug?](#reporting-an-issuebug)
+    - [SolutionVersion.cs](#solutionversioncs)
+  - [Package Issue?](#package-issue)
+  - [Package Request? Package Missing?](#package-request-package-missing)
+  - [Submitting an Enhancement / Feature Request?](#submitting-an-enhancement--feature-request)
+    - [Submitting an Enhancement For Choco](#submitting-an-enhancement-for-choco)
+- [Contributing](#contributing)
+  - [Prerequisites](#prerequisites)
+    - [Definition of Trivial Contributions](#definition-of-trivial-contributions)
+    - [Is the CLA Really Required?](#is-the-cla-really-required)
+- [Contributing Process](#contributing-process)
+  - [Get Buyoff Or Find Open Community Issues/Features](#get-buyoff-or-find-open-community-issuesfeatures)
+  - [Set Up Your Environment](#set-up-your-environment)
+  - [Code Format / Design](#code-format--design)
+    - [C](#c)
+    - [PowerShell](#powershell)
+  - [Debugging / Testing](#debugging--testing)
+    - [Visual Studio](#visual-studio)
+    - [Chocolatey Build](#chocolatey-build)
+  - [Prepare Commits](#prepare-commits)
+  - [Submit Pull Request (PR)](#submit-pull-request-pr)
+  - [Respond to Feedback on Pull Request](#respond-to-feedback-on-pull-request)
+- [Other General Information](#other-general-information)
+
+<!-- /TOC -->
+
+## Are You In the Right Place?
+Chocolatey is a large ecosystem and each component has their own location for submitting issues and enhancement requests. While the website (the community package repository) may be all your know for packages, it represents only a tiny fraction of existing packages (organizations typically maintain and host their own packages internally). This is the repository for choco.exe (the client CLI tool) for Chocolatey, which spans multiple types of environments.
+
+Please follow this decision criteria to see if you are in the right location or if you should head to a different location to submit your request.
+
+### Reporting an Issue/Bug?
 ![submitting isseus](https://cloud.githubusercontent.com/assets/63502/12534440/fc223b74-c21e-11e5-9a41-1ffc1c9af48f.png)
 
 Submitting an Issue (or a Bug)? See the **[Submitting Issues](https://github.com/chocolatey/choco#submitting-issues) section** in the [README](https://github.com/chocolatey/choco/blob/master/README.md#submitting-issues).
 
-**NOTE**: Do not submit issues for missing `SolutionVersion.cs`. Please see [Compiling / Building Source](https://github.com/chocolatey/choco#compiling--building-source).
+#### SolutionVersion.cs
+Do not submit issues for missing `SolutionVersion.cs`. Please see [Compiling / Building Source](https://github.com/chocolatey/choco#compiling--building-source).
 
-# Submitting an Enhancement / Feature Request?
-
-This is the right place. See below.
-
-## Package Issue?
+### Package Issue?
 Please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://chocolatey.org/docs/package-triage-process).
 
-## Package Request? Package Missing?
+### Package Request? Package Missing?
 If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://chocolatey.org/docs/package-triage-process#package-request-package-missing).
 
-# Submitting an Enhancement
+### Submitting an Enhancement / Feature Request?
+If this is for choco (the CLI tool), this is the right place. See below. Otherwise see [Submitting Issues](https://github.com/chocolatey/choco#submitting-issues) for enhancements to the website, enhancements to the ChocolateyGUI, etc.
 
+#### Submitting an Enhancement For Choco
 Log a github issue. There are less constraints on this versus reporting issues.
 
-# Contributors
+## Contributing
 The process for contributions is roughly as follows:
 
-## Prerequisites
-
+### Prerequisites
  * Submit the Enhancement ticket. You will need the issue id for your commits.
  * Ensure you have signed the Contributor License Agreement (CLA) - without this we are not able to take contributions that are not trivial.
   * [Sign the Contributor License Agreement](https://www.clahub.com/agreements/chocolatey/choco).
@@ -31,7 +66,7 @@ The process for contributions is roughly as follows:
   * If you are curious why we would require a CLA, we agree with Julien Ponge - take a look at his [post](https://julien.ponge.org/blog/in-defense-of-contributor-license-agreements/).
  * You agree to follow the [etiquette regarding communication](https://github.com/chocolatey/choco#etiquette-regarding-communication).
 
-### Definition of Trivial Contributions
+#### Definition of Trivial Contributions
 It's hard to define what is a trivial contribution. Sometimes even a 1 character change can be considered significant. Unfortunately because it can be subjective, the decision on what is trivial comes from the committers of the project and not from folks contributing to the project. It is generally safe to assume that you may be subject to signing the [CLA](https://www.clahub.com/agreements/chocolatey/choco) and be prepared to do so. Ask in advance if you are not sure and for reasons are not able to sign the [CLA](https://www.clahub.com/agreements/chocolatey/choco).
 
 What is generally considered trivial:
@@ -44,25 +79,93 @@ What is generally not considered trivial:
 
  * Changes to any code that would be delivered as part of the final product. This includes any scripts that are delivered, such as PowerShell scripts. Yes, even 1 character changes could be considered non-trivial.
 
-## Contributing Process
-### Get Buyoff Or Find Open Community Issues/Features
+#### Is the CLA Really Required?
 
+Yes, and this aspect is not up for discussion. If you would like more resources on understanding CLAs, please see the following articles:
+
+* [What is a CLA and why do I care?](https://www.clahub.com/pages/why_cla)
+* [In defense of Contributor License Agreements](https://julien.ponge.org/blog/in-defense-of-contributor-license-agreements/)
+* [Contributor License Agreements](http://oss-watch.ac.uk/resources/cla)
+* Dissenting opinion - [Why your project doesn't need a Contributor License Agreement](https://sfconservancy.org/blog/2014/jun/09/do-not-need-cla/)
+
+Overall, the flexibility and legal protections provided by a CLA make it necessary to require a CLA. As there is a company and a licensed version behind Chocolatey, those protections must be afforded. We understand this means some folks won't be able to contribute and that's completely fine. We prefer you to know up front this is required so you can make the best decision about contributing.
+
+If you work for an organization that does not allow you to contribute without attempting to own the rights to your work, please do not sign the CLA.
+
+## Contributing Process
+
+Start with [Prerequisites](#prerequisites) and make sure you can sign the Contributor License Agreement (CLA).
+
+### Get Buyoff Or Find Open Community Issues/Features
  * Through GitHub, or through the [mailing list](https://groups.google.com/forum/#!forum/chocolatey) (preferred), you talk about a feature you would like to see (or a bug), and why it should be in Chocolatey.
    * If approved through the mailing list, ensure the accompanying GitHub issue is created with information and a link back to the mailing list discussion.
  * Once you get a nod from one of the [Chocolatey Team](https://github.com/chocolatey?tab=members), you can start on the feature.
  * Alternatively, if a feature is on the issues list with the [Up For Grabs](https://github.com/chocolatey/choco/issues?q=is%3Aopen+is%3Aissue+label%3A%22Up+For+Grabs%22) label, it is open for a community member to patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
 
 ### Set Up Your Environment
-
- * You create, or update, a fork of chocolatey/choco under your GitHub account.
- * From there you create a branch named specific to the feature.
- * In the branch you do work specific to the feature.
+ * Visual Studio 2010+ is recommended for code contributions.
+ * For git specific information:
+    1. Create a fork of chocolatey/choco under your GitHub account. See [forks](https://help.github.com/articles/working-with-forks/) for more information.
+    1. [Clone your fork](https://help.github.com/articles/cloning-a-repository/) locally.
+    1. Open a command line and navigate to that directory.
+    1. Add the upstream fork - `git remote add upstream git@github.com:chocolatey/choco.git`
+    1. Run `git fetch upstream`
+    1. Ensure you have user name and email set appropriately to attribute your contributions - see [Name](https://help.github.com/articles/setting-your-username-in-git/) / [Email](https://help.github.com/articles/setting-your-email-in-git/).
+    1. Ensure that the local repository has the following settings (without `--global`, these only apply to the current repository):
+      * `git config core.autocrlf false`
+      * `git config core.symlinks false`
+      * `git config merge.ff false`
+      * `git config merge.log true`
+      * `git config fetch.prune true`
+    1. From there you create a branch named specific to the feature.
+    1. In the branch you do work specific to the feature.
+    1. For committing the code, please see [Prepare Commits](#prepare-commits).
+    1. See [Submit Pull Request (PR)](#submit-pull-request-pr).
  * Please also observe the following:
     * No reformatting
     * No changing files that are not specific to the feature
     * More covered below in the **Prepare commits** section.
  * Test your changes and please help us out by updating and implementing some automated tests. It is recommended that all contributors spend some time looking over the tests in the source code. You can't go wrong emulating one of the existing tests and then changing it specific to the behavior you are testing.
+    * While not an absolute requirement, automated tests will help reviewers feel comfortable about your changes, which gets your contributions accepted faster.
  * Please do not update your branch from the master unless we ask you to. See the responding to feedback section below.
+
+### Code Format / Design
+
+#### C#
+
+ * Class names are `PascalCase` - this is nearly the only time you start with uppercase.
+ * Namespaces (and their representative folders) are lowercase.
+ * Methods and functions are lowercase. Breaks between words in functions are typically met with an underscore (`_`, e.g. `run_actual()`).
+ * Variables and parameters are `camelCase`.
+ * Constants are `UPPER_CASE`.
+ * There are some adapters over the .NET Framework to ensure some additional functionality works and is consistent. Sometimes this is completely seamless that you are using these (e.g. `Console`).
+
+#### PowerShell
+ * PowerShell must be CRLF and UTF-8. Git attributes are not used, so Git will not ensure this for you.
+ * If you add a new file, also ensure you add it to the Visual Studio project and ensure it becomes an embedded resource.
+
+### Debugging / Testing
+
+When you want to manually verify your changes and run Choco, you have some options.
+
+**NOTE:** Chocolatey behaves differently when built with `Debug` and `Release` configurations. Release is always going to seek out the machine installation (`$env:ChocolateyInstall`), where Debug just runs right next to wherever the choco.exe file is.
+
+#### Visual Studio
+When you are using Visual Studio, ensure the following:
+
+ * Use `Debug` configuration - debug configuration keeps your local changes separate from the machine installed Chocolatey.
+ * `chocolatey.console` is the project you are looking to run.
+ * If you make changes to anything that is in `chocolatey.resources`, delete the folder in `chocolatey.console\bin\Debug` that corresponds to where you've made changes as Chocolatey does not automatically detect changes in the files it is extracting from resource manifests.
+
+#### Chocolatey Build
+
+**NOTE:** When you are doing this, we almost always recommend you take the output of the build to another machine to do the testing, like the [Chocolatey Test Environment](https://github.com/chocolatey/chocolatey-test-environment).
+
+ * Run `build.bat`.
+ * There are two folders created - `build_output` and `code_drop`. You are looking for `code_drop\chocolatey\console` or `code_drop\nuget`. The `choco.exe` file contains everything it needs, but it does unpack the manifest on first use, so you could run into [#1292](https://github.com/chocolatey/choco/issues/1292).
+ * You will need to pass `--allow-unofficial-build` for it to work when built with release mode.
+ * You can also try `build.debug.bat` - note that it is newer and it may have an issue or two. It doesn't require `--allow-unofficial-build` as the binaries are built for debugging.
+ * Use `.\choco.exe` to point to the local file. By default in PowerShell.exe, if you have Chocolatey installed, when you call `choco`, that is using the installed `choco` and not the one in the folder you are currently in. You must be explicit. This catches nearly everyone.
 
 ### Prepare Commits
 This section serves to help you understand what makes a good commit.
@@ -115,7 +218,6 @@ Submitting PR:
  * One of the Chocolatey Team members, or one of the committers, will evaluate it within a reasonable time period (which is to say usually within 2-4 weeks). Some things get evaluated faster or fast tracked. We are human and we have active lives outside of open source so don't fret if you haven't seen any activity on your pull request within a month or two. We don't have a Service Level Agreement (SLA) for pull requests. Just know that we will evaluate your pull request.
 
 ### Respond to Feedback on Pull Request
-
 We may have feedback for you to fix or change some things. We generally like to see that pushed against the same topic branch (it will automatically update the Pull Request). You can also fix/squash/rebase commits and push the same topic branch with `--force` (it's generally acceptable to do this on topic branches not in the main repository, it is generally unacceptable and should be avoided at all costs against the main repository).
 
 If we have comments or questions when we do evaluate it and receive no response, it will probably lessen the chance of getting accepted. Eventually this means it will be closed if it is not accepted. Please know this doesn't mean we don't value your contribution, just that things go stale. If in the future you want to pick it back up, feel free to address our concerns/questions/feedback and reopen the issue/open a new PR (referencing old one).
