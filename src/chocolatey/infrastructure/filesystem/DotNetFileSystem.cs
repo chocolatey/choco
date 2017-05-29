@@ -336,6 +336,8 @@ namespace chocolatey.infrastructure.filesystem
 
         public void move_file(string filePath, string newFilePath)
         {
+            create_directory_if_not_exists(get_directory_name(newFilePath), ignoreError: true);
+
             allow_retries(
                 () =>
                 {
