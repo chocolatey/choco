@@ -79,6 +79,14 @@ namespace chocolatey.tests
             return messageCount;
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to log messages to console. 
+        /// This is purely used in debugging purposes when it is not clear why a spec is failing.
+        /// This should not have any usages in specs in committed code.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if logging messages to console; otherwise, <c>false</c>.
+        /// </value>
         public bool LogMessagesToConsole { get; set; }
 
         private readonly Lazy<ConcurrentDictionary<string, IList<string>>> _messages = new Lazy<ConcurrentDictionary<string, IList<string>>>();
