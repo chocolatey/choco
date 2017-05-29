@@ -18,7 +18,7 @@ The Chocolatey team has very explicit information here regarding the process for
   - [Get Buyoff Or Find Open Community Issues/Features](#get-buyoff-or-find-open-community-issuesfeatures)
   - [Set Up Your Environment](#set-up-your-environment)
   - [Code Format / Design](#code-format--design)
-    - [C](#c)
+    - [CSharp](#csharp)
     - [PowerShell](#powershell)
   - [Debugging / Testing](#debugging--testing)
     - [Visual Studio](#visual-studio)
@@ -131,9 +131,10 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
 
 ### Code Format / Design
 
-#### C#
+#### CSharp
 
- * Class names are `PascalCase` - this is nearly the only time you start with uppercase.
+ * If you are using ReSharper, all of this is already in the shared resharper settings.
+ * Class names and Properties are `PascalCase` - this is nearly the only time you start with uppercase.
  * Namespaces (and their representative folders) are lowercase.
  * Methods and functions are lowercase. Breaks between words in functions are typically met with an underscore (`_`, e.g. `run_actual()`).
  * Variables and parameters are `camelCase`.
