@@ -12,7 +12,7 @@ Chocolatey will attempt to push a compiled nupkg to a package feed.
  [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] (`choco -?`).
 
 A feed can be a local folder, a file share, the [community feed](https://chocolatey.org/packages) 
- (https://chocolatey.org/), or a custom/private feed. For web
+ (https://push.chocolatey.org/), or a custom/private feed. For web
  feeds, it has a requirement that it implements the proper OData
  endpoints required for NuGet packages.
 
@@ -43,8 +43,8 @@ A common error is `Failed to process request. 'The specified API key
  does not provide the authority to push packages.' The remote server 
  returned an error: (403) Forbidden..` This means the package already 
  exists with a different user (API key). The package could be unlisted. 
- You can verify by going to https://chocolatey.org/packages/packageName. 
- Please contact the administrators of https://chocolatey.org/ if you see this 
+ You can verify by going to https://push.chocolatey.org/packages/packageName. 
+ Please contact the administrators of https://push.chocolatey.org/ if you see this 
  and you don't see a good reason for it.
 
 ## Options and Switches
@@ -148,8 +148,8 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        proxy bypass on local setting of 'True'. Available in 0.10.4+.
 
  -s, --source=VALUE
-     Source - The source we are pushing the package to. Use 
-       https://chocolatey.org/ to push to [community feed](https://chocolatey.org/packages).
+     Source - The source we are pushing the package to. Use https://pus-
+       h.chocolatey.org/ to push to [community feed](https://chocolatey.org/packages).
 
  -k, --key, --apikey, --api-key=VALUE
      ApiKey - The api key for the source. If not specified (and not local 

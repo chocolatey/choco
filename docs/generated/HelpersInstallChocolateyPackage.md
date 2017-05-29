@@ -211,9 +211,16 @@ a 32 bit installation on a 64 bit system.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
+In 0.10.6+, `File` and `FileFullPath` are aliases for Url. These 
+aliases, if used in earlier versions of Chocolatey, produce `ERROR: 
+Cannot bind parameter because parameter 'fileType' is specified more 
+than once.` See https://github.com/chocolatey/choco/issues/1284. Do not
+use these aliases with the community package repository until January
+2018.
+
 Property               | Value
----------------------- | -----
-Aliases                | 
+---------------------- | ------------------
+Aliases                | file, fileFullPath
 Required?              | false
 Position?              | 4
 Default Value          | 
@@ -230,9 +237,16 @@ this parameter.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
+In 0.10.6+, `File64` and `FileFullPath64` are aliases for Url64Bit. 
+These aliases, if used in earlier versions of Chocolatey, produce 
+`ERROR: Cannot bind parameter because parameter 'fileType' is specified
+more than once.` See https://github.com/chocolatey/choco/issues/1284. 
+Do not use these aliases with the community package repository until 
+January 2018.
+
 Property               | Value
----------------------- | -----
-Aliases                | url64
+---------------------- | -----------------------------
+Aliases                | url64, file64, fileFullPath64
 Required?              | false
 Position?              | 5
 Default Value          | 

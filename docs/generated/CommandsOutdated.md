@@ -145,6 +145,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Certificate Password - the client certificate's password to the source. 
        Defaults to empty. Available in 0.9.10+.
 
+     --ignore-pinned
+     Ignore Pinned - Ignore pinned packages. Defaults to false. Available in 
+       0.10.6+.
+
 ~~~
 
 [[Command Reference|CommandsReference]]

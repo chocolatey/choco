@@ -431,6 +431,13 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        installer for software. Available in 0.9.10+. [Licensed editions](https://chocolatey.org/compare) only. 
        See https://chocolatey.org/docs/features-install-directory-override 
 
+     --bps, --maxdownloadrate, --max-download-rate, --maxdownloadbitspersecond, --max-download-bits-per-second, --maximumdownloadbitspersecond, --maximum-download-bits-per-second=VALUE
+     Maximum Download Rate Bits Per Second - The maximum download rate in 
+       bits per second. '0' or empty means no maximum. A number means that will 
+       be the maximum download rate in bps. Defaults to config setting of '0'. 
+       Available in [licensed editions](https://chocolatey.org/compare) v2+ only. See https://chocolate-
+       y.org/docs/features-download-throttle  
+
 ~~~
 
 [[Command Reference|CommandsReference]]
