@@ -392,7 +392,7 @@ namespace chocolatey.infrastructure.filesystem
             //}
             return success != 0;
         }
-        
+
         public void replace_file(string sourceFilePath, string destinationFilePath, string backupFilePath)
         {
             this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to replace \"{0}\"{1} with \"{2}\".{1} Backup placed at \"{3}\".".format_with(destinationFilePath, Environment.NewLine, sourceFilePath, backupFilePath));
@@ -407,7 +407,7 @@ namespace chocolatey.infrastructure.filesystem
                         // has not been the case with choco - the backup file has been
                         // the most sensitive to issues with file locking
                         //File.Replace(sourceFilePath, destinationFilePath, backupFilePath);
-                        
+
                         // move existing file to backup location
                         if (!string.IsNullOrEmpty(backupFilePath) && file_exists(destinationFilePath))
                         {
@@ -428,6 +428,7 @@ namespace chocolatey.infrastructure.filesystem
                                 this.Log().Debug("Error capturing backup of '{0}':{1} {2}".format_with(destinationFilePath, Environment.NewLine, ex.Message));
                             }
                         }
+
                         // copy source file to destination
                         this.Log().Debug(ChocolateyLoggers.Trace, "Copying '{0}' to '{1}'.".format_with(sourceFilePath, destinationFilePath));
                         copy_file(sourceFilePath, destinationFilePath, overwriteExisting: true);
@@ -583,7 +584,7 @@ namespace chocolatey.infrastructure.filesystem
             {
                 filePath = filePath.Replace('\\', '/');
             }
-            
+
             try
             {
                 return Path.GetDirectoryName(filePath);
