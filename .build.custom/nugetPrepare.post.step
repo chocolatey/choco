@@ -39,8 +39,9 @@
     <exec program="${app.choco}"
           workingdir="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall"
           commandline="${args.choco}" if="${platform::is-windows()}" />
+    <delete file="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}tools${path.separator}detector.zip" failonerror="false" />
   </target>
-  
+
   <target name="copy_legal">
     <echo level="Warning" message="Copying Credits from '${dirs.current}${path.separator}${folder.documentation}${path.separator}legal${path.separator}CREDITS.md' to nuget packages"/>
     <copy file="${dirs.current}${path.separator}${folder.documentation}${path.separator}legal${path.separator}CREDITS.md" tofile="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}CREDITS.txt" failonerror="true" />

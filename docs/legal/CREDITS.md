@@ -25,7 +25,6 @@ Chocolatey has been the the thoughts, ideas, and work of a large community. Whil
 
 
 ### Committers
-
 These are the committers to Chocolatey/Choco repositories:
 
  * [Core Development Team](https://github.com/orgs/chocolatey/teams/developers)
@@ -36,21 +35,18 @@ These are the committers to Chocolatey/Choco repositories:
    * [Richard Simpson](https://github.com/RichiCoder1) - created and maintains the new Chocolatey GUI
 
 ### Chocolatey Community Team
-
 The Chocolatey Community Team includes the committers and adds these fine folks:
 
 * [Community Package Repository Moderation Team](https://github.com/orgs/chocolatey/teams/community-moderators)
 * [Chocolatey Core Community Maintainers Team](https://github.com/orgs/chocolatey/teams/community-maintainers)
 
 ### Contributors
-
  * [choco.exe](https://github.com/chocolatey/choco/graphs/contributors)
  * [Original Chocolatey - POSH choco](https://github.com/chocolatey/chocolatey/graphs/contributors)
- * [Community Feed / Chocolatey.org](https://github.com/chocolatey/chocolatey.org/graphs/contributors)
+ * [Community Package Repository / Chocolatey.org](https://github.com/chocolatey/chocolatey.org/graphs/contributors)
 
 ### Other Contributors
-
-**NEEDS UPDATED**
+**NOTE: NEEDS UPDATED**
 
  * Nekresh (https://github.com/nekresh) - Contributing code and ideas on direction
  * Chris Ortman (https://github.com/chrisortman) - package contributions and thoughts on where to take it
@@ -59,7 +55,6 @@ The Chocolatey Community Team includes the committers and adds these fine folks:
  * Jason Jarrett (https://github.com/staxmanade) - contributing code and ideas
 
 ## Third Party Licenses - Development
-
 Choco is built, tested and analyzed with the following fantastic frameworks (in no particular order):
 
  * ILMerge
@@ -83,8 +78,7 @@ We would like to credit other super sweet tools/frameworks that aid in the devel
  * NuGet Framework
 
 ## Third Party Licenses - Runtime
-
-Chocolatey open source uses a number of 3rd party components. Their details are below.
+Chocolatey open source uses a number of 3rd party components. Their details are below (order is alphabetical).
 
 <!-- TOC -->
 

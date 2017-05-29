@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.logging
 {
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using adapters;
@@ -35,14 +36,15 @@ namespace chocolatey.infrastructure.logging
         private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof(Log4NetAppenderConfiguration));
 
         private static bool _alreadyConfiguredFileAppender;
-        private static string _summaryLogAppenderName = "{0}.summary.log.appender".format_with(ApplicationParameters.Name);
+        private static readonly string _summaryLogAppenderName = "{0}.summary.log.appender".format_with(ApplicationParameters.Name);
 
         /// <summary>
         ///   Pulls xml configuration from embedded location and applies it. 
         ///   Then it configures a file appender to the specified output directory if one is provided.
         /// </summary>
         /// <param name="outputDirectory">The output directory.</param>
-        public static void configure(string outputDirectory = null)
+        /// <param name="excludeLoggerNames">Loggers, such as a verbose logger, to exclude from this.</param>
+        public static void configure(string outputDirectory = null, params string[] excludeLoggerNames)
         {
             GlobalContext.Properties["pid"] = System.Diagnostics.Process.GetCurrentProcess().Id;
 
@@ -59,7 +61,7 @@ namespace chocolatey.infrastructure.logging
 
             if (!string.IsNullOrWhiteSpace(outputDirectory))
             {
-                set_file_appender(outputDirectory);
+                set_file_appender(outputDirectory, excludeLoggerNames);
             }
 
             _logger.DebugFormat("Configured {0} from assembly {1}", resource, assembly.FullName);
@@ -69,8 +71,11 @@ namespace chocolatey.infrastructure.logging
         ///   Adds a file appender to all current loggers. Only runs one time.
         /// </summary>
         /// <param name="outputDirectory">The output directory.</param>
-        private static void set_file_appender(string outputDirectory)
+        /// <param name="excludeLoggerNames">Loggers, such as a trace logger, to exclude from file appender.</param>
+        private static void set_file_appender(string outputDirectory, params string[] excludeLoggerNames)
         {
+            if (excludeLoggerNames == null) excludeLoggerNames = new string[] {};
+
             if (!_alreadyConfiguredFileAppender)
             {
                 _alreadyConfiguredFileAppender = true;
@@ -111,7 +116,7 @@ namespace chocolatey.infrastructure.logging
                 infoOnlyAppender.ActivateOptions();
 
                 ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
-                foreach (ILogger log in logRepository.GetCurrentLoggers())
+                foreach (ILogger log in logRepository.GetCurrentLoggers().Where(l => excludeLoggerNames.All(name => !l.Name.is_equal_to(name))).or_empty_list_if_null())
                 {
                     var logger = log as Logger;
                     if (logger != null)
@@ -129,9 +134,11 @@ namespace chocolatey.infrastructure.logging
         /// <param name="enableDebug">
         ///   if set to <c>true</c> [enable debug].
         /// </param>
-        /// <param name="excludeLoggerName">Logger, such as a verbose logger, to exclude from this.</param>
-        public static void set_logging_level_debug_when_debug(bool enableDebug, string excludeLoggerName)
+        /// <param name="excludeAppenderNames">Appenders, such as a verbose console appender, to exclude from debug.</param>
+        public static void set_logging_level_debug_when_debug(bool enableDebug, params string[] excludeAppenderNames)
         {
+            if (excludeAppenderNames == null) excludeAppenderNames = new string[] { };
+
             if (enableDebug)
             {
                 ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
@@ -145,7 +152,7 @@ namespace chocolatey.infrastructure.logging
                     }
                 }
 
-                foreach (var append in logRepository.GetAppenders().Where(a => !a.Name.is_equal_to(excludeLoggerName.to_string())).or_empty_list_if_null())
+                foreach (var append in logRepository.GetAppenders().Where(a => excludeAppenderNames.All(name => !a.Name.is_equal_to(name))).or_empty_list_if_null())
                 {
                     var appender = append as AppenderSkeleton;
                     if (appender != null && !appender.Name.is_equal_to(_summaryLogAppenderName))
@@ -196,6 +203,8 @@ namespace chocolatey.infrastructure.logging
                 System.Diagnostics.Trace.AutoFlush = true;
                 System.Diagnostics.Trace.Listeners.Add(new TraceLog());
 
+                var fileAppenders = new List<AppenderSkeleton>();
+
                 ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
                 foreach (var append in logRepository.GetAppenders())
                 {
@@ -205,6 +214,20 @@ namespace chocolatey.infrastructure.logging
                         appender.ClearFilters();
                         var minLevel = Level.Debug;
                         appender.AddFilter(new log4net.Filter.LevelRangeFilter { LevelMin = minLevel, LevelMax = Level.Fatal });
+                    }
+
+                    if (appender != null && appender.GetType() == typeof(RollingFileAppender)) fileAppenders.Add(appender);
+                }
+
+                foreach (ILogger log in logRepository.GetCurrentLoggers().Where(l => l.Name.is_equal_to("Trace")).or_empty_list_if_null())
+                {
+                    var logger = log as Logger;
+                    if (logger != null)
+                    {
+                        foreach (var appender in fileAppenders.or_empty_list_if_null())
+                        {
+                            logger.AddAppender(appender);
+                        }
                     }
                 }
 

@@ -25,6 +25,14 @@ Chocolatey is brought to you by the work and inspiration of the community, the w
 
 You can host your own sources and add them to Chocolatey, you can extend Chocolatey's capabilities, and folks, it's only going to get better.
 
+### Information
+
+ * [Chocolatey Website and Community Package Repository](https://chocolatey.org)
+ * [Mailing List](http://groups.google.com/group/chocolatey) / [Release Announcements Only Mailing List](https://groups.google.com/group/chocolatey-announce) / [Build Status Mailing List](http://groups.google.com/group/chocolatey-build-status)
+ * [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [Github](https://github.com/chocolatey)
+ * [Blog](https://chocolatey.org/blog) / [Newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&amp;id=73b018498d)
+ * [Documentation](https://chocolatey.org/docs) / [Support](https://chocolatey.org/support)
+
 ### Commands
 There are quite a few commands you can call - you should check out the [command reference](https://chocolatey.org/docs/commands-reference). Here are the most common:
 
@@ -55,6 +63,44 @@ In that mess there is a link to the [PowerShell Chocolatey module reference](htt
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
 
+## 0.10.6
+
+### BUG FIXES
+
+ * Fix - Chocolatey config changes in 0.10.4+ - The process cannot access the file because it is being used by another process - see [#1241](https://github.com/chocolatey/choco/issues/1241)
+ * Fix - PowerShell sees authenticode hash as changed in scripts that are UTF8 (w/out BOM) that contain unicode characters - see [#1225](https://github.com/chocolatey/choco/issues/1225)
+ * Fix - Chocolatey timed out immediately when execution timeout was infinite (0) - see [#1224](https://github.com/chocolatey/choco/issues/1224)
+ * Fix - choco list / search / info - Some packages can't be found - see [#1004](https://github.com/chocolatey/choco/issues/1004)
+ * Fix - chocolatey.config gets corrupted when multiple processes access simultaneously - see [#1258](https://github.com/chocolatey/choco/issues/1258)
+ * Fix - Update ShimGen to 0.8.x to address some issues - see [#1243](https://github.com/chocolatey/choco/issues/1243)
+ * Fix - Trace logging should only occur on when trace is enabled - see [#1309](https://github.com/chocolatey/choco/issues/1309)
+ * Fix - RefreshEnv.cmd doesn't set the correct PATH - see [#1227](https://github.com/chocolatey/choco/issues/1227)
+ * [API] Fix- chocolatey.lib nuget package has incorrect documentation xml - see [#1247](https://github.com/chocolatey/choco/issues/1247)
+ * [API] Fix - Chocolatey file cache still adds a 'chocolatey' directory on each install - see [#1231](https://github.com/chocolatey/choco/issues/1231)
+ * [API] Fix - List and Count should implement similar functionality as run - see [#1298](https://github.com/chocolatey/choco/issues/1298)
+ * Pro/Business - [API] Fix - Ensure DLL can work with licensed code - see [#1287](https://github.com/chocolatey/choco/issues/1287)
+
+### IMPROVEMENTS
+
+ * Default package push url now uses push subdomain - see [#1285](https://github.com/chocolatey/choco/issues/1285)
+ * Report process id in the log files - see [#1239](https://github.com/chocolatey/choco/issues/1239)
+ * choco info / list / search - Include summary on detailed view - see [#1253](https://github.com/chocolatey/choco/issues/1253)
+ * choco info / list /search - Include release notes on detailed view - see [#1263](https://github.com/chocolatey/choco/issues/1263)
+ * choco list / search - Option to list packages only by name - see [#1237](https://github.com/chocolatey/choco/issues/1237)
+ * choco list / search - Allow sorting package results by relevance - see [#1101](https://github.com/chocolatey/choco/issues/1101)
+ * choco list / search - Search by tags only - see [#1033](https://github.com/chocolatey/choco/issues/1033)
+ * choco outdated - Option to leave out pinned packages - see [#994](https://github.com/chocolatey/choco/issues/994)
+ * Install-ChocolateyPackage and other functions should alias File/File64 - see [#1284](https://github.com/chocolatey/choco/issues/1284)
+ * Install-ChocolateyPowerShellCommand should alias File/FileFullPath for PsFileFullPath - see [#1311](https://github.com/chocolatey/choco/issues/1311)
+ * Logging - capture more information about a user (user name, domain, remote?, system?) - see [#615](https://github.com/chocolatey/choco/issues/615)
+ * Stop saying "0 packages failed." - see [#1259](https://github.com/chocolatey/choco/issues/1259)
+ * [API] provide a way to see ChocolateyConfiguration - see [#1267](https://github.com/chocolatey/choco/issues/1267)
+ * [API] Attempt to get ChocolateyInstall environment variable prior to extraction - see [#1297](https://github.com/chocolatey/choco/issues/1297)
+ * [API] Expose Container directly - see [#1294](https://github.com/chocolatey/choco/issues/1294)
+ * Pro/Business - Support for Package Audit (who installed packages) - see [#1238](https://github.com/chocolatey/choco/issues/1238)
+ * Pro/Business - [API] Ensure configuration retains base info between uses - see [#1296](https://github.com/chocolatey/choco/issues/1296)
+
+
 ## 0.10.5
 
 ### BUG FIXES
@@ -63,7 +109,7 @@ See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
 
 ### IMPROVEMENTS
 
-* Show machine readable output with `choco outdated -r` - see [#1222](https://github.com/chocolatey/choco/issues/1222)
+ * Show machine readable output with `choco outdated -r` - see [#1222](https://github.com/chocolatey/choco/issues/1222)
 
 
 ## 0.10.4
