@@ -24,6 +24,7 @@ namespace chocolatey.infrastructure.services
     using System.Xml.Serialization;
     using cryptography;
     using filesystem;
+    using logging;
     using tolerance;
     using synchronization;
 
@@ -47,6 +48,8 @@ namespace chocolatey.infrastructure.services
             return FaultTolerance.retry(3, () => GlobalMutex.enter(
                 () =>
                 {
+                    this.Log().Debug(ChocolateyLoggers.Trace, "Entered mutex to deserialize '{0}'".format_with(xmlFilePath));
+
                     return FaultTolerance.try_catch_with_logging_exception(
                     () =>
                     {
@@ -96,6 +99,7 @@ namespace chocolatey.infrastructure.services
                             {
                                 foreach (var updateFile in _fileSystem.get_files(_fileSystem.get_directory_name(xmlFilePath), "*.update").or_empty_list_if_null())
                                 {
+                                    this.Log().Debug("Removing '{0}'".format_with(updateFile));
                                     FaultTolerance.try_catch_with_logging_exception(
                                         () => _fileSystem.delete_file(updateFile),
                                         errorMessage: "Unable to remove update file",
@@ -126,12 +130,13 @@ namespace chocolatey.infrastructure.services
             FaultTolerance.retry(3, () => GlobalMutex.enter(
                 () =>
                 {
+                    this.Log().Debug(ChocolateyLoggers.Trace, "Entered mutex to serialize '{0}'".format_with(xmlFilePath));
                     FaultTolerance.try_catch_with_logging_exception(
                     () =>
                     {
                         var xmlSerializer = new XmlSerializer(typeof(XmlType));
 
-                        // Write the updated file to memory
+                        this.Log().Debug(ChocolateyLoggers.Trace, "Opening memory stream for xml file creation.");
                         using (var memoryStream = new MemoryStream())
                         using (var streamWriter = new StreamWriter(memoryStream, encoding: new UTF8Encoding(encoderShouldEmitUTF8Identifier: true))
                         {
@@ -142,16 +147,20 @@ namespace chocolatey.infrastructure.services
                             streamWriter.Flush();
 
                             // Grab the hash of both files and compare them.
+                            this.Log().Debug(ChocolateyLoggers.Trace, "Hashing original file at '{0}'".format_with(xmlFilePath));
                             var originalFileHash = _hashProvider.hash_file(xmlFilePath);
                             memoryStream.Position = 0;
                             if (!originalFileHash.is_equal_to(_hashProvider.hash_stream(memoryStream)))
                             {
+                                this.Log().Debug(ChocolateyLoggers.Trace, "The hashes were different.");
                                 // If there wasn't a file there in the first place, just write the new one out directly.
                                 if (string.IsNullOrEmpty(originalFileHash))
                                 {
+                                    this.Log().Debug("There was no original file at '{0}'".format_with(xmlFilePath));
                                     memoryStream.Position = 0;
                                     _fileSystem.write_file(xmlFilePath, () => memoryStream);
 
+                                    this.Log().Debug(ChocolateyLoggers.Trace, "Closing xml memory stream.");
                                     memoryStream.Close();
                                     streamWriter.Close();
 
@@ -160,12 +169,15 @@ namespace chocolatey.infrastructure.services
 
                                 // Otherwise, create an update file, and resiliently move it into place.
                                 var tempUpdateFile = xmlFilePath + "." + Process.GetCurrentProcess().Id + ".update";
+                                this.Log().Debug(ChocolateyLoggers.Trace, "Creating a temp file at '{0}'".format_with(tempUpdateFile));
                                 memoryStream.Position = 0;
+                                this.Log().Debug(ChocolateyLoggers.Trace, "Writing file '{0}'".format_with(tempUpdateFile));
                                 _fileSystem.write_file(tempUpdateFile, () => memoryStream);
 
                                 memoryStream.Close();
                                 streamWriter.Close();
 
+                                this.Log().Debug(ChocolateyLoggers.Trace, "Replacing file '{0}' with '{1}'.".format_with(xmlFilePath, tempUpdateFile));
                                 _fileSystem.replace_file(tempUpdateFile, xmlFilePath, xmlFilePath + ".backup");
                             }
                         }
