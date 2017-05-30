@@ -157,6 +157,8 @@ When you are using Visual Studio, ensure the following:
  * Use `Debug` configuration - debug configuration keeps your local changes separate from the machine installed Chocolatey.
  * `chocolatey.console` is the project you are looking to run.
  * If you make changes to anything that is in `chocolatey.resources`, delete the folder in `chocolatey.console\bin\Debug` that corresponds to where you've made changes as Chocolatey does not automatically detect changes in the files it is extracting from resource manifests.
+ * The automated testing framework that Chocolatey uses is [NUnit](https://www.nunit.org/), [TinySpec](https://www.nuget.org/packages/TinySpec.NUnit), [Moq](https://www.nuget.org/packages/moq), and [Should](https://www.nuget.org/packages/Should/). Do not be thrown off thinking it using something else based on seeing `Fact` attributes for specs/tests. That is TinySpec.
+ * For a good understanding of all frameworks used, please see [CREDITS](https://github.com/chocolatey/choco/blob/master/docs/legal/CREDITS.md)
 
 #### Chocolatey Build
 
