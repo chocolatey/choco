@@ -85,11 +85,18 @@ namespace chocolatey.infrastructure.app.services
 
         public void remove(RegistryApplicationKey key, ChocolateyConfiguration config, PackageResult packageResult, string packageCacheLocation)
         {
-            this.Log().Debug(() => " Preparing uninstall key '{0}'".format_with(key.UninstallString.to_string().escape_curly_braces()));
+            //todo: if there is a local package, look to use it in the future
+            if (string.IsNullOrWhiteSpace(key.UninstallString))
+            {
+                this.Log().Info(" Skipping auto uninstaller - '{0}' does not have an uninstall string.".format_with(!string.IsNullOrEmpty(key.DisplayName.to_string()) ? key.DisplayName.to_string().escape_curly_braces() : "The application"));
+                return;
+            }
+
+            this.Log().Debug(() => " Preparing uninstall key '{0}' for '{1}'".format_with(key.UninstallString.to_string().escape_curly_braces(), key.DisplayName.to_string().escape_curly_braces()));
 
             if ((!string.IsNullOrWhiteSpace(key.InstallLocation) && !_fileSystem.directory_exists(key.InstallLocation)) || !_registryService.installer_value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation))
             {
-                this.Log().Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means.");
+                this.Log().Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".format_with(!string.IsNullOrEmpty(key.DisplayName.to_string()) ? key.DisplayName.to_string().escape_curly_braces() : "The application"));
                 this.Log().Debug(() => " Searched for install path '{0}' - found? {1}".format_with(key.InstallLocation.to_string().escape_curly_braces(), _fileSystem.directory_exists(key.InstallLocation)));
                 this.Log().Debug(() => " Searched for registry key '{0}' value '{1}' - found? {2}".format_with(key.KeyPath.escape_curly_braces(), ApplicationParameters.RegistryValueInstallLocation, _registryService.installer_value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation)));
                 return;

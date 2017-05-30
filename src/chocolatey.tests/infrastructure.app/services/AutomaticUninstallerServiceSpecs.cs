@@ -51,6 +51,7 @@ namespace chocolatey.tests.infrastructure.app.services
             protected IList<RegistryApplicationKey> registryKeys = new List<RegistryApplicationKey>();
             protected IInstaller installerType = new CustomInstaller();
 
+            protected readonly string expectedDisplayName = "WinDirStat";
             protected readonly string originalUninstallString = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe""";
             protected readonly string expectedUninstallString = @"C:\Program Files (x86)\WinDirStat\Uninstall.exe";
 
@@ -69,6 +70,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 registryKeys.Add(
                     new RegistryApplicationKey
                     {
+                        DisplayName = expectedDisplayName,
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
                         UninstallString = originalUninstallString,
                         HasQuietUninstall = true,
@@ -197,7 +199,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".format_with(expectedDisplayName)), Times.Once);
             }
 
             [Fact]
@@ -219,6 +221,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 registryKeys.Add(
                     new RegistryApplicationKey
                     {
+                        DisplayName = expectedDisplayName,
                         InstallLocation = string.Empty,
                         UninstallString = originalUninstallString,
                         HasQuietUninstall = true,
@@ -247,6 +250,46 @@ namespace chocolatey.tests.infrastructure.app.services
                     c => c.execute(expectedUninstallString, args, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Once);
             }
+        }   
+        
+        public class when_uninstall_string_is_empty : AutomaticUninstallerServiceSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                fileSystem.ResetCalls();
+                registryKeys.Clear();
+                registryKeys.Add(
+                    new RegistryApplicationKey
+                    {
+                        DisplayName = expectedDisplayName,
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = string.Empty,
+                        HasQuietUninstall = false,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat"
+                    });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(true);
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' does not have an uninstall string.".format_with(expectedDisplayName)), Times.Once);
+            }
+
+            [Fact]
+            public void should_not_call_command_executor()
+            {
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
+            }
         }
 
         public class when_registry_location_does_not_exist : AutomaticUninstallerServiceSpecsBase
@@ -266,7 +309,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".format_with(expectedDisplayName)), Times.Once);
             }
 
             [Fact]
@@ -276,8 +319,8 @@ namespace chocolatey.tests.infrastructure.app.services
                     c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
-        }
-
+        } 
+       
         public class when_registry_location_and_install_location_both_do_not_exist : AutomaticUninstallerServiceSpecsBase
         {
             public override void Context()
@@ -298,7 +341,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".format_with(expectedDisplayName)), Times.Once);
             }
 
             [Fact]
