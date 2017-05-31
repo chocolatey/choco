@@ -33,7 +33,10 @@ This is the Chocolatey Library (API / DLL) package which allows Chocolatey to be
 </description>
     <releaseNotes>See https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md</releaseNotes>
     <dependencies>
-      <dependency id="log4net" version="[2.0.3]" />
+      <group targetFramework="net40">
+        <dependency id="AlphaFS" version="2.0.1" />
+        <dependency id="log4net" version="[2.0.3]" />
+      </group>
     </dependencies>
   </metadata>
 </package>
