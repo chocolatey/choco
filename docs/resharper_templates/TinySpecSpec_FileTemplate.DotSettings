@@ -1,0 +1,67 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Description/@EntryValue">TinySpecSpec</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Text/@EntryValue">namespace $namespace$&#xD;
+{&#xD;
+    using Moq;&#xD;
+    using Should;&#xD;
+&#xD;
+    public class $name$&#xD;
+    {&#xD;
+        public abstract class $name$Base : TinySpec&#xD;
+        {&#xD;
+            protected $item_under_test$ itemUnderTest;&#xD;
+            &#xD;
+            public override void Context()&#xD;
+            {&#xD;
+				itemUnderTest = new $item_under_test$();&#xD;
+			}&#xD;
+        }&#xD;
+&#xD;
+        public class when_$item_under_test$_$has_context$ : $name$Base&#xD;
+        {&#xD;
+			private string result;&#xD;
+&#xD;
+            public override void Context()&#xD;
+            {&#xD;
+                base.Context();&#xD;
+            }&#xD;
+&#xD;
+            public override void Because()&#xD;
+            {&#xD;
+               result = $this_happened$&#xD;
+            }&#xD;
+&#xD;
+           	[Fact]&#xD;
+            public void should_$result_in$()&#xD;
+            {&#xD;
+               $END$&#xD;
+            }&#xD;
+        }&#xD;
+    }&#xD;
+}</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Categories/=Imported_00204_002F20_002F2014/@EntryIndexedValue">Imported 4/20/2014</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/CustomProperties/=FileName/@EntryIndexedValue">Spec</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/CustomProperties/=ValidateFileName/@EntryIndexedValue">False</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Scope/=E8F0594528C33E45BBFEC6CFE851095D/Type/@EntryValue">InCSharpProjectFile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=namespace/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=namespace/Expression/@EntryValue">fileDefaultNamespace()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=namespace/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=namespace/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=name/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=name/Expression/@EntryValue">getFileNameWithoutExtension()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=name/InitialRange/@EntryValue">-1</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=name/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=item_005Funder_005Ftest/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=item_005Funder_005Ftest/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=has_005Fcontext/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=has_005Fcontext/Order/@EntryValue">3</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=this_005Fhappened/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=this_005Fhappened/Order/@EntryValue">4</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=result_005Fin/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=66BEC5AFAD78714BA148EDF64BFB8F1B/Field/=result_005Fin/Order/@EntryValue">5</s:Int64></wpf:ResourceDictionary>
