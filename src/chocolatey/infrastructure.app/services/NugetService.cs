@@ -707,7 +707,7 @@ folder.");
 
                 if (installedPackage.Version == availablePackage.Version)
                 {
-                    string logMessage = "{0} v{1} is the latest version available based on your source(s).".format_with(installedPackage.Id, installedPackage.Version);
+                    string logMessage = "{0}{1} v{2} is the latest version available based on your source(s).".format_with(Environment.NewLine, installedPackage.Id, installedPackage.Version);
 
                     if (!config.Force)
                     {
