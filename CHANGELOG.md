@@ -6,16 +6,22 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 ## [0.10.6](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.6+is%3Aclosed) (unreleased)
 
+This release includes fixes and adjustments to the API to make it more usable. Search / List has also been improved with the data that it returns when verbose/detailed, along with info always returning a package with information instead of erroring sometimes. The search results from the community package repository now match what you see on the website.
+
 ### BUG FIXES
 
+ * Fix - choco.exe.manifest is ignored because it is extracted AFTER first choco.exe access - see [#1292](https://github.com/chocolatey/choco/issues/1292)
  * Fix - Chocolatey config changes in 0.10.4+ - The process cannot access the file because it is being used by another process - see [#1241](https://github.com/chocolatey/choco/issues/1241)
  * Fix - PowerShell sees authenticode hash as changed in scripts that are UTF8 (w/out BOM) that contain unicode characters - see [#1225](https://github.com/chocolatey/choco/issues/1225)
  * Fix - Chocolatey timed out immediately when execution timeout was infinite (0) - see [#1224](https://github.com/chocolatey/choco/issues/1224)
+ * Fix - Multiple authenticated sources with same base url fail when authentication is different - see [#1248](https://github.com/chocolatey/choco/issues/1248)
  * Fix - choco list / search / info - Some packages can't be found - see [#1004](https://github.com/chocolatey/choco/issues/1004)
  * Fix - chocolatey.config gets corrupted when multiple processes access simultaneously - see [#1258](https://github.com/chocolatey/choco/issues/1258)
  * Fix - Update ShimGen to 0.8.x to address some issues - see [#1243](https://github.com/chocolatey/choco/issues/1243)
+ * Fix - AutoUninstaller should skip uninstall keys if they are empty - see [#1315](https://github.com/chocolatey/choco/issues/1315)
  * Fix - Trace logging should only occur on when trace is enabled - see [#1309](https://github.com/chocolatey/choco/issues/1309)
  * Fix - RefreshEnv.cmd doesn't set the correct PATH - see [#1227](https://github.com/chocolatey/choco/issues/1227)
+ * Fix - choco new generates uninstall template with wrong use of registry key variable - see [#1304](https://github.com/chocolatey/choco/issues/1304)
  * [API] Fix- chocolatey.lib nuget package has incorrect documentation xml - see [#1247](https://github.com/chocolatey/choco/issues/1247)
  * [API] Fix - Chocolatey file cache still adds a 'chocolatey' directory on each install - see [#1231](https://github.com/chocolatey/choco/issues/1231)
  * [API] Fix - List and Count should implement similar functionality as run - see [#1298](https://github.com/chocolatey/choco/issues/1298)
