@@ -4,7 +4,7 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
-## [0.10.6](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.6+is%3Aclosed) (unreleased)
+## [0.10.6](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.6+is%3Aclosed) (June 1, 2017)
 
 This release includes fixes and adjustments to the API to make it more usable. Search / List has also been improved with the data that it returns when verbose/detailed, along with info always returning a package with information instead of erroring sometimes. The search results from the community package repository now match what you see on the website.
 
