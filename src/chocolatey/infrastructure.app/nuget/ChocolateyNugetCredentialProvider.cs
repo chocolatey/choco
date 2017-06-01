@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.nuget
     using System;
     using System.Linq;
     using System.Net;
+    using System.Text.RegularExpressions;
     using commandline;
     using NuGet;
     using configuration;
@@ -49,8 +50,11 @@ namespace chocolatey.infrastructure.app.nuget
             }
 
             var configSourceUri = new Uri(INVALID_URL);
+
+            this.Log().Debug(ChocolateyLoggers.Verbose, "Attempting to gather credentials for '{0}'".format_with(uri.OriginalString));
             try
             {
+                // the source to validate against is typically passed in
                 var firstSpecifiedSource = _config.Sources.to_string().Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault().to_string();
                 if (!string.IsNullOrWhiteSpace(firstSpecifiedSource))
                 {
@@ -62,6 +66,7 @@ namespace chocolatey.infrastructure.app.nuget
                 this.Log().Warn("Cannot determine uri from specified source:{0} {1}".format_with(Environment.NewLine, ex.Message));
             }
 
+            // did the user pass credentials and a source?
             if (_config.Sources.TrimEnd('/').is_equal_to(uri.OriginalString.TrimEnd('/')) || configSourceUri.Host.is_equal_to(uri.Host))
             {
                 if (!string.IsNullOrWhiteSpace(_config.SourceCommand.Username) && !string.IsNullOrWhiteSpace(_config.SourceCommand.Password))
@@ -72,15 +77,12 @@ namespace chocolatey.infrastructure.app.nuget
                 }
             }
 
-            var source = _config.MachineSources.FirstOrDefault(s =>
+            // credentials were not explicit
+            // discover based on closest match in sources
+            var candidateSources = _config.MachineSources.Where(
+                s =>
                 {
                     var sourceUrl = s.Key.TrimEnd('/');
-
-                    var equalAtFullUri = sourceUrl.is_equal_to(uri.OriginalString.TrimEnd('/'))
-                       && !string.IsNullOrWhiteSpace(s.Username)
-                       && !string.IsNullOrWhiteSpace(s.EncryptedPassword);
-
-                    if (equalAtFullUri) return true;
 
                     try
                     {
@@ -95,15 +97,49 @@ namespace chocolatey.infrastructure.app.nuget
                     }
 
                     return false;
-                });
+                }).ToList();
+
+            MachineSourceConfiguration source = null;
+
+
+            if (candidateSources.Count == 1)
+            {
+                // only one match, use it
+                source = candidateSources.FirstOrDefault();
+            }
+            else if (candidateSources.Count > 1)
+            {
+                // find the source that is the closest match
+                foreach (var candidateSource in candidateSources.or_empty_list_if_null())
+                {
+                    var candidateRegEx = new Regex(Regex.Escape(candidateSource.Key.TrimEnd('/')),RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+                    if (candidateRegEx.IsMatch(uri.OriginalString.TrimEnd('/')))
+                    {
+                        this.Log().Debug("Source selected will be '{0}'".format_with(candidateSource.Key.TrimEnd('/')));
+                        source = candidateSource;
+                        break;
+                    }
+                }
+
+                if (source == null && !retrying)
+                {
+                    // use the first source. If it fails, fall back to grabbing credentials from the user
+                    var candidateSource = candidateSources.First();
+                    this.Log().Debug("Evaluated {0} candidate sources but was unable to find a match, using {1}".format_with(candidateSources.Count, candidateSource.Key.TrimEnd('/')));
+                    source = candidateSource;
+                }
+            }
 
             if (source == null)
             {
+                this.Log().Debug("Asking user for credentials for '{0}'".format_with(uri.OriginalString));
                 return get_credentials_from_user(uri, proxy, credentialType);
             }
-           
-            this.Log().Debug("Using saved credentials");
-
+            else
+            {
+                this.Log().Debug("Using saved credentials");
+            }
+            
             return new NetworkCredential(source.Username, NugetEncryptionUtility.DecryptString(source.EncryptedPassword));
         }
 
