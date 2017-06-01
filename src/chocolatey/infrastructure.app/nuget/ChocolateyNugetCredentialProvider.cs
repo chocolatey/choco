@@ -44,6 +44,7 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 throw new ArgumentNullException("uri");
             }
+
             if (retrying)
             {
                 this.Log().Warn("Invalid credentials specified.");
