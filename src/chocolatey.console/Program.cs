@@ -122,7 +122,7 @@ namespace chocolatey.console
 
                 remove_old_chocolatey_exe(fileSystem);
 
-                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(Program)), ApplicationParameters.InstallLocation, new List<string>(), "chocolatey.console");
+                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(Program)), ApplicationParameters.InstallLocation, new List<string>(), "chocolatey.console", throwError:false);
                 //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
                 IList<string> folders = new List<string>
                     {
@@ -131,7 +131,7 @@ namespace chocolatey.console
                         "redirects",
                         "tools"
                     };
-                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
+                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources, throwError: false);
 
                 var application = new ConsoleApplication();
                 application.run(args, config, container);
