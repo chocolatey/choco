@@ -31,6 +31,7 @@ namespace chocolatey.console
     using infrastructure.licensing;
     using infrastructure.logging;
     using infrastructure.registration;
+    using infrastructure.tolerance;
     using resources;
     using Assembly = infrastructure.adapters.Assembly;
     using Console = System.Console;
@@ -226,15 +227,18 @@ namespace chocolatey.console
 
         private static void remove_old_chocolatey_exe(IFileSystem fileSystem)
         {
-            try
-            {
-                fileSystem.delete_file(fileSystem.get_current_assembly_path() + ".old");
-                fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
-            }
-            catch (Exception ex)
-            {
-                "chocolatey".Log().Warn("Attempting to delete choco.exe.old ran into an issue:{0} {1}".format_with(Environment.NewLine, ex.Message));
-            }
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                {
+                    fileSystem.delete_file(fileSystem.get_current_assembly_path() + ".old");
+                    fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
+                },
+                errorMessage: "Attempting to delete choco.exe.old ran into an issue",
+                throwError: false,
+                logWarningInsteadOfError: true,
+                logDebugInsteadOfError: false,
+                isSilent: true
+                );
         }
 
         private static void pause_execution_if_debug()
