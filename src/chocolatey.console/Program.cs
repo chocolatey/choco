@@ -109,7 +109,7 @@ namespace chocolatey.console
                 if (config.HelpRequested || config.UnsuccessfulParsing)
                 {
                     pause_execution_if_debug();
-                    Environment.Exit(config.UnsuccessfulParsing? 1 : 0);
+                    Environment.Exit(config.UnsuccessfulParsing ? 1 : 0);
                 }
 
                 var verboseAppenderName = "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string());
