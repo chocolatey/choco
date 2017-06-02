@@ -17,14 +17,12 @@
 namespace chocolatey.infrastructure.app.registration
 {
     using System.Collections.Generic;
-    using configuration;
     using infrastructure.events;
     using infrastructure.tasks;
     using NuGet;
     using SimpleInjector;
     using adapters;
     using commands;
-    using cryptography;
     using filesystem;
     using infrastructure.commands;
     using infrastructure.configuration;
@@ -70,7 +68,6 @@ namespace chocolatey.infrastructure.app.registration
             container.Register<IChocolateyConfigSettingsService, ChocolateyConfigSettingsService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);
             container.Register<IAutomaticUninstallerService, AutomaticUninstallerService>(Lifestyle.Singleton);
-            container.Register<IFileTypeDetectorService, FileTypeDetectorService>(Lifestyle.Singleton);
             container.Register<ICommandExecutor, CommandExecutor>(Lifestyle.Singleton);
             container.Register(() => new CustomString(string.Empty));
 
