@@ -414,7 +414,8 @@ namespace chocolatey
             }
             catch (Exception ex)
             {
-                this.Log().Error("Unable to extract resources. Please ensure the ChocolateyInstall environment variable is set properly. Details:{0} {1}".format_with(Environment.NewLine,ex.ToString()));
+                this.Log().Warn(ChocolateyLoggers.Important, "Please ensure that ChocolateyInstall environment variable is set properly and you've run once as an administrator to ensure all resources are extracted.");
+                this.Log().Error("Unable to extract resources. Please ensure the ChocolateyInstall environment variable is set properly. You may need to run once as an admin to ensure all resources are extracted. Details:{0} {1}".format_with(Environment.NewLine,ex.ToString()));
             }
 
         }
