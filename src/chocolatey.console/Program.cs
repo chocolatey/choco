@@ -31,6 +31,7 @@ namespace chocolatey.console
     using infrastructure.licensing;
     using infrastructure.logging;
     using infrastructure.registration;
+    using infrastructure.tolerance;
     using resources;
     using Assembly = infrastructure.adapters.Assembly;
     using Console = System.Console;
@@ -109,7 +110,7 @@ namespace chocolatey.console
                 if (config.HelpRequested || config.UnsuccessfulParsing)
                 {
                     pause_execution_if_debug();
-                    Environment.Exit(config.UnsuccessfulParsing? 1 : 0);
+                    Environment.Exit(config.UnsuccessfulParsing ? 1 : 0);
                 }
 
                 var verboseAppenderName = "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string());
@@ -122,7 +123,7 @@ namespace chocolatey.console
 
                 remove_old_chocolatey_exe(fileSystem);
 
-                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(Program)), ApplicationParameters.InstallLocation, new List<string>(), "chocolatey.console");
+                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(Program)), ApplicationParameters.InstallLocation, new List<string>(), "chocolatey.console", throwError:false);
                 //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
                 IList<string> folders = new List<string>
                     {
@@ -131,7 +132,7 @@ namespace chocolatey.console
                         "redirects",
                         "tools"
                     };
-                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
+                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources, throwError: false);
 
                 var application = new ConsoleApplication();
                 application.run(args, config, container);
@@ -226,15 +227,18 @@ namespace chocolatey.console
 
         private static void remove_old_chocolatey_exe(IFileSystem fileSystem)
         {
-            try
-            {
-                fileSystem.delete_file(fileSystem.get_current_assembly_path() + ".old");
-                fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
-            }
-            catch (Exception ex)
-            {
-                "chocolatey".Log().Warn("Attempting to delete choco.exe.old ran into an issue:{0} {1}".format_with(Environment.NewLine, ex.Message));
-            }
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                {
+                    fileSystem.delete_file(fileSystem.get_current_assembly_path() + ".old");
+                    fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
+                },
+                errorMessage: "Attempting to delete choco.exe.old ran into an issue",
+                throwError: false,
+                logWarningInsteadOfError: true,
+                logDebugInsteadOfError: false,
+                isSilent: true
+                );
         }
 
         private static void pause_execution_if_debug()
