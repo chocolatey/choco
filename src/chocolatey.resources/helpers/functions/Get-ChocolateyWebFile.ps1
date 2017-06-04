@@ -123,6 +123,11 @@ https://support.microsoft.com/en-us/kb/811833 for more details.
 
 The recommendation is to use at least SHA256.
 
+.PARAMETER Credential
+OPTIONAL - A System.Net.ICredentials object that contains credentials to
+use to authenticate to the URL server. This is just ultimately passed
+onto System.Net.HttpWebRequest Crentials property. Available in 0.10.4+
+
 .PARAMETER Options
 OPTIONAL - Specify custom headers. Available in 0.9.10+.
 
@@ -197,6 +202,7 @@ param(
   [parameter(Mandatory=$false)][string] $checksumType = '',
   [parameter(Mandatory=$false)][string] $checksum64 = '',
   [parameter(Mandatory=$false)][string] $checksumType64 = $checksumType,
+  [parameter(Mandatory=$false)][Object] $credential = $null,
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
   [parameter(Mandatory=$false)][switch] $getOriginalFileName,
   [parameter(Mandatory=$false)][switch] $forceDownload,
@@ -269,7 +275,7 @@ param(
   if ($url.StartsWith('http:')) {
     try {
       $httpsUrl = $url.Replace("http://", "https://")
-      Get-WebHeaders -Url $httpsUrl -ErrorAction "Stop" | Out-Null
+      Get-WebHeaders -Url $httpsUrl -ErrorAction "Stop" -Credential $credential | Out-Null
       $url = $httpsUrl
       Write-Warning "Url has SSL/TLS available, switching to HTTPS for download"
     } catch {
@@ -282,7 +288,7 @@ param(
       $fileFullPath = $fileFullPath -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
       $fileDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
       $originalFileName = [System.IO.Path]::GetFileName($fileFullPath)
-      $fileFullPath = Get-WebFileName -Url $url -DefaultName $originalFileName
+      $fileFullPath = Get-WebFileName -Url $url -DefaultName $originalFileName -Credential $credential
       $fileFullPath = Join-Path $fileDirectory $fileFullPath
       $fileFullPath = [System.IO.Path]::GetFullPath($fileFullPath)
     } catch {
@@ -303,7 +309,7 @@ param(
   $headers = @{}
   if ($url.StartsWith('http')) {
     try {
-      $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
+      $headers = Get-WebHeaders -Url $url -ErrorAction "Stop" -Credential $credential
     } catch {
       if ($host.Version -lt (New-Object 'Version' 3,0)) {
         Write-Debug "Converting Security Protocol to SSL3 only for Powershell v2"
@@ -311,7 +317,7 @@ param(
         $originalProtocol = [System.Net.ServicePointManager]::SecurityProtocol
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Ssl3
         try {
-          $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
+          $headers = Get-WebHeaders -Url $url -ErrorAction "Stop" -Credential $credential
         } catch {
           Write-Host "Attempt to get headers for $url failed.`n  $($_.Exception.Message)"
           [System.Net.ServicePointManager]::SecurityProtocol = $originalProtocol
@@ -342,7 +348,7 @@ param(
     if ($needsDownload) {
       Write-Host "Downloading $packageName $bitPackage
   from `'$url`'"
-      Get-WebFile -Url $url -FileName $fileFullPath -Options $options
+      Get-WebFile -Url $url -FileName $fileFullPath -Credential $credential -Options $options
     } else {
       Write-Debug "$($packageName)'s requested file has already been downloaded. Using cached copy at
  '$fileFullPath'."

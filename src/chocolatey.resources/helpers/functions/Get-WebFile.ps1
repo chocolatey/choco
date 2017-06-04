@@ -57,6 +57,11 @@ package folder next to the install script, the path will be like
 The user agent to use as part of the request. Defaults to 'chocolatey
 command line'.
 
+.PARAMETER Credential
+OPTIONAL - A System.Net.ICredentials object that contains credentials to
+use to authenticate to the URL server. This is just ultimately passed
+onto System.Net.HttpWebRequest Crentials property. Available in 0.10.4+
+
 .PARAMETER PassThru
 DO NOT USE - holdover from original function.
 
@@ -85,6 +90,7 @@ param(
   [parameter(Mandatory=$false, Position=0)][string] $url = '', #(Read-Host "The URL to download"),
   [parameter(Mandatory=$false, Position=1)][string] $fileName = $null,
   [parameter(Mandatory=$false, Position=2)][string] $userAgent = 'chocolatey command line',
+  [parameter(Mandatory=$false)][Object] $credential = $null,
   [parameter(Mandatory=$false)][switch] $Passthru,
   [parameter(Mandatory=$false)][switch] $quiet,
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
@@ -109,7 +115,9 @@ param(
 
   $req = [System.Net.HttpWebRequest]::Create($url);
   $defaultCreds = [System.Net.CredentialCache]::DefaultCredentials
-  if ($defaultCreds -ne $null) {
+  if ($credential -ne $null) {
+    $req.Credentials = $credential
+  } elseif ($defaultCreds -ne $null) {
     $req.Credentials = $defaultCreds
   }
 
