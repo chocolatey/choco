@@ -60,14 +60,14 @@ namespace chocolatey.infrastructure.app.nuget
 
             IQueryable<IPackage> results = packageRepository.Search(searchTermLower, configuration.Prerelease);
 
-            if (configuration.ListCommand.Page.HasValue)
-            {
-                results = results.Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
-            }
-           
             if (configuration.ListCommand.Exact)
             {
                 results = packageRepository.FindPackagesById(searchTermLower).AsQueryable();
+            }
+
+            if (configuration.ListCommand.Page.HasValue)
+            {
+                results = results.Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
             }
 
             if (configuration.ListCommand.ByIdOnly)
