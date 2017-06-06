@@ -10,7 +10,7 @@
            
             Set level to "asInvoker" when you want choco to run under the context
              of the user invoking. This is the same as Chocolatey behavior prior 
-             to 0.10.4.
+             to 0.10.4 and after 0.10.7.
              
             Set level to "requireAdministrator" to only allow administrators to 
              run Chocolatey.
@@ -18,7 +18,7 @@
             Set level to "highestAvailable" to allow non-admins to run in 
              non-administrative context, but require administrators to always run
              with administrative privileges. This is the recommended and default
-             behavior of Chocolatey v0.10.4+.
+             behavior of Chocolatey v0.10.4-0.10.6.1.
             
             NOTE: Currently you will need to make this change every time 
              Chocolatey is re-installed or upgraded (every new version). At least
@@ -28,7 +28,7 @@
              and Registry Virtualization for backward compatibility then delete 
              the requestedExecutionLevel node.
         -->
-        <requestedExecutionLevel level="highestAvailable" uiAccess="false" />
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
       </requestedPrivileges>
     </security>
   </trustInfo>
