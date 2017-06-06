@@ -129,7 +129,7 @@ Install-ChocolateyPinnedTaskBarItem
     [parameter(ValueFromRemainingArguments = $true)][Object[]]$ignoredArguments
 	)
 
-	Write-Debug "Running 'Install-ChocolateyShortcut' with parameters ShortcutFilePath: `'$shortcutFilePath`', TargetPath: `'$targetPath`', WorkingDirectory: `'$workingDirectory`', Arguments: `'$arguments`', IconLocation: `'$iconLocation`', Description: `'$description`', WindowStyle: `'$windowStyle`', RunAsAdmin: `'$runAsAdmin`', PinToTaskbar: `'$pinToTaskbar`'";
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
 	# http://powershell.com/cs/blogs/tips/archive/2009/02/05/validating-a-url.aspx
 	function isURIWeb($address) {

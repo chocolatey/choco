@@ -52,8 +52,8 @@ param(
   [parameter(ValueFromRemainingArguments = $true)][Object[]]$ignoredArguments
 )
 
-  Write-Debug "Running 'Install-ChocolateyPinnedTaskBarItem' with targetFilePath:`'$targetFilePath`'";
-
+  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+ 
   try{
 	if (test-path($targetFilePath)) {
 		$verb = "Pin To Taskbar"
