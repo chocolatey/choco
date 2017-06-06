@@ -299,9 +299,9 @@ param(
   $tempDir = $tempDir -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
 
   if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
-  $file = Join-Path $tempDir "$($packageName)Install.$fileType"
+  $downloadFilePath = Join-Path $tempDir "$($packageName)Install.$fileType"
 
-  [string]$filePath = $file
+  [string]$filePath = $downloadFilePath
   if ($useOriginalLocation) {
     $filePath = $url
     if (Get-ProcessorBits 64) {
@@ -316,7 +316,7 @@ param(
     }
   } else {
     $filePath = Get-ChocolateyWebFile -PackageName $packageName `
-                                      -FileFullPath $file `
+                                      -FileFullPath $downloadFilePath `
                                       -Url $url `
                                       -Url64bit $url64bit `
                                       -Checksum $checksum `

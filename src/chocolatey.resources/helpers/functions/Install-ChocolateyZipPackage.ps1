@@ -198,10 +198,10 @@ param(
   $tempDir = Join-Path $chocTempDir "$($env:chocolateyPackageName)"
   if ($env:chocolateyPackageVersion -ne $null) {$tempDir = Join-Path $tempDir "$($env:chocolateyPackageVersion)"; }
   $tempDir = $tempDir -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+  if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
+  $downloadFilePath = Join-Path $tempDir "$($packageName)Install.$fileType"
 
-  if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir) | Out-Null}
-  $file = Join-Path $tempDir "$($packageName)Install.$fileType"
 
-  $filePath = Get-ChocolateyWebFile $packageName $file $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
+  $filePath = Get-ChocolateyWebFile $packageName $downloadFilePath $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
   Get-ChocolateyUnzip "$filePath" $unzipLocation $specificFolder $packageName
 }
