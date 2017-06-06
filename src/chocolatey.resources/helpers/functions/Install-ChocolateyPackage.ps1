@@ -91,13 +91,6 @@ a 32 bit installation on a 64 bit system.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
-In 0.10.6+, `File` and `FileFullPath` are aliases for Url. These 
-aliases, if used in earlier versions of Chocolatey, produce `ERROR: 
-Cannot bind parameter because parameter 'fileType' is specified more 
-than once.` See https://github.com/chocolatey/choco/issues/1284. Do not
-use these aliases with the community package repository until January
-2018.
-
 .PARAMETER Url64bit
 OPTIONAL - If there is a 64 bit resource available, use this
 parameter. Chocolatey will automatically determine if the user is
@@ -108,13 +101,6 @@ contains both (which is quite rare), set this to '$url' Otherwise remove
 this parameter.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
-
-In 0.10.6+, `File64` and `FileFullPath64` are aliases for Url64Bit. 
-These aliases, if used in earlier versions of Chocolatey, produce 
-`ERROR: Cannot bind parameter because parameter 'fileType' is specified
-more than once.` See https://github.com/chocolatey/choco/issues/1284. 
-Do not use these aliases with the community package repository until 
-January 2018.
 
 .PARAMETER ValidExitCodes
 Array of exit codes indicating success. Defaults to `@(0)`.
@@ -182,6 +168,18 @@ The recommendation is to use at least SHA256.
 
 .PARAMETER Options
 OPTIONAL - Specify custom headers. Available in 0.9.10+.
+
+.PARAMETER File
+Will be used for Url if Url is empty. Available in 0.10.7+.
+
+This parameter provides compatibility, but should not be used directly
+and not with the community package repository until January 2018.
+
+.PARAMETER File64
+Will be used for Url64bit if Url64bit is empty. Available in 0.10.7+.
+
+This parameter provides compatibility, but should not be used directly
+and not with the community package repository until January 2018.
 
 .PARAMETER UseOnlyPackageSilentArguments
 Do not allow choco to provide/merge additional silent arguments and only
@@ -275,15 +273,17 @@ param(
   [parameter(Mandatory=$false, Position=1)]
   [alias("installerType","installType")][string] $fileType = 'exe',
   [parameter(Mandatory=$false, Position=2)][string[]] $silentArgs = '',
-  [alias("file","fileFullPath")][parameter(Mandatory=$false, Position=3)][string] $url = '',
+  [parameter(Mandatory=$false, Position=3)][string] $url = '',
   [parameter(Mandatory=$false, Position=4)]
-  [alias("url64","file64","fileFullPath64")][string] $url64bit = '',
+  [alias("url64")][string] $url64bit = '',
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
   [parameter(Mandatory=$false)][string] $checksum = '',
   [parameter(Mandatory=$false)][string] $checksumType = '',
   [parameter(Mandatory=$false)][string] $checksum64 = '',
   [parameter(Mandatory=$false)][string] $checksumType64 = '',
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
+  [alias("fileFullPath")][parameter(Mandatory=$false)][string] $file = '',
+  [alias("fileFullPath64")][parameter(Mandatory=$false)][string] $file64 = '',
   [parameter(Mandatory=$false)]
   [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
   [parameter(Mandatory=$false)][switch]$useOriginalLocation,
@@ -299,6 +299,13 @@ param(
   $tempDir = $tempDir -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
   $downloadFilePath = Join-Path $tempDir "$($packageName)Install.$fileType"
+
+  if ($url -eq '' -or $url -eq $null) {
+    $url = $file
+  } 
+  if ($url64bit -eq '' -or $url64bit -eq $null) {
+    $url64bit = $file64
+  }
 
   [string]$filePath = $downloadFilePath
   if ($useOriginalLocation) {
