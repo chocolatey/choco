@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading;
     using commandline;
     using configuration;
@@ -104,12 +105,25 @@ namespace chocolatey.infrastructure.app.services
 
             // split on " /" and " -" for quite a bit more accuracy
             IList<string> uninstallArgsSplit = key.UninstallString.to_string().Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            var uninstallExe = uninstallArgsSplit.DefaultIfEmpty(string.Empty).FirstOrDefault();
+            var uninstallExe = uninstallArgsSplit.DefaultIfEmpty(string.Empty).FirstOrDefault().trim_safe();
             if (uninstallExe.Count(u => u == '"') > 2)
             {
                 uninstallExe = uninstallExe.Split(new []{" \""}, StringSplitOptions.RemoveEmptyEntries).First();
             }
-            var uninstallArgs = key.UninstallString.to_string().Replace(uninstallExe.to_string(), string.Empty);
+
+            if (uninstallExe.Count(u => u == ':') > 1)
+            {
+                try
+                {
+                    var firstMatch = Regex.Match(uninstallExe, @"\s+\w\:",RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+                    uninstallExe = uninstallExe.Substring(0, firstMatch.Index);
+                }
+                catch (Exception ex)
+                {
+                   this.Log().Debug("Error splitting the uninstall string:{0} {1}".format_with(Environment.NewLine,ex.to_string()));
+                }
+            }
+            var uninstallArgs = key.UninstallString.to_string().Replace(uninstallExe.to_string(), string.Empty).trim_safe();
             uninstallExe = uninstallExe.remove_surrounding_quotes();
             this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
 

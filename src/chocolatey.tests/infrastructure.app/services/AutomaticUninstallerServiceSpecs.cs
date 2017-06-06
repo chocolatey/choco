@@ -424,6 +424,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 registryKeys.Add(
                     new RegistryApplicationKey
                     {
+                        DisplayName = expectedDisplayName,
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
                         UninstallString = uninstallStringWithQuoteSeparation,
                         HasQuietUninstall = true,
@@ -452,6 +453,56 @@ namespace chocolatey.tests.infrastructure.app.services
                         c.execute(
                             expectedUninstallString,
                             "\"WinDir Stat\"".trim_safe(),
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
+            }
+        } 
+        
+        public class when_uninstall_string_has_multiple_file_paths : AutomaticUninstallerServiceSpecsBase
+        {
+            private readonly string uninstallStringPointingToPath = @"C:\Programs\WinDirStat\Uninstall.exe D:\Programs\WinDirStat";
+            protected readonly string expectedUninstallStringMultiplePaths = @"C:\Programs\WinDirStat\Uninstall.exe";
+
+            public override void Context()
+            {
+                base.Context();
+                registryKeys.Clear();
+                registryKeys.Add(
+                    new RegistryApplicationKey
+                    {
+                        DisplayName = expectedDisplayName,
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = uninstallStringPointingToPath,
+                        HasQuietUninstall = true,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                        InstallerType = installerType.InstallerType,
+                    });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallStringMultiplePaths)).Returns(true);
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_call_get_package_information()
+            {
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_call_command_executor()
+            {
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallStringMultiplePaths,
+                            @"D:\Programs\WinDirStat".trim_safe(),
                             It.IsAny<int>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),
