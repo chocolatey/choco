@@ -286,7 +286,7 @@ param(
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
   [parameter(Mandatory=$false)]
   [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
-  [switch]$useOriginalLocation,
+  [parameter(Mandatory=$false)][switch]$useOriginalLocation,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   [string]$silentArgs = $silentArgs -join ' '
