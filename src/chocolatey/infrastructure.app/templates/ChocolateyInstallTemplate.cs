@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.templates
 
 $ErrorActionPreference = 'Stop'; # stop on all errors
 [[AutomaticPackageNotesInstaller]]
-$packageName= '[[PackageName]]' # arbitrary name for the package, used in messages
+$packageName= $env:ChocolateyPackageName
 $toolsDir   = ""$(Split-Path -parent $MyInvocation.MyCommand.Definition)""
 $url        = '[[Url]]' # download url, HTTPS preferred
 $url64      = '[[Url64]]' # 64bit URL here (HTTPS preferred) or remove - if installer contains both (very rare), use $url
@@ -51,19 +51,19 @@ $packageArgs = @{
   checksum64    = '[[Checksum64]]'
   checksumType64= '[[ChecksumType64]]' #default is checksumType
 
-  #MSI
+  # MSI
   silentArgs    = ""[[SilentArgs]]"" # ALLUSERS=1 DISABLEDESKTOPSHORTCUT=1 ADDDESKTOPICON=0 ADDSTARTMENU=0
   validExitCodes= @(0, 3010, 1641)
-  #OTHERS
+  # OTHERS
   # Uncomment matching EXE type (sorted by most to least common)
   #silentArgs   = '/S'           # NSIS
   #silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   #silentArgs   = '/s'           # InstallShield
-  #silentArgs   = '/s /v""/qn""' # InstallShield with MSI
+  #silentArgs   = '/s /v""/qn""'   # InstallShield with MSI
   #silentArgs   = '/s'           # Wise InstallMaster
   #silentArgs   = '-s'           # Squirrel
   #silentArgs   = '-q'           # Install4j
-  #silentArgs   = '-s -u'        # Ghost
+  #silentArgs   = '-s'           # Ghost
   # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
   #silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
                                  #       https://chocolatey.org/packages/autohotkey.portable
