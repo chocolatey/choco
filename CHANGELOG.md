@@ -4,9 +4,34 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
+## [0.10.7](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.7+is%3Aclosed) (June 8, 2017)
+
+### BREAKING CHANGES
+
+ * Set requested execution level back to asInvoker while determining more advanced elevated scenarios - see [#1324](https://github.com/chocolatey/choco/issues/1324)
+
+    After much deliberation with the community, we're moving execution policy back to the default of `asInvoker` to make it work like it did prior to 0.10.4. However we are leaving it open for you to change it to whatever execution level you want by keeping the manifest external from choco.exe. We will be looking more at advanced scenarios - the discussion is at [#1307](https://github.com/chocolatey/choco/issues/1307). If you don't have a GitHub account, feel free to start a thread on the mailing list (and if you are a customer, you have private channels to voice your opinions on this change).
+
+    Moving to "asInvoker" means that Chocolatey will not ask for elevated privileges prior to execution, so you will need to remember to do that yourself. If you go to `$env:ChocolateyInstall`, you will find `choco.exe.manifest`, and you have freedom to adjust the execution level as you see fit. There is one catch, you will need to do it on every install/upgrade of Chocolatey until [#1206](https://github.com/chocolatey/choco/issues/1206) is implemented.
+
+### BUG FIXES
+
+ * Fix - Add file/file64 not as aliases, but use them to set url/url64 if empty - see [#1323](https://github.com/chocolatey/choco/issues/1323)
+ * Fix - Automatic Uninstaller doesn't split multiple paths - see [#1327](https://github.com/chocolatey/choco/issues/1327)
+ * Fix - choco list / search / info - fails with local directory source - see [#1325](https://github.com/chocolatey/choco/issues/1325)
+ * Fix - When version is four digits, Chocolatey version heading is not shown - see [#1326](https://github.com/chocolatey/choco/issues/1326)
+ * Fix - search / list - page/page-size not honored for exact search in 0.10.6 - see [#1322](https://github.com/chocolatey/choco/issues/1322)
+ * Fix - Deserializing failures on package info files should not fail the choco run - see [#1328](https://github.com/chocolatey/choco/issues/1328)
+
+### IMPROVEMENTS
+
+ * Use `$packageArgs` in default template for uninstall script - see [#1330](https://github.com/chocolatey/choco/issues/1330)
+
+
 ## [0.10.6.1](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.6.1+is%3Aclosed) (June 3, 2017)
 
 ### BUG FIXES
+
  * Fix - shimgen fails with unrecognized option: '/errorendlocation' in .NET 4.0 only environments - see [#1321](https://github.com/chocolatey/choco/issues/1321)
  * Fix - Do not fail extracting resources at runtime - see [#1318](https://github.com/chocolatey/choco/issues/1318)
  * Fix - Silently fail when deleting choco.exe.old - see [#1319](https://github.com/chocolatey/choco/issues/1319)
