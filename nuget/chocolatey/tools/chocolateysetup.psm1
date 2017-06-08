@@ -609,9 +609,11 @@ if (Test-Path($ChocolateyProfile)) {
 '@
 
     $chocoProfileSearch = '$ChocolateyProfile'
-    if(Select-String -Path $profileFile -Pattern $chocoProfileSearch -Quiet -SimpleMatch) {
-      Write-Debug "Chocolatey profile is already installed."
-      return
+    if (Test-Path($profileFile)) {
+      if(Select-String -Path $profileFile -Pattern $chocoProfileSearch -Quiet -SimpleMatch) {
+        Write-Debug "Chocolatey profile is already installed."
+        return
+      }
     }
 
     Write-Output 'Adding Chocolatey to the profile. This will provide tab completion, refreshenv, etc.'
