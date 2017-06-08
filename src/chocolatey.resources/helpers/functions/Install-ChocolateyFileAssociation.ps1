@@ -61,6 +61,7 @@ param(
 )
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+
   if(-not(Test-Path $executable)){
     $errorMessage = "`'$executable`' does not exist, not able to create association"
     Write-Error $errorMessage

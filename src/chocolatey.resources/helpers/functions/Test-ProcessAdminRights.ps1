@@ -36,6 +36,8 @@ None
 System.Boolean
 #>
 
+  # do not log function call
+
   $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent([Security.Principal.TokenAccessLevels]'Query,Duplicate'))
   $isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
   Write-Debug "Test-ProcessAdminRights: returning $isAdmin"

@@ -144,7 +144,12 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
 
 #### PowerShell
  * PowerShell must be CRLF and UTF-8. Git attributes are not used, so Git will not ensure this for you.
+ * The minimum version of PowerShell this must work with is v2. This makes things somewhat more limited but compatible across the board for all areas Chocolatey is deployed. It is getting harder to find a reference for PowerShell v2, but this is a good one: http://adamringenberg.com/powershell2/table-of-contents/.
  * If you add a new file, also ensure you add it to the Visual Studio project and ensure it becomes an embedded resource.
+ * The last parameter in every function must be `[parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments`. This allows for future expansion and compatibility - as new parameters are introduced and used, it doesn't break older versions of Chocolatey.
+ * Do not add new positional elements to functions. We want to promote using named parameters in calling functions.
+ * Do not remove any existing positional elements from functions. We need to maintain compatibility with older versions of Chocolatey.
+ * One of the first calls in a function is to debug what was passed to it - `Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters`
 
 ### Debugging / Testing
 

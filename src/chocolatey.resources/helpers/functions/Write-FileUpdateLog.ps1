@@ -57,7 +57,6 @@ param (
 )
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
-
   Write-Warning "Write-FileUpdateLog has been deprecated and will be removed in v1."
 
   Write-Debug "Tracking current state of `'$locationToMonitor`'"

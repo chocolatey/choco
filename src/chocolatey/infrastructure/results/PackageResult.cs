@@ -51,9 +51,19 @@ namespace chocolatey.infrastructure.results
             var sources = new List<Uri>();
             if (!string.IsNullOrEmpty(source))
             {
-                sources.AddRange(source.Split(new[] {";", ","}, StringSplitOptions.RemoveEmptyEntries).Select(s => new Uri(s)));
+                try
+                {
+                    sources.AddRange(source.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries).Select(s => new Uri(s)));
+                }
+                catch (Exception ex)
+                {
+                    this.Log().Debug("Unable to determine sources from '{0}'. Using value as is.{1} {2}".format_with(source, Environment.NewLine, ex.to_string()));
+                    // source is already set above
+                    return;
+                }
             }
 
+            
             var rp = Package as DataServicePackage;
             if (rp != null && rp.DownloadUrl != null)
             {

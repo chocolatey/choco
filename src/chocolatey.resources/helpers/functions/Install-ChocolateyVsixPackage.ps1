@@ -54,13 +54,6 @@ Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
 In 0.10.4+, `Url` is an alias for VsixUrl.
 
-In 0.10.6+, `File` and `FileFullPath` are aliases for VsixUrl. These 
-aliases, if used in earlier versions of Chocolatey, may produce `ERROR: 
-Cannot bind parameter because parameter 'fileType' is specified more 
-than once.` See https://github.com/chocolatey/choco/issues/1284. Do not
-use these aliases with the community package repository until January
-2018.
-
 .PARAMETER VsVersion
 The major version number of Visual Studio where the
 package should be installed. This is optional. If not
@@ -108,6 +101,12 @@ The recommendation is to use at least SHA256.
 .PARAMETER Options
 OPTIONAL - Specify custom headers. Available in 0.9.10+.
 
+.PARAMETER File
+Will be used for VsixUrl if VsixUrl is empty. Available in 0.10.7+.
+
+This parameter provides compatibility, but should not be used directly
+and not with the community package repository until January 2018.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -139,14 +138,21 @@ Install-ChocolateyZipPackage
 #>
 param(
   [alias("name")][parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [alias("url","file","fileFullPath")][parameter(Mandatory=$false, Position=1)][string] $vsixUrl,
+  [alias("url")][parameter(Mandatory=$false, Position=1)][string] $vsixUrl,
   [alias("visualStudioVersion")][parameter(Mandatory=$false, Position=2)][int] $vsVersion = 0,
   [parameter(Mandatory=$false)][string] $checksum = '',
   [parameter(Mandatory=$false)][string] $checksumType = '',
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
+  [alias("fileFullPath")][parameter(Mandatory=$false)][string] $file = '',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
-    Write-Debug "Running 'Install-ChocolateyVsixPackage' for $packageName with vsixUrl:`'$vsixUrl`', vsVersion: `'$vsVersion`', checksum: `'$checksum`', checksumType: `'$checksumType`' ";
+
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+
+    if ($vsixUrl -eq '' -or $vsixUrl -eq $null) {
+        $vsixUrl = $file
+    }
+
     if($vsVersion -eq 0) {
         if ([System.IntPtr]::Size -eq 4)
         {

@@ -53,6 +53,9 @@ param (
   $parameters,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
+
+  # do not log function call - recursion?
+
   $argumentsPassed = ''
   foreach ($param in $parameters.GetEnumerator()) {
     if ($param.Key -eq 'ignoredArguments') { continue; }

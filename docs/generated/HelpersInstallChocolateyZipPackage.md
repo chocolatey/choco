@@ -19,6 +19,8 @@ Install-ChocolateyZipPackage `
   [-Checksum64 <String>] `
   [-ChecksumType64 <String>] `
   [-Options <Hashtable>] `
+  [-File <String>] `
+  [-File64 <String>] `
   [-IgnoredArguments <Object[]>] [<CommonParameters>]
 ~~~
 
@@ -102,16 +104,9 @@ a 32 bit installation on a 64 bit system.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
-In 0.10.6+, `File` and `FileFullPath` are aliases for Url. These 
-aliases, if used in earlier versions of Chocolatey, may produce `ERROR: 
-Cannot bind parameter because parameter 'fileType' is specified more 
-than once.` See https://github.com/chocolatey/choco/issues/1284. Do not
-use these aliases with the community package repository until January
-2018.
-
 Property               | Value
----------------------- | ------------------
-Aliases                | file, fileFullPath
+---------------------- | -----
+Aliases                | 
 Required?              | false
 Position?              | 2
 Default Value          | 
@@ -142,16 +137,9 @@ this parameter.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
-In 0.10.6+, `File64` and `FileFullPath64` are aliases for Url64Bit. 
-These aliases, if used in earlier versions of Chocolatey, may produce 
-`ERROR: Cannot bind parameter because parameter 'fileType' is specified
-more than once.` See https://github.com/chocolatey/choco/issues/1284. 
-Do not use these aliases with the community package repository until 
-January 2018.
-
 Property               | Value
----------------------- | -----------------------------
-Aliases                | url64, file64, fileFullPath64
+---------------------- | -----
+Aliases                | url64
 Required?              | false
 Position?              | 4
 Default Value          | 
@@ -268,6 +256,34 @@ Aliases                |
 Required?              | false
 Position?              | named
 Default Value          | @{Headers=@{}}
+Accept Pipeline Input? | false
+ 
+###  -File [&lt;String&gt;]
+Will be used for Url if Url is empty. Available in 0.10.7+.
+
+This parameter provides compatibility, but should not be used directly
+and not with the community package repository until January 2018.
+
+Property               | Value
+---------------------- | ------------
+Aliases                | fileFullPath
+Required?              | false
+Position?              | named
+Default Value          | 
+Accept Pipeline Input? | false
+ 
+###  -File64 [&lt;String&gt;]
+Will be used for Url64bit if Url64bit is empty. Available in 0.10.7+.
+
+This parameter provides compatibility, but should not be used directly
+and not with the community package repository until January 2018.
+
+Property               | Value
+---------------------- | --------------
+Aliases                | fileFullPath64
+Required?              | false
+Position?              | named
+Default Value          | 
 Accept Pipeline Input? | false
  
 ###  -IgnoredArguments [&lt;Object[]&gt;]

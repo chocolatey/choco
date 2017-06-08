@@ -66,8 +66,9 @@ namespace chocolatey.infrastructure.app.services
                         packageInformation.RegistrySnapshot = _registryService.read_from_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE)); 
                     }, 
                     "Unable to read registry snapshot file for {0} (located at {1})".format_with(package.Id, _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE)), 
-                    throwError: false, 
-                    logWarningInsteadOfError: true
+                    throwError: false,
+                    logWarningInsteadOfError: true,
+                    isSilent: true
                  );     
             
             FaultTolerance.try_catch_with_logging_exception(
@@ -77,7 +78,8 @@ namespace chocolatey.infrastructure.app.services
                     }, 
                     "Unable to read files snapshot file", 
                     throwError: false, 
-                    logWarningInsteadOfError: true
+                    logWarningInsteadOfError: true, 
+                    isSilent:true
                  );
            
             packageInformation.HasSilentUninstall = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, SILENT_UNINSTALLER_FILE));
@@ -127,7 +129,15 @@ namespace chocolatey.infrastructure.app.services
 
             if (packageInformation.FilesSnapshot != null)
             {
-                _filesService.save_to_file(packageInformation.FilesSnapshot, _fileSystem.combine_paths(pkgStorePath, FILES_SNAPSHOT_FILE));
+                FaultTolerance.try_catch_with_logging_exception(
+              () =>
+              {
+                  _filesService.save_to_file(packageInformation.FilesSnapshot, _fileSystem.combine_paths(pkgStorePath, FILES_SNAPSHOT_FILE));
+              },
+                  "Unable to save files snapshot",
+                  throwError: false,
+                  logWarningInsteadOfError: true
+               );
             }
 
             if (!string.IsNullOrWhiteSpace(packageInformation.Arguments))
