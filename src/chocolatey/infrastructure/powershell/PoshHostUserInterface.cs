@@ -62,6 +62,19 @@ namespace chocolatey.infrastructure.powershell
 
             return Console.ReadLine();
         }
+
+        public override SecureString ReadLineAsSecureString()
+        {
+            if (!_configuration.PromptForConfirmation)
+            {
+                this.Log().Warn(ChocolateyLoggers.Important, @"  Confirmation (`-y`) is set.
+  Respond within {0} seconds or the default selection will be chosen.".format_with(TIMEOUT_IN_SECONDS));
+            }
+
+            var secureStringPlainText = InteractivePrompt.get_password(_configuration.PromptForConfirmation);
+
+            return secureStringPlainText.to_secure_string();
+        }
         
         public override void Write(string value)
         {
@@ -159,7 +172,17 @@ namespace chocolatey.infrastructure.powershell
                     this.Log().Warn(label[1].escape_curly_braces());
                 }
 
-                string selection = ReadLine();
+                dynamic selection = string.Empty;
+
+                if (field.ParameterTypeFullName.is_equal_to(typeof(SecureString).FullName))
+                {
+                    selection = ReadLineAsSecureString();
+                }
+                else
+                {
+                    selection = ReadLine();
+                }
+                
                 if (selection == null) return null;
 
                 results[field.Name] = PSObject.AsPSObject(selection);
@@ -282,13 +305,5 @@ namespace chocolatey.infrastructure.powershell
 
         public override PSHostRawUserInterface RawUI { get { return _rawUi; } }
 
-        #region Not Implemented / Empty
-
-        public override SecureString ReadLineAsSecureString()
-        {
-            throw new NotImplementedException("Reading secure strings is not implemented.");
-        }
-        
-        #endregion
     }
 }
