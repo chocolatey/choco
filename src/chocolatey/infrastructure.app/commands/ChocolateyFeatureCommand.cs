@@ -24,6 +24,7 @@ namespace chocolatey.infrastructure.app.commands
     using configuration;
     using domain;
     using infrastructure.commands;
+    using infrastructure.configuration;
     using logging;
     using services;
 
@@ -124,7 +125,10 @@ Chocolatey will allow you to interact with features.
 
         public virtual bool may_require_admin_access()
         {
-            return true;
+            var config = Config.get_configuration_settings();
+            if (config == null) return true;
+
+            return config.FeatureCommand.Command != FeatureCommandType.list;
         }
     }
 }

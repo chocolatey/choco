@@ -24,6 +24,7 @@ namespace chocolatey.infrastructure.app.commands
     using configuration;
     using domain;
     using infrastructure.commands;
+    using infrastructure.configuration;
     using logging;
     using services;
 
@@ -181,7 +182,10 @@ what you see when you go to https://chocolatey.org/api/v2/.
 
         public virtual bool may_require_admin_access()
         {
-            return true;
+            var config = Config.get_configuration_settings();
+            if (config == null) return true;
+
+            return config.SourceCommand.Command != SourceCommandType.list;
         }
     }
 }

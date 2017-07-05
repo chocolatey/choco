@@ -24,6 +24,7 @@ namespace chocolatey.infrastructure.app.commands
     using configuration;
     using domain;
     using infrastructure.commands;
+    using infrastructure.configuration;
     using logging;
     using services;
 
@@ -151,7 +152,10 @@ Config shown in action: https://raw.githubusercontent.com/wiki/chocolatey/choco/
 
         public virtual bool may_require_admin_access()
         {
-            return true;
+            var config = Config.get_configuration_settings();
+            if (config == null) return true;
+
+            return config.ConfigCommand.Command != ConfigCommandType.list;
         }
     }
 }
