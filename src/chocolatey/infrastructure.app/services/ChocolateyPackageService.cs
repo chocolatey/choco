@@ -508,7 +508,6 @@ Did you know Pro / Business automatically syncs with Programs and
             if (config.Features.FailOnStandardError) arguments.Append(" --fail-on-standard-error");
             if (!config.Features.UsePowerShellHost) arguments.Append(" --use-system-powershell");
 
-
             return NugetEncryptionUtility.EncryptString(arguments.to_string());
         }
 
