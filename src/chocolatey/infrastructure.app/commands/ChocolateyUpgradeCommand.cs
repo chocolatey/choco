@@ -87,7 +87,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Fail On Unfound Packages - If a package is not found in feeds specified, fail instead of warn.",
                      option => configuration.UpgradeCommand.FailOnUnfound = option != null)
                 .Add("failonnotinstalled|fail-on-not-installed",
-                     "Fail On Non-installed Packages - If a package is not already intalled, fail instead of installing.",
+                     "Fail On Non-installed Packages - If a package is not already installed, fail instead of installing.",
                      option => configuration.UpgradeCommand.FailOnNotInstalled = option != null)
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
