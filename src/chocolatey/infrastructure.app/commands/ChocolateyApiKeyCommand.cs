@@ -22,6 +22,7 @@ namespace chocolatey.infrastructure.app.commands
     using commandline;
     using configuration;
     using infrastructure.commands;
+    using infrastructure.configuration;
     using logging;
     using services;
 
@@ -148,7 +149,10 @@ In order to save your API key for {0},
 
         public virtual bool may_require_admin_access()
         {
-            return true;
+            var config = Config.get_configuration_settings();
+            if (config == null) return true;
+
+            return !string.IsNullOrWhiteSpace(config.ApiKeyCommand.Key);
         }
     }
 }

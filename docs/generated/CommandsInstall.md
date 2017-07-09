@@ -435,7 +435,7 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Maximum Download Rate Bits Per Second - The maximum download rate in 
        bits per second. '0' or empty means no maximum. A number means that will 
        be the maximum download rate in bps. Defaults to config setting of '0'. 
-       Available in [licensed editions](https://chocolatey.org/compare) v2+ only. See https://chocolate-
+       Available in [licensed editions](https://chocolatey.org/compare) v1.10+ only. See https://chocolate-
        y.org/docs/features-download-throttle  
 
 ~~~

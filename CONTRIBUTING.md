@@ -98,8 +98,8 @@ If you work for an organization that does not allow you to contribute without at
 Start with [Prerequisites](#prerequisites) and make sure you can sign the Contributor License Agreement (CLA).
 
 ### Get Buyoff Or Find Open Community Issues/Features
- * Through GitHub, or through the [mailing list](https://groups.google.com/forum/#!forum/chocolatey) (preferred), you talk about a feature you would like to see (or a bug), and why it should be in Chocolatey.
-   * If approved through the mailing list, ensure the accompanying GitHub issue is created with information and a link back to the mailing list discussion.
+ * Through a Github issue (preferred), through the [mailing list](https://groups.google.com/forum/#!forum/chocolatey), or through [Gitter](https://gitter.im/chocolatey/choco), talk about a feature you would like to see (or a bug fix), and why it should be in Chocolatey.
+   * If approved through the mailing list or in Gitter chat, ensure the accompanying GitHub issue is created with information and a link back to the mailing list discussion (or the Gitter conversation).
  * Once you get a nod from one of the [Chocolatey Team](https://github.com/chocolatey?tab=members), you can start on the feature.
  * Alternatively, if a feature is on the issues list with the [Up For Grabs](https://github.com/chocolatey/choco/issues?q=is%3Aopen+is%3Aissue+label%3A%22Up+For+Grabs%22) label, it is open for a community member (contributor) to patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
 
@@ -112,7 +112,7 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
     1. Add the upstream fork - `git remote add upstream git@github.com:chocolatey/choco.git`
     1. Run `git fetch upstream`
     1. Ensure you have user name and email set appropriately to attribute your contributions - see [Name](https://help.github.com/articles/setting-your-username-in-git/) / [Email](https://help.github.com/articles/setting-your-email-in-git/).
-    1. Ensure that the local repository has the following settings (without `--global`, these only apply to the current repository):
+    1. Ensure that the local repository has the following settings (without `--global`, these only apply to the *current* repository):
       * `git config core.autocrlf false`
       * `git config core.symlinks false`
       * `git config merge.ff false`
@@ -123,17 +123,15 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
     1. For committing the code, please see [Prepare Commits](#prepare-commits).
     1. See [Submit Pull Request (PR)](#submit-pull-request-pr).
  * Please also observe the following:
-    * No reformatting
-    * No changing files that are not specific to the feature
-    * More covered below in the **Prepare commits** section.
+    * Unless specifically requested, do not reformat the code. It makes it very difficult to see the change you've made.
+    * Do not change files that are not specific to the feature.
+    * More covered below in the [**Prepare commits**](#prepare-commits) section.
  * Test your changes and please help us out by updating and implementing some automated tests. It is recommended that all contributors spend some time looking over the tests in the source code. You can't go wrong emulating one of the existing tests and then changing it specific to the behavior you are testing.
     * While not an absolute requirement, automated tests will help reviewers feel comfortable about your changes, which gets your contributions accepted faster.
  * Please do not update your branch from the master unless we ask you to. See the responding to feedback section below.
 
 ### Code Format / Design
-
 #### CSharp
-
  * If you are using ReSharper, all of this is already in the shared resharper settings.
  * Class names and Properties are `PascalCase` - this is nearly the only time you start with uppercase.
  * Namespaces (and their representative folders) are lowercase.
@@ -152,7 +150,6 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
  * One of the first calls in a function is to debug what was passed to it - `Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters`
 
 ### Debugging / Testing
-
 When you want to manually verify your changes and run Choco, you have some options.
 
 **NOTE:** Chocolatey behaves differently when built with `Debug` and `Release` configurations. Release is always going to seek out the machine installation (`$env:ChocolateyInstall`), where Debug just runs right next to wherever the choco.exe file is.
@@ -170,7 +167,7 @@ When you are using Visual Studio, ensure the following:
 
 > "Testing doesn't prove the absence of bugs, they can only prove code works in the way you've tested."
 
-The design was to get the testing framework out of the way and make it easy to swap out should it ever need to be (the former is the important goal). We test behaviors of the system, which doesn't simply mean ensuring code coverage. It means we want to see how the system behaves under certain behaviors. As you may see from looking over the tests, we have an interesting way of setting up our specs. We recommend importing the ReSharper templates in `docs\resharper_templates`. This will make adding specs and new spec files quite a bit easier.
+The design of our automated test suite is to get the testing framework out of the way and make it easy to swap out should it ever need to be (the former is the important goal). We test behaviors of the system, which doesn't simply mean ensuring code coverage. It means we want to see how the system behaves under certain behaviors. As you may see from looking over the tests, we have an interesting way of setting up our specs. We recommend importing the ReSharper templates in `docs\resharper_templates`. This will make adding specs and new spec files quite a bit easier.
 
 The method of testing as you will see is a file that contains many test classes (scenarios) that set up and perform a behavior, then perform one or more validations (tests/facts) on that scenario. Typically when in a unit test suite, there would be a file for every representative class in the production code. You may not see this as much in this codebase as there are areas that could use more coverage.
 
@@ -202,11 +199,9 @@ Some quick notes on testing terminology (still a WIP):
 
 As far as testing goes, unit tests are extremely quick feedback and great for longer term maintenance, where black box tests give you the most coverage, but are the slowest feedback loops and typically the most frail. Each area of testing has strengths and weaknesses and it's good to understand each of them.
 
-
-**NOTE**: One of the hardest forms of testing is unit testing, as it almost always requires faking out other parts of the system (also known as mocking).
+**NOTE**: One of the hardest forms of automated testing is unit testing, as it almost always requires faking out other parts of the system (also known as mocking).
 
 #### Chocolatey Build
-
 **NOTE:** When you are doing this, we almost always recommend you take the output of the build to another machine to do the testing, like the [Chocolatey Test Environment](https://github.com/chocolatey/chocolatey-test-environment).
 
  * Run `build.bat`.
@@ -267,7 +262,7 @@ Submitting PR:
  * One of the Chocolatey Team members, or one of the committers, will evaluate it within a reasonable time period (which is to say usually within 2-4 weeks). Some things get evaluated faster or fast tracked. We are human and we have active lives outside of open source so don't fret if you haven't seen any activity on your pull request within a month or two. We don't have a Service Level Agreement (SLA) for pull requests. Just know that we will evaluate your pull request.
 
 ### Respond to Feedback on Pull Request
-We may have feedback for you to fix or change some things. We generally like to see that pushed against the same topic branch (it will automatically update the Pull Request). You can also fix/squash/rebase commits and push the same topic branch with `--force` (it's generally acceptable to do this on topic branches not in the main repository, it is generally unacceptable and should be avoided at all costs against the main repository).
+We may have feedback for you in the form of reuqested changes or fixes. We generally like to see that pushed against the same topic branch (it will automatically update the PR). You can also fix/squash/rebase commits and push the same topic branch with `--force` (while it is generally acceptable to do this on topic branches not in the main repository, a force push should be avoided at all costs against the main repository).
 
 If we have comments or questions when we do evaluate it and receive no response, it will probably lessen the chance of getting accepted. Eventually this means it will be closed if it is not accepted. Please know this doesn't mean we don't value your contribution, just that things go stale. If in the future you want to pick it back up, feel free to address our concerns/questions/feedback and reopen the issue/open a new PR (referencing old one).
 
@@ -284,7 +279,7 @@ Sometimes we may need you to rebase your commit against the latest code before w
 The only reasons a pull request should be closed and resubmitted are as follows:
 
   * When the pull request is targeting the wrong branch (this doesn't happen as often).
-  * When there are updates made to the original by someone other than the original contributor. Then the old branch is closed with a note on the newer branch this supersedes #github_number.
+  * When there are updates made to the original by someone other than the original contributor (and the PR is not open for contributions). Then the old branch is closed with a note on the newer branch this supersedes #github_number.
 
 ## Other General Information
 The helpers/utility functions that are available to the packages are what we consider the API. If you are working in the API, please note that you will need to maintain backwards compatibility. If you plan to rename a function or make it more generic, you must provide an alias in the [chocolateyInstaller.psm1](https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/chocolateyInstaller.psm1) as part of what gets exported. You should not remove or reorder parameters, only add optional parameters to the end. They should be named and not positional (we are moving away from positional parameters as much as possible).

@@ -18,6 +18,7 @@ namespace chocolatey
 {
     using System;
     using System.Globalization;
+    using System.Runtime.InteropServices;
     using System.Security;
     using System.Text.RegularExpressions;
     using infrastructure.app;
@@ -104,6 +105,21 @@ namespace chocolatey
             return secureString;
         }
 
+        public static string from_secure_string(this SecureString input)
+        {
+            if (input == null) return string.Empty;
+            
+            IntPtr unmanagedString = IntPtr.Zero;
+            try
+            {
+                unmanagedString = Marshal.SecureStringToGlobalAllocUnicode(input);
+                return Marshal.PtrToStringUni(unmanagedString);
+            }
+            finally
+            {
+                Marshal.ZeroFreeGlobalAllocUnicode(unmanagedString);
+            }
+        }
 
         private static readonly Regex _spacePattern = new Regex(@"\s", RegexOptions.Compiled);
 
