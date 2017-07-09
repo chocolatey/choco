@@ -4,6 +4,99 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
+## 1.12.0 (July 10, 2017)
+
+### FEATURES
+
+ * Package Reducer / Optimize (All licensed editions) - Reduce Space Usage for Chocolatey Installations
+
+    If you have a significant number of Chocolatey packages you manage, you may notice that you also may have a pretty significant space usage under the Chocolatey lib directory. Package reducer automatically decreases the size of nupkg files to around 5KB and removes installers and zips automatically from your package install directories. This may allow you to save GBs of usage for a large amount of packages being managed.
+
+    To learn more about Package Reducer and `choco optimize`, please see https://chocolatey.org/docs/features-package-reducer.
+
+ * Package Audit (C4B) - Learn Who and When
+
+    Reporting is very important, and auditing not only when your installations occurred but who installed them can be critical. There is nothing that presents this kind of information as easily as you will be able to gather it with Chocolatey for Business (C4B) and Package Audit.
+
+    To learn more about Package Audit, please see https://chocolatey.org/docs/features-package-audit.
+
+### IMPROVEMENTS
+
+ * Package Internalizer (Choco Download):
+    * Option (`--internalize-all-urls`) to internalize any url in a package (not just if the package scripts contain known-compatible known functions).
+ * Self-Service / Background Mode:
+    * Added `useBackgroundServiceWithNonAdministratorsOnly` feature switch to skip background mode for administrators.
+ * Windows Service Management Functions:
+    * Added `useLocalSystemForServiceInstalls` feature switch to disable using LocalSystem as the user for services by default.
+    * Added config settings to provide local user / password.
+    * If the password is empty or not provided, Chocoaltey will manage the password securely.
+    * If the user doesn't exist, the account will be created
+    * Accounts are ensured to be administrators
+    * Accounts are ensured to have Log on as service and batch rights.
+
+
+## 1.11.0 (June 27, 2017)
+
+### BUG FIXES
+
+ * Self-Service / Background Mode
+    * Fix - Use a URI with WCF named pipes that doesn't exclusively hold a lock on the root (blocking other services). Fallback to old URI for versions of chocolatey-agent less than 0.7.0+. - see [#12](https://github.com/chocolatey/chocolatey-licensed-issues/issues/12).
+    * Fix - Ensure chocolatey.lib can send arguments through and not just choco.exe.
+
+### IMPROVEMENTS
+
+ * Package Synchronizer - update registry links when software updates
+
+
+## 1.10.0 (June 9, 2017)
+
+This release brings Package Throttle, Package Synchronizer's "Show All Packages in Programs and Features", and Direct Installer (aka Package-less Install) to Chocolatey. There are also numerous improvements to Package Builder, fixes and improvements to Package Internalizer and Self-Service. Package Throttle is in all licensed editions, allowing Pro, MSP, and C4B customers the ability to slow down Chocolatey as it downloads packages and any resources the packages are downloading. See more details each section below.
+
+### BREAKING CHANGES
+
+ * [Security] Self-Service / Background Mode - support background mode with self-service sources only by default
+
+    If you are using self-service functionality, when you upgrade to v1.10, you will need to go to those sources that you allow to be self-service and ensure they are selected to allow self-service (`choco source list`). Otherwise by default users are going to be locked out of using those sources. The move to opt-in is best from a security standpoint and we want to give you the ability to have folks opt-in to the better behavior.
+
+    To change this behavior back to the way it was previously, simply run `choco disable -n useBackgroundServiceWithSelfServiceSourcesOnly`. For more details see `choco feature list` or https://chocolatey.org/docs/chocolatey-configuration#self-service-background-mode
+
+### FEATURES
+
+ * Package Throttle - Throttle Bandwidth / Rate Limit Download Speeds
+
+    By default, Chocolatey downloads packages and resources as fast as it can. Package Throttle gives you a way to slow down Chocolatey so it doesn't overwhelm any bandwidth restrictions you may have. This is done as both a setting and per package install/upgrade. This is in bits per second (not bytes, bits is what most network traffic is measured in). When adding at runtime, simply add `--bps=VALUE`. To set the value in the configuration, call `choco config set maximumDownloadRateBitsPerSecond VALUE`. For more details see https://chocolatey.org/docs/features-package-reducer.
+
+ * Package Synchronizer's Show All Packages In Programs and Features
+
+    This means packages that do not have an underlying installation can still show up in Programs and Features and be managed there as well, which allows for legacy inventory reporting systems to see all the software that is installed in the same way that Chocolatey is able to. A picture can probably best explain this feature, check out [All Package In Programs and Features](https://raw.githubusercontent.com/chocolatey/choco-wiki/e619d5d25018f9362d50749ee86554ebc4f4f04d/images/features/features_packages_in_programs_and_features.png)
+
+    To turn this feature on, simply run the following command `choco feature enable -n showAllPackagesInProgramsAndFeatures`. For more details on the feature, see https://chocolatey.org/docs/chocolatey-configuration#package-synchronizer and https://chocolatey.org/docs/features-synchronize. This does require one additional run of `choco` to take affect (same when disabling the feature), hopefully we can remove that in the future.
+
+ * Package-less Install / Direct Installer - Install and upgrade directly from installers (MSIs, EXEs, etc)!
+
+    If Package Builder can create a fully unattended package for an installer, you don't even need a package first. You can simply call `choco install nameoffile.msi` or `choco upgrade nameoffile.exe` and Chocolatey will generate packaging on the fly and install/upgrade the package!
+
+### BUG FIXES
+
+ * Fix - choco new generates uninstall template with wrong use of registry key variable - see [#1304](https://github.com/chocolatey/choco/issues/1304)
+ * Package Internalizer (Choco Download):
+    * Fix - Append UseOriginalLocation for multiline so that it adds a continuation and not a hanging parameter on a new line
+    * Fix - Variable replacement wasn't working for `${value}` and `$($value)`
+    * Fix - Find and replace the original url in the script
+
+### IMPROVEMENTS
+
+ * [Security] Allow locking down new/download commands to admin only - added as feature flip switches (see `choco feature list`)
+ * Self-Service / Background Mode:
+    * Provide the user context to Chocolatey on install / upgrade (user context is original user requesting action)
+ * Package Builder (Choco New):
+    * Find MSI Properties in CustomActions and in Properties table listed in Properties ending in "Properties"
+    * Show possible silent options when installer type is not determinable or is found to be custom
+    * General template improvements
+ * Package Internalizer (Choco Download):
+    * Rewrite any scripts that `chocolateyInstall.ps1` uses into the `chocolateyInstall.ps1` file
+
+
 ## 1.9.8 (March 25, 2017)
 
 ### BUG FIXES
@@ -61,7 +154,7 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
  * Package Builder (Choco New):
     * Right click - create a package without bringing up the GUI.
- * Package Internalizer (Choco Download)
+ * Package Internalizer (Choco Download):
     * Don't delete the download directory unless `--force`
  * Set user modes for terminal services (`change user /install` | `change user /execute`)
 
