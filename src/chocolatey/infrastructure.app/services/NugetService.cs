@@ -1002,6 +1002,9 @@ folder.");
                     {
                         if (!currentFile.Checksum.is_equal_to(installedFile.Checksum))
                         {
+                            // skip nupkgs if they are different
+                            if (_fileSystem.get_file_extension(currentFile.Path).is_equal_to(".nupkg")) continue;
+
                             var backupName = "{0}.{1}".format_with(_fileSystem.get_file_name(currentFile.Path), version);
                             FaultTolerance.try_catch_with_logging_exception(
                                 () => _fileSystem.copy_file(currentFile.Path, _fileSystem.combine_paths(_fileSystem.get_directory_name(currentFile.Path), backupName), overwriteExisting: true),
