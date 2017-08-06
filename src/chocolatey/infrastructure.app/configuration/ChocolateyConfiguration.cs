@@ -45,6 +45,7 @@ namespace chocolatey.infrastructure.app.configuration
             FeatureCommand = new FeatureCommandConfiguration();
             ConfigCommand = new ConfigCommandConfiguration();
             ApiKeyCommand = new ApiKeyCommandConfiguration();
+            PackCommand = new PackCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
             PinCommand = new PinCommandConfiguration();
             OutdatedCommand = new OutdatedCommandConfiguration();
@@ -302,6 +303,14 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public ApiKeyCommandConfiguration ApiKeyCommand { get;  set; }
 
         /// <summary>
+        ///   Configuration related specifically to the Pack command.
+        /// </summary>
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public PackCommandConfiguration PackCommand { get; set; }
+
+        /// <summary>
         ///   Configuration related specifically to Push command
         /// </summary>
         /// <remarks>
@@ -495,6 +504,17 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class ApiKeyCommandConfiguration
     {
         public string Key { get; set; }
+    }
+
+    [Serializable]
+    public sealed class PackCommandConfiguration
+    {
+        public PackCommandConfiguration()
+        {
+            Properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        public IDictionary<string, string> Properties { get; private set; }
     }
 
     [Serializable]

@@ -77,7 +77,7 @@ namespace chocolatey.infrastructure.app.commands
             {
                 configuration.NewCommand.Name = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault(arg => !arg.StartsWith("-") && !arg.contains("="));
                 var property = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().Split(new[] {'='}, StringSplitOptions.RemoveEmptyEntries);
-                if (property.Count() == 1)
+                if (property.Length == 1)
                 {
                     configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, configuration.NewCommand.Name);
                 }
@@ -86,7 +86,7 @@ namespace chocolatey.infrastructure.app.commands
             foreach (var unparsedArgument in unparsedArguments.or_empty_list_if_null())
             {
                 var property = unparsedArgument.Split(new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries);
-                if (property.Count() == 2)
+                if (property.Length == 2)
                 {
                     var propName = property[0].trim_safe();
                     var propValue = property[1].trim_safe().remove_surrounding_quotes();
