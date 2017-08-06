@@ -47,24 +47,33 @@ namespace chocolatey.infrastructure.logging
         public static void configure(string outputDirectory = null, params string[] excludeLoggerNames)
         {
             GlobalContext.Properties["pid"] = System.Diagnostics.Process.GetCurrentProcess().Id;
-
-            var assembly = Assembly.GetExecutingAssembly();
-            var resource = ApplicationParameters.Log4NetConfigurationResource;
-            if (Platform.get_platform() != PlatformType.Windows)
+            
+            var xmlConfigFile = Path.Combine(ApplicationParameters.InstallLocation, "log4net.config.xml");
+            if (File.Exists(xmlConfigFile))
             {
-                // it became much easier to do this once we realized that updating the current mappings is about impossible.
-                resource = resource.Replace("log4net.", "log4net.mono.");
+                XmlConfigurator.ConfigureAndWatch(new FileInfo(xmlConfigFile));
+                _logger.DebugFormat("Configured Log4Net configuration from file ('{0}').", xmlConfigFile);
             }
-            Stream xmlConfigStream = assembly.get_manifest_stream(resource);
+            else
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                var resource = ApplicationParameters.Log4NetConfigurationResource;
+                if (Platform.get_platform() != PlatformType.Windows)
+                {
+                    // it became much easier to do this once we realized that updating the current mappings is about impossible.
+                    resource = resource.Replace("log4net.", "log4net.mono.");
+                }
+                Stream xmlConfigStream = assembly.get_manifest_stream(resource);
 
-            XmlConfigurator.Configure(xmlConfigStream);
+                XmlConfigurator.Configure(xmlConfigStream);
 
+                _logger.DebugFormat("Configured Log4Net configuration ('{0}') from assembly {1}", resource, assembly.FullName);
+            }
+            
             if (!string.IsNullOrWhiteSpace(outputDirectory))
             {
                 set_file_appender(outputDirectory, excludeLoggerNames);
             }
-
-            _logger.DebugFormat("Configured {0} from assembly {1}", resource, assembly.FullName);
         }
 
         /// <summary>
