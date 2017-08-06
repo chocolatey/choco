@@ -17,6 +17,7 @@
 namespace chocolatey
 {
     using System;
+    using System.Runtime;
     using infrastructure.logging;
 
     // ReSharper disable InconsistentNaming
@@ -31,16 +32,19 @@ namespace chocolatey
         /// </summary>
         public static bool LogTraceMessages = true;
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Trace(this ILog logger, string message, params object[] formatting)
         {
            if (LogTraceMessages) ChocolateyLoggers.Trace.to_string().Log().Debug(message, formatting);
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Trace(this ILog logger, Func<string> message)
         {
             if (LogTraceMessages) ChocolateyLoggers.Trace.to_string().Log().Debug(message);
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Debug(this ILog logger, ChocolateyLoggers logType, string message, params object[] formatting)
         {
             switch (logType)
@@ -58,6 +62,7 @@ namespace chocolatey
             }
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Debug(this ILog logger, ChocolateyLoggers logType, Func<string> message)
         {
             switch (logType)
@@ -74,6 +79,7 @@ namespace chocolatey
             }
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Info(this ILog logger, ChocolateyLoggers logType, string message, params object[] formatting)
         {
             switch (logType)
@@ -90,6 +96,7 @@ namespace chocolatey
             }
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Info(this ILog logger, ChocolateyLoggers logType, Func<string> message)
         {
             switch (logType)
@@ -106,6 +113,7 @@ namespace chocolatey
             }
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Warn(this ILog logger, ChocolateyLoggers logType, string message, params object[] formatting)
         {
             switch (logType)
@@ -122,6 +130,7 @@ namespace chocolatey
             }
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Warn(this ILog logger, ChocolateyLoggers logType, Func<string> message)
         {
             switch (logType)
@@ -138,6 +147,7 @@ namespace chocolatey
             }
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Error(this ILog logger, ChocolateyLoggers logType, string message, params object[] formatting)
         {
             switch (logType)
@@ -154,6 +164,7 @@ namespace chocolatey
             }
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Error(this ILog logger, ChocolateyLoggers logType, Func<string> message)
         {
             switch (logType)
@@ -170,6 +181,7 @@ namespace chocolatey
             }
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Fatal(this ILog logger, ChocolateyLoggers logType, string message, params object[] formatting)
         {
             switch (logType)
@@ -186,6 +198,7 @@ namespace chocolatey
             }
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Fatal(this ILog logger, ChocolateyLoggers logType, Func<string> message)
         {
             switch (logType)

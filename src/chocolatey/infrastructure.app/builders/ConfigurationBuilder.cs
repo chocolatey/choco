@@ -392,7 +392,10 @@ namespace chocolatey.infrastructure.app.builders
                              option => config.Proxy.BypassList = option.remove_surrounding_quotes())
                         .Add("proxy-bypass-on-local",
                              "Proxy Bypass On Local - Bypass proxy for local connections. Requires explicity proxy (`--proxy` or config setting). Overrides the default proxy bypass on local setting of '{0}'. Available in 0.10.4+.".format_with(config.Proxy.BypassOnLocal),
-                             option => config.Proxy.BypassOnLocal = option != null)
+                             option => config.Proxy.BypassOnLocal = option != null)  
+                         .Add("log-file=",
+                             "Log File to output to in addition to regular loggers. Available in 0.10.8+.",
+                             option => config.AdditionalLogFileLocation= option.remove_surrounding_quotes())
                         ;
                 },
                 (unparsedArgs) =>

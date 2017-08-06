@@ -4,6 +4,25 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
+## 1.12.1 (July 13, 2017)
+
+Among the bug fixes, we've brought Package Internalizer to the MSP edition of Chocolatey.
+
+### BUG FIXES
+
+ * Fix - Configuration item is not serialized, causing issues with installs with packages.config and ChocolateyGUI.
+ * Package Synchronizer (Choco Sync):
+    * Fix - syncing new items should capture audit information for Package Audit.
+ * Self-Service / Background Mode
+    * Fix - timeout should be near infinite when execution timeout is 0.
+    * Fix - loading commands over PowerShell remoting can fail.
+    * Fix - do not configure background service unless it applies.
+
+### IMPROVEMENTS
+
+ * Package Internalizer is now available for MSP edition as well.
+
+
 ## 1.12.0 (July 10, 2017)
 
 ### FEATURES
@@ -29,7 +48,7 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
  * Windows Service Management Functions:
     * Added `useLocalSystemForServiceInstalls` feature switch to disable using LocalSystem as the user for services by default.
     * Added config settings to provide local user / password.
-    * If the password is empty or not provided, Chocoaltey will manage the password securely.
+    * If the password is empty or not provided, Chocolatey will manage the password securely.
     * If the user doesn't exist, the account will be created
     * Accounts are ensured to be administrators
     * Accounts are ensured to have Log on as service and batch rights.

@@ -47,24 +47,33 @@ namespace chocolatey.infrastructure.logging
         public static void configure(string outputDirectory = null, params string[] excludeLoggerNames)
         {
             GlobalContext.Properties["pid"] = System.Diagnostics.Process.GetCurrentProcess().Id;
-
-            var assembly = Assembly.GetExecutingAssembly();
-            var resource = ApplicationParameters.Log4NetConfigurationResource;
-            if (Platform.get_platform() != PlatformType.Windows)
+            
+            var xmlConfigFile = Path.Combine(ApplicationParameters.InstallLocation, "log4net.config.xml");
+            if (File.Exists(xmlConfigFile))
             {
-                // it became much easier to do this once we realized that updating the current mappings is about impossible.
-                resource = resource.Replace("log4net.", "log4net.mono.");
+                XmlConfigurator.ConfigureAndWatch(new FileInfo(xmlConfigFile));
+                _logger.DebugFormat("Configured Log4Net configuration from file ('{0}').", xmlConfigFile);
             }
-            Stream xmlConfigStream = assembly.get_manifest_stream(resource);
+            else
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                var resource = ApplicationParameters.Log4NetConfigurationResource;
+                if (Platform.get_platform() != PlatformType.Windows)
+                {
+                    // it became much easier to do this once we realized that updating the current mappings is about impossible.
+                    resource = resource.Replace("log4net.", "log4net.mono.");
+                }
+                Stream xmlConfigStream = assembly.get_manifest_stream(resource);
 
-            XmlConfigurator.Configure(xmlConfigStream);
+                XmlConfigurator.Configure(xmlConfigStream);
 
+                _logger.DebugFormat("Configured Log4Net configuration ('{0}') from assembly {1}", resource, assembly.FullName);
+            }
+            
             if (!string.IsNullOrWhiteSpace(outputDirectory))
             {
                 set_file_appender(outputDirectory, excludeLoggerNames);
             }
-
-            _logger.DebugFormat("Configured {0} from assembly {1}", resource, assembly.FullName);
         }
 
         /// <summary>
@@ -231,7 +240,56 @@ namespace chocolatey.infrastructure.logging
                     }
                 }
 
+                foreach (var append in logRepository.GetAppenders())
+                {
+                    var appender = append as AppenderSkeleton;
+                    if (appender != null && appender.Name.is_equal_to("{0}.changes.log.appender".format_with(ApplicationParameters.Name)))
+                    {
+                        var traceLayout = new PatternLayout
+                        {
+                            ConversionPattern = "%date %property{pid}:%thread [%-5level] - %message - %file:%method:%line %newline"
+                        };
+                        traceLayout.ActivateOptions();
+
+                        appender.Layout = traceLayout;
+                    }
+                }
             }
+        }
+
+        public static void configure_additional_log_file(string logFileLocation)
+        {
+            if (string.IsNullOrWhiteSpace(logFileLocation)) return;
+
+            var logDirectory = Path.GetDirectoryName(logFileLocation);
+            var logFileName = Path.GetFileNameWithoutExtension(logFileLocation);
+            if (!string.IsNullOrWhiteSpace(logDirectory) && !Directory.Exists(logDirectory)) Directory.CreateDirectory(logDirectory);
+            var layout = new PatternLayout
+            {
+                ConversionPattern = "%date %property{pid} [%-5level] - %message%newline"
+            };
+            layout.ActivateOptions();
+
+            var app = new FileAppender()
+            {
+                Name = "{0}.{1}.log.appender".format_with(ApplicationParameters.Name, logFileName),
+                File = logFileLocation,
+                Layout = layout,
+                AppendToFile = true,
+                LockingModel = new FileAppender.MinimalLock(),
+            };
+            app.ActivateOptions();
+
+            ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
+            foreach (ILogger log in logRepository.GetCurrentLoggers().Where(l => !l.Name.is_equal_to("Trace")).or_empty_list_if_null())
+            {
+                var logger = log as Logger;
+                if (logger != null)
+                {
+                    logger.AddAppender(app);
+                }
+            }
+
         }
     }
 }

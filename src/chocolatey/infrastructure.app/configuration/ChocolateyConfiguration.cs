@@ -182,6 +182,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool PromptForConfirmation { get; set; }
         public bool AcceptLicense { get; set; }
         public bool AllowUnofficialBuild { get; set; }
+        public string AdditionalLogFileLocation { get; set; }
 
         /// <summary>
         ///   Usually related to unparsed arguments.
