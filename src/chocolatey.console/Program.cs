@@ -72,6 +72,11 @@ namespace chocolatey.console
                      license,
                      warning => { warnings.Add(warning); }
                      );
+                
+                if (!string.IsNullOrWhiteSpace(config.AdditionalLogFileLocation))
+                {
+                  Log4NetAppenderConfiguration.configure_additional_log_file(config.AdditionalLogFileLocation);
+                }
 
                 report_version_and_exit_if_requested(args, config);
 

@@ -233,5 +233,40 @@ namespace chocolatey.infrastructure.logging
 
             }
         }
+
+        public static void configure_additional_log_file(string logFileLocation)
+        {
+            if (string.IsNullOrWhiteSpace(logFileLocation)) return;
+
+            var logDirectory = Path.GetDirectoryName(logFileLocation);
+            var logFileName = Path.GetFileNameWithoutExtension(logFileLocation);
+            if (!string.IsNullOrWhiteSpace(logDirectory) && !Directory.Exists(logDirectory)) Directory.CreateDirectory(logDirectory);
+            var layout = new PatternLayout
+            {
+                ConversionPattern = "%date %property{pid} [%-5level] - %message%newline"
+            };
+            layout.ActivateOptions();
+
+            var app = new FileAppender()
+            {
+                Name = "{0}.{1}.log.appender".format_with(ApplicationParameters.Name, logFileName),
+                File = logFileLocation,
+                Layout = layout,
+                AppendToFile = true,
+                LockingModel = new FileAppender.MinimalLock(),
+            };
+            app.ActivateOptions();
+
+            ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
+            foreach (ILogger log in logRepository.GetCurrentLoggers().Where(l => !l.Name.is_equal_to("Trace")).or_empty_list_if_null())
+            {
+                var logger = log as Logger;
+                if (logger != null)
+                {
+                    logger.AddAppender(app);
+                }
+            }
+
+        }
     }
 }
