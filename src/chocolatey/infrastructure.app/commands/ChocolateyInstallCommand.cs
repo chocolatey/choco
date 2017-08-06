@@ -41,7 +41,7 @@ namespace chocolatey.infrastructure.app.commands
         {
             optionSet
                 .Add("s=|source=",
-                     "Source - The source to find the package(s) to install. Special sources include: ruby, webpi, cygwin, windowsfeatures, and python. Defaults to default feeds.",
+                     "Source - The source to find the package(s) to install. Special sources include: ruby, webpi, cygwin, windowsfeatures, and python. To specify more than one source, pass it with a semi-colon separating the values (e.g. \"'source1;source2'\"). Defaults to default feeds.",
                      option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("version=",
                      "Version - A specific version to install. Defaults to unspecified.",
