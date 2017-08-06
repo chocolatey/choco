@@ -240,6 +240,20 @@ namespace chocolatey.infrastructure.logging
                     }
                 }
 
+                foreach (var append in logRepository.GetAppenders())
+                {
+                    var appender = append as AppenderSkeleton;
+                    if (appender != null && appender.Name.is_equal_to("{0}.changes.log.appender".format_with(ApplicationParameters.Name)))
+                    {
+                        var traceLayout = new PatternLayout
+                        {
+                            ConversionPattern = "%date %property{pid}:%thread [%-5level] - %message - %file:%method:%line %newline"
+                        };
+                        traceLayout.ActivateOptions();
+
+                        appender.Layout = traceLayout;
+                    }
+                }
             }
         }
 
