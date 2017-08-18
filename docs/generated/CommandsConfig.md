@@ -129,6 +129,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        explicity proxy (`--proxy` or config setting). Overrides the default 
        proxy bypass on local setting of 'True'. Available in 0.10.4+.
 
+     --log-file=VALUE
+     Log File to output to in addition to regular loggers. Available in 0.1-
+       0.8+.
+
      --name=VALUE
      Name - the name of the config setting. Required with some actions. 
        Defaults to empty.

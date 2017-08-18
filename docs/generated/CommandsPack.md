@@ -10,19 +10,22 @@ Chocolatey will attempt to package a nuspec into a compiled nupkg. Some
  and switches with one dash (`-`). For more details, see 
  [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] (`choco -?`).
 
+**NOTE:** You can pass arbitrary property value pairs through to nuspecs.
+ These will replace variables formatted as `$property$` with the value passed.
+
 **NOTE:** `cpack` has been deprecated as it has a name collision with CMake. Please 
  use `choco pack` instead. The shortcut will be removed in v1.
 
 
 ## Usage
 
-    choco pack [<path to nuspec>] [<options/switches>]
+    choco pack [<path to nuspec>] [<options/switches>] [<property=value>]
     cpack [<path to nuspec>] [<options/switches>] (DEPRECATED)
 
 ## Examples
 
     choco pack
-    choco pack --version 1.2.3
+    choco pack --version 1.2.3 configuration=release
     choco pack path/to/nuspec
     choco pack --outputdirectory build
 
@@ -126,6 +129,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Proxy Bypass On Local - Bypass proxy for local connections. Requires 
        explicity proxy (`--proxy` or config setting). Overrides the default 
        proxy bypass on local setting of 'True'. Available in 0.10.4+.
+
+     --log-file=VALUE
+     Log File to output to in addition to regular loggers. Available in 0.1-
+       0.8+.
 
      --version=VALUE
      Version - The version you would like to insert into the package.

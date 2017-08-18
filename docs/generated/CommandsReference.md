@@ -31,6 +31,7 @@ This is a listing of all of the different things you can pass to choco.
  * [[download|CommandsDownload]] - downloads packages - optionally internalizing all remote resources
  * [[synchronize|CommandsSynchronize]] - synchronizes against system installed software - generates missing packages
  * [[sync|CommandsSync]] - synchronizes against system installed software - generates missing packages
+ * [[optimize|CommandsOptimize]] - optimizes installation, reducing space usage
 
 
 Please run chocolatey with `choco command -help` for specific help on
@@ -175,6 +176,10 @@ You can pass options and switches in the following ways:
      Proxy Bypass On Local - Bypass proxy for local connections. Requires 
        explicity proxy (`--proxy` or config setting). Overrides the default 
        proxy bypass on local setting of 'True'. Available in 0.10.4+.
+
+     --log-file=VALUE
+     Log File to output to in addition to regular loggers. Available in 0.1-
+       0.8+.
 
 ~~~
 

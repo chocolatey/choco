@@ -147,6 +147,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        explicity proxy (`--proxy` or config setting). Overrides the default 
        proxy bypass on local setting of 'True'. Available in 0.10.4+.
 
+     --log-file=VALUE
+     Log File to output to in addition to regular loggers. Available in 0.1-
+       0.8+.
+
  -s, --source=VALUE
      Source - The source we are pushing the package to. Use https://pus-
        h.chocolatey.org/ to push to [community feed](https://chocolatey.org/packages).
