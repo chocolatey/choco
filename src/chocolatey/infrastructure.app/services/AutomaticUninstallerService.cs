@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.services
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Threading;
@@ -36,6 +37,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IRegistryService _registryService;
         private readonly ICommandExecutor _commandExecutor;
         private const int SLEEP_TIME = 2;
+        private const string SKIP_FILE_NAME = ".skipAutoUninstall";
 
         public AutomaticUninstallerService(IChocolateyPackageInformationService packageInfoService, IFileSystem fileSystem, IRegistryService registryService, ICommandExecutor commandExecutor)
         {
@@ -54,6 +56,17 @@ namespace chocolatey.infrastructure.app.services
             {
                 this.Log().Info(" Skipping auto uninstaller - AutoUninstaller feature is not enabled.");
                 return;
+            }
+
+            var packageLocation = packageResult.InstallLocation;
+            if (!string.IsNullOrWhiteSpace(packageLocation))
+            {
+                var skipFiles = _fileSystem.get_files(packageLocation, SKIP_FILE_NAME + "*", SearchOption.AllDirectories).Where(p => !p.to_lower().contains("\\templates\\"));
+                if (skipFiles.Count() != 0)
+                {
+                    this.Log().Info(" Skipping auto uninstaller - Package contains a skip file ('{0}').".format_with(SKIP_FILE_NAME));
+                    return;
+                }
             }
 
             var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
