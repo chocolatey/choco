@@ -851,7 +851,7 @@ folder.");
         /// <returns>The original unmodified configuration, so it can be reset after upgrade</returns>
         private ChocolateyConfiguration set_package_config_for_upgrade(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
         {
-            if (!config.Features.UseRememberedArgumentsForUpgrades) return config;
+            if (!config.Features.UseRememberedArgumentsForUpgrades || string.IsNullOrWhiteSpace(packageInfo.Arguments)) return config;
 
             var packageArgumentsUnencrypted = packageInfo.Arguments.contains(" --") && packageInfo.Arguments.to_string().Length > 4 ? packageInfo.Arguments : NugetEncryptionUtility.DecryptString(packageInfo.Arguments);
 
