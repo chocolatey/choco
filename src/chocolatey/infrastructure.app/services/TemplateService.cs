@@ -17,8 +17,8 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
-    using System.Management.Automation;
     using System.Reflection;
     using System.Text;
     using configuration;
@@ -30,6 +30,12 @@ namespace chocolatey.infrastructure.app.services
     public class TemplateService : ITemplateService
     {
         private readonly IFileSystem _fileSystem;
+        private readonly IList<string> _templateBinaryExtensions = new List<string> { 
+            ".exe", ".msi", ".msu", ".msp", ".mst",
+            ".7z", ".zip", ".rar", ".gz", ".iso", ".tar", ".sfx",
+            ".dmg",
+            ".cer", ".crt", ".der", ".p7b", ".pfx", ".p12", ".pem"
+            };
 
         public TemplateService(IFileSystem fileSystem)
         {
@@ -105,6 +111,7 @@ namespace chocolatey.infrastructure.app.services
                 generate_file_from_template(configuration, tokens, ChocolateyLicenseFileTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "LICENSE.txt"), Encoding.UTF8);
                 generate_file_from_template(configuration, tokens, ChocolateyVerificationFileTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "VERIFICATION.txt"), Encoding.UTF8);
                 generate_file_from_template(configuration, tokens, ChocolateyReadMeTemplate.Template, _fileSystem.combine_paths(packageLocation, "ReadMe.md"), Encoding.UTF8);
+                generate_file_from_template(configuration, tokens, ChocolateyTodoTemplate.Template, _fileSystem.combine_paths(packageLocation, "_TODO.txt"), Encoding.UTF8);
             }
             else
             {
@@ -117,8 +124,18 @@ namespace chocolatey.infrastructure.app.services
                 foreach (var file in _fileSystem.get_files(templatePath, "*.*", SearchOption.AllDirectories))
                 {
                     var packageFileLocation = file.Replace(templatePath, packageLocation);
-                    if (_fileSystem.get_file_extension(packageFileLocation).is_equal_to(".nuspec")) packageFileLocation = _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower));
-                    generate_file_from_template(configuration, tokens, _fileSystem.read_file(file), packageFileLocation, Encoding.UTF8);
+                    var fileExtension = _fileSystem.get_file_extension(packageFileLocation);
+                    if (fileExtension.is_equal_to(".nuspec")) packageFileLocation = _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower));
+
+                    if (_templateBinaryExtensions.Contains(fileExtension))
+                    {
+                        this.Log().Debug(" Treating template file ('{0}') as binary instead of replacing templated values.".format_with(_fileSystem.get_file_name(file)));
+                        _fileSystem.copy_file(file, packageFileLocation, overwriteExisting:true);
+                    }
+                    else
+                    {
+                        generate_file_from_template(configuration, tokens, _fileSystem.read_file(file), packageFileLocation, Encoding.UTF8);
+                    }
                 }
             }
 
