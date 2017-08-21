@@ -20,6 +20,7 @@ namespace chocolatey.tests.infrastructure.app.services
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using chocolatey.infrastructure.adapters;
     using chocolatey.infrastructure.app;
@@ -65,7 +66,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 config.PromptForConfirmation = false;
                 package.Setup(p => p.Id).Returns("regular");
                 package.Setup(p => p.Version).Returns(new SemanticVersion("1.2.0"));
-                packageResult = new PackageResult(package.Object, null);
+                packageResult = new PackageResult(package.Object, "c:\\packages\\thispackage");
                 packageInformation = new ChocolateyPackageInformation(package.Object);
                 registryKeys.Add(
                     new RegistryApplicationKey
@@ -114,6 +115,36 @@ namespace chocolatey.tests.infrastructure.app.services
             public void should_not_get_package_information()
             {
                 packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Never);
+            }
+
+            [Fact]
+            public void should_not_call_command_executor()
+            {
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
+            }
+        }
+
+        public class when_an_autoUninstaller_skip_file_exists : AutomaticUninstallerServiceSpecsBase
+        {
+            private string skipFileName = ".skipAutoUninstall";
+            IEnumerable<string> fileList = new List<string>() {"c:\\.skipAutoUninstall"};
+            public override void Context()
+            {
+                base.Context();
+                fileSystem.Setup(f => f.get_files(It.IsAny<string>(), ".skipAutoUninstall*", SearchOption.AllDirectories)).Returns(fileList);
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - Package contains a skip file ('" + skipFileName + "')."), Times.Once);
             }
 
             [Fact]

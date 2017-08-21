@@ -382,6 +382,7 @@ Install-ChocolateyZipPackage '$env:chocolateyPackageName' $url $binRoot
   Generate-CommandReference('Support')
   Generate-CommandReference('Sync')
   Generate-CommandReference('Synchronize')
+  Generate-CommandReference('Optimize')
   Generate-TopLevelCommandReference
 
   Exit 0

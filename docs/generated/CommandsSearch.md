@@ -148,9 +148,13 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        explicity proxy (`--proxy` or config setting). Overrides the default 
        proxy bypass on local setting of 'True'. Available in 0.10.4+.
 
+     --log-file=VALUE
+     Log File to output to in addition to regular loggers. Available in 0.1-
+       0.8+.
+
  -s, --source=VALUE
-     Source - Source location for install. Can include special 'webpi'. 
-       Defaults to sources.
+     Source - Source location for install. Can use special 'webpi' or 
+       'windowsfeatures' sources. Defaults to sources.
 
  -l, --lo, --localonly, --local-only
      LocalOnly - Only search against local machine items.
@@ -230,6 +234,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
 
      --detail, --detailed
      Detailed - Alias for verbose. Available in 0.9.10+.
+
+     --audit, --showaudit, --show-audit, --show-audit-info
+     Show Audit Information - Display auditing information for a package. 
+       Available in business editions 1.12.0+. 
 
 ~~~
 

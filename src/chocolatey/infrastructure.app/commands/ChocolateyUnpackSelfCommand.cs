@@ -29,7 +29,7 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using resources;
 
-    [CommandFor("unpackself", "have chocolatey set it self up")]
+    [CommandFor("unpackself", "have chocolatey set itself up")]
     public class ChocolateyUnpackSelfCommand : ICommand
     {
         private readonly IFileSystem _fileSystem;

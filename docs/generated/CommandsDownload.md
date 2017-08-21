@@ -4,13 +4,14 @@
 
 ### Package Copy / Package Downloader
 
-[Chocolatey Professional](https://chocolatey.org/compare) and up starting in version 1.7.1.
+[Chocolatey Professional](https://chocolatey.org/compare) and up (Pro+) starting in version 1.7.1.
 
 Downloads a package from a source and unpacks it.
 
 ### Package Internalizer
 
-[Chocolatey for Business](https://chocolatey.org/compare) starting at licensed version 1.5.0.
+[Chocolatey for Business](https://chocolatey.org/compare) (C4B) starting at licensed version 1.5.0.
+Chocolatey for Managed Service Providers (MSP) starting in 1.12.1.
 
 Downloads a package from a source, optionally downloading remote
  resources and recompiling the package to use internal resources. This
@@ -28,10 +29,11 @@ See https://chocolatey.org/docs/features-automatically-recompile-packages
 
     choco download sysinternals
 
-    #### [Chocolatey for Business](https://chocolatey.org/compare) only
+    #### [Chocolatey for Business](https://chocolatey.org/compare) / Chocolatey for MSP
     choco download notepadplusplus.install --internalize
     choco download notepadplusplus.install --internalize --resources-location \\server\share
     choco download notepadplusplus.install --internalize --resources-location http://somewhere/internal --append-useoriginallocation
+    choco download KB3033929 --internalize -internalize-all-urls --append-useoriginallocation
 
 ## See It In Action
 
@@ -141,6 +143,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        explicity proxy (`--proxy` or config setting). Overrides the default 
        proxy bypass on local setting of 'True'. Available in 0.10.4+.
 
+     --log-file=VALUE
+     Log File to output to in addition to regular loggers. Available in 0.1-
+       0.8+.
+
  -s, --source=VALUE
      Source - The source to find the package(s) to download. Defaults to 
        default feeds.
@@ -188,10 +194,16 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        version 1.5.1+).
 
      --download-location=VALUE
-     Download Location - OPTIONAL - when internalizing, download the 
+     Download Location - OPTIONAL - When internalizing, download the 
        resources to this location. Used with Resources Location (and defaults 
        to Resources Location when not set). Business editions only (licensed 
        version 1.8.3+). 
+
+ -a, --all-urls, --internalize-all, --internalize-all-urls
+     All Urls - OPTIONAL - When internalizing, Chocolatey would normally only 
+       internalize packages with known helpers. Add this switch to make it 
+       download anytime a URL is found. Business editions only (licensed 
+       version 1.12.0+). 
 
      --append-useoriginallocation, --append-use-original-location
      Append -UseOriginalLocation - When `Install-ChocolateyPackage` is 

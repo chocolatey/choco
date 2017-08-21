@@ -5,7 +5,7 @@
 As a licensed customer, you can reach out to 
  our email for support. If you have phone support, you
  may reach out during the hours that are listed in your support 
- contract. See https://chocolatey.org/compare for details.
+ contract. See https://chocolatey.org/support for details.
 
 
  -?, --help, -h
@@ -95,6 +95,10 @@ As a licensed customer, you can reach out to
      Proxy Bypass On Local - Bypass proxy for local connections. Requires 
        explicity proxy (`--proxy` or config setting). Overrides the default 
        proxy bypass on local setting of 'True'. Available in 0.10.4+.
+
+     --log-file=VALUE
+     Log File to output to in addition to regular loggers. Available in 0.1-
+       0.8+.
 
 ~~~
 
