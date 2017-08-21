@@ -108,6 +108,7 @@
     <Compile Include="infrastructure.app\domain\RegistryValueExtensions.cs" />
     <Compile Include="infrastructure.app\domain\RegistryValueKindType.cs" />
     <Compile Include="infrastructure.app\events\HandlePackageResultCompletedMessage.cs" />
+    <Compile Include="infrastructure.app\templates\ChocolateyTodoTemplate.cs" />
     <Compile Include="infrastructure.app\utility\ArgumentsUtility.cs" />
     <Compile Include="infrastructure\synchronization\GlobalMutex.cs" />
     <Compile Include="infrastructure\logging\TraceLog.cs" />
