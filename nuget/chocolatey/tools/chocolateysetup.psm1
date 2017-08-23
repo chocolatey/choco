@@ -392,6 +392,12 @@ param(
     }
   }
 
+  # remove pdb file if it is found
+  $chocoPdb = Join-Path $chocolateyPath 'choco.pdb'
+  if (Test-Path ($chocoPdb)) {
+    Remove-Item "$chocoPdb" -Force -ErrorAction SilentlyContinue
+  }
+
   Write-Debug "Unpacking files required for Chocolatey."
   $chocInstallFolder = Join-Path $thisScriptFolder "chocolateyInstall"
   $chocoExe = Join-Path $chocInstallFolder 'choco.exe'
