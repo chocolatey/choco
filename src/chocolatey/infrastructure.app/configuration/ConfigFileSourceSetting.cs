@@ -41,6 +41,9 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "selfService")]
         public bool AllowSelfService { get; set; }
 
+        [XmlAttribute(AttributeName = "adminOnly")]
+        public bool VisibleToAdminsOnly { get; set; }
+
         [XmlAttribute(AttributeName = "user")]
         public string UserName { get; set; }
 

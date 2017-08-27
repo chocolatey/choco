@@ -178,6 +178,11 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        'useBackgroundServiceWithSelfServiceSourcesOnly' turned on. Defaults to 
        false. Available in 0.10.4+.
 
+     --adminonly, --admin-only
+     Visible to Administrators Only - Should this source be visible to non-
+       administrators? Requires business edition (v1.12.2+). Defaults to false. 
+       Available in 0.10.8+.
+
 ~~~
 
 [[Command Reference|CommandsReference]]

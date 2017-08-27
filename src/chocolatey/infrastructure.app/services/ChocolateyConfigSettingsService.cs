@@ -55,18 +55,20 @@ namespace chocolatey.infrastructure.app.services
                 if (!configuration.QuietOutput) {
                     if (configuration.RegularOutput)
                     {
-                        this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}|Bypass Proxy - {5}|Self-Service - {6}.".format_with(
+                        this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}|Bypass Proxy - {5}|Self-Service - {6}|Admin Only - {7}.".format_with(
                         source.Id,
                         source.Disabled ? " [Disabled]" : string.Empty,
                         source.Value,
                         (string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)) ? string.Empty : "(Authenticated)",
                         source.Priority,
                         source.BypassProxy.to_string(),
-                        source.AllowSelfService.to_string()));
+                        source.AllowSelfService.to_string(),
+                        source.VisibleToAdminsOnly.to_string()
+                        ));
                     }
                     else
                     {
-                        this.Log().Info(() => "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}".format_with(
+                        this.Log().Info(() => "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}".format_with(
                         source.Id,
                         source.Value,
                         source.Disabled.to_string(),
@@ -74,7 +76,9 @@ namespace chocolatey.infrastructure.app.services
                         source.Certificate,
                         source.Priority,
                         source.BypassProxy.to_string(),
-                        source.AllowSelfService.to_string()));
+                        source.AllowSelfService.to_string(),
+                        source.VisibleToAdminsOnly.to_string()
+                        ));
                     }
                     
                 }
@@ -85,6 +89,7 @@ namespace chocolatey.infrastructure.app.services
                     Authenticated = !(string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)),
                     Priority = source.Priority,
                     BypassProxy = source.BypassProxy,
+                    VisibleToAdminOnly = source.VisibleToAdminsOnly
                 });
             }
             return list;
@@ -106,6 +111,7 @@ namespace chocolatey.infrastructure.app.services
                     Priority = configuration.SourceCommand.Priority,
                     BypassProxy = configuration.SourceCommand.BypassProxy,
                     AllowSelfService = configuration.SourceCommand.AllowSelfService,
+                    VisibleToAdminsOnly = configuration.SourceCommand.VisibleToAdminsOnly
                 };
                 configFileSettings.Sources.Add(source);
 
@@ -123,7 +129,8 @@ namespace chocolatey.infrastructure.app.services
                     configuration.SourceCommand.CertificatePassword.is_equal_to(currentCertificatePassword) &&
                     configuration.SourceCommand.Certificate.is_equal_to(source.Certificate) &&
                     configuration.SourceCommand.BypassProxy == source.BypassProxy && 
-                    configuration.SourceCommand.AllowSelfService == source.AllowSelfService
+                    configuration.SourceCommand.AllowSelfService == source.AllowSelfService &&
+                    configuration.SourceCommand.VisibleToAdminsOnly == source.VisibleToAdminsOnly 
                     )
                 {
                     if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
@@ -138,6 +145,7 @@ namespace chocolatey.infrastructure.app.services
                     source.Certificate = configuration.SourceCommand.Certificate;
                     source.BypassProxy = configuration.SourceCommand.BypassProxy;
                     source.AllowSelfService = configuration.SourceCommand.AllowSelfService;
+                    source.VisibleToAdminsOnly = configuration.SourceCommand.VisibleToAdminsOnly;
 
                     _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                     if (!configuration.QuietOutput) this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));

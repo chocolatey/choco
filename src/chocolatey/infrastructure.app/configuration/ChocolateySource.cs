@@ -30,6 +30,8 @@ namespace chocolatey.infrastructure.app.configuration
 
         public bool AllowSelfService { get; set; }
 
+        public bool VisibleToAdminOnly { get; set; }
+
         public int Priority { get; set; }
     }
 }
