@@ -60,6 +60,7 @@ These are the functions from above as one list.
  * [[Get-EnvironmentVariableNames|HelpersGetEnvironmentVariableNames]]
  * [[Get-FtpFile|HelpersGetFtpFile]]
  * [[Get-OSArchitectureWidth|HelpersGetOSArchitectureWidth]]
+ * [[Get-PackageParameters|HelpersGetPackageParameters]]
  * [[Get-ToolsLocation|HelpersGetToolsLocation]]
  * [[Get-UACEnabled|HelpersGetUACEnabled]]
  * [[Get-UninstallRegistryKey|HelpersGetUninstallRegistryKey]]
