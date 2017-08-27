@@ -89,6 +89,7 @@ namespace chocolatey.infrastructure.app.services
                     Authenticated = !(string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)),
                     Priority = source.Priority,
                     BypassProxy = source.BypassProxy,
+                    AllowSelfService = source.AllowSelfService,
                     VisibleToAdminOnly = source.VisibleToAdminsOnly
                 });
             }
