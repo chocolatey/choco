@@ -332,7 +332,15 @@ namespace chocolatey.infrastructure.app.services
         {
             foreach (var package in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                if (packageName.is_equal_to(package) || packageName.contains(package + "."))
+                if (packageName.is_equal_to(package) 
+                    || packageName.contains(package + ".") 
+                    || (packageName.contains(package) 
+                        && (packageName.contains(".nupkg") 
+                            || packageName.contains(".nuspec") 
+                            || packageName.contains("\\")
+                            )
+                        )
+                    )
                 {
                     return false;
                 }
