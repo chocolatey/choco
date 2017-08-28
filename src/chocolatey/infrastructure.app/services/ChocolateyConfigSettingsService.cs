@@ -20,12 +20,11 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.Linq;
     using configuration;
-    using infrastructure.configuration;
     using infrastructure.services;
     using logging;
     using nuget;
 
-    internal class ChocolateyConfigSettingsService : IChocolateyConfigSettingsService
+    public class ChocolateyConfigSettingsService : IChocolateyConfigSettingsService
     {
         private readonly Lazy<ConfigFileSettings> _configFileSettings;
         private readonly IXmlService _xmlService;
@@ -47,11 +46,18 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info("Would have made a change to the configuration.");
         }
 
-        public IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration)
+        public virtual bool skip_source(ConfigFileSourceSetting source, ChocolateyConfiguration configuration)
+        {
+            return false;
+        }
+
+        public virtual IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration)
         {
             var list = new List<ChocolateySource>();
             foreach (var source in configFileSettings.Sources)
             {
+                if (skip_source(source, configuration)) continue;
+
                 if (!configuration.QuietOutput) {
                     if (configuration.RegularOutput)
                     {
@@ -80,7 +86,6 @@ namespace chocolatey.infrastructure.app.services
                         source.VisibleToAdminsOnly.to_string()
                         ));
                     }
-                    
                 }
                 list.Add(new ChocolateySource {
                     Id = source.Id,
