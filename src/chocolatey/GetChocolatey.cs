@@ -245,7 +245,6 @@ namespace chocolatey
             ensure_original_configuration(new List<string>(),
                 (config) =>
                 {
-                    config.RegularOutput = true;
                     var runner = new GenericRunner();
                     runner.run(config, _container, isConsole: false, parseArgs: command =>
                     {
@@ -298,7 +297,6 @@ namespace chocolatey
             return ensure_original_configuration(new List<string>(),
                 (config) =>
                 {
-                    config.RegularOutput = true;
                     var runner = new GenericRunner();
                     return runner.list<T>(config, _container, isConsole: false, parseArgs: null);        
                 });
@@ -327,7 +325,6 @@ namespace chocolatey
             return ensure_original_configuration(new List<string>(),
                (config) =>
                {
-                   config.RegularOutput = true;
                    var runner = new GenericRunner();
                    return runner.count(config, _container, isConsole: false, parseArgs: null);
                });
