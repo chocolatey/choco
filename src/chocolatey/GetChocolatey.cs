@@ -331,7 +331,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Gets the configuration. Should be used purely for informational purposes
+        /// Gets a copy of the configuration. Any changes here will have no effect as this is provided purely for informational purposes.
         /// </summary>
         /// <returns>The configuration for Chocolatey</returns>
         /// <remarks>Only call this once you have registered all container components with Chocolatey</remarks>
@@ -339,7 +339,14 @@ namespace chocolatey
         {
             ensure_environment();
 
-            return create_configuration(new List<string>());
+            // ensure_original_configuration() already calls create_configuration()
+            // so no need to repeat, just grab the result
+            var configuration = ensure_original_configuration(
+                new List<string>(),
+                (config) => config
+            );
+            
+            return configuration;
         }
 
         private void ensure_original_configuration(IList<string> args, Action<ChocolateyConfiguration> action)
