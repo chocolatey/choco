@@ -306,6 +306,18 @@ namespace chocolatey
                });
         }
 
+        /// <summary>
+        /// Gets the configuration. Should be used purely for informational purposes
+        /// </summary>
+        /// <returns>The configuration for Chocolatey</returns>
+        /// <remarks>Only call this once you have registered all container components with Chocolatey</remarks>
+        public ChocolateyConfiguration GetConfiguration()
+        {
+            ensure_environment();
+
+            return create_configuration(new List<string>());
+        }
+
         private void ensure_original_configuration(IList<string> args, Action<ChocolateyConfiguration> action)
         {
             var success = ensure_original_configuration(args,
@@ -363,18 +375,6 @@ namespace chocolatey
             }
 
             return configuration;
-        }
-
-        /// <summary>
-        /// Gets the configuration. Should be used purely for informational purposes
-        /// </summary>
-        /// <returns>The configuration for Chocolatey</returns>
-        /// <remarks>Only call this once you have registered all container components with Chocolatey</remarks>
-        public ChocolateyConfiguration GetConfiguration()
-        {
-            ensure_environment();
-
-            return create_configuration(new List<string>());
         }
 
         private void ensure_environment()
