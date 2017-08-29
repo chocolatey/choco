@@ -82,6 +82,9 @@ namespace chocolatey
 
     /// <summary>
     /// The place where all the magic happens.
+    /// NOTE: When using the API, this is the only means of accessing the ChocolateyConfiguration without side effects.
+    /// DO NOT call `Config.get_configuration_settings()` or access the container to pull out the ChocolateyConfiguration.
+    /// Doing so can set configuration items that are retained on next use.
     /// </summary>
     /// <remarks>Chocolatey - the most magical place on Windows</remarks>
     public class GetChocolatey
@@ -227,6 +230,12 @@ namespace chocolatey
         /// <summary>
         /// Call this method to run Chocolatey after you have set the options.
         /// WARNING: Once this is called, you will not be able to register additional container components.
+        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here. 
+        /// Make a call, then finish up and make another call. This includes
+        ///  - Run()
+        ///  - RunConsole()
+        ///  - List()
+        ///  - ListCount()
         /// </summary>
         public void Run()
         {
@@ -236,7 +245,6 @@ namespace chocolatey
             ensure_original_configuration(new List<string>(),
                 (config) =>
                 {
-                    config.RegularOutput = true;
                     var runner = new GenericRunner();
                     runner.run(config, _container, isConsole: false, parseArgs: command =>
                     {
@@ -248,6 +256,12 @@ namespace chocolatey
         /// <summary>
         ///   Call this method to run chocolatey after you have set the options.
         /// WARNING: Once this is called, you will not be able to register additional container components.
+        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here. 
+        /// Make a call, then finish up and make another call. This includes
+        ///  - Run()
+        ///  - RunConsole()
+        ///  - List()
+        ///  - ListCount()
         /// </summary>
         /// <param name="args">Commandline arguments to add to configuration.</param>
         public void RunConsole(string[] args)
@@ -267,6 +281,12 @@ namespace chocolatey
         /// <summary>
         ///    Run chocolatey after setting the options, and list the results.
         /// WARNING: Once this is called, you will not be able to register additional container components.
+        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here. 
+        /// Make a call, then finish up and make another call. This includes
+        ///  - Run()
+        ///  - RunConsole()
+        ///  - List()
+        ///  - ListCount()
         /// </summary>
         /// <typeparam name="T">The typer of results you're expecting back.</typeparam>
         public IEnumerable<T> List<T>()
@@ -277,7 +297,6 @@ namespace chocolatey
             return ensure_original_configuration(new List<string>(),
                 (config) =>
                 {
-                    config.RegularOutput = true;
                     var runner = new GenericRunner();
                     return runner.list<T>(config, _container, isConsole: false, parseArgs: null);        
                 });
@@ -287,6 +306,12 @@ namespace chocolatey
         ///    Run chocolatey after setting the options,
         ///    and get the count of items that would be returned if you listed the results.
         /// WARNING: Once this is called, you will not be able to register additional container components.
+        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here. 
+        /// Make a call, then finish up and make another call. This includes
+        ///  - Run()
+        ///  - RunConsole()
+        ///  - List()
+        ///  - ListCount()
         /// </summary>
         /// <remarks>
         ///    Is intended to be more efficient then simply calling <see cref="List{T}">List</see> and then Count() on the returned list.
@@ -300,10 +325,28 @@ namespace chocolatey
             return ensure_original_configuration(new List<string>(),
                (config) =>
                {
-                   config.RegularOutput = true;
                    var runner = new GenericRunner();
                    return runner.count(config, _container, isConsole: false, parseArgs: null);
                });
+        }
+
+        /// <summary>
+        /// Gets a copy of the configuration. Any changes here will have no effect as this is provided purely for informational purposes.
+        /// </summary>
+        /// <returns>The configuration for Chocolatey</returns>
+        /// <remarks>Only call this once you have registered all container components with Chocolatey</remarks>
+        public ChocolateyConfiguration GetConfiguration()
+        {
+            ensure_environment();
+
+            // ensure_original_configuration() already calls create_configuration()
+            // so no need to repeat, just grab the result
+            var configuration = ensure_original_configuration(
+                new List<string>(),
+                (config) => config
+            );
+            
+            return configuration;
         }
 
         private void ensure_original_configuration(IList<string> args, Action<ChocolateyConfiguration> action)
@@ -316,6 +359,16 @@ namespace chocolatey
                 });
         }
 
+        /// <summary>
+        /// After the construction of GetChocolatey, we should have a ChocolateyConfiguration or LicensedChocolateyConfiguration loaded into the environment. 
+        /// We want that original configuration to live on between calls to the API. This function ensures that the 
+        /// original default configuration from new() is reset after each command finishes running, even as each command 
+        /// may make changes to the configuration it uses.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="args">The arguments.</param>
+        /// <param name="function">The function.</param>
+        /// <returns></returns>
         private T ensure_original_configuration<T>(IList<string> args, Func<ChocolateyConfiguration, T> function)
         {
             var originalConfig = Config.get_configuration_settings().deep_copy();
@@ -339,7 +392,8 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Creates the configuration.
+        /// Creates the configuration. 
+        /// This should never be called directly, as it can cause issues that are very difficult to debug.
         /// </summary>
         /// <param name="args">The arguments.</param>
         /// <returns>The configuration for Chocolatey</returns>
@@ -363,18 +417,6 @@ namespace chocolatey
             }
 
             return configuration;
-        }
-
-        /// <summary>
-        /// Gets the configuration. Should be used purely for informational purposes
-        /// </summary>
-        /// <returns>The configuration for Chocolatey</returns>
-        /// <remarks>Only call this once you have registered all container components with Chocolatey</remarks>
-        public ChocolateyConfiguration GetConfiguration()
-        {
-            ensure_environment();
-
-            return create_configuration(new List<string>());
         }
 
         private void ensure_environment()

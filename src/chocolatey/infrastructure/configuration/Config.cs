@@ -28,6 +28,7 @@ namespace chocolatey.infrastructure.configuration
 
         /// <summary>
         ///   Initializes application configuration with a configuration instance.
+        ///   DO NOT USE with API. Use `GetChocolatey` methods - accessing this directly in API can cause very bad side effects.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -37,7 +38,8 @@ namespace chocolatey.infrastructure.configuration
         }
 
         /// <summary>
-        ///   Gets the configuration settings.
+        ///   Gets the configuration settings. 
+        ///   DO NOT USE with API. Use `GetChocolatey` methods - accessing this directly in API can cause very bad side effects.
         /// </summary>
         /// <returns>
         ///   An instance of <see cref="ChocolateyConfiguration" /> if one has been initialized; defaults to new instance of
