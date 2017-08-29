@@ -184,7 +184,7 @@ if ($PowerTab_RegisterTabExpansion)
     param($Context, [ref]$TabExpansionHasOutput, [ref]$QuoteSpaces)  # 1:
 
     $line = $Context.Line
-    $lastBlock = [regex]::Split($line, '[|;]')[-1].TrimStart()
+    $lastBlock = [System.Text.RegularExpressions.Regex]::Split($line, '[|;]')[-1].TrimStart()
     $TabExpansionHasOutput.Value = $true
     ChocolateyTabExpansion $lastBlock
   }
@@ -197,7 +197,7 @@ if (Test-Path Function:\TabExpansion) {
 }
 
 function TabExpansion($line, $lastWord) {
-    $lastBlock = [regex]::Split($line, '[|;]')[-1].TrimStart()
+    $lastBlock = [System.Text.RegularExpressions.Regex]::Split($line, '[|;]')[-1].TrimStart()
 
     switch -regex ($lastBlock) {
         # Execute Chocolatey tab completion for all choco-related commands
