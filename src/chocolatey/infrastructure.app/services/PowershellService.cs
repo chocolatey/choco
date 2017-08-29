@@ -37,6 +37,7 @@ namespace chocolatey.infrastructure.app.services
     using NuGet;
     using powershell;
     using results;
+    using utility;
     using Assembly = adapters.Assembly;
     using Console = System.Console;
     using CryptoHashProvider = cryptography.CryptoHashProvider;
@@ -321,26 +322,6 @@ namespace chocolatey.infrastructure.app.services
             return installerRun;
         }
 
-        /// <summary>
-        /// Is the package we are installing a dependency? Semi-virtual packages do not count:
-        /// .install / .app / .portable / .tool / .commandline
-        /// </summary>
-        /// <param name="config">The configuration.</param>
-        /// <param name="packageName">Name of the package.</param>
-        /// <returns></returns>
-        private bool package_is_a_dependency_not_a_virtual(ChocolateyConfiguration config, string packageName)
-        {
-            foreach (var package in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
-            {
-                if (packageName.is_equal_to(package) || packageName.contains(package + "."))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         private PowerShellExecutionResults run_external_powershell(ChocolateyConfiguration configuration, string chocoPowerShellScript)
         {
             var result = new PowerShellExecutionResults();
@@ -411,9 +392,9 @@ namespace chocolatey.infrastructure.app.services
             Environment.SetEnvironmentVariable("chocolateyChecksumType64", null);
 
             // we only want to pass the following args to packages that would apply. 
-            // like choco install git -params '' should pass those params to git.install, 
+            // like choco install git --params '' should pass those params to git.install, 
             // but not another package unless the switch apply-install-arguments-to-dependencies is used
-            if (!package_is_a_dependency_not_a_virtual(configuration, package.Id) || configuration.ApplyInstallArgumentsToDependencies)
+            if (!PackageUtility.package_is_a_dependency(configuration, package.Id) || configuration.ApplyInstallArgumentsToDependencies)
             {
                 this.Log().Debug(ChocolateyLoggers.Verbose, "Setting installer args for {0}".format_with(package.Id));
                 Environment.SetEnvironmentVariable("installArguments", configuration.InstallArguments);
@@ -428,7 +409,7 @@ namespace chocolatey.infrastructure.app.services
 
             // we only want to pass package parameters to packages that would apply. 
             // but not another package unless the switch apply-package-parameters-to-dependencies is used
-            if (!package_is_a_dependency_not_a_virtual(configuration, package.Id) || configuration.ApplyPackageParametersToDependencies)
+            if (!PackageUtility.package_is_a_dependency(configuration, package.Id) || configuration.ApplyPackageParametersToDependencies)
             {
                 this.Log().Debug(ChocolateyLoggers.Verbose, "Setting package parameters for {0}".format_with(package.Id));
                 Environment.SetEnvironmentVariable("packageParameters", configuration.PackageParameters);

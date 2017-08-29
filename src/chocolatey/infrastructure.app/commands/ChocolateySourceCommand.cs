@@ -70,7 +70,10 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.SourceCommand.BypassProxy = option != null)
                  .Add("allowselfservice|allow-self-service",
                      "Allow Self-Service - Should this source be allowed to be used with self-service? Requires business edition (v1.10.0+) with feature 'useBackgroundServiceWithSelfServiceSourcesOnly' turned on. Defaults to false. Available in 0.10.4+.",
-                     option => configuration.SourceCommand.AllowSelfService = option != null)
+                     option => configuration.SourceCommand.AllowSelfService = option != null)   
+                 .Add("adminonly|admin-only",
+                     "Visible to Administrators Only - Should this source be visible to non-administrators? Requires business edition (v1.12.2+). Defaults to false. Available in 0.10.8+.",
+                     option => configuration.SourceCommand.VisibleToAdminsOnly = option != null)
                 ;
         }
 

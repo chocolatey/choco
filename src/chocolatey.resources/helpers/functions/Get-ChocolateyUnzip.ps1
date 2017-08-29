@@ -141,8 +141,8 @@ param(
   # Replace System32 with sysnative, which does not get redirected.
   # 32-bit 7z is required so it can see both architectures
   if ([IntPtr]::Size -ne 4) {
-    $fileFullPathNoRedirection = $zipfileFullPath -ireplace ([regex]::Escape([Environment]::GetFolderPath('System'))),(Join-Path $Env:SystemRoot 'SysNative')
-    $destinationNoRedirection = $destination -ireplace ([regex]::Escape([Environment]::GetFolderPath('System'))),(Join-Path $Env:SystemRoot 'SysNative')
+    $fileFullPathNoRedirection = $zipfileFullPath -ireplace ([System.Text.RegularExpressions.Regex]::Escape([Environment]::GetFolderPath('System'))),(Join-Path $Env:SystemRoot 'SysNative')
+    $destinationNoRedirection = $destination -ireplace ([System.Text.RegularExpressions.Regex]::Escape([Environment]::GetFolderPath('System'))),(Join-Path $Env:SystemRoot 'SysNative')
   } else {
     $fileFullPathNoRedirection = $zipfileFullPath
     $destinationNoRedirection = $destination

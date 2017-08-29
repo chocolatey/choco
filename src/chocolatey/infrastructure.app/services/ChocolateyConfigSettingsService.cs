@@ -20,12 +20,11 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.Linq;
     using configuration;
-    using infrastructure.configuration;
     using infrastructure.services;
     using logging;
     using nuget;
 
-    internal class ChocolateyConfigSettingsService : IChocolateyConfigSettingsService
+    public class ChocolateyConfigSettingsService : IChocolateyConfigSettingsService
     {
         private readonly Lazy<ConfigFileSettings> _configFileSettings;
         private readonly IXmlService _xmlService;
@@ -47,26 +46,35 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info("Would have made a change to the configuration.");
         }
 
-        public IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration)
+        public virtual bool skip_source(ConfigFileSourceSetting source, ChocolateyConfiguration configuration)
+        {
+            return false;
+        }
+
+        public virtual IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration)
         {
             var list = new List<ChocolateySource>();
             foreach (var source in configFileSettings.Sources)
             {
+                if (skip_source(source, configuration)) continue;
+
                 if (!configuration.QuietOutput) {
                     if (configuration.RegularOutput)
                     {
-                        this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}|Bypass Proxy - {5}|Self-Service - {6}.".format_with(
+                        this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}|Bypass Proxy - {5}|Self-Service - {6}|Admin Only - {7}.".format_with(
                         source.Id,
                         source.Disabled ? " [Disabled]" : string.Empty,
                         source.Value,
                         (string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)) ? string.Empty : "(Authenticated)",
                         source.Priority,
                         source.BypassProxy.to_string(),
-                        source.AllowSelfService.to_string()));
+                        source.AllowSelfService.to_string(),
+                        source.VisibleToAdminsOnly.to_string()
+                        ));
                     }
                     else
                     {
-                        this.Log().Info(() => "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}".format_with(
+                        this.Log().Info(() => "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}".format_with(
                         source.Id,
                         source.Value,
                         source.Disabled.to_string(),
@@ -74,9 +82,10 @@ namespace chocolatey.infrastructure.app.services
                         source.Certificate,
                         source.Priority,
                         source.BypassProxy.to_string(),
-                        source.AllowSelfService.to_string()));
+                        source.AllowSelfService.to_string(),
+                        source.VisibleToAdminsOnly.to_string()
+                        ));
                     }
-                    
                 }
                 list.Add(new ChocolateySource {
                     Id = source.Id,
@@ -85,6 +94,8 @@ namespace chocolatey.infrastructure.app.services
                     Authenticated = !(string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)),
                     Priority = source.Priority,
                     BypassProxy = source.BypassProxy,
+                    AllowSelfService = source.AllowSelfService,
+                    VisibleToAdminOnly = source.VisibleToAdminsOnly
                 });
             }
             return list;
@@ -106,6 +117,7 @@ namespace chocolatey.infrastructure.app.services
                     Priority = configuration.SourceCommand.Priority,
                     BypassProxy = configuration.SourceCommand.BypassProxy,
                     AllowSelfService = configuration.SourceCommand.AllowSelfService,
+                    VisibleToAdminsOnly = configuration.SourceCommand.VisibleToAdminsOnly
                 };
                 configFileSettings.Sources.Add(source);
 
@@ -123,7 +135,8 @@ namespace chocolatey.infrastructure.app.services
                     configuration.SourceCommand.CertificatePassword.is_equal_to(currentCertificatePassword) &&
                     configuration.SourceCommand.Certificate.is_equal_to(source.Certificate) &&
                     configuration.SourceCommand.BypassProxy == source.BypassProxy && 
-                    configuration.SourceCommand.AllowSelfService == source.AllowSelfService
+                    configuration.SourceCommand.AllowSelfService == source.AllowSelfService &&
+                    configuration.SourceCommand.VisibleToAdminsOnly == source.VisibleToAdminsOnly 
                     )
                 {
                     if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
@@ -138,6 +151,7 @@ namespace chocolatey.infrastructure.app.services
                     source.Certificate = configuration.SourceCommand.Certificate;
                     source.BypassProxy = configuration.SourceCommand.BypassProxy;
                     source.AllowSelfService = configuration.SourceCommand.AllowSelfService;
+                    source.VisibleToAdminsOnly = configuration.SourceCommand.VisibleToAdminsOnly;
 
                     _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                     if (!configuration.QuietOutput) this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));

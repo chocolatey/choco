@@ -64,6 +64,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 service.WaitForCleanup = false;
                 config.Features.AutoUninstaller = true;
                 config.PromptForConfirmation = false;
+                config.PackageNames = "regular";
                 package.Setup(p => p.Id).Returns("regular");
                 package.Setup(p => p.Version).Returns(new SemanticVersion("1.2.0"));
                 packageResult = new PackageResult(package.Object, "c:\\packages\\thispackage");
@@ -173,6 +174,34 @@ namespace chocolatey.tests.infrastructure.app.services
             public void should_log_why_it_skips_auto_uninstaller()
             {
                 MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - No registry snapshot."), Times.Once);
+            }
+
+            [Fact]
+            public void should_not_call_command_executor()
+            {
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
+            }
+        }  
+        
+        public class when_package_is_missing : AutomaticUninstallerServiceSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                packageInformation.Package = null;
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - No package in package information."), Times.Once);
             }
 
             [Fact]
@@ -443,7 +472,7 @@ namespace chocolatey.tests.infrastructure.app.services
                     Times.Once);
             }
         }
-
+   
         public class when_uninstall_string_is_split_by_quotes : AutomaticUninstallerServiceSpecsBase
         {
             private readonly string uninstallStringWithQuoteSeparation = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe"" ""WinDir Stat""";
@@ -581,6 +610,111 @@ namespace chocolatey.tests.infrastructure.app.services
                 commandExecutor.Verify(
                     c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
+            }
+        }
+
+        public class when_AutomaticUninstallerService_is_passed_uninstall_arguments_from_command_line : AutomaticUninstallerServiceSpecsBase
+        {
+            IInstaller _installerType = new InnoSetupInstaller();
+
+            public override void Context()
+            {
+                base.Context();
+                registryKeys.Clear();
+                registryKeys.Add(
+                    new RegistryApplicationKey
+                    {
+                        DisplayName = expectedDisplayName,
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = originalUninstallString,
+                        HasQuietUninstall = false,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                        InstallerType = _installerType.InstallerType,
+                    });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+
+                config.InstallArguments = "/bob /nope";
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_call_get_package_information()
+            {
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_call_command_executor_appending_passed_arguments()
+            {
+                var uninstallArgs = _installerType.build_uninstall_command_arguments().trim_safe();
+
+                uninstallArgs += " {0}".format_with(config.InstallArguments);
+
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallString,
+                            uninstallArgs,
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
+            }
+        } 
+        
+        public class when_AutomaticUninstallerService_is_passed_overriding_uninstall_arguments_from_command_line : AutomaticUninstallerServiceSpecsBase
+        {
+            IInstaller _installerType = new InnoSetupInstaller();
+
+            public override void Context()
+            {
+                base.Context();
+                registryKeys.Clear();
+                registryKeys.Add(
+                    new RegistryApplicationKey
+                    {
+                        DisplayName = expectedDisplayName,
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = originalUninstallString,
+                        HasQuietUninstall = false,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                        InstallerType = _installerType.InstallerType,
+                    });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+
+                config.InstallArguments = "/bob /nope";
+                config.OverrideArguments = true;
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_call_get_package_information()
+            {
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_call_command_executor_with_only_passed_arguments()
+            {
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallString,
+                            config.InstallArguments,
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
             }
         }
 

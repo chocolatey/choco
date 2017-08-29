@@ -24,7 +24,7 @@ This is a listing of all of the different things you can pass to choco.
  * [[features|CommandsFeatures]] - view and configure choco features (alias for feature)
  * [[setapikey|CommandsSetapikey]] - retrieves or saves an apikey for a particular source (alias for apikey)
  * [[apikey|CommandsApikey]] - retrieves or saves an apikey for a particular source
- * [[unpackself|CommandsUnpackself]] - have chocolatey set it self up
+ * [[unpackself|CommandsUnpackself]] - have chocolatey set itself up
  * [[version|CommandsVersion]] - [DEPRECATED] will be removed in v1 - use [[`choco outdated`|Commandsoutdated]] or `cup <pkg|all> -whatif` instead
  * [[update|CommandsUpdate]] - [DEPRECATED] RESERVED for future use (you are looking for upgrade, these are not the droids you are looking for)
  * [[support|CommandsSupport]] - provides support information

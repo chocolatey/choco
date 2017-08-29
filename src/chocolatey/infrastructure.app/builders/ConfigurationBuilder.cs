@@ -121,6 +121,7 @@ namespace chocolatey.infrastructure.app.builders
                 Priority = 10,
                 BypassProxy = false,
                 AllowSelfService = false,
+                VisibleToAdminsOnly = false,
             };
 
             if (addOrUpdate && !sources.Any(s =>
@@ -188,6 +189,7 @@ namespace chocolatey.infrastructure.app.builders
                         Priority = source.Priority,
                         BypassProxy = source.BypassProxy,
                         AllowSelfService = source.AllowSelfService,
+                        VisibleToAdminsOnly = source.VisibleToAdminsOnly
                     });
             }
         }
