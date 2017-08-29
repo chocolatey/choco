@@ -28,6 +28,7 @@ namespace chocolatey.infrastructure.app.services
     using domain.installers;
     using filesystem;
     using infrastructure.commands;
+    using logging;
     using results;
 
     public class AutomaticUninstallerService : IAutomaticUninstallerService
@@ -80,6 +81,13 @@ namespace chocolatey.infrastructure.app.services
             if (registryKeys == null || registryKeys.Count == 0)
             {
                 this.Log().Info(" Skipping auto uninstaller - No registry keys in snapshot.");
+                return;
+            }
+
+            var package = pkgInfo.Package;
+            if (package == null)
+            {
+                this.Log().Info(" Skipping auto uninstaller - No package in package information.");
                 return;
             }
 
