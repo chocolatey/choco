@@ -30,6 +30,7 @@ namespace chocolatey.infrastructure.app.services
     using infrastructure.commands;
     using logging;
     using results;
+    using utility;
 
     public class AutomaticUninstallerService : IAutomaticUninstallerService
     {
@@ -97,16 +98,30 @@ namespace chocolatey.infrastructure.app.services
                 this.Log().Debug("  Sleeping for {0} seconds to allow Windows to finish cleaning up.".format_with(SLEEP_TIME));
                 Thread.Sleep((int)TimeSpan.FromSeconds(SLEEP_TIME).TotalMilliseconds);
             }
-            
+
             foreach (var key in registryKeys.or_empty_list_if_null())
             {
-                var packageCacheLocation = _fileSystem.combine_paths(_fileSystem.get_full_path(config.CacheLocation), pkgInfo.Package.Id, pkgInfo.Package.Version.to_string());
+                var packageCacheLocation = _fileSystem.combine_paths(_fileSystem.get_full_path(config.CacheLocation), package.Id, package.Version.to_string());
                 remove(key, config, packageResult, packageCacheLocation);
             }
         }
 
         public void remove(RegistryApplicationKey key, ChocolateyConfiguration config, PackageResult packageResult, string packageCacheLocation)
         {
+            var userProvidedUninstallArguments = string.Empty;
+            var userOverrideUninstallArguments = false;
+            var package = packageResult.Package;
+            if (package != null)
+            {
+                if (!PackageUtility.package_is_a_dependency(config, package.Id) || config.ApplyInstallArgumentsToDependencies)
+                {
+                    userProvidedUninstallArguments = config.InstallArguments;
+                    userOverrideUninstallArguments = config.OverrideArguments;
+
+                    if (!string.IsNullOrWhiteSpace(userProvidedUninstallArguments)) this.Log().Debug(ChocolateyLoggers.Verbose, " Using user passed {2}uninstaller args for {0}:'{1}'".format_with(package.Id, userProvidedUninstallArguments.escape_curly_braces(), userOverrideUninstallArguments ? "overriding " : string.Empty));
+                }
+            }
+            
             //todo: if there is a local package, look to use it in the future
             if (string.IsNullOrWhiteSpace(key.UninstallString))
             {
@@ -145,6 +160,7 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
             var uninstallArgs = key.UninstallString.to_string().Replace(uninstallExe.to_string(), string.Empty).trim_safe();
+
             uninstallExe = uninstallExe.remove_surrounding_quotes();
             this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
 
@@ -173,6 +189,20 @@ namespace chocolatey.infrastructure.app.services
             {
                 //todo: ultimately we should merge keys
                 uninstallArgs += " " + installer.build_uninstall_command_arguments();
+            }
+
+            if (!string.IsNullOrWhiteSpace(userProvidedUninstallArguments))
+            {
+                if (userOverrideUninstallArguments)
+                {
+                    this.Log().Debug(() => " Replacing original uninstall arguments of '{0}' with '{1}'".format_with(uninstallArgs.escape_curly_braces(),userProvidedUninstallArguments.escape_curly_braces()));
+                    uninstallArgs = userProvidedUninstallArguments;
+                }
+                else
+                {
+                    this.Log().Debug(() => " Appending original uninstall arguments with '{0}'".format_with(userProvidedUninstallArguments.escape_curly_braces()));
+                    uninstallArgs += " " + userProvidedUninstallArguments;
+                }
             }
 
             this.Log().Debug(() => " Setting up uninstall logging directory at {0}".format_with(packageCacheLocation.escape_curly_braces()));
