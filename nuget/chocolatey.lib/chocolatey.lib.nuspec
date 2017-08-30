@@ -31,7 +31,45 @@ This is the Chocolatey Library (API / DLL) package which allows Chocolatey to be
  * [Documentation](https://chocolatey.org/docs) / [Support](https://chocolatey.org/support)
 
 </description>
-    <releaseNotes>See https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md</releaseNotes>
+    <releaseNotes>See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
+
+## 0.10.8
+
+With this release, Package Parameters are fully supported from both the user side and the packaging side. Check out [the documentation](https://chocolatey.org/docs/helpers-get-packageparameters) and check out the [walkthrough](https://chocolatey.org/docs/how-to-parse-package-parameters-argument) on how to use package parameters in your packaging. Note if you are pushing packages to the community repository, you must continue to take a dependency on the `chocolatey-core.extension` as a polyfill for older versions until at least six months after a new feature is released.
+
+What you can do with logging has greatly increased your ability to have more power over how it works and deeper output to determine errors (we've expanded `--trace` [#1379](https://github.com/chocolatey/choco/issues/1379)). This release also gives packagers and users more power when working with the AutoUninstaller - opt-out ([#1257](https://github.com/chocolatey/choco/issues/1257)) and passing arguments to the uninstaller ([#1133](https://github.com/chocolatey/choco/issues/1133)).
+
+Another noteworthy addition is the ability to pass custom properties to Choco like you would do with `nuget pack`, allowing better integration with packages you manage in Visual Studio ([#1313](https://github.com/chocolatey/choco/issues/1313)).
+
+### FEATURES
+
+* Function - Get-PackageParameters - see [#1393](https://github.com/chocolatey/choco/issues/1393)
+
+### BUG FIXES
+
+ * Fix - "Value cannot be null" running choco outdated - see [#1383](https://github.com/chocolatey/choco/issues/1383)
+ * Fix - Package parameters are ignored on when install directly points to nupkg/nuspec - see [#1155](https://github.com/chocolatey/choco/issues/1155)
+ * Fix - Logging - log4net Logger location (the code location logging) is incorrect - see [#1377](https://github.com/chocolatey/choco/issues/1377)
+ * [API] Fix - GetConfiguration() sets the configuration for other calls - see [#1347](https://github.com/chocolatey/choco/issues/1347)
+ * [API] Fix - Pro/Business - Self-Service information not returned for sources - see [#1394](https://github.com/chocolatey/choco/issues/1394)
+ * [API] Fix - Config output is being set to Regular Output - see [#1396](https://github.com/chocolatey/choco/issues/1396)
+
+### IMPROVEMENTS
+
+ * [Security][POSH Host] Implement Read-Host -AsSecureString- see [#1335](https://github.com/chocolatey/choco/issues/1335)
+ * AutoUninstaller - Opt-out from packages - see [#1257](https://github.com/chocolatey/choco/issues/1257)
+ * AutoUninstaller - Use Uninstall Arguments and Override Arguments if provided - see [#1133](https://github.com/chocolatey/choco/issues/1133)
+ * pack - Pass arbitrary properties like nuget pack - see [#1313](https://github.com/chocolatey/choco/issues/1313)
+ * list - Sub-command should not require admin access (and not prompt) - see [#1353](https://github.com/chocolatey/choco/issues/1353)
+ * new - Package Templates - Do not treat binaries in template as text files - see [#1385](https://github.com/chocolatey/choco/issues/1385)
+ * new - Package Templates - Add more helpful items, like a todo list to the default template - see [#1386](https://github.com/chocolatey/choco/issues/1386)
+ * Document how to pass multiple sources on CLI - see [#1331](https://github.com/chocolatey/choco/issues/1331)
+ * Logging - Trace output should provide deep logging information - see [#1379](https://github.com/chocolatey/choco/issues/1379)
+ * Logging - Allow external log4net config file - see [#1378](https://github.com/chocolatey/choco/issues/1378)
+ * Logging - Allow capturing output to an additional log file - see [#1376](https://github.com/chocolatey/choco/issues/1376)
+ * [API] Make log4net dependency less restrictive - see [#1395](https://github.com/chocolatey/choco/issues/1395)
+ * Pro/Business - source/list - Support for Admin Only Sources - Limit non-admin list to self service only - see [#1265](https://github.com/chocolatey/choco/issues/1265)
+    </releaseNotes>
     <dependencies>
       <dependency id="log4net" version="2.0.3" />
     </dependencies>
