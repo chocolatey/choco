@@ -4,6 +4,40 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
+## 1.12.2 (August 31, 2017)
+
+### FEATURES
+
+ * [Security] choco source/list - Administrator only visible repositories. Hide repositories from non-administrators who are using Chocolatey (C4B).
+ * choco pin - Provide a reason when pinning to be seen in outdated by others (C4B).
+
+### BUG FIXES
+
+ * Package Synchronizer (Automatic Sync):
+    * Fix - Ignore HKCU pkg on sync when different user instead of removing the package.
+ * Package Builder (Choco New):
+    * Fix - remove "rel[ease]" next to version when building package id.
+    * Fix - remove 'self-installing' when building package id.
+ * Fix - Logging - log sync messages directly to log file when using limit output (`-r`).
+ * Fix - Download CDN Cache - If original url was switch to TLS/SSL by choco, the cache check doesn't override for the file on the CDN.
+
+### IMPROVEMENTS
+
+ * [Security] Runtime - Allow locking down all Chocolatey use to Administrators only (don't allow non-admins to run choco at all) - added as feature flip (see `choco feature list`).
+ * Package Internalizer (Choco Download):
+    * Pass multiple package names to download/internalize (`choco download pkg1 pkg2 pkgN`).
+    * Downloaded resources will use download CDN cache if available.
+ * Windows Service Management Functions:
+    * Allow upgrading services without a restart - pass `-DoNotReinstallService` to `Install-ChocolateyWindowsService`.
+ * Package Synchronizer (Choco Sync):
+    * Specify package name when syncing by id (`--id="'Display Name*'" --package-id=package-id`).
+ * installation - Disable install of context menus with `--params "'/NoContextMenu'"`. Currently only new installs (removal on upgrade will come in a future release).
+ * Package Builder (Choco New):
+    * When an MSI has external files, ensure to copy those into the packaging as well. Requires same folder structure that would be used at install time successfully.
+ * Package Reducer:
+    * Treat MST files as removable binaries.
+
+
 ## 1.12.1 (July 13, 2017)
 
 Among the bug fixes, we've brought Package Internalizer to the MSP edition of Chocolatey.

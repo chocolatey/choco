@@ -265,9 +265,9 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
 
      --fromprograms, --from-programs, --fromprogramsandfeatures, --from-programs-and-features
      From Programs and Features - Uninstalls a program from programs and 
-       features. Name used for package must be a match or a wildcard (*). 
-       Available in [licensed editions](https://chocolatey.org/compare) only (licensed version 1.8.0+) and 
-       requires v0.10.4+.
+       features. Name used for id must be a match or a wildcard (*) to Display 
+       Name in Programs and Features. Available in [licensed editions](https://chocolatey.org/compare) only 
+       (licensed version 1.8.0+) and requires v0.10.4+.
 
 ~~~
 
