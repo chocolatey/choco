@@ -213,6 +213,18 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        the switch appropriately. Overrides the feature 
        'internalizeAppendUseOriginalLocation' set to by default to 'False'.
 
+     --sdc, --skipdownloadcache, --skip-download-cache
+     Skip Download Cache - Use the original download url even if a private 
+       CDN cache is available for a package. Overrides the default feature 
+       'downloadCache' set to 'True'. Business editions only (licensed version 
+       1.12.2+). See https://chocolatey.org/docs/features-private-cdn 
+
+     --dc, --downloadcache, --download-cache, --use-download-cache
+     Use Download Cache - Use private CDN cache if available for a package. 
+       Overrides the default feature 'downloadCache' set to 'True'. Business 
+       editions only (licensed version 1.12.2+). See https://chocolate-
+       y.org/docs/features-private-cdn 
+
 ~~~
 
 [[Command Reference|CommandsReference]]

@@ -20,6 +20,8 @@ See https://chocolatey.org/docs/features-synchronize
 ## Examples
 
     choco sync
+    choco sync --id=putty
+    choco sync --id=putty --package-id=putty
 
 ## See It In Action
 
@@ -135,6 +137,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
 
      --id=VALUE
      Id - The Display Name from Programs and Features
+
+     --packageid, --package-id=VALUE
+     PackageId - When used with Id, this will be the custom name for the 
+       package. Business editions only (version 1.12.2+)
 
      --out, --outdir, --outputdirectory, --output-directory=VALUE
      OutputDirectory - Specifies the directory for the generated Chocolatey 

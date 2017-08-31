@@ -133,6 +133,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Version - Used when multiple versions of a package are installed.  
        Defaults to empty.
 
+     --reason, --pin-reason, --note=VALUE
+     Pin Reason - Text information about why you are setting a pin. Available 
+       in business editions 1.12.2+. 
+
 ~~~
 
 [[Command Reference|CommandsReference]]
