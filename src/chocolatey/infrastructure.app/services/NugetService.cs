@@ -1061,7 +1061,10 @@ folder.");
 
         private void remove_cache_for_package(ChocolateyConfiguration config, IPackage installedPackage)
         {
+            this.Log().Debug(ChocolateyLoggers.Verbose, "Ensuring removal of package cache files.");
             var cacheDirectory = _fileSystem.combine_paths(config.CacheLocation, installedPackage.Id, installedPackage.Version.to_string());
+
+            if (!_fileSystem.directory_exists(cacheDirectory)) return;
 
             FaultTolerance.try_catch_with_logging_exception(
                                        () => _fileSystem.delete_directory_if_exists(cacheDirectory, recursive: true),
@@ -1326,7 +1329,7 @@ folder.");
                                 rename_legacy_package_version(config, packageVersion, pkgInfo);
                                 remove_rollback_directory_if_exists(packageName);
                                 backup_existing_version(config, packageVersion, pkgInfo);
-                                packageManager.UninstallPackage(packageVersion.Id, forceRemove: config.Force, removeDependencies: config.ForceDependencies, version: packageVersion.Version);
+                                packageManager.UninstallPackage(packageVersion.Id.to_lower(), forceRemove: config.Force, removeDependencies: config.ForceDependencies, version: packageVersion.Version);
                                 ensure_nupkg_is_removed(packageVersion, pkgInfo);
                                 remove_installation_files(packageVersion, pkgInfo);
                                 remove_cache_for_package(config, packageVersion);
@@ -1366,11 +1369,14 @@ folder.");
         /// <param name="pkgInfo">The package information.</param>
         private void ensure_nupkg_is_removed(IPackage removedPackage, ChocolateyPackageInformation pkgInfo)
         {
+            this.Log().Debug(ChocolateyLoggers.Verbose, "Removing nupkg if it still exists.");
             var isSideBySide = pkgInfo != null && pkgInfo.IsSideBySide;
 
             var nupkgFile = "{0}{1}.nupkg".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty);
             var installDir = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, "{0}{1}".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty));
             var nupkg = _fileSystem.combine_paths(installDir, nupkgFile);
+
+            if (!_fileSystem.file_exists(nupkg)) return;
 
             FaultTolerance.try_catch_with_logging_exception(
                 () => _fileSystem.delete_file(nupkg),
@@ -1380,6 +1386,7 @@ folder.");
 
         public void remove_installation_files(IPackage removedPackage, ChocolateyPackageInformation pkgInfo)
         {
+            this.Log().Debug(ChocolateyLoggers.Verbose, "Ensuring removal of installation files.");
             var isSideBySide = pkgInfo != null && pkgInfo.IsSideBySide;
             var installDir = _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, "{0}{1}".format_with(removedPackage.Id, isSideBySide ? "." + removedPackage.Version.to_string() : string.Empty));
 
@@ -1392,6 +1399,8 @@ folder.");
 
                     if (fileSnapshot.Checksum == _filesService.get_package_file(file).Checksum)
                     {
+                        if (!_fileSystem.file_exists(file)) continue;
+
                         FaultTolerance.try_catch_with_logging_exception(
                             () => _fileSystem.delete_file(file),
                             "Error deleting file");
