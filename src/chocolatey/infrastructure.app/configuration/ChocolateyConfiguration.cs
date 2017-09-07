@@ -500,6 +500,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class OutdatedCommandConfiguration
     {
         public bool IgnorePinned { get; set; }
+        public bool IgnoreUnfoundPackages { get; set; }
     }
 
     [Serializable]

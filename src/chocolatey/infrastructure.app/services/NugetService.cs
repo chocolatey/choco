@@ -667,6 +667,8 @@ folder.");
 
                 if (availablePackage == null)
                 {
+                    if (config.OutdatedCommand.IgnoreUnfoundPackages) continue;
+                    
                     string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"; Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
                     var unfoundResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
 

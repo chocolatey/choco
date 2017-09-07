@@ -54,7 +54,10 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
                 .Add("ignore-pinned",
                      "Ignore Pinned - Ignore pinned packages. Defaults to false. Available in 0.10.6+.",
-                     option => configuration.OutdatedCommand.IgnorePinned = option != null)
+                     option => configuration.OutdatedCommand.IgnorePinned = option != null) 
+                .Add("ignore-unfound",
+                     "Ignore Unfound Packages - Ignore packages that are not found on the sources used (or the defaults). Defaults to false. Available in 0.10.9+.",
+                     option => configuration.OutdatedCommand.IgnoreUnfoundPackages = option != null)
                 ;
         }
 
