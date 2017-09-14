@@ -387,6 +387,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ShowDownloadProgress { get; set; }
         public bool StopOnFirstPackageFailure { get; set; }
         public bool UseRememberedArgumentsForUpgrades { get; set; }
+        public bool IgnoreUnfoundPackagesOnUpgradeOutdated { get; set; }
 
         //todo remove in 0.11.0
         public bool ScriptsCheckLastExitCode { get; set; }
@@ -500,7 +501,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class OutdatedCommandConfiguration
     {
         public bool IgnorePinned { get; set; }
-        public bool IgnoreUnfoundPackages { get; set; }
     }
 
     [Serializable]
