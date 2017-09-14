@@ -55,6 +55,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("ignore-pinned",
                      "Ignore Pinned - Ignore pinned packages. Defaults to false. Available in 0.10.6+.",
                      option => configuration.OutdatedCommand.IgnorePinned = option != null)
+                .Add("ignore-unfound",
+                    "Ignore Unfound Packages - Ignore packages that are not found on the sources used (or the defaults). Overrides the default feature '{0}' set to '{1}'. Available in 0.10.9+.".format_with(ApplicationParameters.Features.IgnoreUnfoundPackagesOnUpgradeOutdated, configuration.Features.IgnoreUnfoundPackagesOnUpgradeOutdated.to_string()),
+                    option => configuration.Features.IgnoreUnfoundPackagesOnUpgradeOutdated = option != null)
                 ;
         }
 

@@ -29,6 +29,7 @@ namespace chocolatey
     using infrastructure.extractors;
     using infrastructure.logging;
     using infrastructure.registration;
+    using infrastructure.synchronization;
     using resources;
     using Assembly = infrastructure.adapters.Assembly;
     using IFileSystem = infrastructure.filesystem.IFileSystem;
@@ -40,10 +41,18 @@ namespace chocolatey
     /// </summary>
     public static class Lets
     {
-        public static GetChocolatey GetChocolatey()
+        private static readonly GetChocolatey _chocolatey = GlobalMutex.enter(() => set_up(), 5);
+
+        private static GetChocolatey set_up()
         {
             add_assembly_resolver();
+
             return new GetChocolatey();
+        }
+
+        public static GetChocolatey GetChocolatey()
+        {
+            return _chocolatey;
         }
 
         private static ResolveEventHandler _handler = null;

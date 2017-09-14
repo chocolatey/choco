@@ -206,6 +206,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 };
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
                 filesService.Setup(x => x.get_package_file(It.IsAny<string>())).Returns(packageFile);
+                fileSystem.Setup(x => x.file_exists(filePath)).Returns(true);
 
                 because();
 
@@ -236,6 +237,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 };
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
                 filesService.Setup(x => x.get_package_file(It.IsAny<string>())).Returns(packageFileWithUpdatedChecksum);
+                fileSystem.Setup(x => x.file_exists(filePath)).Returns(true);
 
                 because();
 
@@ -267,8 +269,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 };
 
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
-
                 filesService.Setup(x => x.get_package_file(It.IsAny<string>())).Returns(packageFileNotInOriginal);
+                fileSystem.Setup(x => x.file_exists(filePath)).Returns(false);
 
                 because();
 

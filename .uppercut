@@ -17,10 +17,10 @@
   <property name="version.use_semanticversioning" value="true" overwrite="false" />
   <property name="version.major" value="0" overwrite="false" />
   <property name="version.minor" value="10" overwrite="false" />
-  <property name="version.patch" value="8" overwrite="false" />
+  <property name="version.patch" value="9" overwrite="false" />
   <property name="version.fix" value="0" overwrite="false" />
-  <property name="version.nuget.prerelease" value="" overwrite="false" />
-  <property name="version.use.build_date" value="false" overwrite="false" />
+  <property name="version.nuget.prerelease" value="beta" overwrite="false" />
+  <property name="version.use.build_date" value="true" overwrite="false" />
   <property name="assembly.description" value="${project.name} is a product of ${company.name} - All Rights Reserved." overwrite="false" />
   <property name="assembly.copyright" value="Copyright © 2017 ${company.name} Copyright © 2011 - 2017, RealDimensions Software, LLC - All Rights Reserved." overwrite="false" />
   <property name="sign.project_with_key" value="true" overwrite="false" />
