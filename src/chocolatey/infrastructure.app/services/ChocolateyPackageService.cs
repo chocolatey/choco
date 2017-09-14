@@ -925,7 +925,8 @@ The recent package changes indicate a reboot is necessary.
 
         private void uninstall_cleanup(ChocolateyConfiguration config, PackageResult packageResult)
         {
-            _packageInfoService.remove_package_information(packageResult.Package);
+            if (config.Features.RemovePackageInformationOnUninstall) _packageInfoService.remove_package_information(packageResult.Package);
+
             ensure_bad_package_path_is_clean(config, packageResult);
             remove_rollback_if_exists(packageResult);
             handle_extension_packages(config, packageResult);
