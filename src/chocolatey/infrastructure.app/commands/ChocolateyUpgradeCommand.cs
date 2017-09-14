@@ -86,6 +86,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("failonunfound|fail-on-unfound",
                      "Fail On Unfound Packages - If a package is not found in feeds specified, fail instead of warn.",
                      option => configuration.UpgradeCommand.FailOnUnfound = option != null)
+                .Add("ignore-unfound",
+                    "Ignore Unfound Packages - Ignore packages that are not found on the sources used (or the defaults). Overrides the default feature '{0}' set to '{1}'. Available in 0.10.9+.".format_with(ApplicationParameters.Features.IgnoreUnfoundPackagesOnUpgradeOutdated, configuration.Features.IgnoreUnfoundPackagesOnUpgradeOutdated.to_string()),
+                    option => configuration.Features.IgnoreUnfoundPackagesOnUpgradeOutdated = option != null)
                 .Add("failonnotinstalled|fail-on-not-installed",
                      "Fail On Non-installed Packages - If a package is not already installed, fail instead of installing.",
                      option => configuration.UpgradeCommand.FailOnNotInstalled = option != null)
