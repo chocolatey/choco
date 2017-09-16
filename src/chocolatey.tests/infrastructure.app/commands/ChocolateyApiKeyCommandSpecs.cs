@@ -108,6 +108,18 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 optionSet.Contains("k").ShouldBeTrue();
             }
+
+            [Fact]
+            public void should_add_remove_to_the_option_set()
+            {
+                optionSet.Contains("remove").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_short_version_of_remove_to_the_option_set()
+            {
+                optionSet.Contains("rem").ShouldBeTrue();
+            }
         }
 
         public class when_handling_validation : ChocolateyApiKeyCommandSpecsBase
@@ -151,6 +163,37 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_continue_when_both_source_and_key_are_set()
             {
                 configuration.ApiKeyCommand.Key = "bob";
+                configuration.Sources = "bob";
+                command.handle_validation(configuration);
+            }
+
+            [Fact]
+            public void should_throw_when_key_is_removed_without_a_source()
+            {
+                configuration.ApiKeyCommand.Remove = true;
+                configuration.Sources = "";
+                var errorred = false;
+                Exception error = null;
+
+                try
+                {
+                    command.handle_validation(configuration);
+                }
+                catch (Exception ex)
+                {
+                    errorred = true;
+                    error = ex;
+                }
+
+                errorred.ShouldBeTrue();
+                error.ShouldNotBeNull();
+                error.ShouldBeType<ApplicationException>();
+            }
+
+            [Fact]
+            public void should_continue_when_removing_and_source_is_set()
+            {
+                configuration.ApiKeyCommand.Remove = true;
                 configuration.Sources = "bob";
                 command.handle_validation(configuration);
             }

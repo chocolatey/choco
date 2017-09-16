@@ -506,6 +506,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class ApiKeyCommandConfiguration
     {
         public string Key { get; set; }
+        public bool Remove { get; set; }
     }
 
     [Serializable]
