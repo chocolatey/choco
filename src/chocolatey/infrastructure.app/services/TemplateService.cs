@@ -29,8 +29,9 @@ namespace chocolatey.infrastructure.app.services
 
     public class TemplateService : ITemplateService
     {
+        private UTF8Encoding _utf8NoBOM = new UTF8Encoding(false);
         private readonly IFileSystem _fileSystem;
-        private readonly IList<string> _templateBinaryExtensions = new List<string> { 
+        private readonly IList<string> _templateBinaryExtensions = new List<string> {
             ".exe", ".msi", ".msu", ".msp", ".mst",
             ".7z", ".zip", ".rar", ".gz", ".iso", ".tar", ".sfx",
             ".dmg",
@@ -104,14 +105,14 @@ namespace chocolatey.infrastructure.app.services
             var defaultTemplateOverride = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, "default");
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && (!_fileSystem.directory_exists(defaultTemplateOverride) || configuration.NewCommand.UseOriginalTemplate))
             {
-                generate_file_from_template(configuration, tokens, NuspecTemplate.Template, _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower)), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyInstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyinstall.ps1"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyBeforeModifyTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateybeforemodify.ps1"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyUninstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyuninstall.ps1"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyLicenseFileTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "LICENSE.txt"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyVerificationFileTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "VERIFICATION.txt"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyReadMeTemplate.Template, _fileSystem.combine_paths(packageLocation, "ReadMe.md"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyTodoTemplate.Template, _fileSystem.combine_paths(packageLocation, "_TODO.txt"), Encoding.UTF8);
+                generate_file_from_template(configuration, tokens, NuspecTemplate.Template, _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower)), _utf8NoBOM);
+                generate_file_from_template(configuration, tokens, ChocolateyInstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyinstall.ps1"), _utf8NoBOM);
+                generate_file_from_template(configuration, tokens, ChocolateyBeforeModifyTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateybeforemodify.ps1"), _utf8NoBOM);
+                generate_file_from_template(configuration, tokens, ChocolateyUninstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyuninstall.ps1"), _utf8NoBOM);
+                generate_file_from_template(configuration, tokens, ChocolateyLicenseFileTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "LICENSE.txt"), _utf8NoBOM);
+                generate_file_from_template(configuration, tokens, ChocolateyVerificationFileTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "VERIFICATION.txt"), _utf8NoBOM);
+                generate_file_from_template(configuration, tokens, ChocolateyReadMeTemplate.Template, _fileSystem.combine_paths(packageLocation, "ReadMe.md"), _utf8NoBOM);
+                generate_file_from_template(configuration, tokens, ChocolateyTodoTemplate.Template, _fileSystem.combine_paths(packageLocation, "_TODO.txt"), _utf8NoBOM);
             }
             else
             {
@@ -130,7 +131,7 @@ namespace chocolatey.infrastructure.app.services
                     if (_templateBinaryExtensions.Contains(fileExtension))
                     {
                         this.Log().Debug(" Treating template file ('{0}') as binary instead of replacing templated values.".format_with(_fileSystem.get_file_name(file)));
-                        _fileSystem.copy_file(file, packageFileLocation, overwriteExisting:true);
+                        _fileSystem.copy_file(file, packageFileLocation, overwriteExisting: true);
                     }
                     else
                     {
