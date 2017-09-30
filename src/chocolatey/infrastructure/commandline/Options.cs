@@ -871,6 +871,8 @@ namespace chocolatey.infrastructure.commandline
             IDictionary<Option,string> normalOptions = new Dictionary<Option, string>();
 			if (f != "-")
 				return false;
+			if (n == "version")
+				throw new OptionException(localizer("Use --version instead of -version."), n);
 			for (int i = 0; i < n.Length; ++i) {
 				Option p;
 				string opt = f + n [i].ToString ();
