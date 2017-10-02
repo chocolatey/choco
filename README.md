@@ -34,7 +34,7 @@ TeamCity  | AppVeyor | Travis
 [![TeamCity Build Status](https://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/jfxywa3xuwowt20w/branch/master?svg=true)](https://ci.appveyor.com/project/ferventcoder/choco/branch/master) | [![Travis Build Status](https://travis-ci.org/chocolatey/choco.svg?branch=master)](https://travis-ci.org/chocolatey/choco)
 
 ## Chat Room
-Come join in the conversation about Chocolatey in our Gitter Chat Room
+Come join in the conversation about Chocolatey in our Gitter Chat Room.
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chocolatey/choco?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -81,7 +81,7 @@ Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICEN
 ## Submitting Issues
 ![submitting issues](https://cloud.githubusercontent.com/assets/63502/12534554/6ea7cc04-c224-11e5-82ad-3805d0b5c724.png)
 
- * If you are having issue with a package, please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://chocolatey.org/docs/package-triage-process).
+ * If you are having issues with a package, please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://chocolatey.org/docs/package-triage-process).
  * If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://chocolatey.org/docs/package-triage-process#package-request-package-missing).
 
  1. Start with [Troubleshooting](https://github.com/chocolatey/choco/wiki/Troubleshooting) and the [FAQ](https://github.com/chocolatey/choco/wiki/ChocolateyFAQs) to see if your question or issue already has an answer.
@@ -103,7 +103,7 @@ Prerequisites:
 
 Submitting a ticket:
 
- * We'll need debug and verbose output, so please run and capture the log with `-dv` or `--debug --verbose`. You can submit that with the issue or create a gist and link it.
+ * We'll need debug and verbose output, so please run and capture the log with `-dv` or `--debug --verbose`. You can submit that along with the issue or create a gist and link it.
  * **Please note** that the debug/verbose output for some commands may have sensitive data (passwords or apiKeys) related to Chocolatey, so please remove those if they are there prior to submitting the issue.
  * choco.exe logs to a file in `$env:ChocolateyInstall\log\`. You can grab the specific log output from there so you don't have to capture or redirect screen output. Please limit the amount included to just the command run (the log is appended to with every command).
  * Please save the log output in a [gist](https://gist.github.com) (save the file as `log.sh`) and link to the gist from the issue. Feel free to create it as secret so it doesn't fill up against your public gists. Anyone with a direct link can still get to secret gists. If you accidentally include secret information in your gist, please delete it and create a new one (gist history can be seen by anyone) and update the link in the ticket (issue history is not retained except by email - deleting the gist ensures that no one can get to it). Using gists this way also keeps accidental secrets from being shared in the ticket in the first place as well.
@@ -199,4 +199,4 @@ chmod +x zip.sh
 Running the build on Mono produces an artifact similar to Windows but may have more rough edges. You may get a failure or two in the build script that can be safely ignored.
 
 ## Credits
-Chocolatey is brought to you by quite a few people and frameworks. See [CREDITS](https://github.com/chocolatey/choco/blob/master/docs/legal/CREDITS.md) (just LEGAL/Credits.md in the zip folder)
+Chocolatey is brought to you by quite a few people and frameworks. See [CREDITS](https://github.com/chocolatey/choco/blob/master/docs/legal/CREDITS.md) (just LEGAL/Credits.md in the zip folder).
