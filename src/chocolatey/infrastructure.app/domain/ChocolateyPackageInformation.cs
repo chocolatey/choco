@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,8 +28,11 @@ namespace chocolatey.infrastructure.app.domain
         public IPackage Package { get; set; }
         public Registry RegistrySnapshot { get; set; }
         public PackageFiles FilesSnapshot { get; set; }
+        public string Arguments { get; set; }
+        public SemanticVersion VersionOverride { get; set; }
         public bool HasSilentUninstall { get; set; }
         public bool IsSideBySide { get; set; }
         public bool IsPinned { get; set; }
+        public string ExtraInformation { get; set; }
     }
 }

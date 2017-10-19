@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +19,6 @@ namespace chocolatey.tests.integration.infrastructure.app.services
     using System;
     using System.IO;
     using System.Linq;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
@@ -28,6 +27,8 @@ namespace chocolatey.tests.integration.infrastructure.app.services
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.results;
     using chocolatey.infrastructure.services;
+    using Moq;
+    using Should;
 
     public class FilesServiceSpecs
     {
@@ -39,8 +40,8 @@ namespace chocolatey.tests.integration.infrastructure.app.services
 
             public override void Context()
             {
-                HashProvider = new CrytpoHashProvider(FileSystem, CryptoHashProviderType.Md5);
-                Service = new FilesService(new XmlService(FileSystem, HashProvider), FileSystem, new CrytpoHashProvider(FileSystem, CryptoHashProviderType.Md5));
+                HashProvider = new CryptoHashProvider(FileSystem);
+                Service = new FilesService(new XmlService(FileSystem, HashProvider), FileSystem, HashProvider);
             }
         }
 

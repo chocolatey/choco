@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +17,10 @@
 namespace chocolatey.tests.infrastructure.guards
 {
     using System;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.guards;
+    using Moq;
+    using Should;
 
     public class EnsureSpecs
     {
@@ -33,7 +34,7 @@ namespace chocolatey.tests.infrastructure.guards
         public class when_Ensure_is_being_set_to_a_type : EnsureSpecsBase
         {
             private object result;
-            private string bob = "something";
+            private readonly string bob = "something";
 
             public override void Because()
             {
@@ -294,10 +295,10 @@ namespace chocolatey.tests.infrastructure.guards
                     Ensure.that(() => test).meets(
                         s => s == s.ToLower(),
                         (name, value) =>
-                            {
-                                exceptionActionInvoked = true;
-                                throw new ApplicationException("this is what we throw.");
-                            });
+                        {
+                            exceptionActionInvoked = true;
+                            throw new ApplicationException("this is what we throw.");
+                        });
                 }
                 catch (Exception ex)
                 {
@@ -346,10 +347,10 @@ namespace chocolatey.tests.infrastructure.guards
                     Ensure.that(() => test).meets(
                         s => s == s.ToLower(),
                         (name, value) =>
-                            {
-                                exceptionActionInvoked = true;
-                                throw new ApplicationException("this is what we throw.");
-                            });
+                        {
+                            exceptionActionInvoked = true;
+                            throw new ApplicationException("this is what we throw.");
+                        });
                 }
                 catch (Exception ex)
                 {
@@ -398,10 +399,10 @@ namespace chocolatey.tests.infrastructure.guards
                     Ensure.that(() => test).meets(
                         s => s == s.ToLower(),
                         (name, value) =>
-                            {
-                                exceptionActionInvoked = true;
-                                throw new ApplicationException("this is what we throw.");
-                            });
+                        {
+                            exceptionActionInvoked = true;
+                            throw new ApplicationException("this is what we throw.");
+                        });
                 }
                 catch (Exception ex)
                 {

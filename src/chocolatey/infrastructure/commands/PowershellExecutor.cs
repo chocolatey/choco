@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,11 +57,11 @@ namespace chocolatey.infrastructure.commands
             //-NoProfile -NoLogo -ExecutionPolicy unrestricted -Command "[System.Threading.Thread]::CurrentThread.CurrentCulture = ''; [System.Threading.Thread]::CurrentThread.CurrentUICulture = '';& '%DIR%chocolatey.ps1' %PS_ARGS%"
             string arguments = "-NoProfile -NoLogo -ExecutionPolicy Bypass -Command \"{0}\"".format_with(command);
 
-            return CommandExecutor.execute(
+            return CommandExecutor.execute_static(
                 _powershell,
                 arguments,
                 waitForExitSeconds,
-                workingDirectory: fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)),
+                workingDirectory: fileSystem.get_directory_name(fileSystem.get_current_assembly_path()),
                 stdOutAction: stdOutAction,
                 stdErrAction: stdErrAction,
                 updateProcessPath: true,

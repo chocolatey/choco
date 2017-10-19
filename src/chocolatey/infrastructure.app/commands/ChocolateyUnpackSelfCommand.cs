@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,15 +23,14 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using extractors;
     using filesystem;
     using infrastructure.commands;
     using logging;
     using resources;
 
-    [CommandFor(CommandNameType.unpackself)]
-    public sealed class ChocolateyUnpackSelfCommand : ICommand
+    [CommandFor("unpackself", "have chocolatey set itself up")]
+    public class ChocolateyUnpackSelfCommand : ICommand
     {
         private readonly IFileSystem _fileSystem;
         private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)));
@@ -51,19 +51,19 @@ namespace chocolatey.infrastructure.app.commands
             _fileSystem = fileSystem;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "UnpackSelf Command");
             this.Log().Info(@"
@@ -78,15 +78,19 @@ NOTE: This command should only be used when installing Chocolatey, not
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             this.Log().Info("This would have unpacked {0} for use relative where the executable is, based on resources embedded in {0}.".format_with(ApplicationParameters.Name));
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             this.Log().Info("{0} is unpacking required files for use. Overwriting? {1}".format_with(ApplicationParameters.Name, configuration.Force));
-            //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
+            // refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
+
+            // unpack the manifest file as well
+            AssemblyFileExtractor.extract_all_resources_to_relative_directory(_fileSystem, Assembly.GetAssembly(typeof(ChocolateyUnpackSelfCommand)), _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path()), new List<string>(), "chocolatey.console");
+
             IList<string> folders = new List<string>
                 {
                     "helpers",
@@ -98,14 +102,14 @@ NOTE: This command should only be used when installing Chocolatey, not
             AssemblyFileExtractor.extract_all_resources_to_relative_directory(
                 _fileSystem,
                 assembly,
-                 _fileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)),
+                 _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path()),
                 folders,
                 ApplicationParameters.ChocolateyFileResources,
                 overwriteExisting: configuration.Force,
                 logOutput: true);
         }
 
-        public bool may_require_admin_access()
+        public virtual bool may_require_admin_access()
         {
             return true;
         }

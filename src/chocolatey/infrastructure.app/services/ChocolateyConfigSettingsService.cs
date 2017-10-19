@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,13 +17,14 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using configuration;
     using infrastructure.services;
     using logging;
     using nuget;
 
-    internal class ChocolateyConfigSettingsService : IChocolateyConfigSettingsService
+    public class ChocolateyConfigSettingsService : IChocolateyConfigSettingsService
     {
         private readonly Lazy<ConfigFileSettings> _configFileSettings;
         private readonly IXmlService _xmlService;
@@ -44,17 +46,59 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info("Would have made a change to the configuration.");
         }
 
-        public void source_list(ChocolateyConfiguration configuration)
+        public virtual bool skip_source(ConfigFileSourceSetting source, ChocolateyConfiguration configuration)
         {
+            return false;
+        }
+
+        public virtual IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration)
+        {
+            var list = new List<ChocolateySource>();
             foreach (var source in configFileSettings.Sources)
             {
-                this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}.".format_with(
-                    source.Id, 
-                    source.Disabled ? " [Disabled]" : string.Empty, 
-                    source.Value,
-                    string.IsNullOrWhiteSpace(source.UserName) ? string.Empty : "(Authenticated)", 
-                    source.Priority));
+                if (skip_source(source, configuration)) continue;
+
+                if (!configuration.QuietOutput) {
+                    if (configuration.RegularOutput)
+                    {
+                        this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}|Bypass Proxy - {5}|Self-Service - {6}|Admin Only - {7}.".format_with(
+                        source.Id,
+                        source.Disabled ? " [Disabled]" : string.Empty,
+                        source.Value,
+                        (string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)) ? string.Empty : "(Authenticated)",
+                        source.Priority,
+                        source.BypassProxy.to_string(),
+                        source.AllowSelfService.to_string(),
+                        source.VisibleToAdminsOnly.to_string()
+                        ));
+                    }
+                    else
+                    {
+                        this.Log().Info(() => "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}".format_with(
+                        source.Id,
+                        source.Value,
+                        source.Disabled.to_string(),
+                        source.UserName,
+                        source.Certificate,
+                        source.Priority,
+                        source.BypassProxy.to_string(),
+                        source.AllowSelfService.to_string(),
+                        source.VisibleToAdminsOnly.to_string()
+                        ));
+                    }
+                }
+                list.Add(new ChocolateySource {
+                    Id = source.Id,
+                    Value = source.Value,
+                    Disabled = source.Disabled,
+                    Authenticated = !(string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)),
+                    Priority = source.Priority,
+                    BypassProxy = source.BypassProxy,
+                    AllowSelfService = source.AllowSelfService,
+                    VisibleToAdminOnly = source.VisibleToAdminsOnly
+                });
             }
+            return list;
         }
 
         public void source_add(ChocolateyConfiguration configuration)
@@ -68,23 +112,34 @@ namespace chocolatey.infrastructure.app.services
                     Value = configuration.Sources,
                     UserName = configuration.SourceCommand.Username,
                     Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password),
-                    Priority = configuration.SourceCommand.Priority
+                    Certificate = configuration.SourceCommand.Certificate,
+                    CertificatePassword = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.CertificatePassword),
+                    Priority = configuration.SourceCommand.Priority,
+                    BypassProxy = configuration.SourceCommand.BypassProxy,
+                    AllowSelfService = configuration.SourceCommand.AllowSelfService,
+                    VisibleToAdminsOnly = configuration.SourceCommand.VisibleToAdminsOnly
                 };
                 configFileSettings.Sources.Add(source);
 
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                this.Log().Warn(() => "Added {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Added {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
             }
             else
             {
                 var currentPassword = string.IsNullOrWhiteSpace(source.Password) ? null : NugetEncryptionUtility.DecryptString(source.Password);
+                var currentCertificatePassword = string.IsNullOrWhiteSpace(source.CertificatePassword) ? null : NugetEncryptionUtility.DecryptString(source.CertificatePassword);
                 if (configuration.Sources.is_equal_to(source.Value) &&
                     configuration.SourceCommand.Priority == source.Priority &&
                     configuration.SourceCommand.Username.is_equal_to(source.UserName) &&
-                    configuration.SourceCommand.Password.is_equal_to(currentPassword)
+                    configuration.SourceCommand.Password.is_equal_to(currentPassword) &&
+                    configuration.SourceCommand.CertificatePassword.is_equal_to(currentCertificatePassword) &&
+                    configuration.SourceCommand.Certificate.is_equal_to(source.Certificate) &&
+                    configuration.SourceCommand.BypassProxy == source.BypassProxy && 
+                    configuration.SourceCommand.AllowSelfService == source.AllowSelfService &&
+                    configuration.SourceCommand.VisibleToAdminsOnly == source.VisibleToAdminsOnly 
                     )
                 {
-                    this.Log().Warn(NO_CHANGE_MESSAGE);
+                    if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
                 }
                 else
                 {
@@ -92,9 +147,14 @@ namespace chocolatey.infrastructure.app.services
                     source.Priority = configuration.SourceCommand.Priority;
                     source.UserName = configuration.SourceCommand.Username;
                     source.Password = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.Password);
+                    source.CertificatePassword = NugetEncryptionUtility.EncryptString(configuration.SourceCommand.CertificatePassword);
+                    source.Certificate = configuration.SourceCommand.Certificate;
+                    source.BypassProxy = configuration.SourceCommand.BypassProxy;
+                    source.AllowSelfService = configuration.SourceCommand.AllowSelfService;
+                    source.VisibleToAdminsOnly = configuration.SourceCommand.VisibleToAdminsOnly;
 
                     _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                    this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
+                    if (!configuration.QuietOutput) this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
                 }
             }
         }
@@ -107,11 +167,11 @@ namespace chocolatey.infrastructure.app.services
                 configFileSettings.Sources.Remove(source);
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                this.Log().Warn(() => "Removed {0}".format_with(source.Id));
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Removed {0}".format_with(source.Id));
             }
             else
             {
-                this.Log().Warn(NO_CHANGE_MESSAGE);
+                if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
             }
         }
 
@@ -122,11 +182,11 @@ namespace chocolatey.infrastructure.app.services
             {
                 source.Disabled = true;
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                this.Log().Warn(() => "Disabled {0}".format_with(source.Id));
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Disabled {0}".format_with(source.Id));
             }
             else
             {
-                this.Log().Warn(NO_CHANGE_MESSAGE);
+                if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
             }
         }
 
@@ -137,11 +197,11 @@ namespace chocolatey.infrastructure.app.services
             {
                 source.Disabled = false;
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                this.Log().Warn(() => "Enabled {0}".format_with(source.Id));
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Enabled {0}".format_with(source.Id));
             }
             else
             {
-                this.Log().Warn(NO_CHANGE_MESSAGE);
+                if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
             }
         }
 
@@ -149,7 +209,14 @@ namespace chocolatey.infrastructure.app.services
         {
             foreach (var feature in configFileSettings.Features)
             {
-                this.Log().Info(() => "{0} - {1} | {2}".format_with(feature.Name, !feature.Enabled ? "[Disabled]" : "[Enabled]", feature.Description));
+                if (configuration.RegularOutput)
+                {
+                    this.Log().Info(() => "{0} {1} - {2}".format_with(feature.Enabled ? "[x]" : "[ ]", feature.Name, feature.Description));
+                }
+                else
+                {
+                    this.Log().Info(() => "{0}|{1}|{2}".format_with(feature.Name, !feature.Enabled ? "Disabled" : "Enabled", feature.Description));
+                }
             }
         }
 
@@ -284,7 +351,7 @@ namespace chocolatey.infrastructure.app.services
             ;
             this.Log().Info("");
             this.Log().Info(ChocolateyLoggers.Important, "API Keys");
-            this.Log().Info(@"NOTE: Api Keys are not shown through this command. 
+            this.Log().Info(@"NOTE: Api Keys are not shown through this command.
  Use choco apikey to interact with API keys.");
         }
 
@@ -342,6 +409,22 @@ namespace chocolatey.infrastructure.app.services
 
                     this.Log().Warn(() => "Updated {0} = {1}".format_with(config.Key, config.Value));
                 }
+            }
+        }
+
+        public void config_unset(ChocolateyConfiguration configuration)
+        {
+            var config = config_get(configuration.ConfigCommand.Name);
+            if (config == null || string.IsNullOrEmpty(config.Value))
+            {
+                this.Log().Warn(NO_CHANGE_MESSAGE);
+            }
+            else
+            {
+                config.Value = "";
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+
+                this.Log().Warn(() => "Unset {0}".format_with(config.Key));
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +22,7 @@ namespace chocolatey.infrastructure.commands
     using System.IO;
     using adapters;
     using filesystem;
+    using logging;
     using platforms;
     using Process = adapters.Process;
 
@@ -49,7 +51,7 @@ namespace chocolatey.infrastructure.commands
 
         public int execute(string process, string arguments, int waitForExitInSeconds)
         {
-            return execute(process, arguments, waitForExitInSeconds, file_system.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)));
+            return execute(process, arguments, waitForExitInSeconds, file_system.get_directory_name(file_system.get_current_assembly_path()));
         }
 
         public int execute(
@@ -64,11 +66,11 @@ namespace chocolatey.infrastructure.commands
             return execute(process,
                            arguments,
                            waitForExitInSeconds,
-                           file_system.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)),
+                           file_system.get_directory_name(file_system.get_current_assembly_path()),
                            stdOutAction,
                            stdErrAction,
                            updateProcessPath,
-                           allowUseWindow:false
+                           allowUseWindow: false
                 );
         }
 
@@ -77,7 +79,7 @@ namespace chocolatey.infrastructure.commands
             return execute(process, arguments, waitForExitInSeconds, workingDirectory, null, null, updateProcessPath: true, allowUseWindow: false);
         }
 
-        public static int execute(string process,
+        public int execute(string process,
                                   string arguments,
                                   int waitForExitInSeconds,
                                   string workingDirectory,
@@ -85,6 +87,74 @@ namespace chocolatey.infrastructure.commands
                                   Action<object, DataReceivedEventArgs> stdErrAction,
                                   bool updateProcessPath,
                                   bool allowUseWindow
+            )
+        {
+            return execute(process,
+                          arguments,
+                          waitForExitInSeconds,
+                          workingDirectory,
+                          stdOutAction,
+                          stdErrAction,
+                          updateProcessPath,
+                          allowUseWindow,
+                          waitForExit:true
+               );
+        }
+
+        public int execute(string process,
+                                  string arguments,
+                                  int waitForExitInSeconds,
+                                  string workingDirectory,
+                                  Action<object, DataReceivedEventArgs> stdOutAction,
+                                  Action<object, DataReceivedEventArgs> stdErrAction,
+                                  bool updateProcessPath,
+                                  bool allowUseWindow,
+                                  bool waitForExit
+            )
+        {
+            return execute_static(process,
+                          arguments,
+                          waitForExitInSeconds,
+                          workingDirectory,
+                          stdOutAction,
+                          stdErrAction,
+                          updateProcessPath,
+                          allowUseWindow, 
+                          waitForExit
+               );
+        }
+
+        public static int execute_static(string process,
+                                  string arguments,
+                                  int waitForExitInSeconds,
+                                  string workingDirectory,
+                                  Action<object, DataReceivedEventArgs> stdOutAction,
+                                  Action<object, DataReceivedEventArgs> stdErrAction,
+                                  bool updateProcessPath,
+                                  bool allowUseWindow
+           )
+        {
+            return execute_static(process,
+                          arguments,
+                          waitForExitInSeconds,
+                          workingDirectory,
+                          stdOutAction,
+                          stdErrAction,
+                          updateProcessPath,
+                          allowUseWindow,
+                          waitForExit: true
+               );
+        }
+
+        public static int execute_static(string process,
+                                  string arguments,
+                                  int waitForExitInSeconds,
+                                  string workingDirectory,
+                                  Action<object, DataReceivedEventArgs> stdOutAction,
+                                  Action<object, DataReceivedEventArgs> stdErrAction,
+                                  bool updateProcessPath,
+                                  bool allowUseWindow,
+                                  bool waitForExit
             )
         {
             int exitCode = -1;
@@ -99,21 +169,22 @@ namespace chocolatey.infrastructure.commands
                 process = "mono";
             }
 
-            "chocolatey".Log().Debug(() => "Calling command ['\"{0}\" {1}']".format_with(process, arguments));
+            if (string.IsNullOrWhiteSpace(workingDirectory))
+            {
+                workingDirectory = file_system.get_directory_name(file_system.get_current_assembly_path());
+            }
 
-            var psi = new ProcessStartInfo(process, arguments)
+            "chocolatey".Log().Debug(() => "Calling command ['\"{0}\" {1}']".format_with(process.escape_curly_braces(), arguments.escape_curly_braces()));
+
+            var psi = new ProcessStartInfo(process.remove_surrounding_quotes(), arguments)
                 {
                     UseShellExecute = false,
                     WorkingDirectory = workingDirectory,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = !allowUseWindow,
+                    WindowStyle = ProcessWindowStyle.Minimized,
                 };
-
-            if (allowUseWindow)
-            {
-                psi.WindowStyle = ProcessWindowStyle.Minimized;
-            }
 
             using (var p = initialize_process())
             {
@@ -140,28 +211,46 @@ namespace chocolatey.infrastructure.commands
                 p.BeginErrorReadLine();
                 p.BeginOutputReadLine();
 
-                if (waitForExitInSeconds > 0)
+                if (waitForExit || waitForExitInSeconds > 0)
                 {
-                    var exited = p.WaitForExit((int) TimeSpan.FromSeconds(waitForExitInSeconds).TotalMilliseconds);
-                    if (exited)
+                    if (waitForExitInSeconds > 0)
                     {
+                        var exited = p.WaitForExit((int)TimeSpan.FromSeconds(waitForExitInSeconds).TotalMilliseconds);
+                        if (exited)
+                        {
+                            exitCode = p.ExitCode;
+                        }
+                        else
+                        {
+                            "chocolatey".Log().Warn(ChocolateyLoggers.Important, () => @"Chocolatey timed out waiting for the command to finish. The timeout 
+ specified (or the default value) was '{0}' seconds. Perhaps try a 
+ higher `--execution-timeout`? See `choco -h` for details.".format_with(waitForExitInSeconds));
+                        }
+                    }
+                    else
+                    {
+                        p.WaitForExit();
                         exitCode = p.ExitCode;
                     }
                 }
+                else
+                {
+                    "chocolatey".Log().Debug(ChocolateyLoggers.LogFileOnly, () => @"Started process called but not waiting on exit.");
+                }
             }
 
-            "chocolatey".Log().Debug(() => "Command ['\"{0}\" {1}'] exited with '{2}'".format_with(process, arguments, exitCode));
+            "chocolatey".Log().Debug(() => "Command ['\"{0}\" {1}'] exited with '{2}'".format_with(process.escape_curly_braces(), arguments.escape_curly_braces(), exitCode));
             return exitCode;
         }
 
         private static void log_output(object sender, DataReceivedEventArgs e)
         {
-            if (e != null) "chocolatey".Log().Info(e.Data);
+            if (e != null) "chocolatey".Log().Info(e.Data.escape_curly_braces());
         }
 
         private static void log_error(object sender, DataReceivedEventArgs e)
         {
-            if (e != null) "chocolatey".Log().Error(e.Data);
+            if (e != null) "chocolatey".Log().Error(e.Data.escape_curly_braces());
         }
     }
 }

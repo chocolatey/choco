@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +18,8 @@ namespace chocolatey
 {
     using System;
     using System.Globalization;
+    using System.Runtime.InteropServices;
+    using System.Security;
     using System.Text.RegularExpressions;
     using infrastructure.app;
     using infrastructure.logging;
@@ -81,6 +84,41 @@ namespace chocolatey
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
             return input;
+        }
+
+        /// <summary>
+        /// Takes a string and returns a secure string
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <returns></returns>
+        public static SecureString to_secure_string(this string input)
+        {
+            var secureString = new SecureString();
+
+            if (string.IsNullOrWhiteSpace(input)) return secureString;
+            
+            foreach (char character in input)
+            {
+                secureString.AppendChar(character);
+            }
+            
+            return secureString;
+        }
+
+        public static string from_secure_string(this SecureString input)
+        {
+            if (input == null) return string.Empty;
+            
+            IntPtr unmanagedString = IntPtr.Zero;
+            try
+            {
+                unmanagedString = Marshal.SecureStringToGlobalAllocUnicode(input);
+                return Marshal.PtrToStringUni(unmanagedString);
+            }
+            finally
+            {
+                Marshal.ZeroFreeGlobalAllocUnicode(unmanagedString);
+            }
         }
 
         private static readonly Regex _spacePattern = new Regex(@"\s", RegexOptions.Compiled);

@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,5 +33,14 @@ namespace chocolatey.infrastructure.services
         /// <param name="xmlType">Type of the XML.</param>
         /// <param name="xmlFilePath">The XML file path.</param>
         void serialize<XmlType>(XmlType xmlType, string xmlFilePath);
+
+        /// <summary>
+        ///   Serializes the specified XML type.
+        /// </summary>
+        /// <typeparam name="XmlType">The type of the ml type.</typeparam>
+        /// <param name="xmlType">Type of the XML.</param>
+        /// <param name="xmlFilePath">The XML file path.</param>
+        /// <param name="isSilent">Log messages?</param>
+        void serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent);
     }
 }

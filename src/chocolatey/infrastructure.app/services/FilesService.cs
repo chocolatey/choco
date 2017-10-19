@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +18,13 @@ namespace chocolatey.infrastructure.app.services
 {
     using System;
     using System.IO;
+    using System.Linq;
     using configuration;
     using cryptography;
     using domain;
     using filesystem;
     using infrastructure.services;
+    using logging;
     using results;
 
     public sealed class FilesService : IFilesService
@@ -116,7 +119,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Debug(() => "Capturing package files in '{0}'".format_with(directory));
             //gather all files in the folder 
             var files = _fileSystem.get_files(directory, pattern: "*.*", option: SearchOption.AllDirectories);
-            foreach (string file in files.or_empty_list_if_null())
+            foreach (string file in files.or_empty_list_if_null().Where(f => !f.EndsWith(ApplicationParameters.PackagePendingFileName)))
             {
                 packageFiles.Files.Add(get_package_file(file));
             }
@@ -127,7 +130,7 @@ namespace chocolatey.infrastructure.app.services
         public PackageFile get_package_file(string file)
         {
             var hash = _hashProvider.hash_file(file);
-            this.Log().Debug(() => " Found '{0}'{1}  with checksum '{2}'".format_with(file, Environment.NewLine, hash));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => " Found '{0}'{1}  with checksum '{2}'".format_with(file, Environment.NewLine, hash));
             
             return new PackageFile { Path = file, Checksum = hash };
         }

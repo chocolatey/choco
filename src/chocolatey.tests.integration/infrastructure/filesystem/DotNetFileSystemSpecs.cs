@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +19,10 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
     using System;
     using System.IO;
     using System.Linq;
+    using chocolatey.infrastructure.filesystem;
+    using chocolatey.infrastructure.platforms;
     using NUnit.Framework;
     using Should;
-    using chocolatey.infrastructure.filesystem;
 
     public class DotNetFileSystemSpecs
     {
@@ -49,20 +51,68 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
         }
 
         [Category("Integration")]
+        public class when_finding_paths_to_executables_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        {
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_find_existing_executable()
+            {
+                FileSystem.get_executable_path("cmd").ShouldEqual(
+                    Platform.get_platform() == PlatformType.Windows
+                        ? "C:\\Windows\\system32\\cmd.exe"
+                        : "cmd",
+                    StringComparer.OrdinalIgnoreCase
+                );
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_find_existing_executable_with_extension()
+            {
+                FileSystem.get_executable_path("cmd.exe").ShouldEqual(
+                    Platform.get_platform() == PlatformType.Windows
+                        ? "c:\\windows\\system32\\cmd.exe"
+                        : "cmd",
+                    StringComparer.OrdinalIgnoreCase
+                );
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_return_same_value_when_executable_is_not_found()
+            {
+                FileSystem.get_executable_path("daslakjsfdasdfwea").ShouldEqual("daslakjsfdasdfwea");
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_return_empty_string_when_value_is_null()
+            {
+                FileSystem.get_executable_path(null).ShouldEqual(string.Empty);
+            }
+
+            [Fact]
+            public void GetExecutablePath_should_return_empty_string_when_value_is_empty_string()
+            {
+                FileSystem.get_executable_path(string.Empty).ShouldEqual(string.Empty);
+            }
+        }
+
+        [Category("Integration")]
         public class when_doing_file_system_operations_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Context()
             {
                 base.Context();
                 FileArray = new[]
-                    {
-                        Path.Combine(ContextPath, TheTestFile)
-                    };
+                {
+                    Path.Combine(ContextPath, TheTestFile)
+                };
 
                 DirectoryArray = new[]
-                    {
-                        DestinationPath
-                    };
+                {
+                    DestinationPath
+                };
             }
 
             public override void Because()
@@ -150,13 +200,13 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
 
             public override void Because()
             {
-                FileSystem.ensure_file_attribute_set(SourceFile,FileAttributes.Hidden);
+                FileSystem.ensure_file_attribute_set(SourceFile, FileAttributes.Hidden);
             }
-            
+
             [Fact]
             public void visible_file_should_now_be_hidden()
             {
-                (FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.Hidden).ShouldEqual(FileAttributes.Hidden);
+                ((FileAttributes)FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.Hidden).ShouldEqual(FileAttributes.Hidden);
             }
 
             public override void AfterObservations()
@@ -164,9 +214,8 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
                 base.AfterObservations();
                 File.SetAttributes(SourceFile, (FileSystem.get_file_info_for(SourceFile).Attributes & ~FileAttributes.Hidden));
             }
-        }  
-            
-        
+        }
+
         [Category("Integration")]
         public class when_removing_readonly_attributes_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
@@ -179,16 +228,16 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
 
             public override void Because()
             {
-                FileSystem.ensure_file_attribute_removed(SourceFile,FileAttributes.ReadOnly);
+                FileSystem.ensure_file_attribute_removed(SourceFile, FileAttributes.ReadOnly);
             }
-            
+
             [Fact]
             public void readonly_file_should_no_longer_be_readonly()
             {
-                (FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.ReadOnly).ShouldNotEqual(FileAttributes.ReadOnly);
+                ((FileAttributes)FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.ReadOnly).ShouldNotEqual(FileAttributes.ReadOnly);
             }
-        }  
-        
+        }
+
         [Category("Integration")]
         public class when_running_fileMove_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {

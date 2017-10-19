@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,9 +20,6 @@ namespace chocolatey.tests.integration.scenarios
     using System.Collections.Concurrent;
     using System.IO;
     using System.Linq;
-    using NUnit.Framework;
-    using NuGet;
-    using Should;
     using bdddoc.core;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
@@ -29,6 +27,9 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.results;
+    using NuGet;
+    using NUnit.Framework;
+    using Should;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
     public class UninstallScenarios
@@ -58,7 +59,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_noop_uninstalling_a_package : ScenariosBase
         {
             public override void Context()
@@ -95,17 +96,17 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_contain_a_message_that_it_would_have_run_a_powershell_script()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null())
-                {
-                    if (message.Contains("chocolateyuninstall.ps1")) expectedMessage = true;
-                }
+                MockLogger.contains_message("chocolateyuninstall.ps1").ShouldBeTrue();
+            }
 
-                expectedMessage.ShouldBeTrue();
+            [Fact]
+            public void should_contain_a_message_that_it_would_have_run_powershell_modification_script()
+            {
+                MockLogger.contains_message("chocolateyBeforeModify.ps1").ShouldBeTrue();
             }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_noop_uninstalling_a_package_that_does_not_exist : ScenariosBase
         {
             public override void Context()
@@ -133,7 +134,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_happy_path : ScenariosBase
         {
             private PackageResult packageResult;
@@ -219,9 +220,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 packageResult.Name.ShouldEqual(Configuration.PackageNames);
             }
+
+            [Fact]
+            public void should_have_executed_chocolateyBeforeModify_script()
+            {
+                MockLogger.contains_message("installpackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_executed_chocolateyUninstall_script()
+            {
+                MockLogger.contains_message("installpackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
+            }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_force_uninstalling_a_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -307,7 +320,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_packages_with_packages_config : ScenariosBase
         {
             public override void Context()
@@ -322,7 +335,7 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            [ExpectedException(typeof (ApplicationException))]
+            [ExpectedException(typeof(ApplicationException))]
             public void should_throw_an_error_that_it_is_not_allowed()
             {
                 Results = Service.uninstall_run(Configuration);
@@ -395,7 +408,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -468,7 +481,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -549,7 +562,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_added_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -647,7 +660,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -745,7 +758,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_force_uninstalling_a_package_with_added_and_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -851,7 +864,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_that_does_not_exist : ScenariosBase
         {
             private PackageResult packageResult;
@@ -926,7 +939,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof (ChocolateyUninstallCommand))]
+        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;

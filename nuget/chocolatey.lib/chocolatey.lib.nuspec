@@ -2,27 +2,76 @@
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata>
     <id>chocolatey.lib</id>
-    <title>Chocolatey Core [PREVIEW]</title>
     <version>0.9.9</version>
-    <authors>Rob Reynolds, The Chocolatey Team</authors>
     <owners>Rob Reynolds</owners>
-    <summary>Chocolatey is your machine level NuGet repository. Think apt-get for Windows (executables/application packages), not library packages.</summary>
+    <title>Chocolatey Core [PREVIEW]</title>
+    <authors>Chocolatey Software, Inc</authors>
+    <projectUrl>https://github.com/chocolatey/choco</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/chocolatey/choco/master/docs/logo/chocolateyicon.gif</iconUrl>
+    <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>2017 Chocolatey Software, Inc, 2011- 2017 RealDimensions Software, LLC</copyright>
+    <tags>apt-get machine repository chocolatey</tags>
+    <summary>Chocolatey is the package manager for Windows (like apt-get but for Windows)</summary>
     <description>
 Chocolatey is a package manager for Windows (like apt-get but for Windows). It was designed to be a decentralized framework for quickly installing applications and tools that you need. It is built on the NuGet infrastructure currently using PowerShell as its focus for delivering packages from the distros to your door, err computer.
 
-Chocolatey is brought to you by the work and inspiration of the community, the work and thankless nights of the Chocolatey Team (https://github.com/orgs/chocolatey/members), and Rob heading up the direction.
+Chocolatey is brought to you by the work and inspiration of the community, the work and thankless nights of the Chocolatey Team (https://github.com/orgs/chocolatey/people), with Rob heading up the direction.
 
-This is the core package which allows Chocolatey to be embedded in your application.
+You can host your own sources and add them to Chocolatey, you can extend Chocolatey's capabilities, and folks, it's only going to get better.
+
+This is the Chocolatey Library (API / DLL) package which allows Chocolatey to be embedded in your application.
+
+### Information
+
+ * [Chocolatey Website and Community Package Repository](https://chocolatey.org)
+ * [Mailing List](http://groups.google.com/group/chocolatey) / [Release Announcements Only Mailing List](https://groups.google.com/group/chocolatey-announce) / [Build Status Mailing List](http://groups.google.com/group/chocolatey-build-status)
+ * [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [Github](https://github.com/chocolatey)
+ * [Blog](https://chocolatey.org/blog) / [Newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&amp;id=73b018498d)
+ * [Documentation](https://chocolatey.org/docs) / [Support](https://chocolatey.org/support)
+
 </description>
-    <releaseNotes>https://github.com/chocolatey/choco/blob/master/CHANGELOG.md</releaseNotes>
-    <projectUrl>https://github.com/chocolatey/choco</projectUrl>
-    <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>RealDimensions Software, LLC - 2011 - Present</copyright>
-    <tags>apt-get yum machine repository chocolatey</tags>
-    <iconUrl>https://github.com/chocolatey/chocolatey/raw/master/docs/logo/chocolateyicon.gif</iconUrl>
+    <releaseNotes>See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
+
+## 0.10.8
+
+With this release, Package Parameters are fully supported from both the user side and the packaging side. Check out [the documentation](https://chocolatey.org/docs/helpers-get-packageparameters) and check out the [walkthrough](https://chocolatey.org/docs/how-to-parse-package-parameters-argument) on how to use package parameters in your packaging. Note if you are pushing packages to the community repository, you must continue to take a dependency on the `chocolatey-core.extension` as a polyfill for older versions until at least six months after a new feature is released.
+
+What you can do with logging has greatly increased your ability to have more power over how it works and deeper output to determine errors (we've expanded `--trace` [#1379](https://github.com/chocolatey/choco/issues/1379)). This release also gives packagers and users more power when working with the AutoUninstaller - opt-out ([#1257](https://github.com/chocolatey/choco/issues/1257)) and passing arguments to the uninstaller ([#1133](https://github.com/chocolatey/choco/issues/1133)).
+
+Another noteworthy addition is the ability to pass custom properties to Choco like you would do with `nuget pack`, allowing better integration with packages you manage in Visual Studio ([#1313](https://github.com/chocolatey/choco/issues/1313)).
+
+### FEATURES
+
+* Function - Get-PackageParameters - see [#1393](https://github.com/chocolatey/choco/issues/1393)
+
+### BUG FIXES
+
+ * Fix - "Value cannot be null" running choco outdated - see [#1383](https://github.com/chocolatey/choco/issues/1383)
+ * Fix - Package parameters are ignored on when install directly points to nupkg/nuspec - see [#1155](https://github.com/chocolatey/choco/issues/1155)
+ * Fix - Logging - log4net Logger location (the code location logging) is incorrect - see [#1377](https://github.com/chocolatey/choco/issues/1377)
+ * [API] Fix - GetConfiguration() sets the configuration for other calls - see [#1347](https://github.com/chocolatey/choco/issues/1347)
+ * [API] Fix - Pro/Business - Self-Service information not returned for sources - see [#1394](https://github.com/chocolatey/choco/issues/1394)
+ * [API] Fix - Config output is being set to Regular Output - see [#1396](https://github.com/chocolatey/choco/issues/1396)
+
+### IMPROVEMENTS
+
+ * [Security][POSH Host] Implement Read-Host -AsSecureString- see [#1335](https://github.com/chocolatey/choco/issues/1335)
+ * AutoUninstaller - Opt-out from packages - see [#1257](https://github.com/chocolatey/choco/issues/1257)
+ * AutoUninstaller - Use Uninstall Arguments and Override Arguments if provided - see [#1133](https://github.com/chocolatey/choco/issues/1133)
+ * pack - Pass arbitrary properties like nuget pack - see [#1313](https://github.com/chocolatey/choco/issues/1313)
+ * list - Sub-command should not require admin access (and not prompt) - see [#1353](https://github.com/chocolatey/choco/issues/1353)
+ * new - Package Templates - Do not treat binaries in template as text files - see [#1385](https://github.com/chocolatey/choco/issues/1385)
+ * new - Package Templates - Add more helpful items, like a todo list to the default template - see [#1386](https://github.com/chocolatey/choco/issues/1386)
+ * Document how to pass multiple sources on CLI - see [#1331](https://github.com/chocolatey/choco/issues/1331)
+ * Logging - Trace output should provide deep logging information - see [#1379](https://github.com/chocolatey/choco/issues/1379)
+ * Logging - Allow external log4net config file - see [#1378](https://github.com/chocolatey/choco/issues/1378)
+ * Logging - Allow capturing output to an additional log file - see [#1376](https://github.com/chocolatey/choco/issues/1376)
+ * [API] Make log4net dependency less restrictive - see [#1395](https://github.com/chocolatey/choco/issues/1395)
+ * Pro/Business - source/list - Support for Admin Only Sources - Limit non-admin list to self service only - see [#1265](https://github.com/chocolatey/choco/issues/1265)
+    </releaseNotes>
     <dependencies>
-      <dependency id="log4net" version="[1.2.10]" />
+      <dependency id="log4net" version="2.0.3" />
     </dependencies>
   </metadata>
 </package>

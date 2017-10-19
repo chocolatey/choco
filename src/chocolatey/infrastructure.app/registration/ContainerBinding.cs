@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,18 +17,20 @@
 namespace chocolatey.infrastructure.app.registration
 {
     using System.Collections.Generic;
+    using infrastructure.events;
+    using infrastructure.tasks;
     using NuGet;
     using SimpleInjector;
     using adapters;
     using commands;
-    using cryptography;
-    using events;
     using filesystem;
     using infrastructure.commands;
     using infrastructure.configuration;
     using infrastructure.services;
     using nuget;
     using services;
+    using tasks;
+    using CryptoHashProvider = cryptography.CryptoHashProvider;
     using IFileSystem = filesystem.IFileSystem;
     using IHashProvider = cryptography.IHashProvider;
 
@@ -48,16 +51,19 @@ namespace chocolatey.infrastructure.app.registration
             container.Register(() => configuration, Lifestyle.Singleton);
             container.Register<IFileSystem, DotNetFileSystem>(Lifestyle.Singleton);
             container.Register<IXmlService, XmlService>(Lifestyle.Singleton);
+            container.Register<IDateTimeService, SystemDateTimeUtcService>(Lifestyle.Singleton);
+
             //nuget
             container.Register<ILogger, ChocolateyNugetLogger>(Lifestyle.Singleton);
             container.Register<INugetService, NugetService>(Lifestyle.Singleton);
+            container.Register<IPackageDownloader, PackageDownloader>(Lifestyle.Singleton);
             container.Register<IPowershellService, PowershellService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageInformationService, ChocolateyPackageInformationService>(Lifestyle.Singleton);
             container.Register<IShimGenerationService, ShimGenerationService>(Lifestyle.Singleton);
             container.Register<IRegistryService, RegistryService>(Lifestyle.Singleton);
             container.Register<IFilesService, FilesService>(Lifestyle.Singleton);
             container.Register<IConfigTransformService, ConfigTransformService>(Lifestyle.Singleton);
-            container.Register<IHashProvider>(() => new CrytpoHashProvider(container.GetInstance<IFileSystem>(), CryptoHashProviderType.Md5), Lifestyle.Singleton);
+            container.Register<IHashProvider>(() => new CryptoHashProvider(container.GetInstance<IFileSystem>()), Lifestyle.Singleton);
             container.Register<ITemplateService, TemplateService>(Lifestyle.Singleton);
             container.Register<IChocolateyConfigSettingsService, ChocolateyConfigSettingsService>(Lifestyle.Singleton);
             container.Register<IChocolateyPackageService, ChocolateyPackageService>(Lifestyle.Singleton);
@@ -71,6 +77,7 @@ namespace chocolatey.infrastructure.app.registration
                     var list = new List<ICommand>
                         {
                             new ChocolateyListCommand(container.GetInstance<IChocolateyPackageService>()),
+                            new ChocolateyInfoCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyInstallCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyPinCommand(container.GetInstance<IChocolateyPackageInformationService>(), container.GetInstance<ILogger>(), container.GetInstance<INugetService>()),
                             new ChocolateyOutdatedCommand(container.GetInstance<IChocolateyPackageService>()),
@@ -90,10 +97,35 @@ namespace chocolatey.infrastructure.app.registration
                     return list.AsReadOnly();
                 }, Lifestyle.Singleton);
 
+            container.Register<IEnumerable<ISourceRunner>>(() =>
+                {
+                    var list = new List<ISourceRunner>
+                        {
+                            container.GetInstance<INugetService>(),
+                            new WebPiService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>()),
+                            new WindowsFeatureService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>()),
+                            new CygwinService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>(), container.GetInstance<IRegistryService>()),
+                            new PythonService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>(), container.GetInstance<IRegistryService>()),
+                            new RubyGemsService(container.GetInstance<ICommandExecutor>(), container.GetInstance<INugetService>())
+                        };
+                    return list.AsReadOnly();
+                }, Lifestyle.Singleton);
+
+
             container.Register<IEventSubscriptionManagerService, EventSubscriptionManagerService>(Lifestyle.Singleton);
             EventManager.initialize_with(container.GetInstance<IEventSubscriptionManagerService>);
 
-            container.Register<IDateTimeService, SystemDateTimeUtcService>(Lifestyle.Singleton);
+            container.Register<IEnumerable<ITask>>(
+              () =>
+              {
+                  var list = new List<ITask>
+                    {
+                        new RemovePendingPackagesTask(container.GetInstance<IFileSystem>(), container.GetInstance<IDateTimeService>())
+                    };
+
+                  return list.AsReadOnly();
+              },
+              Lifestyle.Singleton);
         }
     }
 

@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,6 +42,7 @@ namespace chocolatey.infrastructure.results
         public string InstallLocation { get; set; }
         public string Source { get; set; }
         public string SourceUri { get; set; }
+        public int ExitCode { get; set; }
 
         public PackageResult(IPackage package, string installLocation, string source = null) : this(package.Id.to_lower(), package.Version.to_string(), installLocation)
         {
@@ -49,11 +51,21 @@ namespace chocolatey.infrastructure.results
             var sources = new List<Uri>();
             if (!string.IsNullOrEmpty(source))
             {
-                sources.AddRange(source.Split(new[] {";", ","}, StringSplitOptions.RemoveEmptyEntries).Select(s => new Uri(s)));
+                try
+                {
+                    sources.AddRange(source.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries).Select(s => new Uri(s)));
+                }
+                catch (Exception ex)
+                {
+                    this.Log().Debug("Unable to determine sources from '{0}'. Using value as is.{1} {2}".format_with(source, Environment.NewLine, ex.to_string()));
+                    // source is already set above
+                    return;
+                }
             }
 
+            
             var rp = Package as DataServicePackage;
-            if (rp != null)
+            if (rp != null && rp.DownloadUrl != null)
             {
                 SourceUri = rp.DownloadUrl.ToString();
                 Source = sources.FirstOrDefault(uri => uri.IsBaseOf(rp.DownloadUrl)).to_string();

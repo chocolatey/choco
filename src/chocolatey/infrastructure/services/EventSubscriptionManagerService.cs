@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +21,7 @@ namespace chocolatey.infrastructure.services
     using System.Reactive.Subjects;
     using events;
     using guards;
+    using logging;
 
     /// <summary>
     ///   Implementation of IEventSubscriptionManagerService
@@ -29,38 +31,21 @@ namespace chocolatey.infrastructure.services
         //http://joseoncode.com/2010/04/29/event-aggregator-with-reactive-extensions/
         //https://github.com/shiftkey/Reactive.EventAggregator
 
-        //private readonly ConcurrentDictionary<Type, object> _subscriptions = new ConcurrentDictionary<Type, object>();
         private readonly ISubject<object> _subject = new Subject<object>();
 
-        public void publish<Event>(Event eventMessage) where Event : class, IEvent
+        public void publish<Event>(Event eventMessage) where Event : class, IMessage
         {
             Ensure.that(() => eventMessage).is_not_null();
 
-            this.Log().Debug(() => "Sending message '{0}' out if there are subscribers...".format_with(typeof (Event).Name));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Sending message '{0}' out if there are subscribers...".format_with(typeof (Event).Name));
 
             _subject.OnNext(eventMessage);
-
-            //object subscription;
-            //if (_subscriptions.TryGetValue(typeof (Event), out subscription))
-            //{
-            //    ((ISubject<Event>) subscription).OnNext(message);
-            //}
         }
 
-        public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IEvent
+        public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
         {
-            //var subject = (ISubject<Event>) _subscriptions.GetOrAdd(typeof (Event), t => new Subject<Event>());
-
-            if (filter == null)
-            {
-                filter = (message) => true;
-            }
-            if (handleError == null)
-            {
-                handleError = (ex) => { };
-            }
-
-            //var subscription = subject.Where(filter).Subscribe(handleEvent, handleError);
+            if (filter == null) filter = (message) => true;
+            if (handleError == null) handleError = (ex) => { };
 
             var subscription = _subject.OfType<Event>().AsObservable()
                                        .Where(filter)

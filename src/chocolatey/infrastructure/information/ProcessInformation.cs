@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -115,6 +116,29 @@ namespace chocolatey.infrastructure.information
             return false;
         }
 
+        public static bool user_is_terminal_services()
+        {
+            return Environment.GetEnvironmentVariable("SESSIONNAME").to_string().contains("rdp-");
+        }
+        
+        public static bool user_is_remote()
+        {
+            return user_is_terminal_services() || Environment.GetEnvironmentVariable("SESSIONNAME").to_string() == string.Empty;
+        }
+
+        public static bool user_is_system()
+        {
+             if (Platform.get_platform() != PlatformType.Windows) return false;
+
+            var isSystem = false;
+
+            using (var identity = WindowsIdentity.GetCurrent())
+            {
+                isSystem = identity.IsSystem;
+            }
+
+            return isSystem;
+        }
 
         // ReSharper disable InconsistentNaming
 

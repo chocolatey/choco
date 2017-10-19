@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +19,14 @@ namespace chocolatey.tests.infrastructure.app.commands
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
+    using Moq;
+    using Should;
 
     public class ChocolateyUpgradeCommandSpecs
     {
@@ -48,7 +49,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
@@ -146,6 +147,18 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
+            public void should_add_applyPackageParametersToDependencies_to_the_option_set()
+            {
+                optionSet.Contains("apply-package-parameters-to-dependencies").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_applyInstallArgumentsToDependencies_to_the_option_set()
+            {
+                optionSet.Contains("apply-install-arguments-to-dependencies").ShouldBeTrue();
+            }
+
+            [Fact]
             public void should_add_allowmultipleversions_to_the_option_set()
             {
                 optionSet.Contains("allowmultipleversions").ShouldBeTrue();
@@ -204,7 +217,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 optionSet.Contains("p").ShouldBeTrue();
             }
-
         }
 
         public class when_handling_additional_argument_parsing : ChocolateyUpgradeCommandSpecsBase

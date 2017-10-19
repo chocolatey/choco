@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +17,13 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
+    using System.Collections.Generic;
     using configuration;
 
     public interface IChocolateyConfigSettingsService
     {
         void noop(ChocolateyConfiguration configuration);
-        void source_list(ChocolateyConfiguration configuration);
+        IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration);
         void source_add(ChocolateyConfiguration configuration);
         void source_remove(ChocolateyConfiguration configuration);
         void source_disable(ChocolateyConfiguration configuration);
@@ -34,5 +36,6 @@ namespace chocolatey.infrastructure.app.services
         void config_list(ChocolateyConfiguration configuration);
         void config_get(ChocolateyConfiguration configuration);
         void config_set(ChocolateyConfiguration configuration);
+        void config_unset(ChocolateyConfiguration configuration);
     }
 }

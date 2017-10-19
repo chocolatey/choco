@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +26,20 @@ namespace chocolatey.infrastructure.app.services
     /// </summary>
     public interface IChocolateyPackageService
     {
+
+        /// <summary>
+        ///   Ensures the application that controls a source is installed
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        void ensure_source_app_installed(ChocolateyConfiguration config);
+
+        /// <summary>
+        ///   Retrieves the count of items that meet the search criteria.
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        int count_run(ChocolateyConfiguration config);
+
         /// <summary>
         ///   Run list in noop mode
         /// </summary>

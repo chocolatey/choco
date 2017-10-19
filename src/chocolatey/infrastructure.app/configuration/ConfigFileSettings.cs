@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,12 +27,11 @@ namespace chocolatey.infrastructure.app.configuration
     [XmlRoot("chocolatey")]
     public class ConfigFileSettings
     {
+        [Obsolete("This will be removed in v1 of Chocolatey")]
         [XmlElement(ElementName = "cacheLocation")]
         public string CacheLocation { get; set; }
 
-        [XmlElement(ElementName = "containsLegacyPackageInstalls")]
-        public bool ContainsLegacyPackageInstalls { get; set; }
-
+        [Obsolete("This will be removed in v1 of Chocolatey")]
         [XmlElement(ElementName = "commandExecutionTimeoutSeconds")]
         public int CommandExecutionTimeoutSeconds { get; set; }
       

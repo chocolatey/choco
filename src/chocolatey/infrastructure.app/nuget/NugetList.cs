@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +16,10 @@
 
 namespace chocolatey.infrastructure.app.nuget
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using NuGet;
     using configuration;
 
@@ -26,12 +29,93 @@ namespace chocolatey.infrastructure.app.nuget
     {
         public static IEnumerable<IPackage> GetPackages(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
-            var packageRepository = NugetCommon.GetRemoteRepository(configuration, nugetLogger);
-            IQueryable<IPackage> results = packageRepository.Search(configuration.Input, configuration.Prerelease);
+            return execute_package_search(configuration, nugetLogger);
+        }
 
-            if (configuration.AllVersions)
+        public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger)
+        {
+            return execute_package_search(configuration, nugetLogger).Count();
+        }
+
+        private static IQueryable<IPackage> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger)
+        {
+            var packageRepository = NugetCommon.GetRemoteRepository(configuration, nugetLogger, new PackageDownloader());
+            var searchTermLower = configuration.Input.to_lower();
+
+            // Whether or not the package is remote determines two things:
+            // 1. Does the repository have a notion of "listed"?
+            // 2. Does it support prerelease in a straight-forward way?
+            // Choco previously dealt with this by taking the path of least resistance and manually filtering out and sort unwanted packages
+            // This result in blocking operations that didn't let service based repositories, like OData, take care of heavy lifting on the server.
+            bool isRemote;
+            var aggregateRepo = packageRepository as AggregateRepository;
+            if (aggregateRepo != null)
             {
-                return results.Where(PackageExtensions.IsListed).OrderBy(p => p.Id);
+                isRemote = aggregateRepo.Repositories.All(repo => repo is IServiceBasedRepository);
+            }
+            else
+            {
+                isRemote = packageRepository is IServiceBasedRepository;
+            }
+
+            IQueryable<IPackage> results = packageRepository.Search(searchTermLower, configuration.Prerelease);
+
+            if (configuration.ListCommand.Exact)
+            {
+                results = packageRepository.FindPackagesById(searchTermLower).AsQueryable();
+            }
+
+            if (configuration.ListCommand.Page.HasValue)
+            {
+                results = results.Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
+            }
+
+            if (configuration.ListCommand.ByIdOnly)
+            {
+                results = isRemote ?
+                    results.Where(p => p.Id.ToLower().Contains(searchTermLower))
+                  : results.Where(p => p.Id.contains(searchTermLower, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (configuration.ListCommand.ByTagOnly)
+            {
+                results = isRemote
+                    ? results.Where(p => p.Tags.Contains(searchTermLower))
+                    : results.Where(p => p.Tags.contains(searchTermLower, StringComparison.InvariantCultureIgnoreCase));
+            }
+
+            if (configuration.ListCommand.IdStartsWith)
+            {
+                results = isRemote ?
+                    results.Where(p => p.Id.ToLower().StartsWith(searchTermLower))
+                  : results.Where(p => p.Id.StartsWith(searchTermLower, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (configuration.ListCommand.ApprovedOnly)
+            {
+                results = results.Where(p => p.IsApproved);
+            }
+
+            if (configuration.ListCommand.DownloadCacheAvailable)
+            {
+                results = results.Where(p => p.IsDownloadCacheAvailable);
+            }
+
+            if (configuration.ListCommand.NotBroken)
+            {
+                results = results.Where(p => (p.IsDownloadCacheAvailable && configuration.Information.IsLicensedVersion) || p.PackageTestResultStatus != "Failing");
+            }
+
+            if (configuration.AllVersions || !string.IsNullOrWhiteSpace(configuration.Version))
+            {
+                if (isRemote)
+                {
+                    return results.OrderBy(p => p.Id).ThenByDescending(p => p.Version);
+                }
+                else
+                {
+                    return results.Where(PackageExtensions.IsListed).OrderBy(p => p.Id).ThenByDescending(p => p.Version).AsQueryable();
+                }
             }
 
             if (configuration.Prerelease && packageRepository.SupportsPrereleasePackages)
@@ -43,12 +127,24 @@ namespace chocolatey.infrastructure.app.nuget
                 results = results.Where(p => p.IsLatestVersion);
             }
 
-            return results.OrderBy(p => p.Id)
-                        .AsEnumerable()
+            if (!isRemote)
+            {
+                results =
+                    results
                         .Where(PackageExtensions.IsListed)
                         .Where(p => configuration.Prerelease || p.IsReleaseVersion())
-                        .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version);
-        }
+                        .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
+                        .AsQueryable();
+            }
+
+            results = configuration.ListCommand.OrderByPopularity ? 
+                 results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Id)
+                 : results;
+
+            return results;
+        } 
+
+
     }
 
     // ReSharper restore InconsistentNaming

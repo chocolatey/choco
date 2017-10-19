@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,14 +16,21 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System.Collections.Generic;
     using domain;
+    using Microsoft.Win32;
+    using Registry = domain.Registry;
 
     public interface IRegistryService
     {
         Registry get_installer_keys();
-        Registry get_differences(Registry before, Registry after);
+        Registry get_installer_key_differences(Registry before, Registry after);
+        IEnumerable<GenericRegistryValue> get_environment_values();
+        IEnumerable<GenericRegistryValue> get_added_changed_environment_differences(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after);
+        IEnumerable<GenericRegistryValue> get_removed_environment_differences(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after);
         void save_to_file(Registry snapshot, string filePath);
         Registry read_from_file(string filePath);
-        bool value_exists(string keyPath, string value);
+        bool installer_value_exists(string keyPath, string value);
+        RegistryKey get_key(RegistryHive hive, string subKeyPath);
     }
 }

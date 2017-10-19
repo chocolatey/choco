@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,15 +17,15 @@
 namespace chocolatey.infrastructure.app.commands
 {
     using System.Collections.Generic;
+    using System.Linq;
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.version)]
-    public sealed class ChocolateyVersionCommand : ChocolateyUpgradeCommand
+    [CommandFor("version", "[DEPRECATED] will be removed in v1 - use `choco outdated` or `cup <pkg|all> -whatif` instead")]
+    public class ChocolateyVersionCommand : ChocolateyUpgradeCommand
     {
         private readonly IChocolateyPackageService _packageService;
 
@@ -95,13 +96,13 @@ DEPRECATION NOTICE - choco version command is deprecated and will be
         {
             this.Log().Info(ChocolateyLoggers.Important, "[DEPRECATED] Version Command");
             this.Log().Info(@"
-Version has been deprecated and will be removed in version 1.0.0. 
+NOTE: Version has been deprecated and will be removed in version 1.0.0. 
 
  If you are attempting to get local installed items, use 
  `choco list -lo`. 
 
  If you want to know what has available upgrades, use 
- `choco upgrade <pkg|all> -whatif`.
+ `choco upgrade <pkg|all> -whatif` or `choco outdated`.
 "); 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
@@ -115,7 +116,8 @@ Version has been deprecated and will be removed in version 1.0.0.
         {
             if (configuration.ListCommand.LocalOnly)
             {
-                _packageService.list_run(configuration);
+                // note: you must leave the .ToList() here or else the method may not be evaluated!
+                _packageService.list_run(configuration).ToList();
             }
             else
             {

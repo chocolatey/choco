@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +19,7 @@ namespace chocolatey.infrastructure.tolerance
     using System;
     using System.Threading;
     using configuration;
+    using logging;
 
     /// <summary>
     /// Provides methods that are able to tolerate faults and recover
@@ -46,7 +48,8 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="action">The action.</param>
         /// <param name="waitDurationMilliseconds">The wait duration in milliseconds.</param>
         /// <param name="increaseRetryByMilliseconds">The time for each try to increase the wait duration by in milliseconds.</param>
-        public static void retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0)
+        /// <param name="isSilent">Log messages?</param>
+        public static void retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
         {
             if (action == null) return;
 
@@ -58,7 +61,8 @@ namespace chocolatey.infrastructure.tolerance
                         return true;
                     },
                 waitDurationMilliseconds,
-                increaseRetryByMilliseconds);
+                increaseRetryByMilliseconds,
+                isSilent);
         }
 
         /// <summary>
@@ -71,13 +75,16 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="increaseRetryByMilliseconds">The time for each try to increase the wait duration by in milliseconds.</param>
         /// <returns>The return value from the function</returns>
         /// <exception cref="System.ApplicationException">You must specify a number of retries greater than zero.</exception>
-        public static T retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0)
+        /// <param name="isSilent">Log messages?</param>
+        public static T retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
         {
             if (function == null) return default(T);
             if (numberOfTries == 0) throw new ApplicationException("You must specify a number of retries greater than zero.");
             var returnValue = default(T);
 
             var debugging = log_is_in_debug_mode();
+            var logLocation = ChocolateyLoggers.Normal;
+            if (isSilent) logLocation = ChocolateyLoggers.LogFileOnly;
 
             for (int i = 1; i <= numberOfTries; i++)
             {
@@ -90,7 +97,7 @@ namespace chocolatey.infrastructure.tolerance
                 {
                     if (i == numberOfTries)
                     {
-                        "chocolatey".Log().Error("Maximum tries of {0} reached. Throwing error.".format_with(numberOfTries));
+                        "chocolatey".Log().Error(logLocation, "Maximum tries of {0} reached. Throwing error.".format_with(numberOfTries));
                         throw;
                     }
                     
@@ -98,7 +105,7 @@ namespace chocolatey.infrastructure.tolerance
 
                     var exceptionMessage = debugging ? ex.ToString() : ex.Message;
 
-                    "chocolatey".Log().Warn("This is try {3}/{4}. Retrying after {2} milliseconds.{0} Error converted to warning:{0} {1}".format_with(
+                    "chocolatey".Log().Warn(logLocation, "This is try {3}/{4}. Retrying after {2} milliseconds.{0} Error converted to warning:{0} {1}".format_with(
                         Environment.NewLine,
                         exceptionMessage,
                         retryWait,
@@ -118,7 +125,9 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="errorMessage">The error message.</param>
         /// <param name="throwError">if set to <c>true</c> [throw error].</param>
         /// <param name="logWarningInsteadOfError">if set to <c>true</c> log as warning instead of error.</param>
-        public static void try_catch_with_logging_exception(Action action, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false)
+        /// <param name="logDebugInsteadOfError">Log to debug</param>
+        /// <param name="isSilent">Log messages?</param>
+        public static void try_catch_with_logging_exception(Action action, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
         {
             if (action == null) return;
 
@@ -130,7 +139,9 @@ namespace chocolatey.infrastructure.tolerance
                     },
                 errorMessage,
                 throwError,
-                logWarningInsteadOfError
+                logWarningInsteadOfError,
+                logDebugInsteadOfError,
+                isSilent
                 );
         }
 
@@ -142,11 +153,16 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="errorMessage">The error message.</param>
         /// <param name="throwError">if set to <c>true</c> [throw error].</param>
         /// <param name="logWarningInsteadOfError">if set to <c>true</c> log as warning instead of error.</param>
+        /// <param name="logDebugInsteadOfError">Log to debug</param>
+        /// <param name="isSilent">Log messages?</param>
         /// <returns>The return value from the function</returns>
-        public static T try_catch_with_logging_exception<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false)
+        public static T try_catch_with_logging_exception<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
         {
             if (function == null) return default(T);
             var returnValue = default(T);
+
+            var logLocation = ChocolateyLoggers.Normal;
+            if (isSilent) logLocation = ChocolateyLoggers.LogFileOnly;
 
             try
             {
@@ -156,13 +172,17 @@ namespace chocolatey.infrastructure.tolerance
             {
                 var exceptionMessage = log_is_in_debug_mode() ? ex.ToString() : ex.Message;
 
-                if (logWarningInsteadOfError)
+                if (logDebugInsteadOfError)
                 {
-                    "chocolatey".Log().Warn("{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
+                    "chocolatey".Log().Debug(logLocation, "{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
+                }
+                else if (logWarningInsteadOfError)
+                {
+                    "chocolatey".Log().Warn(logLocation, "{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
                 }
                 else
                 {
-                    "chocolatey".Log().Error("{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
+                    "chocolatey".Log().Error(logLocation, "{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
                 }
 
                 if (throwError)

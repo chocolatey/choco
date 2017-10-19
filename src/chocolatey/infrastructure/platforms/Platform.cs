@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -83,16 +84,12 @@ namespace chocolatey.infrastructure.platforms
             {
                 case PlatformType.Linux:
                     return "Linux";
-                    break;
                 case PlatformType.Mac:
                     return "OS X";
-                    break;
                 case PlatformType.Windows:
                     return get_windows_name(get_version());
-                    break;
                 default:
                     return "";
-                    break;
             }
         }
 
@@ -122,8 +119,11 @@ namespace chocolatey.infrastructure.platforms
             string majorMinor = version.Major + "." + version.Minor;
             switch (majorMinor)
             {
+                case "10.0":
+                    name = isServer ? "Windows Server 2016" : "Windows 10";
+                    break;
                 case "6.4":
-                    name = isServer ? "Windows Server 2016 (?)" : "Windows 10";
+                    name = isServer ? "Windows Server 2016" : "Windows 10";
                     break;
                 case "6.3":
                     name = isServer ? "Windows Server 2012 R2" : "Windows 8.1";

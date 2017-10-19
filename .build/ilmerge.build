@@ -23,8 +23,8 @@
   <property name="file.merge.name" value="__REPLACE__" overwrite="false" />
   <!-- exe winexe dll -->
   <property name="merge.target.type" value="__REPLACE__" overwrite="false" />
-  <property name="args.ilmerge" value="/internalize /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " />
-  <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
+  <property name="args.ilmerge" value="/internalize /targetplatform:&quot;v4,${environment::get-variable('ProgramFiles(x86)')}\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " />
+  <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:&quot;v4,${environment::get-variable('ProgramFiles(x86)')}\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
 
   <target name="go" depends="load_uppercut_assemblies, run_tasks" if="${run.ilmerge}" />
 
@@ -38,8 +38,8 @@
     <property name="dirs.merge.to" value="${environment::get-variable('uc.dirs.merge.to')}" if="${environment::variable-exists('uc.dirs.merge.to')}" />
     <property name="file.merge.name" value="${environment::get-variable('uc.file.merge.name')}" if="${environment::variable-exists('uc.file.merge.name')}" />
     <property name="merge.target.type" value="${environment::get-variable('uc.merge.target.type')}" if="${environment::variable-exists('uc.merge.target.type')}" />
-    <property name="args.ilmerge" value="/internalize /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /ndebug /allowDup ${file.merge.name} " />
-    <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
+    <property name="args.ilmerge" value="/internalize /targetplatform:&quot;v4,${environment::get-variable('ProgramFiles(x86)')}\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /ndebug /allowDup ${file.merge.name} " />
+    <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:&quot;v4,${environment::get-variable('ProgramFiles(x86)')}\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /log:${dirs.merge.log}${path.separator}${log.merge} /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
   </target>
 
   <target name="error_check">

@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +19,14 @@ namespace chocolatey.tests.infrastructure.app.commands
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
+    using Moq;
+    using Should;
 
     public class ChocolateySourceCommandSpecs
     {
@@ -48,19 +49,19 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void should_implement_source()
             {
-                results.ShouldContain(CommandNameType.source.to_string());
-            } 
-            
+                results.ShouldContain("source");
+            }
+
             [Fact]
             public void should_implement_sources()
             {
-                results.ShouldContain(CommandNameType.sources.to_string());
+                results.ShouldContain("sources");
             }
         }
 
@@ -299,7 +300,6 @@ namespace chocolatey.tests.infrastructure.app.commands
                 error.Message.ShouldEqual("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.SourceCommand.Command.to_string()));
             }
 
-
             [Fact]
             public void should_continue_when_command_is_list_and_name_is_not_set()
             {
@@ -378,6 +378,24 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.SourceCommand.Command = SourceCommandType.enable;
                 because();
                 configSettingsService.Verify(c => c.source_enable(configuration), Times.Once);
+            }
+        }
+
+        public class when_list_is_called : ChocolateySourceCommandSpecsBase
+        {
+            private Action because;
+
+            public override void Because()
+            {
+                because = () => command.list(configuration);
+            }
+
+            [Fact]
+            public void should_call_service_source_list_when_command_is_list()
+            {
+                configuration.SourceCommand.Command = SourceCommandType.list;
+                because();
+                configSettingsService.Verify(c => c.source_list(configuration), Times.Once);
             }
         }
     }

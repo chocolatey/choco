@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +35,15 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "disabled")]
         public bool Disabled { get; set; }
 
+        [XmlAttribute(AttributeName = "bypassProxy")]
+        public bool BypassProxy { get; set; }
+
+        [XmlAttribute(AttributeName = "selfService")]
+        public bool AllowSelfService { get; set; }
+
+        [XmlAttribute(AttributeName = "adminOnly")]
+        public bool VisibleToAdminsOnly { get; set; }
+
         [XmlAttribute(AttributeName = "user")]
         public string UserName { get; set; }
 
@@ -42,5 +52,11 @@ namespace chocolatey.infrastructure.app.configuration
         
         [XmlAttribute(AttributeName = "priority")]
         public int Priority { get; set; }
+
+        [XmlAttribute(AttributeName = "certificate")]
+        public string Certificate { get; set; }
+
+        [XmlAttribute(AttributeName = "certificatePassword")]
+        public string CertificatePassword { get; set; }
     }
 }

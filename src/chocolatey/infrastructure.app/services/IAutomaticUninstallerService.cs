@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +17,7 @@
 namespace chocolatey.infrastructure.app.services
 {
     using configuration;
+    using domain;
     using results;
 
     /// <summary>
@@ -29,5 +31,14 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="packageResult">The package result.</param>
         /// <param name="config">The configuration.</param>
         void run(PackageResult packageResult, ChocolateyConfiguration config);
+
+        /// <summary>
+        /// Removes one app (registry value) based on config and records any messaging in a package result.
+        /// </summary>
+        /// <param name="key">The registry key to remove.</param>
+        /// <param name="config">The configuration.</param>
+        /// <param name="packageResult">The package result.</param>
+        /// <param name="packageCacheLocation">The package cache location.</param>
+        void remove(RegistryApplicationKey key, ChocolateyConfiguration config, PackageResult packageResult, string packageCacheLocation);
     }
 }

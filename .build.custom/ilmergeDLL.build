@@ -19,15 +19,15 @@
   <property name="dirs.merge.from" value="${dirs.drop}${path.separator}${folder.app.drop}${path.separator}lib" />
   <property name="dirs.merge.to" value="${dirs.drop}${path.separator}merge" overwrite="false" />
 
-  <property name="file.internalize.ignore" value="ilmerge.internalize.ignore.txt" />
+  <property name="file.internalize.ignore" value="ilmerge.internalize.ignore.dll.txt" />
   <property name="path.file.internalize.ignore" value="${dirs.build_scripts_custom}${path.separator}${file.internalize.ignore}" />
   <!-- overwrite this property -->
   <property name="file.merge.name" value="chocolatey.dll" />
   <!-- exe winexe dll -->
   <!-- overwrite this property -->
   <property name="merge.target.type" value="dll" />
-  <property name="args.ilmerge" value="/internalize /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " />
-  <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:v4 /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /ndebug /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
+  <property name="args.ilmerge" value="/internalize /targetplatform:&quot;v4,${environment::get-variable('ProgramFiles(x86)')}\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /allowDup ${file.merge.name} " />
+  <property name="args.ilmerge" value="/internalize:${path.file.internalize.ignore} /targetplatform:&quot;v4,${environment::get-variable('ProgramFiles(x86)')}\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&quot; /target:${merge.target.type} /out:${dirs.merge.to}${path.separator}${file.merge.name} /keyfile:${path.key.name.private} /log:${dirs.merge.log}${path.separator}${log.merge} /xmldocs /allowDup ${file.merge.name} " if="${file::exists(path.file.internalize.ignore)}"/>
 
   <target name="go"
           depends="prepare, get_regular_dlls, run_ilmerge, copy_configs, remove_unneeded_assemblies, copy_from_merge, delete_merge_folder"
@@ -52,6 +52,7 @@
           <include name="${dirs.merge.from}${path.separator}Rhino.Licensing.dll" />
           <include name="${dirs.merge.from}${path.separator}System.Reactive*.dll" />
           <include name="${dirs.merge.from}${path.separator}SimpleInjector.dll" />
+          <include name="${dirs.merge.from}${path.separator}AlphaFS.dll" />
           <!-- <exclude name="${dirs.merge.from}${path.separator}*" /> -->
         </items>
       </in>

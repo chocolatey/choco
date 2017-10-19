@@ -21,8 +21,8 @@
   <property name="solution.path" value="${path::get-full-path(solution.path)}" />
   <property name="solution.path.windows.mono" value="${string::replace(dirs.current,'\','/')}/${string::replace(path_to_solution,'\','/')}/${project.name}.sln" />
   <property name="solution.path" value="${dirs.current}${path.separator}${path_to_solution}${path.separator}${project.name}.vbp" if="${microsoft.framework =='vb6'}" />
-  <property name="nant.settings.currentframework" value="mono-4.0" if="${platform::is-unix()}" />
-  <property name="nant.settings.currentframework" value="net-3.5" if="${microsoft.framework !='vb6' and platform::is-windows()}" />
+  <property name="nant.settings.currentframework" value="mono-4.0" if="${platform::is-unix()}" overwrite="true" />
+  <property name="nant.settings.currentframework" value="net-3.5" if="${microsoft.framework !='vb6' and platform::is-windows()}" overwrite="false" />
   <property name="framework.multitargeting" value="false" />
   <property name="framework.multitargeting.delimiter" value="," />
   <target name="go" depends="load_uppercut_assemblies, run_tasks" />

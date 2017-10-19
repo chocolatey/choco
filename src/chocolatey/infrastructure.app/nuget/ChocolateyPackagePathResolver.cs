@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,16 +35,26 @@ namespace chocolatey.infrastructure.app.nuget
 
         public override string GetInstallPath(IPackage package)
         {
-            return Path.Combine(_nugetFileSystem.Root, GetPackageDirectory(package));
+            var packageVersionPath = Path.Combine(_nugetFileSystem.Root, GetPackageDirectory(package.Id,package.Version,useVersionInPath:true));
+            if (_nugetFileSystem.DirectoryExists(packageVersionPath)) return packageVersionPath;
+
+
+            return Path.Combine(_nugetFileSystem.Root, GetPackageDirectory(package.Id, package.Version));
         }
 
         public override string GetPackageDirectory(string packageId, SemanticVersion version)
         {
+            return GetPackageDirectory(packageId, version, UseSideBySidePaths);
+        }
+
+        public string GetPackageDirectory(string packageId, SemanticVersion version, bool useVersionInPath)
+        {
             string directory = packageId;
-            if (UseSideBySidePaths)
+            if (useVersionInPath)
             {
                 directory += "." + version.to_string();
             }
+
             return directory;
         }
 

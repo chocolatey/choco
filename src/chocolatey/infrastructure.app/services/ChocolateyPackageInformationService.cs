@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
 
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
     using System.IO;
     using System.Text;
     using NuGet;
@@ -23,7 +23,7 @@ namespace chocolatey.infrastructure.app.services
     using tolerance;
     using IFileSystem = filesystem.IFileSystem;
 
-    internal class ChocolateyPackageInformationService : IChocolateyPackageInformationService
+    public class ChocolateyPackageInformationService : IChocolateyPackageInformationService
     {
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
@@ -33,6 +33,9 @@ namespace chocolatey.infrastructure.app.services
         private const string SILENT_UNINSTALLER_FILE = ".silentUninstaller";
         private const string SIDE_BY_SIDE_FILE = ".sxs";
         private const string PIN_FILE = ".pin";
+        private const string ARGS_FILE = ".arguments";
+        private const string EXTRA_FILE = ".extra";
+        private const string VERSION_OVERRIDE_FILE = ".version";
 
         public ChocolateyPackageInformationService(IFileSystem fileSystem, IRegistryService registryService, IFilesService filesService)
         {
@@ -61,9 +64,10 @@ namespace chocolatey.infrastructure.app.services
                     {
                         packageInformation.RegistrySnapshot = _registryService.read_from_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE)); 
                     }, 
-                    "Unable to read registry snapshot file", 
-                    throwError: false, 
-                    logWarningInsteadOfError: true
+                    "Unable to read registry snapshot file for {0} (located at {1})".format_with(package.Id, _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE)), 
+                    throwError: false,
+                    logWarningInsteadOfError: true,
+                    isSilent: true
                  );     
             
             FaultTolerance.try_catch_with_logging_exception(
@@ -73,12 +77,32 @@ namespace chocolatey.infrastructure.app.services
                     }, 
                     "Unable to read files snapshot file", 
                     throwError: false, 
-                    logWarningInsteadOfError: true
+                    logWarningInsteadOfError: true, 
+                    isSilent:true
                  );
            
             packageInformation.HasSilentUninstall = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, SILENT_UNINSTALLER_FILE));
             packageInformation.IsSideBySide = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, SIDE_BY_SIDE_FILE));
             packageInformation.IsPinned = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, PIN_FILE));
+            var argsFile = _fileSystem.combine_paths(pkgStorePath, ARGS_FILE);
+            if (_fileSystem.file_exists(argsFile)) packageInformation.Arguments = _fileSystem.read_file(argsFile);
+            var extraInfoFile = _fileSystem.combine_paths(pkgStorePath, EXTRA_FILE);
+            if (_fileSystem.file_exists(extraInfoFile)) packageInformation.ExtraInformation = _fileSystem.read_file(extraInfoFile);
+
+            var versionOverrideFile = _fileSystem.combine_paths(pkgStorePath, VERSION_OVERRIDE_FILE);
+            if (_fileSystem.file_exists(versionOverrideFile))
+            {
+
+                FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                    {
+                        packageInformation.VersionOverride = new SemanticVersion(_fileSystem.read_file(versionOverrideFile).trim_safe());
+                    }, 
+                    "Unable to read version override file", 
+                    throwError: false, 
+                    logWarningInsteadOfError: true
+                 );
+            }
 
             return packageInformation;
         }
@@ -104,7 +128,48 @@ namespace chocolatey.infrastructure.app.services
 
             if (packageInformation.FilesSnapshot != null)
             {
-                _filesService.save_to_file(packageInformation.FilesSnapshot, _fileSystem.combine_paths(pkgStorePath, FILES_SNAPSHOT_FILE));
+                FaultTolerance.try_catch_with_logging_exception(
+              () =>
+              {
+                  _filesService.save_to_file(packageInformation.FilesSnapshot, _fileSystem.combine_paths(pkgStorePath, FILES_SNAPSHOT_FILE));
+              },
+                  "Unable to save files snapshot",
+                  throwError: false,
+                  logWarningInsteadOfError: true
+               );
+            }
+
+            if (!string.IsNullOrWhiteSpace(packageInformation.Arguments))
+            {
+                var argsFile = _fileSystem.combine_paths(pkgStorePath, ARGS_FILE);
+                if (_fileSystem.file_exists(argsFile)) _fileSystem.delete_file(argsFile);
+                _fileSystem.write_file(argsFile, packageInformation.Arguments);
+            }
+            else
+            {
+                _fileSystem.delete_file(_fileSystem.combine_paths(pkgStorePath, ARGS_FILE));
+            }   
+            
+            if (!string.IsNullOrWhiteSpace(packageInformation.ExtraInformation))
+            {
+                var extraFile = _fileSystem.combine_paths(pkgStorePath, EXTRA_FILE);
+                if (_fileSystem.file_exists(extraFile)) _fileSystem.delete_file(extraFile);
+                _fileSystem.write_file(extraFile, packageInformation.ExtraInformation);
+            }
+            else
+            {
+                _fileSystem.delete_file(_fileSystem.combine_paths(pkgStorePath, EXTRA_FILE));
+            }
+            
+            if (packageInformation.VersionOverride != null)
+            {
+                var versionOverrideFile = _fileSystem.combine_paths(pkgStorePath, VERSION_OVERRIDE_FILE);
+                if (_fileSystem.file_exists(versionOverrideFile)) _fileSystem.delete_file(versionOverrideFile);
+                _fileSystem.write_file(versionOverrideFile, packageInformation.VersionOverride.to_string());
+            }
+            else
+            {
+                _fileSystem.delete_file(_fileSystem.combine_paths(pkgStorePath, VERSION_OVERRIDE_FILE));
             }
 
             if (packageInformation.HasSilentUninstall)
@@ -127,7 +192,7 @@ namespace chocolatey.infrastructure.app.services
             else
             {
                 _fileSystem.delete_file(_fileSystem.combine_paths(pkgStorePath, PIN_FILE));
-            }
+            } 
         }
 
         public void remove_package_information(IPackage package)

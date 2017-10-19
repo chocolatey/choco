@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,16 +20,18 @@ namespace chocolatey.tests.infrastructure.app.services
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
-    using Moq;
-    using NuGet;
     using chocolatey.infrastructure.adapters;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
+    using chocolatey.infrastructure.app.domain.installers;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.results;
+    using Moq;
+    using NuGet;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
     public class AutomaticUninstallerServiceSpecs
@@ -49,6 +52,7 @@ namespace chocolatey.tests.infrastructure.app.services
             protected IList<RegistryApplicationKey> registryKeys = new List<RegistryApplicationKey>();
             protected IInstaller installerType = new CustomInstaller();
 
+            protected readonly string expectedDisplayName = "WinDirStat";
             protected readonly string originalUninstallString = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe""";
             protected readonly string expectedUninstallString = @"C:\Program Files (x86)\WinDirStat\Uninstall.exe";
 
@@ -60,12 +64,15 @@ namespace chocolatey.tests.infrastructure.app.services
                 service.WaitForCleanup = false;
                 config.Features.AutoUninstaller = true;
                 config.PromptForConfirmation = false;
+                config.PackageNames = "regular";
                 package.Setup(p => p.Id).Returns("regular");
                 package.Setup(p => p.Version).Returns(new SemanticVersion("1.2.0"));
-                packageResult = new PackageResult(package.Object, null);
+                packageResult = new PackageResult(package.Object, "c:\\packages\\thispackage");
                 packageInformation = new ChocolateyPackageInformation(package.Object);
-                registryKeys.Add(new RegistryApplicationKey
+                registryKeys.Add(
+                    new RegistryApplicationKey
                     {
+                        DisplayName = expectedDisplayName,
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
                         UninstallString = originalUninstallString,
                         HasQuietUninstall = true,
@@ -77,8 +84,12 @@ namespace chocolatey.tests.infrastructure.app.services
                 packageResults.GetOrAdd("regular", packageResult);
 
                 fileSystem.Setup(f => f.directory_exists(registryKeys.FirstOrDefault().InstallLocation)).Returns(true);
-                registryService.Setup(r => r.value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(true);
+                registryService.Setup(r => r.installer_value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(true);
                 fileSystem.Setup(f => f.get_full_path(expectedUninstallString)).Returns(expectedUninstallString);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(true);
+
+                var field = typeof(ApplicationParameters).GetField("AllowPrompts");
+                field.SetValue(null, false);
             }
         }
 
@@ -110,7 +121,39 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
+            }
+        }
+
+        public class when_an_autoUninstaller_skip_file_exists : AutomaticUninstallerServiceSpecsBase
+        {
+            private string skipFileName = ".skipAutoUninstall";
+            IEnumerable<string> fileList = new List<string>() {"c:\\.skipAutoUninstall"};
+            public override void Context()
+            {
+                base.Context();
+                fileSystem.Setup(f => f.get_files(It.IsAny<string>(), ".skipAutoUninstall*", SearchOption.AllDirectories)).Returns(fileList);
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - Package contains a skip file ('" + skipFileName + "')."), Times.Once);
+            }
+
+            [Fact]
+            public void should_not_call_command_executor()
+            {
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -136,7 +179,37 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
+            }
+        }  
+        
+        public class when_package_is_missing : AutomaticUninstallerServiceSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                packageInformation.Package = null;
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - No package in package information."), Times.Once);
+            }
+
+            [Fact]
+            public void should_not_call_command_executor()
+            {
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -162,7 +235,9 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -173,6 +248,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 base.Context();
                 fileSystem.ResetCalls();
                 fileSystem.Setup(f => f.directory_exists(registryKeys.FirstOrDefault().InstallLocation)).Returns(false);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(true);
             }
 
             public override void Because()
@@ -183,13 +259,15 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".format_with(expectedDisplayName)), Times.Once);
             }
 
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -200,14 +278,17 @@ namespace chocolatey.tests.infrastructure.app.services
                 base.Context();
                 fileSystem.ResetCalls();
                 registryKeys.Clear();
-                registryKeys.Add(new RegistryApplicationKey
+                registryKeys.Add(
+                    new RegistryApplicationKey
                     {
+                        DisplayName = expectedDisplayName,
                         InstallLocation = string.Empty,
                         UninstallString = originalUninstallString,
                         HasQuietUninstall = true,
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat"
                     });
                 packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(true);
             }
 
             public override void Because()
@@ -225,7 +306,49 @@ namespace chocolatey.tests.infrastructure.app.services
             public void should_call_command_executor()
             {
                 var args = installerType.build_uninstall_command_arguments().trim_safe();
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, args, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
+                commandExecutor.Verify(
+                    c => c.execute(expectedUninstallString, args, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Once);
+            }
+        }   
+        
+        public class when_uninstall_string_is_empty : AutomaticUninstallerServiceSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                fileSystem.ResetCalls();
+                registryKeys.Clear();
+                registryKeys.Add(
+                    new RegistryApplicationKey
+                    {
+                        DisplayName = expectedDisplayName,
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = string.Empty,
+                        HasQuietUninstall = false,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat"
+                    });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(true);
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' does not have an uninstall string.".format_with(expectedDisplayName)), Times.Once);
+            }
+
+            [Fact]
+            public void should_not_call_command_executor()
+            {
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -235,7 +358,7 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
                 registryService.ResetCalls();
-                registryService.Setup(r => r.value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(false);
+                registryService.Setup(r => r.installer_value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(false);
             }
 
             public override void Because()
@@ -246,16 +369,18 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".format_with(expectedDisplayName)), Times.Once);
             }
 
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
-        }
-
+        } 
+       
         public class when_registry_location_and_install_location_both_do_not_exist : AutomaticUninstallerServiceSpecsBase
         {
             public override void Context()
@@ -263,8 +388,9 @@ namespace chocolatey.tests.infrastructure.app.services
                 base.Context();
                 fileSystem.ResetCalls();
                 fileSystem.Setup(f => f.directory_exists(registryKeys.FirstOrDefault().InstallLocation)).Returns(false);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(true);
                 registryService.ResetCalls();
-                registryService.Setup(r => r.value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(false);
+                registryService.Setup(r => r.installer_value_exists(registryKeys.FirstOrDefault().KeyPath, ApplicationParameters.RegistryValueInstallLocation)).Returns(false);
             }
 
             public override void Because()
@@ -275,13 +401,46 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The application appears to have been uninstalled already by other means."), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".format_with(expectedDisplayName)), Times.Once);
             }
 
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
+            }
+        }
+
+        public class when_uninstall_exe_does_not_exist : AutomaticUninstallerServiceSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                fileSystem.ResetCalls();
+                fileSystem.Setup(f => f.directory_exists(registryKeys.FirstOrDefault().InstallLocation)).Returns(true);
+                fileSystem.Setup(f => f.get_full_path(expectedUninstallString)).Returns(expectedUninstallString);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallString)).Returns(false);
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_log_why_it_skips_auto_uninstaller()
+            {
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The uninstaller file no longer exists. \"" + expectedUninstallString + "\""), Times.Once);
+            }
+
+            [Fact]
+            public void should_not_call_command_executor()
+            {
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
             }
         }
 
@@ -301,7 +460,114 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, installerType.build_uninstall_command_arguments().trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallString,
+                            installerType.build_uninstall_command_arguments().trim_safe(),
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
+            }
+        }
+   
+        public class when_uninstall_string_is_split_by_quotes : AutomaticUninstallerServiceSpecsBase
+        {
+            private readonly string uninstallStringWithQuoteSeparation = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe"" ""WinDir Stat""";
+
+            public override void Context()
+            {
+                base.Context();
+                registryKeys.Clear();
+                registryKeys.Add(
+                    new RegistryApplicationKey
+                    {
+                        DisplayName = expectedDisplayName,
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = uninstallStringWithQuoteSeparation,
+                        HasQuietUninstall = true,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                        InstallerType = installerType.InstallerType,
+                    });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_call_get_package_information()
+            {
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_call_command_executor()
+            {
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallString,
+                            "\"WinDir Stat\"".trim_safe(),
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
+            }
+        } 
+        
+        public class when_uninstall_string_has_multiple_file_paths : AutomaticUninstallerServiceSpecsBase
+        {
+            private readonly string uninstallStringPointingToPath = @"C:\Programs\WinDirStat\Uninstall.exe D:\Programs\WinDirStat";
+            protected readonly string expectedUninstallStringMultiplePaths = @"C:\Programs\WinDirStat\Uninstall.exe";
+
+            public override void Context()
+            {
+                base.Context();
+                registryKeys.Clear();
+                registryKeys.Add(
+                    new RegistryApplicationKey
+                    {
+                        DisplayName = expectedDisplayName,
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = uninstallStringPointingToPath,
+                        HasQuietUninstall = true,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                        InstallerType = installerType.InstallerType,
+                    });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                fileSystem.Setup(x => x.file_exists(expectedUninstallStringMultiplePaths)).Returns(true);
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_call_get_package_information()
+            {
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_call_command_executor()
+            {
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallStringMultiplePaths,
+                            @"D:\Programs\WinDirStat".trim_safe(),
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
             }
         }
 
@@ -312,7 +578,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 base.Context();
                 registryKeys.Clear();
                 commandExecutor.ResetCalls();
-                registryKeys.Add(new RegistryApplicationKey
+                registryKeys.Add(
+                    new RegistryApplicationKey
                     {
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
                         UninstallString = "{0} {1}".format_with(originalUninstallString, "/bob"),
@@ -340,7 +607,114 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_call_command_executor()
             {
-                commandExecutor.Verify(c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Never);
+                commandExecutor.Verify(
+                    c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    Times.Never);
+            }
+        }
+
+        public class when_AutomaticUninstallerService_is_passed_uninstall_arguments_from_command_line : AutomaticUninstallerServiceSpecsBase
+        {
+            IInstaller _installerType = new InnoSetupInstaller();
+
+            public override void Context()
+            {
+                base.Context();
+                registryKeys.Clear();
+                registryKeys.Add(
+                    new RegistryApplicationKey
+                    {
+                        DisplayName = expectedDisplayName,
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = originalUninstallString,
+                        HasQuietUninstall = false,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                        InstallerType = _installerType.InstallerType,
+                    });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+
+                config.InstallArguments = "/bob /nope";
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_call_get_package_information()
+            {
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_call_command_executor_appending_passed_arguments()
+            {
+                var uninstallArgs = _installerType.build_uninstall_command_arguments().trim_safe();
+
+                uninstallArgs += " {0}".format_with(config.InstallArguments);
+
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallString,
+                            uninstallArgs,
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
+            }
+        } 
+        
+        public class when_AutomaticUninstallerService_is_passed_overriding_uninstall_arguments_from_command_line : AutomaticUninstallerServiceSpecsBase
+        {
+            IInstaller _installerType = new InnoSetupInstaller();
+
+            public override void Context()
+            {
+                base.Context();
+                registryKeys.Clear();
+                registryKeys.Add(
+                    new RegistryApplicationKey
+                    {
+                        DisplayName = expectedDisplayName,
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = originalUninstallString,
+                        HasQuietUninstall = false,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                        InstallerType = _installerType.InstallerType,
+                    });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+
+                config.InstallArguments = "/bob /nope";
+                config.OverrideArguments = true;
+            }
+
+            public override void Because()
+            {
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_call_get_package_information()
+            {
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_call_command_executor_with_only_passed_arguments()
+            {
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallString,
+                            config.InstallArguments,
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
             }
         }
 
@@ -365,7 +739,8 @@ namespace chocolatey.tests.infrastructure.app.services
             private void test_installertype(IInstaller installer, bool hasQuietUninstallString)
             {
                 reset();
-                registryKeys.Add(new RegistryApplicationKey
+                registryKeys.Add(
+                    new RegistryApplicationKey
                     {
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
                         UninstallString = "{0} {1}".format_with(originalUninstallString, registryUninstallArgs),
@@ -382,7 +757,16 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var uninstallArgs = !hasQuietUninstallString ? registryUninstallArgs.trim_safe() + " " + installerTypeArgs : registryUninstallArgs.trim_safe();
 
-                commandExecutor.Verify(c => c.execute(expectedUninstallString, uninstallArgs.trim_safe(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()), Times.Once);
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallString,
+                            uninstallArgs.trim_safe(),
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
             }
 
             //[Fact]

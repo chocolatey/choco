@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +19,14 @@ namespace chocolatey.tests.infrastructure.app.commands
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.app.templates;
     using chocolatey.infrastructure.commandline;
+    using Moq;
+    using Should;
 
     public class ChocolateyNewCommandSpecs
     {
@@ -48,13 +48,12 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void should_implement_new()
             {
-                results.ShouldContain(CommandNameType.@new.to_string());
                 results.ShouldContain("new");
             }
         }
@@ -102,6 +101,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_add_maintainer_to_the_option_set()
             {
                 optionSet.Contains("maintainer").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_outputdirectory_to_the_option_set()
+            {
+                optionSet.Contains("outputdirectory").ShouldBeTrue();
             }
         }
 
@@ -353,6 +358,60 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_call_service_generate()
             {
                 templateService.Verify(c => c.generate(configuration), Times.Once);
+            }
+        }
+
+        public class when_handling_arguments_parsing : ChocolateyNewCommandSpecsBase
+        {
+            private OptionSet optionSet;
+
+            public override void Context()
+            {
+                base.Context();
+                optionSet = new OptionSet();
+                command.configure_argument_parser(optionSet, configuration);
+            }
+
+            public override void Because()
+            {
+                optionSet.Parse(new[] { "--name", "Bob", "--automaticpackage", "--template-name", "custom", "--version", "0.42.0", "--maintainer", "Loyd", "--outputdirectory", "c:\\packages" });
+            }
+
+            [Fact]
+            public void should_name_equal_to_Bob()
+            {
+                configuration.NewCommand.Name.ShouldEqual("Bob");
+                configuration.NewCommand.TemplateProperties[TemplateValues.NamePropertyName].ShouldEqual("Bob");
+            }
+
+            [Fact]
+            public void should_automaticpackage_equal_to_true()
+            {
+                configuration.NewCommand.AutomaticPackage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_templatename_equal_to_custom()
+            {
+                configuration.NewCommand.TemplateName.ShouldEqual("custom");
+            }
+
+            [Fact]
+            public void should_version_equal_to_42()
+            {
+                configuration.NewCommand.TemplateProperties[TemplateValues.VersionPropertyName].ShouldEqual("0.42.0");
+            }
+
+            [Fact]
+            public void should_maintainer_equal_to_Loyd()
+            {
+                configuration.NewCommand.TemplateProperties[TemplateValues.MaintainerPropertyName].ShouldEqual("Loyd");
+            }
+
+            [Fact]
+            public void should_outputdirectory_equal_packages()
+            {
+                configuration.OutputDirectory.ShouldEqual("c:\\packages");
             }
         }
     }

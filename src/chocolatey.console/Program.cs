@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +20,7 @@ namespace chocolatey.console
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using infrastructure.adapters;
+    using System.Reflection;
     using infrastructure.app;
     using infrastructure.app.builders;
     using infrastructure.app.configuration;
@@ -27,91 +28,100 @@ namespace chocolatey.console
     using infrastructure.commandline;
     using infrastructure.configuration;
     using infrastructure.extractors;
-    using infrastructure.filesystem;
     using infrastructure.licensing;
     using infrastructure.logging;
     using infrastructure.registration;
-    using infrastructure.services;
+    using infrastructure.tolerance;
     using resources;
+    using Assembly = infrastructure.adapters.Assembly;
     using Console = System.Console;
     using Environment = System.Environment;
+    using IFileSystem = infrastructure.filesystem.IFileSystem;
 
     public sealed class Program
     {
-// ReSharper disable InconsistentNaming
+        // ReSharper disable InconsistentNaming
         private static void Main(string[] args)
-// ReSharper restore InconsistentNaming
+        // ReSharper restore InconsistentNaming
         {
             try
             {
+                add_assembly_resolver();
+
                 string loggingLocation = ApplicationParameters.LoggingLocation;
                 //no file system at this point
                 if (!Directory.Exists(loggingLocation)) Directory.CreateDirectory(loggingLocation);
 
-                Log4NetAppenderConfiguration.configure(loggingLocation);
+                Log4NetAppenderConfiguration.configure(loggingLocation, excludeLoggerNames: ChocolateyLoggers.Trace.to_string());
                 Bootstrap.initialize();
                 Bootstrap.startup();
-
+                var license = License.validate_license();
                 var container = SimpleInjectorContainer.Container;
-                var config = container.GetInstance<ChocolateyConfiguration>();
+
+                "LogFileOnly".Log().Info(() => "".PadRight(60, '='));
+
+                var config = Config.get_configuration_settings();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
                 var warnings = new List<string>();
 
-               ConfigurationBuilder.set_up_configuration(
-                    args,
-                    config,
-                    fileSystem,
-                    container.GetInstance<IXmlService>(),
-                    warning => { warnings.Add(warning); }
-                    );
-                Config.initialize_with(config);
+                ConfigurationBuilder.set_up_configuration(
+                     args,
+                     config,
+                     container,
+                     license,
+                     warning => { warnings.Add(warning); }
+                     );
+                
+                if (!string.IsNullOrWhiteSpace(config.AdditionalLogFileLocation))
+                {
+                  Log4NetAppenderConfiguration.configure_additional_log_file(config.AdditionalLogFileLocation);
+                }
 
                 report_version_and_exit_if_requested(args, config);
 
                 trap_exit_scenarios(config);
 
+                warn_on_nuspec_or_nupkg_usage(args, config);
+
                 if (config.RegularOutput)
                 {
-                    "logfile".Log().Info(() => "".PadRight(60, '='));
 #if DEBUG
-                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1} (DEBUG BUILD)".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
-#else          
-                    if (config.Information.ChocolateyVersion == config.Information.ChocolateyProductVersion && args.Any())
-                    {
-                        "logfile".Log().Info(() => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
-                    }
-                    else
-                    {
-                        "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion));
-                    }
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2} (DEBUG BUILD)".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.is_licensed_version() ? " {0}".format_with(license.LicenseType) : string.Empty));
+#else
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2}".format_with(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.is_licensed_version() ? " {0}".format_with(license.LicenseType) : string.Empty));
 #endif
-
+                    if (args.Length == 0)
+                    {
+                        "chocolatley".Log().Info(ChocolateyLoggers.Important, () => "Please run 'choco -?' or 'choco <command> -?' for help menu.");
+                    }
                 }
-                
+
                 if (warnings.Count != 0 && config.RegularOutput)
                 {
                     foreach (var warning in warnings.or_empty_list_if_null())
                     {
-                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, warning);    
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, warning);
                     }
                 }
 
-                if (config.HelpRequested)
+                if (config.HelpRequested || config.UnsuccessfulParsing)
                 {
                     pause_execution_if_debug();
-                    Environment.Exit(-1);
+                    Environment.Exit(config.UnsuccessfulParsing ? 1 : 0);
                 }
 
-                Log4NetAppenderConfiguration.set_verbose_logger_when_verbose(config.Verbose, "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()));
-                Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug);
+                var verboseAppenderName = "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string());
+                var traceAppenderName = "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Trace.to_string());
+                Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug, verboseAppenderName, traceAppenderName);
+                Log4NetAppenderConfiguration.set_verbose_logger_when_verbose(config.Verbose, config.Debug, verboseAppenderName);
+                Log4NetAppenderConfiguration.set_trace_logger_when_trace(config.Trace, traceAppenderName);
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".format_with(ApplicationParameters.Name, config.Information.PlatformType, config.Information.PlatformVersion.to_string()));
                 //"chocolatey".Log().Debug(() => "Command Line: {0}".format_with(Environment.CommandLine));
 
                 remove_old_chocolatey_exe(fileSystem);
 
-                LicenseValidation.validate(fileSystem);
-
+                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(Program)), ApplicationParameters.InstallLocation, new List<string>(), "chocolatey.console", throwError:false);
                 //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
                 IList<string> folders = new List<string>
                     {
@@ -120,25 +130,14 @@ namespace chocolatey.console
                         "redirects",
                         "tools"
                     };
-                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources);
+                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources, throwError: false);
 
                 var application = new ConsoleApplication();
                 application.run(args, config, container);
             }
             catch (Exception ex)
             {
-                var debug = false;
-                // no access to the good stuff here, need to go a bit primitive in parsing args
-                foreach (var arg in args.or_empty_list_if_null())
-                {
-                    if (arg.Contains("debug") || arg.is_equal_to("-d") || arg.is_equal_to("/d"))
-                    {
-                        debug = true;
-                        break;
-                    }
-                }
-
-                if (debug)
+                if (ApplicationParameters.is_debug_mode_cli_primitive())
                 {
                     "chocolatey".Log().Error(() => "{0} had an error occur:{1}{2}".format_with(
                         ApplicationParameters.Name,
@@ -160,9 +159,50 @@ namespace chocolatey.console
 #endif
                 pause_execution_if_debug();
                 Bootstrap.shutdown();
-
                 Environment.Exit(Environment.ExitCode);
             }
+        }
+
+        private static void warn_on_nuspec_or_nupkg_usage(string[] args, ChocolateyConfiguration config)
+        {
+            var commandLine = Environment.CommandLine;
+            if (!(commandLine.contains(" pack ") || commandLine.contains(" push ")) && (commandLine.contains(".nupkg") || commandLine.contains(".nuspec")))
+            {
+                if (config.RegularOutput) "chocolatey".Log().Warn("The use of .nupkg or .nuspec in for package name or source is known to cause issues. Please use the package id from the nuspec `<id />` with `-s .` (for local folder where nupkg is found).");
+            }
+        }
+
+        private static ResolveEventHandler _handler = null;
+
+        private static void add_assembly_resolver()
+        {
+            _handler = (sender, args) =>
+            {
+                var requestedAssembly = new AssemblyName(args.Name);
+                if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
+                    && !requestedAssembly.Name.is_equal_to("chocolatey.licensed")
+                    && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
+                {
+                    return typeof(ConsoleApplication).Assembly;
+                }
+
+                try
+                {
+                    if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
+                        && requestedAssembly.Name.is_equal_to("chocolatey.licensed"))
+                    {
+                        return Assembly.LoadFile(ApplicationParameters.LicensedAssemblyLocation).UnderlyingType;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    "chocolatey".Log().Warn("Unable to load chocolatey.licensed assembly. {0}".format_with(ex.Message));
+                }
+
+                return null;
+            };
+
+            AppDomain.CurrentDomain.AssemblyResolve += _handler;
         }
 
         private static void report_version_and_exit_if_requested(string[] args, ChocolateyConfiguration config)
@@ -174,11 +214,10 @@ namespace chocolatey.console
             {
                 "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0}".format_with(config.Information.ChocolateyProductVersion));
                 pause_execution_if_debug();
+                "chocolatey".Log().Debug(() => "Exiting with 0");
                 Environment.Exit(0);
             }
         }
-
-        static EventHandler _handler;
 
         private static void trap_exit_scenarios(ChocolateyConfiguration config)
         {
@@ -187,15 +226,18 @@ namespace chocolatey.console
 
         private static void remove_old_chocolatey_exe(IFileSystem fileSystem)
         {
-            try
-            {
-                fileSystem.delete_file(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty) + ".old");
-                fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
-            }
-            catch (Exception ex)
-            {
-                "chocolatey".Log().Warn("Attempting to delete choco.exe.old ran into an issue:{0} {1}".format_with(Environment.NewLine, ex.Message));
-            }
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                {
+                    fileSystem.delete_file(fileSystem.get_current_assembly_path() + ".old");
+                    fileSystem.delete_file(fileSystem.combine_paths(AppDomain.CurrentDomain.BaseDirectory, "choco.exe.old"));
+                },
+                errorMessage: "Attempting to delete choco.exe.old ran into an issue",
+                throwError: false,
+                logWarningInsteadOfError: true,
+                logDebugInsteadOfError: false,
+                isSilent: true
+                );
         }
 
         private static void pause_execution_if_debug()

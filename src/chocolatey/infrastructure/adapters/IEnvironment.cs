@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +17,7 @@
 namespace chocolatey.infrastructure.adapters
 {
     using System;
+    using System.Collections;
 
     // ReSharper disable InconsistentNaming
 
@@ -62,6 +64,63 @@ namespace chocolatey.infrastructure.adapters
         /// </returns>
         /// <filterpriority>1</filterpriority>
         string NewLine { get; }
+
+        /// <summary>
+        /// Replaces the name of each environment variable embedded in the specified string with the string equivalent of the value of the variable, then returns the resulting string.
+        /// 
+        /// </summary>
+        /// 
+        /// <returns>
+        /// A string with each environment variable replaced by its value.
+        /// </returns>
+        /// <param name="name">A string containing the names of zero or more environment variables. Each environment variable is quoted with the percent sign character (%).</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="name"/> is null.
+        /// </exception><filterpriority>1</filterpriority><PermissionSet><IPermission class="System.Security.Permissions.EnvironmentPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/></PermissionSet>
+        string ExpandEnvironmentVariables(string name);
+    
+        /// <summary>
+        /// Gets the environment variable.
+        /// </summary>
+        /// <param name="variable">The variable.</param>
+        /// <returns></returns>
+        string GetEnvironmentVariable(string variable);
+
+        /// <summary>
+        /// Retrieves all environment variable names and their values from the current process.
+        /// 
+        /// </summary>
+        /// 
+        /// <returns>
+        /// An <see cref="T:System.Collections.IDictionary"/> that contains all environment variable names and their values; otherwise, an empty dictionary if no environment variables are found.
+        /// 
+        /// </returns>
+        /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission to perform this operation.
+        ///                 </exception><exception cref="T:System.OutOfMemoryException">The buffer is out of memory.
+        ///                 </exception><filterpriority>1</filterpriority><PermissionSet><IPermission class="System.Security.Permissions.EnvironmentPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/></PermissionSet>
+        IDictionary GetEnvironmentVariables();
+
+        /// <summary>
+        /// Gets the environment variables for a particular target.
+        /// </summary>
+        /// <param name="target">The target.</param>
+        /// <returns></returns>
+        /// 
+
+        /// <summary>
+        /// Retrieves all environment variable names and their values from the current process, or from the Windows operating system registry key for the current user or local machine.
+        /// 
+        /// </summary>
+        /// 
+        /// <returns>
+        /// An <see cref="T:System.Collections.IDictionary"/> object that contains all environment variable names and their values from the source specified by the <paramref name="target"/> parameter; otherwise, an empty dictionary if no environment variables are found.
+        /// 
+        /// </returns>
+        /// <param name="target">One of the <see cref="T:System.EnvironmentVariableTarget"/> values.
+        ///                 </param><exception cref="T:System.Security.SecurityException">The caller does not have the required permission to perform this operation for the specified value of <paramref name="target"/>.
+        ///                 </exception><exception cref="T:System.NotSupportedException">This method cannot be used on Windows 95 or Windows 98 platforms.
+        ///                 </exception><exception cref="T:System.ArgumentException"><paramref name="target"/> contains an illegal value.
+        ///                 </exception><filterpriority>1</filterpriority><PermissionSet><IPermission class="System.Security.Permissions.EnvironmentPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/><IPermission class="System.Security.Permissions.RegistryPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/><IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode"/></PermissionSet>
+        IDictionary GetEnvironmentVariables(EnvironmentVariableTarget target);
 
         /// <summary>
         ///   Creates, modifies, or deletes an environment variable stored in the current process.

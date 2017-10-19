@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,14 +22,13 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using infrastructure.commands;
     using logging;
     using services;
     using templates;
 
-    [CommandFor(CommandNameType.@new)]
-    public sealed class ChocolateyNewCommand : ICommand
+    [CommandFor("new", "generates files necessary for a chocolatey package from a template")]
+    public class ChocolateyNewCommand : ICommand
     {
         private readonly ITemplateService _templateService;
 
@@ -37,14 +37,14 @@ namespace chocolatey.infrastructure.app.commands
             _templateService = templateService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("a|auto|automaticpackage",
                      "AutomaticPackage - Generate automatic package instead of normal. Defaults to false",
-                     option => configuration.NewCommand.AutomaticPackage = option != null)  
+                     option => configuration.NewCommand.AutomaticPackage = option != null)
                 .Add("t=|template=|template-name=",
-                     "TemplateName - Use a named template in {0}\\templates\\templatename instead of built-in template.".format_with(ApplicationParameters.InstallLocation),
+                     "TemplateName - Use a named template in {0}\\templates\\templatename instead of built-in template. Available in 0.9.9.9+. Manage templates as packages in 0.9.10+.".format_with(ApplicationParameters.InstallLocation),
                      option => configuration.NewCommand.TemplateName = option)
                 .Add("name=",
                      "Name [Required]- the name of the package. Can be passed as first parameter without \"--name=\".",
@@ -59,19 +59,25 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("maintainer=",
                      "Maintainer - the name of the maintainer. Can also be passed as the property MaintainerName=somevalue",
                      option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.MaintainerPropertyName, option.remove_surrounding_quotes()))
+                .Add("out=|outdir=|outputdirectory=|output-directory=",
+                    "OutputDirectory - Specifies the directory for the created Chocolatey package file. If not specified, uses the current directory. Available in 0.9.10+.",
+                    option => configuration.OutputDirectory = option)
+                .Add("built-in|built-in-template|originaltemplate|original-template|use-original-template|use-built-in-template",
+                    "BuiltInTemplate - Use the original built-in template instead of any override. Available in 0.9.10+.",
+                    option => configuration.NewCommand.UseOriginalTemplate = option != null)
                 ;
             //todo: more built-in templates
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
 
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.Name))
             {
-                configuration.NewCommand.Name = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
+                configuration.NewCommand.Name = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault(arg => !arg.StartsWith("-") && !arg.contains("="));
                 var property = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().Split(new[] {'='}, StringSplitOptions.RemoveEmptyEntries);
-                if (property.Count() == 1)
+                if (property.Length == 1)
                 {
                     configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, configuration.NewCommand.Name);
                 }
@@ -79,8 +85,8 @@ namespace chocolatey.infrastructure.app.commands
 
             foreach (var unparsedArgument in unparsedArguments.or_empty_list_if_null())
             {
-                var property = unparsedArgument.Split(new[] {'='}, StringSplitOptions.RemoveEmptyEntries);
-                if (property.Count() == 2)
+                var property = unparsedArgument.Split(new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                if (property.Length == 2)
                 {
                     var propName = property[0].trim_safe();
                     var propValue = property[1].trim_safe().remove_surrounding_quotes();
@@ -97,15 +103,21 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.Name))
             {
                 throw new ApplicationException("Name is required. Please pass in a name for the new package.");
             }
+
+            if (configuration.NewCommand.Name.StartsWith("-file", StringComparison.OrdinalIgnoreCase) || configuration.NewCommand.Name.StartsWith("--file", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ApplicationException(@"Automatic package creation from installer files only available in Business
+ edition. See https://chocolatey.org/compare for details.");
+            }
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "New Command");
             this.Log().Info(@"
@@ -124,30 +136,43 @@ Possible properties to pass:
     url
     url64
     silentargs
+
+NOTE: Starting in 0.9.10, you can pass arbitrary property value pairs
+ through to templates. This really unlocks your ability to create
+ packages automatically!
+
+NOTE: Chocolatey for Business can create complete packages by just
+ pointing the new command to native installers!
+
+NOTE: Chocolatey for Business can also download and internalize remote
+ resources from existing packages so that existing packages can be used 
+ without being tied to the internet.
+ This is called automatic recompile.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
     choco new bob
-    choco new bob -a --version 1.2.0 maintainername=""This guy""
-    choco new bob silentargs=""/S"" url=""https://somewhere/out/there.msi""
+    choco new bob -a --version 1.2.0 maintainername=""'This guy'""
+    choco new bob silentargs=""'/S'"" url=""'https://somewhere/out/there.msi'""
+    choco new bob --outputdirectory Packages
 
 ");
-          
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             _templateService.noop(configuration);
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             _templateService.generate(configuration);
         }
 
-        public bool may_require_admin_access()
+        public virtual bool may_require_admin_access()
         {
             return false;
         }

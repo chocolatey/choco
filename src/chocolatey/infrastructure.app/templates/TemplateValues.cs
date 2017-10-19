@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +16,15 @@
 
 namespace chocolatey.infrastructure.app.templates
 {
+    using System;
+    using System.Collections.Generic;
+
     public class TemplateValues
     {
         public TemplateValues()
         {
             set_normal();
+            AdditionalProperties = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
         public void set_normal()
@@ -32,12 +37,12 @@ namespace chocolatey.infrastructure.app.templates
             InstallerType = "EXE_MSI_OR_MSU";
             Url = "";
             Url64 = "";
-            SilentArgs = "";
+            SilentArgs = @"/qn /norestart /l*v `""$($env:TEMP)\$($packageName).$($env:chocolateyPackageVersion).MsiInstall.log`""";
             AutomaticPackageNotesNuspec = "";
             Checksum = "";
-            ChecksumType = "md5";
+            ChecksumType = "sha256";
             Checksum64 = "";
-            ChecksumType64 = "md5";
+            ChecksumType64 = "sha256";
         }
 
         public void set_auto()
@@ -50,8 +55,9 @@ namespace chocolatey.infrastructure.app.templates
             Url64 = "{{DownloadUrlx64}}";
             Checksum = "{{Checksum}}";
             Checksum64 = "{{Checksumx64}}";
+            ChecksumType = "{{ChecksumType}}";
+            ChecksumType64 = "{{ChecksumTypex64}}";
         }
-
 
         public string PackageName { get; set; }
 
@@ -73,6 +79,7 @@ namespace chocolatey.infrastructure.app.templates
         public string ChecksumType { get; set; }
         public string Checksum64 { get; set; }
         public string ChecksumType64 { get; set; }
+        public IDictionary<string, string> AdditionalProperties { get; private set; }
 
         public static readonly string NamePropertyName = "PackageName";
         public static readonly string VersionPropertyName = "PackageVersion";

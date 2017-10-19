@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +21,7 @@ namespace chocolatey.infrastructure.extractors
     using System.Text;
     using adapters;
     using filesystem;
+    using tolerance;
 
     /// <summary>
     ///   Extracts resources from an assembly.
@@ -64,16 +66,26 @@ namespace chocolatey.infrastructure.extractors
         /// <param name="overwriteExisting">
         ///   if set to <c>true</c> [overwrite existing].
         /// </param>
-        public static void extract_binary_file_from_assembly(IFileSystem fileSystem, IAssembly assembly, string manifestLocation, string filePath, bool overwriteExisting = false)
+        /// <param name="throwEror">Throw an error if there are issues</param>
+        public static void extract_binary_file_from_assembly(IFileSystem fileSystem, IAssembly assembly, string manifestLocation, string filePath, bool overwriteExisting = false, bool throwEror = true)
         {
             if (overwriteExisting || !fileSystem.file_exists(filePath))
             {
-                fileSystem.create_directory_if_not_exists(fileSystem.get_directory_name(filePath));
-                fileSystem.write_file(filePath, () => assembly.get_manifest_stream(manifestLocation));
+                FaultTolerance.try_catch_with_logging_exception(
+                    () =>
+                    {
+                        fileSystem.create_directory_if_not_exists(fileSystem.get_directory_name(filePath));
+                        fileSystem.write_file(filePath, () => assembly.get_manifest_stream(manifestLocation));        
+                    }, 
+                   errorMessage:"Unable to extract binary", 
+                   throwError: throwEror, 
+                   logWarningInsteadOfError: false, 
+                   logDebugInsteadOfError: !throwEror,
+                   isSilent: !throwEror);
             }
         }
 
-        public static void extract_all_resources_to_relative_directory(IFileSystem fileSystem, IAssembly assembly, string directoryPath, IList<string> relativeDirectories, string resourcesToInclude, bool overwriteExisting = false, bool logOutput = false)
+        public static void extract_all_resources_to_relative_directory(IFileSystem fileSystem, IAssembly assembly, string directoryPath, IList<string> relativeDirectories, string resourcesToInclude, bool overwriteExisting = false, bool logOutput = false, bool throwError = true)
         {
             var resourceString = new StringBuilder();
             foreach (var resourceName in assembly.GetManifestResourceNames())
@@ -100,8 +112,8 @@ namespace chocolatey.infrastructure.extractors
                 //var fileLocation = fileSystem.combine_paths("", resourceString.ToString().Split('.')) + resourceName.Substring(fileExtensionLocation);
 
                 var filePath = fileSystem.combine_paths(directoryPath, fileLocation);
-                if (logOutput) "chocolatey".Log().Debug("Unpacking {0} to '{1}'".format_with(fileLocation,filePath));
-                extract_binary_file_from_assembly(fileSystem, assembly, resourceName, filePath, overwriteExisting);
+                if (logOutput) "chocolatey".Log().Debug("Unpacking {0} to '{1}'".format_with(fileLocation, filePath));
+                extract_binary_file_from_assembly(fileSystem, assembly, resourceName, filePath, overwriteExisting, throwError);
             }
         }
     }

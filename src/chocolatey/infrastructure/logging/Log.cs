@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,20 +32,24 @@ namespace chocolatey.infrastructure.logging
         ///   Sets up logging to be with a certain type
         /// </summary>
         /// <typeparam name="T">The type of ILog for the application to use</typeparam>
-        public static void InitializeWith<T>() where T : ILog, new()
+        /// <param name="resetLoggers">Should other loggers be reset?</param>
+        public static void InitializeWith<T>(bool resetLoggers = true) where T : ILog, new()
         {
             _logType = typeof (T);
+            if (resetLoggers) LogExtensions.ResetLoggers();
         }
 
         /// <summary>
         ///   Sets up logging to be with a certain instance. The other method is preferred.
         /// </summary>
         /// <param name="loggerType">Type of the logger.</param>
-        /// <remarks>This is mostly geared towards testing</remarks>
-        public static void InitializeWith(ILog loggerType)
+        /// <param name="resetLoggers">Should other loggers be reset?</param>
+        /// <remarks>Resetting the loggers is mostly geared towards testing</remarks>
+        public static void InitializeWith(ILog loggerType, bool resetLoggers = true)
         {
             _logType = loggerType.GetType();
             _logger = loggerType;
+            if (resetLoggers) LogExtensions.ResetLoggers();
         }
 
         /// <summary>

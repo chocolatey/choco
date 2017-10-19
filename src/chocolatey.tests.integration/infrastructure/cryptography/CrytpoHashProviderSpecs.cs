@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,25 +18,24 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
 {
     using System;
     using System.IO;
-    using System.Reflection;
     using System.Security.Cryptography;
-    using Should;
     using chocolatey.infrastructure.cryptography;
     using chocolatey.infrastructure.filesystem;
+    using Should;
 
     public class CrytpoHashProviderSpecs
     {
         public abstract class CrytpoHashProviderSpecsBase : TinySpec
         {
-            protected CrytpoHashProvider Provider;
+            protected CryptoHashProvider Provider;
             protected DotNetFileSystem FileSystem;
             protected string ContextDirectory;
 
             public override void Context()
             {
                 FileSystem = new DotNetFileSystem();
-                Provider = new CrytpoHashProvider(FileSystem,CryptoHashProviderType.Md5);
-                ContextDirectory = FileSystem.combine_paths(FileSystem.get_directory_name(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty)), "context");
+                Provider = new CryptoHashProvider(FileSystem);
+                ContextDirectory = FileSystem.combine_paths(FileSystem.get_directory_name(FileSystem.get_current_assembly_path()), "context");
             }
         }
 
@@ -58,7 +58,7 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
             [Fact]
             public void should_provide_the_correct_hash_based_on_a_checksum()
             {
-                var expected = BitConverter.ToString(MD5.Create().ComputeHash(File.ReadAllBytes(filePath))).Replace("-", string.Empty);
+                var expected = BitConverter.ToString(SHA256.Create().ComputeHash(File.ReadAllBytes(filePath))).Replace("-", string.Empty);
 
                 result.ShouldEqual(expected);
             }
