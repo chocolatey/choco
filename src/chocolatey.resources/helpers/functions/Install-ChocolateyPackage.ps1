@@ -220,6 +220,13 @@ functionality (see links).
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
+.PARAMETER BeforeInstall Script
+Specifies the commands to run after download has completed but before install steps have begun.
+Available in 0.10.16+.
+
+Use this for starting an auxilary process such as AutoHotkey, so that any timeouts are not 
+affected by the time to download.
+
 .EXAMPLE
 >
 $packageName= 'bob'
@@ -359,6 +366,7 @@ param(
   [parameter(Mandatory=$false)]
   [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
   [parameter(Mandatory=$false)][switch]$useOriginalLocation,
+  [parameter(Mandatory=$false)][scriptblock] $beforeInstall,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   [string]$silentArgs = $silentArgs -join ' '
@@ -403,6 +411,10 @@ param(
                                       -ChecksumType64 $checksumType64 `
                                       -Options $options `
                                       -GetOriginalFileName
+  }
+
+  if ($beforeInstall) {
+    & $beforeInstall
   }
 
   Install-ChocolateyInstallPackage -PackageName $packageName `
