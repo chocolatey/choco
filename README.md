@@ -1,4 +1,4 @@
-# Chocolatey - like yum or apt-get, but for Windows
+# Chocolatey - like yum or apt-get, but for Windows(Operating System)
 You can just call me choco.
 
 ![Chocolatey Logo](https://cdn.rawgit.com/chocolatey/choco/14a627932c78c8baaba6bef5f749ebfa1957d28d/docs/logo/chocolateyicon.gif "Chocolatey")
