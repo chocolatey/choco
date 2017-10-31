@@ -96,7 +96,7 @@ Observe the following help for submitting an issue:
 Prerequisites:
 
  * The issue has to do with choco itself and is not a package or website issue.
- * Please check to see if your issue already exists with a quick search of the issues. Start with one relevant term and then add if you get too many results.
+ * Please check to see if your issue already exists with a quick search through [existing issues on github](https://github.com/chocolatey/choco/issues). Start with one relevant term and then add if you get too many results.
  * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) guidelines.
  * You are not submitting a question - questions are better served as [emails](https://groups.google.com/group/chocolatey) or [gitter chat questions](https://gitter.im/chocolatey/choco).
  * Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
