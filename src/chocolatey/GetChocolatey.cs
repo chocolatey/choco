@@ -250,7 +250,7 @@ namespace chocolatey
         {
             ensure_environment();
             extract_resources();
-            
+
             ensure_original_configuration(new List<string>(),
                 (config) =>
                 {
@@ -277,7 +277,7 @@ namespace chocolatey
         {
             ensure_environment();
             extract_resources();
-            
+
             ensure_original_configuration(new List<string>(args),
               (config) =>
               {
@@ -302,12 +302,12 @@ namespace chocolatey
         {
             ensure_environment();
             extract_resources();
-            
+
             return ensure_original_configuration(new List<string>(),
                 (config) =>
                 {
                     var runner = new GenericRunner();
-                    return runner.list<T>(config, _container, isConsole: false, parseArgs: null);        
+                    return runner.list<T>(config, _container, isConsole: false, parseArgs: null);
                 });
         }
 
@@ -354,7 +354,7 @@ namespace chocolatey
                 new List<string>(),
                 (config) => config
             );
-            
+
             return configuration;
         }
 
@@ -396,7 +396,7 @@ namespace chocolatey
                 configuration = originalConfig;
                 Config.initialize_with(originalConfig);
             }
-            
+
             return returnValue;
         }
 
@@ -420,6 +420,8 @@ namespace chocolatey
 
             configuration.PromptForConfirmation = false;
             configuration.AcceptLicense = true;
+
+
             if (_propConfig != null)
             {
                 _propConfig.Invoke(configuration);
@@ -466,7 +468,7 @@ namespace chocolatey
             catch (Exception ex)
             {
                 this.Log().Warn(ChocolateyLoggers.Important, "Please ensure that ChocolateyInstall environment variable is set properly and you've run once as an administrator to ensure all resources are extracted.");
-                this.Log().Error("Unable to extract resources. Please ensure the ChocolateyInstall environment variable is set properly. You may need to run once as an admin to ensure all resources are extracted. Details:{0} {1}".format_with(Environment.NewLine,ex.ToString()));
+                this.Log().Error("Unable to extract resources. Please ensure the ChocolateyInstall environment variable is set properly. You may need to run once as an admin to ensure all resources are extracted. Details:{0} {1}".format_with(Environment.NewLine, ex.ToString()));
             }
 
         }
