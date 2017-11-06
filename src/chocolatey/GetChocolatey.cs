@@ -41,8 +41,6 @@ namespace chocolatey
     /// </summary>
     public static class Lets
     {
-        private static readonly GetChocolatey _chocolatey = GlobalMutex.enter(() => set_up(), 5);
-
         private static GetChocolatey set_up()
         {
             add_assembly_resolver();
@@ -52,7 +50,7 @@ namespace chocolatey
 
         public static GetChocolatey GetChocolatey()
         {
-            return _chocolatey;
+            return GlobalMutex.enter(() => set_up(), 10);
         }
 
         private static ResolveEventHandler _handler = null;
