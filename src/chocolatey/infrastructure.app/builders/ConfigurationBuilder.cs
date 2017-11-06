@@ -103,7 +103,8 @@ namespace chocolatey.infrastructure.app.builders
             FaultTolerance.try_catch_with_logging_exception(
                 () => xmlService.serialize(configFileSettings, globalConfigPath, isSilent: shouldLogSilently),
                 "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
-                logDebugInsteadOfError: true);
+                logDebugInsteadOfError: true,
+                isSilent:shouldLogSilently);
         }
 
         private static void add_or_remove_licensed_source(ChocolateyLicense license, ConfigFileSettings configFileSettings)
