@@ -98,6 +98,7 @@ namespace chocolatey
     {
         private readonly Container _container;
         private readonly ChocolateyLicense _license;
+        private readonly LogSinkLog _logSinkLogger = new LogSinkLog();
         private Action<ChocolateyConfiguration> _propConfig;
 
         /// <summary>
@@ -107,6 +108,7 @@ namespace chocolatey
         {
             Log4NetAppenderConfiguration.configure(null, excludeLoggerNames: ChocolateyLoggers.Trace.to_string());
             Bootstrap.initialize();
+            Log.InitializeWith(new AggregateLog(new List<ILog>() { new Log4NetLog(), _logSinkLogger }));
             _license = License.validate_license();
             _container = SimpleInjectorContainer.Container;
         }
@@ -119,7 +121,38 @@ namespace chocolatey
         public GetChocolatey SetCustomLogging(ILog logger)
         {
             Log.InitializeWith(logger, resetLoggers: false);
+            drain_log_sink(logger);
             return this;
+        }
+
+        private void drain_log_sink(ILog logger)
+        {
+            foreach (var logMessage in _logSinkLogger.Messages.or_empty_list_if_null())
+            {
+                switch (logMessage.LogLevel)
+                {
+                    case LogLevelType.Trace:
+                        logger.Trace(logMessage.Message);
+                        break;
+                    case LogLevelType.Debug:
+                        logger.Debug(logMessage.Message);
+                        break;
+                    case LogLevelType.Information:
+                        logger.Info(logMessage.Message);
+                        break;
+                    case LogLevelType.Warning:
+                        logger.Warn(logMessage.Message);
+                        break;
+                    case LogLevelType.Error:
+                        logger.Error(logMessage.Message);
+                        break;
+                    case LogLevelType.Fatal:
+                        logger.Fatal(logMessage.Message);
+                        break;
+                }
+            }
+
+            _logSinkLogger.Messages.Clear();
         }
 
         /// <summary>

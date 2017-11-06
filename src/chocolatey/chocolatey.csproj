@@ -111,6 +111,10 @@
     <Compile Include="infrastructure.app\templates\ChocolateyTodoTemplate.cs" />
     <Compile Include="infrastructure.app\utility\ArgumentsUtility.cs" />
     <Compile Include="infrastructure.app\utility\PackageUtility.cs" />
+    <Compile Include="infrastructure\logging\AggregateLog.cs" />
+    <Compile Include="infrastructure\logging\LogLevelType.cs" />
+    <Compile Include="infrastructure\logging\LogMessage.cs" />
+    <Compile Include="infrastructure\logging\LogSinkLog.cs" />
     <Compile Include="infrastructure\synchronization\GlobalMutex.cs" />
     <Compile Include="infrastructure\logging\TraceLog.cs" />
     <Compile Include="infrastructure\registration\SecurityProtocol.cs" />
