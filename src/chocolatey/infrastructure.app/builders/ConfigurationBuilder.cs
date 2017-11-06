@@ -145,6 +145,20 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void set_file_configuration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem, Action<string> notifyWarnLoggingAction)
         {
+            set_sources_in_priority_order(config, configFileSettings);
+            set_machine_sources(config, configFileSettings);
+            set_config_items(config, configFileSettings, fileSystem);
+
+            FaultTolerance.try_catch_with_logging_exception(
+                () => fileSystem.create_directory_if_not_exists(config.CacheLocation),
+                "Could not create cache location / temp directory at '{0}'".format_with(config.CacheLocation),
+                logWarningInsteadOfError: true);
+
+            set_feature_flags(config, configFileSettings);
+        }
+
+        private static void set_sources_in_priority_order(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
+        {
             var sources = new StringBuilder();
 
             var defaultSourcesInOrder = configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null().ToList();
@@ -162,22 +176,18 @@ namespace chocolatey.infrastructure.app.builders
             {
                 config.Sources = sources.Remove(sources.Length - 1, 1).ToString();
             }
-
-            set_machine_sources(config, configFileSettings);
-
-            set_config_items(config, configFileSettings, fileSystem);
-
-            FaultTolerance.try_catch_with_logging_exception(
-                () => fileSystem.create_directory_if_not_exists(config.CacheLocation),
-                "Could not create temp directory at '{0}'".format_with(config.CacheLocation),
-                logWarningInsteadOfError: true);
-
-            set_feature_flags(config, configFileSettings);
         }
 
         private static void set_machine_sources(ChocolateyConfiguration config, ConfigFileSettings configFileSettings)
         {
-            foreach (var source in configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null())
+            var defaultSourcesInOrder = configFileSettings.Sources.Where(s => !s.Disabled).or_empty_list_if_null().ToList();
+            if (configFileSettings.Sources.Any(s => s.Priority > 0))
+            {
+                defaultSourcesInOrder = configFileSettings.Sources.Where(s => !s.Disabled && s.Priority != 0).OrderBy(s => s.Priority).or_empty_list_if_null().ToList();
+                defaultSourcesInOrder.AddRange(configFileSettings.Sources.Where(s => !s.Disabled && s.Priority == 0).or_empty_list_if_null().ToList());
+            }
+
+            foreach (var source in defaultSourcesInOrder)
             {
                 config.MachineSources.Add(new MachineSourceConfiguration
                     {
