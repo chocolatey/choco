@@ -469,7 +469,17 @@ folder.");
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                 if (availablePackage == null)
                 {
-                    var logMessage = "{0} not installed. The package was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
+                    var logMessage = @"{0} not installed. The package was not found with the source(s) listed.
+ Source(s): '{1}'
+ NOTE: When you specify explicit sources, it overrides default sources.
+If the package version is a prerelease and you didn't specify `--pre`,
+ the package may not be found.{2}{3}".format_with(packageName, config.Sources, string.IsNullOrWhiteSpace(config.Version) ? String.Empty : 
+@"
+Version was specified as '{0}'. It is possible that version 
+ does not exist for '{1}' at the source specified.".format_with(config.Version.to_string(), packageName), 
+@"
+Please see https://chocolatey.org/docs/troubleshooting for more 
+ assistance.");
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     var noPkgResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                     noPkgResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
