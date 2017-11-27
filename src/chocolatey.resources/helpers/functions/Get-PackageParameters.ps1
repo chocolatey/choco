@@ -125,6 +125,7 @@ param(
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $useDefaultParameters = $false
+  $loggingAllowed = $true
   $paramStrings = @($parameters)
 
   if (!$parameters -or $parameters -eq '') {
@@ -132,6 +133,10 @@ param(
     # if we are using default parameters, we are going to loop over two items
     Write-Debug 'Parsing $env:ChocolateyPackageParameters and $env:ChocolateyPackageParametersSensitive for parameters'
     $paramStrings = @("$env:ChocolateyPackageParameters","$env:ChocolateyPackageParametersSensitive")
+    if ($env:ChocolateyPackageParametersSensitive) {
+      Write-Debug "Sensitive parameters detected, no logging of parameters."
+      $loggingAllowed = $false
+    }
   }
 
   $paramHash = @{}
@@ -145,7 +150,7 @@ param(
       $paramItemValue = ($_.Groups["ItemValue"].Value).Trim()
       if (!$paramItemValue -or $paramItemValue -eq '') { $paramItemValue = $true }
 
-      Write-Debug "Adding package param '$paramItemName'='$paramItemValue'"
+      if ($loggingAllowed) { Write-Debug "Adding package param '$paramItemName'='$paramItemValue'" }
       $paramHash[$paramItemName] = $paramItemValue
     }
   }
