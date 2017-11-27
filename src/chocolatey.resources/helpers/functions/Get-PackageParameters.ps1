@@ -139,25 +139,11 @@ param(
   foreach ($paramString in $paramStrings) {
     if (!$paramString -or $paramString -eq '') { continue }
 
-    # split on "/"
-    $paramArray = $paramString.Split('/', [System.StringSplitOptions]::RemoveEmptyEntries)
-    if ($paramArray -eq $null -or $paramArray -eq @()) { continue }
-
-    foreach ($paramItem in $paramArray.GetEnumerator()) {
-      if (!$paramItem -or $paramItem -eq '') { continue }
-
-      # split on : and =, but only allow a total split of two
-      $paramItemPair = $paramItem.Split(':', 2, [System.StringSplitOptions]::RemoveEmptyEntries)
-      if ($paramItemPair -eq $null -or $paramItemPair -eq @()) { continue }
-      if ($paramItemPair.Length -eq 1 -and $paramItemPair[0].Contains('=')) {
-        $paramItemPair = $paramItem.Split('=', 2, [System.StringSplitOptions]::RemoveEmptyEntries)
-      }
-
-      $paramItemName = $paramItemPair[0].Trim()
-      $paramItemValue = $true
-      if ($paramItemPair.Length -ne 1) {
-        $paramItemValue = $paramItemPair[1].Trim()
-      }
+    Select-String '(?:^|\s+)\/(?<ItemKey>[^\:\=\s)]+)(?:(?:\:|=){1}(?<ItemValue>.*?)(?:(?=\s+\/)|$))?' -Input $paramString -AllMatches | % { $_.Matches } | % {
+      if (!$_) { continue } #Posh v2 issue?
+      $paramItemName = ($_.Groups["ItemKey"].Value).Trim()
+      $paramItemValue = ($_.Groups["ItemValue"].Value).Trim()
+      if (!$paramItemValue -or $paramItemValue -eq '') { $paramItemValue = $true }
 
       Write-Debug "Adding package param '$paramItemName'='$paramItemValue'"
       $paramHash[$paramItemName] = $paramItemValue
