@@ -157,3 +157,8 @@ param(
 
   $paramHash
 }
+
+# override Get-PackageParameters in chocolatey-core.extension package
+Copy-Item Function:Get-PackageParameters Function:Get-PackageParametersBuiltIn -Force
+#Rename-Item Function:Get-PackageParameters Get-PackageParametersBuiltIn
+Set-Alias -Name Get-PackageParameters -Value Get-PackageParametersBuiltIn -Scope Global
