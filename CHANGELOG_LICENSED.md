@@ -4,6 +4,118 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
+## 1.12.10 (December 18, 2017)
+
+### FEATURES
+
+ * Run background service interactively - sometimes you install applications that are unattended but cannot be silent.
+
+If you want self-service to interactively manage installations, run `choco feature enable --name=useBackgroundServiceInteractively`. This requires that you use the `ChocolateyLocalAdmin` account with the Chocolatey-managed password as passwords are not stored and the service would need to produce that at runtime. There are some security considerations and why this is not turned on by default. Please see [interactive self-service consideration](https://chocolatey.org/docs/features-agent-service#interactive-self-service-consideration).
+
+### BUG FIXES
+
+ * Windows Service Management Functions:
+    * Fix - Adding user to Administrators no longer fails with "Network path was not found" when there are domain users and local users in the administrators group.
+ * Package Builder (Choco New):
+    * Fix - Create packages from non-admin (instead of access denied error).
+    * Fix - Don't attempt to generate an icon unless a file for that icon exists.
+
+### IMPROVEMENTS
+
+ * Package Builder (Choco New):
+    * Right click create package w/out GUI should pause on error. This allows a user to see any errors instead of closing quickly.
+    * Do not generate template files if not using the default template.
+
+
+## 1.12.9 (November 10, 2017)
+
+### BUG FIXES
+
+ * Fix: Changes in 1.12.7 restrict some install/upgrade licensed functionality from loading.
+ * Windows Service Management Functions:
+    * Fix - Domain Users should be found by domain context.
+    * Fix - Throw Error if unable to ensure user or administrators membership.
+    * Fix - Domain Users should not attempt to generate password.
+ * Package Synchronizer (Choco Sync):
+    * Fix - syncing new items use "sync" as user name when capturing information for Package Audit.
+ * Package Builder (Choco New):
+    * Fix - additional directories from programs and features not cleared each time.
+
+### IMPROVEMENTS
+
+ * Package Builder (Choco New):
+    * Show Install Arguments in Nuspec with MSI Properties.
+    * Extract icon from Programs and Features.
+    * Extract icon from exe files.
+
+
+## 1.12.8 (October 25, 2017)
+
+### BUG FIXES
+
+ * Fix - "The registered delegate for type IEnumerable threw an exception. Unable to find suitable location for change.exe."
+
+
+## 1.12.7 (October 25, 2017)
+
+### BUG FIXES
+
+* Fix - "ERROR: The term 'Invoke-ChocolateyProcessCmdlet' is not recognized as the name of a cmdlet, function, script file, or operable program" on upgrade all.
+
+
+## 1.12.6 (October 24, 2017)
+
+### BUG FIXES
+
+ * Fix - `change.exe` could not be found when running Chocolatey GUI over RDP (Terminal Services).
+ * Self-Service / Background Mode:
+    * Fix - Set USER_CONTEXT environment variable to contain the user context information.
+
+### IMPROVEMENTS
+
+ * `Install-ChocolateyInstallPackage` - pass in answer file (`-AnswerFile`) to provide to stdin.
+
+
+## 1.12.5 (September 28, 2017)
+
+### BUG FIXES
+
+ * Windows Service Management Functions:
+    * Fix - Do not save created user prior to setting complex password.
+
+
+## 1.12.4 (September 27, 2017)
+
+### BUG FIXES
+
+ * Self-Service / Background Mode:
+    * Fix - Ensure that it configures and works appropriately with Chocolatey API (and the Chocolatey GUI).
+
+### IMPROVEMENTS
+
+ * Self-Service / Background Mode:
+    * Allow commands to be configurable. Covered in more detail at https://chocolatey.org/docs/features-agent-service#setup.
+
+
+## 1.12.3 (September 8, 2017)
+
+### BUG FIXES
+
+ * [Security] Fix - Hide admin only repositories from non-administrators with all Chocolatey commands.
+ * Windows Service Management Functions:
+    * Fix - Empty username causes errors. Will now set to what the configuration of Chocolatey is determining.
+ * Package Internalizer (Choco Download):
+    * Fix - Pass multiple package names to download/internalize (`choco download pkg1 pkg2 pkgN`).
+ * Self-Service / Background Mode:
+    * Fix - Don't display background services messages when background mode is not configured.
+ * Package Reducer:
+    * Fix - Package reducer fails the install when there is no package information.
+
+### IMPROVEMENTS
+
+ * choco sync is now out of preview.
+
+
 ## 1.12.2 (August 31, 2017)
 
 ### FEATURES
