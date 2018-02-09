@@ -19,6 +19,7 @@ if (Get-Module chocolateyProfile) { return }
 $thisDirectory = (Split-Path -parent $MyInvocation.MyCommand.Definition)
 
 . $thisDirectory\functions\Write-FunctionCallLogMessage.ps1
+. $thisDirectory\functions\EnvPathFunctions.ps1
 . $thisDirectory\functions\Get-EnvironmentVariable.ps1
 . $thisDirectory\functions\Get-EnvironmentVariableNames.ps1
 . $thisDirectory\functions\Update-SessionEnvironment.ps1
