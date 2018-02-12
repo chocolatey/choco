@@ -170,5 +170,9 @@
   <logger name="LogFileOnly">
     <level value="DEBUG"/>
   </logger>
+  
+  <logger name="Rhino.Licensing">
+    <level value="DEBUG"/>
+  </logger>
 
 </log4net>
