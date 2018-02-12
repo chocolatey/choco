@@ -168,6 +168,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string UseRememberedArgumentsForUpgrades = "useRememberedArgumentsForUpgrades";
             public static readonly string IgnoreUnfoundPackagesOnUpgradeOutdated = "ignoreUnfoundPackagesOnUpgradeOutdated";
             public static readonly string RemovePackageInformationOnUninstall = "removePackageInformationOnUninstall";
+            public static readonly string LogWithoutColor = "logWithoutColor";
         }
 
         public static class Messages

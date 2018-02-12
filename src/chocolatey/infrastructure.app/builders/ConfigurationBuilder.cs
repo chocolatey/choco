@@ -299,6 +299,8 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.UseRememberedArgumentsForUpgrades = set_feature_flag(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configFileSettings, defaultEnabled: false, description: "Use Remembered Arguments For Upgrades - When running upgrades, use arguments for upgrade that were used for installation ('remembered'). This is helpful when running upgrade for all packages. Available in 0.10.4+. This is considered in preview for 0.10.4 and will be flipped to on by default in a future release.");
             config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated = set_feature_flag(ApplicationParameters.Features.IgnoreUnfoundPackagesOnUpgradeOutdated, configFileSettings, defaultEnabled: false, description: "Ignore Unfound Packages On Upgrade Outdated - When checking outdated or upgrades, if a package is not found against sources specified, don't report the package at all. Available in 0.10.9+.");
             config.Features.RemovePackageInformationOnUninstall = set_feature_flag(ApplicationParameters.Features.RemovePackageInformationOnUninstall, configFileSettings, defaultEnabled: false, description: "Remove Stored Package Information On Uninstall - When a package is uninstalled, should the stored package information also be removed?  Available in 0.10.9+.");
+            config.Features.LogWithoutColor = set_feature_flag(ApplicationParameters.Features.LogWithoutColor, configFileSettings, defaultEnabled: false, description: "Log without color - Do not show colorization in logging output. Available in 0.10.9+.");
+
             config.Features.ScriptsCheckLastExitCode = set_feature_flag(ApplicationParameters.Features.ScriptsCheckLastExitCode, configFileSettings, defaultEnabled: false, description: "Scripts Check $LastExitCode (external commands) - Leave this off unless you absolutely need it while you fix your package scripts  to use `throw 'error message'` or `Set-PowerShellExitCode #` instead of `exit #`. This behavior started in 0.9.10 and produced hard to find bugs. If the last external process exits successfully but with an exit code of not zero, this could cause hard to detect package failures. Available in 0.10.3+. Will be removed in 0.11.0.");
             config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
         }
@@ -347,7 +349,10 @@ namespace chocolatey.infrastructure.app.builders
                              option => config.Verbose = option != null)
                         .Add("trace",
                              "Trace - Show trace messaging. Very, very verbose trace messaging. Avoid except when needing super low-level .NET Framework debugging. Available in 0.10.4+.",
-                             option => config.Trace = option != null)
+                             option => config.Trace = option != null) 
+                        .Add("nocolor|no-color",
+                             "No Color - Do not show colorization in logging output. This overrides the feature '{0}', set to '{1}'. Available in 0.10.9+.".format_with(ApplicationParameters.Features.LogWithoutColor, config.Features.LogWithoutColor),
+                             option => config.Features.LogWithoutColor = option != null)
                         .Add("acceptlicense|accept-license",
                              "AcceptLicense - Accept license dialogs automatically. Reserved for future use.",
                              option => config.AcceptLicense = option != null)
