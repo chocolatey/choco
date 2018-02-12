@@ -179,6 +179,24 @@ namespace chocolatey.tests.integration.scenarios
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
   </metadata>
+</package>";      
+        
+        private const string NuspecContentWithChocolateyData = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>0.1.0</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+  </metadata>
 </package>";
 
         private const string NuspecContentWithVariables = @"<?xml version=""1.0"" encoding=""utf-8""?>
