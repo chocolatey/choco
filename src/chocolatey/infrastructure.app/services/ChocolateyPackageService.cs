@@ -335,11 +335,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
             this.Log().Info("{0} package files {1} completed. Performing other installation steps.".format_with(packageResult.Name, commandName.to_string()));
 
-            var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
-            if (config.AllowMultipleVersions)
-            {
-                pkgInfo.IsSideBySide = true;
-            }
+            var pkgInfo = get_package_information(packageResult, config);
 
             if (packageResult.Success && config.Information.PlatformType == PlatformType.Windows)
             {
@@ -453,6 +449,17 @@ Did you know Pro / Business automatically syncs with Programs and
                 this.Log().Info(ChocolateyLoggers.Important, @"  Software install location not explicitly set, could be in package or 
   default install location if installer.");
             }
+        }
+
+        protected virtual ChocolateyPackageInformation get_package_information(PackageResult packageResult, ChocolateyConfiguration config)
+        {
+            var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
+            if (config.AllowMultipleVersions)
+            {
+                pkgInfo.IsSideBySide = true;
+            }
+
+            return pkgInfo;
         }
 
         protected virtual void update_package_information(ChocolateyPackageInformation pkgInfo)
