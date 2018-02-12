@@ -44,7 +44,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string LoggingFile = @"chocolatey.log";
         public static readonly string LoggingSummaryFile = @"choco.summary.log";
         public static readonly string Log4NetConfigurationAssembly = @"chocolatey";
-        public static readonly string Log4NetConfigurationResource = @"chocolatey.infrastructure.logging.log4net.config.xml";
+        public static string Log4NetConfigurationResource = @"chocolatey.infrastructure.logging.log4net.config.xml";
         public static readonly string ChocolateyFileResources = "chocolatey.resources";
         public static readonly string ChocolateyConfigFileResource = @"chocolatey.infrastructure.app.configuration.chocolatey.config";
         public static readonly string GlobalConfigFileLocation = _fileSystem.combine_paths(InstallLocation, "config", "chocolatey.config");
