@@ -67,6 +67,12 @@ compatibility with `chocolatey-core.extension`, use `:`.
 
 For example `-Parameters "/ITEM1:value /ITEM2:value with spaces"
 
+NOTE: In 0.10.9+, to maintain compatibility with the prior art of the 
+chocolatey-core.extension method, quotes and apostrophes surrounding
+parameter values will be removed. When the param is used, those items
+can be added back if desired, but it's most important to ensure that
+existing packages are compatible on upgrade.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply and future expansion.
 Do not use directly.
@@ -144,7 +150,7 @@ param(
   foreach ($paramString in $paramStrings) {
     if (!$paramString -or $paramString -eq '') { continue }
 
-    Select-String '(?:^|\s+)\/(?<ItemKey>[^\:\=\s)]+)(?:(?:\:|=){1}(?<ItemValue>.*?)(?:(?=\s+\/)|$))?' -Input $paramString -AllMatches | % { $_.Matches } | % {
+    Select-String '(?:^|\s+)\/(?<ItemKey>[^\:\=\s)]+)(?:(?:\:|=){1}(?:\''|\"){0,1}(?<ItemValue>.*?)(?:\''|\"){0,1}(?:(?=\s+\/)|$))?' -Input $paramString -AllMatches | % { $_.Matches } | % {
       if (!$_) { continue } #Posh v2 issue?
       $paramItemName = ($_.Groups["ItemKey"].Value).Trim()
       $paramItemValue = ($_.Groups["ItemValue"].Value).Trim()
