@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -183,7 +183,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Registers a container component. Does not require a dependency on Simple Injector. 
+        /// Registers a container component. Does not require a dependency on Simple Injector.
         /// Will override existing component if registered.
         /// </summary>
         /// <typeparam name="Service">The type of the service.</typeparam>
@@ -200,7 +200,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Registers a container component. 
+        /// Registers a container component.
         /// Will override existing component if registered.
         /// </summary>
         /// <typeparam name="Service">The type of the service.</typeparam>
@@ -219,7 +219,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Registers a container component. Does not require a dependency on Simple Injector. 
+        /// Registers a container component. Does not require a dependency on Simple Injector.
         /// Will override existing component if registered.
         /// </summary>
         /// <typeparam name="Service">The type of the ervice.</typeparam>
@@ -236,7 +236,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Register container components when you need to do multiple setups and want to work with the container directly. 
+        /// Register container components when you need to do multiple setups and want to work with the container directly.
         /// Will override existing components if registered.
         /// </summary>
         /// <param name="containerSetup">The container setup.</param>
@@ -255,7 +255,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Returns the Chocolatey container. 
+        /// Returns the Chocolatey container.
         /// WARNING: Once you call GetInstance of any kind, no more items can be registered on the container
         /// </summary>
         /// <returns>The IoC Container (implemented as a SimpleInjector.Container)</returns>
@@ -270,7 +270,7 @@ namespace chocolatey
         /// <summary>
         /// Call this method to run Chocolatey after you have set the options.
         /// WARNING: Once this is called, you will not be able to register additional container components.
-        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here. 
+        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here.
         /// Make a call, then finish up and make another call. This includes
         ///  - Run()
         ///  - RunConsole()
@@ -296,7 +296,7 @@ namespace chocolatey
         /// <summary>
         ///   Call this method to run chocolatey after you have set the options.
         /// WARNING: Once this is called, you will not be able to register additional container components.
-        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here. 
+        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here.
         /// Make a call, then finish up and make another call. This includes
         ///  - Run()
         ///  - RunConsole()
@@ -321,7 +321,7 @@ namespace chocolatey
         /// <summary>
         ///    Run chocolatey after setting the options, and list the results.
         /// WARNING: Once this is called, you will not be able to register additional container components.
-        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here. 
+        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here.
         /// Make a call, then finish up and make another call. This includes
         ///  - Run()
         ///  - RunConsole()
@@ -346,7 +346,7 @@ namespace chocolatey
         ///    Run chocolatey after setting the options,
         ///    and get the count of items that would be returned if you listed the results.
         /// WARNING: Once this is called, you will not be able to register additional container components.
-        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here. 
+        /// WARNING: Ensure you don't nest additional calls to running Chocolatey here.
         /// Make a call, then finish up and make another call. This includes
         ///  - Run()
         ///  - RunConsole()
@@ -400,9 +400,9 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// After the construction of GetChocolatey, we should have a ChocolateyConfiguration or LicensedChocolateyConfiguration loaded into the environment. 
-        /// We want that original configuration to live on between calls to the API. This function ensures that the 
-        /// original default configuration from new() is reset after each command finishes running, even as each command 
+        /// After the construction of GetChocolatey, we should have a ChocolateyConfiguration or LicensedChocolateyConfiguration loaded into the environment.
+        /// We want that original configuration to live on between calls to the API. This function ensures that the
+        /// original default configuration from new() is reset after each command finishes running, even as each command
         /// may make changes to the configuration it uses.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -438,7 +438,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        /// Creates the configuration. 
+        /// Creates the configuration.
         /// This should never be called directly, as it can cause issues that are very difficult to debug.
         /// </summary>
         /// <param name="args">The arguments.</param>
