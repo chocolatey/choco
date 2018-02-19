@@ -581,7 +581,7 @@ Would have determined packages that are out of date based on what is
 
             var output = config.RegularOutput;
             config.RegularOutput = false;
-            var oudatedPackages = _nugetService.upgrade_noop(config, null);
+            var oudatedPackages = _nugetService.get_outdated(config);
             config.RegularOutput = output;
 
             if (config.RegularOutput)
