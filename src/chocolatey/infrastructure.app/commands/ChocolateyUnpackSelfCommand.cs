@@ -27,13 +27,20 @@ namespace chocolatey.infrastructure.app.commands
     using filesystem;
     using infrastructure.commands;
     using logging;
+#if !NoResources
     using resources;
+#endif
 
     [CommandFor("unpackself", "have chocolatey set itself up")]
     public class ChocolateyUnpackSelfCommand : ICommand
     {
         private readonly IFileSystem _fileSystem;
+
+#if !NoResources
         private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)));
+#else
+        private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>();
+#endif
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void initialize_with(Lazy<IAssembly> assembly_initializer)

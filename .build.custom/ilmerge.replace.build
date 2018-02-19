@@ -73,7 +73,7 @@
     <property name="args.ilmerge" value="${args.ilmerge} ${dlls.regular}" />
   </target>
 
-  <target name="run_ilmerge">
+  <target name="run_ilmerge" if="${msbuild.configuration != 'NoResources'}">
     <echo level="Warning" message="Merging the the contents of ${dirs.merge.from} into a single executable - ${dirs.merge.to}${path.separator}${file.merge.name}. This will fail if all dependencies are not resolved."/>
     <echo level="Warning" message="Running this: ${app.ilmerge} ${args.ilmerge}"/>
     <exec program="${app.ilmerge}"
