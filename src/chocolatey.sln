@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.console", "chocolatey.console\chocolatey.console.csproj", "{E24E3386-244F-4404-9E6E-5B53818EA903}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.tests", "chocolatey.tests\chocolatey.tests.csproj", "{5C4C60F0-47B1-498E-ABF7-D315E1A94BC9}"
@@ -42,7 +40,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "toplevel", "toplevel", "{18FEFF9F-7352-4230-8B4E-E8D8BE976095}"
 	ProjectSection(SolutionItems) = preProject
 		..\CHANGELOG.md = ..\CHANGELOG.md
-		..\COMMITTERS.md = ..\COMMITTERS.md
 		..\CONTRIBUTING.md = ..\CONTRIBUTING.md
 		..\README.md = ..\README.md
 	EndProjectSection
@@ -138,8 +135,8 @@ Global
 		{5C4C60F0-47B1-498E-ABF7-D315E1A94BC9} = {7656D054-387D-409C-A9FB-62A44599AA77}
 		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456} = {7656D054-387D-409C-A9FB-62A44599AA77}
 		{DAB29F30-149D-4005-A8D2-4FA56CF2784D} = {FB6236DD-17EF-4C36-943C-47792FBC3306}
-		{E5C987F8-6B95-4835-BBDD-A25C9D370BB9} = {DAB29F30-149D-4005-A8D2-4FA56CF2784D}
 		{DD9689F3-1D2D-41AE-A672-063EE70C0C9A} = {FB6236DD-17EF-4C36-943C-47792FBC3306}
+		{E5C987F8-6B95-4835-BBDD-A25C9D370BB9} = {DAB29F30-149D-4005-A8D2-4FA56CF2784D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {998CAC46-A2B8-447C-B4CC-3B11DC35ED46}

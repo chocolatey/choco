@@ -16,9 +16,11 @@
 
 namespace chocolatey.infrastructure.app.services
 {
-    using configuration;
+	using chocolatey.infrastructure.results;
+	using configuration;
+	using System.Collections.Concurrent;
 
-    public interface INugetService : ISourceRunner
+	public interface INugetService : ISourceRunner
     {
         /// <summary>
         ///   Run pack in noop mode.
@@ -49,5 +51,11 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="packageName">Name of the package.</param>
         void remove_rollback_directory_if_exists(string packageName);
+
+		/// <summary>
+		///   Get outdated packages
+		/// </summary>
+		/// <param name="config">The configuration.</param>
+		ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config);
     }
 }
