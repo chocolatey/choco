@@ -101,7 +101,7 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
  * Through a Github issue (preferred), through the [mailing list](https://groups.google.com/forum/#!forum/chocolatey), or through [Gitter](https://gitter.im/chocolatey/choco), talk about a feature you would like to see (or a bug fix), and why it should be in Chocolatey.
    * If approved through the mailing list or in Gitter chat, ensure the accompanying GitHub issue is created with information and a link back to the mailing list discussion (or the Gitter conversation).
  * Once you get a nod from one of the [Chocolatey Team](https://github.com/chocolatey?tab=members), you can start on the feature.
- * Alternatively, if a feature is on the issues list with the [Up For Grabs](https://github.com/chocolatey/choco/issues?q=is%3Aopen+is%3Aissue+label%3A%22Up+For+Grabs%22) label, it is open for a community member to patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
+ * Alternatively, if a feature is on the issues list with the [Up For Grabs](https://github.com/chocolatey/choco/issues?q=is%3Aopen+is%3Aissue+label%3A%22Up+For+Grabs%22) label, it is open for a community member (contributor) to patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
 
 ### Set Up Your Environment
  * Visual Studio 2010+ is recommended for code contributions.
@@ -229,7 +229,7 @@ A commit message should observe the following (based on ["A Note About Git Commi
   * After the subject, skip one line and fill out a body if the subject line is not informative enough.
   * Sometimes you will find that even a tiny code change has a commit body that needs to be very detailed and make take more time to do than the actual change itself!
   * The body:
-    * Should indent at `72` characters.
+    * Should wrap at `72` characters.
     * Explains more fully the reason(s) for the change and contrasts with previous behavior.
     * Uses present tense. "Fix" versus "Fixed".
 
