@@ -46,6 +46,13 @@ namespace chocolatey.infrastructure.licensing
                 try
                 {
                     license.AssertValidLicense();
+
+                    // There is a lease expiration timer within Rhino.Licensing, which by
+                    // default re-asserts the license every 5 minutes.  Since we assert a
+                    // valid license on each attempt to execute an action with Chocolatey,
+                    // re-checking of the license for the current session is not required.
+                    license.DisableFutureChecks();
+
                     chocolateyLicense.IsValid = true;
                 }
                 catch (LicenseFileNotFoundException e)
