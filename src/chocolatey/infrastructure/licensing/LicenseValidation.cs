@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,6 +46,13 @@ namespace chocolatey.infrastructure.licensing
                 try
                 {
                     license.AssertValidLicense();
+
+                    // There is a lease expiration timer within Rhino.Licensing, which by
+                    // default re-asserts the license every 5 minutes.  Since we assert a
+                    // valid license on each attempt to execute an action with Chocolatey,
+                    // re-checking of the license for the current session is not required.
+                    license.DisableFutureChecks();
+
                     chocolateyLicense.IsValid = true;
                 }
                 catch (LicenseFileNotFoundException e)
@@ -87,7 +94,7 @@ namespace chocolatey.infrastructure.licensing
                 chocolateyLicense.Name = license.Name;
                 chocolateyLicense.Id = license.UserId.to_string();
 
-                //todo: if it is expired, provide a warning. 
+                //todo: if it is expired, provide a warning.
                 // one month after it should stop working
             }
             else
