@@ -78,6 +78,26 @@
   <PropertyGroup>
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'NoResources|x86'">
+    <OutputPath>bin\x86\NoResources\</OutputPath>
+    <DefineConstants>TRACE;NoResources</DefineConstants>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'NoResources|AnyCPU'">
+    <OutputPath>bin\NoResources\</OutputPath>
+    <DefineConstants>TRACE;NoResources</DefineConstants>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AlphaFS, Version=2.1.0.0, Culture=neutral, PublicKeyToken=4d31a58f7d7ad5c9, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -124,11 +144,17 @@
     <None Include="packages.config" />
     <None Include="targets\Microsoft.Application.targets" />
   </ItemGroup>
+  <Choose>
+    <When Condition=" '$(Configuration)' != 'NoResources' ">
+      <ItemGroup>
+        <ProjectReference Include="..\chocolatey.resources\chocolatey.resources.csproj">
+          <Project>{AF584111-FE32-448D-A1D0-63217AF8B43C}</Project>
+          <Name>chocolatey.resources</Name>
+        </ProjectReference>
+      </ItemGroup>
+    </When>
+  </Choose>
   <ItemGroup>
-    <ProjectReference Include="..\chocolatey.resources\chocolatey.resources.csproj">
-      <Project>{AF584111-FE32-448D-A1D0-63217AF8B43C}</Project>
-      <Name>chocolatey.resources</Name>
-    </ProjectReference>
     <ProjectReference Include="..\chocolatey\chocolatey.csproj">
       <Project>{5563DC61-35FD-4FAB-B331-9AE1FDB23F80}</Project>
       <Name>chocolatey</Name>
