@@ -72,7 +72,13 @@ namespace chocolatey.console
                      license,
                      warning => { warnings.Add(warning); }
                      );
-                
+
+                if (config.Features.LogWithoutColor)
+                {
+                    ApplicationParameters.Log4NetConfigurationResource = @"chocolatey.infrastructure.logging.log4net.nocolor.config.xml";
+                    Log4NetAppenderConfiguration.configure(loggingLocation, excludeLoggerNames: ChocolateyLoggers.Trace.to_string());
+                }
+
                 if (!string.IsNullOrWhiteSpace(config.AdditionalLogFileLocation))
                 {
                   Log4NetAppenderConfiguration.configure_additional_log_file(config.AdditionalLogFileLocation);

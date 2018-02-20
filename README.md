@@ -56,7 +56,9 @@ Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update
 ![install w/pro](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/chocopro_install_stopped.gif "Chocolatey Pro availability now! A great option for individuals looking for that community PLUS option.")
 
 ## Etiquette Regarding Communication
-When requesting support, try to remember that we are all volunteers that have lives outside of open source and none of us are paid to ensure things work for you, so please be considerate of others' time when you are asking for things. Many of us have families that also need time as well and only have so much time to give on a daily basis. In the future, we hope that some of us are paid to do this full time and can provide better support when folks are running into issues, but until then a little consideration and patience can go a long way. After all, you are using a pretty good tool without cost. It may not be perfect (yet), and we know that.
+If you are an open source user requesting support, please remember that most folks in the Chocolatey community are volunteers that have lives outside of open source and are not paid to ensure things work for you, so please be considerate of others' time when you are asking for things. Many of us have families that also need time as well and only have so much time to give on a daily basis. A little consideration and patience can go a long way. After all, you are using a pretty good tool without cost. It may not be perfect (yet), and we know that.
+
+If you are using a [commercial edition of Chocolatey](https://chocolatey.org/compare#compare), you have different terms! Please see [support](https://chocolatey.org/support).
 
 ## Information
  * [Chocolatey Website and Community Package Repository](https://chocolatey.org)

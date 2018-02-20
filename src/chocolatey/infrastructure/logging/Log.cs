@@ -65,10 +65,11 @@ namespace chocolatey.infrastructure.logging
             if (_logger == null)
             {
                 logger = Activator.CreateInstance(_logType) as ILog;
-                if (logger != null)
-                {
-                    logger.InitializeFor(objectName);
-                }
+            }
+
+            if (logger != null)
+            {
+                logger.InitializeFor(objectName);
             }
 
             return logger;

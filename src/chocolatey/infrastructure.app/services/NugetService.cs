@@ -81,7 +81,7 @@ namespace chocolatey.infrastructure.app.services
             // nothing to do. Nuget.Core is already part of Chocolatey
         }
 
-        public int count_run(ChocolateyConfiguration config)
+        public virtual int count_run(ChocolateyConfiguration config)
         {
             if (config.ListCommand.LocalOnly)
             {
@@ -236,7 +236,7 @@ namespace chocolatey.infrastructure.app.services
                                 ));
         }
 
-        public string validate_and_return_package_file(ChocolateyConfiguration config, string extension)
+        public virtual string validate_and_return_package_file(ChocolateyConfiguration config, string extension)
         {
             Func<IFileSystem, string> getLocalFiles = (fileSystem) =>
                 {
@@ -255,7 +255,7 @@ namespace chocolatey.infrastructure.app.services
             return filePath;
         }
 
-        public void pack_run(ChocolateyConfiguration config)
+        public virtual void pack_run(ChocolateyConfiguration config)
         {
             var nuspecFilePath = validate_and_return_package_file(config, Constants.ManifestExtension);
             var nuspecDirectory = _fileSystem.get_full_path(_fileSystem.get_directory_name(nuspecFilePath));
@@ -328,7 +328,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Info(() => "Would have attempted to push '{0}' to source '{1}'.".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Sources));
         }
 
-        public void push_run(ChocolateyConfiguration config)
+        public virtual void push_run(ChocolateyConfiguration config)
         {
             string nupkgFilePath = validate_and_return_package_file(config, Constants.PackageExtension);
             if (config.RegularOutput) this.Log().Info(() => "Attempting to push {0} to {1}".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Sources));
@@ -374,7 +374,7 @@ folder.");
             ApplicationParameters.PackagesLocation = installLocation;
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
@@ -469,7 +469,17 @@ folder.");
                 IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
                 if (availablePackage == null)
                 {
-                    var logMessage = "{0} not installed. The package was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"{1} Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
+                    var logMessage = @"{0} not installed. The package was not found with the source(s) listed.
+ Source(s): '{1}'
+ NOTE: When you specify explicit sources, it overrides default sources.
+If the package version is a prerelease and you didn't specify `--pre`,
+ the package may not be found.{2}{3}".format_with(packageName, config.Sources, string.IsNullOrWhiteSpace(config.Version) ? String.Empty : 
+@"
+Version was specified as '{0}'. It is possible that version 
+ does not exist for '{1}' at the source specified.".format_with(config.Version.to_string(), packageName), 
+@"
+Please see https://chocolatey.org/docs/troubleshooting for more 
+ assistance.");
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     var noPkgResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
                     noPkgResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -535,7 +545,7 @@ folder.");
             return packageInstalls;
         }
 
-        public void remove_rollback_directory_if_exists(string packageName)
+        public virtual void remove_rollback_directory_if_exists(string packageName)
         {
             var rollbackDirectory = _fileSystem.get_full_path(_fileSystem.combine_paths(ApplicationParameters.PackageBackupLocation, packageName));
             if (!_fileSystem.directory_exists(rollbackDirectory))
@@ -570,7 +580,7 @@ folder.");
             return upgrade_run(config, continueAction, performAction: true, beforeUpgradeAction: beforeUpgradeAction);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, bool performAction, Action<PackageResult> beforeUpgradeAction = null)
+        public virtual ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, bool performAction, Action<PackageResult> beforeUpgradeAction = null)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
@@ -916,7 +926,7 @@ folder.");
             return installDirectory;
         }
 
-        public void ensure_package_files_have_compatible_attributes(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
+        public virtual void ensure_package_files_have_compatible_attributes(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
         {
             var installDirectory = get_install_directory(config, installedPackage);
             if (!_fileSystem.directory_exists(installDirectory)) return;
@@ -924,7 +934,7 @@ folder.");
             _filesService.ensure_compatible_file_attributes(installDirectory, config);
         }
 
-        public void rename_legacy_package_version(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
+        public virtual void rename_legacy_package_version(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
         {
             if (pkgInfo != null && pkgInfo.IsSideBySide) return;
 
@@ -943,7 +953,7 @@ folder.");
             }
         }
 
-        public void backup_existing_version(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation packageInfo)
+        public virtual void backup_existing_version(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation packageInfo)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageBackupLocation);
 
@@ -991,7 +1001,7 @@ folder.");
             }
         }
 
-        public void backup_changed_files(string packageInstallPath, ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
+        public virtual void backup_changed_files(string packageInstallPath, ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
         {
             if (packageInfo == null || packageInfo.Package == null) return;
 
@@ -1113,7 +1123,7 @@ folder.");
             return uninstall_run(config, continueAction, performAction: true, beforeUninstallAction: beforeUninstallAction);
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, bool performAction, Action<PackageResult> beforeUninstallAction = null)
+        public virtual ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, bool performAction, Action<PackageResult> beforeUninstallAction = null)
         {
             var packageUninstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -1384,7 +1394,7 @@ folder.");
                 throwError: true);
         }
 
-        public void remove_installation_files(IPackage removedPackage, ChocolateyPackageInformation pkgInfo)
+        public virtual void remove_installation_files(IPackage removedPackage, ChocolateyPackageInformation pkgInfo)
         {
             this.Log().Debug(ChocolateyLoggers.Verbose, "Ensuring removal of installation files.");
             var isSideBySide = pkgInfo != null && pkgInfo.IsSideBySide;

@@ -49,6 +49,11 @@ namespace chocolatey.infrastructure.adapters
             get { return _process.ExitCode; }
         }
 
+        public System.Diagnostics.Process UnderlyingType
+        {
+            get { return _process; }
+        }
+
         public void Start()
         {
             _process.Start();

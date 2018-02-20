@@ -153,6 +153,6 @@ namespace chocolatey.tests.infrastructure.commands
             {
                 process.Verify(p => p.WaitForExit(It.IsAny<int>()), Times.Never);
             }
-        }
+        } 
     }
 }

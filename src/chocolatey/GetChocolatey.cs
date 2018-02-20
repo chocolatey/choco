@@ -41,8 +41,6 @@ namespace chocolatey
     /// </summary>
     public static class Lets
     {
-        private static readonly GetChocolatey _chocolatey = GlobalMutex.enter(() => set_up(), 5);
-
         private static GetChocolatey set_up()
         {
             add_assembly_resolver();
@@ -52,7 +50,7 @@ namespace chocolatey
 
         public static GetChocolatey GetChocolatey()
         {
-            return _chocolatey;
+            return GlobalMutex.enter(() => set_up(), 10);
         }
 
         private static ResolveEventHandler _handler = null;
@@ -100,6 +98,7 @@ namespace chocolatey
     {
         private readonly Container _container;
         private readonly ChocolateyLicense _license;
+        private readonly LogSinkLog _logSinkLogger = new LogSinkLog();
         private Action<ChocolateyConfiguration> _propConfig;
 
         /// <summary>
@@ -109,6 +108,7 @@ namespace chocolatey
         {
             Log4NetAppenderConfiguration.configure(null, excludeLoggerNames: ChocolateyLoggers.Trace.to_string());
             Bootstrap.initialize();
+            Log.InitializeWith(new AggregateLog(new List<ILog>() { new Log4NetLog(), _logSinkLogger }));
             _license = License.validate_license();
             _container = SimpleInjectorContainer.Container;
         }
@@ -121,7 +121,38 @@ namespace chocolatey
         public GetChocolatey SetCustomLogging(ILog logger)
         {
             Log.InitializeWith(logger, resetLoggers: false);
+            drain_log_sink(logger);
             return this;
+        }
+
+        private void drain_log_sink(ILog logger)
+        {
+            foreach (var logMessage in _logSinkLogger.Messages.or_empty_list_if_null())
+            {
+                switch (logMessage.LogLevel)
+                {
+                    case LogLevelType.Trace:
+                        logger.Trace(logMessage.Message);
+                        break;
+                    case LogLevelType.Debug:
+                        logger.Debug(logMessage.Message);
+                        break;
+                    case LogLevelType.Information:
+                        logger.Info(logMessage.Message);
+                        break;
+                    case LogLevelType.Warning:
+                        logger.Warn(logMessage.Message);
+                        break;
+                    case LogLevelType.Error:
+                        logger.Error(logMessage.Message);
+                        break;
+                    case LogLevelType.Fatal:
+                        logger.Fatal(logMessage.Message);
+                        break;
+                }
+            }
+
+            _logSinkLogger.Messages.Clear();
         }
 
         /// <summary>
@@ -250,7 +281,7 @@ namespace chocolatey
         {
             ensure_environment();
             extract_resources();
-            
+
             ensure_original_configuration(new List<string>(),
                 (config) =>
                 {
@@ -277,7 +308,7 @@ namespace chocolatey
         {
             ensure_environment();
             extract_resources();
-            
+
             ensure_original_configuration(new List<string>(args),
               (config) =>
               {
@@ -302,12 +333,12 @@ namespace chocolatey
         {
             ensure_environment();
             extract_resources();
-            
+
             return ensure_original_configuration(new List<string>(),
                 (config) =>
                 {
                     var runner = new GenericRunner();
-                    return runner.list<T>(config, _container, isConsole: false, parseArgs: null);        
+                    return runner.list<T>(config, _container, isConsole: false, parseArgs: null);
                 });
         }
 
@@ -354,7 +385,7 @@ namespace chocolatey
                 new List<string>(),
                 (config) => config
             );
-            
+
             return configuration;
         }
 
@@ -389,6 +420,12 @@ namespace chocolatey
                 {
                     returnValue = function.Invoke(configuration);
                 }
+
+                var verboseAppenderName = "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string());
+                var traceAppenderName = "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Trace.to_string());
+                Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(configuration.Debug, verboseAppenderName, traceAppenderName);
+                Log4NetAppenderConfiguration.set_verbose_logger_when_verbose(configuration.Verbose, configuration.Debug, verboseAppenderName);
+                Log4NetAppenderConfiguration.set_trace_logger_when_trace(configuration.Trace, traceAppenderName);
             }
             finally
             {
@@ -396,7 +433,7 @@ namespace chocolatey
                 configuration = originalConfig;
                 Config.initialize_with(originalConfig);
             }
-            
+
             return returnValue;
         }
 
@@ -420,6 +457,8 @@ namespace chocolatey
 
             configuration.PromptForConfirmation = false;
             configuration.AcceptLicense = true;
+
+
             if (_propConfig != null)
             {
                 _propConfig.Invoke(configuration);
@@ -466,7 +505,7 @@ namespace chocolatey
             catch (Exception ex)
             {
                 this.Log().Warn(ChocolateyLoggers.Important, "Please ensure that ChocolateyInstall environment variable is set properly and you've run once as an administrator to ensure all resources are extracted.");
-                this.Log().Error("Unable to extract resources. Please ensure the ChocolateyInstall environment variable is set properly. You may need to run once as an admin to ensure all resources are extracted. Details:{0} {1}".format_with(Environment.NewLine,ex.ToString()));
+                this.Log().Error("Unable to extract resources. Please ensure the ChocolateyInstall environment variable is set properly. You may need to run once as an admin to ensure all resources are extracted. Details:{0} {1}".format_with(Environment.NewLine, ex.ToString()));
             }
 
         }

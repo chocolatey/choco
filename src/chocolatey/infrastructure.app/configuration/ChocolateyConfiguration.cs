@@ -378,6 +378,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool FailOnStandardError { get; set; }
         public bool UsePowerShellHost { get; set; }
         public bool LogEnvironmentValues { get; set; }
+        public bool LogWithoutColor { get; set; }
         public bool VirusCheck { get; set; }
         public bool FailOnInvalidOrMissingLicense { get; set; }
         public bool IgnoreInvalidOptionsSwitches { get; set; }

@@ -54,8 +54,6 @@ Export-ModuleMember -Function * -Alias * -Cmdlet *
 $extensionsPath = Join-Path "$helpersPath" '..\extensions'
 if (Test-Path($extensionsPath)) {
   Write-Debug 'Loading community extensions'
-  #Resolve-Path $extensionsPath\**\*\*.psm1 | % { Write-Debug "Importing `'$_`'"; Import-Module $_.ProviderPath }
-  Get-ChildItem $extensionsPath -recurse -filter "*.psm1" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }
   Get-ChildItem $extensionsPath -recurse -filter "*.dll" | Select -ExpandProperty FullName | % {
     $path = $_;
     if ($path.Contains("extensions\chocolatey\lib-synced")) { continue }
@@ -72,6 +70,8 @@ if (Test-Path($extensionsPath)) {
       }
     }
   }
+  #Resolve-Path $extensionsPath\**\*\*.psm1 | % { Write-Debug "Importing `'$_`'"; Import-Module $_.ProviderPath }
+  Get-ChildItem $extensionsPath -recurse -filter "*.psm1" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }
 }
 
 # todo: explore removing this for a future version

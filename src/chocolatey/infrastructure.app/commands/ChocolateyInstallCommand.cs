@@ -194,7 +194,7 @@ namespace chocolatey.infrastructure.app.commands
                         var arg = argument.to_lower();
                         if (arg.StartsWith("-dir") || arg.StartsWith("--dir") || arg.StartsWith("-install") || arg.StartsWith("--install"))
                         {
-                            throw new ApplicationException("It appears you are attempting to use options that may be only available in licensed versions of Chocolatey ('{0}'). Please remove and consult the documentation.".format_with(arg));
+                            throw new ApplicationException("It appears you are attempting to use options that may be only available in licensed versions of Chocolatey ('{0}'). There may be ways in the open source edition to achieve what you are looking to do. Please remove the argument and consult the documentation.".format_with(arg));
                         }
                     }
                 }
