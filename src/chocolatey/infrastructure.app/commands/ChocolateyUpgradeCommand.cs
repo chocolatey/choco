@@ -224,9 +224,10 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Upgrade Command");
             this.Log().Info(@"
-Upgrades a package or a list of packages. Some may prefer to use `cup`
- as a shortcut for `choco upgrade`. If you do not have a package
- installed, upgrade will install it.
+Upgrades a package or a list of packages(sometimes specified as a
+ packages.config). Some may prefer to use `cup` as a shortcut for
+ `choco upgrade`. If you do not have a package installed, upgrade
+ will install it.
 
 NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
  with options and switches. Add `-y` for previous behavior with no
@@ -236,11 +237,14 @@ NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco upgrade <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
-    cup <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
+    choco upgrade <pkg|all|packages.config> [<pkg2> <pkgN>] [<options/switches>]
+    cup <pkg|all|packages.config> [<pkg2> <pkgN>] [<options/switches>]
 
 NOTE: `all` is a special package keyword that will allow you to upgrade
  all currently installed packages.
+
+NOTE: Any package name ending with .config is considered a
+ 'packages.config' file. Please see https://bit.ly/packages_config
 
 Skip upgrading certain packages with `choco pin` or with the option
  `--except`.
@@ -268,6 +272,25 @@ choco upgrade: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gi
 
 ");
 
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Packages.config");
+            "chocolatey".Log().Info(@"
+Alternative to PackageName. This is a list of packages in an xml manifest for Chocolatey to upgrade. This is like the packages.config that NuGet uses except it also adds other options and switches. This can also be the path to the packages.config file if it is not in the current working directory.
+
+NOTE: The filename is only required to end in .config, the name is not required to be packages.config.
+
+    <?xml version=""1.0"" encoding=""utf-8""?>
+    <packages>
+      <package id=""apackage"" />
+      <package id=""anotherPackage"" version=""1.1"" />
+      <package id=""chocolateytestpackage"" version=""0.1"" source=""somelocation"" />
+      <package id=""alloptions"" version=""0.1.1""
+               source=""https://somewhere/api/v2/"" installArguments=""""
+               packageParameters="""" forceX86=""false"" allowMultipleVersions=""false""
+               ignoreDependencies=""false""
+               />
+    </packages>
+
+");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
             "chocolatey".Log().Info(@"
