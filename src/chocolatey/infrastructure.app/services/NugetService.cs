@@ -336,7 +336,7 @@ namespace chocolatey.infrastructure.app.services
             NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath));
 
 
-            if (config.RegularOutput && (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) ||config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)))
+            if (config.RegularOutput && (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) || config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)))
             {
                 this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
@@ -434,6 +434,7 @@ folder.");
                 uninstallSuccessAction: null,
                 addUninstallHandler: true);
 
+            bool repositoryIsServiceBased = repository_is_service_based(packageManager.SourceRepository);
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
@@ -466,17 +467,17 @@ folder.");
                     continue;
                 }
 
-                IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository, repositoryIsServiceBased);
                 if (availablePackage == null)
                 {
                     var logMessage = @"{0} not installed. The package was not found with the source(s) listed.
  Source(s): '{1}'
  NOTE: When you specify explicit sources, it overrides default sources.
 If the package version is a prerelease and you didn't specify `--pre`,
- the package may not be found.{2}{3}".format_with(packageName, config.Sources, string.IsNullOrWhiteSpace(config.Version) ? String.Empty : 
+ the package may not be found.{2}{3}".format_with(packageName, config.Sources, string.IsNullOrWhiteSpace(config.Version) ? String.Empty :
 @"
 Version was specified as '{0}'. It is possible that version 
- does not exist for '{1}' at the source specified.".format_with(config.Version.to_string(), packageName), 
+ does not exist for '{1}' at the source specified.".format_with(config.Version.to_string(), packageName),
 @"
 Please see https://chocolatey.org/docs/troubleshooting for more 
  assistance.");
@@ -604,6 +605,8 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 uninstallSuccessAction: null,
                 addUninstallHandler: false);
 
+            bool repositoryIsServiceBased = repository_is_service_based(packageManager.SourceRepository);
+
             var configIgnoreDependencies = config.IgnoreDependencies;
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
@@ -677,7 +680,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository, repositoryIsServiceBased);
                 config.Prerelease = originalPrerelease;
 
                 if (availablePackage == null)
@@ -857,103 +860,132 @@ Please see https://chocolatey.org/docs/troubleshooting for more
             return packageInstalls;
         }
 
-		public ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config)
-		{
-			var packageManager = NugetCommon.GetPackageManager(
-				config,
-				_nugetLogger,
-				_packageDownloader,
-				installSuccessAction: null,
-				uninstallSuccessAction: null,
-				addUninstallHandler: false);
+        public ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config)
+        {
+            var packageManager = NugetCommon.GetPackageManager(
+              config,
+              _nugetLogger,
+              _packageDownloader,
+              installSuccessAction: null,
+              uninstallSuccessAction: null,
+              addUninstallHandler: false);
 
-			var outdatedPackages = new ConcurrentDictionary<string, PackageResult>();
+            var repository = packageManager.SourceRepository;
+            bool repositoryIsServiceBased = repository_is_service_based(repository);
 
-			set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
-			var packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
+            var outdatedPackages = new ConcurrentDictionary<string, PackageResult>();
 
-			var repository = packageManager.SourceRepository;
+            set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
+            var packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
 
-			bool isRemote = repository_is_remote(repository);
+            var originalConfig = config.deep_copy();
 
-			foreach (var packageName in packageNames)
-			{
-				IPackage latestPackage;
+            foreach (var packageName in packageNames)
+            {
+                // set original config back each time through
+                config = originalConfig;
 
-				if (isRemote)
-				{
-					latestPackage = repository.GetPackages().Where(x => x.Id.ToLower() == packageName && x.IsLatestVersion).ToList().SingleOrDefault();
-				}
-				else
-				{
-					latestPackage = repository.FindPackage(packageName);
-				}
+                var installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+                var pkgInfo = _packageInfoService.get_package_information(installedPackage);
+                bool isPinned = pkgInfo.IsPinned;
 
-				if (latestPackage == null)
-				{
-					this.Log().Warn(packageName + " doesn't exist in the source.");
-					continue;
-				}
+                // if the package is pinned and we are skipping pinned, 
+                // move on quickly
+                if (isPinned && config.OutdatedCommand.IgnorePinned)
+                {
+                    string pinnedLogMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
+                    var pinnedPackageResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    pinnedPackageResult.Messages.Add(new ResultMessage(ResultType.Debug, pinnedLogMessage));
+                    pinnedPackageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, pinnedLogMessage));
 
-				var installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+                    continue;
+                }
 
-				if (latestPackage.Version > installedPackage.Version)
-				{
-					var packageResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(latestPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, latestPackage.Id)));
+                if (installedPackage != null && !string.IsNullOrWhiteSpace(installedPackage.Version.SpecialVersion) && !config.UpgradeCommand.ExcludePrerelease)
+                {
+                    // this is a prerelease - opt in for newer prereleases.
+                    config.Prerelease = true;
+                }
 
-					var pkgInfo = _packageInfoService.get_package_information(installedPackage);
-					bool isPinned = pkgInfo.IsPinned;
+                var latestPackage = find_package(packageName, null, config, repository, repositoryIsServiceBased);
+                
+                if (latestPackage == null)
+                {
+                    if (config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated) continue;
 
-					if (config.OutdatedCommand.IgnorePinned && isPinned)
-					{
-						string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
-						packageResult.Messages.Add(new ResultMessage(ResultType.Debug, logMessage));
-						packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-						if (config.RegularOutput)
-							this.Log().Warn(ChocolateyLoggers.Important, logMessage);
-					}
-					else
-					{
-						string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version);
-						packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+                    string unfoundLogMessage = "{0} was not found with the source(s) listed.{1} Source(s): \"{2}\"".format_with(packageName, Environment.NewLine, config.Sources);
+                    var unfoundResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    unfoundResult.Messages.Add(new ResultMessage(ResultType.Warn, unfoundLogMessage));
+                    unfoundResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, unfoundLogMessage));
 
-						if (config.RegularOutput)
-						{
-							this.Log().Warn("{0}{1}".format_with(Environment.NewLine, logMessage));
-						}
-						else
-						{
-							this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version, isPinned.to_string().to_lower()));
-						}
-					}
-				}
-			}
+                    this.Log().Warn("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
+                    continue;
+                }
 
-			return outdatedPackages;
-		}
+                if (latestPackage.Version <= installedPackage.Version) continue;
+                
+                var packageResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(latestPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, latestPackage.Id)));
 
-		private bool repository_is_remote(IPackageRepository repository)
-		{
-			bool isRemote;
-			var aggregateRepo = repository as AggregateRepository;
-			if (aggregateRepo != null)
-			{
-				isRemote = aggregateRepo.Repositories.All(repo => repo is IServiceBasedRepository);
-			}
-			else
-			{
-				isRemote = repository is IServiceBasedRepository;
-			}
+                string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).{3} Source(s): \"{4}\"".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version, Environment.NewLine, config.Sources);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-			return isRemote;
-		}
+                this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version, isPinned.to_string().to_lower()));
+            }
 
-		/// <summary>
-		/// Sets the configuration for the package upgrade
-		/// </summary>
-		/// <param name="config">The configuration.</param>
-		/// <param name="packageInfo">The package information.</param>
-		/// <returns>The original unmodified configuration, so it can be reset after upgrade</returns>
+            return outdatedPackages;
+        }
+
+        private IPackage find_package(string packageName, SemanticVersion version, ChocolateyConfiguration config, IPackageRepository repository, bool isRepositoryServiceBased)
+        {
+            // find the package based on version
+            if (version != null) return repository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+
+            IQueryable<IPackage> results = repository.GetPackages().Where(x => x.Id == packageName);
+
+            if (config.Prerelease && repository.SupportsPrereleasePackages)
+            {
+                results = results.Where(p => p.IsAbsoluteLatestVersion);
+            }
+            else
+            {
+                results = results.Where(p => p.IsLatestVersion);
+            }
+
+            if (!isRepositoryServiceBased)
+            {
+                results = results
+                    .Where(PackageExtensions.IsListed)
+                    .Where(p => config.Prerelease || p.IsReleaseVersion())
+                    .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
+                    .AsQueryable();
+            }
+
+            // get only one result, should be the latest
+            return results.ToList().OrderByDescending(x => x.Version).FirstOrDefault();
+        }
+
+        private bool repository_is_service_based(IPackageRepository repository)
+        {
+            bool isRemote;
+            var aggregateRepo = repository as AggregateRepository;
+            if (aggregateRepo != null)
+            {
+                isRemote = aggregateRepo.Repositories.All(repo => repo is IServiceBasedRepository);
+            }
+            else
+            {
+                isRemote = repository is IServiceBasedRepository;
+            }
+
+            return isRemote;
+        }
+
+        /// <summary>
+        /// Sets the configuration for the package upgrade
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="packageInfo">The package information.</param>
+        /// <returns>The original unmodified configuration, so it can be reset after upgrade</returns>
         protected virtual ChocolateyConfiguration set_package_config_for_upgrade(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
         {
             if (!config.Features.UseRememberedArgumentsForUpgrades || string.IsNullOrWhiteSpace(packageInfo.Arguments)) return config;
