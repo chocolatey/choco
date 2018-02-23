@@ -64,7 +64,14 @@ param(
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $packagelibPath=$env:chocolateyPackageFolder
-  $zipContentFile=(join-path $packagelibPath $zipFileName) + ".txt"
+  $zipContentFile=(join-path $packagelibPath $zipFileName) + "Install.txt"
+
+  # The Zip Content File may have previously existed under a different
+  # name.  If *Install.txt doesn't exist, check for the old name
+  if(-Not (Test-Path -Path $zipFileContentPath)) {
+    $zipContentFile=(Join-Path $packagelibPath -ChildPath $zipFileName) + ".txt"
+  }
+
   if ((Test-Path -path $zipContentFile)) {
     $zipContentFile
     $zipContents=get-content $zipContentFile
