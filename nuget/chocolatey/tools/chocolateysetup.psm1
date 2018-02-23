@@ -126,6 +126,7 @@ Creating Chocolatey folders if they do not already exist.
 
   Add-ChocolateyProfile
   Install-DotNet4IfMissing
+  Invoke-Chocolatey-Initial
   if ($env:ChocolateyExitCode -eq $null -or $env:ChocolateyExitCode -eq '') {
     $env:ChocolateyExitCode = 0
   }
@@ -697,6 +698,19 @@ param(
         Install-DotNet4IfMissing $true
       }
     }
+  }
+}
+
+function Invoke-Chocolatey-Initial {
+  Write-Debug "Initializing Chocolatey files, etc by running Chocolatey..."
+
+  try {
+    $chocoInstallationFolder = Get-ChocolateyInstallFolder
+    $chocoExe = Join-Path -Path $chocoInstallationFolder -ChildPath "choco.exe"
+    & $chocoExe | Out-Null
+    Write-Debug "Chocolatey execution completed successfully."
+  } catch {
+    Write-ChocolateyWarning "Unable to run Chocolately at this time.  It is likely that .Net Framework installation requires a system reboot"
   }
 }
 
