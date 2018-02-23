@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,45 +55,45 @@ namespace chocolatey.infrastructure.app.services
 
         private readonly IList<string> _proBusinessMessages = new List<string> {
 @"
-Are you ready for the ultimate experience? Check out Pro / Business! 
- https://chocolatey.org/compare"       
-, 
+Are you ready for the ultimate experience? Check out Pro / Business!
+ https://chocolatey.org/compare"
+,
 @"
-Enjoy using Chocolatey? Explore more amazing features to take your 
+Enjoy using Chocolatey? Explore more amazing features to take your
 experience to the next level at
- https://chocolatey.org/compare"       
-, 
+ https://chocolatey.org/compare"
+,
 @"
-Did you know the proceeds of Pro (and some proceeds from other 
+Did you know the proceeds of Pro (and some proceeds from other
  licensed editions) go into bettering the community infrastructure?
  Your support ensures an active community, keeps Chocolatey tip top,
- plus it nets you some awesome features! 
- https://chocolatey.org/compare", 
+ plus it nets you some awesome features!
+ https://chocolatey.org/compare",
 @"
 Did you know some organizations use Chocolatey completely internally
  without using the community repository or downloads from the internet?
  Wait until you see how Package Builder and Package Internalizer can
- help you achieve more, quicker and easier! Get your trial started 
- today at https://chocolatey.org/compare", 
+ help you achieve more, quicker and easier! Get your trial started
+ today at https://chocolatey.org/compare",
 @"
 An organization needed total software management life cycle automation.
  They evaluated Chocolatey for Business. You won't believe what happens
  next!
- https://chocolatey.org/compare", 
+ https://chocolatey.org/compare",
 @"
-Did you know that Package Synchronizer and AutoUninstaller enhancements 
- in licensed versions are up to 95% effective in removing system 
+Did you know that Package Synchronizer and AutoUninstaller enhancements
+ in licensed versions are up to 95% effective in removing system
  installed software without an uninstall script? Find out more at
- https://chocolatey.org/compare", 
+ https://chocolatey.org/compare",
 @"
 Did you know Chocolatey goes to eleven? And it turns great developers /
- system admins into something amazing! Singlehandedly solve your 
+ system admins into something amazing! Singlehandedly solve your
  organization's struggles with software management and save the day!
  https://chocolatey.org/compare"
 };
         private const string PRO_BUSINESS_LIST_MESSAGE = @"
 Did you know Pro / Business automatically syncs with Programs and
- Features? Learn more about Package Synchronizer at 
+ Features? Learn more about Package Synchronizer at
  https://chocolatey.org/compare";
 
         private readonly string _shutdownExe = Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\shutdown.exe");
@@ -163,7 +163,7 @@ Did you know Pro / Business automatically syncs with Programs and
         {
             if (string.IsNullOrWhiteSpace(config.Sources))
             {
-                this.Log().Error(ChocolateyLoggers.Important, @"Unable to search for packages when there are no sources enabled for 
+                this.Log().Error(ChocolateyLoggers.Important, @"Unable to search for packages when there are no sources enabled for
  packages and none were passed as arguments.");
                 Environment.ExitCode = 1;
                 yield break;
@@ -284,7 +284,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public void install_noop(ChocolateyConfiguration config)
         {
-            // each package can specify its own configuration values    
+            // each package can specify its own configuration values
             foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, new ConcurrentDictionary<string, PackageResult>()).or_empty_list_if_null())
             {
                 Action<PackageResult> action = null;
@@ -314,8 +314,8 @@ Did you know Pro / Business automatically syncs with Programs and
                 {
                     if (string.IsNullOrWhiteSpace(message))
                     {
-                        // Choose a message at random to display. It is 
-                        // specifically done like this as sometimes Random 
+                        // Choose a message at random to display. It is
+                        // specifically done like this as sometimes Random
                         // doesn't like to grab the max value.
                         var messageCount = _proBusinessMessages.Count;
                         var chosenMessage = new Random().Next(0, messageCount);
@@ -354,7 +354,7 @@ Did you know Pro / Business automatically syncs with Programs and
                     var installersDifferences = _registryService.get_installer_key_differences(installersBefore, _registryService.get_installer_keys());
                     if (installersDifferences.RegistryKeys.Count != 0)
                     {
-                        //todo v1 - note keys passed in 
+                        //todo v1 - note keys passed in
                         pkgInfo.RegistrySnapshot = installersDifferences;
 
                         var key = installersDifferences.RegistryKeys.FirstOrDefault();
@@ -404,7 +404,7 @@ Did you know Pro / Business automatically syncs with Programs and
                     Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, toolsLocation, EnvironmentVariableTarget.Process);
                 }
             }
-            
+
             if (pkgInfo.RegistrySnapshot != null && pkgInfo.RegistrySnapshot.RegistryKeys.Any(k => !string.IsNullOrWhiteSpace(k.InstallLocation)))
             {
                 var key = pkgInfo.RegistrySnapshot.RegistryKeys.FirstOrDefault(k => !string.IsNullOrWhiteSpace(k.InstallLocation));
@@ -431,7 +431,7 @@ Did you know Pro / Business automatically syncs with Programs and
             }
 
             remove_rollback_if_exists(packageResult);
-            
+
             this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".format_with(commandName.to_string(), packageResult.Name));
 
             var installLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation);
@@ -446,7 +446,7 @@ Did you know Pro / Business automatically syncs with Programs and
             }
             else
             {
-                this.Log().Info(ChocolateyLoggers.Important, @"  Software install location not explicitly set, could be in package or 
+                this.Log().Info(ChocolateyLoggers.Important, @"  Software install location not explicitly set, could be in package or
   default install location if installer.");
             }
         }
@@ -479,26 +479,26 @@ Did you know Pro / Business automatically syncs with Programs and
             if (config.Prerelease) arguments.Append(" --prerelease");
             if (config.IgnoreDependencies) arguments.Append(" --ignore-dependencies");
             if (config.ForceX86) arguments.Append(" --forcex86");
-            
+
             if (!string.IsNullOrWhiteSpace(config.InstallArguments)) arguments.Append(" --install-arguments=\"'{0}'\"".format_with(config.InstallArguments));
             if (config.OverrideArguments) arguments.Append(" --override-arguments");
             if (config.ApplyInstallArgumentsToDependencies) arguments.Append(" --apply-install-arguments-to-dependencies");
 
             if (!string.IsNullOrWhiteSpace(config.PackageParameters)) arguments.Append(" --package-parameters=\"'{0}'\"".format_with(config.PackageParameters));
             if (config.ApplyPackageParametersToDependencies) arguments.Append(" --apply-package-parameters-to-dependencies");
-            
+
             if (config.AllowDowngrade) arguments.Append(" --allow-downgrade");
             if (config.AllowMultipleVersions) arguments.Append(" --allow-multiple-versions");
-            
+
             // most times folks won't want to skip automation scripts on upgrade
             //if (config.SkipPackageInstallProvider) arguments.Append(" --skip-automation-scripts");
             //if (config.UpgradeCommand.FailOnUnfound) arguments.Append(" --fail-on-unfound");
-            
+
             if (!string.IsNullOrWhiteSpace(config.SourceCommand.Username)) arguments.Append(" --user=\"'{0}'\"".format_with(config.SourceCommand.Username));
-            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Password)) arguments.Append(" --password=\"'{0}'\"".format_with(config.SourceCommand.Password));    
+            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Password)) arguments.Append(" --password=\"'{0}'\"".format_with(config.SourceCommand.Password));
             if (!string.IsNullOrWhiteSpace(config.SourceCommand.Certificate)) arguments.Append(" --cert=\"'{0}'\"".format_with(config.SourceCommand.Certificate));
             if (!string.IsNullOrWhiteSpace(config.SourceCommand.CertificatePassword)) arguments.Append(" --certpassword=\"'{0}'\"".format_with(config.SourceCommand.CertificatePassword));
-            
+
             // this should likely be limited
             //if (!config.Features.ChecksumFiles) arguments.Append(" --ignore-checksums");
             //if (!config.Features.AllowEmptyChecksums) arguments.Append(" --allow-empty-checksums");
@@ -527,7 +527,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
             if (string.IsNullOrWhiteSpace(config.Sources))
             {
-                this.Log().Error(ChocolateyLoggers.Important, @"Installation was NOT successful. There are no sources enabled for 
+                this.Log().Error(ChocolateyLoggers.Important, @"Installation was NOT successful. There are no sources enabled for
  packages and none were passed as arguments.");
                 Environment.ExitCode = 1;
                 return packageInstalls;
@@ -544,7 +544,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 {
                     action = (packageResult) => handle_package_result(packageResult, packageConfig, CommandNameType.install);
                 }
-                
+
                 var results = perform_source_runner_function(packageConfig, r => r.install_run(packageConfig, action));
 
                 foreach (var result in results)
@@ -567,7 +567,7 @@ Did you know Pro / Business automatically syncs with Programs and
         public void outdated_noop(ChocolateyConfiguration config)
         {
             this.Log().Info(@"
-Would have determined packages that are out of date based on what is 
+Would have determined packages that are out of date based on what is
  installed and what versions are available for upgrade.");
         }
 
@@ -633,8 +633,8 @@ Would have determined packages that are out of date based on what is
         private bool contains_packages_config_file(string packageNames)
         {
             return packageNames.to_string().Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Any(p => p.EndsWith(".config", StringComparison.OrdinalIgnoreCase));
-        } 
-        
+        }
+
         private bool is_packages_config_file(string packageNames)
         {
             return packageNames.to_string().EndsWith(".config", StringComparison.OrdinalIgnoreCase) && !packageNames.to_string().contains(";");
@@ -704,7 +704,7 @@ Would have determined packages that are out of date based on what is
 
             if (string.IsNullOrWhiteSpace(config.Sources))
             {
-                this.Log().Error(ChocolateyLoggers.Important, @"Upgrading was NOT successful. There are no sources enabled for 
+                this.Log().Error(ChocolateyLoggers.Important, @"Upgrading was NOT successful. There are no sources enabled for
  packages and none were passed as arguments.");
                 Environment.ExitCode = 1;
                 return new ConcurrentDictionary<string, PackageResult>();
@@ -727,7 +727,7 @@ Would have determined packages that are out of date based on what is
 
             var beforeUpgradeAction = new Action<PackageResult>(packageResult => before_package_modify(packageResult, config));
             var packageUpgrades = perform_source_runner_function(config, r => r.upgrade_run(config, action, beforeUpgradeAction));
-            
+
             var upgradeFailures = report_action_summary(packageUpgrades, "upgraded");
             if (upgradeFailures != 0 && Environment.ExitCode == 0)
             {
@@ -735,7 +735,7 @@ Would have determined packages that are out of date based on what is
             }
 
             randomly_notify_about_pro_business(config);
-            
+
             return packageUpgrades;
         }
 
@@ -798,17 +798,17 @@ Would have determined packages that are out of date based on what is
             {
                 this.Log().Warn(@"
 If a package uninstall is failing and/or you've already uninstalled the
- software outside of Chocolatey, you can attempt to run the command 
+ software outside of Chocolatey, you can attempt to run the command
  with `-n` to skip running a chocolateyUninstall script, additionally
- adding `--skip-autouninstaller` to skip an attempt to automatically 
- remove system-installed software. This will only remove the packaging 
+ adding `--skip-autouninstaller` to skip an attempt to automatically
+ remove system-installed software. This will only remove the packaging
  files and not things like software installed to Programs and Features.
 
 If a package is failing because it is a dependency of another package
  or packages, then you may first need to consider if it needs removed
- as it is typically installed as a dependency for a reason. If you 
- decide that you still want to remove it, head into 
- `$env:ChocolateyInstall\lib` and find the package folder you want 
+ as it is typically installed as a dependency for a reason. If you
+ decide that you still want to remove it, head into
+ `$env:ChocolateyInstall\lib` and find the package folder you want
  removed. Then delete the folder for the package. This option should
  only be used as a last resort.
  ");
@@ -867,7 +867,7 @@ If a package is failing because it is a dependency of another package
                     this.Log().Warn(" - {0}{1}".format_with(reboot.Value.Name, reboot.Value.ExitCode != 0 ? " (exit code {0})".format_with(reboot.Value.ExitCode) : string.Empty));
                 }
                 this.Log().Warn(ChocolateyLoggers.Important, @"
-The recent package changes indicate a reboot is necessary. 
+The recent package changes indicate a reboot is necessary.
  Please reboot at your earliest convenience.");
             }
 
@@ -1121,11 +1121,11 @@ The recent package changes indicate a reboot is necessary.
                 {
                     this.Log().Error(ChocolateyLoggers.Important, @"
 Package location is not specific enough, cannot move bad package or
- rollback previous version. Erroneous install location captured as 
+ rollback previous version. Erroneous install location captured as
  '{0}'
 
-ATTENTION: You must take manual action to remove {1} from 
- {2}. It will show incorrectly as installed 
+ATTENTION: You must take manual action to remove {1} from
+ {2}. It will show incorrectly as installed
  until you do. To remove you can simply delete the folder in question.
 ".format_with(packageResult.InstallLocation, packageResult.Name, ApplicationParameters.PackagesLocation));
                 }
@@ -1303,7 +1303,7 @@ ATTENTION: You must take manual action to remove {1} from
 
                 if (!config.Features.LogEnvironmentValues)
                 {
-                    this.Log().Debug(@"Logging of values is not turned on by default because it 
+                    this.Log().Debug(@"Logging of values is not turned on by default because it
  could potentially expose sensitive data. If you understand the risk,
  please see `choco feature -h` for information to turn it on.");
                 }
