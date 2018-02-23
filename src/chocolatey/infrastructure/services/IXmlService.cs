@@ -27,6 +27,15 @@ namespace chocolatey.infrastructure.services
         XmlType deserialize<XmlType>(string xmlFilePath);
 
         /// <summary>
+        ///   Deserializes the specified XML file path.
+        /// </summary>
+        /// <typeparam name="XmlType">The type of the ml type.</typeparam>
+        /// <param name="xmlFilePath">The XML file path.</param>
+        /// <param name="retryCount">The number of times to attempt deserialization on event of a failure.</param>
+        /// <returns></returns>
+        XmlType deserialize<XmlType>(string xmlFilePath, int retryCount);
+
+        /// <summary>
         ///   Serializes the specified XML type.
         /// </summary>
         /// <typeparam name="XmlType">The type of the ml type.</typeparam>

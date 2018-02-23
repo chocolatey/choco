@@ -398,7 +398,7 @@ namespace chocolatey.infrastructure.app.services
                 return null;
             }
 
-            return _xmlService.deserialize<Registry>(filePath);
+            return _xmlService.deserialize<Registry>(filePath, 1);
         }
 
         private void get_values(RegistryKey key, string subKeyName, IList<GenericRegistryValue> values, bool expandValues)

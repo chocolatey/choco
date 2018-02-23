@@ -45,75 +45,81 @@ namespace chocolatey.infrastructure.services
 
         public XmlType deserialize<XmlType>(string xmlFilePath)
         {
-            return FaultTolerance.retry(3, () => GlobalMutex.enter(
-                () =>
-                {
-                    this.Log().Trace("Entered mutex to deserialize '{0}'".format_with(xmlFilePath));
+            return deserialize<XmlType>(xmlFilePath, 3);
+        }
 
-                    return FaultTolerance.try_catch_with_logging_exception(
-                    () =>
-                    {
-                        var xmlSerializer = new XmlSerializer(typeof(XmlType));
-                        using (var fileStream = _fileSystem.open_file_readonly(xmlFilePath))
-                        using (var fileReader = new StreamReader(fileStream))
-                        using (var xmlReader = XmlReader.Create(fileReader))
-                        {
-                            if (!xmlSerializer.CanDeserialize(xmlReader))
-                            {
-                                this.Log().Warn("Cannot deserialize response of type {0}", typeof(XmlType));
-                                return default(XmlType);
-                            }
+        public XmlType deserialize<XmlType>(string xmlFilePath, int retryCount)
+        {
+            return FaultTolerance.retry(retryCount, () => GlobalMutex.enter(
+               () =>
+               {
+                   this.Log().Trace("Entered mutex to deserialize '{0}'".format_with(xmlFilePath));
 
-                            try
-                            {
-                                return (XmlType)xmlSerializer.Deserialize(xmlReader);
-                            }
-                            catch (InvalidOperationException ex)
-                            {
-                                // Check if its just a malformed document.
-                                if (ex.Message.Contains("There is an error in XML document"))
-                                {
-                                    // If so, check for a backup file and try an parse that.
-                                    if (_fileSystem.file_exists(xmlFilePath + ".backup"))
-                                    {
-                                        using (var backupStream = _fileSystem.open_file_readonly(xmlFilePath + ".backup"))
-                                        using (var backupReader = new StreamReader(backupStream))
-                                        using (var backupXmlReader = XmlReader.Create(backupReader))
-                                        {
-                                            var validConfig = (XmlType)xmlSerializer.Deserialize(backupXmlReader);
+                   return FaultTolerance.try_catch_with_logging_exception(
+                   () =>
+                   {
+                       var xmlSerializer = new XmlSerializer(typeof(XmlType));
+                       using (var fileStream = _fileSystem.open_file_readonly(xmlFilePath))
+                       using (var fileReader = new StreamReader(fileStream))
+                       using (var xmlReader = XmlReader.Create(fileReader))
+                       {
+                           if (!xmlSerializer.CanDeserialize(xmlReader))
+                           {
+                               this.Log().Warn("Cannot deserialize response of type {0}", typeof(XmlType));
+                               return default(XmlType);
+                           }
 
-                                            // If there's no errors and it's valid, go ahead and replace the bad file with the backup.
-                                            if (validConfig != null)
-                                            {
-                                                _fileSystem.copy_file(xmlFilePath + ".backup", xmlFilePath, overwriteExisting: true);
-                                            }
+                           try
+                           {
+                               return (XmlType)xmlSerializer.Deserialize(xmlReader);
+                           }
+                           catch (InvalidOperationException ex)
+                           {
+                               // Check if its just a malformed document.
+                               if (ex.Message.Contains("There is an error in XML document"))
+                               {
+                                   // If so, check for a backup file and try an parse that.
+                                   if (_fileSystem.file_exists(xmlFilePath + ".backup"))
+                                   {
+                                       using (var backupStream = _fileSystem.open_file_readonly(xmlFilePath + ".backup"))
+                                       using (var backupReader = new StreamReader(backupStream))
+                                       using (var backupXmlReader = XmlReader.Create(backupReader))
+                                       {
+                                           var validConfig = (XmlType)xmlSerializer.Deserialize(backupXmlReader);
 
-                                            return validConfig;
-                                        }
-                                    }
-                                }
+                                           // If there's no errors and it's valid, go ahead and replace the bad file with the backup.
+                                           if (validConfig != null)
+                                           {
+                                               _fileSystem.copy_file(xmlFilePath + ".backup", xmlFilePath, overwriteExisting: true);
+                                           }
 
-                                throw;
-                            }
-                            finally
-                            {
-                                foreach (var updateFile in _fileSystem.get_files(_fileSystem.get_directory_name(xmlFilePath), "*.update").or_empty_list_if_null())
-                                {
-                                    this.Log().Debug("Removing '{0}'".format_with(updateFile));
-                                    FaultTolerance.try_catch_with_logging_exception(
-                                        () => _fileSystem.delete_file(updateFile),
-                                        errorMessage: "Unable to remove update file",
-                                        logDebugInsteadOfError: true,
-                                        isSilent: true
-                                        );
-                                }
-                            }
-                        }
-                    },
-                    "Error deserializing response of type {0}".format_with(typeof(XmlType)),
-                    throwError: true);
+                                           return validConfig;
+                                       }
+                                   }
+                               }
 
-                }, MUTEX_TIMEOUT),
+                               throw;
+
+                           }
+                           finally
+                           {
+                               foreach (var updateFile in _fileSystem.get_files(_fileSystem.get_directory_name(xmlFilePath), "*.update").or_empty_list_if_null())
+                               {
+                                   this.Log().Debug("Removing '{0}'".format_with(updateFile));
+                                   FaultTolerance.try_catch_with_logging_exception(
+                                       () => _fileSystem.delete_file(updateFile),
+                                       errorMessage: "Unable to remove update file",
+                                       logDebugInsteadOfError: true,
+                                       isSilent: true
+                                       );
+                               }
+                           }
+                       }
+                   },
+                   "Error deserializing response of type {0}".format_with(typeof(XmlType)),
+                   throwError: true);
+
+               }, MUTEX_TIMEOUT),
                 waitDurationMilliseconds: 200,
                 increaseRetryByMilliseconds: 200);
         }

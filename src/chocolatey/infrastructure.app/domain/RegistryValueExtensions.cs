@@ -24,7 +24,11 @@ namespace chocolatey.infrastructure.app.domain
         {
             if (key == null) return string.Empty;
 
-            return key.GetValue(name).to_string().Replace("\0", string.Empty);
+            // Since it is possible that registry keys contain characters that are not valid
+            // in XML files, ensure that all content is escaped, prior to serialization
+            var escapedXml = System.Security.SecurityElement.Escape(key.GetValue(name).to_string());
+
+            return escapedXml == null ? string.Empty : escapedXml.Replace("\0", string.Empty);
         }
     }
 }

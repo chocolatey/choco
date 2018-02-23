@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using System.IO;
     using System.Text;
     using NuGet;
@@ -29,6 +30,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IRegistryService _registryService;
         private readonly IFilesService _filesService;
         private const string REGISTRY_SNAPSHOT_FILE = ".registry";
+        private const string REGISTRY_SNAPSHOT_BAD_FILE = ".registry.bad";
         private const string FILES_SNAPSHOT_FILE = ".files";
         private const string SILENT_UNINSTALLER_FILE = ".silentUninstaller";
         private const string SIDE_BY_SIDE_FILE = ".sxs";
@@ -59,16 +61,44 @@ namespace chocolatey.infrastructure.app.services
                 return packageInformation;
             }
 
-            FaultTolerance.try_catch_with_logging_exception(
-                () =>
+            var deserializationErrorMessage = @"
+A corrupt .registry file exists at {0}.
+ Open this file in a text editor, and remove/escape any characters that
+ are regarded as illegal within XML contents.  These are typically the
+ characters <, >, "", ', and &.  Once these have been corrected, rename
+ the .registry.bad file to .registry.  Once saved, try running the same
+ Chocolatey command that was just executed, so verify problem is fixed.
+ NOTE: It will not be possible to rename the file in Windows Explorer.
+ Instead, you can use the following PowerShell command:
+ Move-Item .\.registry.bad .\.registry
+".format_with(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE));
+            try
+            {
+                if (_fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE)))
+                {
+                    this.Log().Warn(deserializationErrorMessage);
+                }
+                else
+                {
+                    packageInformation.RegistrySnapshot = _registryService.read_from_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE));
+                }
+            }
+            catch (Exception)
+            {
+                FaultTolerance.try_catch_with_logging_exception(
+                    () =>
                     {
-                        packageInformation.RegistrySnapshot = _registryService.read_from_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE));
+                        this.Log().Warn(deserializationErrorMessage);
+
+                        // rename the bad registry file so that it isn't processed again
+                        _fileSystem.move_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE), _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE));
                     },
                     "Unable to read registry snapshot file for {0} (located at {1})".format_with(package.Id, _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE)),
                     throwError: false,
                     logWarningInsteadOfError: true,
                     isSilent: true
-                 );
+                );
+            }
 
             FaultTolerance.try_catch_with_logging_exception(
                 () =>
