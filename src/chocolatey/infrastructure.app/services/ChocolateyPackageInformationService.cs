@@ -64,10 +64,13 @@ namespace chocolatey.infrastructure.app.services
             var deserializationErrorMessage = @"
 A corrupt .registry file exists at {0}.
  Open this file in a text editor, and remove/escape any characters that
- are regarded as illegal within XML contents.  These are typically the
- characters <, >, "", ', and &.  Once these have been corrected, rename
- the .registry.bad file to .registry.  Once saved, try running the same
- Chocolatey command that was just executed, so verify problem is fixed.
+ are regarded as illegal within XML strings not surrounded by CData. 
+ These are typically the characters &, ', "", and `<`, `>`. Again, this
+ is an XML document, so you will see many < and > characters, so just
+ focus exclusively in the string values not surrounded by CData. Once 
+ these have been corrected, rename the .registry.bad file to .registry.
+ Once saved, try running the same Chocolatey command that was just 
+ executed, so verify problem is fixed.
  NOTE: It will not be possible to rename the file in Windows Explorer.
  Instead, you can use the following PowerShell command:
  Move-Item .\.registry.bad .\.registry
