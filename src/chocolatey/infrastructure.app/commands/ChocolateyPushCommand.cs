@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.commands
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using attributes;
     using commandline;
     using configuration;
@@ -66,6 +67,21 @@ namespace chocolatey.infrastructure.app.commands
 
             if (!string.IsNullOrWhiteSpace(configuration.Sources))
             {
+                IEnumerable<string> sources = configuration.Sources.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (sources.Count() > 1)
+                {
+                    throw new ApplicationException("Multiple sources are not supported by the push command.");
+                }
+
+                var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Name.is_equal_to(configuration.Sources));
+                if (machineSource != null)
+                {
+                    "chocolatey".Log().Debug("Switching source name {0} to actual source value '{1}'.".format_with(configuration.Sources, machineSource.Key.to_string()));
+
+                    configuration.Sources = machineSource.Key;
+                }
+
                 var remoteSource = new Uri(configuration.Sources);
                 if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
                 {

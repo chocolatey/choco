@@ -26,6 +26,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
+    using NUnit.Framework;
     using Should;
 
     public class ChocolateyPushCommandSpecs
@@ -214,6 +215,33 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
 
                 configSettingsService.Verify(c => c.get_api_key(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
+            }
+
+            [Fact]
+            public void should_throw_if_multiple_sources_are_passed()
+            {
+                reset();
+                configuration.Sources = "https://localhost/somewhere/out/there;https://localhost/somewhere/out/there";
+
+                Assert.Throws<ApplicationException>(() => because(), "Multiple sources are not supported by the push command.");
+            }
+
+            [Fact]
+            public void should_update_source_if_alias_is_passed()
+            {
+                reset();
+                configuration.Sources = "chocolatey";
+                configuration.MachineSources = new List<MachineSourceConfiguration>
+                {
+                    new MachineSourceConfiguration
+                    {
+                        Name = "chocolatey",
+                        Key = "https://localhost/somewhere/out/there"
+                    }
+                 };
+                because();
+
+                configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
             }
         }
 
