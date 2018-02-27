@@ -381,6 +381,9 @@ Did you know Pro / Business automatically syncs with Programs and
                 //review: is this a Windows only kind of thing?
                 pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
 
+                var is32Bit = !config.Information.Is64BitProcess || config.ForceX86;
+                create_ignore_files_for_executables(packageResult.InstallLocation, !is32Bit);
+
                 if (packageResult.Success) _shimgenService.install(config, packageResult);
             }
             else
@@ -448,6 +451,26 @@ Did you know Pro / Business automatically syncs with Programs and
             {
                 this.Log().Info(ChocolateyLoggers.Important, @"  Software install location not explicitly set, could be in package or
   default install location if installer.");
+            }
+        }
+
+        private void create_ignore_files_for_executables(string installLocation, bool is64Bit)
+        {
+            // If we are using a 64 bit architecure, we want to ignore exe's targetting x86
+            // This is done by adding a .ignore file into the package folder for each exe to ignore
+            var exeFiles32Bit = _fileSystem.get_files(_fileSystem.combine_paths(installLocation, "tools\\x86"), pattern: "*.exe", option: SearchOption.AllDirectories).ToArray();
+            var exeFiles64Bit = _fileSystem.get_files(_fileSystem.combine_paths(installLocation, "tools\\x64"), pattern: "*.exe", option: SearchOption.AllDirectories).ToArray();
+
+            // If 64bit, and there are only 32bit files, we should shim the 32bit versions,
+            // therefore, don't ignore anything
+            if (is64Bit && !exeFiles64Bit.Any() && exeFiles32Bit.Any())
+            {
+                return;
+            }
+
+            foreach (var exeFile in is64Bit ? exeFiles32Bit.or_empty_list_if_null() : exeFiles64Bit.or_empty_list_if_null())
+            {
+                _fileSystem.create_file(exeFile + ".ignore");
             }
         }
 
