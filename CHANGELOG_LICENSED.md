@@ -4,6 +4,39 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
+## 1.12.11 (February 1, 2018)
+
+**NOTE**: We've identified an issue with Self-Service interactive and UAC - we are working on a fix. Please see [#36](https://github.com/chocolatey/chocolatey-licensed-issues/issues/36) and subscribe for details.
+
+A few nice things going into this release with Package Reducer/Optimize coming out of preview, Package Internalizer allowing you to specify variable overrides
+
+### BREAKING CHANGES
+
+ * Package Reducer is now on by default
+
+When we first released package reducer, it was in a preview mode to allow for folks to opt in to test it and find issues. Now we are turning it on by default. If you should experience issues with it, please contact support to file an issue (provide a zipped log as well). To turn it off should you not want to use it, you can just run `choco feature disable --name=reduceInstalledPackageSpaceUsage`.
+
+### BUG FIXES
+
+ * Self-Service / Background Mode:
+    * Fix - Work with empty sessions. Self-service users were incorrectly bypassing background service when their active session doesn't have a name, which has become common with Windows 10.
+    * Fix - Allow self-service to work when the current working directory is different from system drive or a mapped drive. Also allow it to be set to locations where any user would not have a permissions error.
+ * Package Internalizer (Choco Download):
+    * Fix - When a variable is set to the contents of a file, work with that appropriately. A good example of this is `$data` variable in [dotnetcore-runtime](https://github.com/dotnetcore-chocolatey/dotnetcore-chocolateypackages/blob/d5960c11dda388cc7f7ab6438eee8984774f7662/dotnetcore-runtime.install/tools/ChocolateyInstall.ps1#L4) package.
+    * Fix - Allow setting variable when there is a comment on the same line following the set. An example of this is in the [Firefox](https://github.com/chocolatey/chocolatey-coreteampackages/blob/91f4e51f5c8503ca962c22a2f087b96d22ae0e9f/automatic/firefox/tools/chocolateyInstall.ps1#L26) package.
+ * Package Builder (Choco New):
+    * Fix - Package Builder UI should recognize Architect and MSP editions and correctly set the UI for use with them.
+    * Fix - Extract icon from the proper location for the file.
+
+### IMPROVEMENTS
+
+ * Package Internalizer (Choco Download):
+    * Override variables in the installation script. When you see something like `$locale` being set and you want to override it to your own value for internalization, you can pass that variable name and value as a key value pair. As an example, try `choco download thunderbird --internalize locale=en-US` versus `choco download thunderbird --internalize locale=es-ES`.
+ * Package Reducer - `choco optimize` command out of preview.
+ * Package Builder (Choco New):
+    * Extract icons from MSIs as well.
+    * Package Builder UI logo animzation should match chocolatey website.
+
 ## 1.12.10 (December 18, 2017)
 
 ### FEATURES
