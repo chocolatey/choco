@@ -3,8 +3,40 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
-## [0.10.8](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.8+is%3Aclosed) (August 30, 2017)
+## [0.10.9](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.9+is%3Aclosed) (unreleased)
+The vendored 7Zip had a couple of security findings that necessitated a release. There is also a lot of goodness going into this release as well. We've fixed XDT transforms not to keep extra data around (requiring manual fixes). We've resolved some issues surrounding compatibility with Get-PackageParameters in the chocolatey-core.extension package and what's now built into Chocolatey. That should now work appropriately, and the built-in method should be preferred, so if you are using `--package-parameters-sensitive`, those will be added as well when you do have the chocolatey-core.extension package also installed.
 
+We've also brought in the long desired logging with no colorization. You can set that as a switch or globally with a feature flipper. With outdated/upgrade, you can now ignore unfound packages along with already skipping pinned packages. That will help you reduce your output to only the things it finds upgrades for that can be upgraded.
+
+### BUG FIXES
+ * [Security] Fix - Pro/Business - Logging - Get-PackageParameters should not log sensitive params - see [#1460](https://github.com/chocolatey/choco/issues/1460)
+ * Fix - XDT transform causes xml file to have extra data in it (unusable until manually fixed) - see [#1482](https://github.com/chocolatey/choco/issues/1482)
+ * Fix - Escape package registry information to reduce unreadable files - see [#1505](https://github.com/chocolatey/choco/issues/1505)
+ * Fix - Uninstall-ChocolateyZipPackage is unable to find zip contents file - see [#1415](https://github.com/chocolatey/choco/issues/1415)
+ * Fix - Get-PackageParameters - Resolve differences between chocolatey.core-extension and built-in method - see [#1490](https://github.com/chocolatey/choco/issues/1490)
+ * Fix - Get-PackageParameters - force built-in method to be preferred over chocolatey-core.extension method - see [#1476](https://github.com/chocolatey/choco/issues/1476)
+ * Fix - Get-PackageParameters should handle urls - see [#1459](https://github.com/chocolatey/choco/issues/1459)
+ * Fix - Setting output directory with proper quoting can result in "The given path's format is not supported." - see [#1517](https://github.com/chocolatey/choco/issues/1517)
+ * Fix - Logging - PowerShell script contents logging should not error if they have contents mistaken for log formatting - see [#1489](https://github.com/chocolatey/choco/issues/1489)
+ * Fix - Incorrect documentation for Install-ChocolateyInstallPackage - see [#1416](https://github.com/chocolatey/choco/issues/1416)
+ * [API] Fix - Logging - Loggers should always be checked for initialization - see [#1447](https://github.com/chocolatey/choco/issues/1447)
+ * Fix - Pro/Business - Expired licenses should not cause Chocolatey errors - see [#1500](https://github.com/chocolatey/choco/issues/1500)
+
+### IMPROVEMENTS
+ * [Security] RAR extraction with older 7zip can cause memory corruption (CVE-2018-5996) / ZIP Shrink vulnerability (CVE-2017-17969) - see [#1478](https://github.com/chocolatey/choco/issues/1478)
+ * Outdated/Upgrade - Option/feature to ignore unfound packages - see [#1398](https://github.com/chocolatey/choco/issues/1398)
+ * Installation/Setup: run choco once to initialize the config file - see [#1401](https://github.com/chocolatey/choco/issues/1401)
+ * Logging - Log access denied for config file to log file only - see [#1445](https://github.com/chocolatey/choco/issues/1445)
+ * Ability to pick x64/x86 runtime binaries for shimming by architecture without needing PowerShell scripts - see [#1365](https://github.com/chocolatey/choco/issues/1365)
+ * Logging - Add '--no-color' as a global option and 'logWithoutColor' feature - see [#100](https://github.com/chocolatey/choco/issues/100)
+ * [API] Logging - Set logging levels debug/verbose/trace - see [#1448](https://github.com/chocolatey/choco/issues/1448)
+ * [API] Logging - Sync already logged items when setting custom logging - see [#1446](https://github.com/chocolatey/choco/issues/1446)
+ * [API] Fix - Ensure one instantiation of GetChocolatey at a time - see [#1400](https://github.com/chocolatey/choco/issues/1400)
+ * Pro/Business - Uninstall - Keep stored package information by default - see [#1399](https://github.com/chocolatey/choco/issues/1399)
+ * Pro/Business - Logging - See licensing logging output - see [#1488](https://github.com/chocolatey/choco/issues/1488)
+
+
+## [0.10.8](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.8+is%3Aclosed) (August 30, 2017)
 With this release, Package Parameters are fully supported from both the user side and the packaging side. Check out [the documentation](https://chocolatey.org/docs/helpers-get-packageparameters) and check out the [walkthrough](https://chocolatey.org/docs/how-to-parse-package-parameters-argument) on how to use package parameters in your packaging. Note if you are pushing packages to the community repository, you must continue to take a dependency on the `chocolatey-core.extension` as a polyfill for older versions until at least six months after a new feature is released.
 
 What you can do with logging has greatly increased your ability to have more power over how it works and deeper output to determine errors (we've expanded `--trace` [#1379](https://github.com/chocolatey/choco/issues/1379)). This release also gives packagers and users more power when working with the AutoUninstaller - opt-out ([#1257](https://github.com/chocolatey/choco/issues/1257)) and passing arguments to the uninstaller ([#1133](https://github.com/chocolatey/choco/issues/1133)).
