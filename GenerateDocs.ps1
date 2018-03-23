@@ -283,6 +283,11 @@ try
   Write-Host "Importing the Module $psModuleName ..."
   Import-Module "$psModuleLocation" -Force -Verbose
 
+  # Switch Get-PackageParameters back for documentation
+  Remove-Item alias:Get-PackageParameters
+  Remove-Item function:Get-PackageParametersBuiltIn
+  Set-Alias -Name Get-PackageParametersBuiltIn -Value Get-PackageParameters -Scope Global
+
   if (Test-Path($docsFolder)) { Remove-Item $docsFolder -Force -Recurse -EA SilentlyContinue }
   if(-not(Test-Path $docsFolder)){ mkdir $docsFolder -EA Continue | Out-Null }
 
