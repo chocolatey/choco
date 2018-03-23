@@ -98,7 +98,7 @@ Install-ChocolateyInstallPackage 'bob' 'exe' '/S' "$(Split-Path -Parent $MyInvoc
 Install-ChocolateyInstallPackage -PackageName 'bob' -FileType 'exe' `
   -SilentArgs '/S' `
   -File "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\bob.exe" `
-  -ValidExitCodes = @(0)
+  -ValidExitCodes @(0)
 ~~~ 
 
 ## Inputs

@@ -104,6 +104,10 @@ You can pass options and switches in the following ways:
        except when needing super low-level .NET Framework debugging. Available 
        in 0.10.4+.
 
+     --nocolor, --no-color
+     No Color - Do not show colorization in logging output. This overrides 
+       the feature 'logWithoutColor', set to 'False'. Available in 0.10.9+.
+
      --acceptlicense, --accept-license
      AcceptLicense - Accept license dialogs automatically. Reserved for 
        future use.
