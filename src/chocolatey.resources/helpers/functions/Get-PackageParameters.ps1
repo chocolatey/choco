@@ -67,7 +67,7 @@ compatibility with `chocolatey-core.extension`, use `:`.
 
 For example `-Parameters "/ITEM1:value /ITEM2:value with spaces"
 
-NOTE: In 0.10.9+, to maintain compatibility with the prior art of the 
+NOTE: In 0.10.9+, to maintain compatibility with the prior art of the
 chocolatey-core.extension method, quotes and apostrophes surrounding
 parameter values will be removed. When the param is used, those items
 can be added back if desired, but it's most important to ensure that
@@ -100,11 +100,11 @@ if (!$pp['LICENSE']) { $pp['LICENSE'] = '1234' }
 .EXAMPLE
 >
 $pp = Get-PackageParameters
-# Requires 0.10.8 for Read-Host -AsSecureString
-if (!$pp['Password']) { $pp['Password'] = Read-Host "Enter password for $userName:" -AsSecureString}
+if (!$pp['UserName']) { $pp['UserName'] = "$env:UserName" }
+# Requires Choocolatey v0.10.8+ for Read-Host -AsSecureString
+if (!$pp['Password']) { $pp['Password'] = Read-Host "Enter password for $($pp['UserName']):" -AsSecureString}
 # fail the install/upgrade if not value is not determined
 if (!$pp['Password']) { throw "Package needs Password to install, that must be provided in params or in prompt." }
-
 
 .EXAMPLE
 >
