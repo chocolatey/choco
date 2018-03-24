@@ -24,6 +24,7 @@ We've also brought in the long desired logging with no colorization. You can set
 
 ### IMPROVEMENTS
  * [Security] RAR extraction with older 7zip can cause memory corruption (CVE-2018-5996) / ZIP Shrink vulnerability (CVE-2017-17969) - see [#1478](https://github.com/chocolatey/choco/issues/1478)
+ * Capture password securely during validation when only the user name has been provided - see [#1524](https://github.com/chocolatey/choco/issues/1524)
  * Outdated/Upgrade - Option/feature to ignore unfound packages - see [#1398](https://github.com/chocolatey/choco/issues/1398)
  * Installation/Setup: run choco once to initialize the config file - see [#1401](https://github.com/chocolatey/choco/issues/1401)
  * Logging - Log access denied for config file to log file only - see [#1445](https://github.com/chocolatey/choco/issues/1445)
