@@ -31,6 +31,7 @@ We've also brought in the long desired logging with no colorization. You can set
  * Logging - Log access denied for config file to log file only - see [#1445](https://github.com/chocolatey/choco/issues/1445)
  * Ability to pick x64/x86 runtime binaries for shimming by architecture without needing PowerShell scripts - see [#1365](https://github.com/chocolatey/choco/issues/1365)
  * Logging - Add '--no-color' as a global option and 'logWithoutColor' feature - see [#100](https://github.com/chocolatey/choco/issues/100)
+ * Reset colors after abnormal exit - see [#474](https://github.com/chocolatey/choco/issues/474)
  * [API] Logging - Set logging levels debug/verbose/trace - see [#1448](https://github.com/chocolatey/choco/issues/1448)
  * [API] Logging - Sync already logged items when setting custom logging - see [#1446](https://github.com/chocolatey/choco/issues/1446)
  * [API] Fix - Ensure one instantiation of GetChocolatey at a time - see [#1400](https://github.com/chocolatey/choco/issues/1400)
