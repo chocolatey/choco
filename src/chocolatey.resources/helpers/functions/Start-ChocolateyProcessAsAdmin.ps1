@@ -100,7 +100,7 @@ Start-ChocolateyProcessAsAdmin "& `'$psFile`'"
 # This also works for cmd and is required if you have any spaces in the paths within your command
 $appPath = "$env:ProgramFiles\myapp"
 $cmdBatch = "/c `"$appPath\bin\installmyappservice.bat`""
-Start-ChocolateyProcessAsAdmin $cmdBatch cmd 
+Start-ChocolateyProcessAsAdmin $cmdBatch cmd
 # or more explicitly
 Start-ChocolateyProcessAsAdmin -Statements $cmdBatch -ExeToRun "cmd.exe"
 
@@ -127,7 +127,7 @@ param(
 
   $alreadyElevated = $false
   if (Test-ProcessAdminRights) {
-    $alreadyElevated = $true  
+    $alreadyElevated = $true
   }
 
   $dbMessagePrepend = "Elevating permissions and running"
@@ -271,9 +271,50 @@ $dbMessagePrepend [`"$exeToRun`" $wrappedStatements]. This may take a while, dep
   $process.Dispose()
 
   Write-Debug "Command [`"$exeToRun`" $wrappedStatements] exited with `'$exitCode`'."
+
+  $exitErrorMessage = ''
+  $errorMessageAddendum = " This is most likely an issue with the '$env:chocolateyPackageName' package and not with Chocolatey itself. Please follow up with the package maintainer(s) directly."
+
+  switch ($exitCode) {
+    0 { break }
+    1 { break }
+    3010 { break }
+    # NSIS - http://nsis.sourceforge.net/Docs/AppendixD.html
+    # InnoSetup - http://www.jrsoftware.org/ishelp/index.php?topic=setupexitcodes
+    2 { $exitErrorMessage = 'Setup was cancelled.'; break }
+    3 { $exitErrorMessage = 'A fatal error occurred when preparing or moving to next install phase. Check to be sure you have enough memory to perform an installation and try again.'; break }
+    4 { $exitErrorMessage = 'A fatal error occurred during installation process.' + $errorMessageAddendum; break }
+    5 { $exitErrorMessage = 'User (you) cancelled the installation.'; break }
+    6 { $exitErrorMessage = 'Setup process was forcefully terminated by the debugger.'; break }
+    7 { $exitErrorMessage = 'While preparing to install, it was determined setup cannot proceed with the installation. Please be sure the software can be installed on your system.'; break }
+    8 { $exitErrorMessage = 'While preparing to install, it was determined setup cannot proceed with the installation until you restart the system. Please reboot and try again.'; break }
+    # MSI - https://msdn.microsoft.com/en-us/library/windows/desktop/aa376931.aspx
+    1602 { $exitErrorMessage = 'User (you) cancelled the installation.'; break }
+    1603 { $exitErrorMessage = "Generic MSI Error. This is a local environment error, not an issue with a package or the MSI itself - it could mean a pending reboot is necessary prior to install or something else (like the same version is already installed). Please see MSI log if available. If not, try again adding `'--install-arguments=`"`'/l*v c:\$($env:chocolateyPackageName)_msi_install.log`'`"`'. Then search the MSI Log for `"Return Value 3`" and look above that for the error."; break }
+    1618 { $exitErrorMessage = 'Another installation currently in progress. Try again later.'; break }
+    1619 { $exitErrorMessage = 'MSI could not be found - it is possibly corrupt or not an MSI at all. If it was downloaded and the MSI is less than 30K, try opening it in an editor like Notepad++ as it is likely HTML.' + $errorMessageAddendum; break }
+    1620 { $exitErrorMessage = 'MSI could not be opened - it is possibly corrupt or not an MSI at all. If it was downloaded and the MSI is less than 30K, try opening it in an editor like Notepad++ as it is likely HTML.' + $errorMessageAddendum; break }
+    1622 { $exitErrorMessage = 'Something is wrong with the install log location specified. Please fix this in the package silent arguments (or in install arguments you specified). The directory specified as part of the log file path must exist for an MSI to be able to log to that directory.' + $errorMessageAddendum; break }
+    1623 { $exitErrorMessage = 'This MSI has a language that is not supported by your system. Contact package maintainer(s) if there is an install available in your language and you would like it added to the packaging.'; break }
+    1625 { $exitErrorMessage = 'Installation of this MSI is forbidden by system policy. Please contact your system administrators.'; break }
+    1632 { $exitErrorMessage = 'Installation of this MSI is not supported on this platform. Contact package maintainer(s) if you feel this is in error or if you need an architecture that is not available with the current packaging.'; break }
+    1633 { $exitErrorMessage = 'Installation of this MSI is not supported on this platform. Contact package maintainer(s) if you feel this is in error or if you need an architecture that is not available with the current packaging.'; break }
+    1638 { $exitErrorMessage = 'This MSI requires uninstall prior to installing a different version. Please ask the package maintainer(s) to add a check in the chocolateyInstall.ps1 script and uninstall if the software is installed.' + $errorMessageAddendum; break }
+    1639 { $exitErrorMessage = 'The command line arguments passed to the MSI are incorrect. If you passed in additional arguments, please adjust. Otherwise followup with the package maintainer(s) to get this fixed.' + $errorMessageAddendum; break }
+    1640 { $exitErrorMessage = 'Cannot install MSI when running from remote desktop (terminal services). This should automatically be handled in licensed editions. For open source editions, you may need to run change.exe prior to running Chocolatey or not use terminal services.'; break }
+    1645 { $exitErrorMessage = 'Cannot install MSI when running from remote desktop (terminal services). This should automatically be handled in licensed editions. For open source editions, you may need to run change.exe prior to running Chocolatey or not use terminal services.'; break }
+  }
+
+  if ($exitErrorMessage) {
+    $errorMessageSpecific = "Exit code indicates the following: $exitErrorMessage."
+    Write-Warning $exitErrorMessage
+  } else {
+    $errorMessageSpecific = 'See log for possible error messages.'
+  }
+
   if ($validExitCodes -notcontains $exitCode) {
     Set-PowerShellExitCode $exitCode
-    throw "Running [`"$exeToRun`" $wrappedStatements] was not successful. Exit code was '$exitCode'. See log for possible error messages."
+    throw "Running [`"$exeToRun`" $wrappedStatements] was not successful. Exit code was '$exitCode'. $($errorMessageSpecific)"
   } else {
     $chocoSuccessCodes = @(0, 1605, 1614, 1641, 3010)
     if ($chocoSuccessCodes -notcontains $exitCode) {

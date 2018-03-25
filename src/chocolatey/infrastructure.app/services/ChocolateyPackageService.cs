@@ -458,8 +458,8 @@ Did you know Pro / Business automatically syncs with Programs and
         {
             // If we are using a 64 bit architecure, we want to ignore exe's targetting x86
             // This is done by adding a .ignore file into the package folder for each exe to ignore
-            var exeFiles32Bit = _fileSystem.get_files(_fileSystem.combine_paths(installLocation, "tools\\x86"), pattern: "*.exe", option: SearchOption.AllDirectories).ToArray();
-            var exeFiles64Bit = _fileSystem.get_files(_fileSystem.combine_paths(installLocation, "tools\\x64"), pattern: "*.exe", option: SearchOption.AllDirectories).ToArray();
+            var exeFiles32Bit = (_fileSystem.directory_exists(_fileSystem.combine_paths(installLocation, "tools\\x86")) ? _fileSystem.get_files(_fileSystem.combine_paths(installLocation, "tools\\x86"), pattern: "*.exe", option: SearchOption.AllDirectories) : new List<string>()).ToArray();
+            var exeFiles64Bit = (_fileSystem.directory_exists(_fileSystem.combine_paths(installLocation, "tools\\x64")) ? _fileSystem.get_files(_fileSystem.combine_paths(installLocation, "tools\\x64"), pattern: "*.exe", option: SearchOption.AllDirectories) : new List<string>()).ToArray();
 
             // If 64bit, and there are only 32bit files, we should shim the 32bit versions,
             // therefore, don't ignore anything

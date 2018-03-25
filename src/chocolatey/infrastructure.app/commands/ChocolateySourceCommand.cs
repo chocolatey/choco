@@ -104,6 +104,13 @@ namespace chocolatey.infrastructure.app.commands
             {
                 throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.SourceCommand.Command.to_string()));
             }
+
+            if (!string.IsNullOrWhiteSpace(configuration.SourceCommand.Username) && string.IsNullOrWhiteSpace(configuration.SourceCommand.Password))
+            {
+                this.Log().Debug(ChocolateyLoggers.LogFileOnly, "Username '{0}' provided. Asking for password.".format_with(configuration.SourceCommand.Username));
+                System.Console.Write("User name '{0}' provided. Password: ".format_with(configuration.SourceCommand.Username));
+                configuration.SourceCommand.Password = InteractivePrompt.get_password(configuration.PromptForConfirmation);
+            }
         }
 
         public virtual void help_message(ChocolateyConfiguration configuration)
