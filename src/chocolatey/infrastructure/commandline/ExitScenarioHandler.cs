@@ -72,6 +72,7 @@ namespace chocolatey.infrastructure.commandline
                     break;
             }
 
+            Console.ResetColor();
             Environment.Exit(-1);
 
             return true;
