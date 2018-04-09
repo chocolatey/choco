@@ -97,7 +97,7 @@ namespace chocolatey.infrastructure.app.nuget
                 if (!string.IsNullOrWhiteSpace(configuration.Proxy.BypassList))
                 {
                     "chocolatey".Log().Debug("Proxy has a bypass list of '{0}'.".format_with(configuration.Proxy.BypassList.escape_curly_braces()));
-                    proxy.BypassList = configuration.Proxy.BypassList.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    proxy.BypassList = configuration.Proxy.BypassList.Replace("*",".*").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 }
 
                 proxy.BypassProxyOnLocal = configuration.Proxy.BypassOnLocal;

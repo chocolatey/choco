@@ -707,7 +707,7 @@ function Invoke-Chocolatey-Initial {
   try {
     $chocoInstallationFolder = Get-ChocolateyInstallFolder
     $chocoExe = Join-Path -Path $chocoInstallationFolder -ChildPath "choco.exe"
-    & $chocoExe | Out-Null
+    & $chocoExe -v | Out-Null
     Write-Debug "Chocolatey execution completed successfully."
   } catch {
     Write-ChocolateyWarning "Unable to run Chocolately at this time.  It is likely that .Net Framework installation requires a system reboot"

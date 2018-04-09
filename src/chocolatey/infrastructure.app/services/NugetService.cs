@@ -1105,7 +1105,6 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     }
                 },
                 "Unable to removed cached NuGet package file");
-
         }
 
         public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)

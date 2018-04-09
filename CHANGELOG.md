@@ -3,6 +3,16 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
+## [0.10.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.10+is%3Aclosed) (April 9, 2018)
+### BUG FIXES
+ * Installing chocolatey 0.10.9 results in an exit code of 1 - see [#1529](https://github.com/chocolatey/choco/issues/1529)
+ * Proxy bypass list with "*" will return regex quantifier parsing errors - see [#1532](https://github.com/chocolatey/choco/issues/1532)
+ * NuGet cache folders - choco should always attempt to remove and should find in the cacheLocation when set - see [#1527](https://github.com/chocolatey/choco/issues/1527)
+
+### IMPROVEMENTS
+ * Logging - Exclusive File Lock on Non-Essential Logs - see [#1531](https://github.com/chocolatey/choco/issues/1531)
+
+
 ## [0.10.9](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.9+is%3Aclosed) (March 25, 2018)
 The vendored 7Zip had a couple of security findings that necessitated a release. There is also a lot of goodness going into this release as well. We've fixed XDT transforms not to keep extra data around (requiring manual fixes). We've resolved some issues surrounding compatibility with Get-PackageParameters in the chocolatey-core.extension package and what's now built into Chocolatey. That should now work appropriately, and the built-in method should be preferred, so if you are using `--package-parameters-sensitive`, those will be added as well when you do have the chocolatey-core.extension package also installed.
 

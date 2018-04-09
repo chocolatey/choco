@@ -118,7 +118,7 @@ namespace chocolatey.infrastructure.logging
                     RollingStyle = RollingFileAppender.RollingMode.Size,
                     MaxFileSize = 1024 * 1024 * 10,
                     MaxSizeRollBackups = 50,
-                    LockingModel = new FileAppender.MinimalLock(),
+                    LockingModel = new FileAppender.ExclusiveLock(),
                     PreserveLogFileNameExtension = true,
                 };
                 infoOnlyAppender.AddFilter(new LevelRangeFilter { LevelMin = Level.Info, LevelMax = Level.Fatal });
@@ -276,7 +276,7 @@ namespace chocolatey.infrastructure.logging
                 File = logFileLocation,
                 Layout = layout,
                 AppendToFile = true,
-                LockingModel = new FileAppender.MinimalLock(),
+                LockingModel = new FileAppender.ExclusiveLock(),
             };
             app.ActivateOptions();
 

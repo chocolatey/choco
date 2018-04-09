@@ -114,7 +114,7 @@ namespace chocolatey.infrastructure.filesystem
         {
             var path = Path.GetTempPath();
 
-            if (System.Environment.UserName.contains(ApplicationParameters.Environment.SystemUserName) || path.contains("config\\systemprofile\\appdata"))
+            if (System.Environment.UserName.contains(ApplicationParameters.Environment.SystemUserName) || path.contains("config\\systemprofile"))
             {
                 path = System.Environment.ExpandEnvironmentVariables(System.Environment.GetEnvironmentVariable(ApplicationParameters.Environment.Temp, EnvironmentVariableTarget.Machine).to_string());
             }
