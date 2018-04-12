@@ -5,9 +5,9 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 ## [0.10.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.10+is%3Aclosed) (April 12, 2018)
 ### BUG FIXES
- * Installing chocolatey 0.10.9 results in an exit code of 1 - see [#1529](https://github.com/chocolatey/choco/issues/1529)
- * Proxy bypass list with "*" will return regex quantifier parsing errors - see [#1532](https://github.com/chocolatey/choco/issues/1532)
- * NuGet cache folders - choco should always attempt to remove and should find in the cacheLocation when set - see [#1527](https://github.com/chocolatey/choco/issues/1527)
+ * Fix - Installing Chocolatey 0.10.9 results in an exit code of 1 - see [#1529](https://github.com/chocolatey/choco/issues/1529)
+ * Fix - Proxy bypass list with "*" will return regex quantifier parsing errors - see [#1532](https://github.com/chocolatey/choco/issues/1532)
+ * Fix - NuGet cache folders - choco should always attempt to remove and should find in the cacheLocation when set - see [#1527](https://github.com/chocolatey/choco/issues/1527)
 
 ### IMPROVEMENTS
  * Logging - Exclusive File Lock on Non-Essential Logs - see [#1531](https://github.com/chocolatey/choco/issues/1531)
