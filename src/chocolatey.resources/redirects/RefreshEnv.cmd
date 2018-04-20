@@ -56,6 +56,9 @@ goto main
     :: Set these variables
     call "%TEMP%\_env.cmd"
 
+    :: Cleanup
+    del /f /q "%TEMP%\_env.cmd" 2>nul
+
     :: reset user / architecture
     SET "USERNAME=%OriginalUserName%"
     SET "PROCESSOR_ARCHITECTURE=%OriginalArchitecture%"
