@@ -1,4 +1,9 @@
 <!--
+
+REPORTING A SECURITY?
+Stop, this is not the correct place to provide a security disclosure.
+Please go to https://chocolatey.org/security for the proper disclosure process.
+
 BEFORE YOU SUBMIT AN ISSUE:
 
 Ensure you have read over Submitting Issues -
