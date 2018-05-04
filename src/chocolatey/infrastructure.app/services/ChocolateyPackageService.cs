@@ -441,7 +441,7 @@ Did you know Pro / Business automatically syncs with Programs and
             var installerDetected = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType);
             if (!string.IsNullOrWhiteSpace(installLocation))
             {
-                 this.Log().Info(ChocolateyLoggers.Important, "  Software installed to '{0}'".format_with(installLocation));
+                 this.Log().Info(ChocolateyLoggers.Important, "  Software installed to '{0}'".format_with(installLocation.escape_curly_braces()));
             }
             else if (!string.IsNullOrWhiteSpace(installerDetected))
             {
