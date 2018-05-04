@@ -37,6 +37,7 @@ System.Boolean
 #>
 
   # do not log function call
+  ## Called from chocolateysetup.psm1 - wrap any Write-Host in try/catch
 
   $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent([Security.Principal.TokenAccessLevels]'Query,Duplicate'))
   $isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
