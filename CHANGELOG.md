@@ -3,6 +3,17 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
+## [0.10.11](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.11+is%3Aclosed) (May 4, 2018)
+### BUG FIXES
+ * Fix - AutoUninstaller - Captures registry snapshot escaping quotes - unable to find path for uninstall - see [#1540](https://github.com/chocolatey/choco/issues/1540)
+ * Fix - Installation/Setup - Use of Write-Host in Install-ChocolateyPath.ps1 prevents non-interactive installation of Chocolatey itself - see [#1560](https://github.com/chocolatey/choco/issues/1560)
+ * Fix - Logging - GUID in software name: "Chocolatey had an error formatting string" - see [#1543](https://github.com/chocolatey/choco/issues/1543)
+
+### IMPROVEMENTS
+ * [Security] RAR Extraction with older 7zip uses uninitialized memory (CVE-2018-10115) - see [#1557](https://github.com/chocolatey/choco/issues/1557)
+ * Tab Completion - Modify profile if file exists but is empty - see [#991](https://github.com/chocolatey/choco/issues/991)
+
+
 ## [0.10.10](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.10+is%3Aclosed) (April 12, 2018)
 ### BUG FIXES
  * Fix - Installing Chocolatey 0.10.9 results in an exit code of 1 - see [#1529](https://github.com/chocolatey/choco/issues/1529)
