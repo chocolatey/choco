@@ -140,7 +140,7 @@ namespace chocolatey.infrastructure.app.services
             }
 
             // split on " /" and " -" for quite a bit more accuracy
-            IList<string> uninstallArgsSplit = key.UninstallString.to_string().Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            IList<string> uninstallArgsSplit = key.UninstallString.to_string().Replace("&quot;","\"").Replace("&apos;","'").Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             var uninstallExe = uninstallArgsSplit.DefaultIfEmpty(string.Empty).FirstOrDefault().trim_safe();
             if (uninstallExe.Count(u => u == '"') > 2)
             {
@@ -159,7 +159,7 @@ namespace chocolatey.infrastructure.app.services
                    this.Log().Debug("Error splitting the uninstall string:{0} {1}".format_with(Environment.NewLine,ex.to_string()));
                 }
             }
-            var uninstallArgs = key.UninstallString.to_string().Replace(uninstallExe.to_string(), string.Empty).trim_safe();
+            var uninstallArgs = key.UninstallString.to_string().Replace("&quot;", "\"").Replace("&apos;", "'").Replace(uninstallExe.to_string(), string.Empty).trim_safe();
 
             uninstallExe = uninstallExe.remove_surrounding_quotes();
             this.Log().Debug(() => " Uninstaller path is '{0}'".format_with(uninstallExe));
