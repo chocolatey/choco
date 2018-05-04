@@ -187,7 +187,10 @@ namespace chocolatey.infrastructure.app.nuget
                     Logger = nugetLogger,
                 };
 
-            //NOTE DO NOT EVER use this method - packageManager.PackageInstalling += (s, e) =>
+            // GH-1548
+            //note: is this a good time to capture a backup (for dependencies) / maybe grab remembered arguments here instead / and somehow get out of the endless loop! 
+            //NOTE DO NOT EVER use this method - packageManager.PackageInstalling += (s, e) => { };
+            
             packageManager.PackageInstalled += (s, e) =>
                 {
                     var pkg = e.Package;

@@ -65,7 +65,7 @@ namespace chocolatey.infrastructure.app.services
 A corrupt .registry file exists at {0}.
  Open this file in a text editor, and remove/escape any characters that
  are regarded as illegal within XML strings not surrounded by CData. 
- These are typically the characters &, ', "", and `<`, `>`. Again, this
+ These are typically the characters &, `<`, and `>`. Again, this
  is an XML document, so you will see many < and > characters, so just
  focus exclusively in the string values not surrounded by CData. Once 
  these have been corrected, rename the .registry.bad file to .registry.

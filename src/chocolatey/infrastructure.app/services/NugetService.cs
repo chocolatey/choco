@@ -608,8 +608,13 @@ Please see https://chocolatey.org/docs/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
+            var originalConfig = config.deep_copy();
+
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
+                // set original config back each time through
+                config = originalConfig;
+
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
                 if (installedPackage == null)
@@ -789,7 +794,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                         continue;
                     }
 
-                    var originalConfig = set_package_config_for_upgrade(config, pkgInfo);
+                    set_package_config_for_upgrade(config, pkgInfo);
 
                     if (performAction)
                     {
@@ -846,9 +851,6 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                             if (continueAction != null) continueAction.Invoke(packageResult);
                         }
                     }
-
-                    // set original config back
-                    config = originalConfig;
                 }
             }
 
@@ -861,7 +863,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
         /// <param name="config">The configuration.</param>
         /// <param name="packageInfo">The package information.</param>
         /// <returns>The original unmodified configuration, so it can be reset after upgrade</returns>
-        private ChocolateyConfiguration set_package_config_for_upgrade(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
+        protected virtual ChocolateyConfiguration set_package_config_for_upgrade(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
         {
             if (!config.Features.UseRememberedArgumentsForUpgrades || string.IsNullOrWhiteSpace(packageInfo.Arguments)) return config;
 

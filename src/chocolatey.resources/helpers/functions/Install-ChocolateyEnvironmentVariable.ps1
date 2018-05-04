@@ -96,6 +96,7 @@ param(
 )
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+  ## Called from chocolateysetup.psm1 - wrap any Write-Host in try/catch
 
   if ($variableType -eq [System.EnvironmentVariableTarget]::Machine) {
     if (Test-ProcessAdminRights) {

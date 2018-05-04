@@ -26,7 +26,7 @@ namespace chocolatey.infrastructure.app.domain
 
             // Since it is possible that registry keys contain characters that are not valid
             // in XML files, ensure that all content is escaped, prior to serialization
-            var escapedXml = System.Security.SecurityElement.Escape(key.GetValue(name).to_string());
+            var escapedXml = System.Security.SecurityElement.Escape(key.GetValue(name).to_string()).Replace("&quot;","\"").Replace("&apos;","'");
 
             return escapedXml == null ? string.Empty : escapedXml.Replace("\0", string.Empty);
         }
