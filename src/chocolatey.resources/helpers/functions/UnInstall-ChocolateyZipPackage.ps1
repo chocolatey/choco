@@ -68,7 +68,7 @@ param(
 
   # The Zip Content File may have previously existed under a different
   # name.  If *Install.txt doesn't exist, check for the old name
-  if(-Not (Test-Path -Path $zipFileContentPath)) {
+  if(-Not (Test-Path -Path $zipContentFile)) {
     $zipContentFile=(Join-Path $packagelibPath -ChildPath $zipFileName) + ".txt"
   }
 
