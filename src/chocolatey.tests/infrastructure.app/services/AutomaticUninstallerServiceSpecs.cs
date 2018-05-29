@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -183,8 +183,8 @@ namespace chocolatey.tests.infrastructure.app.services
                     c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
-        }  
-        
+        }
+
         public class when_package_is_missing : AutomaticUninstallerServiceSpecsBase
         {
             public override void Context()
@@ -310,8 +310,8 @@ namespace chocolatey.tests.infrastructure.app.services
                     c => c.execute(expectedUninstallString, args, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Once);
             }
-        }   
-        
+        }
+
         public class when_uninstall_string_is_empty : AutomaticUninstallerServiceSpecsBase
         {
             public override void Context()
@@ -379,8 +379,8 @@ namespace chocolatey.tests.infrastructure.app.services
                     c => c.execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
-        } 
-       
+        }
+
         public class when_registry_location_and_install_location_both_do_not_exist : AutomaticUninstallerServiceSpecsBase
         {
             public override void Context()
@@ -472,7 +472,7 @@ namespace chocolatey.tests.infrastructure.app.services
                     Times.Once);
             }
         }
-   
+
         public class when_uninstall_string_is_split_by_quotes : AutomaticUninstallerServiceSpecsBase
         {
             private readonly string uninstallStringWithQuoteSeparation = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe"" ""WinDir Stat""";
@@ -519,8 +519,8 @@ namespace chocolatey.tests.infrastructure.app.services
                             It.IsAny<bool>()),
                     Times.Once);
             }
-        }        
-        
+        }
+
         public class when_uninstall_string_has_ampersand_quot : AutomaticUninstallerServiceSpecsBase
         {
             private readonly string uninstallStringWithAmpersandQuot = @"&quot;C:\Program Files (x86)\WinDirStat\Uninstall.exe&quot; /SILENT";
@@ -568,8 +568,8 @@ namespace chocolatey.tests.infrastructure.app.services
                             It.IsAny<bool>()),
                     Times.Once);
             }
-        } 
-        
+        }
+
         public class when_uninstall_string_has_multiple_file_paths : AutomaticUninstallerServiceSpecsBase
         {
             private readonly string uninstallStringPointingToPath = @"C:\Programs\WinDirStat\Uninstall.exe D:\Programs\WinDirStat";
@@ -714,8 +714,8 @@ namespace chocolatey.tests.infrastructure.app.services
                             It.IsAny<bool>()),
                     Times.Once);
             }
-        } 
-        
+        }
+
         public class when_AutomaticUninstallerService_is_passed_overriding_uninstall_arguments_from_command_line : AutomaticUninstallerServiceSpecsBase
         {
             IInstaller _installerType = new InnoSetupInstaller();
@@ -822,7 +822,7 @@ namespace chocolatey.tests.infrastructure.app.services
             //public void should_use_CustomInstaller_uninstall_args_when_installtype_is_unknown_and_has_quiet_uninstall_is_false()
             //{
             //    test_installertype(new CustomInstaller(), hasQuietUninstallString: false);
-            //}  
+            //}
 
             [Fact]
             public void should_use_registry_uninstall_args_when_installtype_is_unknown_and_has_quiet_uninstall_is_true()
