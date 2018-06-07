@@ -892,7 +892,7 @@ We'll try to capture everything here that you should know about. Please call `ch
    1. Read the above about apikey changes
    2. Read above about dependency resolution changes.
  * **Deprecated/Removed Commands:**
-   1. `installmissing` has been removed. It was deprecated awhile ago, so this should not be a surprise.
+   1. `installmissing` and 'cinstm' have been removed. They were deprecated awhile ago, so this should not be a surprise. For equivalent functionality see the plain install/cinst commands.
    2. `choco version` has been deprecated and will be removed in v1. Use `choco upgrade pkgName --noop` or `choco upgrade pkgName -whatif` instead.
    3. `Write-ChocolateySuccess`, `Write-ChocolateyFailure` have been deprecated.
    4. `update` is now `upgrade`. `update` has been deprecated and will be removed/replaced in v1. Update will be reincarnated later for a different purpose. **Hint**: It rhymes with smackage pindexes.
