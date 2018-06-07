@@ -1,5 +1,5 @@
 ---
-name: Report Issue With Choco.exe
+name: Choco - Report Issue With Choco.exe
 about: Did you find unexpected behavior?
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: Enhancement / Feature Request
+name: Choco - Enhancement / Feature Request
 about: How can we make Chocolatey work better for you? Is there additional functionality you would love us to consider?
 ---
 
