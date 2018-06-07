@@ -44,7 +44,6 @@ Please make sure you've read over and agree with the [etiquette regarding commun
 
 ## Support Chocolatey!
  * Purchase [Chocolatey Pro / Chocolatey for Business](https://chocolatey.org/pricing#compare)
- * Donate [![](https://img.shields.io/gratipay/Chocolatey.svg)](https://www.gratipay.com/Chocolatey/)
 
 ## See Chocolatey In Action
 Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update environment variables without restarting your shell):
@@ -73,7 +72,7 @@ Please see the [docs](https://chocolatey.org/docs)
 Give `choco.exe -?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
 
 ### Requirements
-* .NET Framework 4.0
+* .NET Framework 4.0+
 * PowerShell 2.0+
 * Windows Server 2003+ / Windows 7+
 
