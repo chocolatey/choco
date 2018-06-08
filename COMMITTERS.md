@@ -73,8 +73,8 @@ Because we ask contributors to target master, sometimes a fix/enhancement may ne
  * `git checkout pr<github_pull_id>`
  * `git rebase --onto stable master` - this uses the local branch, starts with latest stable and reapplies the commits from the branch to it, removing all commits that were only on the master.
  * `build.bat` - build and test
+ * Any additional changes or testing here.
  * `git checkout stable`
- * Any addtional changes or testing here.
  * `git merge pr<github_pull_id> --log --no-ff`
  * `git branch -d pr<github_pull_id>`
  * `git checkout master`

@@ -13,7 +13,7 @@ DO NOT CREATE ISSUES FOR PACKAGES. Read over Submitting Issues.
 
 DO NOT CREATE AN ISSUE FOR A QUESTION - questions are better served as email or chat.
 - email - http://groups.google.com/group/chocolatey
--  chat - https://gitter.im/chocolatey/choco
+- chat - https://gitter.im/chocolatey/choco
 
 DELETE EVERYTHING IN THIS COMMENT BLOCK
 
