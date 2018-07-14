@@ -34,5 +34,28 @@ namespace chocolatey.infrastructure.app.configuration
 
         [XmlAttribute(AttributeName = "description")]
         public string Description { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            // Check for null values and compare run-time types.
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            var item = (ConfigFileConfigSetting) obj;
+
+            return (Key == item.Key)
+                   && (Value == item.Value)
+                   && (Description == item.Description);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode
+                .Of(Key)
+                .And(Value)
+                .And(Description);
+        }
     }
 }

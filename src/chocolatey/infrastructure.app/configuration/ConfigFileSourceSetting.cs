@@ -58,5 +58,44 @@ namespace chocolatey.infrastructure.app.configuration
 
         [XmlAttribute(AttributeName = "certificatePassword")]
         public string CertificatePassword { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            // Check for null values and compare run-time types.
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            var item = (ConfigFileSourceSetting) obj;
+
+            return (Id == item.Id)
+                && (Value == item.Value)
+                && (Disabled == item.Disabled)
+                && (BypassProxy == item.BypassProxy)
+                && (AllowSelfService == item.AllowSelfService)
+                && (VisibleToAdminsOnly == item.VisibleToAdminsOnly)
+                && (UserName == item.UserName)
+                && (Password == item.Password)
+                && (Priority == item.Priority)
+                && (Certificate == item.Certificate)
+                && (CertificatePassword == item.CertificatePassword);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode
+                .Of(Id)
+                .And(Value)
+                .And(Disabled)
+                .And(BypassProxy)
+                .And(AllowSelfService)
+                .And(VisibleToAdminsOnly)
+                .And(UserName)
+                .And(Password)
+                .And(Priority)
+                .And(Certificate)
+                .And(CertificatePassword);
+        }
     }
 }

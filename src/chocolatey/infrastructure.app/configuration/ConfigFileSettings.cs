@@ -46,5 +46,34 @@ namespace chocolatey.infrastructure.app.configuration
 
         [XmlArray("apiKeys")]
         public HashSet<ConfigFileApiKeySetting> ApiKeys { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            // Check for null values and compare run-time types.
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            var item = (ConfigFileSettings) obj;
+
+            return (CacheLocation == item.CacheLocation)
+                && (CommandExecutionTimeoutSeconds == item.CommandExecutionTimeoutSeconds)
+                && (ConfigSettings == item.ConfigSettings)
+                && (Sources == item.Sources)
+                && (Features == item.Features)
+                && (ApiKeys == item.ApiKeys);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode
+                .Of(CacheLocation)
+                .And(CommandExecutionTimeoutSeconds)
+                .AndEach(ConfigSettings)
+                .AndEach(Sources)
+                .AndEach(Features)
+                .AndEach(ApiKeys);
+        }
     }
 }

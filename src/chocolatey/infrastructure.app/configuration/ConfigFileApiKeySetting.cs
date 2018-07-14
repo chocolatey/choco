@@ -31,5 +31,26 @@ namespace chocolatey.infrastructure.app.configuration
 
         [XmlAttribute(AttributeName = "key")]
         public string Key { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            // Check for null values and compare run-time types.
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            var item = (ConfigFileApiKeySetting) obj;
+
+            return (Source == item.Source)
+                   && (Key == item.Source);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode
+                .Of(Source)
+                .And(Key);
+        }
     }
 }
