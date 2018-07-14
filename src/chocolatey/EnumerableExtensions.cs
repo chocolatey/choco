@@ -97,5 +97,28 @@ namespace chocolatey
                 yield return maxElement;
             }
         }
+
+        /// <summary>
+        ///   Generates a unique hash code for a source of objects
+        /// </summary>
+        /// <typeparam name="T">Generic type.</typeparam>
+        /// <param name="source">The source.</param>
+        /// <returns>
+        ///   Integer value representing hash code for input collection.
+        /// </returns>
+        /// <remarks>
+        ///   Taken from here: https://stackoverflow.com/a/30758270/671491
+        /// </remarks>
+        public static int get_sequence_hash_code<T>(this IEnumerable<T> source)
+        {
+            const int seed = 487;
+            const int modifier = 31;
+
+            unchecked
+            {
+                return source.Aggregate(seed, (current, item) =>
+                    (current*modifier) + item.GetHashCode());
+            }
+        }
     }
 }
