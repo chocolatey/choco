@@ -210,16 +210,14 @@ Did you know Pro / Business automatically syncs with Programs and
 
         private IEnumerable<PackageResult> report_registry_programs(ChocolateyConfiguration config, IEnumerable<IPackage> list)
         {
-            var itemsToRemoveFromMachine = list.Select(package => _packageInfoService.get_package_information(package)).
-                                                Where(p => p.RegistrySnapshot != null).
-                                                Select(p => p.RegistrySnapshot.RegistryKeys.FirstOrDefault()).
-                                                Where(p => p != null).
-                                                Select(p => p.DisplayName).ToList();
+            var itemsToRemoveFromMachine = list.Select(package => _packageInfoService.get_package_information(package)).Where(p => p.RegistrySnapshot != null).ToList();
 
             var count = 0;
-            var machineInstalled = _registryService.get_installer_keys().RegistryKeys.
-                                                Where((p) => p.is_in_programs_and_features() && !itemsToRemoveFromMachine.Contains(p.DisplayName) && !p.KeyPath.contains("choco-")).
-                                                OrderBy((p) => p.DisplayName).Distinct();
+            var machineInstalled = _registryService.get_installer_keys().RegistryKeys.Where(
+                p => p.is_in_programs_and_features() &&
+                     !itemsToRemoveFromMachine.Any(pkg => pkg.RegistrySnapshot.RegistryKeys.Any(k => k.DisplayName.is_equal_to(p.DisplayName))) &&
+                     !p.KeyPath.contains("choco-")).OrderBy(p => p.DisplayName).Distinct();
+
             this.Log().Info(() => "");
             foreach (var key in machineInstalled)
             {
