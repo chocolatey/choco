@@ -242,6 +242,7 @@
     <Compile Include="infrastructure.app\domain\installers\SquirrelInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\WindowsUpdateInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\WiseInstaller.cs" />
+    <Compile Include="infrastructure.app\domain\PackageOrder.cs" />
     <Compile Include="infrastructure.app\domain\RegistryHiveType.cs" />
     <Compile Include="infrastructure.app\domain\RegistryValueExtensions.cs" />
     <Compile Include="infrastructure.app\domain\RegistryValueKindType.cs" />

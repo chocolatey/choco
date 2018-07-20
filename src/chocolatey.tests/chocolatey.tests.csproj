@@ -184,6 +184,7 @@
     <Compile Include="infrastructure.app\services\ChocolateyConfigSettingsServiceSpecs.cs" />
     <Compile Include="infrastructure.app\services\ChocolateyPackageServiceSpecs.cs" />
     <Compile Include="infrastructure.app\services\FilesServiceSpecs.cs" />
+    <Compile Include="infrastructure.app\services\NugetListSpecs.cs" />
     <Compile Include="infrastructure.app\services\NugetServiceSpecs.cs" />
     <Compile Include="infrastructure.app\services\RegistryServiceSpecs.cs" />
     <Compile Include="infrastructure.app\services\RulesServiceSpecs.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="infrastructure\tolerance\FaultToleranceSpecs.cs" />
     <Compile Include="infrastructure.app\utility\PackageUtilitySpecs.cs" />
     <Compile Include="MockLogger.cs" />
+    <Compile Include="MockLoggerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TinySpec.cs" />
     <Compile Include="UNCHelper.cs" />
