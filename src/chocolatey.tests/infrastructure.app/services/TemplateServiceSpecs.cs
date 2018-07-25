@@ -344,6 +344,7 @@ namespace chocolatey.tests.infrastructure.app.services
                             return a + "\\" + b[0];
                         });
                 fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
+                fileSystem.Setup(x => x.get_full_path(It.IsAny<string>())).Returns<string>(dirPath => dirPath);
                 fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
                 fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
@@ -424,6 +425,106 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
+        public class when_generate_is_called_with_relative_template_path : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private readonly List<string> files = new List<string>();
+            private readonly HashSet<string> directoryCreated = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            private readonly UTF8Encoding utf8WithoutBOM = new UTF8Encoding(false);
+
+            public override void Context()
+            {
+                base.Context();
+                
+                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\nested\\path");
+                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                    .Returns(
+                        (string a, string[] b) => a + "\\" + b[0]
+                        );
+                fileSystem.Setup(x => x.get_full_path(It.IsAny<string>())).Returns<string>(Path.GetFullPath);
+                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.Equals("c:\\nested\\relative_path\\test"));
+                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
+                    .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
+                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
+                    .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
+                fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
+                fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
+                    .Returns(new[] { "c:\\nested\\relative_path\\test\\template.nuspec",
+                                     "c:\\nested\\relative_path\\test\\random.txt",
+                                     "c:\\nested\\relative_path\\test\\tools\\chocolateyInstall.ps1",
+                                     "c:\\nested\\relative_path\\test\\tools\\lower\\another.ps1" });
+                fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback(
+                    (string directory) =>
+                    {
+                        if (!string.IsNullOrWhiteSpace(directory))
+                        {
+                            directoryCreated.Add(directory);
+                        }
+                    });
+                fileSystem.Setup(x => x.get_directory_name(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
+                fileSystem.Setup(x => x.get_file_extension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
+                fileSystem.Setup(x => x.read_file(It.IsAny<string>())).Returns(string.Empty);
+
+                config.NewCommand.Name = "Bob";
+                config.NewCommand.TemplateName = "..\\relative_path\\test";
+            }
+
+            public override void Because()
+            {
+                because = () => service.generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.reset();
+                files.Clear();
+                directoryCreated.Clear();
+            }
+
+            [Fact]
+            public void should_generate_all_files_and_directories()
+            {
+                because();
+
+                var directories = directoryCreated.ToList();
+                directories.Count.ShouldEqual(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
+                directories[0].ShouldEqual("c:\\nested\\path\\Bob");
+                directories[1].ShouldEqual("c:\\nested\\path\\Bob\\tools");
+                directories[2].ShouldEqual("c:\\nested\\path\\Bob\\tools\\lower");
+
+                files.Count.ShouldEqual(4, "There should be 4 files, but there was: " + string.Join(", ", files));
+                files[0].ShouldEqual("c:\\nested\\path\\Bob\\__name_replace__.nuspec");
+                files[1].ShouldEqual("c:\\nested\\path\\Bob\\random.txt");
+                files[2].ShouldEqual("c:\\nested\\path\\Bob\\tools\\chocolateyInstall.ps1");
+                files[3].ShouldEqual("c:\\nested\\path\\Bob\\tools\\lower\\another.ps1");
+
+                MockLogger.MessagesFor(LogLevel.Info).Last().ShouldEqual(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\nested\path\Bob'", Environment.NewLine));
+            }
+
+            [Fact]
+            public void should_generate_all_files_and_directories_even_with_outputdirectory()
+            {
+                config.OutputDirectory = "c:\\packages";
+
+                because();
+
+                var directories = directoryCreated.ToList();
+                directories.Count.ShouldEqual(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
+                directories[0].ShouldEqual("c:\\packages\\Bob");
+                directories[1].ShouldEqual("c:\\packages\\Bob\\tools");
+                directories[2].ShouldEqual("c:\\packages\\Bob\\tools\\lower");
+
+                files.Count.ShouldEqual(4, "There should be 4 files, but there was: " + string.Join(", ", files));
+                files[0].ShouldEqual("c:\\packages\\Bob\\__name_replace__.nuspec");
+                files[1].ShouldEqual("c:\\packages\\Bob\\random.txt");
+                files[2].ShouldEqual("c:\\packages\\Bob\\tools\\chocolateyInstall.ps1");
+                files[3].ShouldEqual("c:\\packages\\Bob\\tools\\lower\\another.ps1");
+
+                MockLogger.MessagesFor(LogLevel.Info).Last().ShouldEqual(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
+            }
+        }
+
         public class when_generate_is_called_with_empty_nested_folders : TemplateServiceSpecsBase
         {
             private Action because;
@@ -447,7 +548,7 @@ namespace chocolatey.tests.infrastructure.app.services
                             }
                             return a + "\\" + b[0];
                         });
-                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
+                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath != null && dirPath.EndsWith("templates\\test"));
                 fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
                 fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))

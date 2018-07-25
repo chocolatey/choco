@@ -138,8 +138,7 @@ namespace chocolatey.infrastructure.app.services
             else
             {
                 configuration.NewCommand.TemplateName = string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) ? "default" : configuration.NewCommand.TemplateName;
-
-                var templatePath = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.NewCommand.TemplateName);
+                var templatePath = parse_template_path(configuration);
                 if (!_fileSystem.directory_exists(templatePath)) throw new ApplicationException("Unable to find path to requested template '{0}'. Path should be '{1}'".format_with(configuration.NewCommand.TemplateName, templatePath));
 
                 this.Log().Info(configuration.QuietOutput ? logger : ChocolateyLoggers.Important, "Generating package from custom template at '{0}'.".format_with(templatePath));
@@ -187,6 +186,22 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Debug(() => "{0}".format_with(template));
             _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(fileLocation));
             _fileSystem.write_file(fileLocation, template, encoding);
+        }
+
+        private string parse_template_path(ChocolateyConfiguration configuration)
+        {
+            if (!configuration.NewCommand.TemplateName.Equals("default"))
+            {
+                var rawRelativePath = _fileSystem.combine_paths(_fileSystem.get_current_directory(), configuration.NewCommand.TemplateName);
+                var fullPath = _fileSystem.get_full_path(rawRelativePath);
+
+                if (_fileSystem.directory_exists(fullPath))
+                {
+                    return fullPath;
+                }
+            }
+
+            return _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.NewCommand.TemplateName);
         }
     }
 }
