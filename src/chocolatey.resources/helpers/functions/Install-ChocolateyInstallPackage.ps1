@@ -74,6 +74,12 @@ are not setting up a silent/unattended package. Please note that if you
 are submitting to the community repository, it is nearly a requirement
 for the package to be completely unattended.
 
+When you are using this with an MSI, it will set up the arguments as 
+follows: `"C:\Full\Path\To\msiexec.exe" /i "$fileFullPath" $silentArgs`,
+where `$fileFullPath` is `$file` or `$file64`, depending on what has been
+decided to be used. Previous to 0.10.4, it will be just `$file` as 
+passing `$file64` would not have been available yet.
+
 .PARAMETER File
 Full file path to native installer to run. If embedding in the package,
 you can get it to the path with

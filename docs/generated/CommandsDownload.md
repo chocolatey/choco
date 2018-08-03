@@ -23,17 +23,29 @@ See https://chocolatey.org/docs/features-automatically-recompile-packages
 
 ## Usage
 
-    choco download <pkg> [<options/switches>]
+    choco download <pkg> [<options/switches>] [install_script_variable=value]
+
+    Install script variables are values that are discovered in the 
+     chocolateyInstall.ps1 (or a script it calls). When you find values
+     there maybe don't get found and replaced or they use a default 
+     value and you want to provide a value for them to use instead, you
+     can find them and then provide the value you want to pass instead.
+     For example, in the Firefox package, it uses a default value of 
+     'en-US' for `$locale`. If you want to change that, you can add 
+     `locale` and a value, which will replace `$locale` in the script,
+     e.g. `choco download firefox --internalize locale=en-GB`.
 
 ## Examples
 
     choco download sysinternals
 
     #### [Chocolatey for Business](https://chocolatey.org/compare) / Chocolatey for MSP
-    choco download notepadplusplus.install --internalize
+    choco download notepadplusplus --internalize
     choco download notepadplusplus.install --internalize --resources-location \\server\share
     choco download notepadplusplus.install --internalize --resources-location http://somewhere/internal --append-useoriginallocation
     choco download KB3033929 --internalize -internalize-all-urls --append-useoriginallocation
+    choco download firefox --internalize locale=es-AR
+
 
 ## See It In Action
 
