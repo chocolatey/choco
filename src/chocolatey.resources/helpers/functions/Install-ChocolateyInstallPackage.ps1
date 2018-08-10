@@ -235,13 +235,13 @@ param(
     $fileFullPath = $file64
     $bitnessMessage = '64-bit '
   }
-  
+
   if ($fileFullPath -eq '' -or $fileFullPath -eq $null) {
     throw 'Package parameters incorrect, either File or File64 must be specified.'
   }
-  
+
   Write-Host "Installing $bitnessMessage$packageName..."
-  
+
   if ($fileType -eq '' -or $fileType -eq $null) {
     Write-Debug 'No FileType supplied. Using the file extension to determine FileType'
     $fileType = [System.IO.Path]::GetExtension("$fileFullPath").Replace(".", "")
