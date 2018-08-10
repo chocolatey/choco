@@ -80,7 +80,7 @@ Start-ChocolateyProcessAsAdmin "& `'$psFile`'"
 # This also works for cmd and is required if you have any spaces in the paths within your command
 $appPath = "$env:ProgramFiles\myapp"
 $cmdBatch = "/c `"$appPath\bin\installmyappservice.bat`""
-Start-ChocolateyProcessAsAdmin $cmdBatch cmd 
+Start-ChocolateyProcessAsAdmin $cmdBatch cmd
 # or more explicitly
 Start-ChocolateyProcessAsAdmin -Statements $cmdBatch -ExeToRun "cmd.exe"
 ~~~ 
