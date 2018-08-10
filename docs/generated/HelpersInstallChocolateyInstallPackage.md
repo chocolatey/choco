@@ -87,11 +87,52 @@ Install-ChocolateyInstallPackage @packageArgs
 **EXAMPLE 3**
 
 ~~~powershell
+
+$packageName= 'bob'
+$toolsDir   = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$fileLocation = Join-Path $toolsDir 'someinstaller.msi'
+
+$packageArgs = @{
+  packageName   = $packageName
+  fileType      = 'msi'
+  file          = $fileLocation
+  silentArgs    = "/qn /norestart MSIPROPERTY=`"true`""
+  validExitCodes= @(0, 3010, 1641)
+  softwareName  = 'Bob*'
+}
+
+Install-ChocolateyInstallPackage @packageArgs
+~~~
+
+**EXAMPLE 4**
+
+~~~powershell
+
+$packageName= 'bob'
+$toolsDir   = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$fileLocation = Join-Path $toolsDir 'someinstaller.msi'
+$mstFileLocation = Join-Path $toolsDir 'transform.mst'
+
+$packageArgs = @{
+  packageName   = $packageName
+  fileType      = 'msi'
+  file          = $fileLocation
+  silentArgs    = "/qn /norestart TRANSFORMS=`"$mstFileLocation`""
+  validExitCodes= @(0, 3010, 1641)
+  softwareName  = 'Bob*'
+}
+
+Install-ChocolateyInstallPackage @packageArgs
+~~~
+
+**EXAMPLE 5**
+
+~~~powershell
 Install-ChocolateyInstallPackage 'bob' 'exe' '/S' "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\bob.exe"
 
 ~~~
 
-**EXAMPLE 4**
+**EXAMPLE 6**
 
 ~~~powershell
 
@@ -154,6 +195,24 @@ are not setting up a silent/unattended package. Please note that if you
 are submitting to the [community repository](https://chocolatey.org/packages), it is nearly a requirement
 for the package to be completely unattended.
 
+When you are using this with an MSI, it will set up the arguments as
+follows: `"C:\Full\Path\To\msiexec.exe" /i "$fileFullPath" $silentArgs`,
+where `$fileFullPath` is `$file` or `$file64`, depending on what has been
+decided to be used. Previous to 0.10.4, it will be just `$file` as
+passing `$file64` would not have been available yet.
+
+When you use this with MSU, it is similar to MSI above in that it finds
+the right executable to run.
+
+When you use this with executable installers, the `$fileFullPath` will
+be `$file` (or `$file64` starting with 0.10.4+) and expects to be a full
+path to the file. If the file is in the package, see the parameters for
+"File" and "File64" to determine how you can get that path at runtime in
+a deterministic way. SilentArgs is everything you call against that
+file, as in `"$fileFullPath" $silentArgs". An example would be
+`"c:\path\setup.exe" /S`, where `$fileFullPath = "c:\path\setup.exe"`
+and `$silentArgs = "/S"`.
+
 Property               | Value
 ---------------------- | -----
 Aliases                | 
@@ -186,7 +245,7 @@ If embedding in the package, you can get it to the path with
 `"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
 
 Provide this when you want to provide both 32-bit and 64-bit
-installers or explicitly only a 64-bit installer (which will cause a package 
+installers or explicitly only a 64-bit installer (which will cause a package
 install failure on 32-bit systems).
 
 Property               | Value
