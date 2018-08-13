@@ -37,7 +37,7 @@ Chocolatey is a large ecosystem and each component has their own location for su
 Please follow this decision criteria to see if you are in the right location or if you should head to a different location to submit your request.
 
 ### Reporting an Issue/Bug?
-![submitting isseus](https://cloud.githubusercontent.com/assets/63502/12534440/fc223b74-c21e-11e5-9a41-1ffc1c9af48f.png)
+![submitting issues](https://cloud.githubusercontent.com/assets/63502/12534440/fc223b74-c21e-11e5-9a41-1ffc1c9af48f.png)
 
 Submitting an Issue (or a Bug)? See the **[Submitting Issues](https://github.com/chocolatey/choco#submitting-issues) section** in the [README](https://github.com/chocolatey/choco/blob/master/README.md#submitting-issues).
 
