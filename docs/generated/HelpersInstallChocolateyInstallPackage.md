@@ -209,7 +209,7 @@ be `$file` (or `$file64` starting with 0.10.4+) and expects to be a full
 path to the file. If the file is in the package, see the parameters for
 "File" and "File64" to determine how you can get that path at runtime in
 a deterministic way. SilentArgs is everything you call against that
-file, as in `"$fileFullPath" $silentArgs". An example would be
+file, as in `"$fileFullPath" $silentArgs"`. An example would be
 `"c:\path\setup.exe" /S`, where `$fileFullPath = "c:\path\setup.exe"`
 and `$silentArgs = "/S"`.
 

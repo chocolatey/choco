@@ -227,7 +227,7 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        function. Business editions only (licensed version 1.7.0+). Requires at 
        least Chocolatey v0.10.1 for `Install-ChocolateyPackage` to recognize 
        the switch appropriately. Overrides the feature 
-       'internalizeAppendUseOriginalLocation' set to by default to 'False'.
+       'internalizeAppendUseOriginalLocation' set to by default to 'True'.
 
      --sdc, --skipdownloadcache, --skip-download-cache
      Skip Download Cache - Use the original download url even if a private 

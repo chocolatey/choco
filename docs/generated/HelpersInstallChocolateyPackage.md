@@ -269,7 +269,7 @@ the right executable to run.
 When you use this with executable installers, the
 `$downloadedFileFullPath` will also be `$url`/`$url64` SilentArgs is
 everything you call against that file, as in
-`"$fileFullPath" $silentArgs". An example would be
+`"$fileFullPath" $silentArgs"`. An example would be
 `"c:\path\setup.exe" /S`, where
 `$downloadedfileFullPath = "c:\path\setup.exe"` and `$silentArgs = "/S"`.
 
