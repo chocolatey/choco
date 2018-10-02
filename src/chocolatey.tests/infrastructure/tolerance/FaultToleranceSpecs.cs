@@ -51,7 +51,6 @@ namespace chocolatey.tests.infrastructure.tolerance
                     0,
                     () =>
                     {
-                        var dude = 1;
                     });
             }
 
