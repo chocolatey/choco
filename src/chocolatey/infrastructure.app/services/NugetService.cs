@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -336,7 +336,7 @@ namespace chocolatey.infrastructure.app.services
             NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath));
 
 
-            if (config.RegularOutput && (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) ||config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)))
+            if (config.RegularOutput && (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) || config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)))
             {
                 this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
@@ -413,7 +413,7 @@ folder.");
                 }
             }
 
-            // this is when someone points the source directly at a nupkg 
+            // this is when someone points the source directly at a nupkg
             // e.g. -source c:\somelocation\somewhere\packagename.nupkg
             if (config.Sources.to_string().EndsWith(Constants.PackageExtension))
             {
@@ -434,6 +434,7 @@ folder.");
                 uninstallSuccessAction: null,
                 addUninstallHandler: true);
 
+            bool repositoryIsServiceBased = repository_is_service_based(packageManager.SourceRepository);
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
@@ -466,17 +467,17 @@ folder.");
                     continue;
                 }
 
-                IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository, repositoryIsServiceBased);
                 if (availablePackage == null)
                 {
                     var logMessage = @"{0} not installed. The package was not found with the source(s) listed.
  Source(s): '{1}'
  NOTE: When you specify explicit sources, it overrides default sources.
 If the package version is a prerelease and you didn't specify `--pre`,
- the package may not be found.{2}{3}".format_with(packageName, config.Sources, string.IsNullOrWhiteSpace(config.Version) ? String.Empty : 
+ the package may not be found.{2}{3}".format_with(packageName, config.Sources, string.IsNullOrWhiteSpace(config.Version) ? String.Empty :
 @"
 Version was specified as '{0}'. It is possible that version 
- does not exist for '{1}' at the source specified.".format_with(config.Version.to_string(), packageName), 
+ does not exist for '{1}' at the source specified.".format_with(config.Version.to_string(), packageName),
 @"
 Please see https://chocolatey.org/docs/troubleshooting for more 
  assistance.");
@@ -604,6 +605,8 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 uninstallSuccessAction: null,
                 addUninstallHandler: false);
 
+            bool repositoryIsServiceBased = repository_is_service_based(packageManager.SourceRepository);
+
             var configIgnoreDependencies = config.IgnoreDependencies;
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
@@ -677,13 +680,13 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                IPackage availablePackage = packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository, repositoryIsServiceBased);
                 config.Prerelease = originalPrerelease;
 
                 if (availablePackage == null)
                 {
                     if (config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated) continue;
-                    
+
                     string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"; Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
                     var unfoundResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
 
@@ -855,6 +858,126 @@ Please see https://chocolatey.org/docs/troubleshooting for more
             }
 
             return packageInstalls;
+        }
+
+        public ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config)
+        {
+            var packageManager = NugetCommon.GetPackageManager(
+              config,
+              _nugetLogger,
+              _packageDownloader,
+              installSuccessAction: null,
+              uninstallSuccessAction: null,
+              addUninstallHandler: false);
+
+            var repository = packageManager.SourceRepository;
+            bool repositoryIsServiceBased = repository_is_service_based(repository);
+
+            var outdatedPackages = new ConcurrentDictionary<string, PackageResult>();
+
+            set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
+            var packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
+
+            var originalConfig = config.deep_copy();
+
+            foreach (var packageName in packageNames)
+            {
+                // set original config back each time through
+                config = originalConfig;
+
+                var installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+                var pkgInfo = _packageInfoService.get_package_information(installedPackage);
+                bool isPinned = pkgInfo.IsPinned;
+
+                // if the package is pinned and we are skipping pinned, 
+                // move on quickly
+                if (isPinned && config.OutdatedCommand.IgnorePinned)
+                {
+                    string pinnedLogMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
+                    var pinnedPackageResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    pinnedPackageResult.Messages.Add(new ResultMessage(ResultType.Debug, pinnedLogMessage));
+                    pinnedPackageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, pinnedLogMessage));
+
+                    continue;
+                }
+
+                if (installedPackage != null && !string.IsNullOrWhiteSpace(installedPackage.Version.SpecialVersion) && !config.UpgradeCommand.ExcludePrerelease)
+                {
+                    // this is a prerelease - opt in for newer prereleases.
+                    config.Prerelease = true;
+                }
+
+                var latestPackage = find_package(packageName, null, config, repository, repositoryIsServiceBased);
+                
+                if (latestPackage == null)
+                {
+                    if (config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated) continue;
+
+                    string unfoundLogMessage = "{0} was not found with the source(s) listed.{1} Source(s): \"{2}\"".format_with(packageName, Environment.NewLine, config.Sources);
+                    var unfoundResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(installedPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, installedPackage.Id)));
+                    unfoundResult.Messages.Add(new ResultMessage(ResultType.Warn, unfoundLogMessage));
+                    unfoundResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, unfoundLogMessage));
+
+                    this.Log().Warn("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
+                    continue;
+                }
+
+                if (latestPackage.Version <= installedPackage.Version) continue;
+                
+                var packageResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(latestPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, latestPackage.Id)));
+
+                string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).{3} Source(s): \"{4}\"".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version, Environment.NewLine, config.Sources);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+
+                this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version, isPinned.to_string().to_lower()));
+            }
+
+            return outdatedPackages;
+        }
+
+        private IPackage find_package(string packageName, SemanticVersion version, ChocolateyConfiguration config, IPackageRepository repository, bool isRepositoryServiceBased)
+        {
+            // find the package based on version
+            if (version != null) return repository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+
+            IQueryable<IPackage> results = repository.GetPackages().Where(x => x.Id == packageName);
+
+            if (config.Prerelease && repository.SupportsPrereleasePackages)
+            {
+                results = results.Where(p => p.IsAbsoluteLatestVersion);
+            }
+            else
+            {
+                results = results.Where(p => p.IsLatestVersion);
+            }
+
+            if (!isRepositoryServiceBased)
+            {
+                results = results
+                    .Where(PackageExtensions.IsListed)
+                    .Where(p => config.Prerelease || p.IsReleaseVersion())
+                    .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
+                    .AsQueryable();
+            }
+
+            // get only one result, should be the latest
+            return results.ToList().OrderByDescending(x => x.Version).FirstOrDefault();
+        }
+
+        private bool repository_is_service_based(IPackageRepository repository)
+        {
+            bool isRemote;
+            var aggregateRepo = repository as AggregateRepository;
+            if (aggregateRepo != null)
+            {
+                isRemote = aggregateRepo.Repositories.All(repo => repo is IServiceBasedRepository);
+            }
+            else
+            {
+                isRemote = repository is IServiceBasedRepository;
+            }
+
+            return isRemote;
         }
 
         /// <summary>
@@ -1046,10 +1169,10 @@ Please see https://chocolatey.org/docs/troubleshooting for more
 
         /// <summary>
         /// Remove the shimgen director files from the package.
-        /// These are .gui/.ignore files that may have been created during the installation 
+        /// These are .gui/.ignore files that may have been created during the installation
         /// process and won't be pulled by the nuget package replacement.
-        /// This usually happens when package maintainers haven't been very good about how 
-        /// they create the files in the past (not using force with new-item typically throws 
+        /// This usually happens when package maintainers haven't been very good about how
+        /// they create the files in the past (not using force with new-item typically throws
         /// an error if the file exists).
         /// </summary>
         /// <param name="config">The configuration.</param>
@@ -1084,10 +1207,10 @@ Please see https://chocolatey.org/docs/troubleshooting for more
         }
 
         /// <summary>
-        /// Remove NuGet cache of the package. 
+        /// Remove NuGet cache of the package.
         /// Whether we use the cached file or not, NuGet always caches the package.
-        /// This is annoying with choco, but if you use both choco and NuGet, it can 
-        /// cause hard to detect issues in NuGet when there is a NuGet package of the 
+        /// This is annoying with choco, but if you use both choco and NuGet, it can
+        /// cause hard to detect issues in NuGet when there is a NuGet package of the
         /// same name with different contents.
         /// </summary>
         /// <param name="installedPackage">The installed package.</param>
@@ -1179,12 +1302,12 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     }
                 };
 
-            // if we are uninstalling a package and not forcing dependencies, 
+            // if we are uninstalling a package and not forcing dependencies,
             // look to see if the user is missing the actual package they meant
             // to uninstall.
             if (!config.ForceDependencies)
             {
-                // if you find an install of an .install / .portable / .commandline, allow adding it to the list               
+                // if you find an install of an .install / .portable / .commandline, allow adding it to the list
                 var installedPackages = get_all_installed_packages(config).Select(p => p.Name).ToList().@join(ApplicationParameters.PackageNamesSeparator);
                 foreach (var packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
                 {
