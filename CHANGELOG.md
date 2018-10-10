@@ -3,6 +3,16 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
+## 0.10.12 - (Unreleased)
+### Bug Fixes
+ * Fix - Uninstall-ChocolateyZipPackage - Corrected issue with null passed to Test-Path - see [#1546](https://github.com/chocolatey/choco/issues/1546) and [#1550](https://github.com/chocolatey/choco/issues/1550)
+ * Fix - Get-ChocolateyWebFile - Setting Security Protocol to SSL3 is not supported with PowerShell 6.0.3 - see [#1623](https://github.com/chocolatey/choco/issues/1623)
+
+### Improvements
+ * Performance of `choco outdated` command - see [#1397](https://github.com/chocolatey/choco/issues/1397)
+ * Added ability to get consistent hash of ConfigFileSettings class - see [#1612](https://github.com/chocolatey/choco/issues/1612)
+
+
 ## [0.10.11](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.11+is%3Aclosed) (May 4, 2018)
 ### BUG FIXES
  * Fix - AutoUninstaller - Captures registry snapshot escaping quotes - unable to find path for uninstall - see [#1540](https://github.com/chocolatey/choco/issues/1540)
