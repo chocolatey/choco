@@ -89,7 +89,7 @@ Install-ChocolateyShortcut -ShortcutFilePath "C:\test.lnk" -TargetPath "C:\test.
 Install-ChocolateyShortcut `
   -ShortcutFilePath "C:\notepad.lnk" `
   -TargetPath "C:\Windows\System32\notepad.exe" `
-  -WorkDirectory "C:\" `
+  -WorkingDirectory "C:\" `
   -Arguments "C:\test.txt" `
   -IconLocation "C:\test.ico" `
   -Description "This is the description"
