@@ -435,7 +435,6 @@ folder.");
                 uninstallSuccessAction: null,
                 addUninstallHandler: true);
 
-            bool repositoryIsServiceBased = repository_is_service_based(packageManager.SourceRepository);
             var originalConfig = config;
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
@@ -472,7 +471,7 @@ folder.");
                     continue;
                 }
 
-                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository, repositoryIsServiceBased);
+                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository);
                 if (availablePackage == null)
                 {
                     var logMessage = @"{0} not installed. The package was not found with the source(s) listed.
@@ -610,8 +609,6 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 uninstallSuccessAction: null,
                 addUninstallHandler: false);
 
-            bool repositoryIsServiceBased = repository_is_service_based(packageManager.SourceRepository);
-
             var configIgnoreDependencies = config.IgnoreDependencies;
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
@@ -685,7 +682,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository, repositoryIsServiceBased);
+                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository);
                 config.Prerelease = originalPrerelease;
 
                 if (availablePackage == null)
@@ -876,8 +873,6 @@ Please see https://chocolatey.org/docs/troubleshooting for more
               addUninstallHandler: false);
 
             var repository = packageManager.SourceRepository;
-            bool repositoryIsServiceBased = repository_is_service_based(repository);
-
             var outdatedPackages = new ConcurrentDictionary<string, PackageResult>();
 
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
@@ -912,7 +907,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                var latestPackage = find_package(packageName, null, config, repository, repositoryIsServiceBased);
+                var latestPackage = find_package(packageName, null, config, repository);
                 
                 if (latestPackage == null)
                 {
@@ -940,11 +935,56 @@ Please see https://chocolatey.org/docs/troubleshooting for more
             return outdatedPackages;
         }
 
-        private IPackage find_package(string packageName, SemanticVersion version, ChocolateyConfiguration config, IPackageRepository repository, bool isRepositoryServiceBased)
+        private IPackage find_package(string packageName, SemanticVersion version, ChocolateyConfiguration config, IPackageRepository repository)
         {
             packageName = packageName.to_string().ToLower(CultureInfo.CurrentCulture);
             // find the package based on version
             if (version != null) return repository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+
+            // we should always be using an aggregate repository
+            var aggregateRepository = repository as AggregateRepository;
+            if (aggregateRepository != null)
+            {
+                var packageResults = new List<IPackage>();
+
+                foreach (var packageRepository in aggregateRepository.Repositories.or_empty_list_if_null())
+                {
+                    this.Log().Debug("Using '" + packageRepository.Source + "'.");
+                    this.Log().Debug("- Supports prereleases? '" + packageRepository.SupportsPrereleasePackages + "'.");
+                    this.Log().Debug("- Is ServiceBased? '" + (packageRepository is IServiceBasedRepository) + "'.");
+
+                    // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
+                    IQueryable<IPackage> combinedResults = packageRepository.GetPackages().Where(x => x.Id.ToLower() == packageName);
+
+                    if (config.Prerelease && packageRepository.SupportsPrereleasePackages)
+                    {
+                        combinedResults = combinedResults.Where(p => p.IsAbsoluteLatestVersion);
+                    }
+                    else
+                    {
+                        combinedResults = combinedResults.Where(p => p.IsLatestVersion);
+                    }
+
+                    if (!(packageRepository is IServiceBasedRepository))
+                    {
+                        combinedResults = combinedResults
+                            .Where(PackageExtensions.IsListed)
+                            .Where(p => config.Prerelease || p.IsReleaseVersion())
+                            .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
+                            .AsQueryable();
+                    }
+
+                    var packageRepositoryResults = combinedResults.ToList();
+                    if (packageRepositoryResults.Count() != 0)
+                    {
+                        this.Log().Debug("Package '{0}' found on source '{1}'".format_with(packageName, packageRepository.Source));
+                        packageResults.AddRange(packageRepositoryResults);
+                    }
+                }
+
+                // get only one result, should be the latest - similar to TryFindLatestPackageById
+                return packageResults.OrderByDescending(x => x.Version).FirstOrDefault();
+            }
 
             // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
             IQueryable<IPackage> results = repository.GetPackages().Where(x => x.Id.ToLower() == packageName);
@@ -958,7 +998,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 results = results.Where(p => p.IsLatestVersion);
             }
 
-            if (!isRepositoryServiceBased)
+            if (!(repository is IServiceBasedRepository))
             {
                 results = results
                     .Where(PackageExtensions.IsListed)
@@ -969,22 +1009,6 @@ Please see https://chocolatey.org/docs/troubleshooting for more
 
             // get only one result, should be the latest - similar to TryFindLatestPackageById
             return results.ToList().OrderByDescending(x => x.Version).FirstOrDefault();
-        }
-
-        private bool repository_is_service_based(IPackageRepository repository)
-        {
-            bool isRemote;
-            var aggregateRepo = repository as AggregateRepository;
-            if (aggregateRepo != null)
-            {
-                isRemote = aggregateRepo.Repositories.All(repo => repo is IServiceBasedRepository);
-            }
-            else
-            {
-                isRemote = repository is IServiceBasedRepository;
-            }
-
-            return isRemote;
         }
 
         /// <summary>
