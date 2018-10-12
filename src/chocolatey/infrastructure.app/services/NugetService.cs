@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -937,10 +938,12 @@ Please see https://chocolatey.org/docs/troubleshooting for more
 
         private IPackage find_package(string packageName, SemanticVersion version, ChocolateyConfiguration config, IPackageRepository repository, bool isRepositoryServiceBased)
         {
+            packageName = packageName.to_string().ToLower(CultureInfo.CurrentCulture);
             // find the package based on version
             if (version != null) return repository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
 
-            IQueryable<IPackage> results = repository.GetPackages().Where(x => x.Id == packageName);
+            // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
+            IQueryable<IPackage> results = repository.GetPackages().Where(x => x.Id.ToLower() == packageName);
 
             if (config.Prerelease && repository.SupportsPrereleasePackages)
             {
@@ -960,7 +963,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     .AsQueryable();
             }
 
-            // get only one result, should be the latest
+            // get only one result, should be the latest - similar to TryFindLatestPackageById
             return results.ToList().OrderByDescending(x => x.Version).FirstOrDefault();
         }
 
