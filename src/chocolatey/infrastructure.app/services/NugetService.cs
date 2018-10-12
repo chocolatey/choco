@@ -436,9 +436,13 @@ folder.");
                 addUninstallHandler: true);
 
             bool repositoryIsServiceBased = repository_is_service_based(packageManager.SourceRepository);
+            var originalConfig = config;
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
+                // reset config each time through
+                config = originalConfig.deep_copy();
+
                 //todo: get smarter about realizing multiple versions have been installed before and allowing that
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
@@ -612,12 +616,12 @@ Please see https://chocolatey.org/docs/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-            var originalConfig = config.deep_copy();
+            var originalConfig = config;
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                // set original config back each time through
-                config = originalConfig;
+                // reset config each time through
+                config = originalConfig.deep_copy();
 
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
@@ -879,12 +883,12 @@ Please see https://chocolatey.org/docs/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             var packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
 
-            var originalConfig = config.deep_copy();
+            var originalConfig = config;
 
             foreach (var packageName in packageNames)
             {
-                // set original config back each time through
-                config = originalConfig;
+                // reset config each time through
+                config = originalConfig.deep_copy();
 
                 var installedPackage = packageManager.LocalRepository.FindPackage(packageName);
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
@@ -1367,8 +1371,13 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     config.ForceDependencies = false;
                 });
 
+            var originalConfig = config;
+
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
+                // reset config each time through
+                config = originalConfig.deep_copy();
+
                 IList<IPackage> installedPackageVersions = new List<IPackage>();
                 if (string.IsNullOrWhiteSpace(config.Version))
                 {
