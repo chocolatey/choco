@@ -83,6 +83,12 @@ goto main
         REM Remove double quotes from temporary value
         set "__tempvar=!tempvar:"=!"
 
+        REM Only escape percentage signs when the value type
+        REM is not defined as an expandable string.
+        if /I NOT "%%~A"=="REG_EXPAND_SZ" (
+            set "tempvar=!tempvar:%%=%%%%!"
+        )
+
         REM If the dequoted string differs from the original string, the variable contains double quotes.
         REM Escape the | and & in the variable to avoid errors.
         if NOT "!__tempvar!" == "!tempvar!" (
