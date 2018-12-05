@@ -43,7 +43,8 @@ The full absolute path to the target for new shortcut.
 
 .PARAMETER WorkingDirectory
 OPTIONAL - The full absolute path of the Working Directory that will be
-used by the new shortcut.
+used by the new shortcut. The directory will be created unless it contains
+environment variable expansion like "%AppData%\FooBar".
 
 .PARAMETER Arguments
 OPTIONAL - Additonal arguments that should be passed along to the new
@@ -164,7 +165,7 @@ Install-ChocolateyPinnedTaskBarItem
 	}
 
   if ($workingDirectory) {
-    if (!(Test-Path($workingDirectory))) {
+    if ($workingDirectory -notmatch '%\w+%' -and !(Test-Path($workingDirectory))) {
       [System.IO.Directory]::CreateDirectory($workingDirectory) | Out-Null
     }
 	}
