@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.licensing
     using System;
     using System.IO;
     using app;
+    using logging;
     using Rhino.Licensing;
 
     public sealed class LicenseValidation
@@ -37,7 +38,35 @@ namespace chocolatey.infrastructure.licensing
             var userLicenseFile = ApplicationParameters.UserLicenseFileLocation;
             if (File.Exists(userLicenseFile)) licenseFile = userLicenseFile;
 
-            //no IFileSystem at this point
+            // no IFileSystem at this point
+            if (!File.Exists(licenseFile))
+            {
+                var licenseFileName = Path.GetFileName(ApplicationParameters.LicenseFileLocation);
+                var licenseDirectory = Path.GetDirectoryName(ApplicationParameters.LicenseFileLocation);
+
+                // look for misnamed files and locations
+                // - look in the license directory for misnamed files
+                if (Directory.Exists(licenseDirectory))
+                {
+                    if (Directory.GetFiles(licenseDirectory).Length != 0)
+                    {
+                        "chocolatey".Log().Error(@"Files found in directory '{0}' but not a 
+ valid license file. License should be named '{1}'.".format_with(licenseDirectory, licenseFileName));
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important,@" Rename license file to '{0}' to allow commercial features.".format_with(licenseFileName));
+                    }
+                }
+
+
+                // - user put the license file in the top level location and/or forgot to rename it
+                if (File.Exists(Path.Combine(ApplicationParameters.InstallLocation, licenseFileName)) || File.Exists(Path.Combine(ApplicationParameters.InstallLocation, licenseFileName + ".txt")))
+                {
+                    "chocolatey".Log().Error(@"Chocolatey license found in the wrong location. File must be located at 
+ '{0}'.".format_with(ApplicationParameters.LicenseFileLocation));
+                    "chocolatey".Log().Warn(ChocolateyLoggers.Important, @" Move license file to '{0}' to allow commercial features.".format_with(ApplicationParameters.LicenseFileLocation));
+                }
+            }
+            
+            // no IFileSystem at this point
             if (File.Exists(licenseFile))
             {
                 "chocolatey".Log().Debug("Evaluating license file found at '{0}'".format_with(licenseFile));
