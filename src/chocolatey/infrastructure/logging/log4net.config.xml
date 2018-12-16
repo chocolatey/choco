@@ -142,7 +142,7 @@
       <param name="LevelMax" value="FATAL" />
     </filter>
   </appender>
-  
+
   <root>
     <level value="DEBUG" />
   </root>
@@ -150,13 +150,13 @@
   <logger name="Important">
     <level value="DEBUG" />
     <appender-ref ref="ImportantLoggingColoredConsoleAppender" />
-  </logger>  
-  
+  </logger>
+
   <logger name="Verbose">
     <level value="DEBUG" />
     <appender-ref ref="VerboseLoggingColoredConsoleAppender" />
-  </logger>  
-  
+  </logger>
+
   <logger name="Trace">
     <level value="DEBUG" />
     <appender-ref ref="TraceLoggingColoredConsoleAppender" />
@@ -165,9 +165,13 @@
   <logger name="chocolatey">
     <level value="DEBUG"/>
     <appender-ref ref="NormalLoggingColoredConsoleAppender" />
-  </logger>  
-  
+  </logger>
+
   <logger name="LogFileOnly">
+    <level value="DEBUG"/>
+  </logger>
+
+  <logger name="Rhino.Licensing">
     <level value="DEBUG"/>
   </logger>
 

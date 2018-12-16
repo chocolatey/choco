@@ -73,6 +73,7 @@ param(
 )
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+  ## Called from chocolateysetup.psm1 - wrap any Write-Host in try/catch
 
   $originalPathToInstall = $pathToInstall
 
@@ -81,7 +82,12 @@ param(
   $envPath = $env:PATH
   if (!$envPath.ToLower().Contains($pathToInstall.ToLower()))
   {
-    Write-Host "PATH environment variable does not have $pathToInstall in it. Adding..."
+    try {
+      Write-Host "PATH environment variable does not have $pathToInstall in it. Adding..."
+    } catch {
+      Write-Verbose "PATH environment variable does not have $pathToInstall in it. Adding..."
+    }
+
     $actualPath = Get-EnvironmentVariable -Name 'Path' -Scope $pathType -PreserveVariables
 
     $statementTerminator = ";"

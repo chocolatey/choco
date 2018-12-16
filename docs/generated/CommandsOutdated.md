@@ -53,6 +53,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        except when needing super low-level .NET Framework debugging. Available 
        in 0.10.4+.
 
+     --nocolor, --no-color
+     No Color - Do not show colorization in logging output. This overrides 
+       the feature 'logWithoutColor', set to 'False'. Available in 0.10.9+.
+
      --acceptlicense, --accept-license
      AcceptLicense - Accept license dialogs automatically. Reserved for 
        future use.
@@ -153,6 +157,12 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      --ignore-pinned
      Ignore Pinned - Ignore pinned packages. Defaults to false. Available in 
        0.10.6+.
+
+     --ignore-unfound
+     Ignore Unfound Packages - Ignore packages that are not found on the 
+       sources used (or the defaults). Overrides the default feature 
+       'ignoreUnfoundPackagesOnUpgradeOutdated' set to 'False'. Available in -
+       0.10.9+.
 
 ~~~
 

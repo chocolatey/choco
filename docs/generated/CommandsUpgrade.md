@@ -72,6 +72,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        except when needing super low-level .NET Framework debugging. Available 
        in 0.10.4+.
 
+     --nocolor, --no-color
+     No Color - Do not show colorization in logging output. This overrides 
+       the feature 'logWithoutColor', set to 'False'. Available in 0.10.9+.
+
      --acceptlicense, --accept-license
      AcceptLicense - Accept license dialogs automatically. Reserved for 
        future use.
@@ -204,8 +208,14 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Skip Powershell - Do not run chocolateyInstall.ps1. Defaults to false.
 
      --failonunfound, --fail-on-unfound
-     Fail On Unfound Packages - If a package is not found in feeds specified, 
-       fail instead of warn.
+     Fail On Unfound Packages - If a package is not found in sources 
+       specified, fail instead of warn.
+
+     --ignore-unfound
+     Ignore Unfound Packages - Ignore packages that are not found on the 
+       sources used (or the defaults). Overrides the default feature 
+       'ignoreUnfoundPackagesOnUpgradeOutdated' set to 'False'. Available in -
+       0.10.9+.
 
      --failonnotinstalled, --fail-on-not-installed
      Fail On Non-installed Packages - If a package is not already installed, 

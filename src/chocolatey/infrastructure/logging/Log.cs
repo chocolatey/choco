@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,10 +65,11 @@ namespace chocolatey.infrastructure.logging
             if (_logger == null)
             {
                 logger = Activator.CreateInstance(_logType) as ILog;
-                if (logger != null)
-                {
-                    logger.InitializeFor(objectName);
-                }
+            }
+
+            if (logger != null)
+            {
+                logger.InitializeFor(objectName);
             }
 
             return logger;

@@ -34,7 +34,7 @@ TeamCity  | AppVeyor | Travis
 [![TeamCity Build Status](https://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/jfxywa3xuwowt20w/branch/master?svg=true)](https://ci.appveyor.com/project/ferventcoder/choco/branch/master) | [![Travis Build Status](https://travis-ci.org/chocolatey/choco.svg?branch=master)](https://travis-ci.org/chocolatey/choco)
 
 ## Chat Room
-Come join in the conversation about Chocolatey in our Gitter Chat Room
+Come join in the conversation about Chocolatey in our Gitter Chat Room.
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chocolatey/choco?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -44,7 +44,6 @@ Please make sure you've read over and agree with the [etiquette regarding commun
 
 ## Support Chocolatey!
  * Purchase [Chocolatey Pro / Chocolatey for Business](https://chocolatey.org/pricing#compare)
- * Donate [![](https://img.shields.io/gratipay/Chocolatey.svg)](https://www.gratipay.com/Chocolatey/)
 
 ## See Chocolatey In Action
 Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update environment variables without restarting your shell):
@@ -56,7 +55,9 @@ Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update
 ![install w/pro](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/chocopro_install_stopped.gif "Chocolatey Pro availability now! A great option for individuals looking for that community PLUS option.")
 
 ## Etiquette Regarding Communication
-When requesting support, try to remember that we are all volunteers that have lives outside of open source and none of us are paid to ensure things work for you, so please be considerate of others' time when you are asking for things. Many of us have families that also need time as well and only have so much time to give on a daily basis. In the future, we hope that some of us are paid to do this full time and can provide better support when folks are running into issues, but until then a little consideration and patience can go a long way. After all, you are using a pretty good tool without cost. It may not be perfect (yet), and we know that.
+If you are an open source user requesting support, please remember that most folks in the Chocolatey community are volunteers that have lives outside of open source and are not paid to ensure things work for you, so please be considerate of others' time when you are asking for things. Many of us have families that also need time as well and only have so much time to give on a daily basis. A little consideration and patience can go a long way. After all, you are using a pretty good tool without cost. It may not be perfect (yet), and we know that.
+
+If you are using a [commercial edition of Chocolatey](https://chocolatey.org/compare#compare), you have different terms! Please see [support](https://chocolatey.org/support).
 
 ## Information
  * [Chocolatey Website and Community Package Repository](https://chocolatey.org)
@@ -71,7 +72,7 @@ Please see the [docs](https://chocolatey.org/docs)
 Give `choco.exe -?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
 
 ### Requirements
-* .NET Framework 4.0
+* .NET Framework 4.0+
 * PowerShell 2.0+
 * Windows Server 2003+ / Windows 7+
 
@@ -199,4 +200,4 @@ chmod +x zip.sh
 Running the build on Mono produces an artifact similar to Windows but may have more rough edges. You may get a failure or two in the build script that can be safely ignored.
 
 ## Credits
-Chocolatey is brought to you by quite a few people and frameworks. See [CREDITS](https://github.com/chocolatey/choco/blob/master/docs/legal/CREDITS.md) (just LEGAL/Credits.md in the zip folder)
+Chocolatey is brought to you by quite a few people and frameworks. See [CREDITS](https://github.com/chocolatey/choco/blob/master/docs/legal/CREDITS.md) (just LEGAL/Credits.md in the zip folder).

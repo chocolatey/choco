@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -97,7 +97,7 @@ namespace chocolatey.infrastructure.app.nuget
                 if (!string.IsNullOrWhiteSpace(configuration.Proxy.BypassList))
                 {
                     "chocolatey".Log().Debug("Proxy has a bypass list of '{0}'.".format_with(configuration.Proxy.BypassList.escape_curly_braces()));
-                    proxy.BypassList = configuration.Proxy.BypassList.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    proxy.BypassList = configuration.Proxy.BypassList.Replace("*",".*").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 }
 
                 proxy.BypassProxyOnLocal = configuration.Proxy.BypassOnLocal;
@@ -187,7 +187,10 @@ namespace chocolatey.infrastructure.app.nuget
                     Logger = nugetLogger,
                 };
 
-            //NOTE DO NOT EVER use this method - packageManager.PackageInstalling += (s, e) =>
+            // GH-1548
+            //note: is this a good time to capture a backup (for dependencies) / maybe grab remembered arguments here instead / and somehow get out of the endless loop! 
+            //NOTE DO NOT EVER use this method - packageManager.PackageInstalling += (s, e) => { };
+            
             packageManager.PackageInstalled += (s, e) =>
                 {
                     var pkg = e.Package;

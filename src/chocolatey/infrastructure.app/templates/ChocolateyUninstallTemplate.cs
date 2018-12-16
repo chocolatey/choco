@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,7 +65,8 @@ $uninstalled = $false
 
 if ($key.Count -eq 1) {
   $key | % { 
-    $packageArgs['file'] = ""$($_.UninstallString)""
+    $packageArgs['file'] = ""$($_.UninstallString)"" #NOTE: You may need to split this if it contains spaces, see below
+    
     if ($packageArgs['fileType'] -eq 'MSI') {
       # The Product Code GUID is all that should be passed for MSI, and very 
       # FIRST, because it comes directly after /x, which is already set in the 
@@ -76,6 +77,12 @@ if ($key.Count -eq 1) {
       # Alternatively if you need to pass a path to an msi, determine that and 
       # use it instead of the above in silentArgs, still very first
       $packageArgs['file'] = ''
+    } else {
+      # NOTES:
+      # - You probably will need to sanitize $packageArgs['file'] as it comes from the registry and could be in a variety of fun but unusable formats
+      # - Split args from exe in $packageArgs['file'] and pass those args through $packageArgs['silentArgs'] or ignore them
+      # - Ensure you don't pass double quotes in $file (aka $packageArgs['file']) - otherwise you will get ""Illegal characters in path when you attempt to run this""
+      # - Review the code for auto-uninstaller for all of the fun things it does in sanitizing - https://github.com/chocolatey/choco/blob/bfe351b7d10c798014efe4bfbb100b171db25099/src/chocolatey/infrastructure.app/services/AutomaticUninstallerService.cs#L142-L192
     }
 
     Uninstall-ChocolateyPackage @packageArgs

@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,9 @@ namespace chocolatey.console
     using infrastructure.logging;
     using infrastructure.registration;
     using infrastructure.tolerance;
+#if !NoResources
     using resources;
+#endif
     using Assembly = infrastructure.adapters.Assembly;
     using Console = System.Console;
     using Environment = System.Environment;
@@ -72,7 +74,13 @@ namespace chocolatey.console
                      license,
                      warning => { warnings.Add(warning); }
                      );
-                
+
+                if (config.Features.LogWithoutColor)
+                {
+                    ApplicationParameters.Log4NetConfigurationResource = @"chocolatey.infrastructure.logging.log4net.nocolor.config.xml";
+                    Log4NetAppenderConfiguration.configure(loggingLocation, excludeLoggerNames: ChocolateyLoggers.Trace.to_string());
+                }
+
                 if (!string.IsNullOrWhiteSpace(config.AdditionalLogFileLocation))
                 {
                   Log4NetAppenderConfiguration.configure_additional_log_file(config.AdditionalLogFileLocation);
@@ -130,8 +138,9 @@ namespace chocolatey.console
                         "redirects",
                         "tools"
                     };
+#if !NoResources
                 AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources, throwError: false);
-
+#endif
                 var application = new ConsoleApplication();
                 application.run(args, config, container);
             }

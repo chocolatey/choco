@@ -6,6 +6,7 @@ code_drop
 obj
 src/packages
 /.vscode/
+.vs
 
 *.suo
 *.sln.docstates

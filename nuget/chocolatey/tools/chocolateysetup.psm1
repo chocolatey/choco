@@ -126,6 +126,7 @@ Creating Chocolatey folders if they do not already exist.
 
   Add-ChocolateyProfile
   Install-DotNet4IfMissing
+  Invoke-Chocolatey-Initial
   if ($env:ChocolateyExitCode -eq $null -or $env:ChocolateyExitCode -eq '') {
     $env:ChocolateyExitCode = 0
   }
@@ -599,10 +600,14 @@ function Add-ChocolateyProfile {
       #"" | Out-File $profileFile -Encoding UTF8
     }
 
-    $signature = Get-AuthenticodeSignature $profile
-    if ($signature.Status -ne 'NotSigned') {
-      Write-Warning "Not setting tab completion: File is Authenticode signed at '$profile'."
-      return
+    # Check authenticode, but only if file is greater than 4 bytes
+    $profileFileInfo = New-Object System.IO.FileInfo($profileFile)
+    if ($profileFileInfo.Length -ge 5) {
+      $signature = Get-AuthenticodeSignature $profile
+      if ($signature.Status -ne 'NotSigned') {
+        Write-Warning "Not setting tab completion: File is Authenticode signed at '$profile'."
+        return
+      }
     }
 
     $profileInstall = @'
@@ -697,6 +702,19 @@ param(
         Install-DotNet4IfMissing $true
       }
     }
+  }
+}
+
+function Invoke-Chocolatey-Initial {
+  Write-Debug "Initializing Chocolatey files, etc by running Chocolatey..."
+
+  try {
+    $chocoInstallationFolder = Get-ChocolateyInstallFolder
+    $chocoExe = Join-Path -Path $chocoInstallationFolder -ChildPath "choco.exe"
+    & $chocoExe -v | Out-Null
+    Write-Debug "Chocolatey execution completed successfully."
+  } catch {
+    Write-ChocolateyWarning "Unable to run Chocolately at this time.  It is likely that .Net Framework installation requires a system reboot"
   }
 }
 

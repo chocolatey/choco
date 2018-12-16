@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,7 +118,7 @@ namespace chocolatey.infrastructure.logging
                     RollingStyle = RollingFileAppender.RollingMode.Size,
                     MaxFileSize = 1024 * 1024 * 10,
                     MaxSizeRollBackups = 50,
-                    LockingModel = new FileAppender.MinimalLock(),
+                    LockingModel = new FileAppender.ExclusiveLock(),
                     PreserveLogFileNameExtension = true,
                 };
                 infoOnlyAppender.AddFilter(new LevelRangeFilter { LevelMin = Level.Info, LevelMax = Level.Fatal });
@@ -276,7 +276,7 @@ namespace chocolatey.infrastructure.logging
                 File = logFileLocation,
                 Layout = layout,
                 AppendToFile = true,
-                LockingModel = new FileAppender.MinimalLock(),
+                LockingModel = new FileAppender.ExclusiveLock(),
             };
             app.ActivateOptions();
 

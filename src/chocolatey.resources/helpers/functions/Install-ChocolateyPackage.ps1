@@ -23,12 +23,20 @@ Installs software into "Programs and Features" based on a remote file
 download. Use Install-ChocolateyInstallPackage when local or embedded
 file.
 
+Building packages for an organization or for use internally? You want to
+use Install-ChocolateyINSTALLPackage instead of this method (see links
+below).
+
 .DESCRIPTION
 This will download a native installer from a url and install it on your
 machine. Has error handling built in.
 
 If you are embedding the file(s) directly in the package (or do not need
 to download a file first), use Install-ChocolateyInstallPackage instead.
+
+Building packages for an organization or for use internally? You want to
+use Install-ChocolateyINSTALLPackage instead of this method
+(see links below).
 
 .NOTES
 This command will assert UAC/Admin privileges on the machine.
@@ -80,6 +88,22 @@ Please include the `notSilent` tag in your Chocolatey package if you
 are not setting up a silent/unattended package. Please note that if you
 are submitting to the community repository, it is nearly a requirement
 for the package to be completely unattended.
+
+When you are using this with an MSI, it will set up the arguments as
+follows:
+`"C:\Full\Path\To\msiexec.exe" /i "$downloadedFileFullPath" $silentArgs`,
+where `$downloadedfileFullPath` is `$url` or `$url64`, depending on what
+has been decided to be used.
+
+When you use this with MSU, it is similar to MSI above in that it finds
+the right executable to run.
+
+When you use this with executable installers, the
+`$downloadedFileFullPath` will also be `$url`/`$url64` SilentArgs is
+everything you call against that file, as in
+`"$fileFullPath" $silentArgs"`. An example would be
+`"c:\path\setup.exe" /S`, where
+`$downloadedfileFullPath = "c:\path\setup.exe"` and `$silentArgs = "/S"`.
 
 .PARAMETER Url
 This is the 32 bit url to download the resource from. This resource can
@@ -221,6 +245,54 @@ Install-ChocolateyPackage @packageArgs
 
 .EXAMPLE
 >
+$packageName= 'bob'
+$toolsDir   = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$url        = 'https://somewhere.com/file.msi'
+$url64      = 'https://somewhere.com/file-x64.msi'
+
+
+$packageArgs = @{
+  packageName   = $packageName
+  fileType      = 'msi'
+  url           = $url
+  url64bit      = $url64
+  silentArgs    = "/qn /norestart MSIPROPERTY=`"true`""
+  validExitCodes= @(0, 3010, 1641)
+  softwareName  = 'Bob*'
+  checksum      = '12345'
+  checksumType  = 'sha256'
+  checksum64    = '123356'
+  checksumType64= 'sha256'
+}
+
+Install-ChocolateyPackage @packageArgs
+
+.EXAMPLE
+>
+$packageName= 'bob'
+$toolsDir   = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$url        = 'https://somewhere.com/file.msi'
+$url64      = 'https://somewhere.com/file-x64.msi'
+$urlTransform = 'https://somewhere.com/file.mst'
+$mstFileLocation = Join-Path $toolsDir 'transform.mst'
+
+Get-ChocolateyWebFile -PackageName 'bob' `
+                      -Url $urlTransform -FileFullPath $mstFileLocation `
+                      -Checksum '1234' -ChecksumType 'sha256'
+
+$packageArgs = @{
+  packageName   = $packageName
+  fileType      = 'msi'
+  file          = $fileLocation
+  silentArgs    = "/qn /norestart TRANSFORMS=`"$mstFileLocation`""
+  validExitCodes= @(0, 3010, 1641)
+  softwareName  = 'Bob*'
+}
+
+Install-ChocolateyInstallPackage @packageArgs
+
+.EXAMPLE
+>
 Install-ChocolateyPackage 'StExBar' 'msi' '/quiet' `
  'http://stexbar.googlecode.com/files/StExBar-1.8.3.msi' `
  'http://stexbar.googlecode.com/files/StExBar64-1.8.3.msi'
@@ -302,7 +374,7 @@ param(
 
   if ($url -eq '' -or $url -eq $null) {
     $url = $file
-  } 
+  }
   if ($url64bit -eq '' -or $url64bit -eq $null) {
     $url64bit = $file64
   }

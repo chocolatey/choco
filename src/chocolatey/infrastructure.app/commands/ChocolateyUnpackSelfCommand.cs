@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,13 +27,20 @@ namespace chocolatey.infrastructure.app.commands
     using filesystem;
     using infrastructure.commands;
     using logging;
+#if !NoResources
     using resources;
+#endif
 
     [CommandFor("unpackself", "have chocolatey set itself up")]
     public class ChocolateyUnpackSelfCommand : ICommand
     {
         private readonly IFileSystem _fileSystem;
+
+#if !NoResources
         private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)));
+#else
+        private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>();
+#endif
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void initialize_with(Lazy<IAssembly> assembly_initializer)
@@ -67,11 +74,11 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "UnpackSelf Command");
             this.Log().Info(@"
-This will unpack files needed by choco. It will overwrite existing 
+This will unpack files needed by choco. It will overwrite existing
  files only if --force is specified.
 
-NOTE: This command should only be used when installing Chocolatey, not 
- during normal operation. 
+NOTE: This command should only be used when installing Chocolatey, not
+ during normal operation.
 
 ");
 

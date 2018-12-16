@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,7 +44,7 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.Version = option.remove_surrounding_quotes())
                 .Add("out=|outdir=|outputdirectory=|output-directory=",
                      "OutputDirectory - Specifies the directory for the created Chocolatey package file. If not specified, uses the current directory.",
-                     option => configuration.OutputDirectory = option)
+                     option => configuration.OutputDirectory = option.remove_surrounding_quotes())
                 ;
         }
 

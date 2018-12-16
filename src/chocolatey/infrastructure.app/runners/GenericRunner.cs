@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -142,33 +142,38 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             SecurityProtocol.set_protocol(config, provideWarning:true);
             EventManager.publish(new PreRunMessage(config));
 
-            var command = find_command(config, container, isConsole, parseArgs);
-            if (command != null)
+            try
             {
-                if (config.Noop)
+                var command = find_command(config, container, isConsole, parseArgs);
+                if (command != null)
                 {
-                    if (config.RegularOutput)
+                    if (config.Noop)
                     {
-                        this.Log().Info("_ {0}:{1} - Noop Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Info("_ {0}:{1} - Noop Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                        }
+
+                        command.noop(config);
                     }
-
-                    command.noop(config);
-                }
-                else
-                {
-                    this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
-                    command.run(config);
+                    else
+                    {
+                        this.Log().Debug("_ {0}:{1} - Normal Run Mode _".format_with(ApplicationParameters.Name, command.GetType().Name));
+                        command.run(config);
+                    }
                 }
             }
-
-            EventManager.publish(new PostRunMessage(config));
-
-            foreach (var task in tasks.or_empty_list_if_null())
+            finally
             {
-                task.shutdown();
-            }
+                EventManager.publish(new PostRunMessage(config));
 
-            remove_nuget_cache(container);
+                foreach (var task in tasks.or_empty_list_if_null())
+                {
+                    task.shutdown();
+                }
+
+                remove_nuget_cache(container, config);
+            }
         }
 
         /// <summary>
@@ -177,6 +182,16 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
         /// <param name="container">The container.</param>
         private void remove_nuget_cache(Container container)
         {
+            remove_nuget_cache(container, null);
+        }
+
+        /// <summary>
+        /// if there is a NuGetScratch cache found, kill it with fire
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="config">optional Chocolatey configuration to look at cacheLocation</param>
+        private void remove_nuget_cache(Container container, ChocolateyConfiguration config)
+        {
             try
             {
                 var fileSystem = container.GetInstance<IFileSystem>();
@@ -184,6 +199,13 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                 fileSystem.delete_directory_if_exists(scratch, recursive: true, overrideAttributes: true, isSilent: true);
                 var nugetX = fileSystem.combine_paths(fileSystem.get_temp_path(), "x", "nuget");
                 fileSystem.delete_directory_if_exists(nugetX, recursive: true, overrideAttributes: true, isSilent: true);
+
+                if (config != null && !string.IsNullOrWhiteSpace(config.CacheLocation)) {
+                    scratch = fileSystem.combine_paths(config.CacheLocation, "NuGetScratch");
+                    fileSystem.delete_directory_if_exists(scratch, recursive: true, overrideAttributes: true, isSilent: true);
+                    nugetX = fileSystem.combine_paths(config.CacheLocation, "x", "nuget");
+                    fileSystem.delete_directory_if_exists(nugetX, recursive: true, overrideAttributes: true, isSilent: true);
+                }
             }
             catch (Exception ex)
             {
@@ -229,7 +251,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                     task.shutdown();
                 }
 
-                remove_nuget_cache(container);
+                remove_nuget_cache(container, config);
             }
         }
 

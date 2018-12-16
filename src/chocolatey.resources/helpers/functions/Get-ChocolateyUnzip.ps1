@@ -215,14 +215,16 @@ param(
   }
 
   Write-Debug "7z exit code: $exitCode"
+
+  $errorMessageAddendum = " This is most likely an issue with the '$env:chocolateyPackageName' package and not with Chocolatey itself. Please follow up with the package maintainer(s) directly."
   switch ($exitCode) {
     0 { break }
-    1 { throw 'Some files could not be extracted' } # this one is returned e.g. for access denied errors
-    2 { throw '7-Zip encountered a fatal error while extracting the files' }
-    7 { throw '7-Zip command line error' }
-    8 { throw '7-Zip out of memory' }
-    255 { throw 'Extraction cancelled by the user' }
-    default { throw "7-Zip signalled an unknown error (code $exitCode)" }
+    1 { throw 'Some files could not be extracted.' + $errorMessageAddendum } # this one is returned e.g. for access denied errors
+    2 { throw '7-Zip encountered a fatal error while extracting the files.' + $errorMessageAddendum }
+    7 { throw ('7-Zip command line error.' + $errorMessageAddendum) }
+    8 { throw '7-Zip out of memory.' + $errorMessageAddendum }
+    255 { throw 'Extraction cancelled by the user.' + $errorMessageAddendum }
+    default { throw "7-Zip signalled an unknown error (code $exitCode)"  + $errorMessageAddendum}
   }
 
   $env:ChocolateyPackageInstallLocation = $destination

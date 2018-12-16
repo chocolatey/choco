@@ -1,4 +1,9 @@
 <!--
+
+REPORTING A SECURITY FINDING?
+Stop, this is not the correct place to provide a security disclosure.
+Please go to https://chocolatey.org/security for the proper disclosure process.
+
 BEFORE YOU SUBMIT AN ISSUE:
 
 Ensure you have read over Submitting Issues -
@@ -8,7 +13,7 @@ DO NOT CREATE ISSUES FOR PACKAGES. Read over Submitting Issues.
 
 DO NOT CREATE AN ISSUE FOR A QUESTION - questions are better served as email or chat.
 - email - http://groups.google.com/group/chocolatey
--  chat - https://gitter.im/chocolatey/choco
+- chat - https://gitter.im/chocolatey/choco
 
 DELETE EVERYTHING IN THIS COMMENT BLOCK
 

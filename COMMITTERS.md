@@ -64,7 +64,7 @@ Unless there is something wrong with the code, we don't ask contributors to reba
 ## Merging
 Once you have reviewed the change set and determined it is ready for merge, the next steps are to bring it local and evaluate the code further by actually working with it, running the tests locally and adding any additional commits or fix-ups that are necessary in a local branch.
 
-When merging the user's contribution, it should be done with `git merge --log --no-ff` to create a merge commit so that in case there is an issue it becomes easier to revert later, and so that we can see where the code came from should we ever need to go find it later (more information on this can be found [here](https://www.kernel.org/pub/software/scm/git/docs/git-merge.html) and also a discussion on why this is a good idea [here](http://differential.io/blog/best-way-to-merge-a-github-pull-request)).
+When merging the user's contribution, it should be done with `git merge --log --no-ff` to create a merge commit so that in case there is an issue it becomes easier to revert later, and so that we can see where the code came from should we ever need to go find it later (more information on this can be found [here](https://www.kernel.org/pub/software/scm/git/docs/git-merge.html) and also a discussion on why this is a good idea [here](https://differential.com/insights/best-way-to-merge-a-github-pull-request/)).
 
 ### Merge Retargeting to Stable
 Because we ask contributors to target master, sometimes a fix/enhancement may need to be retargeted to stable. This process is somewhat easy thanks to git. In most cases you won't even need to ask the user to do this for you.
@@ -73,8 +73,8 @@ Because we ask contributors to target master, sometimes a fix/enhancement may ne
  * `git checkout pr<github_pull_id>`
  * `git rebase --onto stable master` - this uses the local branch, starts with latest stable and reapplies the commits from the branch to it, removing all commits that were only on the master.
  * `build.bat` - build and test
+ * Any additional changes or testing here.
  * `git checkout stable`
- * Any addtional changes or testing here.
  * `git merge pr<github_pull_id> --log --no-ff`
  * `git branch -d pr<github_pull_id>`
  * `git checkout master`

@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -213,11 +213,17 @@ namespace chocolatey.infrastructure.app.commands
                         var arg = argument.to_lower();
                         if (arg.StartsWith("-dir") || arg.StartsWith("--dir") || arg.StartsWith("-install") || arg.StartsWith("--install"))
                         {
-                            throw new ApplicationException(
-                                "It appears you are attempting to use options that may be only available in licensed versions of Chocolatey ('{0}'). Please remove and consult the documentation.".format_with(arg));
+                            throw new ApplicationException("It appears you are attempting to use options that may be only available in licensed versions of Chocolatey ('{0}'). There may be ways in the open source edition to achieve what you are looking to do. Please remove the argument and consult the documentation.".format_with(arg));
                         }
                     }
                 }
+            }
+
+            if (!string.IsNullOrWhiteSpace(configuration.SourceCommand.Username) && string.IsNullOrWhiteSpace(configuration.SourceCommand.Password))
+            {
+                this.Log().Debug(ChocolateyLoggers.LogFileOnly, "Username '{0}' provided. Asking for password.".format_with(configuration.SourceCommand.Username));
+                System.Console.Write("User name '{0}' provided. Password: ".format_with(configuration.SourceCommand.Username));
+                configuration.SourceCommand.Password = InteractivePrompt.get_password(configuration.PromptForConfirmation);
             }
         }
 

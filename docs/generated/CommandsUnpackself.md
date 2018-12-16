@@ -2,11 +2,11 @@
 
 # UnpackSelf Command (choco unpackself)
 
-This will unpack files needed by choco. It will overwrite existing 
+This will unpack files needed by choco. It will overwrite existing
  files only if --force is specified.
 
-**NOTE:** This command should only be used when installing Chocolatey, not 
- during normal operation. 
+**NOTE:** This command should only be used when installing Chocolatey, not
+ during normal operation.
 
 
 ## Options and Switches
@@ -35,6 +35,10 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
      Trace - Show trace messaging. Very, very verbose trace messaging. Avoid 
        except when needing super low-level .NET Framework debugging. Available 
        in 0.10.4+.
+
+     --nocolor, --no-color
+     No Color - Do not show colorization in logging output. This overrides 
+       the feature 'logWithoutColor', set to 'False'. Available in 0.10.9+.
 
      --acceptlicense, --accept-license
      AcceptLicense - Accept license dialogs automatically. Reserved for 

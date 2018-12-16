@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -513,6 +513,55 @@ namespace chocolatey.tests.infrastructure.app.services
                         c.execute(
                             expectedUninstallString,
                             "\"WinDir Stat\"".trim_safe(),
+                            It.IsAny<int>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<Action<object, DataReceivedEventArgs>>(),
+                            It.IsAny<bool>()),
+                    Times.Once);
+            }
+        }        
+        
+        public class when_uninstall_string_has_ampersand_quot : AutomaticUninstallerServiceSpecsBase
+        {
+            private readonly string uninstallStringWithAmpersandQuot = @"&quot;C:\Program Files (x86)\WinDirStat\Uninstall.exe&quot; /SILENT";
+
+            public override void Context()
+            {
+                base.Context();
+                registryKeys.Clear();
+                registryKeys.Add(
+                    new RegistryApplicationKey
+                    {
+                        DisplayName = expectedDisplayName,
+                        InstallLocation = @"C:\Program Files (x86)\WinDirStat",
+                        UninstallString = uninstallStringWithAmpersandQuot,
+                        HasQuietUninstall = true,
+                        KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
+                        InstallerType = installerType.InstallerType,
+                    });
+                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+            }
+
+            public override void Because()
+            {
+                MockLogger.LogMessagesToConsole = true;
+                service.run(packageResult, config);
+            }
+
+            [Fact]
+            public void should_call_get_package_information()
+            {
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+            }
+
+            [Fact]
+            public void should_call_command_executor()
+            {
+                commandExecutor.Verify(
+                    c =>
+                        c.execute(
+                            expectedUninstallString,
+                            "/SILENT".trim_safe(),
                             It.IsAny<int>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),

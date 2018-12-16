@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -378,6 +378,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool FailOnStandardError { get; set; }
         public bool UsePowerShellHost { get; set; }
         public bool LogEnvironmentValues { get; set; }
+        public bool LogWithoutColor { get; set; }
         public bool VirusCheck { get; set; }
         public bool FailOnInvalidOrMissingLicense { get; set; }
         public bool IgnoreInvalidOptionsSwitches { get; set; }

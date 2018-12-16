@@ -67,6 +67,12 @@ compatibility with `chocolatey-core.extension`, use `:`.
 
 For example `-Parameters "/ITEM1:value /ITEM2:value with spaces"
 
+NOTE: In 0.10.9+, to maintain compatibility with the prior art of the
+chocolatey-core.extension method, quotes and apostrophes surrounding
+parameter values will be removed. When the param is used, those items
+can be added back if desired, but it's most important to ensure that
+existing packages are compatible on upgrade.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply and future expansion.
 Do not use directly.
@@ -94,11 +100,11 @@ if (!$pp['LICENSE']) { $pp['LICENSE'] = '1234' }
 .EXAMPLE
 >
 $pp = Get-PackageParameters
-# Requires 0.10.8 for Read-Host -AsSecureString
-if (!$pp['Password']) { $pp['Password'] = Read-Host "Enter password for $userName:" -AsSecureString}
+if (!$pp['UserName']) { $pp['UserName'] = "$env:UserName" }
+# Requires Choocolatey v0.10.8+ for Read-Host -AsSecureString
+if (!$pp['Password']) { $pp['Password'] = Read-Host "Enter password for $($pp['UserName']):" -AsSecureString}
 # fail the install/upgrade if not value is not determined
 if (!$pp['Password']) { throw "Package needs Password to install, that must be provided in params or in prompt." }
-
 
 .EXAMPLE
 >
@@ -125,6 +131,7 @@ param(
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $useDefaultParameters = $false
+  $loggingAllowed = $true
   $paramStrings = @($parameters)
 
   if (!$parameters -or $parameters -eq '') {
@@ -132,6 +139,10 @@ param(
     # if we are using default parameters, we are going to loop over two items
     Write-Debug 'Parsing $env:ChocolateyPackageParameters and $env:ChocolateyPackageParametersSensitive for parameters'
     $paramStrings = @("$env:ChocolateyPackageParameters","$env:ChocolateyPackageParametersSensitive")
+    if ($env:ChocolateyPackageParametersSensitive) {
+      Write-Debug "Sensitive parameters detected, no logging of parameters."
+      $loggingAllowed = $false
+    }
   }
 
   $paramHash = @{}
@@ -139,30 +150,21 @@ param(
   foreach ($paramString in $paramStrings) {
     if (!$paramString -or $paramString -eq '') { continue }
 
-    # split on "/"
-    $paramArray = $paramString.Split('/', [System.StringSplitOptions]::RemoveEmptyEntries)
-    if ($paramArray -eq $null -or $paramArray -eq @()) { continue }
+    Select-String '(?:^|\s+)\/(?<ItemKey>[^\:\=\s)]+)(?:(?:\:|=){1}(?:\''|\"){0,1}(?<ItemValue>.*?)(?:\''|\"){0,1}(?:(?=\s+\/)|$))?' -Input $paramString -AllMatches | % { $_.Matches } | % {
+      if (!$_) { continue } #Posh v2 issue?
+      $paramItemName = ($_.Groups["ItemKey"].Value).Trim()
+      $paramItemValue = ($_.Groups["ItemValue"].Value).Trim()
+      if (!$paramItemValue -or $paramItemValue -eq '') { $paramItemValue = $true }
 
-    foreach ($paramItem in $paramArray.GetEnumerator()) {
-      if (!$paramItem -or $paramItem -eq '') { continue }
-
-      # split on : and =, but only allow a total split of two
-      $paramItemPair = $paramItem.Split(':', 2, [System.StringSplitOptions]::RemoveEmptyEntries)
-      if ($paramItemPair -eq $null -or $paramItemPair -eq @()) { continue }
-      if ($paramItemPair.Length -eq 1 -and $paramItemPair[0].Contains('=')) {
-        $paramItemPair = $paramItem.Split('=', 2, [System.StringSplitOptions]::RemoveEmptyEntries)
-      }
-
-      $paramItemName = $paramItemPair[0].Trim()
-      $paramItemValue = $true
-      if ($paramItemPair.Length -ne 1) {
-        $paramItemValue = $paramItemPair[1].Trim()
-      }
-
-      Write-Debug "Adding package param '$paramItemName'='$paramItemValue'"
+      if ($loggingAllowed) { Write-Debug "Adding package param '$paramItemName'='$paramItemValue'" }
       $paramHash[$paramItemName] = $paramItemValue
     }
   }
 
   $paramHash
 }
+
+# override Get-PackageParameters in chocolatey-core.extension package
+Copy-Item Function:Get-PackageParameters Function:Get-PackageParametersBuiltIn -Force
+#Rename-Item Function:Get-PackageParameters Get-PackageParametersBuiltIn
+Set-Alias -Name Get-PackageParameters -Value Get-PackageParametersBuiltIn -Scope Global
