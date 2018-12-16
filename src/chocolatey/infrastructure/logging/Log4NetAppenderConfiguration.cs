@@ -131,6 +131,27 @@ namespace chocolatey.infrastructure.logging
                             };
                             appender.AddMapping(warnMapping);
                         }
+
+                        // make sure errors can be clearly seen
+                        if (bgColor == ConsoleColor.Red
+                            || bgColor == ConsoleColor.DarkRed
+                            || bgColor == ConsoleColor.Yellow
+                            || bgColor == ConsoleColor.DarkYellow
+                            || bgColor == ConsoleColor.DarkCyan
+                            || bgColor == ConsoleColor.DarkGray
+                            || bgColor == ConsoleColor.DarkGreen
+                            || bgColor == ConsoleColor.Blue
+                        )
+                        {
+                            var errorMapping = new ManagedColoredConsoleAppender.LevelColors
+                            {
+                                Level = Level.Error,
+                                BackColor = ConsoleColor.Black,
+                                ForeColor = ConsoleColor.Red,
+                            };
+                            appender.AddMapping(errorMapping);
+                        }
+
                         appender.ActivateOptions();
                     }
                 }

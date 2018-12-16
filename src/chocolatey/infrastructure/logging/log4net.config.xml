@@ -12,7 +12,6 @@
     <mapping>
       <level value="ERROR" />
       <foreColor value="Red" />
-      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="WARN" />
