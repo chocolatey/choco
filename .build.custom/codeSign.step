@@ -121,7 +121,6 @@ Set-AuthenticodeSignature -Filepath @("C:\ProgramData\chocolatey\helpers\chocola
       <in>
         <items>
           <!--exclude name="${dirs.drop.nuget}/chocolatey/tools/chocolateyInstall.ps1" /-->
-          <exclude name="${dirs.drop.nuget}/chocolatey/tools/init.ps1" />
           <include name="${dirs.drop.nuget}/**/*.ps1" />
           <include name="${dirs.drop.nuget}/**/*.psm1" />
         </items>

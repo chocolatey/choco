@@ -27,6 +27,13 @@
             The following is an unsupported use case: If you want to utilize File 
              and Registry Virtualization for backward compatibility then delete 
              the requestedExecutionLevel node.
+             
+            NOTE: If you do change this file, make sure that you change the
+             modification date on choco.exe that this sits next to. Windows 
+             caches manifests based on path and last modified date. So you'll 
+             need to change the modification date on choco.exe for the manifest
+             change to take effect.
+             Details: https://github.com/chocolatey/choco/issues/1292#issuecomment-304068121
         -->
         <requestedExecutionLevel level="asInvoker" uiAccess="false" />
       </requestedPrivileges>

@@ -16,7 +16,9 @@
 
 namespace chocolatey.infrastructure.logging
 {
+    using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.IO;
     using System.Linq;
     using adapters;
@@ -30,13 +32,27 @@ namespace chocolatey.infrastructure.logging
     using log4net.Repository;
     using log4net.Repository.Hierarchy;
     using platforms;
+    using Console = adapters.Console;
 
     public sealed class Log4NetAppenderConfiguration
     {
         private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof(Log4NetAppenderConfiguration));
+        private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IConsole> console)
+        {
+            _console = console;
+        }
+
+        private static IConsole Console
+        {
+            get { return _console.Value; }
+        }
 
         private static bool _alreadyConfiguredFileAppender;
         private static readonly string _summaryLogAppenderName = "{0}.summary.log.appender".format_with(ApplicationParameters.Name);
+        private const string NORMAL_LOGGING_COLORED_APPENDER = "NormalLoggingColoredConsoleAppender";
+        private const string IMPORTANT_LOGGING_COLORED_APPENDER = "ImportantLoggingColoredConsoleAppender";
 
         /// <summary>
         ///   Pulls xml configuration from embedded location and applies it. 
@@ -69,10 +85,119 @@ namespace chocolatey.infrastructure.logging
 
                 _logger.DebugFormat("Configured Log4Net configuration ('{0}') from assembly {1}", resource, assembly.FullName);
             }
+
+            configure_info_logging_colors();
             
             if (!string.IsNullOrWhiteSpace(outputDirectory))
             {
                 set_file_appender(outputDirectory, excludeLoggerNames);
+            }
+        }
+
+        private static void configure_info_logging_colors()
+        {
+            try
+            {
+                // configure INFO on same as current background color and foreground colors
+                var bgColor = Console.BackgroundColor;
+                var fgColor = Console.ForegroundColor;
+                ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetCallingAssembly().UnderlyingType);
+                foreach (var append in logRepository.GetAppenders().Where(a => a.Name.is_equal_to(NORMAL_LOGGING_COLORED_APPENDER)).or_empty_list_if_null())
+                {
+                    var appender = append as ManagedColoredConsoleAppender;
+                    if (appender != null)
+                    {
+                        var infoMapping = new ManagedColoredConsoleAppender.LevelColors
+                        {
+                            Level = Level.Info,
+                            BackColor = bgColor,
+                            ForeColor = fgColor,
+                        };
+                        appender.AddMapping(infoMapping);
+
+                        // make sure warnings can be clearly seen
+                        if (bgColor == ConsoleColor.White
+                            || bgColor == ConsoleColor.Gray
+                            || bgColor == ConsoleColor.Yellow
+                            || bgColor == ConsoleColor.DarkYellow
+                            || bgColor == ConsoleColor.DarkCyan
+                        )
+                        {
+                            var warnMapping = new ManagedColoredConsoleAppender.LevelColors
+                            {
+                                Level = Level.Warn,
+                                BackColor = ConsoleColor.Black,
+                                ForeColor = ConsoleColor.Yellow,
+                            };
+                            appender.AddMapping(warnMapping);
+                        }
+
+                        // make sure errors can be clearly seen
+                        if (bgColor == ConsoleColor.Red
+                            || bgColor == ConsoleColor.DarkRed
+                            || bgColor == ConsoleColor.Yellow
+                            || bgColor == ConsoleColor.DarkYellow
+                            || bgColor == ConsoleColor.DarkCyan
+                            || bgColor == ConsoleColor.DarkGray
+                            || bgColor == ConsoleColor.DarkGreen
+                            || bgColor == ConsoleColor.Blue
+                        )
+                        {
+                            var errorMapping = new ManagedColoredConsoleAppender.LevelColors
+                            {
+                                Level = Level.Error,
+                                BackColor = ConsoleColor.Black,
+                                ForeColor = ConsoleColor.Red,
+                            };
+                            appender.AddMapping(errorMapping);
+                        }
+
+                        appender.ActivateOptions();
+                    }
+                }
+
+                foreach (var append in logRepository.GetAppenders().Where(a => a.Name.is_equal_to(IMPORTANT_LOGGING_COLORED_APPENDER)).or_empty_list_if_null())
+                {
+                    var appender = append as ManagedColoredConsoleAppender;
+                    if (appender != null)
+                    {
+                        // add black based on current background color
+                        if (bgColor == ConsoleColor.White
+                            || bgColor == ConsoleColor.Gray
+                            || bgColor == ConsoleColor.Yellow
+                            || bgColor == ConsoleColor.DarkYellow
+                            || bgColor == ConsoleColor.DarkCyan
+                            || bgColor == ConsoleColor.DarkGray
+                            || bgColor == ConsoleColor.DarkGreen
+                            || bgColor == ConsoleColor.Green
+                            || bgColor == ConsoleColor.Cyan
+                            || bgColor == ConsoleColor.Magenta
+                        )
+                        {
+                            var infoMapping = new ManagedColoredConsoleAppender.LevelColors
+                            {
+                                Level = Level.Info,
+                                BackColor = ConsoleColor.Black,
+                                ForeColor = ConsoleColor.Green,
+                            };
+                            appender.AddMapping(infoMapping);
+
+                            var warnMapping = new ManagedColoredConsoleAppender.LevelColors
+                            {
+                                Level = Level.Warn,
+                                BackColor = ConsoleColor.Black,
+                                ForeColor = ConsoleColor.Magenta,
+                            };
+                            appender.AddMapping(warnMapping);
+
+                            appender.ActivateOptions();
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // ignore this and move on
             }
         }
 
