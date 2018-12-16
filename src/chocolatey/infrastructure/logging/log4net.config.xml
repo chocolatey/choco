@@ -17,7 +17,6 @@
     <mapping>
       <level value="WARN" />
       <foreColor value="Yellow" />
-      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="INFO" />
@@ -52,7 +51,6 @@
     <mapping>
       <level value="WARN" />
       <foreColor value="Magenta" />
-      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="INFO" />

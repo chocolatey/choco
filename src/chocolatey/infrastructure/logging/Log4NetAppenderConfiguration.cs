@@ -114,6 +114,23 @@ namespace chocolatey.infrastructure.logging
                             ForeColor = fgColor,
                         };
                         appender.AddMapping(infoMapping);
+
+                        // make sure warnings can be clearly seen
+                        if (bgColor == ConsoleColor.White
+                            || bgColor == ConsoleColor.Gray
+                            || bgColor == ConsoleColor.Yellow
+                            || bgColor == ConsoleColor.DarkYellow
+                            || bgColor == ConsoleColor.DarkCyan
+                        )
+                        {
+                            var warnMapping = new ManagedColoredConsoleAppender.LevelColors
+                            {
+                                Level = Level.Warn,
+                                BackColor = ConsoleColor.Black,
+                                ForeColor = ConsoleColor.Yellow,
+                            };
+                            appender.AddMapping(warnMapping);
+                        }
                         appender.ActivateOptions();
                     }
                 }
@@ -143,6 +160,14 @@ namespace chocolatey.infrastructure.logging
                                 ForeColor = ConsoleColor.Green,
                             };
                             appender.AddMapping(infoMapping);
+
+                            var warnMapping = new ManagedColoredConsoleAppender.LevelColors
+                            {
+                                Level = Level.Warn,
+                                BackColor = ConsoleColor.Black,
+                                ForeColor = ConsoleColor.Magenta,
+                            };
+                            appender.AddMapping(warnMapping);
 
                             appender.ActivateOptions();
                         }
