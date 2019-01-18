@@ -161,7 +161,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
-            if (string.IsNullOrWhiteSpace(config.Sources))
+            if (string.IsNullOrWhiteSpace(config.Sources) && !config.ListCommand.LocalOnly)
             {
                 this.Log().Error(ChocolateyLoggers.Important, @"Unable to search for packages when there are no sources enabled for
  packages and none were passed as arguments.");
