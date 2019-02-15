@@ -71,6 +71,9 @@ likely your script folder. If unzipping to your package folder, the path
 will be like
 `"$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\\file.exe"`
 
+.PARAMETER SpecificFolder
+OPTIONAL - This is a specific directory within zip file to extract.
+
 .PARAMETER Checksum
 The checksum hash value of the Url resource. This allows a checksum to
 be validated for files that are not local. The checksum type is covered
