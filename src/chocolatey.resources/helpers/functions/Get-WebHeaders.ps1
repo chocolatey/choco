@@ -43,6 +43,9 @@ command line'.
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
+.PARAMETER Options
+Specify request headers. Please note that UserAgent function parameter, if specified, overwrite header present in this parameter.
+
 .LINK
 Get-ChocolateyWebFile
 
@@ -54,8 +57,9 @@ Get-WebFile
 #>
 param(
   [parameter(Mandatory=$false, Position=0)][string] $url = '',
-  [parameter(Mandatory=$false, Position=1)][string] $userAgent = 'chocolatey command line',
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+  [parameter(Mandatory=$false, Position=1)][string] $userAgent,
+  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments,
+  [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}}
 )
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
@@ -127,7 +131,25 @@ param(
 
   #http://stackoverflow.com/questions/518181/too-many-automatic-redirections-were-attempted-error-message-when-using-a-httpw
   $request.CookieContainer = New-Object System.Net.CookieContainer
-  if ($userAgent -ne $null) {
+
+  #Mimic previous behaviour with default User-Agent
+  $request.UserAgent = 'chocolatey command line'
+
+  if ($Options.Headers) {
+    $Options.Headers.Keys | % {
+      if ([System.Net.WebHeaderCollection]::IsRestricted($_)) {
+       $key = $_.Replace('-','')
+       $request.$key = $Options.Headers[$_]
+      }
+      else {
+       $request.Headers.add($_, $Options.Headers[$_])
+      }
+    }
+  }
+
+  #User-Agent, if specified explicitly as function parameter, should overwrite header from Headers hashtable
+  #`$userAgent` is typed parameter, when it's not passed value is '' (empty string)
+  if ($userAgent -ne '') {
     Write-Debug "Setting the UserAgent to `'$userAgent`'"
     $request.UserAgent = $userAgent
   }

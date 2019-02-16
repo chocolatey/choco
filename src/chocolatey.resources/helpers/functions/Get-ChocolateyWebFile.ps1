@@ -269,7 +269,7 @@ param(
   if ($url.StartsWith('http:')) {
     try {
       $httpsUrl = $url.Replace("http://", "https://")
-      Get-WebHeaders -Url $httpsUrl -ErrorAction "Stop" | Out-Null
+      Get-WebHeaders -Url $httpsUrl -ErrorAction "Stop" -Options $options | Out-Null
       $url = $httpsUrl
       Write-Warning "Url has SSL/TLS available, switching to HTTPS for download"
     } catch {
@@ -303,7 +303,7 @@ param(
   $headers = @{}
   if ($url.StartsWith('http')) {
     try {
-      $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
+      $headers = Get-WebHeaders -Url $url -ErrorAction "Stop" -Options $options
     } catch {
       if ($PSVersionTable.PSVersion -lt (New-Object 'Version' 3,0)) {
         Write-Debug "Converting Security Protocol to SSL3 only for Powershell v2"
@@ -311,7 +311,7 @@ param(
         $originalProtocol = [System.Net.ServicePointManager]::SecurityProtocol
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Ssl3
         try {
-          $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
+          $headers = Get-WebHeaders -Url $url -ErrorAction "Stop" -Options $options
         } catch {
           Write-Host "Attempt to get headers for $url failed.`n  $($_.Exception.Message)"
           [System.Net.ServicePointManager]::SecurityProtocol = $originalProtocol
