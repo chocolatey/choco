@@ -17,7 +17,6 @@
 namespace chocolatey.infrastructure.licensing
 {
     using System;
-    using adapters;
     using app;
     using information;
     using logging;
@@ -33,7 +32,8 @@ namespace chocolatey.infrastructure.licensing
             {
                 try
                 {
-                    var licensedAssembly = Assembly.LoadFile(ApplicationParameters.LicensedAssemblyLocation);
+                    var licensedAssembly = AssemblyResolution.resolve_or_load_assembly(ApplicationParameters.LicensedChocolateyAssemblySimpleName, ApplicationParameters.OfficialChocolateyPublicKey, ApplicationParameters.LicensedAssemblyLocation);
+                    if (licensedAssembly == null) throw new ApplicationException("Unable to load licensed assembly.");
                     license.AssemblyLoaded = true;
                     license.Assembly = licensedAssembly;
                     license.Version = VersionInformation.get_current_informational_version(licensedAssembly);

@@ -62,8 +62,11 @@ namespace chocolatey
             _handler = (sender, args) =>
             {
                 var requestedAssembly = new AssemblyName(args.Name);
+
+                // There are things that are ILMerged into Chocolatey. Anything with 
+                // the right public key except licensed should use the choco/chocolatey assembly
                 if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
-                    && !requestedAssembly.Name.is_equal_to("chocolatey.licensed")
+                    && !requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName)
                     && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
                 {
                     return typeof(Lets).Assembly;
@@ -72,9 +75,12 @@ namespace chocolatey
                 try
                 {
                     if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
-                        && requestedAssembly.Name.is_equal_to("chocolatey.licensed"))
+                        && requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName))
                     {
-                        return Assembly.LoadFile(ApplicationParameters.LicensedAssemblyLocation).UnderlyingType;
+                        return AssemblyResolution.resolve_or_load_assembly(
+                            ApplicationParameters.LicensedChocolateyAssemblySimpleName,
+                            ApplicationParameters.OfficialChocolateyPublicKey,
+                            ApplicationParameters.LicensedAssemblyLocation).UnderlyingType;
                     }
                 }
                 catch (Exception ex)
