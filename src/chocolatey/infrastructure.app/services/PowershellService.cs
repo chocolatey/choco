@@ -267,7 +267,7 @@ namespace chocolatey.infrastructure.app.services
                     catch (Exception ex)
                     {
                         this.Log().Error(ex.Message.escape_curly_braces());
-                        result.ExitCode = -1;
+                        result.ExitCode = 1;
                     }
 
                     if (configuration.Features.UsePowerShellHost)

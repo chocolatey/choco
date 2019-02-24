@@ -53,6 +53,7 @@ namespace chocolatey.infrastructure.app
               System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)
             : CommonAppDataChocolatey;
         public static readonly string UserLicenseFileLocation = _fileSystem.combine_paths(UserProfilePath, "chocolatey.license.xml");
+        public static readonly string LicensedChocolateyAssemblySimpleName = "chocolatey.licensed";
         public static readonly string LicensedComponentRegistry = @"chocolatey.licensed.infrastructure.app.registration.ContainerBinding";
         public static readonly string LicensedConfigurationBuilder = @"chocolatey.licensed.infrastructure.app.builders.ConfigurationBuilder";
         public static readonly string LicensedEnvironmentSettings = @"chocolatey.licensed.infrastructure.app.configuration.EnvironmentSettings";

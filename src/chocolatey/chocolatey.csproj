@@ -124,10 +124,12 @@
     <Compile Include="infrastructure.app\utility\ArgumentsUtility.cs" />
     <Compile Include="infrastructure.app\utility\HashCode.cs" />
     <Compile Include="infrastructure.app\utility\PackageUtility.cs" />
+    <Compile Include="infrastructure\filesystem\FileSystem.cs" />
     <Compile Include="infrastructure\logging\AggregateLog.cs" />
     <Compile Include="infrastructure\logging\LogLevelType.cs" />
     <Compile Include="infrastructure\logging\LogMessage.cs" />
     <Compile Include="infrastructure\logging\LogSinkLog.cs" />
+    <Compile Include="infrastructure\registration\AssemblyResolution.cs" />
     <Compile Include="infrastructure\synchronization\GlobalMutex.cs" />
     <Compile Include="infrastructure\logging\TraceLog.cs" />
     <Compile Include="infrastructure\registration\SecurityProtocol.cs" />
