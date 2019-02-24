@@ -30,11 +30,13 @@ namespace chocolatey
     using infrastructure.logging;
     using infrastructure.registration;
     using infrastructure.synchronization;
+    using log4net;
 #if !NoResources
     using resources;
 #endif
     using Assembly = infrastructure.adapters.Assembly;
     using IFileSystem = infrastructure.filesystem.IFileSystem;
+    using ILog = infrastructure.logging.ILog;
 
     // ReSharper disable InconsistentNaming
 
@@ -43,6 +45,8 @@ namespace chocolatey
     /// </summary>
     public static class Lets
     {
+        private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof(Lets));
+
         private static GetChocolatey set_up()
         {
             add_assembly_resolver();
@@ -76,6 +80,7 @@ namespace chocolatey
                     if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
                         && requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName))
                     {
+                        _logger.Debug("Resolving reference to chocolatey.licensed...");
                         return AssemblyResolution.resolve_or_load_assembly(
                             ApplicationParameters.LicensedChocolateyAssemblySimpleName,
                             ApplicationParameters.OfficialChocolateyPublicKey,
