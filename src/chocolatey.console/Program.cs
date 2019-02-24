@@ -182,7 +182,6 @@ namespace chocolatey.console
         }
 
         private static ResolveEventHandler _handler = null;
-
         private static void add_assembly_resolver()
         {
             _handler = (sender, args) =>

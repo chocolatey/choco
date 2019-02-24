@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2019 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,7 +56,6 @@ namespace chocolatey
         }
 
         private static ResolveEventHandler _handler = null;
-
         private static void add_assembly_resolver()
         {
             _handler = (sender, args) =>
