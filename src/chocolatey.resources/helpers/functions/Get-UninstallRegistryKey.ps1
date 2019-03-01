@@ -134,13 +134,13 @@ param(
 
     $keyPaths = $keys | Select-Object -ExpandProperty PSPath
     try {
-      [array]$foundKey = Get-ItemProperty -Path $keyPaths -ErrorAction Stop | ? { $_.DisplayName -like $softwareName }
+      [array]$foundKey = Get-ItemProperty -LiteralPath $keyPaths -ErrorAction Stop | ? { $_.DisplayName -like $softwareName }
       $success = $true
     } catch {
       Write-Debug "Found bad key."
       foreach ($key in $keys){
         try {
-          Get-ItemProperty $key.PsPath > $null
+          Get-ItemProperty -LiteralPath $key.PsPath > $null
         } catch {
           $badKey = $key.PsPath
         }
