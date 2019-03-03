@@ -634,6 +634,16 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                         continue;
                     }
 
+                    if (config.Features.SkipPackageUpgradesWhenNotInstalled)
+                    {
+                        string warnLogMessage = "{0} is not installed and skip non-installed option selected. Skipping...".format_with(packageName);
+                        var result = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                        result.Messages.Add(new ResultMessage(ResultType.Warn, warnLogMessage));
+                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, warnLogMessage);
+
+                        continue;
+                    }
+
                     string logMessage = @"{0} is not installed. Installing...".format_with(packageName);
 
                     if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);

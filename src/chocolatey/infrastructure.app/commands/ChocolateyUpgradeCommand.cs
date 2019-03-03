@@ -165,7 +165,20 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
                      "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
+                     ) 
+                 .Add("skip-if-not-installed|only-upgrade-installed|skip-when-not-installed",
+                     "Skip Packages Not Installed - if a package is not installed, do not install it during the upgrade process. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with(ApplicationParameters.Features.SkipPackageUpgradesWhenNotInstalled, configuration.Features.SkipPackageUpgradesWhenNotInstalled.to_string()),
+                     option => configuration.Features.SkipPackageUpgradesWhenNotInstalled = option != null
                      )
+                 .Add("install-if-not-installed",
+                     "Install Missing Packages When Not Installed - if a package is not installed, install it as part of running upgrade (typically default behavior). Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with(ApplicationParameters.Features.SkipPackageUpgradesWhenNotInstalled, configuration.Features.SkipPackageUpgradesWhenNotInstalled.to_string()),
+                     option =>
+                     {
+                        if (option != null)
+                        {
+                            configuration.Features.SkipPackageUpgradesWhenNotInstalled = false;
+                        }
+                     })
                  .Add("exclude-pre|exclude-prerelease|exclude-prereleases",
                      "Exclude Prerelease - Should prerelease be ignored for upgrades? Will be ignored if you pass `--pre`. Available in 0.10.4+.",
                      option => configuration.UpgradeCommand.ExcludePrerelease = option != null
