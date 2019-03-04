@@ -45,7 +45,7 @@ namespace chocolatey.infrastructure.app.commands
 
             optionSet
                 .Add("n=|name=",
-                     "Name - the name of the source. Required with some actions. Defaults to empty.",
+                     "Name - the name of the source. Required with actions other than list. Defaults to empty.",
                      option => configuration.FeatureCommand.Name = option.remove_surrounding_quotes())
                 ;
         }
