@@ -279,8 +279,24 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_throw_when_command_is_not_list_and_name_is_not_set()
             {
-                configuration.SourceCommand.Command = SourceCommandType.add;
                 configuration.SourceCommand.Name = "";
+                const string expectedMessage = "When specifying the subcommand '{0}', you must also specify --name.";
+                verify_exception_thrown_on_command(expectedMessage);
+            }
+
+            [Fact]
+            public void should_throw_when_command_is_add_and_source_is_not_set()
+            {
+                configuration.SourceCommand.Name = "irrelevant";
+                configuration.Sources = string.Empty;
+                const string expectedMessage = "When specifying the subcommand '{0}', you must also specify --source.";
+                verify_exception_thrown_on_command(expectedMessage);
+            }
+
+            private void verify_exception_thrown_on_command(string expectedMessage)
+            {
+                configuration.SourceCommand.Command = SourceCommandType.add;
+
                 var errorred = false;
                 Exception error = null;
 
@@ -297,7 +313,8 @@ namespace chocolatey.tests.infrastructure.app.commands
                 errorred.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldEqual("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.SourceCommand.Command.to_string()));
+                var commandName = configuration.SourceCommand.Command.to_string();
+                error.Message.ShouldEqual(expectedMessage.format_with(commandName));
             }
 
             [Fact]
