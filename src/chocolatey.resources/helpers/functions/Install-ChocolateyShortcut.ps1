@@ -1,4 +1,4 @@
-# Copyright © 2017 Chocolatey Software, Inc.
+﻿# Copyright © 2017 Chocolatey Software, Inc.
 # Copyright © 2015 - 2017 RealDimensions Software, LLC
 # Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
@@ -57,7 +57,7 @@ shortcut.
 OPTIONAL - A text description to be associated with the new description.
 
 .PARAMETER WindowStyle
-OPTIONAL - Type of windows target application should open with. 
+OPTIONAL - Type of windows target application should open with.
 Available in 0.9.10+.
 0 = Hidden, 1 = Normal Size, 3 = Maximized, 7 - Minimized.
 Full list table 3.9 here: https://technet.microsoft.com/en-us/library/ee156605.aspx
