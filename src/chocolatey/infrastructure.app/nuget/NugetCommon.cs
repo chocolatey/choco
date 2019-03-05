@@ -160,8 +160,7 @@ namespace chocolatey.infrastructure.app.nuget
                 configuration.Sources = updatedSources.Remove(updatedSources.Length - 1, 1).to_string();
             }
 
-            //todo well that didn't work on failing repos... grrr
-            var repository = new AggregateRepository(repositories)
+            var repository = new AggregateRepository(repositories, ignoreFailingRepositories: true)
             {
                 IgnoreFailingRepositories = true,
                 Logger = nugetLogger,
