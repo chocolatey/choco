@@ -562,6 +562,8 @@ Did you know Pro / Business automatically syncs with Programs and
 
             foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, packageInstalls).or_empty_list_if_null())
             {
+                upgrade_outdated_packages_and_remove_from_config(packageConfig);
+
                 Action<PackageResult> action = null;
                 if (packageConfig.SourceType == SourceType.normal)
                 {
@@ -1357,6 +1359,43 @@ ATTENTION: You must take manual action to remove {1} from
                     }
                 }
             }
+        }
+
+        private void upgrade_outdated_packages_and_remove_from_config(ChocolateyConfiguration config)
+        {
+            if (string.IsNullOrEmpty(config.Version)) return;
+
+            var notifyOnlyUpgrade = config.UpgradeCommand.NotifyOnlyAvailableUpgrades;
+            config.UpgradeCommand.NotifyOnlyAvailableUpgrades = true;
+            var output = config.RegularOutput;
+            config.RegularOutput = false;
+            var outdatedPackages = _nugetService.upgrade_noop(config, null);
+            config.RegularOutput = output;
+            config.UpgradeCommand.NotifyOnlyAvailableUpgrades = notifyOnlyUpgrade;
+
+            var configVersion = new SemanticVersion(config.Version);
+            var packageIdsToUpdate = outdatedPackages
+                   .Where(p => p.Value.Package != null && p.Value.Success && !p.Value.Inconclusive
+                                                           && configVersion >= p.Value.Package.Version
+                                                           && !_packageInfoService.get_package_information(p.Value.Package).IsSideBySide)
+                   .Select(p => p.Value.Package.Id).ToArray();
+
+            if (packageIdsToUpdate.Length == 0) return;
+
+            // Remove the package names that are going to be upgraded from original config
+            var optionalPacakgeSeparator = ApplicationParameters.PackageNamesSeparator + "?";
+            config.PackageNames = System.Text.RegularExpressions.Regex.Replace(
+                    config.PackageNames,
+                    "(" + string.Join(optionalPacakgeSeparator + "|", packageIdsToUpdate) + optionalPacakgeSeparator + ")",
+                    "");
+
+            var updateConfig = config.deep_copy();
+            updateConfig.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator, packageIdsToUpdate);
+
+            this.Log().Warn("{0}{1} already installed. Performing upgrade instead.{0}"
+                .format_with(Environment.NewLine, updateConfig.PackageNames.Replace(ApplicationParameters.PackageNamesSeparator, ", ")));
+
+            upgrade_run(updateConfig);
         }
     }
 }
