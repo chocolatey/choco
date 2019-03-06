@@ -330,6 +330,24 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
+        public void remove_api_key(ChocolateyConfiguration configuration)
+        {
+            var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Sources));
+            if (apiKey != null)
+            {
+                configFileSettings.ApiKeys.RemoveWhere(x => x.Source.is_equal_to(configuration.Sources));
+
+                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+
+                this.Log().Info(() => "Removed ApiKey for {0}".format_with(configuration.Sources));
+            }
+            else
+            {
+                this.Log().Info(() => "ApiKey was not found for {0}".format_with(configuration.Sources));
+            }
+
+        }
+
         public void config_list(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Settings");
