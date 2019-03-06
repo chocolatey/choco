@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,11 +39,11 @@ namespace chocolatey.infrastructure.app.runners
             else
             {
                 this.Log().Debug(() => "Command line: {0}".format_with(commandLine));
-                this.Log().Debug(() => "Received arguments: {0}".format_with(string.Join(" ", args)));    
+                this.Log().Debug(() => "Received arguments: {0}".format_with(string.Join(" ", args)));
             }
-            
+
             IList<string> commandArgs = new List<string>();
-            //shift the first arg off 
+            //shift the first arg off
             int count = 0;
             foreach (var arg in args)
             {
@@ -55,7 +55,7 @@ namespace chocolatey.infrastructure.app.runners
 
                 commandArgs.Add(arg);
             }
-            
+
             var runner = new GenericRunner();
             runner.run(config, container, isConsole: true, parseArgs: command =>
                 {
@@ -64,7 +64,7 @@ namespace chocolatey.infrastructure.app.runners
                         config,
                         (optionSet) => command.configure_argument_parser(optionSet, config),
                         (unparsedArgs) => {
-                            // if debug is bundled with local options, it may not get picked up when global 
+                            // if debug is bundled with local options, it may not get picked up when global
                             // options are parsed. Attempt to set it again once local options are set.
                             // This does mean some output from debug will be missed (but not much)
                             if (config.Debug) Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug, "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()), "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Trace.to_string()));
@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.app.runners
 
                             if (!config.Features.IgnoreInvalidOptionsSwitches)
                             {
-                                // all options / switches should be parsed, 
+                                // all options / switches should be parsed,
                                 //  so show help menu if there are any left
                                 foreach (var unparsedArg in unparsedArgs.or_empty_list_if_null())
                                 {
