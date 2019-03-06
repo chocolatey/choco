@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -150,7 +150,7 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("usepackagecodes|usepackageexitcodes|use-package-codes|use-package-exit-codes",
                      "UsePackageExitCodes - Package scripts can provide exit codes. Use those for choco's exit code when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010.  Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
                      option => configuration.Features.UsePackageExitCodes = option != null
-                     ) 
+                     )
                  .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
                      "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
@@ -234,13 +234,13 @@ NOTE: `all` is a special package keyword that will allow you to install
 NOTE: Any package name ending with .config is considered a
  'packages.config' file. Please see https://bit.ly/packages_config
 
-NOTE: Chocolatey Pro / Business builds on top of a great open source 
- experience with quite a few features that enhance the your use of the 
+NOTE: Chocolatey Pro / Business builds on top of a great open source
+ experience with quite a few features that enhance the your use of the
  community package repository (when using Pro), and really enhance the
  Chocolatey experience all around. If you are an organization looking
  for a better ROI, look no further than Business - automatic package
  creation from installer files, automatic recompile support, runtime
- malware protection, private CDN download cache, synchronize with 
+ malware protection, private CDN download cache, synchronize with
  Programs and Features, etc - https://chocolatey.org/compare.
 
 ");

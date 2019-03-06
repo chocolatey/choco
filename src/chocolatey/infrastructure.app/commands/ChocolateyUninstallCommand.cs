@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -113,7 +113,7 @@ namespace chocolatey.infrastructure.app.commands
                          {
                              configuration.Features.FailOnAutoUninstaller = false;
                          }
-                     }) 
+                     })
                  .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
                      "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
@@ -177,14 +177,14 @@ NOTE: Starting in 0.9.10+, the Automatic Uninstaller (AutoUninstaller)
 
     choco feature disable -n autoUninstaller
 
-NOTE: Chocolatey Pro / Business automatically synchronizes with 
- Programs and Features, ensuring manually removed apps are 
+NOTE: Chocolatey Pro / Business automatically synchronizes with
+ Programs and Features, ensuring manually removed apps are
  automatically removed from Chocolatey's repository.
 
-NOTE: Synchronizer and AutoUninstaller enhancements in licensed 
- versions of Chocolatey ensure that Autouninstaller is up to 95% 
- effective at removing software without an uninstall script. This is 
- because synchronizer ensures the registry snapshot stays up to date 
+NOTE: Synchronizer and AutoUninstaller enhancements in licensed
+ versions of Chocolatey ensure that Autouninstaller is up to 95%
+ effective at removing software without an uninstall script. This is
+ because synchronizer ensures the registry snapshot stays up to date
  and licensed enhancements have the ability to inspect more locations
  to determine how to automatically uninstall software.
 ");
