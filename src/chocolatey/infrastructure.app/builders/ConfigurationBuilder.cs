@@ -473,9 +473,6 @@ You can pass options and switches in the following ways:
    (`` `""value`"" ``) or apostrophes (`'value'`). Using the combination
    allows for both shells to work without issue, except for when the next
    section applies.
- * **Periods in PowerShell**: If you need to pass a period as part of a 
-   value or a path, PowerShell doesn't always handle it well. Please 
-   quote those values using ""Quote Values"" section above.
  * **Pass quotes in arguments**: When you need to pass quoted values to
    to something like a native installer, you are in for a world of fun. In
    cmd.exe you must pass it like this: `-ia ""/yo=""""Spaces spaces""""""`. In
@@ -483,6 +480,9 @@ You can pass options and switches in the following ways:
    No other combination will work. In PowerShell.exe if you are on version
    v3+, you can try `--%` before `-ia` to just pass the args through as is,
    which means it should not require any special workarounds.
+ * **Periods in PowerShell**: If you need to pass a period as part of a 
+   value or a path, PowerShell doesn't always handle it well. Please 
+   quote those values using ""Quote Values"" section above.
  * Options and switches apply to all items passed, so if you are
    installing multiple packages, and you use `--version=1.0.0`, choco
    is going to look for and try to install version 1.0.0 of every
