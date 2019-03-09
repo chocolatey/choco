@@ -27,9 +27,11 @@ namespace chocolatey.infrastructure.app.registration
     using infrastructure.commands;
     using infrastructure.configuration;
     using infrastructure.services;
+    using infrastructure.validations;
     using nuget;
     using services;
     using tasks;
+    using validations;
     using CryptoHashProvider = cryptography.CryptoHashProvider;
     using IFileSystem = filesystem.IFileSystem;
     using IHashProvider = cryptography.IHashProvider;
@@ -126,6 +128,18 @@ namespace chocolatey.infrastructure.app.registration
                   return list.AsReadOnly();
               },
               Lifestyle.Singleton);
+
+            container.Register<IEnumerable<IValidation>>(
+                () =>
+                {
+                    var list = new List<IValidation>
+                    {
+                        new GlobalConfigurationValidation(),
+                    };
+
+                    return list.AsReadOnly();
+                },
+                Lifestyle.Singleton);
         }
     }
 

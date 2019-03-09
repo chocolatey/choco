@@ -102,6 +102,7 @@
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInfoCommand.cs" />
+    <Compile Include="infrastructure.app\validations\GlobalConfigurationValidation.cs" />
     <Compile Include="infrastructure.app\configuration\EnvironmentSettings.cs" />
     <Compile Include="infrastructure.app\domain\GenericRegistryKey.cs" />
     <Compile Include="infrastructure.app\domain\GenericRegistryValue.cs" />
@@ -317,6 +318,9 @@
     <Compile Include="infrastructure\tokens\TokenReplacer.cs" />
     <Compile Include="ILogExtensions.cs" />
     <Compile Include="infrastructure\tolerance\FaultTolerance.cs" />
+    <Compile Include="infrastructure\validations\IValidation.cs" />
+    <Compile Include="infrastructure\validations\ValidationResult.cs" />
+    <Compile Include="infrastructure\validations\ValidationStatus.cs" />
     <Compile Include="infrastructure\xml\XmlCData.cs" />
     <Compile Include="LogExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
