@@ -63,6 +63,7 @@ namespace chocolatey.infrastructure.app.registration
             container.Register<IChocolateyPackageInformationService, ChocolateyPackageInformationService>(Lifestyle.Singleton);
             container.Register<IShimGenerationService, ShimGenerationService>(Lifestyle.Singleton);
             container.Register<IRegistryService, RegistryService>(Lifestyle.Singleton);
+            container.Register<IPendingRebootService, PendingRebootService>(Lifestyle.Singleton);
             container.Register<IFilesService, FilesService>(Lifestyle.Singleton);
             container.Register<IConfigTransformService, ConfigTransformService>(Lifestyle.Singleton);
             container.Register<IHashProvider>(() => new CryptoHashProvider(container.GetInstance<IFileSystem>()), Lifestyle.Singleton);
@@ -135,6 +136,7 @@ namespace chocolatey.infrastructure.app.registration
                     var list = new List<IValidation>
                     {
                         new GlobalConfigurationValidation(),
+                        new SystemStateValidation(container.GetInstance<IPendingRebootService>())
                     };
 
                     return list.AsReadOnly();
