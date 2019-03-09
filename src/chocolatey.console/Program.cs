@@ -158,7 +158,7 @@ namespace chocolatey.console
                     "chocolatey".Log().Error(ChocolateyLoggers.Important, () => "{0}".format_with(ex.Message));
                 }
 
-                Environment.ExitCode = 1;
+                if (Environment.ExitCode == 0) Environment.ExitCode = 1;
             }
             finally
             {

@@ -1,6 +1,6 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 //
@@ -127,6 +127,12 @@ namespace chocolatey.infrastructure.app
         /// </summary>
         public static readonly bool AllowPrompts = true;
 
+        public static class ExitCodes
+        {
+            public static readonly int ErrorFailNoActionReboot = 350;
+            public static readonly int ErrorInstallSuspend = 1604;
+        }
+
         public static class Tools
         {
             //public static readonly string WebPiCmdExe = _fileSystem.combine_paths(InstallLocation, "nuget.exe");
@@ -171,6 +177,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string SkipPackageUpgradesWhenNotInstalled = "skipPackageUpgradesWhenNotInstalled";
             public static readonly string RemovePackageInformationOnUninstall = "removePackageInformationOnUninstall";
             public static readonly string LogWithoutColor = "logWithoutColor";
+            public static readonly string ExitOnRebootDetected = "exitOnRebootDetected";
         }
 
         public static class Messages
