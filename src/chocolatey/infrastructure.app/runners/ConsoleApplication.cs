@@ -18,10 +18,13 @@ namespace chocolatey.infrastructure.app.runners
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using SimpleInjector;
     using configuration;
+    using infrastructure.validations;
     using logging;
     using utility;
+    using validations;
 
     /// <summary>
     ///   Console application responsible for running chocolatey
@@ -85,9 +88,67 @@ namespace chocolatey.infrastructure.app.runners
                                 }
                             }
                         },
-                        () => command.handle_validation(config),
+                        () => {
+                            command.handle_validation(config);
+
+                            var validationResults = new List<ValidationResult>();
+                            var validationChecks = container.GetAllInstances<IValidation>();
+
+                            foreach (var validationCheck in validationChecks)
+                            {
+                                validationResults.AddRange(validationCheck.validate(config));
+                            }
+
+                            var validationErrors = report_validation_summary(validationResults, config);
+
+                            if (validationErrors != 0)
+                            {
+                                // NOTE: This is intentionally left blank, as the reason for throwing is
+                                // documented in the report_validation_summary above, and a duplication
+                                // is not required in the exception.
+                                throw new ApplicationException("");
+                            }
+                        },
                         () => command.help_message(config));
                 });
+        }
+
+        private int report_validation_summary(IList<ValidationResult> validationResults, ChocolateyConfiguration config)
+        {
+            var successes = validationResults.Count(v => v.Status == ValidationStatus.Success);
+            var warnings = validationResults.Count(v => v.Status == ValidationStatus.Warning);
+            var errors = validationResults.Count(v => v.Status == ValidationStatus.Error);
+
+            if (config.RegularOutput)
+            {
+                this.Log().Info(errors + warnings == 0 ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, () => "{0} validations performed. {1} success(es), {2} warning(s), and {3} error(s).".format_with(
+                    validationResults.Count,
+                    successes,
+                    warnings,
+                    errors));
+
+                if (warnings != 0)
+                {
+                    this.Log().Info("");
+                    this.Log().Warn("Validation Warnings:");
+                    foreach (var warning in validationResults.Where(p => p.Status == ValidationStatus.Warning).or_empty_list_if_null())
+                    {
+                        this.Log().Warn(" - {0}".format_with(warning.Message));
+                    }
+                }
+            }
+
+            if (errors != 0)
+            {
+                this.Log().Info("");
+                this.Log().Error("Validation Errors:");
+                foreach (var error in validationResults.Where(p => p.Status == ValidationStatus.Error).or_empty_list_if_null())
+                {
+                    this.Log().Error(" - {0}".format_with(error.Message));
+                }
+            }
+
+            return errors;
         }
     }
 }
