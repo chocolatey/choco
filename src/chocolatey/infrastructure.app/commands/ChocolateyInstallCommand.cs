@@ -251,7 +251,11 @@ NOTE: Chocolatey Pro / Business builds on top of a great open source
     choco install notepadplusplus googlechrome atom 7zip
     choco install notepadplusplus --force --force-dependencies
     choco install notepadplusplus googlechrome atom 7zip -dvfy
-    choco install git --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'"" -y
+    choco install git -y --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'""
+    choco install git -y --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'"" --install-args=""'/DIR=C:\git'""
+    # Params are package parameters, passed to the package
+    # Install args are installer arguments, appended to the silentArgs 
+    #  in the package for the installer itself
     choco install nodejs.install --version 0.10.35
     choco install git -s ""'https://somewhere/out/there'""
     choco install git -s ""'https://somewhere/protected'"" -u user -p pass
