@@ -38,6 +38,7 @@ namespace chocolatey.infrastructure.app.validations
 
         public ICollection<ValidationResult> validate(ChocolateyConfiguration config)
         {
+            this.Log().Debug("System State Validation Checks:");
             var validationResults = new List<ValidationResult>();
 
             check_system_pending_reboot(config, validationResults);

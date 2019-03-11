@@ -18,6 +18,8 @@ namespace chocolatey.infrastructure.validations
 {
     public enum ValidationStatus
     {
+        Unknown,
+        Checked,
         Success,
         Error,
         Warning

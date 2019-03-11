@@ -30,6 +30,7 @@ namespace chocolatey.infrastructure.app.validations
     {
         public ICollection<ValidationResult> validate(ChocolateyConfiguration config)
         {
+            this.Log().Debug("Global Configuration Validation Checks:");
             var validationResults = new List<ValidationResult>();
 
             check_usage_of_package_exit_code(config, validationResults);
@@ -49,6 +50,7 @@ namespace chocolatey.infrastructure.app.validations
 
         private void check_usage_of_package_exit_code(ChocolateyConfiguration config, ICollection<ValidationResult> validationResults)
         {
+            var validationStatusResult = ValidationStatus.Checked;
             // In order for a Chocolatey execution to correctly halt
             // on a detected reboot, it is necessary for package exit
             // codes to be used.  Otherwise, the codes (1641, and 3010)
@@ -74,8 +76,11 @@ namespace chocolatey.infrastructure.app.validations
                     validationResult.Status = ValidationStatus.Warning;
                 }
 
+                validationStatusResult = validationResult.Status;
                 validationResults.Add(validationResult);
             }
+
+            this.Log().Debug(" - Package Exit Code / Exit On Reboot = {0}".format_with(validationStatusResult.to_string()));
         }
     }
 }

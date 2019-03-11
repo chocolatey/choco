@@ -89,6 +89,7 @@ namespace chocolatey.infrastructure.app.runners
                             }
                         },
                         () => {
+                            this.Log().Debug(() => "Performing validation checks.");
                             command.handle_validation(config);
 
                             var validationResults = new List<ValidationResult>();

@@ -46,8 +46,9 @@ namespace chocolatey.infrastructure.app.services
                 return false;
             }
 
-            this.Log().Debug("Performing reboot requirement checks...");
+            this.Log().Debug(" Reboot Requirement Checks:");
 
+            // note this is short-circuited, if one trips, it won't continue the checks
             return is_pending_computer_rename() ||
                    is_pending_component_based_servicing() ||
                    is_pending_windows_auto_update() ||
@@ -66,7 +67,7 @@ namespace chocolatey.infrastructure.app.services
                           !string.IsNullOrWhiteSpace(pendingName) &&
                           activeName != pendingName;
 
-            this.Log().Debug("PendingComputerRename: {0}".format_with(result));
+            this.Log().Debug(" - Pending Computer Rename = {0}".format_with(result ? "Flagged" : "Checked"));
 
             return result;
         }
@@ -75,7 +76,7 @@ namespace chocolatey.infrastructure.app.services
         {
             if (!is_vista_sp1_or_later())
             {
-                this.Log().Debug("Not using Windows Vista SP1 or earlier, so no check for Component Based Servicing can be made.");
+                this.Log().Trace("Not using Windows Vista SP1 or earlier, so no check for Component Based Servicing can be made.");
                 return false;
             }
 
@@ -83,7 +84,7 @@ namespace chocolatey.infrastructure.app.services
             var key = _registryService.get_key(RegistryHive.LocalMachine, path);
             var result = key != null;
 
-            this.Log().Debug("PendingComponentBasedServicing: {0}".format_with(result));
+            this.Log().Debug(" - Pending Component Based Servicing = {0}".format_with(result ? "Flagged" : "Checked"));
 
             return result;
         }
@@ -94,7 +95,7 @@ namespace chocolatey.infrastructure.app.services
             var key = _registryService.get_key(RegistryHive.LocalMachine, path);
             var result = key != null;
 
-            this.Log().Debug("PendingWindowsAutoUpdate: {0}".format_with(result));
+            this.Log().Debug(" - Pending Windows Auto Update = {0}".format_with(result ? "Flagged" : "Checked"));
 
             return result;
         }
@@ -111,7 +112,7 @@ namespace chocolatey.infrastructure.app.services
                 result = (value as string[]).Length != 0;
             }
 
-            this.Log().Debug("PendingFileRenameOperations: {0}".format_with(result));
+            this.Log().Debug(" - Pending File Rename Operations = {0}".format_with(result ? "Flagged" : "Checked"));
 
             return result;
         }
@@ -125,7 +126,7 @@ namespace chocolatey.infrastructure.app.services
 
             var result = !string.IsNullOrWhiteSpace(value) && value != "0";
 
-            this.Log().Debug("PendingPackageInstaller: {0}".format_with(result));
+            this.Log().Debug(" - Pending Windows Package Installer = {0}".format_with(result ? "Flagged" : "Checked"));
 
             return result;
         }
@@ -139,7 +140,7 @@ namespace chocolatey.infrastructure.app.services
 
             var result = !string.IsNullOrWhiteSpace(value) && value != "0";
 
-            this.Log().Debug("PendingPackageInstallerSysWow64: {0}".format_with(result));
+            this.Log().Debug(" - Pending Windows Package Installer SysWow64 = {0}".format_with(result ? "Flagged" : "Checked"));
 
             return result;
         }
@@ -172,7 +173,7 @@ namespace chocolatey.infrastructure.app.services
         {
             var versionNumber = Platform.get_version();
 
-            this.Log().Debug("Operating System Version Number: {0}".format_with(versionNumber));
+            this.Log().Trace(" Operating System Version Number: {0}".format_with(versionNumber));
 
             return versionNumber.Build >= 6001;
         }
