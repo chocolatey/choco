@@ -123,12 +123,12 @@ Did you know Pro / Business automatically syncs with Programs and
             _configTransformService = configTransformService;
         }
 
-        public void ensure_source_app_installed(ChocolateyConfiguration config)
+        public virtual void ensure_source_app_installed(ChocolateyConfiguration config)
         {
             perform_source_runner_action(config, r => r.ensure_source_app_installed(config, (packageResult) => handle_package_result(packageResult, config, CommandNameType.install)));
         }
 
-        public int count_run(ChocolateyConfiguration config)
+        public virtual int count_run(ChocolateyConfiguration config)
         {
             return perform_source_runner_function(config, r => r.count_run(config));
         }
@@ -164,7 +164,7 @@ Did you know Pro / Business automatically syncs with Programs and
             randomly_notify_about_pro_business(config, PRO_BUSINESS_LIST_MESSAGE);
         }
 
-        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
+        public virtual IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
             if (string.IsNullOrWhiteSpace(config.Sources) && !config.ListCommand.LocalOnly)
             {
@@ -251,7 +251,7 @@ Did you know Pro / Business automatically syncs with Programs and
             randomly_notify_about_pro_business(config);
         }
 
-        public void pack_run(ChocolateyConfiguration config)
+        public virtual void pack_run(ChocolateyConfiguration config)
         {
             if (config.SourceType != SourceType.normal)
             {
@@ -275,7 +275,7 @@ Did you know Pro / Business automatically syncs with Programs and
             randomly_notify_about_pro_business(config);
         }
 
-        public void push_run(ChocolateyConfiguration config)
+        public virtual void push_run(ChocolateyConfiguration config)
         {
             if (config.SourceType != SourceType.normal)
             {
@@ -333,7 +333,7 @@ Did you know Pro / Business automatically syncs with Programs and
             }
         }
 
-        public void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
+        public virtual void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
         {
             EnvironmentSettings.reset_environment_variables(config);
             set_pending(packageResult, config);
@@ -558,7 +558,7 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
             return NugetEncryptionUtility.EncryptString(arguments.to_string());
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
+        public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
         {
             this.Log().Info(is_packages_config_file(config.PackageNames) ? @"Installing from config file:" : @"Installing the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
@@ -616,7 +616,7 @@ Would have determined packages that are out of date based on what is
  installed and what versions are available for upgrade.");
         }
 
-        public void outdated_run(ChocolateyConfiguration config)
+        public virtual void outdated_run(ChocolateyConfiguration config)
         {
             if (config.SourceType != SourceType.normal)
             {
@@ -742,7 +742,7 @@ Would have determined packages that are out of date based on what is
             randomly_notify_about_pro_business(config);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config)
+        public virtual ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config)
         {
             this.Log().Info(@"Upgrading the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
@@ -820,7 +820,7 @@ Would have determined packages that are out of date based on what is
             randomly_notify_about_pro_business(config);
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config)
+        public virtual ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config)
         {
             this.Log().Info(@"Uninstalling the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
@@ -959,7 +959,7 @@ The recent package changes indicate a reboot is necessary.
             return failures;
         }
 
-        public void handle_package_uninstall(PackageResult packageResult, ChocolateyConfiguration config)
+        public virtual void handle_package_uninstall(PackageResult packageResult, ChocolateyConfiguration config)
         {
             if (!_fileSystem.directory_exists(packageResult.InstallLocation))
             {
@@ -1290,7 +1290,7 @@ ATTENTION: You must take manual action to remove {1} from
             _nugetService.remove_rollback_directory_if_exists(packageResult.Name);
         }
 
-        public void set_pending(PackageResult packageResult, ChocolateyConfiguration config)
+        public virtual void set_pending(PackageResult packageResult, ChocolateyConfiguration config)
         {
             var packageDirectory = packageResult.InstallLocation;
             if (string.IsNullOrWhiteSpace(packageDirectory)) return;
@@ -1314,7 +1314,7 @@ ATTENTION: You must take manual action to remove {1} from
             }
         }
 
-        public void remove_pending(PackageResult packageResult, ChocolateyConfiguration config)
+        public virtual void remove_pending(PackageResult packageResult, ChocolateyConfiguration config)
         {
             var packageDirectory = packageResult.InstallLocation;
             if (string.IsNullOrWhiteSpace(packageDirectory)) return;
