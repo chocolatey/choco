@@ -379,8 +379,9 @@ namespace chocolatey.infrastructure.app.builders
                             option =>
                             {
                                 int timeout = 0;
-                                int.TryParse(option.remove_surrounding_quotes(), out timeout);
-                                if (timeout > 0)
+                                var timeoutString = option.remove_surrounding_quotes();
+                                int.TryParse(timeoutString, out timeout);
+                                if (timeout > 0 || timeoutString.is_equal_to("0"))
                                 {
                                     config.CommandExecutionTimeoutSeconds = timeout;
                                 }
