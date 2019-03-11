@@ -91,7 +91,7 @@ A corrupt .registry file exists at {0}.
             {
                 if (_fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE)))
                 {
-                    if(_config.RegularOutput) { this.Log().Warn(deserializationErrorMessage); }
+                    if (_config.RegularOutput) this.Log().Warn(deserializationErrorMessage);
                 }
                 else
                 {
@@ -103,7 +103,7 @@ A corrupt .registry file exists at {0}.
                 FaultTolerance.try_catch_with_logging_exception(
                     () =>
                     {
-                        if(_config.RegularOutput) { this.Log().Warn(deserializationErrorMessage); }
+                        if (_config.RegularOutput) this.Log().Warn(deserializationErrorMessage);
 
                         // rename the bad registry file so that it isn't processed again
                         _fileSystem.move_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE), _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE));
@@ -159,7 +159,7 @@ A corrupt .registry file exists at {0}.
 
             if (packageInformation.Package == null)
             {
-                if(_config.RegularOutput) { this.Log().Debug("No package information to save as package is null."); }
+                if (_config.RegularOutput) this.Log().Debug("No package information to save as package is null.");
                 return;
             }
 
@@ -243,7 +243,7 @@ A corrupt .registry file exists at {0}.
         public void remove_package_information(IPackage package)
         {
             var pkgStorePath = _fileSystem.combine_paths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".format_with(package.Id, package.Version.to_string()));
-            if (_config.RegularOutput) { this.Log().Info("Removing Package Information for {0}".format_with(pkgStorePath)); }
+            if (_config.RegularOutput) this.Log().Info("Removing Package Information for {0}".format_with(pkgStorePath));
             _fileSystem.delete_directory_if_exists(pkgStorePath, recursive: true);
         }
     }
