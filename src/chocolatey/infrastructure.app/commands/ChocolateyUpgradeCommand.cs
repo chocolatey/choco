@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -195,6 +195,21 @@ namespace chocolatey.infrastructure.app.commands
                     {
                         if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = false;
                     })
+                 .Add("exitwhenrebootdetected|exit-when-reboot-detected",
+                     "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}.  Overrides the default feature '{3}' set to '{4}'.  Available in 0.10.12+.".format_with
+                         (ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend, ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
+                     option => configuration.Features.ExitOnRebootDetected = option != null
+                     )
+                 .Add("ignoredetectedreboot|ignore-detected-reboot",
+                     "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'.  Available in 0.10.12+.".format_with
+                         (ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
+                     option =>
+                     {
+                         if (option != null)
+                         {
+                             configuration.Features.ExitOnRebootDetected = false;
+                         }
+                     })
                 ;
         }
 
@@ -265,9 +280,9 @@ NOTE: `all` is a special package keyword that will allow you to upgrade
 Skip upgrading certain packages with `choco pin` or with the option
  `--except`.
 
-NOTE: Chocolatey Pro / Business automatically synchronizes with 
+NOTE: Chocolatey Pro / Business automatically synchronizes with
  Programs and Features, ensuring automatically updating apps' versions
- (like Chrome) are up to date in Chocolatey's repository. 
+ (like Chrome) are up to date in Chocolatey's repository.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");

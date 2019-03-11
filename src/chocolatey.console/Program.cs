@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -158,7 +158,7 @@ namespace chocolatey.console
                     "chocolatey".Log().Error(ChocolateyLoggers.Important, () => "{0}".format_with(ex.Message));
                 }
 
-                Environment.ExitCode = 1;
+                if (Environment.ExitCode == 0) Environment.ExitCode = 1;
             }
             finally
             {
@@ -188,7 +188,7 @@ namespace chocolatey.console
             {
                 var requestedAssembly = new AssemblyName(args.Name);
 
-                // There are things that are ILMerged into Chocolatey. Anything with 
+                // There are things that are ILMerged into Chocolatey. Anything with
                 // the right public key except licensed should use the choco/chocolatey assembly
                 if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
                     && !requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName)

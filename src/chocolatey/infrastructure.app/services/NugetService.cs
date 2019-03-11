@@ -872,7 +872,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
             return packageInstalls;
         }
 
-        public ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config)
+        public virtual ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config)
         {
             var packageManager = NugetCommon.GetPackageManager(
               config,

@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,7 @@ namespace chocolatey.infrastructure.app
 #if DEBUG
         public static readonly string InstallLocation = _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path());
         public static readonly string LicensedAssemblyLocation = _fileSystem.file_exists(_fileSystem.combine_paths(InstallLocation, "chocolatey.licensed.dll")) ? _fileSystem.combine_paths(InstallLocation, "chocolatey.licensed.dll") : _fileSystem.combine_paths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
- 
+
 #else
         public static readonly string InstallLocation = System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) ?? _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path());
         public static readonly string LicensedAssemblyLocation = _fileSystem.combine_paths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
@@ -112,10 +112,10 @@ namespace chocolatey.infrastructure.app
         public static readonly string[] ConfigFileExtensions = new string[] {".autoconf",".config",".conf",".cfg",".jsc",".json",".jsonp",".ini",".xml",".yaml"};
         public static readonly string ConfigFileTransformExtension = ".install.xdt";
         public static readonly string[] ShimDirectorFileExtensions = new string[] {".gui",".ignore"};
-       
+
         public static readonly string HashProviderFileTooBig = "UnableToDetectChanges_FileTooBig";
         public static readonly string HashProviderFileLocked = "UnableToDetectChanges_FileLocked";
-        
+
         /// <summary>
         /// This is a readonly bool set to true. It is only shifted for specs.
         /// </summary>
@@ -126,6 +126,12 @@ namespace chocolatey.infrastructure.app
         /// This is a readonly bool set to true. It is only shifted for specs.
         /// </summary>
         public static readonly bool AllowPrompts = true;
+
+        public static class ExitCodes
+        {
+            public static readonly int ErrorFailNoActionReboot = 350;
+            public static readonly int ErrorInstallSuspend = 1604;
+        }
 
         public static class Tools
         {
@@ -145,7 +151,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string ProxyBypassOnLocal = "proxyBypassOnLocal";
             public static readonly string WebRequestTimeoutSeconds = "webRequestTimeoutSeconds";
         }
-        
+
         public static class Features
         {
             public static readonly string ChecksumFiles = "checksumFiles";
@@ -171,6 +177,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string SkipPackageUpgradesWhenNotInstalled = "skipPackageUpgradesWhenNotInstalled";
             public static readonly string RemovePackageInformationOnUninstall = "removePackageInformationOnUninstall";
             public static readonly string LogWithoutColor = "logWithoutColor";
+            public static readonly string ExitOnRebootDetected = "exitOnRebootDetected";
         }
 
         public static class Messages

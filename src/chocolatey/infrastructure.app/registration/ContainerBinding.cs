@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,9 +27,11 @@ namespace chocolatey.infrastructure.app.registration
     using infrastructure.commands;
     using infrastructure.configuration;
     using infrastructure.services;
+    using infrastructure.validations;
     using nuget;
     using services;
     using tasks;
+    using validations;
     using CryptoHashProvider = cryptography.CryptoHashProvider;
     using IFileSystem = filesystem.IFileSystem;
     using IHashProvider = cryptography.IHashProvider;
@@ -61,6 +63,7 @@ namespace chocolatey.infrastructure.app.registration
             container.Register<IChocolateyPackageInformationService, ChocolateyPackageInformationService>(Lifestyle.Singleton);
             container.Register<IShimGenerationService, ShimGenerationService>(Lifestyle.Singleton);
             container.Register<IRegistryService, RegistryService>(Lifestyle.Singleton);
+            container.Register<IPendingRebootService, PendingRebootService>(Lifestyle.Singleton);
             container.Register<IFilesService, FilesService>(Lifestyle.Singleton);
             container.Register<IConfigTransformService, ConfigTransformService>(Lifestyle.Singleton);
             container.Register<IHashProvider>(() => new CryptoHashProvider(container.GetInstance<IFileSystem>()), Lifestyle.Singleton);
@@ -126,6 +129,19 @@ namespace chocolatey.infrastructure.app.registration
                   return list.AsReadOnly();
               },
               Lifestyle.Singleton);
+
+            container.Register<IEnumerable<IValidation>>(
+                () =>
+                {
+                    var list = new List<IValidation>
+                    {
+                        new GlobalConfigurationValidation(),
+                        new SystemStateValidation(container.GetInstance<IPendingRebootService>())
+                    };
+
+                    return list.AsReadOnly();
+                },
+                Lifestyle.Singleton);
         }
     }
 

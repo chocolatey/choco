@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -210,7 +210,7 @@ namespace chocolatey.infrastructure.app.builders
             config.CacheLocation = Environment.ExpandEnvironmentVariables(set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder. Replaces `$env:TEMP` value."));
             if (string.IsNullOrWhiteSpace(config.CacheLocation)) {
                 config.CacheLocation = fileSystem.get_temp_path(); // System.Environment.GetEnvironmentVariable("TEMP");
-                // TEMP gets set in EnvironmentSettings, so it may already have 
+                // TEMP gets set in EnvironmentSettings, so it may already have
                 // chocolatey in the path when it installs the next package from
                 // the API.
                 if(!String.Equals(fileSystem.get_directory_info_for(config.CacheLocation).Name, "chocolatey", StringComparison.OrdinalIgnoreCase)) {
@@ -220,7 +220,7 @@ namespace chocolatey.infrastructure.app.builders
 
             // if it is still empty, use temp in the Chocolatey install directory.
             if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
-            
+
             var commandExecutionTimeoutSeconds = 0;
             var commandExecutionTimeout = set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CommandExecutionTimeoutSeconds.to_string()) ? ApplicationParameters.DefaultWaitForExitInSeconds.to_string() : configFileSettings.CommandExecutionTimeoutSeconds.to_string(), "Default timeout for command execution. '0' for infinite (starting in 0.10.4).");
             int.TryParse(commandExecutionTimeout, out commandExecutionTimeoutSeconds);
@@ -304,6 +304,7 @@ namespace chocolatey.infrastructure.app.builders
 
             config.Features.ScriptsCheckLastExitCode = set_feature_flag(ApplicationParameters.Features.ScriptsCheckLastExitCode, configFileSettings, defaultEnabled: false, description: "Scripts Check $LastExitCode (external commands) - Leave this off unless you absolutely need it while you fix your package scripts  to use `throw 'error message'` or `Set-PowerShellExitCode #` instead of `exit #`. This behavior started in 0.9.10 and produced hard to find bugs. If the last external process exits successfully but with an exit code of not zero, this could cause hard to detect package failures. Available in 0.10.3+. Will be removed in 0.11.0.");
             config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
+            config.Features.ExitOnRebootDetected = set_feature_flag(ApplicationParameters.Features.ExitOnRebootDetected, configFileSettings, defaultEnabled: false, description: "Exit On Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}. When it exits with {1}, it means pending reboot discovered prior to running operation. When it exits with {2}, it means some work completed prior to reboot request being detected. As this will affect upgrade all, it is normally recommended to leave this off.  Available in 0.10.12+.".format_with(ApplicationParameters.Features.ExitOnRebootDetected, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend));
         }
 
         private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings, bool defaultEnabled, string description)
@@ -350,7 +351,7 @@ namespace chocolatey.infrastructure.app.builders
                              option => config.Verbose = option != null)
                         .Add("trace",
                              "Trace - Show trace messaging. Very, very verbose trace messaging. Avoid except when needing super low-level .NET Framework debugging. Available in 0.10.4+.",
-                             option => config.Trace = option != null) 
+                             option => config.Trace = option != null)
                         .Add("nocolor|no-color",
                              "No Color - Do not show colorization in logging output. This overrides the feature '{0}', set to '{1}'. Available in 0.10.9+.".format_with(ApplicationParameters.Features.LogWithoutColor, config.Features.LogWithoutColor),
                              option => config.Features.LogWithoutColor = option != null)
@@ -378,8 +379,9 @@ namespace chocolatey.infrastructure.app.builders
                             option =>
                             {
                                 int timeout = 0;
-                                int.TryParse(option.remove_surrounding_quotes(), out timeout);
-                                if (timeout > 0)
+                                var timeoutString = option.remove_surrounding_quotes();
+                                int.TryParse(timeoutString, out timeout);
+                                if (timeout > 0 || timeoutString.is_equal_to("0"))
                                 {
                                     config.CommandExecutionTimeoutSeconds = timeout;
                                 }
@@ -413,7 +415,7 @@ namespace chocolatey.infrastructure.app.builders
                              option => config.Proxy.BypassList = option.remove_surrounding_quotes())
                         .Add("proxy-bypass-on-local",
                              "Proxy Bypass On Local - Bypass proxy for local connections. Requires explicity proxy (`--proxy` or config setting). Overrides the default proxy bypass on local setting of '{0}'. Available in 0.10.4+.".format_with(config.Proxy.BypassOnLocal),
-                             option => config.Proxy.BypassOnLocal = option != null)  
+                             option => config.Proxy.BypassOnLocal = option != null)
                          .Add("log-file=",
                              "Log File to output to in addition to regular loggers. Available in 0.10.8+.",
                              option => config.AdditionalLogFileLocation= option.remove_surrounding_quotes())
@@ -480,8 +482,8 @@ You can pass options and switches in the following ways:
    No other combination will work. In PowerShell.exe if you are on version
    v3+, you can try `--%` before `-ia` to just pass the args through as is,
    which means it should not require any special workarounds.
- * **Periods in PowerShell**: If you need to pass a period as part of a 
-   value or a path, PowerShell doesn't always handle it well. Please 
+ * **Periods in PowerShell**: If you need to pass a period as part of a
+   value or a path, PowerShell doesn't always handle it well. Please
    quote those values using ""Quote Values"" section above.
  * Options and switches apply to all items passed, so if you are
    installing multiple packages, and you use `--version=1.0.0`, choco
@@ -614,7 +616,7 @@ Following these scripting best practices will ensure your scripts work
             config.Information.IsUserRemoteDesktop = ProcessInformation.user_is_terminal_services();
             config.Information.IsUserRemote = ProcessInformation.user_is_remote();
             config.Information.IsProcessElevated = ProcessInformation.process_is_elevated();
-            
+
             if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("https_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
                 config.Proxy.Location = Environment.GetEnvironmentVariable("https_proxy");
@@ -643,7 +645,7 @@ Following these scripting best practices will ensure your scripts work
                 if (licensedConfigBuilder == null)
                 {
                     if (config.RegularOutput) "chocolatey".Log().Warn(ChocolateyLoggers.Important,
-                        @"Unable to set licensed configuration. Please upgrade to a newer 
+                        @"Unable to set licensed configuration. Please upgrade to a newer
  licensed version (choco upgrade chocolatey.extension).");
                     return;
                 }
@@ -697,7 +699,7 @@ Following these scripting best practices will ensure your scripts work
                         if (ex.InnerException != null && ex.InnerException.Message.contains("FIPS"))
                         {
                             "chocolatey".Log().Warn(ChocolateyLoggers.Important, @"
-FIPS Mode detected - run 'choco feature enable -n {0}' 
+FIPS Mode detected - run 'choco feature enable -n {0}'
  to use Chocolatey.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums));
 
                             var errorMessage = "When FIPS Mode is enabled, Chocolatey requires {0} feature also be enabled.".format_with(ApplicationParameters.Features.UseFipsCompliantChecksums);
