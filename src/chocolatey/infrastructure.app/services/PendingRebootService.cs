@@ -34,8 +34,7 @@ namespace chocolatey.infrastructure.app.services
         }
 
         /// <summary>
-        ///   Test to see if there are any known situations that require
-        ///   a System reboot.
+        ///   Test to see if there are any known situations that require a system reboot.
         /// </summary>
         /// <param name="config">The current Chocolatey Configuration</param>
         /// <returns><c>true</c> if reboot is required; otherwise <c>false</c>.</returns>
@@ -57,6 +56,12 @@ namespace chocolatey.infrastructure.app.services
                    is_pending_package_installer_syswow64();
         }
 
+        /// <summary>
+        /// Determines whether Windows is waiting on a reboot to rename the computer.
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if [is pending computer rename]; otherwise, <c>false</c>.
+        /// </returns>
         private bool is_pending_computer_rename()
         {
             var path = "SYSTEM\\CurrentControlSet\\Control\\ComputerName\\{0}";
@@ -72,6 +77,17 @@ namespace chocolatey.infrastructure.app.services
             return result;
         }
 
+        /// <summary>
+        /// Determines whether Windows is waiting on a reboot for component based servicing.
+        /// CBS (Component Based Servicing) is also known as trusted installer. This could also be where
+        /// pending reboots related to MSI installs are recorded as of newer versions of Windows.
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if [is pending component based servicing]; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// https://blogs.technet.microsoft.com/askperf/2008/04/23/understanding-component-based-servicing/
+        /// </remarks>
         private bool is_pending_component_based_servicing()
         {
             if (!is_vista_sp1_or_later())
@@ -89,6 +105,12 @@ namespace chocolatey.infrastructure.app.services
             return result;
         }
 
+        /// <summary>
+        /// Determines whether Windows Automatic Update is waiting on a reboot.
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if is pending windows automatic update; otherwise, <c>false</c>.
+        /// </returns>
         private bool is_pending_windows_auto_update()
         {
             var path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update\\RebootRequired";
@@ -100,6 +122,12 @@ namespace chocolatey.infrastructure.app.services
             return result;
         }
 
+        /// <summary>
+        /// Determines whether there is a pending file rename operation waiting on reboot for lock releases.
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if is pending file rename operations; otherwise, <c>false</c>.
+        /// </returns>
         private bool is_pending_file_rename_operations()
         {
             var path = "SYSTEM\\CurrentControlSet\\Control\\Session Manager";
@@ -117,10 +145,18 @@ namespace chocolatey.infrastructure.app.services
             return result;
         }
 
+        /// <summary>
+        /// Determines whether Windows has a pending software install waiting for reboot (MSIs typically).
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if [is pending package installer]; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// https://support.microsoft.com/kb/832475
+        /// 0x00000000 (0)	No pending restart.
+        /// </remarks>
         private bool is_pending_package_installer()
         {
-            // http://support.microsoft.com/kb/832475
-            // 0x00000000 (0)	No pending restart.
             var path = "SOFTWARE\\Microsoft\\Updates";
             var value = get_registry_key_string_value(path, "UpdateExeVolatile");
 
@@ -131,10 +167,18 @@ namespace chocolatey.infrastructure.app.services
             return result;
         }
 
+        /// <summary>
+        /// Determines whether Windows has a pending 32-bit software install waiting for reboot (MSIs typically).
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if [is pending package installer syswow64]; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// https://support.microsoft.com/kb/832475
+        /// 0x00000000 (0)	No pending restart.
+        /// </remarks>
         private bool is_pending_package_installer_syswow64()
         {
-            // http://support.microsoft.com/kb/832475
-            // 0x00000000 (0)	No pending restart.
             var path = "SOFTWARE\\Wow6432Node\\Microsoft\\Updates";
             var value = get_registry_key_string_value(path, "UpdateExeVolatile");
 

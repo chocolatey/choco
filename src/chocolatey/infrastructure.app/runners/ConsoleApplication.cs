@@ -94,7 +94,6 @@ namespace chocolatey.infrastructure.app.runners
 
                             var validationResults = new List<ValidationResult>();
                             var validationChecks = container.GetAllInstances<IValidation>();
-
                             foreach (var validationCheck in validationChecks)
                             {
                                 validationResults.AddRange(validationCheck.validate(config));
