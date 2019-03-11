@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -121,7 +121,7 @@ namespace chocolatey.infrastructure.app.services
                     if (!string.IsNullOrWhiteSpace(userProvidedUninstallArguments)) this.Log().Debug(ChocolateyLoggers.Verbose, " Using user passed {2}uninstaller args for {0}:'{1}'".format_with(package.Id, userProvidedUninstallArguments.escape_curly_braces(), userOverrideUninstallArguments ? "overriding " : string.Empty));
                 }
             }
-            
+
             //todo: if there is a local package, look to use it in the future
             if (string.IsNullOrWhiteSpace(key.UninstallString))
             {
@@ -294,7 +294,7 @@ namespace chocolatey.infrastructure.app.services
                     installer = new InstallShieldInstaller();
                     break;
             }
-            
+
             return installer;
         }
     }
