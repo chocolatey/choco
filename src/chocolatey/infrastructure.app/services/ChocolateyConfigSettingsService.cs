@@ -78,7 +78,7 @@ namespace chocolatey.infrastructure.app.services
                         source.Id,
                         source.Value,
                         source.Disabled.to_string(),
-                        source.UserName,
+                        source.UserName.quote_if_pipe_found(),
                         source.Certificate,
                         source.Priority,
                         source.BypassProxy.to_string(),
