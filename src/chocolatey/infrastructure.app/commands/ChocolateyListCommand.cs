@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.commands
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using attributes;
@@ -201,7 +202,13 @@ This specifies that the source is a Windows Feature and we should
         {
             _packageService.ensure_source_app_installed(configuration);
             // note: you must leave the .ToList() here or else the method won't be evaluated!
-            _packageService.list_run(configuration).ToList();
+            var packageResults = _packageService.list_run(configuration).ToList();
+
+            // if there are no results, exit with a 1.
+            if (packageResults.Count == 0)
+            {
+                Environment.ExitCode = 1;
+            }
         }
 
         public virtual IEnumerable<PackageResult> list(ChocolateyConfiguration configuration)

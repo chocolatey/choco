@@ -195,5 +195,20 @@ namespace chocolatey
 
             return open_brace_regex.Replace(close_brace_regex.Replace(input,"}}"),"{{");
         }
+
+        /// <summary>
+        /// Surrounds with quotes if a pipe is found in the input string.
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The input, but with double quotes if there is a pipe character found in the string.</returns>
+        public static string quote_if_pipe_found(this string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return input.to_string();
+
+            if (input.contains("|")) return "\"{0}\"".format_with(input);
+
+            return input;
+        }
+
     }
 }
