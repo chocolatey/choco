@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2019 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
+    using System.Security;
     using Microsoft.Win32;
 
     public static class RegistryValueExtensions
@@ -26,9 +27,11 @@ namespace chocolatey.infrastructure.app.domain
 
             // Since it is possible that registry keys contain characters that are not valid
             // in XML files, ensure that all content is escaped, prior to serialization
-            var escapedXml = System.Security.SecurityElement.Escape(key.GetValue(name).to_string()).Replace("&quot;","\"").Replace("&apos;","'");
-
-            return escapedXml == null ? string.Empty : escapedXml.Replace("\0", string.Empty);
+            // https://docs.microsoft.com/en-us/dotnet/api/system.security.securityelement.escape?view=netframework-4.0
+            return SecurityElement.Escape(key.GetValue(name).to_string()).to_string()
+                                  .Replace("&quot;", "\"")
+                                  .Replace("&apos;", "'")
+                                  .Replace("\0", string.Empty);
         }
     }
 }
