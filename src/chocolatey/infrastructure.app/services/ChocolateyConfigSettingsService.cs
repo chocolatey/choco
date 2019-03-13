@@ -75,7 +75,7 @@ namespace chocolatey.infrastructure.app.services
                     else
                     {
                         this.Log().Info(() => "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}".format_with(
-                        source.Id,
+                        source.Id.quote_if_pipe_found(),
                         source.Value,
                         source.Disabled.to_string(),
                         source.UserName.quote_if_pipe_found(),

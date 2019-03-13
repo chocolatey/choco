@@ -633,27 +633,32 @@ Would have determined packages that are out of date based on what is
 
             var output = config.RegularOutput;
             config.RegularOutput = false;
-            var oudatedPackages = _nugetService.get_outdated(config);
+            var outdatedPackages = _nugetService.get_outdated(config);
             config.RegularOutput = output;
 
             if (config.RegularOutput)
             {
-                var upgradeWarnings = oudatedPackages.Count(p => p.Value.Warning);
+                var upgradeWarnings = outdatedPackages.Count(p => p.Value.Warning);
                 this.Log().Warn(() => @"{0}{1} has determined {2} package(s) are outdated. {3}".format_with(
                     Environment.NewLine,
                     ApplicationParameters.Name,
-                    oudatedPackages.Count(p => p.Value.Success && !p.Value.Inconclusive),
+                    outdatedPackages.Count(p => p.Value.Success && !p.Value.Inconclusive),
                     upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings)
                     ));
 
                 if (upgradeWarnings != 0)
                 {
                     this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
-                    foreach (var warning in oudatedPackages.Where(p => p.Value.Warning).or_empty_list_if_null())
+                    foreach (var warning in outdatedPackages.Where(p => p.Value.Warning).or_empty_list_if_null())
                     {
                         this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
                     }
                 }
+            }
+
+            if (outdatedPackages.Count != 0 && Environment.ExitCode == 0)
+            {
+                Environment.ExitCode = 2;
             }
 
             randomly_notify_about_pro_business(config);

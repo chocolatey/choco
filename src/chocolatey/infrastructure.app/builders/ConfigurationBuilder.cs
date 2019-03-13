@@ -512,7 +512,12 @@ based on choco not receiving things you think you are passing to it.
    `choco source list`, where `source` is the command and `list` is the
    subcommand.
  * Typically the subject comes next. If installing packages, the 
-   subject would be the package names. e.g. `choco install pkg1 pkg2`.
+   subject would be the package names, e.g. `choco install pkg1 pkg2`.
+ * Never use 'nupkg' or point directly to a nupkg file UNLESS using
+   'choco push'. Use the source folder instead, e.g. `choco install
+   <package id> --source=""'c:\folder\with\package'""` instead of 
+   `choco install DoNotDoThis.1.0.nupkg` or `choco install DoNotDoThis 
+    --source=""'c:\folder\with\package\DoNotDoThis.1.0.nupkg'""`.
  * Switches and parameters are called simply options. Options come 
    after the subject. e.g. `choco install pkg1 --debug --verbose`.
  * Never use the force option (`--force`/`-f`) in scripts (or really
@@ -529,15 +534,15 @@ based on choco not receiving things you think you are passing to it.
    temporarily stop for input - the key here is temporarily. They will 
    continue without requiring any action after the temporary timeout
    (typically 30 seconds).
- * Full option names are prepended with two dashes. e.g. `--` or 
+ * Full option names are prepended with two dashes, e.g. `--` or 
    `--debug --verbose --ignore-proxy`.
  * When setting a value to an option, always put an equals (`=`) 
    between the name and the setting, e.g. `--source=""'local'""`.
  * When setting a value to an option, always surround the value 
-   properly with double quotes bookending apostrophes. e.g. 
+   properly with double quotes bookending apostrophes, e.g. 
    `--source=""'internal_server'""`.
  * If you are building PowerShell scripts, you can most likely just 
-   simply use apostrophes surrounding option values e.g. 
+   simply use apostrophes surrounding option values, e.g. 
    `--source='internal_server'`.
  * Prefer upgrade to install in scripts. You can't `install` to a newer
    version of something, but you can `choco upgrade` which will do both
