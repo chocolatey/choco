@@ -512,7 +512,12 @@ based on choco not receiving things you think you are passing to it.
    `choco source list`, where `source` is the command and `list` is the
    subcommand.
  * Typically the subject comes next. If installing packages, the 
-   subject would be the package names. e.g. `choco install pkg1 pkg2`.
+   subject would be the package names, e.g. `choco install pkg1 pkg2`.
+ * Never use 'nupkg' or point directly to a nupkg file UNLESS using
+   'choco push'. Use the source folder instead, e.g. `choco install
+   <package id> --source=""'c:\folder\with\package'""` instead of 
+   `choco install DoNotDoThis.1.0.nupkg` or `choco install DoNotDoThis 
+    --source=""'c:\folder\with\package\DoNotDoThis.1.0.nupkg'""`.
  * Switches and parameters are called simply options. Options come 
    after the subject. e.g. `choco install pkg1 --debug --verbose`.
  * Never use the force option (`--force`/`-f`) in scripts (or really
