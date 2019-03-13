@@ -899,7 +899,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 bool isPinned = pkgInfo.IsPinned;
 
-                // if the package is pinned and we are skipping pinned, 
+                // if the package is pinned and we are skipping pinned,
                 // move on quickly
                 if (isPinned && config.OutdatedCommand.IgnorePinned)
                 {
@@ -918,7 +918,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 }
 
                 var latestPackage = find_package(packageName, null, config, repository);
-                
+
                 if (latestPackage == null)
                 {
                     if (config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated) continue;
@@ -933,7 +933,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 }
 
                 if (latestPackage.Version <= installedPackage.Version) continue;
-                
+
                 var packageResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(latestPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, latestPackage.Id)));
 
                 string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).{3} Source(s): \"{4}\"".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version, Environment.NewLine, config.Sources);
