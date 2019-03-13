@@ -83,7 +83,7 @@ namespace chocolatey.console
 
                 if (!string.IsNullOrWhiteSpace(config.AdditionalLogFileLocation))
                 {
-                  Log4NetAppenderConfiguration.configure_additional_log_file(config.AdditionalLogFileLocation);
+                  Log4NetAppenderConfiguration.configure_additional_log_file(fileSystem.get_full_path(config.AdditionalLogFileLocation));
                 }
 
                 report_version_and_exit_if_requested(args, config);
