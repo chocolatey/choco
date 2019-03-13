@@ -87,6 +87,7 @@ A corrupt .registry file exists at {0}.
  Instead, you can use the following PowerShell command:
  Move-Item .\.registry.bad .\.registry
 ".format_with(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE));
+
             try
             {
                 if (_fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE)))
