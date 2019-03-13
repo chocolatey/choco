@@ -75,6 +75,7 @@ Because we ask contributors to target master, sometimes a fix/enhancement may ne
  * `build.bat` - build and test
  * Any additional changes or testing here.
  * `git checkout stable`
+ * `git fetch upstream` - if this pulls anything, make sure to also run `git rebase upstream/stable` prior to merging or you will lose the merge commit.
  * `git merge pr<github_pull_id> --log --no-ff`
  * `git branch -d pr<github_pull_id>`
  * `git checkout master`
