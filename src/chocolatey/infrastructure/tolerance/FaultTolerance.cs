@@ -79,7 +79,7 @@ namespace chocolatey.infrastructure.tolerance
         public static T retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
         {
             if (function == null) return default(T);
-            if (numberOfTries == 0) throw new ApplicationException("You must specify a number of retries greater than zero.");
+            if (numberOfTries == 0) throw new ApplicationException("You must specify a number of tries greater than zero.");
             var returnValue = default(T);
 
             var debugging = log_is_in_debug_mode();
