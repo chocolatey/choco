@@ -899,7 +899,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 bool isPinned = pkgInfo.IsPinned;
 
-                // if the package is pinned and we are skipping pinned, 
+                // if the package is pinned and we are skipping pinned,
                 // move on quickly
                 if (isPinned && config.OutdatedCommand.IgnorePinned)
                 {
@@ -918,7 +918,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 }
 
                 var latestPackage = find_package(packageName, null, config, repository);
-                
+
                 if (latestPackage == null)
                 {
                     if (config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated) continue;
@@ -933,7 +933,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 }
 
                 if (latestPackage.Version <= installedPackage.Version) continue;
-                
+
                 var packageResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(latestPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, latestPackage.Id)));
 
                 string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).{3} Source(s): \"{4}\"".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version, Environment.NewLine, config.Sources);
@@ -1146,6 +1146,8 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     try
                     {
                         _fileSystem.copy_directory(backupLocation, pkgInstallPath, overwriteExisting: true);
+
+                        remove_packaging_files_prior_to_upgrade(pkgInstallPath, config.CommandName);
                     }
                     catch (Exception ex)
                     {
@@ -1163,6 +1165,29 @@ Please see https://chocolatey.org/docs/troubleshooting for more
  process locking the folder or files. Please make sure nothing is 
  running that would lock the files or folders in this directory prior 
  to upgrade. If the package fails to upgrade, this is likely the cause.");
+                }
+            }
+        }
+
+        public virtual void remove_packaging_files_prior_to_upgrade(string directoryPath, string commandName)
+        {
+            if (commandName.to_lower() == "upgrade")
+            {
+                // Due to the way that Package Reducer works, there is a potential that a Chocolatey Packaging
+                // script could be incorrectly left in place during an upgrade operation.  To guard against this,
+                // remove any Chocolatey Packaging scripts, which will then be restored by the new package, if
+                // they are still required
+                var filesToDelete = new List<string> {"chocolateyinstall", "chocolateyuninstall", "chocolateybeforemodify"};
+                var packagingScripts = _fileSystem.get_files(directoryPath, "*.ps1", SearchOption.AllDirectories)
+                    .Where(p => filesToDelete.Contains(_fileSystem.get_file_name_without_extension(p).to_lower()));
+
+                foreach (var packagingScript in packagingScripts)
+                {
+                    if (_fileSystem.file_exists(packagingScript))
+                    {
+                        this.Log().Debug("Deleting file {0}".format_with(packagingScript));
+                        _fileSystem.delete_file(packagingScript);
+                    }
                 }
             }
         }
