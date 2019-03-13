@@ -98,8 +98,14 @@ A corrupt .registry file exists at {0}.
                     packageInformation.RegistrySnapshot = _registryService.read_from_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE));
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                if (_config.RegularOutput) this.Log().Warn(@"A .registry file at '{0}'
+ has errored attempting to read it. This file will be renamed to 
+ '{1}' The error:
+ {2} 
+ ".format_with(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE), _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE), e.ToString()));
+
                 FaultTolerance.try_catch_with_logging_exception(
                     () =>
                     {
