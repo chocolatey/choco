@@ -3,14 +3,51 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
-## 0.10.12 - (Unreleased)
-### Bug Fixes
- * Fix - Uninstall-ChocolateyZipPackage - Corrected issue with null passed to Test-Path - see [#1546](https://github.com/chocolatey/choco/issues/1546) and [#1550](https://github.com/chocolatey/choco/issues/1550)
- * Fix - Get-ChocolateyWebFile - Setting Security Protocol to SSL3 is not supported with PowerShell 6.0.3 - see [#1623](https://github.com/chocolatey/choco/issues/1623)
+## [0.10.12](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.12+is%3Aclosed) - (March 14, 2019)
+### FEATURES
+ * Halt install if dependency requires a reboot - see [#1038](https://github.com/chocolatey/choco/issues/1038)
 
-### Improvements
- * Performance of `choco outdated` command - see [#1397](https://github.com/chocolatey/choco/issues/1397)
- * Added ability to get consistent hash of ConfigFileSettings class - see [#1612](https://github.com/chocolatey/choco/issues/1612)
+### BUG FIXES
+ * [Security] Fix - upgrade - remove automation scripts prior to upgrade even if changed - see [#1689](https://github.com/chocolatey/choco/issues/1689)
+ * [Security] Fix - scripts - Digitally sign the init.ps1 PowerShell file as well  - see [#1665](https://github.com/chocolatey/choco/issues/1665)
+ * Fix - When a source fails, choco exits instead of moving to next source - see [#612](https://github.com/chocolatey/choco/issues/612)
+ * Fix - Upgrade all reuses overridden package parameters when useRememberedArgumentsForUpgrades feature is turned on - see [#1443](https://github.com/chocolatey/choco/issues/1443)
+ * Fix - Passing `--execution-timeout=0` doesn't override the default execution timeout in the configuration - see [#1747](https://github.com/chocolatey/choco/issues/1747)
+ * Fix - ChocolateyLastPathUpdate environment variable stores date as locale-specific - see [#1604](https://github.com/chocolatey/choco/issues/1604)
+ * [POSH Host] Fix - install/upgrade/uninstall - PowerShell host should exit with 1 instead of -1 if there is a package error - see [#1734](https://github.com/chocolatey/choco/issues/1734)
+ * Fix - Logging - warnings for ".registry.bad." files are emitted with "-r" switch - see [#1580](https://github.com/chocolatey/choco/issues/1580)
+ * Fix - Logging - ".registry.bad" files are created for actually valid registry snapshots - see [#1581](https://github.com/chocolatey/choco/issues/1746)
+ * Fix - list/search - Listing local packages fails if no sources are enabled - see [#661](https://github.com/chocolatey/choco/issues/661)
+ * Fix - uninstall - Object reference exception when there are no sources - see [#1584](https://github.com/chocolatey/choco/issues/1584)
+ * Fix - Logging - self-service errors attempting to write to the config when using Chocolatey GUI - see [#1649](https://github.com/chocolatey/choco/issues/1649)
+ * Fix - source list - running with -r fails to escape pipe (|) char - see [#1614](https://github.com/chocolatey/choco/issues/1614)
+ * Fix - source add - Adding a source allows an empty url - see [#1582](https://github.com/chocolatey/choco/issues/1582)
+ * Fix - Get-ChocolateyWebFile - Ensure PSVersionTable is used for PowerShell Version - see [#1623](https://github.com/chocolatey/choco/issues/1623)
+ * Fix - Install-ChocolateyShortcut - Don't create a folder if environment variable is used - see [#1687](https://github.com/chocolatey/choco/issues/1687)
+ * Fix - `choco --version` includes warnings, breaks version parsing - see [#1562](https://github.com/chocolatey/choco/issues/1562)
+ * Fix - Uninstall-ChocolateyZipPackage failing with Path error - see [#1550](https://github.com/chocolatey/choco/issues/1550)
+ * Fix - Uninstall-ChocolateyZipPackage fails from null passed to Test-Path - see [#1546](https://github.com/chocolatey/choco/issues/1546)
+ * Fix - Get-ChocolateyUnzip - Ensure 7z cmd window is hidden - see [#1642](https://github.com/chocolatey/choco/issues/1642)
+ * [API] Fix - Resolve assemblies globally without locking - see [#1735](https://github.com/chocolatey/choco/issues/1735)
+
+### IMPROVEMENTS
+ * [Security] tools - Update 7z to 18.06  Enhancement  Security - see [#1704](https://github.com/chocolatey/choco/issues/1704)
+ * [Security] Refreshenv script leaves temporary file behind - see [#1549](https://github.com/chocolatey/choco/issues/1549)
+ * Halt install if dependency requires a reboot - see [#1038](https://github.com/chocolatey/choco/issues/1038)
+ * Logging - better default colors - see [#1131](https://github.com/chocolatey/choco/issues/1131)
+ * Validate config / system state across everything - see [#1746](https://github.com/chocolatey/choco/issues/1746)
+ * upgrade - switch for not installing if not installed - see [#1646](https://github.com/chocolatey/choco/issues/1646)
+ * outdated - improve performance of `choco outdated` - see [#1397](https://github.com/chocolatey/choco/issues/1397)
+ * outdated - Use exit codes to determine update status - see [#1602](https://github.com/chocolatey/choco/issues/1602)
+ * search/list/info - exit 1 when no results are returned - see [#1724](https://github.com/chocolatey/choco/issues/1724)
+ * search/list - Add alias "find" for search - see [#1744](https://github.com/chocolatey/choco/issues/1744)
+ * apikey - Enable removal of API key via CLI - see [#1301](https://github.com/chocolatey/choco/issues/1301)
+ * Logging - Choco --log-file option should create log files relative to current directory - see [#1603](https://github.com/chocolatey/choco/issues/1603)
+ * Logging - Don't suggest installing separate "checksum" tool - see [#981](https://github.com/chocolatey/choco/issues/981)
+ * template - Add notes to uninstaller file string on how to correctly parse the value from the registry - see [#1644](https://github.com/chocolatey/choco/issues/1644)
+ * Pro/Business - license - If license is found in top-level folder or named wrong, choco should warn - see [#1503](https://github.com/chocolatey/choco/issues/1503)
+ * [API] Allow verifying DI Container in release build - see [#1738](https://github.com/chocolatey/choco/issues/1738)
+ * [API] ability to get consistent hash of ConfigFileSettings class - see [#1612](https://github.com/chocolatey/choco/issues/1612)
 
 
 ## [0.10.11](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.11+is%3Aclosed) (May 4, 2018)
