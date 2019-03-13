@@ -656,6 +656,11 @@ Would have determined packages that are out of date based on what is
                 }
             }
 
+            if (oudatedPackages.Count != 0 && Environment.ExitCode == 0)
+            {
+                Environment.ExitCode = 2;
+            }
+
             randomly_notify_about_pro_business(config);
         }
 
