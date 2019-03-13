@@ -534,15 +534,15 @@ based on choco not receiving things you think you are passing to it.
    temporarily stop for input - the key here is temporarily. They will 
    continue without requiring any action after the temporary timeout
    (typically 30 seconds).
- * Full option names are prepended with two dashes. e.g. `--` or 
+ * Full option names are prepended with two dashes, e.g. `--` or 
    `--debug --verbose --ignore-proxy`.
  * When setting a value to an option, always put an equals (`=`) 
    between the name and the setting, e.g. `--source=""'local'""`.
  * When setting a value to an option, always surround the value 
-   properly with double quotes bookending apostrophes. e.g. 
+   properly with double quotes bookending apostrophes, e.g. 
    `--source=""'internal_server'""`.
  * If you are building PowerShell scripts, you can most likely just 
-   simply use apostrophes surrounding option values e.g. 
+   simply use apostrophes surrounding option values, e.g. 
    `--source='internal_server'`.
  * Prefer upgrade to install in scripts. You can't `install` to a newer
    version of something, but you can `choco upgrade` which will do both
