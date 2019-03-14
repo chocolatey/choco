@@ -340,7 +340,6 @@ choco upgrade: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gi
 
 ");
 
-
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
             "chocolatey".Log().Info(@"
 NOTE: Options and switches apply to all items passed, so if you are

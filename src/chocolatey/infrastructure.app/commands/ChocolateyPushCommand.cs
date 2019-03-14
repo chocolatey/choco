@@ -181,6 +181,7 @@ NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Troubleshooting");
             "chocolatey".Log().Info(()=> @"
 To use this command, you must have your API key saved for the community
