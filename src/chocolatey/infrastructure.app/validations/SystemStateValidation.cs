@@ -85,7 +85,7 @@ namespace chocolatey.infrastructure.app.validations
    want to halt when this occurs, then either set the global feature
    using:
      choco feature enable -name={0}
-   or, pass the option --exit-when-reboot-detected.
+   or pass the option --exit-when-reboot-detected.
 ".format_with(ApplicationParameters.Features.ExitOnRebootDetected),
                         Status = ValidationStatus.Warning,
                         ExitCode = 0
