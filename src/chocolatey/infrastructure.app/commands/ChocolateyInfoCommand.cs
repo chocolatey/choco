@@ -83,6 +83,19 @@ Chocolatey will perform a search for a package local or remote and provide
 
 NOTE: New as of 0.9.10.0.
 
+");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
+            "chocolatey".Log().Info(@"
+    choco info [<options/switches>]
+");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
+            "chocolatey".Log().Info(@"
+    choco info chocolatey
+    choco info googlechrome
+    choco info powershell
+
 NOTE: See scripting in the command reference (`choco -?`) for how to 
  write proper scripts and integrations.
 
