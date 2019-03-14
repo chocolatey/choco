@@ -204,10 +204,10 @@ This specifies that the source is a Windows Feature and we should
             // note: you must leave the .ToList() here or else the method won't be evaluated!
             var packageResults = _packageService.list_run(configuration).ToList();
 
-            // if there are no results, exit with a 1.
+            // if there are no results, exit with a 2.
             if (configuration.Features.UseEnhancedExitCodes && packageResults.Count == 0 && Environment.ExitCode == 0)
             {
-                Environment.ExitCode = 1;
+                Environment.ExitCode = 2;
             }
         }
 
