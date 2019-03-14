@@ -110,6 +110,9 @@ NOTE: `cpack` has been deprecated as it has a name collision with CMake. Please
     choco pack path/to/nuspec
     choco pack --outputdirectory build
 
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");

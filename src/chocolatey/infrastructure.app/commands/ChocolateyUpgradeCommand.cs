@@ -300,6 +300,10 @@ NOTE: Chocolatey Pro / Business automatically synchronizes with
     choco upgrade git -s ""'https://somewhere/protected'"" -u user -p pass
     choco upgrade all
     choco upgrade all --except=""'skype,conemu'""
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"

@@ -295,6 +295,10 @@ NOTE: All of these will add to PATH variable. We'll be adding a special
  go modify Path to just one Ruby and then use something like uru
  (https://bitbucket.org/jonforums/uru) or pik
  (https://chocolatey.org/packages/pik) to switch between versions.
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"

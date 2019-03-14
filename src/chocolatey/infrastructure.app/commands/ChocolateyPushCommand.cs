@@ -176,6 +176,10 @@ NOTE: If there is more than one nupkg file in the folder, the command
     choco push --source https://chocolatey.org/
     choco push --source ""'https://chocolatey.org/'"" -t 500
     choco push --source ""'https://chocolatey.org/'"" -k=""'123-123123-123'""
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Troubleshooting");
             "chocolatey".Log().Info(()=> @"

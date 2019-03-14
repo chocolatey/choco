@@ -116,6 +116,9 @@ NOTE: `Unset` subcommand available in 0.9.10+.
     choco config unset proxy
     choco config unset --name proxy
 
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"

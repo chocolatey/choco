@@ -164,8 +164,12 @@ NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
     choco list -lai
     choco list --page=0 --page-size=25
     choco search git
-    choco search git -s ""'https://somewhere/out/there'""
+    choco search git --source=""'https://somewhere/out/there'""
     choco search bob -s ""'https://somewhere/protected'"" -u user -p pass
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"

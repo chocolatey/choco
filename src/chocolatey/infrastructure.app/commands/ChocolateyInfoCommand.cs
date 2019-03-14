@@ -82,6 +82,10 @@ Chocolatey will perform a search for a package local or remote and provide
  `choco search <pkgname> --exact --detailed`.
 
 NOTE: New as of 0.9.10.0.
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }

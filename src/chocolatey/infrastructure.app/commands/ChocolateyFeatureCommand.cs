@@ -97,6 +97,10 @@ Chocolatey will allow you to interact with features.
     choco feature list
     choco feature disable -n=bob
     choco feature enable -n=bob
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");

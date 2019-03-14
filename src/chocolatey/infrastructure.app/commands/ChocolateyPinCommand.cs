@@ -115,6 +115,9 @@ This is especially helpful when running `choco upgrade` for all
     choco pin add -n=git --version 1.2.3
     choco pin remove --name git
 
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");

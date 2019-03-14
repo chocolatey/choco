@@ -153,6 +153,9 @@ location. If it is a url, it will be a location you can go to in a browser and
 it returns OData with something that says Packages in the browser, similar to 
 what you see when you go to https://chocolatey.org/api/v2/.
 
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");

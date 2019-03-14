@@ -101,6 +101,9 @@ NOTE: Available with 0.9.9.6+.
 If you use `--source=https://somewhere/out/there`, it is 
  going to look for outdated packages only based on that source.
 
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"

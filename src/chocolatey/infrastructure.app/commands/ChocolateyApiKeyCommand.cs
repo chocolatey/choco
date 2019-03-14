@@ -111,6 +111,9 @@ user name and password specified as 'user:password' for the API key. Please see
 your repository's documentation (for Nexus, please see 
 https://bit.ly/nexus2apikey).
 
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Connecting to Chocolatey.org (Community Package Repository)");
