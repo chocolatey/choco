@@ -99,7 +99,8 @@ NOTE: Available with 0.9.9.6+.
     choco outdated -s ""'https://somewhere/protected'"" -u user -p pass
 
 If you use `--source=https://somewhere/out/there`, it is 
- going to look for outdated packages only based on that source.
+ going to look for outdated packages only based on that source, so 
+ you may want to add `--ignore-unfound` to your options.
 
 NOTE: See scripting in the command reference (`choco -?`) for how to 
  write proper scripts and integrations.
