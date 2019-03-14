@@ -179,6 +179,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string RemovePackageInformationOnUninstall = "removePackageInformationOnUninstall";
             public static readonly string LogWithoutColor = "logWithoutColor";
             public static readonly string ExitOnRebootDetected = "exitOnRebootDetected";
+            public static readonly string LogValidationResultsOnWarnings = "logValidationResultsOnWarnings";
         }
 
         public static class Messages

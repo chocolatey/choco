@@ -119,9 +119,10 @@ namespace chocolatey.infrastructure.app.runners
             var warnings = validationResults.Count(v => v.Status == ValidationStatus.Warning);
             var errors = validationResults.Count(v => v.Status == ValidationStatus.Error);
 
+            var logOnWarnings = config.Features.LogValidationResultsOnWarnings;
             if (config.RegularOutput)
             {
-                this.Log().Info(errors + warnings == 0 ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, () => "{0} validations performed. {1} success(es), {2} warning(s), and {3} error(s).".format_with(
+                this.Log().Info(errors + (logOnWarnings ? warnings : 0) == 0 ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, () => "{0} validations performed. {1} success(es), {2} warning(s), and {3} error(s).".format_with(
                     validationResults.Count,
                     successes,
                     warnings,
@@ -129,11 +130,12 @@ namespace chocolatey.infrastructure.app.runners
 
                 if (warnings != 0)
                 {
-                    this.Log().Info("");
-                    this.Log().Warn("Validation Warnings:");
+                    var warningLogger = logOnWarnings ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly;
+                    this.Log().Info(warningLogger, "");
+                    this.Log().Warn(warningLogger, "Validation Warnings:");
                     foreach (var warning in validationResults.Where(p => p.Status == ValidationStatus.Warning).or_empty_list_if_null())
                     {
-                        this.Log().Warn(" - {0}".format_with(warning.Message));
+                        this.Log().Warn(warningLogger, " - {0}".format_with(warning.Message));
                     }
                 }
             }
