@@ -247,8 +247,8 @@ Package Exit Codes:
  - 3010: success, reboot required
  - other (not listed): likely an error has occurred
 
-In addition to normal exit codes, packages are allowed to exit 
- with their own codes when the feature '{0}' is 
+In addition to normal exit codes, packages are allowed to exit
+ with their own codes when the feature '{0}' is
  turned on. Available in v0.9.10+.
 
 Reboot Exit Codes:
