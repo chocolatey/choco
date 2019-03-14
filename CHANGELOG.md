@@ -4,8 +4,26 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
 ## [0.10.12](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.12+is%3Aclosed) - (March 14, 2019)
+We are pretty excited to finally share a new Chocolatey release! And this release won't disappoint. Loads of bug fixes, enhanced exit codes for search, list, info and outdated when results are returned versus nothing being returned, and some really nice improvements.
+
+Perhaps the biggest addition this release is the ability to halt installation if a reboot is detected ([#1038](https://github.com/chocolatey/choco/issues/1038)). Once you turn this feature on, if you are installing some packages and somewhere in the middle of that there is a need for a reboot, Chocolatey will stop and exit with either exit code 350 (pending reboot prior to anything) or 1604 (install incomplete), indicating a reboot is needed to continue. It won't reboot for you, as it is just a package manager - but it will stop execution so nothing that may error on install is attemtped. You'll need to opt into this feature, so see [#1038](https://github.com/chocolatey/choco/issues/1038) for details.
+
+If you've long hated the default console colors, we've spent quite a bit of time detecting the background console color and adjusting the colorization output of Chocolatey for this release ([#1131](https://github.com/chocolatey/choco/issues/1131)). You might give that a whirl and see if you can turn back on console colors for good.
+
+We've added the ability to validate the configuration and system state at a global level ([#1746](https://github.com/chocolatey/choco/issues/1746)). It's early, but expect that we'll do a lot more to really provide good experiences in this area.
+
+A bug that is worth noting as fixed is having choco exit when a source fails instead of ignoring it ([#612](https://github.com/chocolatey/choco/issues/612)). This is now fixed!
+
+The last thing worth noting in the summary is Enhanced Exit Codes, or providing more intentional exit codes that mean something instead of just 0 or 1 ([#1758](https://github.com/chocolatey/choco/issues/1758)). In this release, outdated and search commands will have additional exit codes that mean something. This is noted in the next section, so please read over and see how to shut off this behavior if you see it breaking any integration you might be using (including your own scripts).
+
+### BREAKING CHANGES
+ * outdated - Exit 2 when there are packages out of date - see [#1602](https://github.com/chocolatey/choco/issues/1602)
+ * search/list/info - Exit 2 when no results are returned - see [#1724](https://github.com/chocolatey/choco/issues/1724)
+
+We've listed these as breaking changes as it may affect tools that are integrating with Chocolatey and interpreting the output of the exit code. In these cases, it would likely temporarily break those tools until they've had a chance to release new versions of their tools. If you run into this, you simply need to turn off the feature "useEnhancedExitCodes". That is as simple as `choco feature disable --name="'useEnhancedExitCodes'"` ([#1758](https://github.com/chocolatey/choco/issues/1758)).
+
 ### FEATURES
- * Halt install if dependency requires a reboot - see [#1038](https://github.com/chocolatey/choco/issues/1038)
+ * Exit when reboot is detected - w/350 for pending & w/1604 on dependency package requiring reboot - see [#1038](https://github.com/chocolatey/choco/issues/1038)
 
 ### BUG FIXES
  * [Security] Fix - upgrade - remove automation scripts prior to upgrade even if changed - see [#1689](https://github.com/chocolatey/choco/issues/1689)
@@ -33,13 +51,11 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 ### IMPROVEMENTS
  * [Security] tools - Update 7z to 18.06  Enhancement  Security - see [#1704](https://github.com/chocolatey/choco/issues/1704)
  * [Security] Refreshenv script leaves temporary file behind - see [#1549](https://github.com/chocolatey/choco/issues/1549)
- * Halt install if dependency requires a reboot - see [#1038](https://github.com/chocolatey/choco/issues/1038)
+ * Control enhanced exit codes with a feature switch - see [#1758](https://github.com/chocolatey/choco/issues/1758)
  * Logging - better default colors - see [#1131](https://github.com/chocolatey/choco/issues/1131)
  * Validate config / system state across everything - see [#1746](https://github.com/chocolatey/choco/issues/1746)
  * upgrade - switch for not installing if not installed - see [#1646](https://github.com/chocolatey/choco/issues/1646)
  * outdated - improve performance of `choco outdated` - see [#1397](https://github.com/chocolatey/choco/issues/1397)
- * outdated - Use exit codes to determine update status - see [#1602](https://github.com/chocolatey/choco/issues/1602)
- * search/list/info - exit 1 when no results are returned - see [#1724](https://github.com/chocolatey/choco/issues/1724)
  * search/list - Add alias "find" for search - see [#1744](https://github.com/chocolatey/choco/issues/1744)
  * apikey - Enable removal of API key via CLI - see [#1301](https://github.com/chocolatey/choco/issues/1301)
  * Logging - Choco --log-file option should create log files relative to current directory - see [#1603](https://github.com/chocolatey/choco/issues/1603)
