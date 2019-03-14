@@ -382,7 +382,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool VirusCheck { get; set; }
         public bool FailOnInvalidOrMissingLicense { get; set; }
         public bool IgnoreInvalidOptionsSwitches { get; set; }
-        public bool UsePackageExitCodes { get; set; }
+        public bool UsePackageExitCodes { get; set; } 
+        public bool UseEnhancedExitCodes { get; set; }
         public bool UseFipsCompliantChecksums { get; set; }
         public bool ShowNonElevatedWarnings { get; set; }
         public bool ShowDownloadProgress { get; set; }

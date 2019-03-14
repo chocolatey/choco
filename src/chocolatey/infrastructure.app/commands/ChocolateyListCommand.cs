@@ -205,7 +205,7 @@ This specifies that the source is a Windows Feature and we should
             var packageResults = _packageService.list_run(configuration).ToList();
 
             // if there are no results, exit with a 1.
-            if (packageResults.Count == 0)
+            if (configuration.Features.UseEnhancedExitCodes && packageResults.Count == 0 && Environment.ExitCode == 0)
             {
                 Environment.ExitCode = 1;
             }
