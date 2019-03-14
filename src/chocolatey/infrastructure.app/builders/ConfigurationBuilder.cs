@@ -559,7 +559,9 @@ based on choco not receiving things you think you are passing to it.
  * Use exit codes to determine status. Chocolatey exits with 0 when 
    everything worked appropriately and other exits codes like 1 when 
    things error. There are package specific exit codes that are 
-   recommended to be used and reboot indicating exit codes as well.
+   recommended to be used and reboot indicating exit codes as well. To
+   check exit code when using PowerShell, immediately call 
+   `$exitCode = $LASTEXITCODE` to get the value choco exited with.
 
 Here's an example following bad practices (line breaks added for 
  readability):
