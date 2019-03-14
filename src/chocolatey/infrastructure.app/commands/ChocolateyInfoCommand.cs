@@ -100,6 +100,28 @@ NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+Enhanced:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+ - 2: no results (enhanced)
+
+NOTE: Starting in v0.10.12, if you have the feature '{0}' 
+ turned on, then choco will provide enhanced exit codes that allow 
+ better integration and scripting.
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
+
+".format_with(ApplicationParameters.Features.UseEnhancedExitCodes));
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
     }
