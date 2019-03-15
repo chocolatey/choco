@@ -40,14 +40,14 @@ chocolatey without attempting to uninstall the program.
 
     choco feature disable -n autoUninstaller
 
-**NOTE:** [Chocolatey Pro](https://chocolatey.org/compare) / Business automatically synchronizes with 
- Programs and Features, ensuring manually removed apps are 
+**NOTE:** [Chocolatey Pro](https://chocolatey.org/compare) / Business automatically synchronizes with
+ Programs and Features, ensuring manually removed apps are
  automatically removed from Chocolatey's repository.
 
-**NOTE:** Synchronizer and AutoUninstaller enhancements in licensed 
- versions of Chocolatey ensure that Autouninstaller is up to 95% 
- effective at removing software without an uninstall script. This is 
- because synchronizer ensures the registry snapshot stays up to date 
+**NOTE:** Synchronizer and AutoUninstaller enhancements in licensed
+ versions of Chocolatey ensure that Autouninstaller is up to 95%
+ effective at removing software without an uninstall script. This is
+ because synchronizer ensures the registry snapshot stays up to date
  and licensed enhancements have the ability to inspect more locations
  to determine how to automatically uninstall software.
 
@@ -72,6 +72,38 @@ chocolatey without attempting to uninstall the program.
     choco uninstall notepadplusplus googlechrome atom 7zip -dv
     choco uninstall ruby --version 1.8.7.37402
     choco uninstall nodejs.install --all-versions
+
+**NOTE:** See scripting in [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] (`choco -?`) for how to 
+ write proper scripts and integrations.
+
+
+## Exit Codes
+
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+Package Exit Codes:
+ - 1605: software is not installed
+ - 1614: product is uninstalled
+ - 1641: success, reboot initiated
+ - 3010: success, reboot required
+ - other (not listed): likely an error has occurred
+
+In addition to normal exit codes, packages are allowed to exit
+ with their own codes when the feature 'usePackageExitCodes' is
+ turned on. Available in v0.9.10+.
+
+Reboot Exit Codes:
+ - 350: pending reboot detected, no action has occurred
+ - 1604: install suspended, incomplete
+
+In addition to the above exit codes, you may also see reboot exit codes
+ when the feature 'exitOnRebootDetected' is turned on. It typically requires
+ the feature 'usePackageExitCodes' to also be turned on to work properly.
+ Available in v0.10.12+.
 
 ## Options and Switches
 
@@ -266,6 +298,18 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        uninstall on first package failure instead of continuing with others. 
        Overrides the default feature 'stopOnFirstPackageFailure' set to 'False-
        '. Available in 0.10.4+.
+
+     --exitwhenrebootdetected, --exit-when-reboot-detected
+     Exit When Reboot Detected - Stop running install, upgrade, or uninstall 
+       when a reboot request is detected. Requires 'usePackageExitCodes' 
+       feature to be turned on. Will exit with either 350 or 1604.  Overrides 
+       the default feature 'exitOnRebootDetected' set to 'False'.  Available in 
+       0.10.12+.
+
+     --ignoredetectedreboot, --ignore-detected-reboot
+     Ignore Detected Reboot - Ignore any detected reboots if found. Overrides 
+       the default feature 'exitOnRebootDetected' set to 'False'.  Available in 
+       0.10.12+.
 
      --fromprograms, --from-programs, --fromprogramsandfeatures, --from-programs-and-features
      From Programs and Features - Uninstalls a program from programs and 

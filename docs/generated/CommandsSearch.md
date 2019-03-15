@@ -23,8 +23,34 @@ Chocolatey will perform a search for a package local or remote. Some
     choco list -lai
     choco list --page=0 --page-size=25
     choco search git
-    choco search git -s "'https://somewhere/out/there'"
+    choco search git --source="'https://somewhere/out/there'"
     choco search bob -s "'https://somewhere/protected'" -u user -p pass
+
+**NOTE:** See scripting in [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] (`choco -?`) for how to 
+ write proper scripts and integrations.
+
+
+## Exit Codes
+
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+Enhanced:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+ - 2: no results (enhanced)
+
+**NOTE:** Starting in v0.10.12, if you have the feature 'useEnhancedExitCodes' 
+ turned on, then choco will provide enhanced exit codes that allow 
+ better integration and scripting.
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
+
 
 ## See It In Action
 

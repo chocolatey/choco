@@ -15,6 +15,23 @@ Chocolatey will allow you to interact with features.
     choco feature disable -n=bob
     choco feature enable -n=bob
 
+**NOTE:** See scripting in [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] (`choco -?`) for how to 
+ write proper scripts and integrations.
+
+
+## Exit Codes
+
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
+
+
 ## Options and Switches
 
 **NOTE:** Options and switches apply to all items passed, so if you are
@@ -124,8 +141,8 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        0.8+.
 
  -n, --name=VALUE
-     Name - the name of the source. Required with some actions. Defaults to 
-       empty.
+     Name - the name of the source. Required with actions other than list. 
+       Defaults to empty.
 
 ~~~
 

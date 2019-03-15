@@ -53,6 +53,22 @@ Possible properties to pass:
     choco new bob silentargs="'/S'" url="'https://somewhere/out/there.msi'"
     choco new bob --outputdirectory Packages
 
+**NOTE:** See scripting in [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] (`choco -?`) for how to 
+ write proper scripts and integrations.
+
+
+## Exit Codes
+
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
+
 
 ## Options and Switches
 
