@@ -50,6 +50,8 @@ Get-Item $helpersPath\functions\*.ps1 |
 # This behavior was broken from v0.9.9.5 - v0.10.3.
 Export-ModuleMember -Function * -Alias * -Cmdlet *
 
+$currentAssemblies = [System.AppDomain]::CurrentDomain.GetAssemblies()
+
 # load extensions if they exist
 $extensionsPath = Join-Path "$helpersPath" '..\extensions'
 if (Test-Path($extensionsPath)) {
@@ -60,8 +62,18 @@ if (Test-Path($extensionsPath)) {
 
     try {
       Write-Debug "Importing '$path'";
-      Write-Debug "Loading '$([System.IO.Path]::GetFileNameWithoutExtension($path))' extension.";
-      Import-Module $path;
+      $fileNameWithoutExtension = $([System.IO.Path]::GetFileNameWithoutExtension($path))
+      Write-Debug "Loading '$fileNameWithoutExtension' extension.";
+      $loaded = $false
+      $currentAssemblies | % {
+		    $name = $_.GetName().Name
+        if ($name -eq $fileNameWithoutExtension) { 
+          Import-Module $_ 
+			    $loaded = $true
+        }
+	    }
+
+	    if (!$loaded) { Import-Module $path; }
     } catch {
       if ($env:ChocolateyPowerShellHost -eq 'true') {
         Write-Warning "Import failed for '$path'.  Error: '$_'"
