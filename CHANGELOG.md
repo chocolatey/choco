@@ -3,6 +3,11 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
+## [0.10.13](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.13+is%3Aclosed) - (March 15, 2019)
+### BUG FIXES
+ * Fix - Licensed - Licensed code failing when using licensed PowerShell functions - see [#1767](https://github.com/chocolatey/choco/issues/1767)
+
+
 ## [0.10.12](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.12+is%3Aclosed) - (March 14, 2019)
 We are pretty excited to finally share a new Chocolatey release! And this release won't disappoint. Loads of bug fixes, enhanced exit codes for search, list, info and outdated when results are returned versus nothing being returned, and some really nice improvements.
 
