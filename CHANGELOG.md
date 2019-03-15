@@ -49,7 +49,7 @@ We've listed these as breaking changes as it may affect tools that are integrati
  * [API] Fix - Resolve assemblies globally without locking - see [#1735](https://github.com/chocolatey/choco/issues/1735)
 
 ### IMPROVEMENTS
- * [Security] tools - Update 7z to 18.06  Enhancement  Security - see [#1704](https://github.com/chocolatey/choco/issues/1704)
+ * [Security] tools - Update 7z to 18.06 - see [#1704](https://github.com/chocolatey/choco/issues/1704)
  * [Security] Refreshenv script leaves temporary file behind - see [#1549](https://github.com/chocolatey/choco/issues/1549)
  * Control enhanced exit codes with a feature switch - see [#1758](https://github.com/chocolatey/choco/issues/1758)
  * Logging - better default colors - see [#1131](https://github.com/chocolatey/choco/issues/1131)
