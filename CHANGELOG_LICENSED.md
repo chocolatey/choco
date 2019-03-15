@@ -4,6 +4,35 @@ This covers changes for the "chocolatey.extension" package, where the licensed e
 
 **NOTE**: If you have a licensed edition of Chocolatey, refer to this in tandem with [Chocolatey Open source CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG.md).
 
+## 2.0.0 (March 14, 2019)
+### FEATURES
+ * Chocolatey Central Management tie in - Brings Central Management client configuration to Chocolatey. Requires Chocolatey v0.10.12 along with Chocolatey Agent v0.9.0 to allow communication with Central Maangement.
+ * [Security] Self-Service - allow uninstalls of ONLY packages installed by a user. Allows restricting what a user can uninstall to only what they have installed - see [licensed #2](https://github.com/chocolatey/chocolatey-licensed-issues/issues/2)
+
+### BUG FIXES
+ * Self-Service / Background Mode:
+    * Fix - Package arguments not being passed from Agent to choco.exe properly (client side fixes) - see [licensed #60](https://github.com/chocolatey/chocolatey-licensed-issues/issues/60)
+    * Fix - Background Service does not pass the exit code back to the console (client side) - see [licensed #51](https://github.com/chocolatey/chocolatey-licensed-issues/issues/51)
+ * Package Internalizer (Choco Download):
+    * Fix - PackageInternalizer - UseOriginalLocation switch being appended inappropriately when line continuation is used with no arguments on first line - see [licensed #64](https://github.com/chocolatey/chocolatey-licensed-issues/issues/64)
+ * Package Upload UI:
+    * Fix - Package Uploader is unable to push to a non https source - see [licensed #49](https://github.com/chocolatey/chocolatey-licensed-issues/issues/49)
+ * Package Builder (Choco New):
+    * Fix - Nuspec files section should not be commented out as it doesn't allow subdirectories
+    * Fix - Ensure Architect and MSP are able to use Package Builder
+    * Fix - Escape XML characters in generated nuspec file
+ * Windows Service Management Functions:
+    * Fix - When shutting down a Windows service it may hold a lock on a file for a second after it shuts down
+ * Fix - Type detection holds file locks if it times out - see [licensed #59](https://github.com/chocolatey/chocolatey-licensed-issues/issues/59)
+ * Fix - Ensure Architect edition has all features set appropriately
+
+### IMPROVEMENTS
+ * Package Builder - Remove "v" as part of "Name v2.2.23" In product names
+ * Package Upload UI - Ability to auto populate Source dropdown list - see [licensed #50](https://github.com/chocolatey/chocolatey-licensed-issues/issues/50)
+ * Package Internalizer - Allow downloading all installed packages with `--installed-packages`
+ * PowerShell - Cmdlets for Getting/Setting encrypted values in JSON files
+
+
 ## 1.12.12 (June 12, 2018)
 ### FEATURES
  * Package Upload UI - Ability to right click on a nupkg, and access UI for selecting where package is pushed to

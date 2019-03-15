@@ -164,9 +164,37 @@ NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
     choco list -lai
     choco list --page=0 --page-size=25
     choco search git
-    choco search git -s ""'https://somewhere/out/there'""
+    choco search git --source=""'https://somewhere/out/there'""
     choco search bob -s ""'https://somewhere/protected'"" -u user -p pass
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
+      
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+Enhanced:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+ - 2: no results (enhanced)
+
+NOTE: Starting in v0.10.12, if you have the feature '{0}' 
+ turned on, then choco will provide enhanced exit codes that allow 
+ better integration and scripting.
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
+
+".format_with(ApplicationParameters.Features.UseEnhancedExitCodes));
+           
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"
 choco search: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_search.gif
@@ -204,10 +232,10 @@ This specifies that the source is a Windows Feature and we should
             // note: you must leave the .ToList() here or else the method won't be evaluated!
             var packageResults = _packageService.list_run(configuration).ToList();
 
-            // if there are no results, exit with a 1.
-            if (packageResults.Count == 0)
+            // if there are no results, exit with a 2.
+            if (configuration.Features.UseEnhancedExitCodes && packageResults.Count == 0 && Environment.ExitCode == 0)
             {
-                Environment.ExitCode = 1;
+                Environment.ExitCode = 2;
             }
         }
 

@@ -295,7 +295,40 @@ NOTE: All of these will add to PATH variable. We'll be adding a special
  go modify Path to just one Ruby and then use something like uru
  (https://bitbucket.org/jonforums/uru) or pik
  (https://chocolatey.org/packages/pik) to switch between versions.
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+Package Exit Codes:
+ - 1641: success, reboot initiated
+ - 3010: success, reboot required
+ - other (not listed): likely an error has occurred
+
+In addition to normal exit codes, packages are allowed to exit
+ with their own codes when the feature '{0}' is
+ turned on. Uninstall command has additional valid exit codes.
+ Available in v0.9.10+.
+
+Reboot Exit Codes:
+ - 350: pending reboot detected, no action has occurred
+ - 1604: install suspended, incomplete
+
+In addition to the above exit codes, you may also see reboot exit codes
+ when the feature '{1}' is turned on. It typically requires
+ the feature '{0}' to also be turned on to work properly.
+ Available in v0.10.12+.
+".format_with(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected));
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"
 Chocolatey FOSS install showing tab completion and `refreshenv` (a way

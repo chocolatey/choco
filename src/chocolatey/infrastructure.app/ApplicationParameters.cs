@@ -167,6 +167,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string FailOnInvalidOrMissingLicense = "failOnInvalidOrMissingLicense";
             public static readonly string IgnoreInvalidOptionsSwitches = "ignoreInvalidOptionsSwitches";
             public static readonly string UsePackageExitCodes = "usePackageExitCodes";
+            public static readonly string UseEnhancedExitCodes = "useEnhancedExitCodes";
             public static readonly string UseFipsCompliantChecksums = "useFipsCompliantChecksums";
             public static readonly string ScriptsCheckLastExitCode = "scriptsCheckLastExitCode";
             public static readonly string ShowNonElevatedWarnings = "showNonElevatedWarnings";
@@ -178,6 +179,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string RemovePackageInformationOnUninstall = "removePackageInformationOnUninstall";
             public static readonly string LogWithoutColor = "logWithoutColor";
             public static readonly string ExitOnRebootDetected = "exitOnRebootDetected";
+            public static readonly string LogValidationResultsOnWarnings = "logValidationResultsOnWarnings";
         }
 
         public static class Messages

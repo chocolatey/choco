@@ -226,7 +226,40 @@ choco uninstall: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/
     choco uninstall notepadplusplus googlechrome atom 7zip -dv
     choco uninstall ruby --version 1.8.7.37402
     choco uninstall nodejs.install --all-versions
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+Package Exit Codes:
+ - 1605: software is not installed
+ - 1614: product is uninstalled
+ - 1641: success, reboot initiated
+ - 3010: success, reboot required
+ - other (not listed): likely an error has occurred
+
+In addition to normal exit codes, packages are allowed to exit
+ with their own codes when the feature '{0}' is
+ turned on. Available in v0.9.10+.
+
+Reboot Exit Codes:
+ - 350: pending reboot detected, no action has occurred
+ - 1604: install suspended, incomplete
+
+In addition to the above exit codes, you may also see reboot exit codes
+ when the feature '{1}' is turned on. It typically requires
+ the feature '{0}' to also be turned on to work properly.
+ Available in v0.10.12+.
+".format_with(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
             "chocolatey".Log().Info(@"

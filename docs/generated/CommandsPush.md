@@ -30,6 +30,10 @@ A feed can be a local folder, a file share, the [community feed](https://chocola
     choco push --source "'https://chocolatey.org/'" -t 500
     choco push --source "'https://chocolatey.org/'" -k="'123-123123-123'"
 
+**NOTE:** See scripting in [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] (`choco -?`) for how to 
+ write proper scripts and integrations.
+
+
 ## Troubleshooting
 
 To use this command, you must have your API key saved for the community
@@ -46,6 +50,19 @@ A common error is `Failed to process request. 'The specified API key
  You can verify by going to https://push.chocolatey.org/packages/packageName. 
  Please contact the administrators of https://push.chocolatey.org/ if you see this 
  and you don't see a good reason for it.
+
+## Exit Codes
+
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
+
 
 ## Options and Switches
 

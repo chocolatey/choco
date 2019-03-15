@@ -31,6 +31,22 @@ location. If it is a url, it will be a location you can go to in a browser and
 it returns OData with something that says Packages in the browser, similar to 
 what you see when you go to https://chocolatey.org/api/v2/.
 
+**NOTE:** See scripting in [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] (`choco -?`) for how to 
+ write proper scripts and integrations.
+
+
+## Exit Codes
+
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
+
 
 ## Options and Switches
 
@@ -141,15 +157,15 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        0.8+.
 
  -n, --name=VALUE
-     Name - the name of the source. Required with some actions. Defaults to 
-       empty.
+     Name - the name of the source. Required with actions other than list. 
+       Defaults to empty.
 
  -s, --source=VALUE
      Source - The source. This can be a folder/file share or an http locatio-
        n. If it is a url, it will be a location you can go to in a browser and 
        it returns OData with something that says Packages in the browser, 
        similar to what you see when you go to https://chocolatey.org/api/v2/. 
-       Defaults to empty.
+       Required with add action. Defaults to empty.
 
  -u, --user=VALUE
      User - used with authenticated feeds. Defaults to empty.
