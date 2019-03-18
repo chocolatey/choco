@@ -133,7 +133,7 @@ The following are experimental or use not recommended:
 #### Not Useful Or Anti-Pattern If Used
 
  * ChocolateyInstallOverride = Not for use in package automation scripts. Based on `--override-arguments` being passed. (0.9.9+)
- * ChocolateyInstallArguments = The installer arguments meant for the native installer. You should use chocolateyPackageParameters intead. Based on `--install-arguments` being passed. (0.9.9+)
+ * ChocolateyInstallArguments = The installer arguments meant for the native installer. You should use chocolateyPackageParameters instead. Based on `--install-arguments` being passed. (0.9.9+)
  * ChocolateyIgnoreChecksums - Was `--ignore-checksums` passed or the feature `checksumFiles` turned off? (0.9.9.9+)
  * ChocolateyAllowEmptyChecksums - Was `--allow-empty-checksums` passed or the feature `allowEmptyChecksums` turned on? (0.10.0+)
  * ChocolateyAllowEmptyChecksumsSecure - Was `--allow-empty-checksums-secure` passed or the feature `allowEmptyChecksumsSecure` turned on? (0.10.0+)
