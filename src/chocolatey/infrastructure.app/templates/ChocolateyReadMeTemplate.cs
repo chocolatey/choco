@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,40 +27,40 @@ always try to ensure you have read, understood and adhere to the create
 packages wiki link above.
 
 ## Automatic Packaging Updates?
-Consider making this package an automatic package, for the best 
+Consider making this package an automatic package, for the best
 maintainability over time. Read up at https://chocolatey.org/docs/automatic-packages
 
 ## Shim Generation
-Any executables you include in the package or download (but don't call 
+Any executables you include in the package or download (but don't call
 install against using the built-in functions) will be automatically shimmed.
 
 This means those executables will automatically be included on the path.
-Shim generation runs whether the package is self-contained or uses automation 
-scripts. 
+Shim generation runs whether the package is self-contained or uses automation
+scripts.
 
 By default, these are considered console applications.
 
-If the application is a GUI, you should create an empty file next to the exe 
+If the application is a GUI, you should create an empty file next to the exe
 named 'name.exe.gui' e.g. 'bob.exe' would need a file named 'bob.exe.gui'.
 See https://chocolatey.org/docs/create-packages#how-do-i-set-up-shims-for-applications-that-have-a-gui
 
-If you want to ignore the executable, create an empty file next to the exe 
-named 'name.exe.ignore' e.g. 'bob.exe' would need a file named 
-'bob.exe.ignore'. 
+If you want to ignore the executable, create an empty file next to the exe
+named 'name.exe.ignore' e.g. 'bob.exe' would need a file named
+'bob.exe.ignore'.
 See https://chocolatey.org/docs/create-packages#how-do-i-exclude-executables-from-getting-shims
 
-## Self-Contained? 
-If you have a self-contained package, you can remove the automation scripts 
-entirely and just include the executables, they will automatically get shimmed, 
-which puts them on the path. Ensure you have the legal right to distribute 
-the application though. See https://chocolatey.org/docs/legal. 
+## Self-Contained?
+If you have a self-contained package, you can remove the automation scripts
+entirely and just include the executables, they will automatically get shimmed,
+which puts them on the path. Ensure you have the legal right to distribute
+the application though. See https://chocolatey.org/docs/legal.
 
-You should read up on the Shim Generation section to familiarize yourself 
+You should read up on the Shim Generation section to familiarize yourself
 on what to do with GUI applications and/or ignoring shims.
 
 ## Automation Scripts
 You have a powerful use of Chocolatey, as you are using PowerShell. So you
-can do just about anything you need. Choco has some very handy built-in 
+can do just about anything you need. Choco has some very handy built-in
 functions that you can use, these are sometimes called the helpers.
 
 ### Built-In Functions
@@ -91,8 +91,8 @@ Chocolatey makes a number of environment variables available (You can access any
 The following are more advanced settings:
 
  * ChocolateyPackageParameters - Parameters to use with packaging, not the same as install arguments (which are passed directly to the native installer). Based on `--package-parameters`. (0.9.8.22+)
- * CHOCOLATEY_VERSION - The version of Choco you normally see. Use if you are 'lighting' things up based on choco version. (0.9.9+) - Otherwise take a dependency on the specific version you need. 
- * ChocolateyForceX86 = If available and set to 'true', then user has requested 32bit version. (0.9.9+) - Automatically handled in built in Choco functions. 
+ * CHOCOLATEY_VERSION - The version of Choco you normally see. Use if you are 'lighting' things up based on choco version. (0.9.9+) - Otherwise take a dependency on the specific version you need.
+ * ChocolateyForceX86 = If available and set to 'true', then user has requested 32bit version. (0.9.9+) - Automatically handled in built in Choco functions.
  * OS_PLATFORM - Like Windows, OSX, Linux. (0.9.9+)
  * OS_VERSION - The version of OS, like 6.1 something something for Windows. (0.9.9+)
  * OS_NAME - The reported name of the OS. (0.9.9+)
@@ -118,10 +118,10 @@ Some environment variables are set based on options that are passed, configurati
 
  * ChocolateyInstallArgumentsSensitive - Encrypted arguments passed from command line `--install-arguments-sensitive` that are not logged anywhere. (0.10.1+ and licensed editions 1.6.0+)
  * ChocolateyPackageParametersSensitive - Package parameters passed from command line `--package-parameters-senstivite` that are not logged anywhere.  (0.10.1+ and licensed editions 1.6.0+)
- * ChocolateyLicensedVersion - What version is the licensed edition on? 
+ * ChocolateyLicensedVersion - What version is the licensed edition on?
  * ChocolateyLicenseType - What edition / type of the licensed edition is installed?
  * USER_CONTEXT - The original user context - different when self-service is used (Licensed v1.10.0+)
- 
+
 #### Experimental Environment Variables
 The following are experimental or use not recommended:
 
