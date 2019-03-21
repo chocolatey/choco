@@ -31,6 +31,7 @@ namespace chocolatey.infrastructure.app.runners
     using configuration;
     using domain;
     using infrastructure.commands;
+    using infrastructure.configuration;
     using logging;
     using Console = System.Console;
     using Environment = System.Environment;
@@ -182,7 +183,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
         /// <param name="container">The container.</param>
         private void remove_nuget_cache(Container container)
         {
-            remove_nuget_cache(container, null);
+            remove_nuget_cache(container, Config.get_configuration_settings());
         }
 
         /// <summary>
