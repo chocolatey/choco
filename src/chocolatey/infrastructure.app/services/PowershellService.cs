@@ -391,6 +391,7 @@ namespace chocolatey.infrastructure.app.services
             Environment.SetEnvironmentVariable("chocolateyChecksumType32", null);
             Environment.SetEnvironmentVariable("chocolateyChecksum64", null);
             Environment.SetEnvironmentVariable("chocolateyChecksumType64", null);
+            Environment.SetEnvironmentVariable("chocolateyForceX86", null);
 
             // we only want to pass the following args to packages that would apply. 
             // like choco install git --params '' should pass those params to git.install, 
