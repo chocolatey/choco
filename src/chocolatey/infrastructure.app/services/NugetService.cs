@@ -471,7 +471,10 @@ folder.");
                     continue;
                 }
 
-                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository);
+                IPackage availablePackage = config.Features.UsePackageRepositoryOptimizations ? 
+                    find_package(packageName, version, config, packageManager.SourceRepository) 
+                    : packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+
                 if (availablePackage == null)
                 {
                     var logMessage = @"{0} not installed. The package was not found with the source(s) listed.
@@ -692,7 +695,10 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository);
+                IPackage availablePackage = config.Features.UsePackageRepositoryOptimizations ? 
+                    find_package(packageName, version, config, packageManager.SourceRepository) 
+                    : packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+
                 config.Prerelease = originalPrerelease;
 
                 if (availablePackage == null)
@@ -917,7 +923,10 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                var latestPackage = find_package(packageName, null, config, repository);
+                SemanticVersion version =  null;
+                var latestPackage = config.Features.UsePackageRepositoryOptimizations ? 
+                    find_package(packageName, null, config, packageManager.SourceRepository) 
+                    : packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
 
                 if (latestPackage == null)
                 {
@@ -959,36 +968,43 @@ Please see https://chocolatey.org/docs/troubleshooting for more
 
                 foreach (var packageRepository in aggregateRepository.Repositories.or_empty_list_if_null())
                 {
-                    this.Log().Debug("Using '" + packageRepository.Source + "'.");
-                    this.Log().Debug("- Supports prereleases? '" + packageRepository.SupportsPrereleasePackages + "'.");
-                    this.Log().Debug("- Is ServiceBased? '" + (packageRepository is IServiceBasedRepository) + "'.");
-
-                    // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
-                    IQueryable<IPackage> combinedResults = packageRepository.GetPackages().Where(x => x.Id.ToLower() == packageName);
-
-                    if (config.Prerelease && packageRepository.SupportsPrereleasePackages)
+                    try
                     {
-                        combinedResults = combinedResults.Where(p => p.IsAbsoluteLatestVersion);
+                        this.Log().Debug("Using '" + packageRepository.Source + "'.");
+                        this.Log().Debug("- Supports prereleases? '" + packageRepository.SupportsPrereleasePackages + "'.");
+                        this.Log().Debug("- Is ServiceBased? '" + (packageRepository is IServiceBasedRepository) + "'.");
+
+                        // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
+                        IQueryable<IPackage> combinedResults = packageRepository.GetPackages().Where(x => x.Id.ToLower() == packageName);
+
+                        if (config.Prerelease && packageRepository.SupportsPrereleasePackages)
+                        {
+                            combinedResults = combinedResults.Where(p => p.IsAbsoluteLatestVersion);
+                        }
+                        else
+                        {
+                            combinedResults = combinedResults.Where(p => p.IsLatestVersion);
+                        }
+
+                        if (!(packageRepository is IServiceBasedRepository))
+                        {
+                            combinedResults = combinedResults
+                                .Where(PackageExtensions.IsListed)
+                                .Where(p => config.Prerelease || p.IsReleaseVersion())
+                                .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
+                                .AsQueryable();
+                        }
+
+                        var packageRepositoryResults = combinedResults.ToList();
+                        if (packageRepositoryResults.Count() != 0)
+                        {
+                            this.Log().Debug("Package '{0}' found on source '{1}'".format_with(packageName, packageRepository.Source));
+                            packageResults.AddRange(packageRepositoryResults);
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        combinedResults = combinedResults.Where(p => p.IsLatestVersion);
-                    }
-
-                    if (!(packageRepository is IServiceBasedRepository))
-                    {
-                        combinedResults = combinedResults
-                            .Where(PackageExtensions.IsListed)
-                            .Where(p => config.Prerelease || p.IsReleaseVersion())
-                            .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
-                            .AsQueryable();
-                    }
-
-                    var packageRepositoryResults = combinedResults.ToList();
-                    if (packageRepositoryResults.Count() != 0)
-                    {
-                        this.Log().Debug("Package '{0}' found on source '{1}'".format_with(packageName, packageRepository.Source));
-                        packageResults.AddRange(packageRepositoryResults);
+                       this.Log().Warn("Error retrieving packages from source '{0}':{1} {2}".format_with(packageRepository.Source, Environment.NewLine, e.Message));
                     }
                 }
 

@@ -156,18 +156,28 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
                      )
                  .Add("exitwhenrebootdetected|exit-when-reboot-detected",
-                     "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}.  Overrides the default feature '{3}' set to '{4}'.  Available in 0.10.12+.".format_with
+                     "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}. Overrides the default feature '{3}' set to '{4}'. Available in 0.10.12+.".format_with
                      (ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend, ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
                      option => configuration.Features.ExitOnRebootDetected = option != null
                      )
                  .Add("ignoredetectedreboot|ignore-detected-reboot",
-                     "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'.  Available in 0.10.12+.".format_with
+                     "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with
                      (ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
                      option =>
                      {
                          if (option != null)
                          {
                              configuration.Features.ExitOnRebootDetected = false;
+                         }
+                     })
+                .Add("disable-repository-optimizations|disable-package-repository-optimizations",
+                     "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When used, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.14+.".format_with
+                        (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.to_string()),
+                     option =>
+                     {
+                         if (option != null)
+                         {
+                             configuration.Features.UsePackageRepositoryOptimizations = false;
                          }
                      })
                 ;

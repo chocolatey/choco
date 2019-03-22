@@ -11,7 +11,7 @@
     <iconUrl>https://raw.githubusercontent.com/chocolatey/choco/master/docs/logo/chocolateyicon.gif</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>2017 Chocolatey Software, Inc, 2011- 2017 RealDimensions Software, LLC</copyright>
+    <copyright>2017-2019 Chocolatey Software, Inc, 2011- 2017 RealDimensions Software, LLC</copyright>
     <!--<projectSourceUrl>https://github.com/chocolatey/choco</projectSourceUrl>
     <docsUrl>https://chocolatey.org/docs</docsUrl>
     <mailingListUrl>https://groups.google.com/forum/#!forum/chocolatey</mailingListUrl>
