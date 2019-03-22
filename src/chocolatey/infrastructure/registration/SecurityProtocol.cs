@@ -54,7 +54,6 @@ Choco prefers to use TLS v1.2 if it is available, but this client is
 
  For more information you should visit https://www.howsmyssl.com/");
                 }
-
             }
 
             try

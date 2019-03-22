@@ -384,12 +384,12 @@ namespace chocolatey.infrastructure.app.services
             Environment.SetEnvironmentVariable("installArguments", null);
             Environment.SetEnvironmentVariable("installerArguments", null);
             Environment.SetEnvironmentVariable("chocolateyInstallArguments", null);
+            Environment.SetEnvironmentVariable("chocolateyInstallOverride", null);
             Environment.SetEnvironmentVariable("packageParameters", null);
             Environment.SetEnvironmentVariable("chocolateyPackageParameters", null);
-            Environment.SetEnvironmentVariable("chocolateyInstallOverride", null);
             Environment.SetEnvironmentVariable("chocolateyChecksum32", null);
-            Environment.SetEnvironmentVariable("chocolateyChecksumType32", null);
             Environment.SetEnvironmentVariable("chocolateyChecksum64", null);
+            Environment.SetEnvironmentVariable("chocolateyChecksumType32", null);
             Environment.SetEnvironmentVariable("chocolateyChecksumType64", null);
 
             // we only want to pass the following args to packages that would apply. 
