@@ -180,6 +180,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string LogWithoutColor = "logWithoutColor";
             public static readonly string ExitOnRebootDetected = "exitOnRebootDetected";
             public static readonly string LogValidationResultsOnWarnings = "logValidationResultsOnWarnings";
+            public static readonly string UsePackageRepositoryOptimizations = "usePackageRepositoryOptimizations";
         }
 
         public static class Messages

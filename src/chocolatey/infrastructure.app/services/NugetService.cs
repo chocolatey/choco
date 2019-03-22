@@ -471,7 +471,10 @@ folder.");
                     continue;
                 }
 
-                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository);
+                IPackage availablePackage = config.Features.UsePackageRepositoryOptimizations ? 
+                    find_package(packageName, version, config, packageManager.SourceRepository) 
+                    : packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+
                 if (availablePackage == null)
                 {
                     var logMessage = @"{0} not installed. The package was not found with the source(s) listed.
@@ -692,7 +695,10 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository);
+                IPackage availablePackage = config.Features.UsePackageRepositoryOptimizations ? 
+                    find_package(packageName, version, config, packageManager.SourceRepository) 
+                    : packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+
                 config.Prerelease = originalPrerelease;
 
                 if (availablePackage == null)
@@ -917,7 +923,10 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                var latestPackage = find_package(packageName, null, config, repository);
+                SemanticVersion version =  null;
+                var latestPackage = config.Features.UsePackageRepositoryOptimizations ? 
+                    find_package(packageName, null, config, packageManager.SourceRepository) 
+                    : packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
 
                 if (latestPackage == null)
                 {
