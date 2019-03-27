@@ -126,7 +126,7 @@ namespace chocolatey.infrastructure.app.services
         /// Determines whether there is a pending file rename operation waiting on reboot for lock releases.
         /// </summary>
         /// <returns>
-        ///   <c>true</c> if is pending file rename operations; otherwise, <c>false</c>.
+        ///   <c>false</c>, however, additional information provided in debug log to indicate if it was ignored.
         /// </returns>
         private bool is_pending_file_rename_operations()
         {
@@ -140,9 +140,11 @@ namespace chocolatey.infrastructure.app.services
                 result = (value as string[]).Length != 0;
             }
 
-            this.Log().Debug(" - Pending File Rename Operations = {0}".format_with(result ? "Flagged" : "Checked"));
+            this.Log().Debug(" - Pending File Rename Operations = {0}".format_with(result ? "Ignored" : "Checked"));
 
-            return result;
+            // Always return false, as we don't want this check to result in a pending reboot warning/error.
+            // Instead, this will only provide output in the debug log indicating that the check was ignored.
+            return false;
         }
 
         /// <summary>
