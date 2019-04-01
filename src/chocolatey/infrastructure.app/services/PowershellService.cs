@@ -384,13 +384,15 @@ namespace chocolatey.infrastructure.app.services
             Environment.SetEnvironmentVariable("installArguments", null);
             Environment.SetEnvironmentVariable("installerArguments", null);
             Environment.SetEnvironmentVariable("chocolateyInstallArguments", null);
+            Environment.SetEnvironmentVariable("chocolateyInstallOverride", null);
             Environment.SetEnvironmentVariable("packageParameters", null);
             Environment.SetEnvironmentVariable("chocolateyPackageParameters", null);
-            Environment.SetEnvironmentVariable("chocolateyInstallOverride", null);
             Environment.SetEnvironmentVariable("chocolateyChecksum32", null);
-            Environment.SetEnvironmentVariable("chocolateyChecksumType32", null);
             Environment.SetEnvironmentVariable("chocolateyChecksum64", null);
+            Environment.SetEnvironmentVariable("chocolateyChecksumType32", null);
             Environment.SetEnvironmentVariable("chocolateyChecksumType64", null);
+            Environment.SetEnvironmentVariable("chocolateyForceX86", null);
+            Environment.SetEnvironmentVariable("DownloadCacheAvailable", null);
 
             // we only want to pass the following args to packages that would apply. 
             // like choco install git --params '' should pass those params to git.install, 
