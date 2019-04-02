@@ -51,9 +51,9 @@ namespace chocolatey.infrastructure.app.nuget
             catch (InvalidOperationException ex)
             {
                 var message = ex.Message;
-                if (!string.IsNullOrWhiteSpace(message) && message.Contains("(500) Internal Server Error"))
+                if (!string.IsNullOrWhiteSpace(message) && (message.Contains("(406)") || message.Contains("(409)")))
                 {
-                    throw new ApplicationException("There was an internal server error, which might mean the package already exists on a Simple OData Server.", ex);
+                    throw new ApplicationException("An error has occurred. It's possible the package version already exists on the repository.", ex);
                 }
 
                 throw;
