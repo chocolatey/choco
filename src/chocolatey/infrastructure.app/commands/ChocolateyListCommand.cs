@@ -45,7 +45,7 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("s=|source=",
                      "Source - Source location for install. Can use special 'webpi' or 'windowsfeatures' sources. Defaults to sources.",
                      option => configuration.Sources = option.remove_surrounding_quotes())
-                .Add("l|lo|localonly|local-only",
+                .Add("l|lo|local|localonly|local-only",
                      "LocalOnly - Only search against local machine items.",
                      option => configuration.ListCommand.LocalOnly = option != null)
                 .Add("idonly|id-only",
