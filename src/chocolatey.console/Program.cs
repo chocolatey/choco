@@ -156,6 +156,7 @@ namespace chocolatey.console
                 else
                 {
                     "chocolatey".Log().Error(ChocolateyLoggers.Important, () => "{0}".format_with(ex.Message));
+                    "chocolatey".Log().Error(ChocolateyLoggers.LogFileOnly, () => "More Details: {0}".format_with(ex.ToString()));
                 }
 
                 if (Environment.ExitCode == 0) Environment.ExitCode = 1;

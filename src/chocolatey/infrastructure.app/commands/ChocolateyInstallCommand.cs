@@ -52,7 +52,7 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("x86|forcex86",
                      "ForceX86 - Force x86 (32bit) installation on 64 bit systems. Defaults to false.",
                      option => configuration.ForceX86 = option != null)
-                .Add("ia=|installargs=|installarguments=|install-arguments=",
+                .Add("ia=|installargs=|install-args=|installarguments=|install-arguments=",
                      "InstallArguments - Install Arguments to pass to the native installer in the package. Defaults to unspecified.",
                      option => configuration.InstallArguments = option.remove_surrounding_quotes())
                 .Add("o|override|overrideargs|overridearguments|override-arguments",
@@ -277,7 +277,7 @@ NOTE: Chocolatey Pro / Business builds on top of a great open source
     choco install notepadplusplus --force --force-dependencies
     choco install notepadplusplus googlechrome atom 7zip -dvfy
     choco install git -y --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'""
-    choco install git -y --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'"" --install-args=""'/DIR=C:\git'""
+    choco install git -y --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'"" --install-arguments=""'/DIR=C:\git'""
     # Params are package parameters, passed to the package
     # Install args are installer arguments, appended to the silentArgs 
     #  in the package for the installer itself
