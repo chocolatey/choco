@@ -31,6 +31,11 @@ on, this simple function comes in handy.
 Available as `Get-OSArchitectureWidth` in 0.9.10+. If you need
 compatibility with pre 0.9.10, please use the alias `Get-ProcessorBits`.
 
+As of 0.10.14+, ARM64 architecture will automatically select 32bit width as
+there is an emulator for 32 bit and there are no current plans by Microsoft to
+ship 64 bit x86 emulation for ARM64. For more details, see
+https://github.com/chocolatey/choco/issues/1800#issuecomment-484293844.
+
 .INPUTS
 None
 
@@ -51,6 +56,14 @@ param(
   if (([System.IntPtr]::Size -eq 4) -and (Test-Path env:\PROCESSOR_ARCHITEW6432)) {
     $bits = 64
   } elseif ([System.IntPtr]::Size -eq 4) {
+    $bits = 32
+  } 
+
+  # ARM64 has a x86 32bit emulator, so we need to select 32 bit if we detect 
+  # ARM64 - According to Microsoft on 2019 APR 18 (jkunkee), there are no 
+  # current plans to ship 64-bit emulation for ARM64.
+  $processorArchitecture = $env:PROCESSOR_ARCHITECTURE
+  if ($processorArchitecture -and $processorArchitecture -eq 'ARM64') {
     $bits = 32
   }
 

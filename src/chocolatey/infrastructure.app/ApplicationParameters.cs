@@ -89,6 +89,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string SystemUserName = "SYSTEM";
             public static readonly string Username = "USERNAME";
             public static readonly string ProcessorArchitecture = "PROCESSOR_ARCHITECTURE";
+            public const string ARM64_PROCESSOR_ARCHITECTURE = "ARM64";
             public static readonly string EnvironmentSeparator = ";";
 
             public static readonly string ChocolateyToolsLocation = "ChocolateyToolsLocation";

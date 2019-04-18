@@ -46,6 +46,14 @@ namespace chocolatey.infrastructure.adapters
         bool Is64BitOperatingSystem { get; }
 
         /// <summary>
+        /// Gets a value indicating whether [is64 bit process].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [is64 bit process]; otherwise, <c>false</c>.
+        /// </value>
+        bool Is64BitProcess { get; }
+
+        /// <summary>
         ///   Gets a value indicating whether the current process is running in user interactive mode.
         /// </summary>
         /// <returns>
