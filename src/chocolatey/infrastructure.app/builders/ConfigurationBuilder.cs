@@ -616,7 +616,7 @@ Following these scripting best practices will ensure your scripts work
             config.Information.ChocolateyProductVersion = VersionInformation.get_current_informational_version();
             config.Information.FullName = Assembly.GetExecutingAssembly().FullName;
             config.Information.Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;
-            config.Information.Is64BitProcess = (IntPtr.Size == 8);
+            config.Information.Is64BitProcess = Environment.Is64BitProcess;
             config.Information.IsInteractive = Environment.UserInteractive;
             config.Information.UserName = System.Environment.UserName;
             config.Information.UserDomainName = System.Environment.UserDomainName;
