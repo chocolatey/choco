@@ -22,6 +22,7 @@ namespace chocolatey.infrastructure.app.nuget
 
     using NuGet;
     using configuration;
+    using chocolatey.infrastructure.app.domain;
 
     // ReSharper disable InconsistentNaming
 
@@ -137,9 +138,31 @@ namespace chocolatey.infrastructure.app.nuget
                         .AsQueryable();
             }
 
-            results = configuration.ListCommand.OrderByPopularity ? 
-                 results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Id)
-                 : results;
+
+            switch (configuration.ListCommand.OrderBy)
+            {
+                case PackageOrder.name:
+                    results = results.OrderBy(p => p.Id);
+                    break;
+
+                case PackageOrder.title:
+                    results = results.OrderBy(p => p.Title).ThenBy(p => p.Id);
+                    break;
+
+                case PackageOrder.popularity:
+                    results = results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Id);
+                    break;
+
+                case PackageOrder.lastpublished:
+                    results = results.OrderByDescending(p => p.Published).ThenBy(p => p.Id);
+                    break;
+
+                case PackageOrder.unsorted:
+                    break;
+
+                default:
+                    break;
+            }
 
             return results;
         } 

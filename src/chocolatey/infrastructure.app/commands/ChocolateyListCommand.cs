@@ -22,6 +22,7 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
+    using domain;
     using infrastructure.commands;
     using logging;
     using results;
@@ -104,9 +105,28 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("id-starts-with",
                      "IdStartsWith - Only return packages where the id starts with the search filter. Available in 0.9.10+.",
                      option => configuration.ListCommand.IdStartsWith = option != null)
+                 .Add("o=|order=|order-by=",
+                     "OrderBy - Sort by package results by name (default), title, popularity, lastpublished, unsorted. Available in 0.10.12+.",
+                     option =>
+                     {
+                         PackageOrder packageOrder;
+                         if (Enum.TryParse(option, true, out packageOrder)) {
+                             configuration.ListCommand.OrderBy = packageOrder;
+                         }
+                         else
+                         {
+                             this.Log().Warn("Unknown package order {0}, ignoring".format_with(option));
+                         }
+                     })
                  .Add("order-by-popularity",
                      "OrderByPopularity - Sort by package results by popularity. Available in 0.9.10+.",
-                     option => configuration.ListCommand.OrderByPopularity = option != null)    
+                     option =>
+                     {
+                         if (option != null)
+                         {
+                             configuration.ListCommand.OrderBy = PackageOrder.popularity;
+                         }
+                     })
                  .Add("approved-only",
                      "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository. Available in 0.9.10+.",
                      option => configuration.ListCommand.ApprovedOnly = option != null)   
