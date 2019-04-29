@@ -66,6 +66,10 @@ param(
   if ($processorArchitecture -and $processorArchitecture -eq 'ARM64') {
     $bits = 32
   }
+  $processorArchiteW6432 = $env:PROCESSOR_ARCHITEW6432
+  if ($processorArchiteW6432 -and $processorArchiteW6432 -eq 'ARM64') {
+    $bits = 32
+  }
 
   # Return bool|int
   if ("$compare" -ne '' -and $compare -eq $bits) {
