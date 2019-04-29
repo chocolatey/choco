@@ -102,6 +102,8 @@
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInfoCommand.cs" />
+    <Compile Include="infrastructure\cryptography\DefaultEncryptionUtility.cs" />
+    <Compile Include="infrastructure\adapters\IEncryptionUtility.cs" />
     <Compile Include="infrastructure.app\validations\GlobalConfigurationValidation.cs" />
     <Compile Include="infrastructure.app\configuration\EnvironmentSettings.cs" />
     <Compile Include="infrastructure.app\domain\GenericRegistryKey.cs" />

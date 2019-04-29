@@ -17,40 +17,41 @@
 namespace chocolatey.infrastructure.app.nuget
 {
     using System;
-    using System.Security.Cryptography;
+    using System.ComponentModel;
     using System.Text;
-    using NuGet;
+    using adapters;
+    using cryptography;
 
     // ReSharper disable InconsistentNaming
 
     public static class NugetEncryptionUtility
     {
-        private static readonly byte[] _entropyBytes = Encoding.UTF8.GetBytes("Chocolatey");
-
-        internal static string EncryptString(string value)
+        private static Lazy<IEncryptionUtility> _encryptionUtility = new Lazy<IEncryptionUtility>(() => new DefaultEncryptionUtility());
+        
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IEncryptionUtility> encryptionUtility)
         {
-            if (string.IsNullOrWhiteSpace(value)) return null;
+            _encryptionUtility = encryptionUtility;
+        }
 
-            var decryptedByteArray = Encoding.UTF8.GetBytes(value);
-            var encryptedByteArray = ProtectedData.Protect(decryptedByteArray, _entropyBytes, DataProtectionScope.LocalMachine);
-            var encryptedString = Convert.ToBase64String(encryptedByteArray);
-            return encryptedString;
+        private static IEncryptionUtility EncryptionUtility
+        {
+            get { return _encryptionUtility.Value; }
+        }
+
+        internal static string EncryptString(string cleartextValue)
+        {
+            return EncryptionUtility.encrypt_string(cleartextValue);
         }
 
         internal static string DecryptString(string encryptedString)
         {
-            var encryptedByteArray = Convert.FromBase64String(encryptedString);
-            var decryptedByteArray = ProtectedData.Unprotect(encryptedByteArray, _entropyBytes, DataProtectionScope.LocalMachine);
-            return Encoding.UTF8.GetString(decryptedByteArray);
+            return EncryptionUtility.decrypt_string(encryptedString);
         }
 
         public static string GenerateUniqueToken(string caseInsensitiveKey)
         {
-            // SHA256 is case sensitive; given that our key is case insensitive, we upper case it
-            var pathBytes = Encoding.UTF8.GetBytes(caseInsensitiveKey.ToUpperInvariant());
-            var hashProvider = new CryptoHashProvider("SHA256");
-
-            return Convert.ToBase64String(hashProvider.CalculateHash(pathBytes)).ToUpperInvariant();
+            return EncryptionUtility.generate_unique_token(caseInsensitiveKey);
         }
     }
 
