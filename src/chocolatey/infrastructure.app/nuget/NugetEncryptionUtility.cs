@@ -39,12 +39,12 @@ namespace chocolatey.infrastructure.app.nuget
             get { return _encryptionUtility.Value; }
         }
 
-        internal static string EncryptString(string cleartextValue)
+        public static string EncryptString(string cleartextValue)
         {
             return EncryptionUtility.encrypt_string(cleartextValue);
         }
 
-        internal static string DecryptString(string encryptedString)
+        public static string DecryptString(string encryptedString)
         {
             return EncryptionUtility.decrypt_string(encryptedString);
         }
