@@ -19,7 +19,7 @@ namespace chocolatey.infrastructure.app.attributes
     using System;
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class CommandForAttribute : Attribute
+    public class CommandForAttribute : Attribute
     {
         public string CommandName { get; private set; }
         public string Description { get; private set; }
