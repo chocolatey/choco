@@ -6,7 +6,13 @@ matrix:
       before_install:
         - sudo apt-get install mono-devel mono-gmcs
     - os: windows
+      language: csharp  # try "language: csharp" just to be sure
+      before_install:
+        - choco install nuget.commandline
+    - os: windows
       language: c  # "language: csharp" is not yet supported in Travis CI Windows
+      before_install:
+        - choco install nuget.commandline
 install:
   - nuget restore src/chocolatey.sln
 before_script:
