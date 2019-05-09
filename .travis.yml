@@ -9,7 +9,7 @@ matrix:
       language: c  # "language: csharp" is not yet supported in Travis CI Windows
       before_install:
         - choco install nuget.commandline
-        - "echo \"build.sh must be rewritten to not rely on mono...\"" > build.sh
+        - echo "echo \"build.sh must be rewritten to not rely on mono...\"" > build.sh
 install:
   - nuget restore src/chocolatey.sln
 before_script:
