@@ -8,6 +8,7 @@ matrix:
         - nuget restore src/chocolatey.sln
     - os: windows
       language: c  # "language: csharp" is not yet supported in Travis CI Windows
+      env: PATH="/c/Program Files/Mono/bin:$PATH"
       solution: src/chocolatey.sln
       before_install:
         - choco install mono
