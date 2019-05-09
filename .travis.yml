@@ -6,6 +6,7 @@ matrix:
       before_install:
         - sudo apt-get install mono-devel mono-gmcs
     - os: windows
+      language: c  # "language: csharp" is not yet supported in Travis CI Windows
 install:
   - nuget restore src/chocolatey.sln
 before_script:
