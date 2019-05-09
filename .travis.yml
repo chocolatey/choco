@@ -2,13 +2,13 @@ language: csharp
 matrix:
   include:
     - os: linux
-      mono: 5.20.1
+      mono: 3.12.0
       before_install:
         - sudo apt-get install mono-devel mono-gmcs
     - os: windows
       language: c  # "language: csharp" is not yet supported in Travis CI Windows
       before_install:
-        - choco install mono
+        - choco install mono nuget.commandline
 install:
   - nuget restore src/chocolatey.sln
 before_script:
