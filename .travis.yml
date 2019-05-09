@@ -1,11 +1,12 @@
-language: csharp
-os:
-  - linux
-  - windows
-mono:
-  - 3.12.0
+matrix:
+  include:
+    - os: linux
+      language: csharp
+      mono: 3.12.0
+      before_install:
+        - sudo apt-get install mono-devel mono-gmcs
+    - windows
 install:
-  - sudo apt-get install mono-devel mono-gmcs
   - nuget restore src/chocolatey.sln
 before_script:
   - chmod +x build.sh
