@@ -1,4 +1,7 @@
 language: csharp
+os:
+  - linux
+  - windows
 mono:
   - 3.12.0
 install:
