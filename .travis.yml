@@ -12,6 +12,8 @@ matrix:
       solution: src/chocolatey.sln
       before_install:
         - choco install mono
+  allow_failures:
+    - os: windows
 before_script:
   - chmod +x build.sh
 script:
