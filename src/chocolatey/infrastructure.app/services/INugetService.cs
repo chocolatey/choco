@@ -17,6 +17,7 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using configuration;
     using results;
 
@@ -58,5 +59,11 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="packageName">Name of the package.</param>
         void remove_rollback_directory_if_exists(string packageName);
 
+
+        /// <summary>
+        ///   Get all installed packages
+        /// </summary>
+        /// <param name="config">The configuration</param>
+        IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config);
     }
 }
