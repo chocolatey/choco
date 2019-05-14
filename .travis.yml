@@ -1,6 +1,6 @@
 language: csharp
 mono:
-  - 5.20.1.19
+  - 5.20.1
 install:
   - sudo apt-get install mono-devel mono-gmcs
   - nuget restore src/chocolatey.sln
