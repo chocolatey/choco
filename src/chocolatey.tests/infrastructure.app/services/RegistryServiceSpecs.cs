@@ -23,6 +23,7 @@ namespace chocolatey.tests.infrastructure.app.services
     using Moq;
     using Should;
     using Registry = chocolatey.infrastructure.app.domain.Registry;
+	using NUnit.Framework;
 
     public class RegistryServiceSpecs
     {
@@ -47,6 +48,7 @@ namespace chocolatey.tests.infrastructure.app.services
         }
 
         [WindowsOnly]
+		[Platform(Exclude="Unix,Linux,MacOsX")]
         public class when_RegistryService_get_installer_keys_is_called : RegistryServiceSpecsBase
         {
             private Registry _result;
@@ -69,6 +71,7 @@ namespace chocolatey.tests.infrastructure.app.services
         }
 
         [WindowsOnly]
+		[Platform(Exclude="Unix,Linux,MacOsX")]
         public class when_RegistryService_get_key_is_called_for_a_value_that_exists : RegistryServiceSpecsBase
         {
             private RegistryKey _result;
@@ -111,6 +114,7 @@ namespace chocolatey.tests.infrastructure.app.services
         }
 
         [WindowsOnly]
+		[Platform(Exclude="Unix,Linux,MacOsX")]
         public class when_RegistryService_get_key_is_called_for_a_value_that_does_not_exist : RegistryServiceSpecsBase
         {
             private RegistryKey _result;
