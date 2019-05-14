@@ -1,4 +1,4 @@
-FROM mono:3.12.1
+FROM mono:5.20.1.19
 
 MAINTAINER Justin Phelps <linuturk@onitato.com>
 
