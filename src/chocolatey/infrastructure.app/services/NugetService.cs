@@ -471,7 +471,10 @@ folder.");
                     continue;
                 }
 
-                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository);
+                IPackage availablePackage = config.Features.UsePackageRepositoryOptimizations ? 
+                    find_package(packageName, version, config, packageManager.SourceRepository) 
+                    : packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+
                 if (availablePackage == null)
                 {
                     var logMessage = @"{0} not installed. The package was not found with the source(s) listed.
@@ -634,6 +637,16 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                         continue;
                     }
 
+                    if (config.Features.SkipPackageUpgradesWhenNotInstalled)
+                    {
+                        string warnLogMessage = "{0} is not installed and skip non-installed option selected. Skipping...".format_with(packageName);
+                        var result = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                        result.Messages.Add(new ResultMessage(ResultType.Warn, warnLogMessage));
+                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, warnLogMessage);
+
+                        continue;
+                    }
+
                     string logMessage = @"{0} is not installed. Installing...".format_with(packageName);
 
                     if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
@@ -682,7 +695,10 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                IPackage availablePackage = find_package(packageName, version, config, packageManager.SourceRepository);
+                IPackage availablePackage = config.Features.UsePackageRepositoryOptimizations ? 
+                    find_package(packageName, version, config, packageManager.SourceRepository) 
+                    : packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+
                 config.Prerelease = originalPrerelease;
 
                 if (availablePackage == null)
@@ -862,7 +878,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
             return packageInstalls;
         }
 
-        public ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config)
+        public virtual ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config)
         {
             var packageManager = NugetCommon.GetPackageManager(
               config,
@@ -889,7 +905,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 bool isPinned = pkgInfo.IsPinned;
 
-                // if the package is pinned and we are skipping pinned, 
+                // if the package is pinned and we are skipping pinned,
                 // move on quickly
                 if (isPinned && config.OutdatedCommand.IgnorePinned)
                 {
@@ -907,8 +923,11 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                var latestPackage = find_package(packageName, null, config, repository);
-                
+                SemanticVersion version =  null;
+                var latestPackage = config.Features.UsePackageRepositoryOptimizations ? 
+                    find_package(packageName, null, config, packageManager.SourceRepository) 
+                    : packageManager.SourceRepository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
+
                 if (latestPackage == null)
                 {
                     if (config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated) continue;
@@ -923,7 +942,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 }
 
                 if (latestPackage.Version <= installedPackage.Version) continue;
-                
+
                 var packageResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(latestPackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, latestPackage.Id)));
 
                 string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).{3} Source(s): \"{4}\"".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version, Environment.NewLine, config.Sources);
@@ -949,36 +968,43 @@ Please see https://chocolatey.org/docs/troubleshooting for more
 
                 foreach (var packageRepository in aggregateRepository.Repositories.or_empty_list_if_null())
                 {
-                    this.Log().Debug("Using '" + packageRepository.Source + "'.");
-                    this.Log().Debug("- Supports prereleases? '" + packageRepository.SupportsPrereleasePackages + "'.");
-                    this.Log().Debug("- Is ServiceBased? '" + (packageRepository is IServiceBasedRepository) + "'.");
-
-                    // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
-                    IQueryable<IPackage> combinedResults = packageRepository.GetPackages().Where(x => x.Id.ToLower() == packageName);
-
-                    if (config.Prerelease && packageRepository.SupportsPrereleasePackages)
+                    try
                     {
-                        combinedResults = combinedResults.Where(p => p.IsAbsoluteLatestVersion);
+                        this.Log().Debug("Using '" + packageRepository.Source + "'.");
+                        this.Log().Debug("- Supports prereleases? '" + packageRepository.SupportsPrereleasePackages + "'.");
+                        this.Log().Debug("- Is ServiceBased? '" + (packageRepository is IServiceBasedRepository) + "'.");
+
+                        // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
+                        IQueryable<IPackage> combinedResults = packageRepository.GetPackages().Where(x => x.Id.ToLower() == packageName);
+
+                        if (config.Prerelease && packageRepository.SupportsPrereleasePackages)
+                        {
+                            combinedResults = combinedResults.Where(p => p.IsAbsoluteLatestVersion);
+                        }
+                        else
+                        {
+                            combinedResults = combinedResults.Where(p => p.IsLatestVersion);
+                        }
+
+                        if (!(packageRepository is IServiceBasedRepository))
+                        {
+                            combinedResults = combinedResults
+                                .Where(PackageExtensions.IsListed)
+                                .Where(p => config.Prerelease || p.IsReleaseVersion())
+                                .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
+                                .AsQueryable();
+                        }
+
+                        var packageRepositoryResults = combinedResults.ToList();
+                        if (packageRepositoryResults.Count() != 0)
+                        {
+                            this.Log().Debug("Package '{0}' found on source '{1}'".format_with(packageName, packageRepository.Source));
+                            packageResults.AddRange(packageRepositoryResults);
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        combinedResults = combinedResults.Where(p => p.IsLatestVersion);
-                    }
-
-                    if (!(packageRepository is IServiceBasedRepository))
-                    {
-                        combinedResults = combinedResults
-                            .Where(PackageExtensions.IsListed)
-                            .Where(p => config.Prerelease || p.IsReleaseVersion())
-                            .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
-                            .AsQueryable();
-                    }
-
-                    var packageRepositoryResults = combinedResults.ToList();
-                    if (packageRepositoryResults.Count() != 0)
-                    {
-                        this.Log().Debug("Package '{0}' found on source '{1}'".format_with(packageName, packageRepository.Source));
-                        packageResults.AddRange(packageRepositoryResults);
+                       this.Log().Warn("Error retrieving packages from source '{0}':{1} {2}".format_with(packageRepository.Source, Environment.NewLine, e.Message));
                     }
                 }
 
@@ -1136,6 +1162,8 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     try
                     {
                         _fileSystem.copy_directory(backupLocation, pkgInstallPath, overwriteExisting: true);
+
+                        remove_packaging_files_prior_to_upgrade(pkgInstallPath, config.CommandName);
                     }
                     catch (Exception ex)
                     {
@@ -1153,6 +1181,29 @@ Please see https://chocolatey.org/docs/troubleshooting for more
  process locking the folder or files. Please make sure nothing is 
  running that would lock the files or folders in this directory prior 
  to upgrade. If the package fails to upgrade, this is likely the cause.");
+                }
+            }
+        }
+
+        public virtual void remove_packaging_files_prior_to_upgrade(string directoryPath, string commandName)
+        {
+            if (commandName.to_lower() == "upgrade")
+            {
+                // Due to the way that Package Reducer works, there is a potential that a Chocolatey Packaging
+                // script could be incorrectly left in place during an upgrade operation.  To guard against this,
+                // remove any Chocolatey Packaging scripts, which will then be restored by the new package, if
+                // they are still required
+                var filesToDelete = new List<string> {"chocolateyinstall", "chocolateyuninstall", "chocolateybeforemodify"};
+                var packagingScripts = _fileSystem.get_files(directoryPath, "*.ps1", SearchOption.AllDirectories)
+                    .Where(p => filesToDelete.Contains(_fileSystem.get_file_name_without_extension(p).to_lower()));
+
+                foreach (var packagingScript in packagingScripts)
+                {
+                    if (_fileSystem.file_exists(packagingScript))
+                    {
+                        this.Log().Debug("Deleting file {0}".format_with(packagingScript));
+                        _fileSystem.delete_file(packagingScript);
+                    }
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2019 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,11 +30,13 @@ namespace chocolatey
     using infrastructure.logging;
     using infrastructure.registration;
     using infrastructure.synchronization;
+    using log4net;
 #if !NoResources
     using resources;
 #endif
     using Assembly = infrastructure.adapters.Assembly;
     using IFileSystem = infrastructure.filesystem.IFileSystem;
+    using ILog = infrastructure.logging.ILog;
 
     // ReSharper disable InconsistentNaming
 
@@ -43,6 +45,8 @@ namespace chocolatey
     /// </summary>
     public static class Lets
     {
+        private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof(Lets));
+
         private static GetChocolatey set_up()
         {
             add_assembly_resolver();
@@ -56,14 +60,16 @@ namespace chocolatey
         }
 
         private static ResolveEventHandler _handler = null;
-
         private static void add_assembly_resolver()
         {
             _handler = (sender, args) =>
             {
                 var requestedAssembly = new AssemblyName(args.Name);
+
+                // There are things that are ILMerged into Chocolatey. Anything with 
+                // the right public key except licensed should use the choco/chocolatey assembly
                 if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
-                    && !requestedAssembly.Name.is_equal_to("chocolatey.licensed")
+                    && !requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName)
                     && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
                 {
                     return typeof(Lets).Assembly;
@@ -72,9 +78,13 @@ namespace chocolatey
                 try
                 {
                     if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
-                        && requestedAssembly.Name.is_equal_to("chocolatey.licensed"))
+                        && requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName))
                     {
-                        return Assembly.LoadFile(ApplicationParameters.LicensedAssemblyLocation).UnderlyingType;
+                        _logger.Debug("Resolving reference to chocolatey.licensed...");
+                        return AssemblyResolution.resolve_or_load_assembly(
+                            ApplicationParameters.LicensedChocolateyAssemblySimpleName,
+                            ApplicationParameters.OfficialChocolateyPublicKey,
+                            ApplicationParameters.LicensedAssemblyLocation).UnderlyingType;
                     }
                 }
                 catch (Exception ex)

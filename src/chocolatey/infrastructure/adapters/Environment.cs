@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.adapters
 {
     using System;
     using System.Collections;
+    using app;
 
     public sealed class Environment : IEnvironment
     {
@@ -33,7 +34,16 @@ namespace chocolatey.infrastructure.adapters
 
         public bool Is64BitProcess
         {
-            get { return (IntPtr.Size == 8); }
+            get
+            {
+                // ARM64 bit architecture has a x86-32 emulator, so return false
+                if (System.Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ProcessorArchitecture).to_string().is_equal_to(ApplicationParameters.Environment.ARM64_PROCESSOR_ARCHITECTURE))
+                {
+                    return false;
+                }
+
+                return (IntPtr.Size == 8);
+            }
         }
 
         public bool UserInteractive

@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -113,11 +113,26 @@ namespace chocolatey.infrastructure.app.commands
                          {
                              configuration.Features.FailOnAutoUninstaller = false;
                          }
-                     }) 
+                     })
                  .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
                      "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
                      )
+                 .Add("exitwhenrebootdetected|exit-when-reboot-detected",
+                     "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}.  Overrides the default feature '{3}' set to '{4}'.  Available in 0.10.12+.".format_with
+                         (ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend, ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
+                     option => configuration.Features.ExitOnRebootDetected = option != null
+                     )
+                 .Add("ignoredetectedreboot|ignore-detected-reboot",
+                     "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'.  Available in 0.10.12+.".format_with
+                         (ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
+                     option =>
+                     {
+                         if (option != null)
+                         {
+                             configuration.Features.ExitOnRebootDetected = false;
+                         }
+                     })
                 ;
         }
 
@@ -177,14 +192,14 @@ NOTE: Starting in 0.9.10+, the Automatic Uninstaller (AutoUninstaller)
 
     choco feature disable -n autoUninstaller
 
-NOTE: Chocolatey Pro / Business automatically synchronizes with 
- Programs and Features, ensuring manually removed apps are 
+NOTE: Chocolatey Pro / Business automatically synchronizes with
+ Programs and Features, ensuring manually removed apps are
  automatically removed from Chocolatey's repository.
 
-NOTE: Synchronizer and AutoUninstaller enhancements in licensed 
- versions of Chocolatey ensure that Autouninstaller is up to 95% 
- effective at removing software without an uninstall script. This is 
- because synchronizer ensures the registry snapshot stays up to date 
+NOTE: Synchronizer and AutoUninstaller enhancements in licensed
+ versions of Chocolatey ensure that Autouninstaller is up to 95%
+ effective at removing software without an uninstall script. This is
+ because synchronizer ensures the registry snapshot stays up to date
  and licensed enhancements have the ability to inspect more locations
  to determine how to automatically uninstall software.
 ");
@@ -211,7 +226,40 @@ choco uninstall: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/
     choco uninstall notepadplusplus googlechrome atom 7zip -dv
     choco uninstall ruby --version 1.8.7.37402
     choco uninstall nodejs.install --all-versions
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+Package Exit Codes:
+ - 1605: software is not installed
+ - 1614: product is uninstalled
+ - 1641: success, reboot initiated
+ - 3010: success, reboot required
+ - other (not listed): likely an error has occurred
+
+In addition to normal exit codes, packages are allowed to exit
+ with their own codes when the feature '{0}' is
+ turned on. Available in v0.9.10+.
+
+Reboot Exit Codes:
+ - 350: pending reboot detected, no action has occurred
+ - 1604: install suspended, incomplete
+
+In addition to the above exit codes, you may also see reboot exit codes
+ when the feature '{1}' is turned on. It typically requires
+ the feature '{0}' to also be turned on to work properly.
+ Available in v0.10.12+.
+".format_with(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
             "chocolatey".Log().Info(@"

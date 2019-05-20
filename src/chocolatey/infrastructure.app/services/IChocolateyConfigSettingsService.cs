@@ -33,6 +33,7 @@ namespace chocolatey.infrastructure.app.services
         void feature_enable(ChocolateyConfiguration configuration);
         string get_api_key(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction);
         void set_api_key(ChocolateyConfiguration configuration);
+        void remove_api_key(ChocolateyConfiguration configuration);
         void config_list(ChocolateyConfiguration configuration);
         void config_get(ChocolateyConfiguration configuration);
         void config_set(ChocolateyConfiguration configuration);

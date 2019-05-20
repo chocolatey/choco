@@ -186,6 +186,7 @@ param(
   $process.StartInfo.UseShellExecute = $false
   $process.StartInfo.WorkingDirectory = Get-Location
   $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+  $process.StartInfo.CreateNoWindow = $true
 
   $process.Start() | Out-Null
   if ($process.StartInfo.RedirectStandardOutput) { $process.BeginOutputReadLine() }

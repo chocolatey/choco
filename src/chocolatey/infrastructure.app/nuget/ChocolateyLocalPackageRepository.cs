@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.app.nuget
     using System.IO;
     using System.Linq;
     using System.Runtime.Versioning;
+    using System.Threading;
     using NuGet;
 
     // ReSharper disable InconsistentNaming
@@ -50,10 +51,15 @@ namespace chocolatey.infrastructure.app.nuget
         public override void AddPackage(IPackage package)
         {
             string packageFilePath = GetPackageFilePath(package);
+            FileSystem.AddFileWithCheck(packageFilePath, package.GetStream);
+            // allow the file to finish being written 
+            Thread.Sleep(200);
             if (PackageSaveMode.HasFlag(PackageSaveModes.Nuspec))
             {
+                // don't trust the package metadata to be complete - extract from the downloaded nupkg
+                var zipPackage = new OptimizedZipPackage(FileSystem, packageFilePath);
                 string manifestFilePath = GetManifestFilePath(package.Id, package.Version);
-                Manifest manifest = Manifest.Create(package);
+                Manifest manifest = Manifest.Create(zipPackage);
                 manifest.Metadata.ReferenceSets = Enumerable.ToList<ManifestReferenceSet>(Enumerable.Select<IGrouping<FrameworkName, IPackageAssemblyReference>, ManifestReferenceSet>(Enumerable.GroupBy<IPackageAssemblyReference, FrameworkName>(package.AssemblyReferences, (Func<IPackageAssemblyReference, FrameworkName>)(f => f.TargetFramework)), (Func<IGrouping<FrameworkName, IPackageAssemblyReference>, ManifestReferenceSet>)(g => new ManifestReferenceSet()
                 {
                     TargetFramework = g.Key == (FrameworkName)null ? (string)null : VersionUtility.GetFrameworkString(g.Key),
@@ -64,8 +70,6 @@ namespace chocolatey.infrastructure.app.nuget
                 })));
                 FileSystem.AddFileWithCheck(manifestFilePath, manifest.Save);
             }
-
-            FileSystem.AddFileWithCheck(packageFilePath, package.GetStream);
         }
 
         private string GetManifestFilePath(string packageId, SemanticVersion version)

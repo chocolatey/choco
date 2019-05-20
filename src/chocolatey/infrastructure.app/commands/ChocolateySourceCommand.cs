@@ -45,10 +45,10 @@ namespace chocolatey.infrastructure.app.commands
 
             optionSet
                 .Add("n=|name=",
-                     "Name - the name of the source. Required with some actions. Defaults to empty.",
+                     "Name - the name of the source. Required with actions other than list. Defaults to empty.",
                      option => configuration.SourceCommand.Name = option.remove_surrounding_quotes())
                 .Add("s=|source=",
-                     "Source - The source. This can be a folder/file share or an http location. If it is a url, it will be a location you can go to in a browser and it returns OData with something that says Packages in the browser, similar to what you see when you go to https://chocolatey.org/api/v2/. Defaults to empty.",
+                     "Source - The source. This can be a folder/file share or an http location. If it is a url, it will be a location you can go to in a browser and it returns OData with something that says Packages in the browser, similar to what you see when you go to https://chocolatey.org/api/v2/. Required with add action. Defaults to empty.",
                      option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
@@ -104,6 +104,11 @@ namespace chocolatey.infrastructure.app.commands
             {
                 throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.SourceCommand.Command.to_string()));
             }
+            
+            if (configuration.SourceCommand.Command == SourceCommandType.add && string.IsNullOrWhiteSpace(configuration.Sources))
+            {
+                throw new ApplicationException("When specifying the subcommand 'add', you must also specify --source.".format_with(configuration.SourceCommand.Command.to_string()));
+            }
 
             if (!string.IsNullOrWhiteSpace(configuration.SourceCommand.Username) && string.IsNullOrWhiteSpace(configuration.SourceCommand.Password))
             {
@@ -147,6 +152,23 @@ When it comes to the source location, this can be a folder/file share or an http
 location. If it is a url, it will be a location you can go to in a browser and 
 it returns OData with something that says Packages in the browser, similar to 
 what you see when you go to https://chocolatey.org/api/v2/.
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
+");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
 
 ");
 

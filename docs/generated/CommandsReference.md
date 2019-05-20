@@ -59,9 +59,6 @@ You can pass options and switches in the following ways:
    (`` `"value`" ``) or apostrophes (`'value'`). Using the combination
    allows for both shells to work without issue, except for when the next
    section applies.
- * **Periods in PowerShell**: If you need to pass a period as part of a 
-   value or a path, PowerShell doesn't always handle it well. Please 
-   quote those values using "Quote Values" section above.
  * **Pass quotes in arguments**: When you need to pass quoted values to
    to something like a native installer, you are in for a world of fun. In
    cmd.exe you must pass it like this: `-ia "/yo=""Spaces spaces"""`. In
@@ -69,11 +66,124 @@ You can pass options and switches in the following ways:
    No other combination will work. In PowerShell.exe if you are on version
    v3+, you can try `--%` before `-ia` to just pass the args through as is,
    which means it should not require any special workarounds.
+ * **Periods in PowerShell**: If you need to pass a period as part of a
+   value or a path, PowerShell doesn't always handle it well. Please
+   quote those values using "Quote Values" section above.
  * Options and switches apply to all items passed, so if you are
    installing multiple packages, and you use `--version=1.0.0`, choco
    is going to look for and try to install version 1.0.0 of every
    package passed. So please split out multiple package calls when
    wanting to pass specific options.
+
+## Scripting / Integration - Best Practices / Style Guide
+
+When writing scripts, such as PowerShell scripts passing options and
+switches, there are some best practices to follow to ensure that you
+don't run into issues later. This also applies to integrations that
+are calling Chocolatey and parsing output. Chocolatey **uses** 
+PowerShell, but it is an exe, so it cannot return PowerShell objects.
+
+Following these practices ensures both readability of your scripts AND 
+compatibility across different versions and editions of Chocolatey. 
+Following this guide will ensure your experience is not frustrating 
+based on choco not receiving things you think you are passing to it.
+
+ * For consistency, always use `choco`, not `choco.exe`. Never use 
+   shortcut commands like `cinst` or `cup`.
+ * Always have the command as the first argument to `choco. e.g.
+   [[`choco install`|Commandsinstall]], where [[`install`|Commandsinstall]] is the command.
+ * If there is a subcommand, ensure that is the second argument. e.g.
+   `choco source list`, where `source` is the command and [[`list`|Commandslist]] is the
+   subcommand.
+ * Typically the subject comes next. If installing packages, the 
+   subject would be the package names, e.g. `choco install pkg1 pkg2`.
+ * Never use 'nupkg' or point directly to a nupkg file UNLESS using
+   'choco push'. Use the source folder instead, e.g. `choco install
+   <package id> --source="'c:\folder\with\package'"` instead of 
+   `choco install DoNotDoThis.1.0.nupkg` or `choco install DoNotDoThis 
+    --source="'c:\folder\with\package\DoNotDoThis.1.0.nupkg'"`.
+ * Switches and parameters are called simply options. Options come 
+   after the subject. e.g. `choco install pkg1 --debug --verbose`.
+ * Never use the force option (`--force`/`-f`) in scripts (or really
+   otherwise as a default mode of use). Force is an override on 
+   Chocolatey behavior. If you are wondering why Chocolatey isn't doing
+   something like the documentation says it should, it's likely because
+   you are using force. Stop.
+ * Always use full option name. If the short option is `-n`, and the
+   full option is `--name`, use `--name`. The only acceptable short
+   option for use in scripts is `-y`. Find option names in help docs
+   online or through `choco -?` /`choco [Command Name] -?`.
+ * For scripts that are running automated, always use `-y`. Do note 
+   that even with `-y` passed, some things / state issues detected will
+   temporarily stop for input - the key here is temporarily. They will 
+   continue without requiring any action after the temporary timeout
+   (typically 30 seconds).
+ * Full option names are prepended with two dashes, e.g. `--` or 
+   `--debug --verbose --ignore-proxy`.
+ * When setting a value to an option, always put an equals (`=`) 
+   between the name and the setting, e.g. `--source="'local'"`.
+ * When setting a value to an option, always surround the value 
+   properly with double quotes bookending apostrophes, e.g. 
+   `--source="'internal_server'"`.
+ * If you are building PowerShell scripts, you can most likely just 
+   simply use apostrophes surrounding option values, e.g. 
+   `--source='internal_server'`.
+ * Prefer upgrade to install in scripts. You can't [[`install`|Commandsinstall]] to a newer
+   version of something, but you can [[`choco upgrade`|Commandsupgrade]] which will do both
+   upgrade or install (unless switched off explicitly).
+ * If you are sharing the script with others, pass `--source` to be 
+   explicit about where the package is coming from. Use full link and 
+   not source name ('https://chocolatey.org/api/v2' versus 
+   'chocolatey').
+ * If parsing output, you might want to use `--limit-output`/`-r` to 
+   get output in a more machine parseable format. **NOTE:** Not all 
+   commands handle return of information in an easily digestible 
+   output.
+ * Use exit codes to determine status. Chocolatey exits with 0 when 
+   everything worked appropriately and other exits codes like 1 when 
+   things error. There are package specific exit codes that are 
+   recommended to be used and reboot indicating exit codes as well. To
+   check exit code when using PowerShell, immediately call 
+   `$exitCode = $LASTEXITCODE` to get the value choco exited with.
+
+Here's an example following bad practices (line breaks added for 
+ readability):
+
+  `choco install pkg1 -y -params '/Option:Value /Option2:value with 
+   spaces' --c4b-option 'Yaass' --option-that-is-new 'dude upgrade'`
+
+Now here is that example written with best practices (again line 
+ breaks added for readability - there are not line continuations 
+ for choco):
+
+  `choco upgrade pkg1 -y --source="'https://chocolatey.org/api/v2'" 
+   --package-parameters="'/Option:Value /Option2:value with spaces'"
+   --c4b-option="'Yaass'" --option-that-is-new="'dude upgrade'"`
+
+Note the differences between the two: 
+ * Which is more self-documenting? 
+ * Which will allow for the newest version of something installed or 
+   upgraded to (which allows for more environmental consistency on
+   packages and versions)?
+ * Which may throw an error on a badly passed option?
+ * Which will throw errors on unknown option values? See explanation 
+   below.
+
+Chocolatey ignores options it doesn't understand, but it can only
+ ignore option values if they are tied to the option with an
+ equals sign ('='). Note those last two options in the examples above?
+ If you roll off of a commercial edition or someone with older version
+ attempts to run the badly crafted script `--c4b-option 'Yaass'
+ --option-that-is-new 'dude upgrade'`, they are likely to see errors on
+ 'Yaass' and 'dude upgrade' because they are not explicitly tied to the 
+ option they are written after. Now compare that to the other script. 
+ Choco will ignore `--c4b-option="'Yaass'"` and
+ `--option-that-is-new="'dude upgrade'"` as a whole when it doesn't
+ register the options. This means that your script doesn't error.
+
+Following these scripting best practices will ensure your scripts work
+ everywhere they are used and with newer versions of Chocolatey.
+
 
 ## See Help Menu In Action
 

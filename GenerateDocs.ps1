@@ -192,7 +192,7 @@ param(
     return
   }
   $commandText = $commandText -creplace '^(.+)(\s+Command\s*)$', "# `$1`$2 (choco $commandName)"
-  $commandText = $commandText -replace '^(Usage|Troubleshooting|Examples|Connecting to Chocolatey.org|See It In Action|Alternative Sources|Resources|Packages.config)', '## $1'
+  $commandText = $commandText -creplace '^(Usage|Troubleshooting|Examples|Exit Codes|Connecting to Chocolatey.org|See It In Action|Alternative Sources|Resources|Packages.config|Scripting \/ Integration - Best Practices \/ Style Guide)', '## $1'
   $commandText = $commandText -replace '^(Commands|How To Pass Options)', '## $1'
   $commandText = $commandText -replace '^(WebPI|Windows Features|Ruby|Cygwin|Python)\s*$', '### $1'
   $commandText = $commandText -replace 'NOTE\:', '**NOTE:**'

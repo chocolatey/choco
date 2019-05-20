@@ -76,6 +76,7 @@ REM Processing begin
     del /f /q "%TEMP%\_envget.tmp" 2>nul
 
     REM reset user / architecture and exit
+
     SET "USERNAME=%OriginalUserName%"
     SET "PROCESSOR_ARCHITECTURE=%OriginalArchitecture%"
     echo Finished re-setting environment variables.

@@ -12,12 +12,10 @@
     <mapping>
       <level value="ERROR" />
       <foreColor value="Red" />
-      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="WARN" />
       <foreColor value="Yellow" />
-      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="INFO" />
@@ -52,12 +50,10 @@
     <mapping>
       <level value="WARN" />
       <foreColor value="Magenta" />
-      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="INFO" />
       <foreColor value="Green" />
-      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="DEBUG" />

@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,8 +61,8 @@ namespace chocolatey.infrastructure.app.configuration
             var properties = new StringBuilder();
 
             this.Log().Debug(ChocolateyLoggers.Important, @"
-NOTE: Hiding sensitive configuration data! Please double and triple 
- check to be sure no sensitive data is shown, especially if copying 
+NOTE: Hiding sensitive configuration data! Please double and triple
+ check to be sure no sensitive data is shown, especially if copying
  output to a gist for review.");
             output_tostring(properties, GetType().GetProperties(), this, "");
             return properties.ToString();
@@ -174,7 +174,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <value><c>true</c> for regular output; <c>false</c> for limited output.</value>
         public bool RegularOutput { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether console logging should be supressed. 
+        /// Gets or sets a value indicating whether console logging should be supressed.
         /// This is for use by API calls which surface results in alternate forms.
         /// </summary>
         /// <value><c>true</c> for no output; <c>false</c> for regular or limited output.</value>
@@ -221,7 +221,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string DownloadChecksum64 { get; set; }
         public string DownloadChecksumType { get; set; }
         public string DownloadChecksumType64 { get; set; }
-        
+
         /// <summary>
         ///   Configuration values provided by choco.
         /// </summary>
@@ -268,8 +268,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public SourcesCommandConfiguration SourceCommand { get;  set; }        
-        
+        public SourcesCommandConfiguration SourceCommand { get;  set; }
+
         /// <summary>
         ///   Default Machine Sources Configuration
         /// </summary>
@@ -382,14 +382,19 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool VirusCheck { get; set; }
         public bool FailOnInvalidOrMissingLicense { get; set; }
         public bool IgnoreInvalidOptionsSwitches { get; set; }
-        public bool UsePackageExitCodes { get; set; }
+        public bool UsePackageExitCodes { get; set; } 
+        public bool UseEnhancedExitCodes { get; set; }
         public bool UseFipsCompliantChecksums { get; set; }
         public bool ShowNonElevatedWarnings { get; set; }
         public bool ShowDownloadProgress { get; set; }
         public bool StopOnFirstPackageFailure { get; set; }
         public bool UseRememberedArgumentsForUpgrades { get; set; }
         public bool IgnoreUnfoundPackagesOnUpgradeOutdated { get; set; }
+        public bool SkipPackageUpgradesWhenNotInstalled { get; set; }
         public bool RemovePackageInformationOnUninstall { get; set; }
+        public bool ExitOnRebootDetected { get; set; }
+        public bool LogValidationResultsOnWarnings { get; set; }
+        public bool UsePackageRepositoryOptimizations { get; set; }
 
         //todo remove in 0.11.0
         public bool ScriptsCheckLastExitCode { get; set; }
@@ -482,8 +487,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         public string Name { get; set; }
         public FeatureCommandType Command { get; set; }
-    }    
-    
+    }
+
     [Serializable]
     public sealed class ConfigCommandConfiguration
     {
@@ -509,6 +514,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class ApiKeyCommandConfiguration
     {
         public string Key { get; set; }
+        public bool Remove { get; set; }
     }
 
     [Serializable]
@@ -527,8 +533,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         public string Key { get; set; }
         //DisableBuffering?
-    } 
-    
+    }
+
     [Serializable]
     public sealed class ProxyConfiguration
     {

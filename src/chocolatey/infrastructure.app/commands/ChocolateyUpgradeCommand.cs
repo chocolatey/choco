@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,7 +53,7 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("x86|forcex86",
                      "ForceX86 - Force x86 (32bit) installation on 64 bit systems. Defaults to false.",
                      option => configuration.ForceX86 = option != null)
-                .Add("ia=|installargs=|installarguments=|install-arguments=",
+                .Add("ia=|installargs=|install-args=|installarguments=|install-arguments=",
                      "InstallArguments - Install Arguments to pass to the native installer in the package. Defaults to unspecified.",
                      option => configuration.InstallArguments = option.remove_surrounding_quotes())
                 .Add("o|override|overrideargs|overridearguments|override-arguments",
@@ -165,23 +165,61 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
                      "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
+                     ) 
+                 .Add("skip-if-not-installed|only-upgrade-installed|skip-when-not-installed",
+                     "Skip Packages Not Installed - if a package is not installed, do not install it during the upgrade process. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with(ApplicationParameters.Features.SkipPackageUpgradesWhenNotInstalled, configuration.Features.SkipPackageUpgradesWhenNotInstalled.to_string()),
+                     option => configuration.Features.SkipPackageUpgradesWhenNotInstalled = option != null
                      )
+                 .Add("install-if-not-installed",
+                     "Install Missing Packages When Not Installed - if a package is not installed, install it as part of running upgrade (typically default behavior). Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with(ApplicationParameters.Features.SkipPackageUpgradesWhenNotInstalled, configuration.Features.SkipPackageUpgradesWhenNotInstalled.to_string()),
+                     option =>
+                     {
+                        if (option != null)
+                        {
+                            configuration.Features.SkipPackageUpgradesWhenNotInstalled = false;
+                        }
+                     })
                  .Add("exclude-pre|exclude-prerelease|exclude-prereleases",
                      "Exclude Prerelease - Should prerelease be ignored for upgrades? Will be ignored if you pass `--pre`. Available in 0.10.4+.",
                      option => configuration.UpgradeCommand.ExcludePrerelease = option != null
                      )
                  .Add("userememberedargs|userememberedarguments|userememberedoptions|use-remembered-args|use-remembered-arguments|use-remembered-options",
                      "Use Remembered Options for Upgrade - use the arguments and options used during install for upgrade. Does not override arguments being passed at runtime. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configuration.Features.UseRememberedArgumentsForUpgrades.to_string()),
-                    option =>
-                    {
-                        if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = true;
-                    })
+                     option =>
+                     {
+                         if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = true;
+                     })
                  .Add("ignorerememberedargs|ignorerememberedarguments|ignorerememberedoptions|ignore-remembered-args|ignore-remembered-arguments|ignore-remembered-options",
                      "Ignore Remembered Options for Upgrade - ignore the arguments and options used during install for upgrade. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configuration.Features.UseRememberedArgumentsForUpgrades.to_string()),
-                    option =>
-                    {
-                        if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = false;
-                    })
+                     option =>
+                     {
+                         if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = false;
+                     })
+                 .Add("exitwhenrebootdetected|exit-when-reboot-detected",
+                     "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}. Overrides the default feature '{3}' set to '{4}'. Available in 0.10.12+.".format_with
+                         (ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend, ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
+                     option => configuration.Features.ExitOnRebootDetected = option != null
+                     )
+                 .Add("ignoredetectedreboot|ignore-detected-reboot",
+                     "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with
+                         (ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
+                     option =>
+                     {
+                         if (option != null)
+                         {
+                             configuration.Features.ExitOnRebootDetected = false;
+                         }
+                     })
+                 .Add("disable-repository-optimizations|disable-package-repository-optimizations",
+                     "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.14+.".format_with
+                         (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.to_string()),
+                     option =>
+                     {
+                         if (option != null)
+                         {
+                             configuration.Features.UsePackageRepositoryOptimizations = false;
+                         }
+                     })
                 ;
         }
 
@@ -252,9 +290,9 @@ NOTE: `all` is a special package keyword that will allow you to upgrade
 Skip upgrading certain packages with `choco pin` or with the option
  `--except`.
 
-NOTE: Chocolatey Pro / Business automatically synchronizes with 
+NOTE: Chocolatey Pro / Business automatically synchronizes with
  Programs and Features, ensuring automatically updating apps' versions
- (like Chrome) are up to date in Chocolatey's repository. 
+ (like Chrome) are up to date in Chocolatey's repository.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
@@ -262,19 +300,55 @@ NOTE: Chocolatey Pro / Business automatically synchronizes with
     choco upgrade chocolatey
     choco upgrade notepadplusplus googlechrome atom 7zip
     choco upgrade notepadplusplus googlechrome atom 7zip -dvfy
-    choco upgrade git --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'"" -y
+    choco upgrade git -y --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'""
+    choco upgrade git -y --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'"" --install-args=""'/DIR=C:\git'""
+    # Params are package parameters, passed to the package
+    # Install args are installer arguments, appended to the silentArgs 
+    #  in the package for the installer itself
     choco upgrade nodejs.install --version 0.10.35
     choco upgrade git -s ""'https://somewhere/out/there'""
     choco upgrade git -s ""'https://somewhere/protected'"" -u user -p pass
     choco upgrade all
     choco upgrade all --except=""'skype,conemu'""
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+Package Exit Codes:
+ - 1641: success, reboot initiated
+ - 3010: success, reboot required
+ - other (not listed): likely an error has occurred
+
+In addition to normal exit codes, packages are allowed to exit
+ with their own codes when the feature '{0}' is
+ turned on.  Uninstall command has additional valid exit codes.
+ Available in v0.9.10+.
+
+Reboot Exit Codes:
+ - 350: pending reboot detected, no action has occurred
+ - 1604: install suspended, incomplete
+
+In addition to the above exit codes, you may also see reboot exit codes
+ when the feature '{1}' is turned on. It typically requires
+ the feature '{0}' to also be turned on to work properly.
+ Available in v0.10.12+.
+".format_with(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected));
+            
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"
 choco upgrade: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_upgrade.gif
 
 ");
-
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
             "chocolatey".Log().Info(@"

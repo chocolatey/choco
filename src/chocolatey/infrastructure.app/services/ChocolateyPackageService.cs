@@ -98,6 +98,11 @@ Did you know Pro / Business automatically syncs with Programs and
 
         private readonly string _shutdownExe = Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\shutdown.exe");
 
+        // Hold a list of exit codes that are known to be related to reboots
+        // 1641 - restart initiated
+        // 3010 - restart required
+        private readonly List<int> _rebootExitCodes = new List<int> { 1641, 3010 };
+
         public ChocolateyPackageService(INugetService nugetService, IPowershellService powershellService,
             IEnumerable<ISourceRunner> sourceRunners, IShimGenerationService shimgenService,
             IFileSystem fileSystem, IRegistryService registryService,
@@ -118,12 +123,12 @@ Did you know Pro / Business automatically syncs with Programs and
             _configTransformService = configTransformService;
         }
 
-        public void ensure_source_app_installed(ChocolateyConfiguration config)
+        public virtual void ensure_source_app_installed(ChocolateyConfiguration config)
         {
             perform_source_runner_action(config, r => r.ensure_source_app_installed(config, (packageResult) => handle_package_result(packageResult, config, CommandNameType.install)));
         }
 
-        public int count_run(ChocolateyConfiguration config)
+        public virtual int count_run(ChocolateyConfiguration config)
         {
             return perform_source_runner_function(config, r => r.count_run(config));
         }
@@ -159,9 +164,9 @@ Did you know Pro / Business automatically syncs with Programs and
             randomly_notify_about_pro_business(config, PRO_BUSINESS_LIST_MESSAGE);
         }
 
-        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
+        public virtual IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
-            if (string.IsNullOrWhiteSpace(config.Sources))
+            if (string.IsNullOrWhiteSpace(config.Sources) && !config.ListCommand.LocalOnly)
             {
                 this.Log().Error(ChocolateyLoggers.Important, @"Unable to search for packages when there are no sources enabled for
  packages and none were passed as arguments.");
@@ -246,7 +251,7 @@ Did you know Pro / Business automatically syncs with Programs and
             randomly_notify_about_pro_business(config);
         }
 
-        public void pack_run(ChocolateyConfiguration config)
+        public virtual void pack_run(ChocolateyConfiguration config)
         {
             if (config.SourceType != SourceType.normal)
             {
@@ -270,7 +275,7 @@ Did you know Pro / Business automatically syncs with Programs and
             randomly_notify_about_pro_business(config);
         }
 
-        public void push_run(ChocolateyConfiguration config)
+        public virtual void push_run(ChocolateyConfiguration config)
         {
             if (config.SourceType != SourceType.normal)
             {
@@ -328,7 +333,7 @@ Did you know Pro / Business automatically syncs with Programs and
             }
         }
 
-        public void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
+        public virtual void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
         {
             EnvironmentSettings.reset_environment_variables(config);
             set_pending(packageResult, config);
@@ -419,6 +424,18 @@ Did you know Pro / Business automatically syncs with Programs and
             EventManager.publish(new HandlePackageResultCompletedMessage(packageResult, config, commandName));
 
             remove_pending(packageResult, config);
+
+            if(_rebootExitCodes.Contains(packageResult.ExitCode))
+            {
+                if(config.Features.ExitOnRebootDetected)
+                {
+                    Environment.ExitCode = ApplicationParameters.ExitCodes.ErrorInstallSuspend;
+                    this.Log().Warn(ChocolateyLoggers.Important, @"Chocolatey has detected a pending reboot after installing/upgrading
+package '{0}' - stopping further execution".format_with(packageResult.Name));
+
+                    throw new ApplicationException("Reboot required before continuing. Reboot and run same command again.");
+                }
+            }
 
             if (!packageResult.Success)
             {
@@ -541,7 +558,7 @@ Did you know Pro / Business automatically syncs with Programs and
             return NugetEncryptionUtility.EncryptString(arguments.to_string());
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
+        public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
         {
             this.Log().Info(is_packages_config_file(config.PackageNames) ? @"Installing from config file:" : @"Installing the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
@@ -560,29 +577,34 @@ Did you know Pro / Business automatically syncs with Programs and
 
             get_environment_before(config, allowLogging: true);
 
-            foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, packageInstalls).or_empty_list_if_null())
+            try
             {
-                Action<PackageResult> action = null;
-                if (packageConfig.SourceType == SourceType.normal)
+                foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, packageInstalls).or_empty_list_if_null())
                 {
-                    action = (packageResult) => handle_package_result(packageResult, packageConfig, CommandNameType.install);
-                }
+                    Action<PackageResult> action = null;
+                    if (packageConfig.SourceType == SourceType.normal)
+                    {
+                        action = (packageResult) => handle_package_result(packageResult, packageConfig, CommandNameType.install);
+                    }
 
-                var results = perform_source_runner_function(packageConfig, r => r.install_run(packageConfig, action));
+                    var results = perform_source_runner_function(packageConfig, r => r.install_run(packageConfig, action));
 
-                foreach (var result in results)
-                {
-                    packageInstalls.GetOrAdd(result.Key, result.Value);
+                    foreach (var result in results)
+                    {
+                        packageInstalls.GetOrAdd(result.Key, result.Value);
+                    }
                 }
             }
-
-            var installFailures = report_action_summary(packageInstalls, "installed");
-            if (installFailures != 0 && Environment.ExitCode == 0)
+            finally
             {
-                Environment.ExitCode = 1;
-            }
+                var installFailures = report_action_summary(packageInstalls, "installed");
+                if (installFailures != 0 && Environment.ExitCode == 0)
+                {
+                    Environment.ExitCode = 1;
+                }
 
-            randomly_notify_about_pro_business(config);
+                randomly_notify_about_pro_business(config);
+            }
 
             return packageInstalls;
         }
@@ -594,7 +616,7 @@ Would have determined packages that are out of date based on what is
  installed and what versions are available for upgrade.");
         }
 
-        public void outdated_run(ChocolateyConfiguration config)
+        public virtual void outdated_run(ChocolateyConfiguration config)
         {
             if (config.SourceType != SourceType.normal)
             {
@@ -611,27 +633,33 @@ Would have determined packages that are out of date based on what is
 
             var output = config.RegularOutput;
             config.RegularOutput = false;
-            var oudatedPackages = _nugetService.get_outdated(config);
+            var outdatedPackages = _nugetService.get_outdated(config);
             config.RegularOutput = output;
 
             if (config.RegularOutput)
             {
-                var upgradeWarnings = oudatedPackages.Count(p => p.Value.Warning);
+                var upgradeWarnings = outdatedPackages.Count(p => p.Value.Warning);
                 this.Log().Warn(() => @"{0}{1} has determined {2} package(s) are outdated. {3}".format_with(
                     Environment.NewLine,
                     ApplicationParameters.Name,
-                    oudatedPackages.Count(p => p.Value.Success && !p.Value.Inconclusive),
+                    outdatedPackages.Count(p => p.Value.Success && !p.Value.Inconclusive),
                     upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings)
                     ));
 
                 if (upgradeWarnings != 0)
                 {
                     this.Log().Warn(ChocolateyLoggers.Important, "Warnings:");
-                    foreach (var warning in oudatedPackages.Where(p => p.Value.Warning).or_empty_list_if_null())
+                    foreach (var warning in outdatedPackages.Where(p => p.Value.Warning).or_empty_list_if_null())
                     {
                         this.Log().Warn(ChocolateyLoggers.Important, " - {0}".format_with(warning.Value.Name));
                     }
                 }
+            }
+
+            // oudated packages, return 2
+            if (config.Features.UseEnhancedExitCodes && outdatedPackages.Count != 0 && Environment.ExitCode == 0)
+            {
+                Environment.ExitCode = 2;
             }
 
             randomly_notify_about_pro_business(config);
@@ -720,7 +748,7 @@ Would have determined packages that are out of date based on what is
             randomly_notify_about_pro_business(config);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config)
+        public virtual ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config)
         {
             this.Log().Info(@"Upgrading the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
@@ -740,24 +768,36 @@ Would have determined packages that are out of date based on what is
                 throw new ApplicationException("A packages.config file is only used with installs.");
             }
 
-            Action<PackageResult> action = null;
-            if (config.SourceType == SourceType.normal)
+            var packageUpgrades = new ConcurrentDictionary<string, PackageResult>();
+
+            try
             {
-                action = (packageResult) => handle_package_result(packageResult, config, CommandNameType.upgrade);
+                Action<PackageResult> action = null;
+                if (config.SourceType == SourceType.normal)
+                {
+                    action = (packageResult) => handle_package_result(packageResult, config, CommandNameType.upgrade);
+                }
+
+                get_environment_before(config, allowLogging: true);
+
+                var beforeUpgradeAction = new Action<PackageResult>(packageResult => before_package_modify(packageResult, config));
+                var results = perform_source_runner_function(config, r => r.upgrade_run(config, action, beforeUpgradeAction));
+
+                foreach (var result in results)
+                {
+                    packageUpgrades.GetOrAdd(result.Key, result.Value);
+                }
             }
-
-            get_environment_before(config, allowLogging: true);
-
-            var beforeUpgradeAction = new Action<PackageResult>(packageResult => before_package_modify(packageResult, config));
-            var packageUpgrades = perform_source_runner_function(config, r => r.upgrade_run(config, action, beforeUpgradeAction));
-
-            var upgradeFailures = report_action_summary(packageUpgrades, "upgraded");
-            if (upgradeFailures != 0 && Environment.ExitCode == 0)
+            finally
             {
-                Environment.ExitCode = 1;
-            }
+                var upgradeFailures = report_action_summary(packageUpgrades, "upgraded");
+                if (upgradeFailures != 0 && Environment.ExitCode == 0)
+                {
+                    Environment.ExitCode = 1;
+                }
 
-            randomly_notify_about_pro_business(config);
+                randomly_notify_about_pro_business(config);
+            }
 
             return packageUpgrades;
         }
@@ -786,7 +826,7 @@ Would have determined packages that are out of date based on what is
             randomly_notify_about_pro_business(config);
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config)
+        public virtual ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config)
         {
             this.Log().Info(@"Uninstalling the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
@@ -796,30 +836,41 @@ Would have determined packages that are out of date based on what is
                 throw new ApplicationException("A packages.config file is only used with installs.");
             }
 
-            Action<PackageResult> action = null;
-            if (config.SourceType == SourceType.normal)
+            var packageUninstalls = new ConcurrentDictionary<string, PackageResult>();
+
+            try
             {
-                action = (packageResult) => handle_package_uninstall(packageResult, config);
+                Action<PackageResult> action = null;
+                if (config.SourceType == SourceType.normal)
+                {
+                    action = (packageResult) => handle_package_uninstall(packageResult, config);
+                }
+
+                var environmentBefore = get_environment_before(config);
+                var beforeUninstallAction = new Action<PackageResult>(packageResult => before_package_modify(packageResult, config));
+                var results = perform_source_runner_function(config, r => r.uninstall_run(config, action, beforeUninstallAction));
+
+                foreach (var result in results)
+                {
+                    packageUninstalls.GetOrAdd(result.Key, result.Value);
+                }
+
+                // not handled in the uninstall handler
+                IEnumerable<GenericRegistryValue> environmentChanges;
+                IEnumerable<GenericRegistryValue> environmentRemovals;
+                get_log_environment_changes(config, environmentBefore, out environmentChanges, out environmentRemovals);
             }
-
-            var environmentBefore = get_environment_before(config);
-            var beforeUninstallAction = new Action<PackageResult>(packageResult => before_package_modify(packageResult, config));
-            var packageUninstalls = perform_source_runner_function(config, r => r.uninstall_run(config, action, beforeUninstallAction));
-
-            // not handled in the uninstall handler
-            IEnumerable<GenericRegistryValue> environmentChanges;
-            IEnumerable<GenericRegistryValue> environmentRemovals;
-            get_log_environment_changes(config, environmentBefore, out environmentChanges, out environmentRemovals);
-
-            var uninstallFailures = report_action_summary(packageUninstalls, "uninstalled");
-            if (uninstallFailures != 0 && Environment.ExitCode == 0)
+            finally
             {
-                Environment.ExitCode = 1;
-            }
+                var uninstallFailures = report_action_summary(packageUninstalls, "uninstalled");
+                if (uninstallFailures != 0 && Environment.ExitCode == 0)
+                {
+                    Environment.ExitCode = 1;
+                }
 
-            if (uninstallFailures != 0)
-            {
-                this.Log().Warn(@"
+                if (uninstallFailures != 0)
+                {
+                    this.Log().Warn(@"
 If a package uninstall is failing and/or you've already uninstalled the
  software outside of Chocolatey, you can attempt to run the command
  with `-n` to skip running a chocolateyUninstall script, additionally
@@ -835,9 +886,10 @@ If a package is failing because it is a dependency of another package
  removed. Then delete the folder for the package. This option should
  only be used as a last resort.
  ");
-            }
+                }
 
-            randomly_notify_about_pro_business(config);
+                randomly_notify_about_pro_business(config);
+            }
 
             return packageUninstalls;
         }
@@ -913,7 +965,7 @@ The recent package changes indicate a reboot is necessary.
             return failures;
         }
 
-        public void handle_package_uninstall(PackageResult packageResult, ChocolateyConfiguration config)
+        public virtual void handle_package_uninstall(PackageResult packageResult, ChocolateyConfiguration config)
         {
             if (!_fileSystem.directory_exists(packageResult.InstallLocation))
             {
@@ -944,6 +996,18 @@ The recent package changes indicate a reboot is necessary.
             {
                 this.Log().Error(ChocolateyLoggers.Important, "{0} {1} not successful.".format_with(packageResult.Name, "uninstall"));
                 handle_unsuccessful_operation(config, packageResult, movePackageToFailureLocation: false, attemptRollback: false);
+            }
+
+            if(_rebootExitCodes.Contains(packageResult.ExitCode))
+            {
+                if(config.Features.ExitOnRebootDetected)
+                {
+                    Environment.ExitCode = ApplicationParameters.ExitCodes.ErrorInstallSuspend;
+                    this.Log().Warn(ChocolateyLoggers.Important, @"Chocolatey has detected a pending reboot after uninstalling
+package '{0}' - stopping further execution".format_with(packageResult.Name));
+
+                    throw new ApplicationException("Reboot required before continuing. Reboot and run same command again.");
+                }
             }
 
             if (!packageResult.Success)
@@ -1232,7 +1296,7 @@ ATTENTION: You must take manual action to remove {1} from
             _nugetService.remove_rollback_directory_if_exists(packageResult.Name);
         }
 
-        public void set_pending(PackageResult packageResult, ChocolateyConfiguration config)
+        public virtual void set_pending(PackageResult packageResult, ChocolateyConfiguration config)
         {
             var packageDirectory = packageResult.InstallLocation;
             if (string.IsNullOrWhiteSpace(packageDirectory)) return;
@@ -1256,7 +1320,7 @@ ATTENTION: You must take manual action to remove {1} from
             }
         }
 
-        public void remove_pending(PackageResult packageResult, ChocolateyConfiguration config)
+        public virtual void remove_pending(PackageResult packageResult, ChocolateyConfiguration config)
         {
             var packageDirectory = packageResult.InstallLocation;
             if (string.IsNullOrWhiteSpace(packageDirectory)) return;

@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -109,11 +109,28 @@ This is especially helpful when running `choco upgrade` for all
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
-    choco pin   
-    choco pin list  
+    choco pin
+    choco pin list
     choco pin add -n=git
     choco pin add -n=git --version 1.2.3
     choco pin remove --name git
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
+");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
 
 ");
 
@@ -128,7 +145,7 @@ This is especially helpful when running `choco upgrade` for all
         public virtual void run(ChocolateyConfiguration configuration)
         {
             var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
-                                                               new PackageDownloader(), 
+                                                               new PackageDownloader(),
                                                                installSuccessAction: null,
                                                                uninstallSuccessAction: null,
                                                                addUninstallHandler: false);

@@ -23,13 +23,13 @@ Installs a package or a list of packages (sometimes specified as a
 **NOTE:** Any package name ending with .config is considered a
  'packages.config' file. Please see https://bit.ly/packages_config
 
-**NOTE:** [Chocolatey Pro](https://chocolatey.org/compare) / Business builds on top of a great open source 
- experience with quite a few features that enhance the your use of the 
+**NOTE:** [Chocolatey Pro](https://chocolatey.org/compare) / Business builds on top of a great open source
+ experience with quite a few features that enhance the your use of the
  community package repository (when using Pro), and really enhance the
  Chocolatey experience all around. If you are an organization looking
  for a better ROI, look no further than Business - automatic package
  creation from installer files, automatic recompile support, runtime
- malware protection, private CDN download cache, synchronize with 
+ malware protection, private CDN download cache, synchronize with
  Programs and Features, etc - https://chocolatey.org/compare.
 
 
@@ -39,7 +39,11 @@ Installs a package or a list of packages (sometimes specified as a
     choco install notepadplusplus googlechrome atom 7zip
     choco install notepadplusplus --force --force-dependencies
     choco install notepadplusplus googlechrome atom 7zip -dvfy
-    choco install git --params="'/GitAndUnixToolsOnPath /NoAutoCrlf'" -y
+    choco install git -y --params="'/GitAndUnixToolsOnPath /NoAutoCrlf'"
+    choco install git -y --params="'/GitAndUnixToolsOnPath /NoAutoCrlf'" --install-args="'/DIR=C:\git'"
+    # Params are package parameters, passed to the package
+    # Install args are installer arguments, appended to the silentArgs 
+    #  in the package for the installer itself
     choco install nodejs.install --version 0.10.35
     choco install git -s "'https://somewhere/out/there'"
     choco install git -s "'https://somewhere/protected'" -u user -p pass
@@ -64,6 +68,37 @@ What is `-my`? See option bundling in [[how to pass arguments|CommandsReference#
  go modify Path to just one Ruby and then use something like uru
  (https://bitbucket.org/jonforums/uru) or pik
  (https://chocolatey.org/packages/pik) to switch between versions.
+
+**NOTE:** See scripting in [[how to pass arguments|CommandsReference#how-to-pass-options--switches]] (`choco -?`) for how to 
+ write proper scripts and integrations.
+
+
+## Exit Codes
+
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+Package Exit Codes:
+ - 1641: success, reboot initiated
+ - 3010: success, reboot required
+ - other (not listed): likely an error has occurred
+
+In addition to normal exit codes, packages are allowed to exit
+ with their own codes when the feature 'usePackageExitCodes' is
+ turned on. Uninstall command has additional valid exit codes.
+ Available in v0.9.10+.
+
+Reboot Exit Codes:
+ - 350: pending reboot detected, no action has occurred
+ - 1604: install suspended, incomplete
+
+In addition to the above exit codes, you may also see reboot exit codes
+ when the feature 'exitOnRebootDetected' is turned on. It typically requires
+ the feature 'usePackageExitCodes' to also be turned on to work properly.
+ Available in v0.10.12+.
 
 ## See It In Action
 
@@ -391,6 +426,18 @@ Includes [[default options/switches|CommandsReference#default-options-and-switch
        uninstall on first package failure instead of continuing with others. 
        Overrides the default feature 'stopOnFirstPackageFailure' set to 'False-
        '. Available in 0.10.4+.
+
+     --exitwhenrebootdetected, --exit-when-reboot-detected
+     Exit When Reboot Detected - Stop running install, upgrade, or uninstall 
+       when a reboot request is detected. Requires 'usePackageExitCodes' 
+       feature to be turned on. Will exit with either 350 or 1604.  Overrides 
+       the default feature 'exitOnRebootDetected' set to 'False'.  Available in 
+       0.10.12+.
+
+     --ignoredetectedreboot, --ignore-detected-reboot
+     Ignore Detected Reboot - Ignore any detected reboots if found. Overrides 
+       the default feature 'exitOnRebootDetected' set to 'False'.  Available in 
+       0.10.12+.
 
      --sdc, --skipdownloadcache, --skip-download-cache
      Skip Download Cache - Use the original download even if a private CDN 

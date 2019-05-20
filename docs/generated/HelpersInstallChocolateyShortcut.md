@@ -60,7 +60,7 @@ Install-ChocolateyShortcut -ShortcutFilePath "C:\test.lnk" -TargetPath "C:\test.
 Install-ChocolateyShortcut `
   -ShortcutFilePath "C:\notepad.lnk" `
   -TargetPath "C:\Windows\System32\notepad.exe" `
-  -WorkDirectory "C:\" `
+  -WorkingDirectory "C:\" `
   -Arguments "C:\test.txt" `
   -IconLocation "C:\test.ico" `
   -Description "This is the description"
@@ -118,6 +118,9 @@ Accept Pipeline Input? | false
 OPTIONAL - The full absolute path of the Working Directory that will be
 used by the new shortcut.
 
+As of v0.10.12, the directory will be created unless it contains environment
+variable expansion like `%AppData%\FooBar`.
+
 Property               | Value
 ---------------------- | -----
 Aliases                | 
@@ -162,7 +165,7 @@ Default Value          |
 Accept Pipeline Input? | false
  
 ###  -WindowStyle [&lt;Int32&gt;]
-OPTIONAL - Type of windows target application should open with. 
+OPTIONAL - Type of windows target application should open with.
 Available in 0.9.10+.
 0 = Hidden, 1 = Normal Size, 3 = Maximized, 7 - Minimized.
 Full list table 3.9 here: https://technet.microsoft.com/en-us/library/ee156605.aspx

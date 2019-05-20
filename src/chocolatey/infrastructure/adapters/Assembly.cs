@@ -88,6 +88,11 @@ namespace chocolatey.infrastructure.adapters
             return _assembly.GetType(name,throwOnError, ignoreCase);
         }
 
+        public static IAssembly Load(byte[] rawAssembly)
+        {
+            return new Assembly(System.Reflection.Assembly.Load(rawAssembly));
+        } 
+        
         public static IAssembly LoadFile(string path)
         {
            return new Assembly(System.Reflection.Assembly.LoadFile(path));
@@ -108,6 +113,16 @@ namespace chocolatey.infrastructure.adapters
         public static IAssembly GetCallingAssembly()
         {
             return new Assembly(System.Reflection.Assembly.GetCallingAssembly());
+        }
+
+        public static IAssembly set_assembly(System.Reflection.Assembly value)
+        {
+            return new Assembly(value);
+        }
+
+        public static implicit operator Assembly(System.Reflection.Assembly value)
+        {
+            return new Assembly(value);
         }
     }
 

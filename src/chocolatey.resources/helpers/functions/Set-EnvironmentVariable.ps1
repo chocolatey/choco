@@ -118,7 +118,7 @@ public static extern IntPtr SendMessageTimeout(
 
     # Set a user environment variable making the system refresh
     $setx = "$($env:SystemRoot)\System32\setx.exe"
-    & "$setx" ChocolateyLastPathUpdate `"$(Get-Date -UFormat %c)`" | Out-Null
+    & "$setx" ChocolateyLastPathUpdate `"$((Get-Date).ToFileTime())`" | Out-Null
   } catch {
     Write-Warning "Failure attempting to let Explorer know about updated environment settings.`n  $($_.Exception.Message)"
   }

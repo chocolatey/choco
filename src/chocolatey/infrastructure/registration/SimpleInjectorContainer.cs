@@ -33,6 +33,18 @@ namespace chocolatey.infrastructure.registration
         private static readonly IList<Type> _componentRegistries = new List<Type>();
         private const string REGISTER_COMPONENTS_METHOD = "RegisterComponents";
 
+#if DEBUG
+        private static bool _verifyContainer = true;
+#else
+        private static bool _verifyContainer = false;
+#endif
+        
+        public static bool VerifyContainer { 
+            get { return _verifyContainer; }
+            set { _verifyContainer = value; } 
+        }
+        
+
         /// <summary>
         ///   Add a component registry class to the container. 
         ///   Must have `public void RegisterComponents(Container container)`
@@ -67,9 +79,7 @@ namespace chocolatey.infrastructure.registration
                 load_component_registry(componentRegistry, container);
             }
 
-#if DEBUG
-            container.Verify();
-#endif
+            if (_verifyContainer) container.Verify();
 
             return container;
         }

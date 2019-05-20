@@ -45,7 +45,7 @@ namespace chocolatey.infrastructure.app.commands
 
             optionSet
                 .Add("n=|name=",
-                     "Name - the name of the source. Required with some actions. Defaults to empty.",
+                     "Name - the name of the source. Required with actions other than list. Defaults to empty.",
                      option => configuration.FeatureCommand.Name = option.remove_surrounding_quotes())
                 ;
         }
@@ -97,6 +97,24 @@ Chocolatey will allow you to interact with features.
     choco feature list
     choco feature disable -n=bob
     choco feature enable -n=bob
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
+");
+            
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");

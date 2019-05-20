@@ -176,7 +176,12 @@ NOTE: If there is more than one nupkg file in the folder, the command
     choco push --source https://chocolatey.org/
     choco push --source ""'https://chocolatey.org/'"" -t 500
     choco push --source ""'https://chocolatey.org/'"" -k=""'123-123123-123'""
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Troubleshooting");
             "chocolatey".Log().Info(()=> @"
 To use this command, you must have your API key saved for the community
@@ -194,6 +199,20 @@ A common error is `Failed to process request. 'The specified API key
  Please contact the administrators of {0} if you see this 
  and you don't see a good reason for it.
 ".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
+
+");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }

@@ -77,7 +77,7 @@ namespace chocolatey.infrastructure.app.nuget
                 };
             }
             
-            IEnumerable<string> sources = configuration.Sources.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+            IEnumerable<string> sources = configuration.Sources.to_string().Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
 
             IList<IPackageRepository> repositories = new List<IPackageRepository>();
 
@@ -160,8 +160,7 @@ namespace chocolatey.infrastructure.app.nuget
                 configuration.Sources = updatedSources.Remove(updatedSources.Length - 1, 1).to_string();
             }
 
-            //todo well that didn't work on failing repos... grrr
-            var repository = new AggregateRepository(repositories)
+            var repository = new AggregateRepository(repositories, ignoreFailingRepositories: true)
             {
                 IgnoreFailingRepositories = true,
                 Logger = nugetLogger,

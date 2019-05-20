@@ -26,8 +26,8 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
-    [CommandFor("apikey", "retrieves or saves an apikey for a particular source")]
-    [CommandFor("setapikey", "retrieves or saves an apikey for a particular source (alias for apikey)")]
+    [CommandFor("apikey", "retrieves, saves or deletes an apikey for a particular source")]
+    [CommandFor("setapikey", "retrieves, saves or deletes an apikey for a particular source (alias for apikey)")]
     public class ChocolateyApiKeyCommand : ICommand
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
@@ -48,6 +48,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The API key for the source. This is the authentication that identifies you and allows you to push to a source. With some sources this is either a key or it could be a user name and password specified as 'user:password'.",
                      option => configuration.ApiKeyCommand.Key = option.remove_surrounding_quotes())
+                .Add("rem|remove",
+                    "Removes an API key from Chocolatey",
+                    option => configuration.ApiKeyCommand.Remove = true)
                 ;
         }
 
@@ -58,9 +61,15 @@ namespace chocolatey.infrastructure.app.commands
 
         public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
-            if (!string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key) && string.IsNullOrWhiteSpace(configuration.Sources))
+            if (!configuration.ApiKeyCommand.Remove && !string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key) 
+                && string.IsNullOrWhiteSpace(configuration.Sources))
             {
-                throw new ApplicationException("You must specify both 'source' and 'key' to set an api key.");
+                throw new ApplicationException("You must specify both 'source' and 'key' to set an API key.");
+            }
+            if (configuration.ApiKeyCommand.Remove && string.IsNullOrWhiteSpace(configuration.Sources))
+            {
+                throw new ApplicationException("You must specify 'source' to remove an API key.");
+                
             }
         }
 
@@ -102,6 +111,9 @@ user name and password specified as 'user:password' for the API key. Please see
 your repository's documentation (for Nexus, please see 
 https://bit.ly/nexus2apikey).
 
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Connecting to Chocolatey.org (Community Package Repository)");
@@ -115,6 +127,19 @@ In order to save your API key for {0},
 
 ".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
 
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
+
+");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
@@ -125,7 +150,11 @@ In order to save your API key for {0},
 
         public virtual void run(ChocolateyConfiguration configuration)
         {
-            if (string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key))
+            if (configuration.ApiKeyCommand.Remove)
+            {
+                _configSettingsService.remove_api_key(configuration);
+            }
+            else if (string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key))
             {
                 _configSettingsService.get_api_key(configuration, (key) =>
                     {

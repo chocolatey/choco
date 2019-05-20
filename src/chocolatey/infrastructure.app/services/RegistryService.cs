@@ -248,12 +248,8 @@ namespace chocolatey.infrastructure.app.services
             key.Dispose();
         }
 
-        private int _componentLoopCount = 0;
-
         private void get_msi_information(RegistryApplicationKey appKey, RegistryKey key)
         {
-            _componentLoopCount = 0;
-
             var userDataProductKeyId = get_msi_user_data_key(key.Name);
             if (string.IsNullOrWhiteSpace(userDataProductKeyId)) return;
 
@@ -290,7 +286,7 @@ namespace chocolatey.infrastructure.app.services
                      appKey.Version = set_if_empty(appKey.Version, msiProductKey.get_value_as_string("Version"));
                      appKey.VersionMajor = set_if_empty(appKey.VersionMajor, msiProductKey.get_value_as_string("VersionMajor"));
                      appKey.VersionMinor = set_if_empty(appKey.VersionMinor, msiProductKey.get_value_as_string("VersionMinor"));
-
+                     // int _componentLoopCount = 0;
                      // search components for install location if still empty
                      // the performance of this is very bad - without this the query is sub-second
                      // with this it takes about 15 seconds with around 200 apps installed
@@ -398,7 +394,7 @@ namespace chocolatey.infrastructure.app.services
                 return null;
             }
 
-            return _xmlService.deserialize<Registry>(filePath, 1);
+            return _xmlService.deserialize<Registry>(filePath, 2);
         }
 
         private void get_values(RegistryKey key, string subKeyName, IList<GenericRegistryValue> values, bool expandValues)

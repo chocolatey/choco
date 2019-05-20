@@ -19,8 +19,10 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.IO;
     using System.Text;
+    using configuration;
     using NuGet;
     using domain;
+    using infrastructure.configuration;
     using tolerance;
     using IFileSystem = filesystem.IFileSystem;
 
@@ -29,6 +31,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
         private readonly IFilesService _filesService;
+        private readonly ChocolateyConfiguration _config;
         private const string REGISTRY_SNAPSHOT_FILE = ".registry";
         private const string REGISTRY_SNAPSHOT_BAD_FILE = ".registry.bad";
         private const string FILES_SNAPSHOT_FILE = ".files";
@@ -44,6 +47,15 @@ namespace chocolatey.infrastructure.app.services
             _fileSystem = fileSystem;
             _registryService = registryService;
             _filesService = filesService;
+            _config = Config.get_configuration_settings();
+        }
+
+        public ChocolateyPackageInformationService(IFileSystem fileSystem, IRegistryService registryService, IFilesService filesService, ChocolateyConfiguration config)
+        {
+            _fileSystem = fileSystem;
+            _registryService = registryService;
+            _filesService = filesService;
+            _config = config;
         }
 
         public ChocolateyPackageInformation get_package_information(IPackage package)
@@ -51,7 +63,7 @@ namespace chocolatey.infrastructure.app.services
             var packageInformation = new ChocolateyPackageInformation(package);
             if (package == null)
             {
-                this.Log().Debug("No package information as package is null.");
+                if (_config.RegularOutput) { this.Log().Debug("No package information as package is null."); }
                 return packageInformation;
             }
 
@@ -75,23 +87,30 @@ A corrupt .registry file exists at {0}.
  Instead, you can use the following PowerShell command:
  Move-Item .\.registry.bad .\.registry
 ".format_with(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE));
+
             try
             {
                 if (_fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE)))
                 {
-                    this.Log().Warn(deserializationErrorMessage);
+                    if (_config.RegularOutput) this.Log().Warn(deserializationErrorMessage);
                 }
                 else
                 {
                     packageInformation.RegistrySnapshot = _registryService.read_from_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE));
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                if (_config.RegularOutput) this.Log().Warn(@"A .registry file at '{0}'
+ has errored attempting to read it. This file will be renamed to 
+ '{1}' The error:
+ {2} 
+ ".format_with(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE), _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE), e.ToString()));
+
                 FaultTolerance.try_catch_with_logging_exception(
                     () =>
                     {
-                        this.Log().Warn(deserializationErrorMessage);
+                        if (_config.RegularOutput) this.Log().Warn(deserializationErrorMessage);
 
                         // rename the bad registry file so that it isn't processed again
                         _fileSystem.move_file(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE), _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE));
@@ -147,7 +166,7 @@ A corrupt .registry file exists at {0}.
 
             if (packageInformation.Package == null)
             {
-                this.Log().Debug("No package information to save as package is null.");
+                if (_config.RegularOutput) this.Log().Debug("No package information to save as package is null.");
                 return;
             }
 
@@ -231,6 +250,7 @@ A corrupt .registry file exists at {0}.
         public void remove_package_information(IPackage package)
         {
             var pkgStorePath = _fileSystem.combine_paths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".format_with(package.Id, package.Version.to_string()));
+            if (_config.RegularOutput) this.Log().Info("Removing Package Information for {0}".format_with(pkgStorePath));
             _fileSystem.delete_directory_if_exists(pkgStorePath, recursive: true);
         }
     }

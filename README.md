@@ -124,6 +124,7 @@ There is a `build.bat`/`build.sh` file that creates a necessary generated file n
 #### Windows
 Prerequisites:
 
+ * .NET Framework 3.5 (This is a windows feature installation).
  * .NET Framework 4+
  * Visual Studio is helpful for working on source.
  * ReSharper is immensely helpful (and there is a `.sln.DotSettings` file to help with code conventions).

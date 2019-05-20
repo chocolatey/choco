@@ -45,6 +45,9 @@ The full absolute path to the target for new shortcut.
 OPTIONAL - The full absolute path of the Working Directory that will be
 used by the new shortcut.
 
+As of v0.10.12, the directory will be created unless it contains environment
+variable expansion like `%AppData%\FooBar`.
+
 .PARAMETER Arguments
 OPTIONAL - Additonal arguments that should be passed along to the new
 shortcut.
@@ -57,7 +60,7 @@ shortcut.
 OPTIONAL - A text description to be associated with the new description.
 
 .PARAMETER WindowStyle
-OPTIONAL - Type of windows target application should open with. 
+OPTIONAL - Type of windows target application should open with.
 Available in 0.9.10+.
 0 = Hidden, 1 = Normal Size, 3 = Maximized, 7 - Minimized.
 Full list table 3.9 here: https://technet.microsoft.com/en-us/library/ee156605.aspx
@@ -89,7 +92,7 @@ Install-ChocolateyShortcut -ShortcutFilePath "C:\test.lnk" -TargetPath "C:\test.
 Install-ChocolateyShortcut `
   -ShortcutFilePath "C:\notepad.lnk" `
   -TargetPath "C:\Windows\System32\notepad.exe" `
-  -WorkDirectory "C:\" `
+  -WorkingDirectory "C:\" `
   -Arguments "C:\test.txt" `
   -IconLocation "C:\test.ico" `
   -Description "This is the description"
@@ -164,7 +167,7 @@ Install-ChocolateyPinnedTaskBarItem
 	}
 
   if ($workingDirectory) {
-    if (!(Test-Path($workingDirectory))) {
+    if ($workingDirectory -notmatch '%\w+%' -and !(Test-Path($workingDirectory))) {
       [System.IO.Directory]::CreateDirectory($workingDirectory) | Out-Null
     }
 	}
