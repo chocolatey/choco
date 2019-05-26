@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2019 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,18 @@
 
 namespace chocolatey.infrastructure.app.services
 {
-	using chocolatey.infrastructure.results;
-	using configuration;
-	using System.Collections.Concurrent;
+    using System.Collections.Concurrent;
+    using configuration;
+    using results;
 
-	public interface INugetService : ISourceRunner
+    public interface INugetService : ISourceRunner
     {
+        /// <summary>
+        ///   Get outdated packages
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config);
+
         /// <summary>
         ///   Run pack in noop mode.
         /// </summary>
@@ -52,10 +58,5 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="packageName">Name of the package.</param>
         void remove_rollback_directory_if_exists(string packageName);
 
-		/// <summary>
-		///   Get outdated packages
-		/// </summary>
-		/// <param name="config">The configuration.</param>
-		ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config);
     }
 }
