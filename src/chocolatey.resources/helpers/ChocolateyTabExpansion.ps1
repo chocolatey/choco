@@ -33,33 +33,35 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
       where { $_ -like "$filter*" }
 }
 
-$script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','pack','push','sync','-h','--help','pin','source','config','feature','apikey')
+$script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','optimize','pack','push','sync','-h','--help','pin','source','config','feature','apikey')
 
-$allcommands = " --debug --verbose --force --noop --help --accept-license --confirm --limit-output --no-progress --execution-timeout= --cache-location='' --proxy='' --proxy-user= --proxy-password= --proxy-bypass-list='' --proxy-bypass-on-local --fail-on-error-output --use-system-powershell"
+# ensure these all have a space to start, or they will cause issues
+$allcommands = " --debug --verbose --trace --noop --help --accept-license --confirm --limit-output --no-progress --log-file='' --execution-timeout='' --cache-location='' --proxy='' --proxy-user='' --proxy-password='' --proxy-bypass-list='' --proxy-bypass-on-local --force --no-color"
 $proListOptions = " --audit"
-$proInstallUpgradeOptions = " --install-directory='' --max-download-rate= --install-arguments-sensitive= --package-parameters-sensitive= --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum="
-$proNewOptions = " --file='' --build-package --file64='' --from-programs-and-features --use-original-location --keep-remote --url='' --url64='' --checksum= --checksum64= --checksumtype= --pause-on-error"
+$proInstallUpgradeOptions = " --install-directory='' --package-parameters-sensitive='' --max-download-rate='' --install-arguments-sensitive='' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum='' --deflate-package-size --no-deflate-package-size --deflate-nupkg-only"
+$proNewOptions = " --file='' --build-package --file64='' --from-programs-and-features --use-original-location --keep-remote --url='' --url64='' --checksum='' --checksum64='' --checksumtype='' --pause-on-error --remove-architecture-from-name --include-architecture-in-name"
 $proUninstallOptions = " --from-programs-and-features"
 $proPinOptions = " --note=''"
 
 $commandOptions = @{
-  list = "--lo --id-only --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $proListOptions + $allcommands
-  search = "--pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user= --password= --local-only --prerelease --include-programs --page= --page-size= --order-by-popularity --download-cache-only" + $allcommands
-  info = "--pre --lo --source='' --user= --password= --local-only --prerelease" + $allcommands
-  install = "-y -whatif -? --pre --version= --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user= --password= --prerelease --forcex86 --not-silent --package-parameters='' --allow-downgrade --force-dependencies --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --allow-multiple-versions --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --stop-on-first-package-failure" + $proInstallUpgradeOptions + $allcommands
-  pin = "--name= --version= -?" + $proPinOptions + $allcommands
-  outdated = "-? --source='' --user= --password= --ignore-pinned --ignore-unfound" + $allcommands
-  upgrade = "-y -whatif -? --pre --version= --except='' --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user= --password= --prerelease --forcex86 --not-silent --package-parameters='' --allow-downgrade --allow-multiple-versions --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --fail-on-unfound --fail-on-not-installed --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --exclude-prerelease --stop-on-first-package-failure --use-remembered-options --ignore-remembered-options" + $proInstallUpgradeOptions + $allcommands
-  uninstall = "-y -whatif -? --force-dependencies --remove-dependencies --all-versions --source='windowsfeatures' --source='webpi' --version= --uninstall-arguments='' --override-arguments --not-silent --params='' --package-parameters='' --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --use-autouninstaller --skip-autouninstaller --fail-on-autouninstaller --ignore-autouninstaller-failure --stop-on-first-package-failure" + $proUninstallOptions + $allcommands
-  new = "--template-name= --output-directory='' --automaticpackage --version= --maintainer='' packageversion= maintainername='' maintainerrepo='' installertype= url='' url64='' silentargs='' --use-built-in-template -?" + $proNewOptions + $allcommands
-  pack = "--version= -?" + $allcommands
-  push = "--source='' --api-key= --timeout= -?" + $allcommands
-  source = "--name= --source='' --user= --password= --priority= --bypass-proxy --allow-self-service -?" + $allcommands
-  config = "--name= --value= -?" + $allcommands
-  feature = "--name= -?" + $allcommands
-  apikey = "--source='' --api-key= -?" + $allcommands
-  download = "--internalize --ignore-dependencies --resources-location= --download-location= --outputdirectory= --source='' --version='' --prerelease --user= --password= --cert='' --certpassword= --append-use-original-location --recompile -?" + $allcommands
-  sync = "--output-directory= --id= --package-id= -?" + $allcommands
+  list = "--lo --id-only --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --local-only --prerelease --include-programs --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations" + $proListOptions + $allcommands
+  search = "--pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --local-only --prerelease --include-programs --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations" + $allcommands
+  info = "--pre --lo --source='' --user='' --password='' --local-only --prerelease --disable-package-repository-optimizations" + $allcommands
+  install = "-y -whatif -? --pre --version= --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user='' --password='' --prerelease --forcex86 --not-silent --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --allow-downgrade --force-dependencies --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --allow-multiple-versions --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --stop-on-first-package-failure --disable-package-repository-optimizations" + $proInstallUpgradeOptions + $allcommands
+  pin = "--name='' --version='' -?" + $proPinOptions + $allcommands
+  outdated = "-? --source='' --user='' --password='' --ignore-pinned --ignore-unfound --pre --prerelease --disable-package-repository-optimizations" + $allcommands
+  upgrade = "-y -whatif -? --pre --version='' --except='' --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user='' --password='' --prerelease --forcex86 --not-silent --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --allow-downgrade --allow-multiple-versions --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --fail-on-unfound --fail-on-not-installed --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --exclude-prerelease --stop-on-first-package-failure --use-remembered-options --ignore-remembered-options --skip-when-not-installed --install-if-not-installed --disable-package-repository-optimizations" + $proInstallUpgradeOptions + $allcommands
+  uninstall = "-y -whatif -? --force-dependencies --remove-dependencies --all-versions --source='windowsfeatures' --source='webpi' --version= --uninstall-arguments='' --override-arguments --not-silent --params='' --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --use-autouninstaller --skip-autouninstaller --fail-on-autouninstaller --ignore-autouninstaller-failure --stop-on-first-package-failure" + $proUninstallOptions + $allcommands
+  new = "--template-name='' --output-directory='' --automaticpackage --version='' --maintainer='' packageversion='' maintainername='' maintainerrepo='' installertype='' url='' url64='' silentargs='' --use-built-in-template -?" + $proNewOptions + $allcommands
+  pack = "--version='' --output-directory='' -?" + $allcommands
+  push = "--source='' --api-key='' --timeout='' -?" + $allcommands
+  source = "--name='' --source='' --user='' --password='' --priority= --bypass-proxy --allow-self-service -?" + $allcommands
+  config = "--name='' --value='' -?" + $allcommands
+  feature = "--name='' -?" + $allcommands
+  apikey = "--source='' --api-key='' --remove -?" + $allcommands
+  download = "--internalize --internalize-all-urls --ignore-dependencies --installed-packages --ignore-unfound-packages --resources-location='' --download-location='' --outputdirectory='' --source='' --version='' --prerelease --user='' --password='' --cert='' --certpassword='' --append-use-original-location --recompile --disable-package-repository-optimizations -?" + $allcommands
+  sync = "--output-directory='' --id='' --package-id='' -?" + $allcommands
+  optimize = "--deflate-nupkg-only --id='' -?" + $allcommands
 }
 
 try {
@@ -95,7 +97,7 @@ function script:chocoLocalPackagesUpgrade($filter) {
 
 function script:chocoRemotePackages($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
-    @('packages.config|') + @(& $script:choco search $filter --page=0 --page-size=30 -r --id-starts-with --order-by-popularity) | where { $_ -like "$filter*" } | %{ $_.Split('|')[0] }
+    @('packages.config|') + @(& $script:choco search $filter --page='0' --page-size='30' -r --id-starts-with --order-by-popularity) | where { $_ -like "$filter*" } | %{ $_.Split('|')[0] }
 }
 
 function Get-AliasPattern($exe) {
