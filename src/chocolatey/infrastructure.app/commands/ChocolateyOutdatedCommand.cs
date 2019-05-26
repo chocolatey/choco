@@ -52,6 +52,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("cp=|certpassword=",
                      "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
                      option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
+                .Add("pre|prerelease",
+                    "Prerelease - Include Prereleases? Defaults to false. Available in 0.10.14+.",
+                    option => configuration.Prerelease = option != null)
                 .Add("ignore-pinned",
                      "Ignore Pinned - Ignore pinned packages. Defaults to false. Available in 0.10.6+.",
                      option => configuration.OutdatedCommand.IgnorePinned = option != null)
