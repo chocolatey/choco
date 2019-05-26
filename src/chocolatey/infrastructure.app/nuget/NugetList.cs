@@ -61,9 +61,14 @@ namespace chocolatey.infrastructure.app.nuget
 
             IQueryable<IPackage> results = packageRepository.Search(searchTermLower, configuration.Prerelease);
 
+            SemanticVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? new SemanticVersion(configuration.Version) : null;
+            
             if (configuration.ListCommand.Exact)
             {
-                results = packageRepository.FindPackagesById(searchTermLower).AsQueryable();
+                return new List<IPackage>()
+                {
+                    find_package(searchTermLower, version, configuration, packageRepository)
+                }.AsQueryable();
             }
 
             if (configuration.ListCommand.Page.HasValue)
