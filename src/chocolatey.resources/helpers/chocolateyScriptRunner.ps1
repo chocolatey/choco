@@ -12,6 +12,7 @@ if ($env:ChocolateyEnvironmentDebug -eq 'true') { $global:DebugPreference = "Con
 $global:VerbosePreference = "SilentlyContinue"
 if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $global:VerbosePreference = "Continue"; $verbosity = $true }
 
+Write-Debug '---------------------------Script Execution---------------------------'
 Write-Debug "Running 'ChocolateyScriptRunner' for $($env:packageName) v$($env:packageVersion) with packageScript `'$packageScript`', packageFolder:`'$($env:packageFolder)`', installArguments: `'$installArguments`', packageParameters: `'$packageParameters`',"
 
 ## Set the culture to invariant
@@ -73,5 +74,7 @@ if ($env:ChocolateyExitCode -ne $null -and $env:ChocolateyExitCode -ne '') {
 if ($exitCode -ne $null -and $exitCode -ne '' -and $exitCode -ne 0) {
   Set-PowerShellExitCode $exitCode
 }
+
+Write-Debug '----------------------------------------------------------------------'
 
 Exit $exitCode
