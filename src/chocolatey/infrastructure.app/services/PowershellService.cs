@@ -213,7 +213,7 @@ namespace chocolatey.infrastructure.app.services
                     this.Log().Info(ChocolateyLoggers.Important, () => @"choco feature enable -n allowGlobalConfirmation");
 
                     var selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run the script?",
-                        new[] { "yes", "no", "print" },
+                        new[] { "yes", "all - yes to all", "no", "print" },
                         defaultChoice: null,
                         requireAnswer: true,
                         allowShortAnswer: true,
@@ -235,6 +235,11 @@ namespace chocolatey.infrastructure.app.services
                     }
 
                     if (selection.is_equal_to("yes")) shouldRun = true;
+                    if (selection.is_equal_to("all - yes to all"))
+                    {
+                        configuration.PromptForConfirmation = false;
+                        shouldRun = true;
+                    }
                     if (selection.is_equal_to("no"))
                     {
                         //MSI ERROR_INSTALL_USEREXIT - 1602 - https://support.microsoft.com/en-us/kb/304888 / https://msdn.microsoft.com/en-us/library/aa376931.aspx
