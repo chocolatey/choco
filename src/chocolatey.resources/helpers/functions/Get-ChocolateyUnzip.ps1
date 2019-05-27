@@ -106,11 +106,11 @@ param(
     $zipfileFullPath = $fileFullPath64
     $bitnessMessage = '64-bit '
   }
-  
+
   if ($zipfileFullPath -eq '' -or $zipfileFullPath -eq $null) {
     throw 'Package parameters incorrect, either FileFullPath or FileFullPath64 must be specified.'
   }
-  
+
   if ($packageName) {
     $packagelibPath = $env:ChocolateyPackageFolder
     if (!(Test-Path -path $packagelibPath)) {
