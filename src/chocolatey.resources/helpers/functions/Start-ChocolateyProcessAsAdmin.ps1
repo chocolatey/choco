@@ -117,7 +117,7 @@ param(
   [parameter(Mandatory=$false)][switch] $minimized,
   [parameter(Mandatory=$false)][switch] $noSleep,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
-  [parameter(Mandatory=$false)][string] $workingDirectory = $(Get-Location),
+  [parameter(Mandatory=$false)][string] $workingDirectory = $(Get-Location -PSProvider "FileSystem"),
   [parameter(Mandatory=$false)][string] $sensitiveStatements = '',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )

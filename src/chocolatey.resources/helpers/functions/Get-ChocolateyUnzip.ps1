@@ -148,6 +148,7 @@ param(
     $destinationNoRedirection = $destination
   }
 
+  $workingDirectory = Get-Location -PSProvider "FileSystem"
   $params = "x -aoa -bd -bb1 -o`"$destinationNoRedirection`" -y `"$fileFullPathNoRedirection`""
   if ($specificfolder) {
     $params += " `"$specificfolder`""
@@ -184,7 +185,7 @@ param(
   $process.StartInfo.RedirectStandardOutput = $true
   $process.StartInfo.RedirectStandardError = $true
   $process.StartInfo.UseShellExecute = $false
-  $process.StartInfo.WorkingDirectory = Get-Location
+  $process.StartInfo.WorkingDirectory = $workingDirectory
   $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
   $process.StartInfo.CreateNoWindow = $true
 
