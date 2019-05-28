@@ -60,7 +60,7 @@ If embedding in the package, you can get it to the path with
 `"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
 
 Provide this when you want to provide both 32-bit and 64-bit
-installers or explicitly only a 64-bit installer (which will cause a package 
+installers or explicitly only a 64-bit installer (which will cause a package
 install failure on 32-bit systems).
 
 .PARAMETER Destination
