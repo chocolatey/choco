@@ -620,6 +620,7 @@ Following these scripting best practices will ensure your scripts work
             config.Information.IsInteractive = Environment.UserInteractive;
             config.Information.UserName = System.Environment.UserName;
             config.Information.UserDomainName = System.Environment.UserDomainName;
+            config.Information.CurrentDirectory = Environment.CurrentDirectory;
             config.Information.IsUserAdministrator = ProcessInformation.user_is_administrator();
             config.Information.IsUserSystemAccount = ProcessInformation.user_is_system();
             config.Information.IsUserRemoteDesktop = ProcessInformation.user_is_terminal_services();

@@ -365,6 +365,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IsProcessElevated { get; set; }
         public bool IsLicensedVersion { get; set; }
         public string LicenseType { get; set; }
+        public string CurrentDirectory { get; set; }
     }
 
     [Serializable]
