@@ -252,6 +252,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Proxy.EncryptedPassword = set_config_item(ApplicationParameters.ConfigSettings.ProxyPassword, configFileSettings, string.Empty, "Optional proxy password. Encrypted. Available in 0.9.9.9+.");
             config.Proxy.BypassList = set_config_item(ApplicationParameters.ConfigSettings.ProxyBypassList, configFileSettings, string.Empty, "Optional proxy bypass list. Comma separated. Available in 0.10.4+.");
             config.Proxy.BypassOnLocal = set_config_item(ApplicationParameters.ConfigSettings.ProxyBypassOnLocal, configFileSettings, "true", "Bypass proxy for local connections. Available in 0.10.4+.").is_equal_to(bool.TrueString);
+            config.UpgradeCommand.PackageNamesToSkip = set_config_item(ApplicationParameters.ConfigSettings.UpgradeAllExceptions, configFileSettings, string.Empty, "A comma-separated list of package names that should not be upgraded when running `choco upgrade all'. Defaults to empty. Available in 0.10.14+.");
         }
 
         private static string set_config_item(string configName, ConfigFileSettings configFileSettings, string defaultValue, string description, bool forceSettingValue = false)
