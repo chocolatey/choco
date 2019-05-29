@@ -148,7 +148,13 @@ param(
     $destinationNoRedirection = $destination
   }
 
-  $workingDirectory = Get-Location -PSProvider "FileSystem"
+  $workingDirectory = $(Get-Location -PSProvider 'FileSystem')
+  if ($workingDirectory -eq $null -or $workingDirectory.ProviderPath -eq $null) {
+    Write-Debug "Unable to use current location for Working Directory. Using Cache Location instead."
+    $workingDirectory = $env:TEMP
+  }
+  $workingDirectory = $workingDirectory.ProviderPath
+
   $params = "x -aoa -bd -bb1 -o`"$destinationNoRedirection`" -y `"$fileFullPathNoRedirection`""
   if ($specificfolder) {
     $params += " `"$specificfolder`""

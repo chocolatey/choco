@@ -65,7 +65,8 @@ Array of exit codes indicating success. Defaults to `@(0)`.
 
 .PARAMETER WorkingDirectory
 The working directory for the running process. Defaults to
-`Get-Location`.
+`Get-Location`. If current location is a UNC path, uses
+`$env:TEMP` for default as of 0.10.14.
 
 Available in 0.10.1+.
 
@@ -117,13 +118,19 @@ param(
   [parameter(Mandatory=$false)][switch] $minimized,
   [parameter(Mandatory=$false)][switch] $noSleep,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
-  [parameter(Mandatory=$false)][string] $workingDirectory = $(Get-Location -PSProvider "FileSystem"),
+  [parameter(Mandatory=$false)][string] $workingDirectory = $(Get-Location -PSProvider 'FileSystem'),
   [parameter(Mandatory=$false)][string] $sensitiveStatements = '',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   [string]$statements = $statements -join ' '
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+
+  if ($workingDirectory -eq $null -or $workingDirectory.ProviderPath -eq $null) {
+    Write-Debug "Unable to use current location for Working Directory. Using Cache Location instead."
+    $workingDirectory = $env:TEMP
+  }
+  $workingDirectory = $workingDirectory.ProviderPath
 
   $alreadyElevated = $false
   if (Test-ProcessAdminRights) {
