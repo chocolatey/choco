@@ -658,5 +658,43 @@ namespace chocolatey.tests.infrastructure.commandline
                 console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
         }
+        
+        public class when_prompting_answer_with_dash_with_interactivePrompt : InteractivePromptSpecsBase
+        {
+            private Func<string> prompt;
+
+            public override void Context()
+            {
+                base.Context();
+                choices.Add("all - yes to all");
+            }
+
+            public override void Because()
+            {
+                prompt = () => InteractivePrompt.prompt_for_confirmation(prompt_value, choices, defaultChoice: null, requireAnswer: true, shortPrompt: true);
+            }
+
+            public override void AfterObservations()
+            {
+                base.AfterObservations();
+                should_have_called_Console_ReadLine();
+            }
+
+            [Fact]
+            public void should_return_all_when_full_all_answer_is_given()
+            {
+                console.Setup(c => c.ReadLine()).Returns("all - yes to all");
+                var result = prompt();
+                result.ShouldEqual("all - yes to all");
+            }
+
+            [Fact]
+            public void should_return_all_when_only_all_is_given()
+            {
+                console.Setup(c => c.ReadLine()).Returns("all");
+                var result = prompt();
+                result.ShouldEqual("all - yes to all");
+            }
+        }
     }
 }
