@@ -18,6 +18,7 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 ### IMPROVEMENTS
  * info/search/list - apply query optimizations when searching by package id - see [#1831](https://github.com/chocolatey/choco/issues/1831)
  * feature - usePackageRepositoryOptimizations to control install/upgrade for repositories that don't handle the newer optimizations well - optimizations break LaGet / NuGet Simple Server (PHP) / PHPNuget / Gemfury - see [#1770](https://github.com/chocolatey/choco/issues/1770)
+ * install/upgrade/uninstall - allow confirming for remaining installs (aka Yes to All) - see [#53](https://github.com/chocolatey/choco/issues/53)
  * Config: Setting to exempt packages from upgrade all - see [#1433](https://github.com/chocolatey/choco/issues/1433)
  * Support ARM64 Win32 32bit emulation - see [#1800](https://github.com/chocolatey/choco/issues/1800)
  * outdated - Add --pre to outdated command - see [#1804](https://github.com/chocolatey/choco/issues/1804)
