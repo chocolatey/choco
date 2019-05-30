@@ -74,6 +74,15 @@ namespace chocolatey.infrastructure.adapters
         string NewLine { get; }
 
         /// <summary>
+        /// Gets the fully qualified path of the current working directory.
+        /// </summary>
+        /// <returns>A string containing a directory path.</returns>
+        /// <value>
+        /// A string containing a directory path.
+        /// </value>
+        string CurrentDirectory { get; }
+
+        /// <summary>
         /// Replaces the name of each environment variable embedded in the specified string with the string equivalent of the value of the variable, then returns the resulting string.
         /// 
         /// </summary>

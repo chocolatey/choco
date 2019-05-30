@@ -292,11 +292,12 @@ Pro / Business supports a single, ubiquitous install directory option.
     }
   }
 
-  $workingDirectory = Get-Location
+  $workingDirectory = Get-Location -PSProvider "FileSystem"
   try {
     $workingDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
   } catch {
     Write-Warning "Unable to set the working directory for installer to location of '$fileFullPath'"
+    $workingDirectory = $env:TEMP
   }
 
   try {

@@ -56,6 +56,11 @@ namespace chocolatey.infrastructure.adapters
             get { return System.Environment.NewLine; }
         }
 
+        public string CurrentDirectory
+        {
+            get { return System.Environment.CurrentDirectory; }
+        }
+
         public string ExpandEnvironmentVariables(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) return name;

@@ -3,6 +3,28 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
+## [0.10.14](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.14+is%3Aclosed) (May 30, 2019)
+### BUG FIXES
+ * Fix - feature - Turn off Enhanced Exit Codes by Default - see [#1784](https://github.com/chocolatey/choco/issues/1784)
+ * Fix - Reboot - Pending File Rename Operations check returns true, even after reboot - see [#1768](https://github.com/chocolatey/choco/issues/1768)
+ * Fix - ".registry.bad" files are created for actually valid registry snapshots - see [#1581](https://github.com/chocolatey/choco/issues/1581)
+ * Fix - repositories - Azure DevOps NuGet v2 endpoints don't provide metadata in Packages() queries - fails on "Authors is required." - see [#1771](https://github.com/chocolatey/choco/issues/1771)
+ * Fix - install/upgrade - Chocolatey still fails on failing source repositories - see [#1774](https://github.com/chocolatey/choco/issues/1774)
+ * Fix - Chocolatey remembers --forceX86 value with subsequent packages - see [#1772](https://github.com/chocolatey/choco/issues/1772)
+ * Fix - Get-ChocolateyUnzip / Start-ChocolateyProcessAsAdmin - can fail running a process when working directory is a UNC path - see [#1781](https://github.com/chocolatey/choco/issues/1781)
+ * Fix - Get-UninstallRegistryKey errors when registry keys have bracket characters(`[]`) - see [#1788](https://github.com/chocolatey/choco/issues/1788)
+ * Fix - push - Fix exception message "There was an internal server error, which might mean the package already exists on a Simple OData Server" / OutOfMemoryException - see [#1786](https://github.com/chocolatey/choco/issues/1786)
+
+### IMPROVEMENTS
+ * info/search/list - apply query optimizations when searching by package id - see [#1831](https://github.com/chocolatey/choco/issues/1831)
+ * feature - usePackageRepositoryOptimizations to control install/upgrade for repositories that don't handle the newer optimizations well - optimizations break LaGet / NuGet Simple Server (PHP) / PHPNuget / Gemfury - see [#1770](https://github.com/chocolatey/choco/issues/1770)
+ * install/upgrade/uninstall - allow confirming for remaining installs (aka Yes to All) - see [#53](https://github.com/chocolatey/choco/issues/53)
+ * Config: Setting to exempt packages from upgrade all - see [#1433](https://github.com/chocolatey/choco/issues/1433)
+ * Support ARM64 Win32 32bit emulation - see [#1800](https://github.com/chocolatey/choco/issues/1800)
+ * outdated - Add --pre to outdated command - see [#1804](https://github.com/chocolatey/choco/issues/1804)
+ * Update tab completion options - see [#1834](https://github.com/chocolatey/choco/issues/1834)
+
+
 ## [0.10.13](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.13+is%3Aclosed) - (March 15, 2019)
 ### BUG FIXES
  * Fix - Licensed - Licensed code failing when using licensed PowerShell functions - see [#1767](https://github.com/chocolatey/choco/issues/1767)

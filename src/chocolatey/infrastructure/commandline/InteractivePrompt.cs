@@ -131,7 +131,11 @@ namespace chocolatey.infrastructure.commandline
                 var selectionFound = false;
                 foreach (var pair in choiceDictionary)
                 {
-                    if (pair.Value.is_equal_to(selection) || (allowShortAnswer && pair.Value.Substring(0, 1).is_equal_to(selection)))
+                    var value = pair.Value.to_string();
+                    if (value.is_equal_to(selection) || 
+                        (allowShortAnswer && value.Substring(0, 1).is_equal_to(selection)) || 
+                        (value.contains("-") && value.Substring(0, value.IndexOf("-")).trim_safe().is_equal_to(selection))
+                        )
                     {
                         selected = pair.Key;
                         selectionFound = true;

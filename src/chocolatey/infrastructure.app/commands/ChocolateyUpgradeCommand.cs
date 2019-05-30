@@ -159,7 +159,7 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.Features.UsePackageExitCodes = option != null
                      )
                  .Add("except=",
-                     "Except - a comma-separated list of package names that should not be upgraded when upgrading 'all'. Defaults to empty. Available in 0.9.10+.",
+                     "Except - a comma-separated list of package names that should not be upgraded when upgrading 'all'. Overrides the configuration setting '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.ConfigSettings.UpgradeAllExceptions, configuration.UpgradeCommand.PackageNamesToSkip.to_string()),
                      option => configuration.UpgradeCommand.PackageNamesToSkip = option.remove_surrounding_quotes()
                      )
                  .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",

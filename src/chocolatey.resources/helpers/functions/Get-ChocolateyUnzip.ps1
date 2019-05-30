@@ -60,7 +60,7 @@ If embedding in the package, you can get it to the path with
 `"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
 
 Provide this when you want to provide both 32-bit and 64-bit
-installers or explicitly only a 64-bit installer (which will cause a package 
+installers or explicitly only a 64-bit installer (which will cause a package
 install failure on 32-bit systems).
 
 .PARAMETER Destination
@@ -106,11 +106,11 @@ param(
     $zipfileFullPath = $fileFullPath64
     $bitnessMessage = '64-bit '
   }
-  
+
   if ($zipfileFullPath -eq '' -or $zipfileFullPath -eq $null) {
     throw 'Package parameters incorrect, either FileFullPath or FileFullPath64 must be specified.'
   }
-  
+
   if ($packageName) {
     $packagelibPath = $env:ChocolateyPackageFolder
     if (!(Test-Path -path $packagelibPath)) {
@@ -148,6 +148,13 @@ param(
     $destinationNoRedirection = $destination
   }
 
+  $workingDirectory = $(Get-Location -PSProvider 'FileSystem')
+  if ($workingDirectory -eq $null -or $workingDirectory.ProviderPath -eq $null) {
+    Write-Debug "Unable to use current location for Working Directory. Using Cache Location instead."
+    $workingDirectory = $env:TEMP
+  }
+  $workingDirectory = $workingDirectory.ProviderPath
+
   $params = "x -aoa -bd -bb1 -o`"$destinationNoRedirection`" -y `"$fileFullPathNoRedirection`""
   if ($specificfolder) {
     $params += " `"$specificfolder`""
@@ -184,7 +191,7 @@ param(
   $process.StartInfo.RedirectStandardOutput = $true
   $process.StartInfo.RedirectStandardError = $true
   $process.StartInfo.UseShellExecute = $false
-  $process.StartInfo.WorkingDirectory = Get-Location
+  $process.StartInfo.WorkingDirectory = $workingDirectory
   $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
   $process.StartInfo.CreateNoWindow = $true
 
