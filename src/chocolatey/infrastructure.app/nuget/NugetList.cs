@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,12 +62,16 @@ namespace chocolatey.infrastructure.app.nuget
             IQueryable<IPackage> results = packageRepository.Search(searchTermLower, configuration.Prerelease);
 
             SemanticVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? new SemanticVersion(configuration.Version) : null;
-            
+
             if (configuration.ListCommand.Exact)
             {
+                var exactPackage = find_package(searchTermLower, version, configuration, packageRepository);
+
+                if (exactPackage == null) return new List<IPackage>().AsQueryable();
+
                 return new List<IPackage>()
                 {
-                    find_package(searchTermLower, version, configuration, packageRepository)
+                    exactPackage
                 }.AsQueryable();
             }
 
@@ -143,7 +147,7 @@ namespace chocolatey.infrastructure.app.nuget
                         .AsQueryable();
             }
 
-            results = configuration.ListCommand.OrderByPopularity ? 
+            results = configuration.ListCommand.OrderByPopularity ?
                  results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Id)
                  : results;
 
