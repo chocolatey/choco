@@ -65,9 +65,13 @@ namespace chocolatey.infrastructure.app.nuget
 
             if (configuration.ListCommand.Exact)
             {
+                var exactPackage = find_package(searchTermLower, version, configuration, packageRepository);
+
+                if (exactPackage == null) return new List<IPackage>().AsQueryable();
+
                 return new List<IPackage>()
                 {
-                    find_package(searchTermLower, version, configuration, packageRepository)
+                    exactPackage
                 }.AsQueryable();
             }
 
