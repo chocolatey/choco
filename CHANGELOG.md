@@ -5,7 +5,7 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 ## [0.10.14](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.14+is%3Aclosed) (May 30, 2019)
 ### BUG FIXES
- * Fix - feature - Turn off Enhanced Exit Codes by Default - see [#1784](https://github.com/chocolatey/choco/issues/1784)
+ * Fix - feature - Turn off Enhanced Exit Codes by default - see [#1784](https://github.com/chocolatey/choco/issues/1784)
  * Fix - Reboot - Pending File Rename Operations check returns true, even after reboot - see [#1768](https://github.com/chocolatey/choco/issues/1768)
  * Fix - ".registry.bad" files are created for actually valid registry snapshots - see [#1581](https://github.com/chocolatey/choco/issues/1581)
  * Fix - repositories - Azure DevOps NuGet v2 endpoints don't provide metadata in Packages() queries - fails on "Authors is required." - see [#1771](https://github.com/chocolatey/choco/issues/1771)
