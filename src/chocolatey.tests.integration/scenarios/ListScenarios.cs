@@ -459,6 +459,18 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_not_error()
+            {
+                // nothing necessary here
+            }
+
+            [Fact]
+            public void should_find_exactly_one_result()
+            {
+                Results.Count.ShouldEqual(1);
+            }
+
+            [Fact]
             public void should_contain_packages_and_versions_with_a_space_between_them()
             {
                 MockLogger.contains_message("exactpackage 1.0.0").ShouldBeTrue();
