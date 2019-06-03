@@ -459,9 +459,77 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_not_error()
+            {
+                // nothing necessary here
+            }
+
+            [Fact]
+            public void should_find_exactly_one_result()
+            {
+                Results.Count.ShouldEqual(1);
+            }
+
+            [Fact]
             public void should_contain_packages_and_versions_with_a_space_between_them()
             {
                 MockLogger.contains_message("exactpackage 1.0.0").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_contain_packages_that_do_not_match()
+            {
+                MockLogger.contains_message("exactpackage.dontfind").ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_summary()
+            {
+                MockLogger.contains_message("packages found").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_debugging_messages()
+            {
+                MockLogger.contains_message("Searching for package information", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("Start of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("End of List", LogLevel.Debug).ShouldBeTrue();
+            }
+        }        
+        
+        [Concern(typeof(ChocolateyListCommand))]
+        public class when_searching_for_an_exact_package_with_zero_results : ScenariosBase
+        {
+            public override void Context()
+            {
+                Configuration = Scenario.list();
+                Scenario.reset(Configuration);
+                Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + Constants.PackageExtension);
+                Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+
+                Configuration.ListCommand.Exact = true;
+                Configuration.Input = Configuration.PackageNames = "exactpackage123";
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+
+            [Fact]
+            public void should_not_error()
+            {
+                // nothing necessary here
+            }
+
+
+            [Fact]
+            public void should_not_have_any_results()
+            {
+                Results.Count.ShouldEqual(0);
             }
 
             [Fact]
