@@ -262,7 +262,7 @@ param(
   # If we're on 32 bit or attempting to force 32 bit and there is no
   # 32 bit url, we need to throw an error.
   if ($url -eq $null -or $url -eq '') {
-    throw "This package does not support $bitWidth bit architecture."
+    throw "This package does not support $bitPackage architecture."
   }
 
   # determine if the url can be SSL/TLS
