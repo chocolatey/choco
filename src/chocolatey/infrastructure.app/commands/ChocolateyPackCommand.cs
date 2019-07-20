@@ -26,7 +26,7 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
-    [CommandFor("pack", "packages up a nuspec to a compiled nupkg")]
+    [CommandFor("pack", "packages nuspec, scripts, and other Chocolatey package resources into a nupkg file")]
     public class ChocolateyPackCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;

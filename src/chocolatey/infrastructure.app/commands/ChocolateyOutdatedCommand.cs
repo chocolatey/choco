@@ -24,7 +24,7 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
-    [CommandFor("outdated", "retrieves packages that are outdated. Similar to upgrade all --noop")]
+    [CommandFor("outdated", "retrieves information about packages that are outdated. Similar to upgrade all --noop")]
     public class ChocolateyOutdatedCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;
