@@ -31,7 +31,7 @@ namespace chocolatey.infrastructure.app.commands
     using resources;
 #endif
 
-    [CommandFor("unpackself", "have chocolatey set itself up")]
+    [CommandFor("unpackself", "re-installs Chocolatey base files")]
     public class ChocolateyUnpackSelfCommand : ICommand
     {
         private readonly IFileSystem _fileSystem;
