@@ -1,0 +1,475 @@
+[33mcommit 2ec31875f9865529afa399216096be0249b5787d[m[33m ([m[1;36mHEAD -> [m[1;32mhelp-command-enhancements[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/help-command-enhancements[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Author: Prasanth Maddali <maddali.prasanth@gmail.com>
+Date:   Sat Jul 20 08:18:34 2019 +0800
+
+    ENHANCEMENTS & BUG - terminology improvements in choco.exe help output #1861
+
+[33mcommit c57829c325e95c99b553a0e26e7d7aac8e233725[m
+Merge: 0f86f78d 53a25927
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Mon Jun 3 17:48:45 2019 -0500
+
+    Merge branch 'stable'
+    
+    * stable:
+      (GH-1837) update behavior scenarios
+      (version) 0.10.15
+      (doc) update release notes for 0.10.15
+      (maint) formatting
+      (GH-1837) Specs: ensure zero results on info/exact
+      (spec) adding additional checks
+
+[33mcommit 53a25927eac84b718e8247c1eb945218bb2c4bb9[m[33m ([m[1;31morigin/stable[m[33m)[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Mon Jun 3 17:48:28 2019 -0500
+
+    (GH-1837) update behavior scenarios
+    
+    The specs produce a Scenarios file, ensure that is updated with the
+    latest results.
+
+[33mcommit 70f5e373ae3bbc74f27ca51e5ddafb46d2b7fc0c[m[33m ([m[1;33mtag: 0.10.15[m[33m)[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Mon Jun 3 16:06:31 2019 -0500
+
+    (version) 0.10.15
+
+[33mcommit b688aa438f89d24edd01f9ddf24fc411f69cde74[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Mon Jun 3 16:06:23 2019 -0500
+
+    (doc) update release notes for 0.10.15
+
+[33mcommit 3837ffdc36812fdbb030e938032517c3a5cd8ffc[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Mon Jun 3 16:06:03 2019 -0500
+
+    (maint) formatting
+
+[33mcommit 7a9b1f1c1763aa55c2700832a096a258db48489b[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Mon Jun 3 16:05:50 2019 -0500
+
+    (GH-1837) Specs: ensure zero results on info/exact
+    
+    Added tests to ensure that no results does not result in an error when
+    searching with info or by exact name of package.
+
+[33mcommit 5531c00b3ff5bb557ca15e40395c0b6c8e31f835[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Mon Jun 3 16:04:10 2019 -0500
+
+    (spec) adding additional checks
+
+[33mcommit 0f86f78dc58bc226d70e64192751ff89e52fa1ad[m
+Merge: 3564dfb8 4010ccd9
+Author: Gary Ewan Park <gep13@gep13.co.uk>
+Date:   Fri May 31 15:17:21 2019 +0100
+
+    Merge branch 'stable'
+    
+    * stable:
+      (GH-1837) Handle potential for null package
+      (maint) Correct whitespace
+      (version) 0.10.15-beta
+
+[33mcommit 4010ccd934fea4724be2aff9bc6a0338ca22738b[m
+Merge: 7d2ad9af 97f29f19
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Fri May 31 08:13:08 2019 -0500
+
+    Merge pull request #1838 from gep13/issue-1837
+    
+     (GH-1837) Handle potential for null package
+
+[33mcommit 97f29f19248d756cf0e2b4dea909857c0ff9a8f6[m
+Author: Gary Ewan Park <gep13@gep13.co.uk>
+Date:   Fri May 31 08:01:37 2019 +0100
+
+    (GH-1837) Handle potential for null package
+    
+    find_package will either return the package that was found, or null.
+    The case for null being returned needs to be handled, so that upstream
+    callers are not affected.
+
+[33mcommit ba3c10b544d919ab39e21c558fed64008f835c34[m
+Author: Gary Ewan Park <gep13@gep13.co.uk>
+Date:   Fri May 31 07:58:58 2019 +0100
+
+    (maint) Correct whitespace
+
+[33mcommit 7d2ad9afc9f619442f4f39fb954e42cada238eb5[m[33m ([m[1;33mtag: 0.10.15-beta[m[33m)[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Thu May 30 14:19:08 2019 -0500
+
+    (version) 0.10.15-beta
+
+[33mcommit 3564dfb83782d9a02504ad2c89c5c978fb65f4ca[m
+Merge: 0a60bacf db4c12e8
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Thu May 30 13:41:21 2019 -0500
+
+    Merge branch 'stable'
+    
+    * stable:
+      (version) 0.10.14
+      (doc) update release notes
+      (GH-53) Interactive Prompt -  allow short answer when "-" included
+      (GH-53) Confirmation - Allow Yes To All
+      (doc) update release notes for 0.10.14
+      (GH-1433) config: UpgradeAllExceptions
+      (GH-1781) fix: use ProviderPath for Get-Location
+      (GH-1781) capture current directory in config
+      (GH-1781) Fix: fallback to temp for working dir
+      (maint) formatting
+      (GH-1781) Ensure Get-Location uses FileSystem
+      (maint) formatting
+
+[33mcommit db4c12e83c5b99f1014fa4433f86c0b804390e8e[m[33m ([m[1;33mtag: 0.10.14[m[33m)[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Thu May 30 13:20:06 2019 -0500
+
+    (version) 0.10.14
+
+[33mcommit 1d6875db2616c00a8338e5d25bbf924960264c30[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Thu May 30 13:19:24 2019 -0500
+
+    (doc) update release notes
+
+[33mcommit 723f0dc2e04dba977fb8e6bde09be8d3f182db99[m
+Merge: d90dad66 6989998d
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Thu May 30 10:50:26 2019 -0500
+
+    Merge branch 'ticket/stable/yes-to-all' into stable
+    
+    * ticket/stable/yes-to-all:
+      (GH-53) Interactive Prompt -  allow short answer when "-" included
+      (GH-53) Confirmation - Allow Yes To All
+
+[33mcommit 6989998d87c792eaa1c10012a95efa2f73bb0957[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Thu May 30 10:41:16 2019 -0500
+
+    (GH-53) Interactive Prompt -  allow short answer when "-" included
+    
+    When something like "all - yes to all" is an option, allow "all" to be
+    a perfectly valid answer.
+
+[33mcommit 445a14d84eb6227577194dbd4d7c5c028429be15[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 17:15:36 2019 -0500
+
+    (GH-53) Confirmation - Allow Yes To All
+    
+    Sometimes one may run upgrade all and forget to pass for all. It would
+    be helpful to be able to confirm all related at once.
+
+[33mcommit d90dad66e8289a27b338fe09ab3e6e18b0292eaa[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Wed May 29 21:24:51 2019 -0500
+
+    (doc) update release notes for 0.10.14
+
+[33mcommit 5c3660b0613fe4cacac27168e694c442f8718adc[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Wed May 29 15:10:14 2019 -0500
+
+    (GH-1433) config: UpgradeAllExceptions
+    
+    Allow setting default configuration of items that should always be
+    skipped during choco upgrade all. Update configuration for except to
+    note the defaults in the configuration, if set.
+
+[33mcommit 9e2e49a68f401d3825884c9b701e00c33bf37aeb[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Wed May 29 14:35:34 2019 -0500
+
+    (GH-1781) fix: use ProviderPath for Get-Location
+    
+    When seeing the following error:
+    `ERROR: Exception calling "Start" with "0" argument(s): "The directory
+    name is invalid"` this can stem off of permissions issues or an
+    incorrectly formatted directory being passed. When using Get-Location,
+    if that location is a UNC path, PowerShell shows that with
+    `Microsoft.PowerShell.Core\FileSystem::\\server\share`, resulting in
+    that entire string to be passed as the PATH for the working directory
+    that is passed to
+    `System.Diagnostics.Process.StartInfo.WorkingDirectory`. Unfortunately
+    that doesn't evaluate to an acutal valid path, thus the error is
+    produced. Instead, the path should be evaluated with ProviderPath,
+    which removes the `Microsoft.PowerShell.Core\FileSystem::` from the
+    actual path, resulting in a valid path using a UNC location.
+    
+    Also make a determination if the path is not set (such as with things
+    that are run during provisioning) and provide a valid working directory
+    using cache location.
+
+[33mcommit a2f358cf6a9e80d3d634a34556628a878586d06c[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Wed May 29 14:22:31 2019 -0500
+
+    (GH-1781) capture current directory in config
+    
+    Capture the current directory as part of the configuration, allowing it
+    to be inspected in the logs later for issues that might occur.
+
+[33mcommit 43899b317c435103bdd7b4f14b500cb0a1faab51[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Tue May 28 17:00:39 2019 -0500
+
+    (GH-1781) Fix: fallback to temp for working dir
+    
+    When unable to set the working directory next to the installer, fall
+    back to setting that directory to temp.
+
+[33mcommit 0fe09728612a1ef29317aecf9d9cfa041817d3d8[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Tue May 28 16:56:03 2019 -0500
+
+    (maint) formatting
+
+[33mcommit fd6fc122f0b451e5e517e98b555179ebd84201b1[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Tue May 28 16:55:48 2019 -0500
+
+    (GH-1781) Ensure Get-Location uses FileSystem
+    
+    Ensure when calling Get-Location, the FileSystem PSProvider is taken
+    into account. Otherwise folks in a different PSDrive calling choco
+    could cause unforeseen errors.
+
+[33mcommit e0c753fc4da00c5863ff5d6b25b332d29f83f11f[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Mon May 27 01:18:39 2019 -0500
+
+    (maint) formatting
+
+[33mcommit 0a60bacfe41557e2e8402e533cfddff99c2a56b2[m
+Merge: 1c10b3fe c0e82679
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 18:42:07 2019 -0500
+
+    Merge branch 'stable'
+    
+    * stable:
+      (GH-1788) Use LiteralPath in Get-UninstallRegistryKey
+      (GH-1800) Prefer 32-bit in ARM64 emulated PowerShell
+      (doc) Corrected typo
+      (maint) Corrected whitespace
+
+[33mcommit c0e826798428112e01630cce3687ae0518092e68[m
+Merge: 0a16b41a a0cc2dc7
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 18:40:59 2019 -0500
+
+    Merge branch 'pr1741' into stable
+    
+    * pr1741:
+      (GH-1788) Use LiteralPath in Get-UninstallRegistryKey
+
+[33mcommit a0cc2dc7f04d6297e45e88d826b859683234793a[m
+Author: Farid Nouri Neshat <FaridN_SOAD@yahoo.com>
+Date:   Fri Mar 1 12:54:52 2019 +0100
+
+    (GH-1788) Use LiteralPath in Get-UninstallRegistryKey
+    
+    Some registry keys contain characters that passing to `-Path` comes back as
+    invalid. Fortunately, `-LiteralPath` accepts values as they are without any
+    issues. This fixes cases where registry keys contains some characters
+    (eg `[` or `]`) where `Get-ItemProperty -Path` wouldn't accept.
+
+[33mcommit 0a16b41a25706b1e52322035500dead8aeea429c[m
+Merge: 88fdfa6c 19d4056c
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 18:30:30 2019 -0500
+
+    Merge branch 'pr1810' into stable
+    
+    * pr1810:
+      (GH-1800) Prefer 32-bit in ARM64 emulated PowerShell
+
+[33mcommit 19d4056c43e8e71e76f576d7d1bdf9733fd66c06[m
+Author: João Reis <reis@janeasystems.com>
+Date:   Mon Apr 29 21:42:19 2019 +0100
+
+    (GH-1800) Prefer 32-bit in ARM64 emulated PowerShell
+    
+    PowerShell runs emulated in ARM64 Windows systems. Thus, it is also
+    necessary to check the PROCESSOR_ARCHITEW6432 to determine if
+    Chocolatey should prefer 32-bit packages.
+
+[33mcommit 88fdfa6c1ffe28bb25b08fe791eaef745f78930f[m
+Merge: a1cda376 1be1c926
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 18:25:38 2019 -0500
+
+    Merge branch 'pr1769' into stable
+    
+    * pr1769:
+      (doc) Corrected typo
+      (maint) Corrected whitespace
+
+[33mcommit 1be1c92638ff0379f02f409fee9cde5b4246906e[m
+Author: Gary Ewan Park <gep13@gep13.co.uk>
+Date:   Mon Mar 18 10:03:02 2019 -0700
+
+    (doc) Corrected typo
+    
+    - intead corrected to instead
+
+[33mcommit 44558390a70614440bc9c113e5c7da4576cfeaa4[m
+Author: Gary Ewan Park <gep13@gep13.co.uk>
+Date:   Mon Mar 18 10:02:15 2019 -0700
+
+    (maint) Corrected whitespace
+
+[33mcommit 1c10b3fe364f47e9030453c0fb90fdbec44cc3f3[m
+Merge: f4611808 a1cda376
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 18:21:11 2019 -0500
+
+    Merge branch 'stable'
+    
+    * stable:
+      (GH-1804) Added pre parameter to outdated
+      (GH-1834) update tab completion
+      (GH-1831) list/search/info - disabe repo opts switch
+
+[33mcommit a1cda376ca0527733ae7458f3a33b4803869e3e8[m
+Merge: 643634f4 446ab366
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 18:20:55 2019 -0500
+
+    Merge branch 'pr1832' into stable
+    
+    * pr1832:
+      (GH-1804) Added pre parameter to outdated
+
+[33mcommit 446ab3666649c39524b5dae935edd0f5f3d073b7[m
+Author: Maurice Kevenaar <maurice@kevenaar.name>
+Date:   Sun May 26 13:49:46 2019 +0200
+
+    (GH-1804) Added pre parameter to outdated
+    
+    With the pre parameter added to the outdated command, you are able to
+    list outdated packages that have a pre-release available. As all the
+    code was already available, only the parameter was added to the
+    outdated command.
+
+[33mcommit 643634f49fc19351b65aeca0ac3d13dda9ce3577[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 18:13:36 2019 -0500
+
+    (GH-1834) update tab completion
+    
+    Update tab completion to see all of the new options.
+
+[33mcommit 36f71828ea874d572b85c01007632de40622e7ff[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 18:12:49 2019 -0500
+
+    (GH-1831) list/search/info - disabe repo opts switch
+    
+    Ensure that when running search, list, or info, there is a switch to
+    disable the repository optimizations when they are not available.
+
+[33mcommit f4611808f3bed1227bbd9d1ba28ba8bae422eef6[m
+Merge: e9e5bc98 97a171f2
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 17:16:10 2019 -0500
+
+    Merge branch 'stable'
+    
+    * stable:
+      (GH-1831) search/list/info - use package search optimizations
+      (maint) move find_package to NuGetList
+      (log) add separators for package execution output
+      (maint) reorder outdated in interface
+
+[33mcommit 97a171f2faa54e3bea2fcaa6bbe2517d786780ba[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 17:08:32 2019 -0500
+
+    (GH-1831) search/list/info - use package search optimizations
+    
+    When searching for packages based on id, instead of using the older
+    methods, use the optimizations if they are turned on in the
+    configuration. This follows GH-1397 to ensure that info uses the same
+    algorithm.
+
+[33mcommit 754cd0a4323e61a882a06d6b1fa738a48ce078a9[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 17:05:52 2019 -0500
+
+    (maint) move find_package to NuGetList
+    
+    Listing or searching using some of NuGet.Core components should be in
+    a common place - that is NuGetList.cs currently. Move the optimized
+    method to where it can be used everywhere.
+    
+    Additionally, add smarts to the method to determine if one is using the
+    older methods of search when repository optimizations are not available.
+
+[33mcommit da91eb36568bde5b7980f1a9825c4e7e44509ec0[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 17:02:00 2019 -0500
+
+    (log) add separators for package execution output
+    
+    Sometimes in reading over the log it's hard to determine where the
+    package script execution is occurring. To ensure it is easier to
+    follow, add separators.
+
+[33mcommit 77687fe7f368e9d98043f7741a5a857a19257c39[m
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Sun May 26 17:00:30 2019 -0500
+
+    (maint) reorder outdated in interface
+
+[33mcommit e9e5bc98ccca5bbea31d68f2c47779e9db5d1a52[m
+Merge: 8bf39743 d01b58ba
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Mon May 13 14:49:00 2019 -0500
+
+    Merge branch 'stable'
+    
+    * stable:
+      (GH-1816) Add NuGet.Config beside sln file
+      (maint) Remove sealed modifier from attribute
+      (maint) Correct whitespace
+      (maint) Change modifier from internal to public
+      (maint) Correct whitespace
+      (maint) refactor encryption to adapter
+
+[33mcommit d01b58bab7b354eca3c4be3d16728e96fde22882[m
+Merge: ddc77a5c aa6a6f88
+Author: Rob Reynolds <ferventcoder@gmail.com>
+Date:   Mon May 13 14:45:14 2019 -0500
+
+    Merge pull request #1826 from gep13/issue-1816
+    
+    (GH-1816) Add NuGet.Config beside sln file
+
+[33mcommit aa6a6f88cdddf60ed476dd31fd47a21745ebbd0b[m
+Author: Gary Ewan Park <gep13@gep13.co.uk>
+Date:   Mon May 13 11:15:14 2019 +0100
+
+    (GH-1816) Add NuGet.Config beside sln file
+    
+    Depending on the end user setup, the machine level NuGet Configuration
+    file can include an entry for the v3 NuGet feed.  This causes problems
+    when restoring packages for the Chocolatey build, since two packages
+    (NUnit.Runners and coveralls) do not restore from the v3 feed, only the
+    v2 feed.  By specifying this feed in the solution level NuGet.Config
+    file, should mean that they restore correctly on any machine.
+    
+    NOTE: The existing NuGet.Config file in the .nuget folder actually
+    doesn't seem to be being used at all.  Based on the documentation here:
+    
+    https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior
+    
+    A NuGet.Config file is looked for at the location of the sln file,
+    upwards to the root of the drive.  As a result, the existing file is
+    being ignored.
