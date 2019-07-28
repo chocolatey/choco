@@ -43,7 +43,7 @@ namespace chocolatey.infrastructure.app.configuration
             var item = (ConfigFileApiKeySetting) obj;
 
             return (Source == item.Source)
-                   && (Key == item.Source);
+                   && (Key == item.Key);
         }
 
         public override int GetHashCode()
