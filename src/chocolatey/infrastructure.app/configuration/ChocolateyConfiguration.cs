@@ -436,6 +436,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool NotifyOnlyAvailableUpgrades { get; set; }
         public string PackageNamesToSkip { get; set; }
         public bool ExcludePrerelease { get; set; }
+        public bool IgnorePinnedMessages { get; set; }
     }
 
     [Serializable]

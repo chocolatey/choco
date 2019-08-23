@@ -38,6 +38,7 @@ namespace chocolatey.infrastructure.app.services
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
     using chocolatey.infrastructure.app.utility;
+    using Console = adapters.Console;
 
     //todo - this monolith is too large. Refactor once test coverage is up.
 
@@ -742,13 +743,16 @@ Please see https://chocolatey.org/docs/troubleshooting for more
 
                     if (!config.UpgradeCommand.NotifyOnlyAvailableUpgrades)
                     {
-                        if (config.RegularOutput)
+                        if ((!isPinned) || (!config.UpgradeCommand.IgnorePinnedMessages && isPinned))
                         {
-                            this.Log().Info(ChocolateyLoggers.Important, logMessage);
-                        }
-                        else
-                        {
-                            this.Log().Info("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
+                            if (config.RegularOutput)
+                            {
+                                this.Log().Info(ChocolateyLoggers.Important, logMessage);
+                            }
+                            else
+                            {
+                                this.Log().Info("{0}|{1}|{1}|{2}".format_with(installedPackage.Id, installedPackage.Version, isPinned.to_string().to_lower()));
+                            }
                         }
                     }
 
@@ -765,16 +769,19 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                         {
                             packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                         }
-
+                        
                         if (!config.UpgradeCommand.NotifyOnlyAvailableUpgrades)
                         {
-                            if (config.RegularOutput)
+                            if ((!isPinned) || (!config.UpgradeCommand.IgnorePinnedMessages && isPinned))
                             {
-                                this.Log().Info(logMessage);
-                            }
-                            else
-                            {
-                                this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
+                                if (config.RegularOutput)
+                                {
+                                    this.Log().Info(logMessage);
+                                }
+                                else
+                                {
+                                    this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
+                                }
                             }
                         }
 
@@ -790,15 +797,18 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                     if (availablePackage.Version > installedPackage.Version)
                     {
                         string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version);
+  
                         packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
-
-                        if (config.RegularOutput)
+                        if ((!isPinned) || (!config.UpgradeCommand.IgnorePinnedMessages && isPinned))
                         {
-                            this.Log().Warn("{0}{1}".format_with(Environment.NewLine, logMessage));
-                        }
-                        else
-                        {
-                            this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
+                            if (config.RegularOutput)
+                            {
+                                this.Log().Warn("{0}{1}".format_with(Environment.NewLine, logMessage));
+                            }
+                            else
+                            {
+                                this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, availablePackage.Version, isPinned.to_string().to_lower()));
+                            }
                         }
                     }
 
@@ -807,7 +817,7 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                         string logMessage = "{0} is pinned. Skipping pinned package.".format_with(packageName);
                         packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                         packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOutput && !config.UpgradeCommand.IgnorePinnedMessages) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
 
                         continue;
                     }
@@ -1438,7 +1448,9 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                         var pinnedResult = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                         pinnedResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                         pinnedResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        
+                        if (config.RegularOutput && !config.UpgradeCommand.IgnorePinnedMessages) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        
                         continue;
                     }
 
