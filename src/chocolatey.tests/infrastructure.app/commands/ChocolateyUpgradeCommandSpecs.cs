@@ -177,6 +177,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
+            public void should_add_ignorepinnedmessages_to_the_option_set()
+            {
+                optionSet.Contains("ignore-pinned-messages").ShouldBeTrue();
+            }
+            
+            [Fact]
             public void should_add_short_version_of_ignoredependencies_to_the_option_set()
             {
                 optionSet.Contains("i").ShouldBeTrue();
