@@ -396,6 +396,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ExitOnRebootDetected { get; set; }
         public bool LogValidationResultsOnWarnings { get; set; }
         public bool UsePackageRepositoryOptimizations { get; set; }
+        public bool PinVersion { get; set; }
 
         //todo remove in 0.11.0
         public bool ScriptsCheckLastExitCode { get; set; }

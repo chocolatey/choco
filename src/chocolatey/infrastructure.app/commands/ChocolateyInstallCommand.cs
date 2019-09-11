@@ -20,21 +20,27 @@ namespace chocolatey.infrastructure.app.commands
     using System.Collections.Generic;
     using System.Linq;
     using attributes;
+    using chocolatey.infrastructure.app.nuget;
     using commandline;
     using configuration;
     using infrastructure.commands;
     using infrastructure.configuration;
     using logging;
+    using NuGet;
     using services;
 
     [CommandFor("install", "installs packages from various sources")]
     public class ChocolateyInstallCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;
+        private readonly ChocolateyPinCommand _chocolateyPinCommand;
+        private readonly ILogger _nugetLogger;
 
-        public ChocolateyInstallCommand(IChocolateyPackageService packageService)
+        public ChocolateyInstallCommand(IChocolateyPackageService packageService, ChocolateyPinCommand chocolateyPinCommand, ILogger nugetLogger)
         {
             _packageService = packageService;
+            _chocolateyPinCommand = chocolateyPinCommand;
+            _nugetLogger = nugetLogger;
         }
 
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
@@ -178,6 +184,15 @@ namespace chocolatey.infrastructure.app.commands
                          if (option != null)
                          {
                              configuration.Features.UsePackageRepositoryOptimizations = false;
+                         }
+                     })
+                .Add("pin-version",
+                     "Pin version to prevent future upgrades.",
+                     option =>
+                     {
+                         if (option != null)
+                         {
+                             configuration.Features.PinVersion = true;
                          }
                      })
                 ;
@@ -436,6 +451,17 @@ NOTE: Options and switches apply to all items passed, so if you are
         {
             _packageService.ensure_source_app_installed(configuration);
             _packageService.install_run(configuration);
+
+            if (configuration.Features.PinVersion)
+            {
+                var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
+                                                       new PackageDownloader(),
+                                                       installSuccessAction: null,
+                                                       uninstallSuccessAction: null,
+                                                       addUninstallHandler: false);
+
+                _chocolateyPinCommand.set_pin(packageManager, configuration);
+            }
         }
 
         public virtual bool may_require_admin_access()
