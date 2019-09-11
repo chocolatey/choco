@@ -36,7 +36,7 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             protected ChocolateyInstallCommand command;
             protected Mock<IChocolateyPackageService> packageService = new Mock<IChocolateyPackageService>();
-            protected Mock<ICommand> chocolateyInstallCommand = new Mock<ICommand>();
+            protected Mock<IChocolateyPackageInformationService> chocolateyPackageInformationService = new Mock<IChocolateyPackageInformationService>();
             protected Mock<INugetService> nugetService = new Mock<INugetService>();
             protected Mock<ILogger> nugetLogger = new Mock<ILogger>();
             protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
@@ -44,8 +44,8 @@ namespace chocolatey.tests.infrastructure.app.commands
             public override void Context()
             {
                 configuration.Sources = "bob";
-                var chocolateyPinCommand = new ChocolateyPinCommand(packageService.Object, nugetLogger.Object, nugetService.Object);
-                command = new ChocolateyInstallCommand(packageService.Object, chocolateyPinCommand, chocolateyInstallCommand.Object);
+                var chocolateyPinCommand = new ChocolateyPinCommand(chocolateyPackageInformationService.Object, nugetLogger.Object, nugetService.Object);
+                command = new ChocolateyInstallCommand(packageService.Object, chocolateyPinCommand, nugetLogger.Object);
             }
         }
 
