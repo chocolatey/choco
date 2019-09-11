@@ -241,6 +241,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 optionSet.Contains("p").ShouldBeTrue();
             }
+
+            [Fact]
+            public void should_add_pinVersion_to_the_option_set()
+            {
+                optionSet.Contains("pin-version").ShouldBeTrue();
+            }
         }
 
         public class when_handling_additional_argument_parsing : ChocolateyInstallCommandSpecsBase
