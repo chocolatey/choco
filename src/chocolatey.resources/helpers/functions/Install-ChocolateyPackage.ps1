@@ -278,8 +278,6 @@ Install-ChocolateyPackage @packageArgs
 >
 $packageName= 'bob'
 $toolsDir   = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$url        = 'https://somewhere.com/file.msi'
-$url64      = 'https://somewhere.com/file-x64.msi'
 $urlTransform = 'https://somewhere.com/file.mst'
 $mstFileLocation = Join-Path $toolsDir 'transform.mst'
 
