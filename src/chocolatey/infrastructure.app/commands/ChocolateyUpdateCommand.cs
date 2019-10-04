@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,12 +19,11 @@ namespace chocolatey.infrastructure.app.commands
     using attributes;
     using commandline;
     using configuration;
-    using domain;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.update)]
-    public sealed class ChocolateyUpdateCommand : ChocolateyUpgradeCommand
+    [CommandFor("update", "[DEPRECATED] RESERVED for future use (you are looking for upgrade, these are not the droids you are looking for)")]
+    public class ChocolateyUpdateCommand : ChocolateyUpgradeCommand
     {
         //todo: v1 Deprecation - update is removed or becomes package indexes
         public ChocolateyUpdateCommand(IChocolateyPackageService packageService) : base(packageService)
@@ -59,12 +59,11 @@ DEPRECATION NOTICE - choco update is deprecated and will be removed or
         {
             this.Log().Info(ChocolateyLoggers.Important, "[DEPRECATED] Update Command");
             this.Log().Info(@"
-Update has been deprecated and will be removed/replaced in version 
+NOTE: Update has been deprecated and will be removed/replaced in version 
  1.0.0 with something that performs the functions of updating package
  indexes.  Please use `choco upgrade` instead.
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
-
     }
 }

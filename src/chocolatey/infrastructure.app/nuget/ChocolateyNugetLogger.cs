@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.nuget
 {
+    using logging;
     using NuGet;
 
     // ReSharper disable InconsistentNaming
@@ -41,6 +43,12 @@ namespace chocolatey.infrastructure.app.nuget
                     break;
                 case MessageLevel.Error:
                     this.Log().Error("[NuGet] " + message, args);
+                    break;
+                case MessageLevel.Fatal:
+                    this.Log().Fatal("[NuGet] " + message, args);
+                    break;
+                case MessageLevel.Verbose:
+                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message, args);
                     break;
             }
         }

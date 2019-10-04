@@ -41,7 +41,8 @@
     <property name="nuget.version" value="${nuget.version + '-' + version.nuget.prerelease}" if="${version.nuget.prerelease != ''}" />
     <property name="nuget.version" value="${nuget.version + '.' + pkg.build.date}" if="${version.use.build_date and version.use_semanticversioning and version.nuget.prerelease == ''}" />
     <property name="nuget.version" value="${nuget.version + '-' + pkg.build.date}" if="${version.use.build_date and version.nuget.prerelease != ''}" />
-    <property name="nuget.version" value="${nuget.version + '.' + version.fix}" if="${version.fix != '0'}" />
+    <property name="nuget.version" value="${nuget.version + '.' + version.fix}" if="${version.fix != '0' and not version.use.build_date}" />
+    <property name="nuget.version" value="${nuget.version + '-' + version.fix}" if="${version.fix != '0' and version.use.build_date}" />
     <!-- version.use.build_date -->
     <echo level="Warning" message="Using ${nuget.version} as the version for the nuget package(s)." />
   </target>

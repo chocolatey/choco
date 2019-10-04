@@ -7,6 +7,12 @@
   [string]$packageScript
 )
 
+$global:DebugPreference = "SilentlyContinue"
+if ($env:ChocolateyEnvironmentDebug -eq 'true') { $global:DebugPreference = "Continue"; }
+$global:VerbosePreference = "SilentlyContinue"
+if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $global:VerbosePreference = "Continue"; $verbosity = $true }
+
+Write-Debug '---------------------------Script Execution---------------------------'
 Write-Debug "Running 'ChocolateyScriptRunner' for $($env:packageName) v$($env:packageVersion) with packageScript `'$packageScript`', packageFolder:`'$($env:packageFolder)`', installArguments: `'$installArguments`', packageParameters: `'$packageParameters`',"
 
 ## Set the culture to invariant
@@ -35,9 +41,40 @@ $extensionsPath = Join-Path $nugetPath 'extensions'
 $chocInstallVariableName = "ChocolateyInstall"
 $chocoTools = Join-Path $nuGetPath 'tools'
 $nugetExe = Join-Path $chocoTools 'nuget.exe'
-$7zip = Join-Path $chocoTools '7za.exe'
+$7zip = Join-Path $chocoTools '7z.exe'
 $ShimGen = Join-Path $chocoTools 'shimgen.exe'
 $checksumExe = Join-Path $chocoTools 'checksum.exe'
 
 Write-Debug "Running `'$packageScript`'";
 & "$packageScript"
+$scriptSuccess = $?
+$lastExecutableExitCode = $LASTEXITCODE
+
+if ($lastExecutableExitCode -ne $null -and $lastExecutableExitCode -ne '') {
+  Write-Debug "The last executable that ran had an exit code of '$lastExecutableExitCode'."
+} 
+
+if (-not $scriptSuccess) {
+ Write-Debug "The script exited with a failure."
+} 
+
+$exitCode = 0
+if ($env:ChocolateyCheckLastExitCode -ne $null -and $env:ChocolateyCheckLastExitCode -eq 'true' -and $lastExecutableExitCode -ne $null -and $lastExecutableExitCode -ne '') {
+  $exitCode = $lastExecutableExitCode
+}
+
+if ($exitCode -eq 0 -and -not $scriptSuccess) {
+  $exitCode = 1
+}
+
+if ($env:ChocolateyExitCode -ne $null -and $env:ChocolateyExitCode -ne '') {
+ $exitCode = $env:ChocolateyExitCode
+}
+
+if ($exitCode -ne $null -and $exitCode -ne '' -and $exitCode -ne 0) {
+  Set-PowerShellExitCode $exitCode
+}
+
+Write-Debug '----------------------------------------------------------------------'
+
+Exit $exitCode

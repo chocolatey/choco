@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,14 +26,15 @@ namespace chocolatey.infrastructure.app.nuget
     {
         public static void push_package(ChocolateyConfiguration config, string nupkgFilePath)
         {
-            var timeout = TimeSpan.FromSeconds(Math.Abs(config.PushCommand.TimeoutInSeconds));
+            var timeout = TimeSpan.FromSeconds(Math.Abs(config.CommandExecutionTimeoutSeconds));
             if (timeout.Seconds <= 0)
             {
-                timeout = TimeSpan.FromMinutes(5); // Default to 5 minutes
+                timeout = TimeSpan.FromMinutes(300); // Default to 5 hours if there is a zero (infinite) timeout
             }
             const bool disableBuffering = false;
 
             var packageServer = new PackageServer(config.Sources, ApplicationParameters.UserAgent);
+            
             packageServer.SendingRequest += (sender, e) => { if (config.Verbose) "chocolatey".Log().Info(ChocolateyLoggers.Verbose, "{0} {1}".format_with(e.Request.Method, e.Request.RequestUri)); };
 
             var package = new OptimizedZipPackage(nupkgFilePath);
@@ -49,14 +51,13 @@ namespace chocolatey.infrastructure.app.nuget
             catch (InvalidOperationException ex)
             {
                 var message = ex.Message;
-                if (!string.IsNullOrWhiteSpace(message) && message.Contains("(500) Internal Server Error"))
+                if (!string.IsNullOrWhiteSpace(message) && (message.Contains("(406)") || message.Contains("(409)")))
                 {
-                    throw new ApplicationException("There was an internal server error, which might mean the package already exists on a Simple OData Server.", ex);
+                    throw new ApplicationException("An error has occurred. It's possible the package version already exists on the repository.", ex);
                 }
 
                 throw;
             }
-
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} was pushed successfully to {1}".format_with(package.GetFullName(), config.Sources));
         }

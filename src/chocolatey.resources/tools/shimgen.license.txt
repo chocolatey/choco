@@ -1,29 +1,62 @@
 Shim Generator - shimgen.exe
-Copyright (C) 2013-Present RealDimensions Software, LLC ("RDS")
+Copyright (C) 2013 - 2017 RealDimensions Software, LLC ("RDS")
 ===================================================================
 Grant of License
 ===================================================================
-You may use Shim Generator ("shimgen.exe") only with the official chocolatey client.
+ATTENTION: Shim Generator ("shimgen.exe") is a closed source application with
+a proprietary license and its use is strictly limited to the terms of this 
+license agreement.
 
-The use of shimgen.exe for any other reason is strictly prohibited.
+RealDimensions Software, LLC ("RDS") grants Chocolatey Software, Inc a revocable, 
+non-exclusive license to distribute and use shimgen.exe with the official 
+Chocolatey client (https://chocolatey.org). This license file must be stored in 
+Chocolatey source next to shimgen.exe and distributed with every copy of 
+shimgen.exe. The distribution or use of shimgen.exe outside of these terms 
+without the express written permission of RDS is strictly prohibited.
 
-If you would like to use this software for any other reason, you must obtain a personal or commercial license to do so. To do that you must contact RDS at ferventcoder.com.
-
-This software is not free to distribute.  If you would like to distribute this software, you must receive written permission from the software owner.
+While the source for shimgen.exe is closed source, the shims have reference 
+source at https://github.com/chocolatey/shimgen/tree/master/shim.
 
 ===================================================================
 End-User License Agreement
 ===================================================================
 EULA - Shim Generator
 
-IMPORTANT- READ CAREFULLY: This RealDimensions Software ("RDS") End-User License Agreement ("EULA") is a legal agreement between you("End User") and RDS for all RDS products, controls, source code, demos, intermediate files, media, printed materials, and "online" or electronic documentation ("SOFTWARE PRODUCT(S)") contained with this distribution.
+IMPORTANT- READ CAREFULLY: This RealDimensions Software, LLC ("RDS") End-User License
+Agreement ("EULA") is a legal agreement between you ("END USER") and RDS for all 
+RDS products, controls, source code, demos, intermediate files, media, printed 
+materials, and "online" or electronic documentation (collectively "SOFTWARE 
+PRODUCT(S)") contained with this distribution.
 
-RDS grants to you as an individual, a personal, nonexclusive license to install and use the SOFTWARE PRODUCT(S) for the sole purpose of use with the official chocolatey client. By installing, copying, or otherwise using the SOFTWARE PRODUCT(S), you agree to be bound by the terms of this EULA. If you do not agree to any part of the terms of this EULA, DO NOT INSTALL, USE, OR EVALUATE, ANY PART, FILE OR PORTION OF THE SOFTWARE PRODUCT(S).
+RDS grants to you as an individual or entity, a personal, non-exclusive license 
+to install and use the SOFTWARE PRODUCT(S) for the sole purpose of use with the 
+official Chocolatey client. By installing, copying, or otherwise using the 
+SOFTWARE PRODUCT(S), END USER agrees to be bound by the terms of this EULA. If 
+END USER does not agree to any part of the terms of this EULA, DO NOT INSTALL, 
+USE, OR EVALUATE, ANY PART, FILE OR PORTION OF THE SOFTWARE PRODUCT(S).
 
-ALL SOFTWARE PRODUCT(S) are licensed not sold. If you are an individual, you must acquire an individual license for the SOFTWARE PRODUCT(S) from RDS or its authorized resellers. If you are an entity, you must acquire an individual license for each Developer End User and each Build Machine Running the SOFTWARE PRODUCT(S) within your organization from RDS or its authorized resellers. Both Virtual and Physical Build Machines running the SOFTWARE PRODUCT(S) must be counted in the SOFTWARE PRODUCT(S) licenses quantity of the organization.
+In no event shall RDS be liable to END USER for damages, including any direct, 
+indirect, special, incidental, or consequential damages of any character arising
+as a result of the use or inability to use the SOFTWARE PRODUCT(S) (including 
+but not limited to damages for loss of goodwill, work stoppage, computer failure
+or malfunction, or any and all other commercial damages or losses).
+
+The liability of RDS to END USER for any reason and upon any cause of action 
+related to the performance of the work under this agreement whether in tort or 
+in contract or otherwise shall be limited to the amount paid by the END USER to 
+RDS pursuant to this agreement or as determined by written agreement signed 
+by both RDS and END USER.
+
+ALL SOFTWARE PRODUCT(S) are licensed not sold. If you are an individual, you 
+must acquire an individual license for the SOFTWARE PRODUCT(S) from RDS or its 
+authorized resellers. If you are an entity, you must acquire an individual license 
+for each machine running the SOFTWARE PRODUCT(S) within your organization from RDS 
+or its authorized resellers. Both virtual and physical machines running the SOFTWARE 
+PRODUCT(S) must be counted in the SOFTWARE PRODUCT(S) licenses quantity of the 
+organization.
 
 ===================================================================
 Commercial / Personal Licensing
 ===================================================================
-Shim Generator (shimgen.exe) is also offered under personal and commercial licenses.
-You can learn more about this option by contacting RDS at http://ferventcoder.com
+Shim Generator ("shimgen.exe") is also offered under personal and commercial 
+licenses. You can learn more by contacting RDS at http://ferventcoder.com.

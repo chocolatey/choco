@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +17,12 @@
 namespace chocolatey.tests.infrastructure.commands
 {
     using System;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.adapters;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
+    using Moq;
+    using Should;
 
     public class CommandExecutorSpecs
     {
@@ -138,7 +139,7 @@ namespace chocolatey.tests.infrastructure.commands
 
             public override void Because()
             {
-                result = commandExecutor.execute("bob", "args", waitForExitInSeconds: 0);
+                result = commandExecutor.execute("bob", "args", waitForExitInSeconds: 0, workingDirectory: null, stdOutAction: null, stdErrAction: null, updateProcessPath: false, allowUseWindow: true, waitForExit: false);
             }
 
             [Fact]
@@ -152,6 +153,6 @@ namespace chocolatey.tests.infrastructure.commands
             {
                 process.Verify(p => p.WaitForExit(It.IsAny<int>()), Times.Never);
             }
-        }
+        } 
     }
 }

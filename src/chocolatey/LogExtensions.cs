@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,6 +42,14 @@ namespace chocolatey
         //     string objectName = obj.GetType().FullName;
         //     return Log(objectName);
         //}
+
+        /// <summary>
+        /// Resets the loggers. This allows switching to a new logger and not reusing old loggers that may be already cached.
+        /// </summary>
+        public static void ResetLoggers()
+        {
+            _dictionary.Value.Clear();
+        }
 
         /// <summary>
         ///   Gets the logger for <see cref="T" />.

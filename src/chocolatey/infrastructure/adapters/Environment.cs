@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +17,8 @@
 namespace chocolatey.infrastructure.adapters
 {
     using System;
+    using System.Collections;
+    using app;
 
     public sealed class Environment : IEnvironment
     {
@@ -29,6 +32,20 @@ namespace chocolatey.infrastructure.adapters
             get { return System.Environment.Is64BitOperatingSystem; }
         }
 
+        public bool Is64BitProcess
+        {
+            get
+            {
+                // ARM64 bit architecture has a x86-32 emulator, so return false
+                if (System.Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ProcessorArchitecture).to_string().is_equal_to(ApplicationParameters.Environment.ARM64_PROCESSOR_ARCHITECTURE))
+                {
+                    return false;
+                }
+
+                return (IntPtr.Size == 8);
+            }
+        }
+
         public bool UserInteractive
         {
             get { return System.Environment.UserInteractive; }
@@ -37,6 +54,33 @@ namespace chocolatey.infrastructure.adapters
         public string NewLine
         {
             get { return System.Environment.NewLine; }
+        }
+
+        public string CurrentDirectory
+        {
+            get { return System.Environment.CurrentDirectory; }
+        }
+
+        public string ExpandEnvironmentVariables(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return name;
+
+            return System.Environment.ExpandEnvironmentVariables(name);
+        }
+
+        public string GetEnvironmentVariable(string variable)
+        {
+            return System.Environment.GetEnvironmentVariable(variable);
+        }
+
+        public IDictionary GetEnvironmentVariables()
+        {
+            return System.Environment.GetEnvironmentVariables();
+        }
+
+        public IDictionary GetEnvironmentVariables(EnvironmentVariableTarget target)
+        {
+            return System.Environment.GetEnvironmentVariables(target);
         }
 
         public void SetEnvironmentVariable(string variable, string value)

@@ -1,0 +1,1 @@
+when running choco list exactpackage -e, this is the only package that should be returned.

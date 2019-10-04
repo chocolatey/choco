@@ -8,7 +8,8 @@
 :: With this batch file, there should be no need to reload command
 :: environment every time you want environment changes to propagate
 
-echo | set /p dummy="Reading environment variables from registry. Please wait... "
+::echo "RefreshEnv.cmd only works from cmd.exe, please install the Chocolatey Profile to take advantage of refreshenv from PowerShell"
+echo | set /p dummy="Refreshing environment variables from registry for cmd.exe. Please wait..."
 
 goto main
 
@@ -16,7 +17,7 @@ goto main
 :SetFromReg
     "%WinDir%\System32\Reg" QUERY "%~1" /v "%~2" > "%TEMP%\_envset.tmp" 2>NUL
     for /f "usebackq skip=2 tokens=2,*" %%A IN ("%TEMP%\_envset.tmp") do (
-        echo/set %~3=%%B
+        echo/set "%~3=%%B"
     )
     goto :EOF
 
@@ -42,14 +43,25 @@ goto main
     call :SetFromReg "HKCU\Environment" Path Path_HKCU >> "%TEMP%\_env.cmd"
 
     :: Caution: do not insert space-chars before >> redirection sign
-    echo/set Path=%%Path_HKLM%%;%%Path_HKCU%% >> "%TEMP%\_env.cmd"
+    echo/set "Path=%%Path_HKLM%%;%%Path_HKCU%%" >> "%TEMP%\_env.cmd"
 
     :: Cleanup
     del /f /q "%TEMP%\_envset.tmp" 2>nul
     del /f /q "%TEMP%\_envget.tmp" 2>nul
 
+    :: capture user / architecture
+    SET "OriginalUserName=%USERNAME%"
+    SET "OriginalArchitecture=%PROCESSOR_ARCHITECTURE%"
+
     :: Set these variables
     call "%TEMP%\_env.cmd"
 
-    echo | set /p dummy="Done"
+    :: Cleanup
+    del /f /q "%TEMP%\_env.cmd" 2>nul
+
+    :: reset user / architecture
+    SET "USERNAME=%OriginalUserName%"
+    SET "PROCESSOR_ARCHITECTURE=%OriginalArchitecture%"
+
+    echo | set /p dummy="Finished."
     echo .

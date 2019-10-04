@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +19,13 @@ namespace chocolatey.tests.infrastructure.app.commands
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
+    using Moq;
+    using Should;
 
     public class ChocolateyApiKeyCommandSpecs
     {
@@ -48,25 +48,24 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof (CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void should_implement_apikey()
             {
-                results.ShouldContain(CommandNameType.apikey.to_string());
-            }  
-            
+                results.ShouldContain("apikey");
+            }
+
             [Fact]
             public void should_implement_setapikey()
             {
-                results.ShouldContain(CommandNameType.setapikey.to_string());
+                results.ShouldContain("setapikey");
             }
         }
 
         public class when_configuring_the_argument_parser : ChocolateyApiKeyCommandSpecsBase
         {
-            private string result;
             private OptionSet optionSet;
 
             public override void Context()
@@ -108,6 +107,18 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_add_short_version_of_apikey_to_the_option_set()
             {
                 optionSet.Contains("k").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_remove_to_the_option_set()
+            {
+                optionSet.Contains("remove").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_short_version_of_remove_to_the_option_set()
+            {
+                optionSet.Contains("rem").ShouldBeTrue();
             }
         }
 
@@ -152,6 +163,37 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_continue_when_both_source_and_key_are_set()
             {
                 configuration.ApiKeyCommand.Key = "bob";
+                configuration.Sources = "bob";
+                command.handle_validation(configuration);
+            }
+
+            [Fact]
+            public void should_throw_when_key_is_removed_without_a_source()
+            {
+                configuration.ApiKeyCommand.Remove = true;
+                configuration.Sources = "";
+                var errorred = false;
+                Exception error = null;
+
+                try
+                {
+                    command.handle_validation(configuration);
+                }
+                catch (Exception ex)
+                {
+                    errorred = true;
+                    error = ex;
+                }
+
+                errorred.ShouldBeTrue();
+                error.ShouldNotBeNull();
+                error.ShouldBeType<ApplicationException>();
+            }
+
+            [Fact]
+            public void should_continue_when_removing_and_source_is_set()
+            {
+                configuration.ApiKeyCommand.Remove = true;
                 configuration.Sources = "bob";
                 command.handle_validation(configuration);
             }

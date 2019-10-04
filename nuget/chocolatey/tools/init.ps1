@@ -1,4 +1,4 @@
-param($installPath, $toolsPath, $package, $project)
+﻿param($installPath, $toolsPath, $package, $project)
 
 $modules = Get-ChildItem $ToolsPath -Filter *.psm1
 $modules | ForEach-Object { import-module -name  $_.FullName }
@@ -16,7 +16,7 @@ Visual Studio -
 ----------
 Please run Initialize-Chocolatey one time per machine to set up the repository. 
 If you are upgrading, please remember to run Initialize-Chocolatey again.
-After you have run Initiliaze-Chocolatey, you can safely uninstall the chocolatey package from your current Visual Studio solution.
+After you have run Initialize-Chocolatey, you can safely uninstall the chocolatey package from your current Visual Studio solution.
 ----------
 Alternative NuGet -
 ----------

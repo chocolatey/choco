@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +19,7 @@ namespace chocolatey.infrastructure.app.domain
     using System;
     using System.Xml.Serialization;
     using Microsoft.Win32;
+    using xml;
 
     [Serializable]
     [XmlType("key")]
@@ -35,14 +37,14 @@ namespace chocolatey.infrastructure.app.domain
         [XmlAttribute(AttributeName = "displayName")]
         public string DisplayName { get; set; }
 
-        public string InstallLocation { get; set; }
-        public string UninstallString { get; set; }
+        public XmlCData InstallLocation { get; set; }
+        public XmlCData UninstallString { get; set; }
         public bool HasQuietUninstall { get; set; }
 
         // informational
-        public string Publisher { get; set; }
+        public XmlCData Publisher { get; set; }
         public string InstallDate { get; set; }
-        public string InstallSource { get; set; }
+        public XmlCData InstallSource { get; set; }
         public string Language { get; set; } //uint
 
         // version stuff
@@ -63,6 +65,7 @@ namespace chocolatey.infrastructure.app.domain
         public bool NoRepair { get; set; }
         public string ReleaseType { get; set; } //hotfix, securityupdate, update rollup, servicepack
         public string ParentKeyName { get; set; }
+        public XmlCData LocalPackage { get; set; }
 
         /// <summary>
         ///   Is an application listed in ARP (Programs and Features)?
@@ -74,7 +77,7 @@ namespace chocolatey.infrastructure.app.domain
         public bool is_in_programs_and_features()
         {
             return !string.IsNullOrWhiteSpace(DisplayName)
-                   && !string.IsNullOrWhiteSpace(UninstallString)
+                   && !string.IsNullOrWhiteSpace(UninstallString.to_string())
                    && InstallerType != InstallerType.HotfixOrSecurityUpdate
                    && InstallerType != InstallerType.ServicePack
                    && string.IsNullOrWhiteSpace(ParentKeyName)
@@ -91,14 +94,14 @@ namespace chocolatey.infrastructure.app.domain
                 InstallerType,
                 UninstallString,
                 KeyPath
-                );
+            );
         }
 
         public override int GetHashCode()
         {
             return DisplayName.GetHashCode()
                    & DisplayVersion.GetHashCode()
-                   & UninstallString.GetHashCode()
+                   & UninstallString.to_string().GetHashCode()
                    & KeyPath.GetHashCode();
         }
 
@@ -113,9 +116,9 @@ namespace chocolatey.infrastructure.app.domain
         {
             if (ReferenceEquals(other, null)) return false;
 
-            return DisplayName.is_equal_to(other.DisplayName)
+            return DisplayName.to_string().is_equal_to(other.DisplayName)
                    && DisplayVersion.is_equal_to(other.DisplayVersion)
-                   && UninstallString.is_equal_to(other.UninstallString)
+                   && UninstallString.to_string().is_equal_to(other.UninstallString.to_string())
                    && KeyPath.is_equal_to(other.KeyPath)
                 ;
         }

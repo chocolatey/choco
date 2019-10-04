@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,11 +24,12 @@ namespace chocolatey.infrastructure.app.commands
     using configuration;
     using domain;
     using infrastructure.commands;
+    using infrastructure.configuration;
     using logging;
     using services;
 
-    [CommandFor(CommandNameType.config)]
-    public sealed class ChocolateyConfigCommand : ICommand
+    [CommandFor("config", "Retrieve and configure config file settings")]
+    public class ChocolateyConfigCommand : ICommand
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
 
@@ -36,7 +38,7 @@ namespace chocolatey.infrastructure.app.commands
             _configSettingsService = configSettingsService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             configuration.Sources = string.Empty;
 
@@ -52,7 +54,7 @@ namespace chocolatey.infrastructure.app.commands
                 ;
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
             var command = ConfigCommandType.unknown;
@@ -81,22 +83,26 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
             if (configuration.ConfigCommand.Command != ConfigCommandType.list && string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name)) throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name by option or position.".format_with(configuration.ConfigCommand.Command.to_string()));
             if (configuration.ConfigCommand.Command == ConfigCommandType.set && string.IsNullOrWhiteSpace(configuration.ConfigCommand.ConfigValue)) throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --value by option or position.".format_with(configuration.ConfigCommand.Command.to_string()));
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public virtual void help_message(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Config Command");
             this.Log().Info(@"
 Chocolatey will allow you to interact with the configuration file settings.
+
+NOTE: Available in 0.9.9.9+.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco config [list]|get|set [<options/switches>]
+    choco config [list]|get|set|unset [<options/switches>]
+
+NOTE: `Unset` subcommand available in 0.9.10+.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
@@ -107,17 +113,43 @@ Chocolatey will allow you to interact with the configuration file settings.
     choco config get --name cacheLocation
     choco config set cacheLocation c:\temp\choco
     choco config set --name cacheLocation --value c:\temp\choco
+    choco config unset proxy
+    choco config unset --name proxy
+
+NOTE: See scripting in the command reference (`choco -?`) for how to 
+ write proper scripts and integrations.
+
+");
+            
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
+            "chocolatey".Log().Info(@"
+Exit codes that normally result from running this command.
+
+Normal:
+ - 0: operation was successful, no issues detected
+ - -1 or 1: an error has occurred
+
+If you find other exit codes that we have not yet documented, please 
+ file a ticket so we can document it at 
+ https://github.com/chocolatey/choco/issues/new/choose.
+
+");
+
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
+            "chocolatey".Log().Info(@"
+Config shown in action: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_config.gif
+
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public virtual void noop(ChocolateyConfiguration configuration)
         {
             _configSettingsService.noop(configuration);
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public virtual void run(ChocolateyConfiguration configuration)
         {
             switch (configuration.ConfigCommand.Command)
             {
@@ -130,12 +162,18 @@ Chocolatey will allow you to interact with the configuration file settings.
                 case ConfigCommandType.set:
                     _configSettingsService.config_set(configuration);
                     break;
+                case ConfigCommandType.unset:
+                    _configSettingsService.config_unset(configuration);
+                    break;
             }
         }
 
-        public bool may_require_admin_access()
+        public virtual bool may_require_admin_access()
         {
-            return true;
+            var config = Config.get_configuration_settings();
+            if (config == null) return true;
+
+            return config.ConfigCommand.Command != ConfigCommandType.list;
         }
     }
 }

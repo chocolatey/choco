@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,12 +23,15 @@ namespace chocolatey.tests.infrastructure.events.context
     {
         public FakeSubscriber(IEventSubscriptionManagerService subscriptionManager)
         {
-            subscriptionManager.subscribe<FakeEvent>(x =>
+            subscriptionManager.subscribe<FakeEvent>(
+                x =>
                 {
                     WasCalled = true;
                     ReceivedEvent = x;
                     CalledAt = DateTime.Now;
-                }, null, null);
+                },
+                null,
+                null);
         }
 
         public FakeEvent ReceivedEvent { get; private set; }

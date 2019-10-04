@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,9 +20,9 @@ namespace chocolatey.tests.integration
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reactive.Subjects;
-    using Moq;
     using chocolatey.infrastructure.events;
     using chocolatey.infrastructure.services;
+    using Moq;
 
     public class MockEventSubscriptionManager : Mock<IEventSubscriptionManagerService>, IEventSubscriptionManagerService
     {
@@ -32,14 +33,14 @@ namespace chocolatey.tests.integration
             get { return _messages.Value; }
         }
 
-        public void publish<Event>(Event eventMessage) where Event : class, IEvent
+        public void publish<Event>(Event eventMessage) where Event : class, IMessage
         {
-            var list = _messages.Value.GetOrAdd(typeof (Event), new List<object>());
+            var list = _messages.Value.GetOrAdd(typeof(Event), new List<object>());
             list.Add(eventMessage);
             Object.publish(eventMessage);
         }
 
-        public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IEvent
+        public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
         {
             return new Subject<Event>();
         }

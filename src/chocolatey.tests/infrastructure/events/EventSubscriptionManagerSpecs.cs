@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,10 +19,10 @@ namespace chocolatey.tests.infrastructure.events
     using System;
     using System.Collections.Generic;
     using System.Threading;
-    using NUnit.Framework;
-    using Should;
     using chocolatey.infrastructure.services;
     using context;
+    using NUnit.Framework;
+    using Should;
 
     public class EventSubscriptionManagerSpecs
     {
@@ -46,11 +47,14 @@ namespace chocolatey.tests.infrastructure.events
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeEvent>(x =>
+                SubscriptionManager.subscribe<FakeEvent>(
+                    x =>
                     {
                         _wasCalled = true;
                         _localFakeEvent = x;
-                    }, null, null);
+                    },
+                    null,
+                    null);
             }
 
             public override void Because()
@@ -91,14 +95,17 @@ namespace chocolatey.tests.infrastructure.events
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeEvent>(m =>
+                SubscriptionManager.subscribe<FakeEvent>(
+                    m =>
                     {
                         //stuff is happening
                         Thread.Sleep(2000);
                         _wasCalled = true;
                         _localFakeEvent = m;
                         Console.WriteLine("event complete");
-                    }, null, null);
+                    },
+                    null,
+                    null);
             }
 
             public override void Because()
@@ -128,11 +135,14 @@ namespace chocolatey.tests.infrastructure.events
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeEvent>(x =>
+                SubscriptionManager.subscribe<FakeEvent>(
+                    x =>
                     {
                         _wasCalled = true;
                         _localFakeEvent = x;
-                    }, null, (message) => message.Digits > 3);
+                    },
+                    null,
+                    (message) => message.Digits > 3);
             }
 
             public override void Because()
@@ -173,11 +183,14 @@ namespace chocolatey.tests.infrastructure.events
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeEvent>(x =>
+                SubscriptionManager.subscribe<FakeEvent>(
+                    x =>
                     {
                         _wasCalled = true;
                         _localFakeEvent = x;
-                    }, null, (message) => message.Digits < 3);
+                    },
+                    null,
+                    (message) => message.Digits < 3);
             }
 
             public override void Because()
@@ -210,7 +223,8 @@ namespace chocolatey.tests.infrastructure.events
                 do
                 {
                     _list.Add(new FakeSubscriber(SubscriptionManager));
-                } while (_list.Count < 5);
+                }
+                while (_list.Count < 5);
             }
 
             public override void Because()

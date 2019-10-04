@@ -1,12 +1,13 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +17,8 @@
 namespace chocolatey.tests.infrastructure.app.commands
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-    using Moq;
-    using NuGet;
-    using Should;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
@@ -29,8 +26,10 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
-    using chocolatey.infrastructure.logging;
     using chocolatey.infrastructure.results;
+    using Moq;
+    using NuGet;
+    using Should;
 
     public class ChocolateyPinCommandSpecs
     {
@@ -46,19 +45,27 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Context()
             {
-               // MockLogger = new MockLogger();
-               // Log.InitializeWith(MockLogger);
+                // MockLogger = new MockLogger();
+                // Log.InitializeWith(MockLogger);
                 configuration.Sources = "https://localhost/somewhere/out/there";
                 command = new ChocolateyPinCommand(packageInfoService.Object, nugetLogger.Object, nugetService.Object);
 
                 package = new Mock<IPackage>();
                 package.Setup(p => p.Id).Returns("regular");
                 package.Setup(p => p.Version).Returns(new SemanticVersion("1.2.0"));
-                packageInfoService.Setup(s => s.get_package_information(package.Object)).Returns(new ChocolateyPackageInformation(package.Object) { IsPinned = false });
+                packageInfoService.Setup(s => s.get_package_information(package.Object)).Returns(
+                    new ChocolateyPackageInformation(package.Object)
+                    {
+                        IsPinned = false
+                    });
                 pinnedPackage = new Mock<IPackage>();
                 pinnedPackage.Setup(p => p.Id).Returns("pinned");
                 pinnedPackage.Setup(p => p.Version).Returns(new SemanticVersion("1.1.0"));
-                packageInfoService.Setup(s => s.get_package_information(pinnedPackage.Object)).Returns(new ChocolateyPackageInformation(pinnedPackage.Object) { IsPinned = true });
+                packageInfoService.Setup(s => s.get_package_information(pinnedPackage.Object)).Returns(
+                    new ChocolateyPackageInformation(pinnedPackage.Object)
+                    {
+                        IsPinned = true
+                    });
             }
 
             public void reset()
@@ -80,7 +87,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_implement_source()
             {
-                results.ShouldContain(CommandNameType.pin.to_string());
+                results.ShouldContain("pin");
             }
         }
 
@@ -337,7 +344,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.Sources = ApplicationParameters.PackagesLocation;
                 configuration.ListCommand.LocalOnly = true;
                 configuration.AllVersions = true;
-                var packageResults = new []
+                var packageResults = new[]
                 {
                     new PackageResult(package.Object, null),
                     new PackageResult(pinnedPackage.Object, null)
@@ -416,7 +423,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
                 nugetService.Verify(n => n.list_run(It.IsAny<ChocolateyConfiguration>()), Times.Once);
             }
-            
+
             [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object.")]
             [Fact]
             public void should_set_pin_when_command_is_add()

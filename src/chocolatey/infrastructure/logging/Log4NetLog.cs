@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +21,9 @@ using log4net.Config;
 namespace chocolatey.infrastructure.logging
 {
     using System;
+    using System.Runtime;
     using log4net;
+    using log4net.Core;
 
     // ReSharper disable InconsistentNaming
 
@@ -30,70 +33,91 @@ namespace chocolatey.infrastructure.logging
     public sealed class Log4NetLog : ILog, ILog<Log4NetLog>
     {
         private log4net.ILog _logger;
+        // ignore Log4NetLog in the call stack
+        private static readonly Type _declaringType = typeof(Log4NetLog);
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void InitializeFor(string loggerName)
         {
             _logger = LogManager.GetLogger(loggerName);
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Debug(string message, params object[] formatting)
         {
-            if (_logger.IsDebugEnabled) _logger.DebugFormat(decorate_message_with_audit_information(message), formatting);
+            if (_logger.IsDebugEnabled) Log(Level.Debug, decorate_message_with_audit_information(message), formatting);
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Debug(Func<string> message)
         {
-            if (_logger.IsDebugEnabled) _logger.DebugFormat(decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
+            if (_logger.IsDebugEnabled) Log(Level.Debug, decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Info(string message, params object[] formatting)
         {
-            if (_logger.IsInfoEnabled) _logger.InfoFormat(decorate_message_with_audit_information(message), formatting);
+            if (_logger.IsInfoEnabled) Log(Level.Info, decorate_message_with_audit_information(message), formatting);
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Info(Func<string> message)
         {
-            if (_logger.IsInfoEnabled) _logger.InfoFormat(decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
+            if (_logger.IsInfoEnabled) Log(Level.Info, decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Warn(string message, params object[] formatting)
         {
-            if (_logger.IsWarnEnabled) _logger.WarnFormat(decorate_message_with_audit_information(message), formatting);
+            if (_logger.IsWarnEnabled) Log(Level.Warn, decorate_message_with_audit_information(message), formatting);
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Warn(Func<string> message)
         {
-            if (_logger.IsWarnEnabled) _logger.WarnFormat(decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
+            if (_logger.IsWarnEnabled) Log(Level.Warn, decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Error(string message, params object[] formatting)
         {
             // don't need to check for enabled at this level
-            _logger.ErrorFormat(decorate_message_with_audit_information(message), formatting);
+            Log(Level.Error, decorate_message_with_audit_information(message), formatting);
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Error(Func<string> message)
         {
             // don't need to check for enabled at this level
-            _logger.ErrorFormat(decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
+            Log(Level.Error, decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Fatal(string message, params object[] formatting)
         {
             // don't need to check for enabled at this level
-            _logger.FatalFormat(decorate_message_with_audit_information(message), formatting);
+            Log(Level.Fatal, decorate_message_with_audit_information(message), formatting);
         }
 
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Fatal(Func<string> message)
         {
             // don't need to check for enabled at this level
-            _logger.FatalFormat(decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
+            Log(Level.Fatal, decorate_message_with_audit_information(message.Invoke()).escape_curly_braces());
         }
 
         public string decorate_message_with_audit_information(string message)
         {
             return message;
         }
+
+        [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
+        private void Log(Level level, string message, params object[] formatting)
+        {
+            // SystemStringFormat is used to evaluate the message as late as possible. A filter may discard this message.
+            _logger.Logger.Log(_declaringType, level, message.format_with(formatting), null);
+        }
+
     }
 
     // ReSharper restore InconsistentNaming

@@ -1,0 +1,4 @@
+chocolatey.*
+NuGet.*
+SimpleInjector.*
+Rhino.Licensing.*

@@ -1,12 +1,13 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
-// 
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -94,6 +95,29 @@ namespace chocolatey
             if (!first)
             {
                 yield return maxElement;
+            }
+        }
+
+        /// <summary>
+        ///   Generates a unique hash code for a source of objects
+        /// </summary>
+        /// <typeparam name="T">Generic type.</typeparam>
+        /// <param name="source">The source.</param>
+        /// <returns>
+        ///   Integer value representing hash code for input collection.
+        /// </returns>
+        /// <remarks>
+        ///   Taken from here: https://stackoverflow.com/a/30758270/671491
+        /// </remarks>
+        public static int get_sequence_hash_code<T>(this IEnumerable<T> source)
+        {
+            const int seed = 487;
+            const int modifier = 31;
+
+            unchecked
+            {
+                return source.Aggregate(seed, (current, item) =>
+                    (current*modifier) + item.GetHashCode());
             }
         }
     }

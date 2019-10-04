@@ -60,6 +60,7 @@
         <exclude name="*Moq.*" />
         <exclude name="**${path.separator}*.template" />
         <include name="**/*.*" />
+        <include name="**/*" />
       </fileset>
     </copy>
   </target>
@@ -71,6 +72,7 @@
       <fileset basedir="${dir.build.publishedapps}">
         <exclude name="**${path.separator}*.template" />
         <include name="**/*.*" />
+        <include name="**/*" />
       </fileset>
     </copy>
   </target>
@@ -82,6 +84,7 @@
       <fileset basedir="${dir.build.publishedwebsites}">
         <exclude name="**${path.separator}*.template" />
         <include name="**/*.*" />
+        <include name="**/*" />
       </fileset>
     </copy>
   </target>
@@ -93,6 +96,7 @@
       <fileset basedir="${dir.build.db}">
         <exclude name="**${path.separator}*.template" />
         <include name="**/*.*" />
+        <include name="**/*" />
       </fileset>
     </copy>
   </target>
@@ -104,6 +108,7 @@
       <fileset basedir="${dir.reports}">
         <exclude name="**${path.separator}*.template" />
         <include name="**/*.*" />
+        <include name="**/*" />
       </fileset>
     </copy>
   </target>
@@ -115,6 +120,7 @@
       <fileset basedir="${dir.fileserver}">
         <exclude name="**${path.separator}*.template" />
         <include name="**/*.*" />
+        <include name="**/*" />
       </fileset>
     </copy>
 
@@ -133,6 +139,7 @@
     <copy todir="${dirs.drop}${path.separator}${folder.environment_files}" if="${directory::exists(dir.build.environmentfiles)}">
       <fileset basedir="${dir.build.environmentfiles}">
         <include name="**/*.*" />
+        <include name="**/*" />
       </fileset>
     </copy>
   </target>

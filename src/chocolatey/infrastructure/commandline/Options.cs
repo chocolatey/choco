@@ -824,7 +824,7 @@ namespace chocolatey.infrastructure.commandline
 		    }
 		    catch (Exception ex)
 		    {
-                "chocolatey".Log().Debug("Parsing {0} resulted in exception:{1} {2}".format_with(argument,Environment.NewLine,ex.Message));
+                "chocolatey".Log().Warn("Parsing {0} resulted in error (converted to warning):{1} {2}".format_with(argument, Environment.NewLine, ex.Message));
 		    }
             
 			return false;
