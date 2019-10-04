@@ -10,7 +10,7 @@ RUN chmod +x zip.sh
 RUN ./build.sh
 
 WORKDIR /usr/local/bin
-RUN ln -s /usr/local/src/choco/build_output/chocolatey
+RUN ln -s /usr/local/src/choco/code_drop/chocolatey
 
 COPY docker/choco_wrapper /usr/local/bin/choco
 
