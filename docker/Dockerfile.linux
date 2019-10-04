@@ -14,4 +14,6 @@ RUN ln -s /usr/local/src/choco/code_drop/chocolatey
 
 COPY docker/choco_wrapper /usr/local/bin/choco
 
+ENV ChocolateyInstall /usr/local/bin/chocolatey
+
 WORKDIR /root
