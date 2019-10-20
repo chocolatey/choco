@@ -60,13 +60,13 @@ namespace chocolatey.infrastructure.app.tasks
         {
             this.Log().Debug(ChocolateyLoggers.Verbose, "[Pending] Removing all pending packages that should not be considered installed...");
 
-            var pendingFiles = _fileSystem.get_files(ApplicationParameters.PackagesLocation, ApplicationParameters.PackagePendingFileName, SearchOption.AllDirectories).ToList();
+            var pendingFiles = _fileSystem.get_files(ApplicationParameters.PackagesLocation, ApplicationParameters.PackagePendingFileName).ToList();
             foreach (var pendingFile in pendingFiles.or_empty_list_if_null())
             {
                 var packageFolder = _fileSystem.get_directory_name(pendingFile);
                 string packageFolderName = _fileSystem.get_directory_info_for(packageFolder).Name;
 
-                var pendingSkipFiles = _fileSystem.get_files(packageFolder, PENDING_SKIP_FILE, SearchOption.AllDirectories).ToList();
+                var pendingSkipFiles = _fileSystem.get_files(packageFolder, PENDING_SKIP_FILE).ToList();
                 if (pendingSkipFiles.Count != 0)
                 {
                     this.Log().Warn("Pending file found for {0}, but a {1} file was also found. Skipping removal".format_with(packageFolderName, PENDING_SKIP_FILE));
