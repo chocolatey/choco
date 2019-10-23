@@ -507,8 +507,7 @@ compatibility across different versions and editions of Chocolatey.
 Following this guide will ensure your experience is not frustrating 
 based on choco not receiving things you think you are passing to it.
 
- * For consistency, always use `choco`, not `choco.exe`. Never use 
-   shortcut commands like `cinst` or `cup`.
+ * For consistency, always use `choco`, not `choco.exe`.
  * Always have the command as the first argument to `choco. e.g.
    `choco install`, where `install` is the command.
  * If there is a subcommand, ensure that is the second argument. e.g.

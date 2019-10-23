@@ -24,7 +24,7 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
-    [CommandFor("version", "[DEPRECATED] will be removed in v1 - use `choco outdated` or `cup <pkg|all> -whatif` instead")]
+    [CommandFor("version", "[DEPRECATED] will be removed in v1 - use `choco outdated` or `choco upgrade <pkg|all> -whatif` instead")]
     public class ChocolateyVersionCommand : ChocolateyUpgradeCommand
     {
         private readonly IChocolateyPackageService _packageService;
