@@ -3,7 +3,7 @@
 # Uninstall Command (choco uninstall)
 
 Uninstalls a package or a list of packages. Some may prefer to use
- `cuninst` as a shortcut for [[`choco uninstall`|Commandsuninstall]].
+ `choco-uninst` as a shortcut for [[`choco uninstall`|Commandsuninstall]].
 
 **NOTE:** 100% compatible with older chocolatey client (0.9.8.32 and below)
  with options and switches. Add `-y` for previous behavior with no
@@ -54,7 +54,7 @@ chocolatey without attempting to uninstall the program.
 ## Usage
 
     choco uninstall <pkg|all> [pkg2 pkgN] [options/switches]
-    cuninst <pkg|all> [pkg2 pkgN] [options/switches]
+    choco-uninst <pkg|all> [pkg2 pkgN] [options/switches]
 
 **NOTE:** `all` is a special package keyword that will allow you to
  uninstall all packages.

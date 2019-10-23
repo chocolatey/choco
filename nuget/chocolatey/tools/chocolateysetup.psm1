@@ -314,7 +314,7 @@ param(
 
     $from = "$chocolateyPathOld\bin"
     $to = "$chocolateyPath\bin"
-    $exclude = @("choco.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpack.exe", "cpush.exe", "cuninst.exe", "cup.exe", "cver.exe", "RefreshEnv.cmd")
+    $exclude = @("choco.exe", "chocolatey.exe", "choco-inst.exe", "choco-list.exe", "choco-pack.exe", "choco-push.exe", "choco-uninst.exe", "choco-up.exe", "choco-ver.exe", "RefreshEnv.cmd")
     Get-ChildItem -Path $from -recurse -Exclude $exclude |
       % {
         Write-Debug "Copying $_ `n to $to"

@@ -3,7 +3,7 @@
 # Install Command (choco install)
 
 Installs a package or a list of packages (sometimes specified as a
- packages.config). Some may prefer to use `cinst` as a shortcut for
+ packages.config). Some may prefer to use `choco-inst` as a shortcut for
  [[`choco install`|Commandsinstall]].
 
 **NOTE:** 100% compatible with older chocolatey client (0.9.8.32 and below)
@@ -14,7 +14,7 @@ Installs a package or a list of packages (sometimes specified as a
 ## Usage
 
     choco install <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>]
-    cinst <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>]
+    choco-inst <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>]
 
 **NOTE:** `all` is a special package keyword that will allow you to install
  all packages from a custom feed. Will not work with Chocolatey default

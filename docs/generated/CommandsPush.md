@@ -3,7 +3,7 @@
 # Push Command (choco push)
 
 Chocolatey will attempt to push a compiled nupkg to a package feed. 
- Some may prefer to use `cpush` as a shortcut for `choco push`.
+ Some may prefer to use `choco-push` as a shortcut for `choco push`.
 
 **NOTE:** 100% compatible with older chocolatey client (0.9.8.32 and below)
  with options and switches. Default push location is deprecated and 
@@ -19,7 +19,7 @@ A feed can be a local folder, a file share, the [community feed](https://chocola
 ## Usage
 
     choco push [<path to nupkg>] [<options/switches>]
-    cpush [<path to nupkg>] [<options/switches>]
+    choco-push [<path to nupkg>] [<options/switches>]
 
 **NOTE:** If there is more than one nupkg file in the folder, the command 
  will require specifying the path to the file.

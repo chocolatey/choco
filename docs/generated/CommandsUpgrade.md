@@ -2,7 +2,7 @@
 
 # Upgrade Command (choco upgrade)
 
-Upgrades a package or a list of packages. Some may prefer to use `cup`
+Upgrades a package or a list of packages. Some may prefer to use `choco-up`
  as a shortcut for [[`choco upgrade`|Commandsupgrade]]. If you do not have a package
  installed, upgrade will install it.
 
@@ -14,7 +14,7 @@ Upgrades a package or a list of packages. Some may prefer to use `cup`
 ## Usage
 
     choco upgrade <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
-    cup <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
+    choco-up <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
 
 **NOTE:** `all` is a special package keyword that will allow you to upgrade
  all currently installed packages.

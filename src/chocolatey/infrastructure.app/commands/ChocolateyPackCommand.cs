@@ -82,7 +82,7 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Pack Command");
             this.Log().Info(@"
 Chocolatey will attempt to package a nuspec into a compiled nupkg. Some
- may prefer to use `cpack` as a shortcut for `choco pack`.
+ may prefer to use `choco-pack` as a shortcut for `choco pack`.
 
 NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
  with options and switches. In most cases you can still pass options 
@@ -92,7 +92,7 @@ NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
 NOTE: You can pass arbitrary property value pairs through to nuspecs.
  These will replace variables formatted as `$property$` with the value passed.
 
-NOTE: `cpack` has been deprecated as it has a name collision with CMake. Please 
+NOTE: `choco-pack` has been deprecated as it has a name collision with CMake. Please 
  use `choco pack` instead. The shortcut will be removed in v1.
 
 ");
@@ -100,7 +100,7 @@ NOTE: `cpack` has been deprecated as it has a name collision with CMake. Please
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco pack [<path to nuspec>] [<options/switches>] [<property=value>]
-    cpack [<path to nuspec>] [<options/switches>] (DEPRECATED)
+    choco-pack [<path to nuspec>] [<options/switches>] (DEPRECATED)
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
