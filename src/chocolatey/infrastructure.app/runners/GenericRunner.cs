@@ -98,7 +98,7 @@ Custom unofficial builds are not allowed by default.
                     }
                     else
                     {
-                        this.Log().Warn(ChocolateyLoggers.Important, @"
+                        this.Log().Warn(config.RegularOutput ? ChocolateyLoggers.Important : ChocolateyLoggers.LogFileOnly, @"
 Chocolatey is not an official build (bypassed with --allow-unofficial).
  If you are seeing this message and it is not expected, your system may 
  now be in a bad state. Only official builds are to be trusted.
