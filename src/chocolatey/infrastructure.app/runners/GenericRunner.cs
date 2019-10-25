@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,7 +52,7 @@ namespace chocolatey.infrastructure.app.runners
                 //todo add a search among other location/extensions for the command
                 if (!string.IsNullOrWhiteSpace(config.CommandName))
                 {
-                    throw new Exception(@"Could not find a command registered that meets '{0}'. 
+                    throw new Exception(@"Could not find a command registered that meets '{0}'.
  Try choco -? for command reference/help.".format_with(config.CommandName));
                 }
 
@@ -98,9 +98,9 @@ Custom unofficial builds are not allowed by default.
                     }
                     else
                     {
-                        this.Log().Warn(ChocolateyLoggers.Important, @"
+                        this.Log().Warn(config.RegularOutput ? ChocolateyLoggers.Important : ChocolateyLoggers.LogFileOnly, @"
 Chocolatey is not an official build (bypassed with --allow-unofficial).
- If you are seeing this message and it is not expected, your system may 
+ If you are seeing this message and it is not expected, your system may
  now be in a bad state. Only official builds are to be trusted.
 "
                         );
@@ -280,7 +280,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
         public void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
         {
             if (config.HelpRequested) return;
-               
+
             // skip when commands will set or for background mode
             if (!config.Features.ShowNonElevatedWarnings) return;
 
@@ -301,11 +301,11 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                 this.Log().Warn(ChocolateyLoggers.Important, @"
  You may experience errors - many functions/packages
  require admin rights. Only advanced users should run choco w/out an
- elevated shell. When you open the command shell, you should ensure 
- that you do so with ""Run as Administrator"" selected. If you are 
+ elevated shell. When you open the command shell, you should ensure
+ that you do so with ""Run as Administrator"" selected. If you are
  attempting to use Chocolatey in a non-administrator setting, you
  must select a different location other than the default install
- location. See 
+ location. See
  https://chocolatey.org/install#non-administrative-install for details.
 ");
                 var selection = InteractivePrompt.prompt_for_confirmation(@"
