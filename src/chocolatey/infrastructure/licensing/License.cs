@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2019 Chocolatey Software, Inc
+// Copyright © 2017 - 2019 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,13 @@ namespace chocolatey.infrastructure.licensing
                 try
                 {
                     var licensedAssembly = AssemblyResolution.resolve_or_load_assembly(ApplicationParameters.LicensedChocolateyAssemblySimpleName, ApplicationParameters.OfficialChocolateyPublicKey, ApplicationParameters.LicensedAssemblyLocation);
+
+#if !FORCE_CHOCOLATEY_OFFICIAL_KEY
+                    if (licensedAssembly == null)
+                    {
+                        licensedAssembly = AssemblyResolution.resolve_or_load_assembly(ApplicationParameters.LicensedChocolateyAssemblySimpleName, ApplicationParameters.UnofficialChocolateyPublicKey, ApplicationParameters.LicensedAssemblyLocation);
+                    }
+#endif
                     if (licensedAssembly == null) throw new ApplicationException("Unable to load licensed assembly.");
                     license.AssemblyLoaded = true;
                     license.Assembly = licensedAssembly;

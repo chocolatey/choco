@@ -13,7 +13,7 @@ SET BUILD_DIR=%~d0%~p0%
 SET NANT="%BUILD_DIR%lib\Nant\nant.exe"
 SET build.config.settings="%DIR%\.uppercut"
 
-%NANT% /logger:"NAnt.Core.DefaultLogger" /quiet /nologo /f:"%BUILD_DIR%.build\default.build" -D:build.config.settings=%build.config.settings% -D:msbuild.configuration="Release" %*
+%NANT% /logger:"NAnt.Core.DefaultLogger" /quiet /nologo /f:"%BUILD_DIR%.build\default.build" -D:build.config.settings=%build.config.settings% -D:msbuild.configuration="ReleaseOfficial" %*
 
 if %ERRORLEVEL% NEQ 0 goto errors
 
@@ -23,7 +23,7 @@ goto finish
 
 :usage
 echo.
-echo Usage: build.bat
+echo Usage: build.official.bat
 echo.
 goto finish
 

@@ -191,7 +191,11 @@ namespace chocolatey.console
 
                 // There are things that are ILMerged into Chocolatey. Anything with
                 // the right public key except licensed should use the choco/chocolatey assembly
-                if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
+                if ((requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
+#if !FORCE_CHOCOLATEY_OFFICIAL_KEY
+                || requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.UnofficialChocolateyPublicKey)
+#endif
+                )
                     && !requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName)
                     && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
                 {
@@ -200,13 +204,17 @@ namespace chocolatey.console
 
                 try
                 {
-                    if (requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
+                    if ((requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
+#if !FORCE_CHOCOLATEY_OFFICIAL_KEY
+                    || requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.UnofficialChocolateyPublicKey)
+#endif
+                    )
                         && requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName))
                     {
                         "chocolatey".Log().Debug(() => "Resolving reference to chocolatey.licensed...");
                         return AssemblyResolution.resolve_or_load_assembly(
                             ApplicationParameters.LicensedChocolateyAssemblySimpleName,
-                            ApplicationParameters.OfficialChocolateyPublicKey,
+                            requestedAssembly.get_public_key_token(),
                             ApplicationParameters.LicensedAssemblyLocation).UnderlyingType;
                     }
                 }

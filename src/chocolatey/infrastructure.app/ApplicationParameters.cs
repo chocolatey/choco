@@ -58,6 +58,7 @@ namespace chocolatey.infrastructure.app
         public static readonly string LicensedConfigurationBuilder = @"chocolatey.licensed.infrastructure.app.builders.ConfigurationBuilder";
         public static readonly string LicensedEnvironmentSettings = @"chocolatey.licensed.infrastructure.app.configuration.EnvironmentSettings";
         public static readonly string PackageNamesSeparator = ";";
+        public static readonly string UnofficialChocolateyPublicKey = "fd112f53c3ab578c";
         public static readonly string OfficialChocolateyPublicKey = "79d02ea9cad655eb";
 
         public static string PackagesLocation = _fileSystem.combine_paths(InstallLocation, "lib");
