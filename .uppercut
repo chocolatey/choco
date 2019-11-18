@@ -53,6 +53,7 @@
   <property name="app.strongname" value="C:${path.separator}Program Files${path.separator}Microsoft SDKs${path.separator}Windows${path.separator}v7.0A${path.separator}Bin${path.separator}sn.exe" />
   <property name="app.strongname" value="C:${path.separator}Program Files (x86)${path.separator}Microsoft SDKs${path.separator}Windows${path.separator}v7.0A${path.separator}Bin${path.separator}sn.exe" if="${not file::exists(app.strongname)}" />
 
+  <property name="msbuild.configuration" value="Release" overwrite="false" />
   <property name="path.key.name.private" value="${environment::get-variable('CHOCOLATEY_OFFICIAL_KEY')}" if="${environment::variable-exists('CHOCOLATEY_OFFICIAL_KEY') and msbuild.configuration == 'ReleaseOfficial'}" />
 
   <property name="app.signtool" value="C:${path.separator}Program Files${path.separator}Microsoft SDKs${path.separator}Windows${path.separator}v7.0A${path.separator}Bin${path.separator}signtool.exe" />
