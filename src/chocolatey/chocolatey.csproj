@@ -53,7 +53,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficial|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\ReleaseOfficial\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;FORCE_CHOCOLATEY_OFFICIAL_KEY</DefineConstants>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <DocumentationFile>bin\Release\chocolatey.xml</DocumentationFile>
     <Optimize>true</Optimize>

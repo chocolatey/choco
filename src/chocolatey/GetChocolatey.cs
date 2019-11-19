@@ -68,11 +68,12 @@ namespace chocolatey
 
                 // There are things that are ILMerged into Chocolatey. Anything with
                 // the right public key except licensed should use the choco/chocolatey assembly
-                if ((requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
-#if !FORCE_CHOCOLATEY_OFFICIAL_KEY
-                || requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.UnofficialChocolateyPublicKey)
+#if FORCE_CHOCOLATEY_OFFICIAL_KEY
+                var chocolateyPublicKey = ApplicationParameters.OfficialChocolateyPublicKey;
+#else
+                var chocolateyPublicKey = ApplicationParameters.UnofficialChocolateyPublicKey;
 #endif
-                )
+                if (requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey)
                     && !requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName)
                     && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
                 {
@@ -81,11 +82,7 @@ namespace chocolatey
 
                 try
                 {
-                    if ((requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.OfficialChocolateyPublicKey)
-#if !FORCE_CHOCOLATEY_OFFICIAL_KEY
-                    || requestedAssembly.get_public_key_token().is_equal_to(ApplicationParameters.UnofficialChocolateyPublicKey)
-#endif
-                    )
+                    if (requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey)
                         && requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName))
                     {
                         _logger.Debug("Resolving reference to chocolatey.licensed...");
