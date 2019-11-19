@@ -32,14 +32,14 @@ namespace chocolatey.infrastructure.licensing
             {
                 try
                 {
-                    var licensedAssembly = AssemblyResolution.resolve_or_load_assembly(ApplicationParameters.LicensedChocolateyAssemblySimpleName, ApplicationParameters.OfficialChocolateyPublicKey, ApplicationParameters.LicensedAssemblyLocation);
 
-#if !FORCE_CHOCOLATEY_OFFICIAL_KEY
-                    if (licensedAssembly == null)
-                    {
-                        licensedAssembly = AssemblyResolution.resolve_or_load_assembly(ApplicationParameters.LicensedChocolateyAssemblySimpleName, ApplicationParameters.UnofficialChocolateyPublicKey, ApplicationParameters.LicensedAssemblyLocation);
-                    }
+#if FORCE_CHOCOLATEY_OFFICIAL_KEY
+                    var chocolateyPublicKey = ApplicationParameters.OfficialChocolateyPublicKey;
+#else
+                    var chocolateyPublicKey = ApplicationParameters.UnofficialChocolateyPublicKey;
 #endif
+                    var licensedAssembly = AssemblyResolution.resolve_or_load_assembly(ApplicationParameters.LicensedChocolateyAssemblySimpleName, chocolateyPublicKey, ApplicationParameters.LicensedAssemblyLocation);
+
                     if (licensedAssembly == null) throw new ApplicationException("Unable to load licensed assembly.");
                     license.AssemblyLoaded = true;
                     license.Assembly = licensedAssembly;
