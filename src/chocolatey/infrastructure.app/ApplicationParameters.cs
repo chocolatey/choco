@@ -45,8 +45,10 @@ namespace chocolatey.infrastructure.app
         // we might be testing on a server or in the local debugger. Either way,
         // start from the assembly location and if unfound, head to the machine
         // locations instead. This is a merge of official and Debug modes.
-        public static readonly string InstallLocation = _fileSystem.file_exists(_fileSystem.combine_paths(_fileSystem.get_directory_name(Assembly.GetEntryAssembly().CodeBase.Replace("file:///", string.Empty)), "chocolatey.dll")) ?
-                _fileSystem.get_directory_name(Assembly.GetEntryAssembly().CodeBase.Replace("file:///", string.Empty)) :
+        private static IAssembly _assemblyForLocation = Assembly.GetEntryAssembly().UnderlyingType != null ? Assembly.GetEntryAssembly() : Assembly.GetExecutingAssembly();
+        public static readonly string InstallLocation = _fileSystem.file_exists(_fileSystem.combine_paths(_fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace("file:///", string.Empty)), "chocolatey.dll")) ||
+                                                        _fileSystem.file_exists(_fileSystem.combine_paths(_fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace("file:///", string.Empty)), "choco.exe")) ?
+                _fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace("file:///", string.Empty)) :
                 !string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName)) ?
                     System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) :
                     @"C:\ProgramData\Chocolatey"
