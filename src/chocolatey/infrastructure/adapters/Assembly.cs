@@ -113,6 +113,11 @@ namespace chocolatey.infrastructure.adapters
         public static IAssembly GetCallingAssembly()
         {
             return new Assembly(System.Reflection.Assembly.GetCallingAssembly());
+        } 
+        
+        public static IAssembly GetEntryAssembly()
+        {
+            return new Assembly(System.Reflection.Assembly.GetEntryAssembly());
         }
 
         public static IAssembly set_assembly(System.Reflection.Assembly value)

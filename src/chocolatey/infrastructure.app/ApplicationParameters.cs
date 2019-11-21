@@ -35,9 +35,23 @@ namespace chocolatey.infrastructure.app
         // always look at the official location of the machine installation
         public static readonly string InstallLocation = System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) ?? _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path());
         public static readonly string LicensedAssemblyLocation = _fileSystem.combine_paths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
-#else
+#elif DEBUG
         // Install location is choco.exe or chocolatey.dll
         public static readonly string InstallLocation = _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path());
+        // when being used as a reference, start by looking next to Chocolatey, then in a subfolder.
+        public static readonly string LicensedAssemblyLocation = _fileSystem.file_exists(_fileSystem.combine_paths(InstallLocation, "chocolatey.licensed.dll")) ? _fileSystem.combine_paths(InstallLocation, "chocolatey.licensed.dll") : _fileSystem.combine_paths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
+#else
+        // Install locations is chocolatey.dll or choco.exe - In Release mode
+        // we might be testing on a server or in the local debugger. Either way,
+        // start from the assembly location and if unfound, head to the machine
+        // locations instead. This is a merge of official and Debug modes.
+        public static readonly string InstallLocation = _fileSystem.file_exists(_fileSystem.combine_paths(_fileSystem.get_directory_name(Assembly.GetEntryAssembly().CodeBase.Replace("file:///", string.Empty)), "chocolatey.dll")) ?
+                _fileSystem.get_directory_name(Assembly.GetEntryAssembly().CodeBase.Replace("file:///", string.Empty)) :
+                !string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName)) ?
+                    System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) :
+                    @"C:\ProgramData\Chocolatey"
+            ;
+
         // when being used as a reference, start by looking next to Chocolatey, then in a subfolder.
         public static readonly string LicensedAssemblyLocation = _fileSystem.file_exists(_fileSystem.combine_paths(InstallLocation, "chocolatey.licensed.dll")) ? _fileSystem.combine_paths(InstallLocation, "chocolatey.licensed.dll") : _fileSystem.combine_paths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
 #endif
