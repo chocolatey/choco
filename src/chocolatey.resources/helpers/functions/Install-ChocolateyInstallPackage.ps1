@@ -211,7 +211,7 @@ Get-UninstallRegistryKey
 Start-ChocolateyProcessAsAdmin
 #>
 param(
-  [parameter(Mandatory=$true, Position=0)][string] $packageName,
+  [parameter(Mandatory=false, Position=0)][string] $packageName = $env:chocolateyPackageName,
   [parameter(Mandatory=$false, Position=1)]
   [alias("installerType","installType")][string] $fileType = 'exe',
   [parameter(Mandatory=$false, Position=2)][string[]] $silentArgs = '',

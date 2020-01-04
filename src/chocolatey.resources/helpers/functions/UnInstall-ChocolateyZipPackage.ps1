@@ -56,7 +56,7 @@ Install-ChocolateyZipPackage
 Uninstall-ChocolateyPackage
 #>
 param(
-  [parameter(Mandatory=$true, Position=0)][string] $packageName,
+  [parameter(Mandatory=$false, Position=0)][string] $packageName = $env:chocolateyPackageName,
   [parameter(Mandatory=$true, Position=1)][string] $zipFileName,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
