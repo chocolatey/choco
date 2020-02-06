@@ -177,6 +177,8 @@ namespace chocolatey.tests.integration
             config.PinCommand.Name = string.Empty;
             config.PinCommand.Command = PinCommandType.unknown;
             config.ListCommand.IdOnly = false;
+            config.NoShims = false;
+            config.NoShimsGlobal = false;
 
             return config;
         }

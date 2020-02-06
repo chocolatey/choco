@@ -3391,5 +3391,372 @@ namespace chocolatey.tests.integration.scenarios
                 Results.Count().ShouldEqual(0);
             }
         }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_with_noshims : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "shimbasepackage";
+                Scenario.add_packages_to_source_location(Configuration, "shimbasepackage.1.0.0*" + Constants.PackageExtension);
+                Configuration.NoShims = true;
+            }
+
+            public override void Because()
+            {
+                Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_shim_target()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var target = Path.Combine(packageDir, "tools", "shimbasepackage1.exe");
+
+                File.Exists(target).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_the_package()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimbasepackage1.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_with_dependencies_and_noshims : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "shimhasdependency";
+                Scenario.add_packages_to_source_location(Configuration, "shimhasdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "shimbasepackage.1.0.0*" + Constants.PackageExtension);
+                Configuration.NoShims = true;
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_shim_targets()
+            {
+                var targetsExist = true;
+                var errorMessage = string.Empty;
+
+                foreach (var packageResult in Results)
+                {
+                    var target = Path.Combine(packageResult.Value.InstallLocation, "tools", packageResult.Value.Name + "1.exe");
+
+                    if (!File.Exists(target))
+                    {
+                        targetsExist = false;
+                        errorMessage = "Target file missing: {0}".format_with(target);
+                        break;
+                    }
+                }
+
+                targetsExist.ShouldBeTrue(errorMessage);
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_the_package()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimhasdependency1.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_create_a_shim_for_the_dependency()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimbasepackage1.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_with_dependencies_and_noshimsglobal : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "shimhasdependency";
+                Scenario.add_packages_to_source_location(Configuration, "shimhasdependency.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "shimbasepackage.1.0.0*" + Constants.PackageExtension);
+                Configuration.NoShimsGlobal = true;
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_shim_targets()
+            {
+                var targetsExist = true;
+                var errorMessage = string.Empty;
+
+                foreach (var packageResult in Results)
+                {
+                    var target = Path.Combine(packageResult.Value.InstallLocation, "tools", packageResult.Value.Name + "1.exe");
+
+                    if (!File.Exists(target))
+                    {
+                        targetsExist = false;
+                        errorMessage = "Target file missing: {0}".format_with(target);
+                        break;
+                    }
+                }
+
+                targetsExist.ShouldBeTrue(errorMessage);
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_the_package()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimhasdependency1.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_the_dependency()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimbasepackage1.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_with_install_bin_file : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "shimwithbinfile";
+                Scenario.add_packages_to_source_location(Configuration, "shimwithbinfile.1.0.0*" + Constants.PackageExtension);
+            }
+
+            public override void Because()
+            {
+                Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_not_see_the_shim_as_an_existing_shim_and_remove_it()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimwithbinfile1.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_with_install_bin_file_and_noshims : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "shimwithbinfile";
+                Scenario.add_packages_to_source_location(Configuration, "shimwithbinfile.1.0.0*" + Constants.PackageExtension);
+                Configuration.NoShims = true;
+            }
+
+            public override void Because()
+            {
+                Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_shim_target()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var target = Path.Combine(packageDir, "tools", "shimwithbinfile1.bat");
+
+                File.Exists(target).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimwithbinfile1.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_that_tries_to_overwrite_its_own_shim : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "shimoverwrite";
+                Scenario.add_packages_to_source_location(Configuration, "shimoverwrite.1.0.0*" + Constants.PackageExtension);
+            }
+
+            public override void Because()
+            {
+                Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_shim_targets()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var toolsPath = Path.Combine(packageDir, "tools");
+
+                string[] targets = {
+                    Path.Combine(toolsPath, "shimoverwrite1.exe"),
+                    Path.Combine(toolsPath, "install", "shimoverwrite1.exe")
+                };
+
+                var targetsExist = true;
+                var errorMessage = string.Empty;
+
+                foreach (string target in targets)
+                {
+                    if (!File.Exists(target))
+                    {
+                        targetsExist = false;
+                        errorMessage = "Target file missing: {0}".format_with(target);
+                        break;
+                    }
+                }
+
+                targetsExist.ShouldBeTrue(errorMessage);
+            }
+
+            [Fact]
+            public void should_have_an_error_message()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).or_empty_list_if_null())
+                {
+                    if (message.Contains("cannot overwrite")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_create_a_shim()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimoverwrite1.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_shim_with_target_in_tools_folder()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimoverwrite1.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                );
+
+                var messageFound = false;
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var path = Path.Combine(packageDir, "tools", "shimoverwrite1.exe");
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains(path)) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("Target file message not found for: {0}".format_with(path));
+            }
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_a_package_that_tries_to_overwrite_another_shim : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "shimoverwriteother";
+                Scenario.add_packages_to_source_location(Configuration, "shimoverwriteother.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "shimbasepackage.1.0.0*" + Constants.PackageExtension);
+            }
+
+            public override void Because()
+            {
+                Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_shim_target()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                // this matches the name of the existing shim from the shimbasepackage dependency
+                var target = Path.Combine(packageDir, "tools", "shimbasepackage1.exe");
+
+                File.Exists(target).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_an_error_message()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).or_empty_list_if_null())
+                {
+                    if (message.Contains("cannot overwrite")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_shim()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimbasepackage1.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_shim_with_target_in_other_package_tools_folder()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimbasepackage1.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                );
+
+                var messageFound = false;
+                var dependencyDir = Path.Combine(Scenario.get_top_level(), "lib", "shimbasepackage");
+                var path = Path.Combine(dependencyDir, "tools", "shimbasepackage1.exe");
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains(path)) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("Target file message not found for: {0}".format_with(path));
+            }
+        }
     }
 }

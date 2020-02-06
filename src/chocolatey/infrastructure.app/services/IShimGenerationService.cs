@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System.Collections.Generic;
     using configuration;
     using results;
 
@@ -34,5 +35,10 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="configuration">The configuration.</param>
         /// <param name="packageResult">The package result.</param>
         void uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
+
+        /// <summary>
+        ///   Takes a snapshot of the existing shimgens
+        /// </summary>
+        void take_snapshot();
     }
 }

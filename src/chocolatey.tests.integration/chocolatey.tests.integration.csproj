@@ -346,6 +346,105 @@
     <None Include="context\nonterminatingerror\1.0\tools\chocolateyInstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\shims\shimbasepackage\1.0.0\shimbasepackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimbasepackage\1.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimbasepackage\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimbasepackage\1.0.0\tools\shimbasepackage1.exe.">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimhasdependency\1.0.0\shimhasdependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimhasdependency\1.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimhasdependency\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimhasdependency\1.0.0\tools\shimhasdependency1.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimoverwrite\1.0.0\shimoverwrite.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimoverwrite\1.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimoverwrite\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimoverwrite\1.0.0\tools\shimoverwrite1.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimoverwrite\1.0.0\tools\install\shimoverwrite1.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimoverwriteother\1.0.0\shimoverwriteother.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimoverwriteother\1.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimoverwriteother\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimoverwriteother\1.0.0\tools\shimbasepackage1.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\1.0.0\shimupgrade.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\1.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\1.0.0\tools\shimupgrade1.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\2.0.0\shimupgrade.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\2.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\2.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\2.0.0\tools\shimupgrade2.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\3.0.0\shimupgrade.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\3.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\3.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimupgrade\3.0.0\tools\shimupgrade3.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimwithbinfile\1.0.0\shimwithbinfile.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimwithbinfile\1.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimwithbinfile\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\shims\shimwithbinfile\1.0.0\tools\shimwithbinfile1.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\testing.packages.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

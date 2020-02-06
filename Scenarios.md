@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 35 Scenario(s), 293 Observation(s) ]
+### ChocolateyInstallCommand [ 42 Scenario(s), 312 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -247,6 +247,20 @@
  * should not install a package in the lib directory
  * should put a package in the lib bad directory
 
+#### when installing a package that tries to overwrite another shim
+
+ * should have a shim
+ * should have a shim with target in other package tools folder
+ * should have an error message
+ * should have shim target
+
+#### when installing a package that tries to overwrite its own shim
+
+ * should create a shim
+ * should have a shim with target in tools folder
+ * should have an error message
+ * should have shim targets
+
 #### when installing a package with a dependent package that also depends on a less constrained but still valid dependency of the same package
 
  * [PENDING] should contain a message that everything installed successfully
@@ -281,6 +295,18 @@
  * should not have warning package result
  * should not install a package in the lib directory
  * should not install the dependency in the lib directory
+
+#### when installing a package with dependencies and noshims
+
+ * should create a shim for the dependency
+ * should have shim targets
+ * should not create a shim for the package
+
+#### when installing a package with dependencies and noshimsglobal
+
+ * should have shim targets
+ * should not create a shim for the dependency
+ * should not create a shim for the package
 
 #### when installing a package with dependencies happy
 
@@ -326,10 +352,24 @@
  * [PENDING] should not install the conflicting package in the lib directory
  * [PENDING] should not upgrade the exact version dependency
 
+#### when installing a package with install bin file
+
+ * should not see the shim as an existing shim and remove it
+
+#### when installing a package with install bin file and noshims
+
+ * should have shim target
+ * should not create a shim
+
 #### when installing a package with no sources enabled
 
  * should have no sources enabled result
  * should not install any packages
+
+#### when installing a package with noshims
+
+ * should have shim target
+ * should not create a shim for the package
 
 #### when installing a side by side package
 
@@ -541,7 +581,7 @@
 
  * should contain success message
 
-### ChocolateyUninstallCommand [ 13 Scenario(s), 93 Observation(s) ]
+### ChocolateyUninstallCommand [ 14 Scenario(s), 95 Observation(s) ]
 
 #### when force uninstalling a package
 
@@ -617,6 +657,11 @@
  * should not remove package from the lib directory
  * should still have the package file in the directory
 
+#### when uninstalling a package that forgets to call uninstall bin file
+
+ * should have had a shim
+ * should have removed the shim
+
 #### when uninstalling a package with a read and delete share locked file
 
  * should contain a message that it uninstalled successfully
@@ -675,7 +720,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 36 Scenario(s), 295 Observation(s) ]
+### ChocolateyUpgradeCommand [ 39 Scenario(s), 301 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -920,6 +965,11 @@
  * should have no sources enabled result
  * should not have any packages upgraded
 
+#### when upgrading a package with noshims
+
+ * should have shim target
+ * should not create a shim
+
 #### when upgrading a package with readonly files
 
  * should contain a warning message that it upgraded successfully
@@ -932,6 +982,16 @@
  * should upgrade a package in the lib directory
  * should upgrade the package
  * should upgrade where install location reports
+
+#### when upgrading a package with shims
+
+ * should create a shim
+ * should not have original shim
+
+#### when upgrading a package with shims that errors
+
+ * should have original shim
+ * should not create a shim
 
 #### when upgrading a package with unavailable dependencies
 

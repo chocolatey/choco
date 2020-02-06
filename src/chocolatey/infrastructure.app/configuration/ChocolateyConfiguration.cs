@@ -221,6 +221,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string DownloadChecksum64 { get; set; }
         public string DownloadChecksumType { get; set; }
         public string DownloadChecksumType64 { get; set; }
+        public bool NoShims { get; set; }
+        public bool NoShimsGlobal { get; set; }
 
         /// <summary>
         ///   Configuration values provided by choco.
