@@ -180,7 +180,7 @@ param(
   if($options.Headers.Count -gt 0){
     Write-Debug "Setting custom headers"
     foreach($key in $options.headers.keys){
-      $uri = (New-Object sysetem.uri $url)
+      $uri = (New-Object -Typename system.uri $url)
       switch($key){
         'Accept' {$req.Accept = $options.headers.$key}
         'Cookie' {$req.CookieContainer.SetCookies($uri,$options.headers.$key)}
