@@ -118,7 +118,7 @@ param(
   [parameter(Mandatory=$false)][switch] $minimized,
   [parameter(Mandatory=$false)][switch] $noSleep,
   [parameter(Mandatory=$false)] $validExitCodes = @(0),
-  [parameter(Mandatory=$false)][string] $workingDirectory = $(Get-Location -PSProvider 'FileSystem'),
+  [parameter(Mandatory=$false)][string] $workingDirectory = $null,
   [parameter(Mandatory=$false)][string] $sensitiveStatements = '',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
@@ -126,12 +126,14 @@ param(
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  if ($workingDirectory -eq $null -or $workingDirectory.ProviderPath -eq $null) {
-    Write-Debug "Unable to use current location for Working Directory. Using Cache Location instead."
-    $workingDirectory = $env:TEMP
+  if ($workingDirectory -eq $null) {
+    $pwd = $(Get-Location -PSProvider 'FileSystem')
+    if ($pwd -eq $null -or $pwd.ProviderPath -eq $null) {
+      Write-Debug "Unable to use current location for Working Directory. Using Cache Location instead."
+      $workingDirectory = $env:TEMP
+    }
+    $workingDirectory = $pwd.ProviderPath
   }
-  $workingDirectory = $workingDirectory.ProviderPath
-
   $alreadyElevated = $false
   if (Test-ProcessAdminRights) {
     $alreadyElevated = $true
