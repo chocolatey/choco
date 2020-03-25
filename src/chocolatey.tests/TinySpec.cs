@@ -154,7 +154,9 @@ namespace chocolatey.tests
             Exclude = "Mono, Linux, MacOsX, Linux";
         }
 
-        public WindowsOnlyAttribute(string platforms): base(platforms)
+        public WindowsOnlyAttribute(string platforms) : base(platforms)
+        {
+        }
     }
 
     public class IntegrationAttribute : CategoryAttribute
