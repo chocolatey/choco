@@ -147,18 +147,15 @@ namespace chocolatey.tests
         }
     }
 
-#if __MonoCS__
-     public class WindowsOnlyAttribute : IgnoreAttribute
+    public class WindowsOnlyAttribute : PlatformAttribute
     {
-        public WindowsOnlyAttribute() : base("This is a Windows only test")
+        public WindowsOnlyAttribute()
         {
+            Exclude = "Mono, Linux, MacOsX, Linux";
         }
+
+        public WindowsOnlyAttribute(string platforms): base(platforms)
     }
-#else
-    public class WindowsOnlyAttribute : Attribute
-    {
-    }
-#endif
 
     public class IntegrationAttribute : CategoryAttribute
     {

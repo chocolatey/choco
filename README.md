@@ -137,17 +137,24 @@ Running the build on Windows should produce an artifact that is tested and ready
 #### Other Platforms
 ##### Prerequisites:
 
- * Install and configure Mono 3.12.0 (3.8.0 should also work).
+ * Install and configure Mono 5.20.x (Other versions may work but have not been tested).
   * [Debian based](http://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives)
 
 ```sh
+# install prerequisites
+sudo apt install apt-transport-https dirmngr gnupg ca-certificates
 # add the key
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
 
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
 # add the package repository
-echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
-# Ubuntu 12.10/12.04 - add this deb as well
-echo "deb http://download.mono-project.com/repo/debian wheezy-libtiff-compat main" | sudo tee -a /etc/apt/sources.list.d/mono-xamarin.list
+# Debian 10
+echo "deb https://download.mono-project.com/repo/debian stable-buster main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+# Debian 9
+echo "deb https://download.mono-project.com/repo/debian stable-stretch main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+# Ubuntu 18.04
+echo "deb https://download.mono-project.com/repo/ubuntu stable-bionic main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+# Ubuntu 16.04
+echo "deb https://download.mono-project.com/repo/ubuntu stable-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
 
 # update package indexes
 sudo apt-get update
@@ -155,24 +162,54 @@ sudo apt-get update
 sudo apt-get install mono-devel -y
 ```
 
-  * [RPM Based](http://www.mono-project.com/docs/getting-started/install/linux/#centos-fedora-and-derivatives)
+  * [CentOS/RHEL](https://www.mono-project.com/download/stable/#download-lin-centos)
 
 ```sh
 ### NOT FULLY TESTED AND WORKING ###
-# add the EPEL
-sudo yum install epel-release -y
+# Switch to root shell
+su
+# Add the EPEL
+yum install epel-release -y
 # Add the key
-sudo rpm --import "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF"
+pmkeys --import "http://pool.sks-keyservers.net/pks/lookup?op=get&search=0x3fa7e0328081bff6a14da29aa6a19b38d3d831ef"
 
 # Add the package repository
-sudo yum-config-manager --add-repo http://download.mono-project.com/repo/centos/
+# CentOS/RHEL 8
+su -c 'curl https://download.mono-project.com/repo/centos8-stable.repo | tee /etc/yum.repos.d/mono-centos8-stable.repo'
+# CentOS/RHEL 7
+su -c 'curl https://download.mono-project.com/repo/centos7-stable.repo | tee /etc/yum.repos.d/mono-centos7-stable.repo'
+# CentOS/RHEL 6
+rpm --import "http://pool.sks-keyservers.net/pks/lookup?op=get&search=0x3fa7e0328081bff6a14da29aa6a19b38d3d831ef"
 
-# update your system
-sudo yum update -y
+# Update your system
+yum update -y
 
 # Install mono-devel
-sudo yum install mono-devel -y
+yum install mono-devel -y
 
+```
+
+  * [Fedora](https://www.mono-project.com/download/stable/#download-lin-fedora)
+  
+```sh
+### NOT FULLY TESTED AND WORKING ###
+
+# Switch to root shell
+su
+# Add the key
+rpm --import "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF"
+
+# Add the package repository
+# Fedora 29
+su -c 'curl https://download.mono-project.com/repo/centos8-stable.repo | tee /etc/yum.repos.d/mono-centos8-stable.repo'
+# Fedora 28
+su -c 'curl https://download.mono-project.com/repo/centos7-stable.repo | tee /etc/yum.repos.d/mono-centos7-stable.repo'
+
+# Update
+dnf update
+
+# Install mono-devel
+dnf install mono-devel -y
 
 ```
 

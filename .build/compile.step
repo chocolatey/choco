@@ -21,7 +21,7 @@
   <property name="solution.path" value="${path::get-full-path(solution.path)}" />
   <property name="solution.path.windows.mono" value="${string::replace(dirs.current,'\','/')}/${string::replace(path_to_solution,'\','/')}/${project.name}.sln" />
   <property name="solution.path" value="${dirs.current}${path.separator}${path_to_solution}${path.separator}${project.name}.vbp" if="${microsoft.framework =='vb6'}" />
-  <property name="nant.settings.currentframework" value="mono-4.0" if="${platform::is-unix()}" overwrite="true" />
+  <property name="nant.settings.currentframework" value="mono-4.5" if="${platform::is-unix()}" overwrite="true" />
   <property name="nant.settings.currentframework" value="net-3.5" if="${microsoft.framework !='vb6' and platform::is-windows()}" overwrite="false" />
   <property name="framework.multitargeting" value="false" />
   <property name="framework.multitargeting.delimiter" value="," />
@@ -106,18 +106,18 @@
     <mkdir dir="${msbuild.outputpath}" />
     <if test="${platform::is-unix()}">
       <!-- Do clean and build in two steps since xbuild has a bug with using OutputPath and Rebuild together Bug #628525 at Novell -->
-      <echo level="Warning" message="Cleaning build..." if="${microsoft.framework.specific != 'mono-4.0'}" />
+      <echo level="Warning" message="Cleaning build..." if="${microsoft.framework.specific != 'mono-4.5'}" />
       <exec program="${app.xbuild}"
           basedir="/usr/bin"
           workingdir="${dirs.build}"
-          commandline="${solution.path} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.0'}" />
+          commandline="${solution.path} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.5'}" />
       <echo level="Warning" message="Building..." />
       <echo level="Warning" message="Working directory ${dirs.build}" />
       <echo level="Warning" message="Running ${app.xbuild} ${solution.path} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:detailed /toolsversion:${framework::get-version(microsoft.framework.specific)} /property:Platform='${msbuild.platform}' /property:TargetFrameworkVersion=v${framework::get-version(microsoft.framework.specific)} /l:${msbuild.logger};'${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml'" />
       <exec program="${app.xbuild}"
           basedir="/usr/bin"
           workingdir="${dirs.build}"
-          commandline="${solution.path} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:detailed /toolsversion:${framework::get-version(microsoft.framework.specific)} /property:Platform='${msbuild.platform}'  /property:TargetFrameworkProfile='' /property:TargetFrameworkVersion=v${framework::get-version(microsoft.framework.specific)} /l:${msbuild.logger};'${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml'" />
+          commandline="${solution.path} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:detailed /toolsversion:4.0 /property:Platform='${msbuild.platform}'  /property:TargetFrameworkProfile='' /property:TargetFrameworkVersion=v${framework::get-version(microsoft.framework.specific)} /l:${msbuild.logger};'${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml'" />
     </if>
     <if test="${platform::is-windows()}">
       <!-- nant is retarded - I had to have four of these instead of throwing an if on the outputpath and targets -->
@@ -125,11 +125,11 @@
         <if test="${framework.multitargeting}">
           <if test="${framework::get-family(microsoft.framework.specific) == 'mono'}" >
             <!-- Do clean and build in two steps since xbuild has a bug with using OutputPath and Rebuild together Bug #628525 at Novell -->
-            <echo level="Warning" message="Cleaning build..." if="${microsoft.framework.specific != 'mono-4.0'}" />
+            <echo level="Warning" message="Cleaning build..." if="${microsoft.framework.specific != 'mono-4.5'}" />
             <exec program="${app.xbuild}"
                 basedir="${dirs.build.windows.mono}"
                 workingdir="${dirs.build.windows.mono}"
-                commandline="${solution.path.windows.mono} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.0'}" />
+                commandline="${solution.path.windows.mono} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.5'}" />
             <echo level="Warning" message='Building...by running this command ${app.xbuild} ${solution.path.windows.mono} /nologo /property:OutputPath="${msbuild.outputpath.windows.mono}" /property:Configuration=${msbuild.configuration} /verbosity:minimal' />
             <exec program="${app.xbuild}"
                 basedir="${dirs.build.windows.mono}"
@@ -158,11 +158,11 @@
         <if test="${not framework.multitargeting}">
           <if test="${framework::get-family(microsoft.framework.specific) == 'mono'}" >
             <!-- Do clean and build in two steps since xbuild has a bug with using OutputPath and Rebuild together Bug #628525 at Novell -->
-            <echo level="Warning" message="Cleaning build..." if="${microsoft.framework.specific != 'mono-4.0'}" />
+            <echo level="Warning" message="Cleaning build..." if="${microsoft.framework.specific != 'mono-4.5'}" />
             <exec program="${app.xbuild}"
                 basedir="${dirs.build.windows.mono}"
                 workingdir="${dirs.build.windows.mono}"
-                commandline="${solution.path.windows.mono} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.0'}" />
+                commandline="${solution.path.windows.mono} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.5'}" />
             <echo level="Warning" message='Building without multitargeting by running this command ${app.xbuild} ${solution.path.windows.mono} /nologo /property:OutputPath="${msbuild.outputpath.windows.mono}" /property:Configuration=${msbuild.configuration} /verbosity:minimal' />
             <exec program="${app.xbuild}"
                 basedir="${dirs.build.windows.mono}"
@@ -191,11 +191,11 @@
         <if test="${framework.multitargeting}">
           <if test="${framework::get-family(microsoft.framework.specific) == 'mono'}" >
             <!-- Do clean and build in two steps since xbuild has a bug with using OutputPath and Rebuild together Bug #628525 at Novell -->
-            <echo level="Warning" message="Cleaning build..." if="${microsoft.framework.specific != 'mono-4.0'}" />
+            <echo level="Warning" message="Cleaning build..." if="${microsoft.framework.specific != 'mono-4.5'}" />
             <exec program="${app.xbuild}"
                 basedir="${dirs.build}"
                 workingdir="${dirs.build}"
-                commandline="${solution.path} /nologo /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.0'}" />
+                commandline="${solution.path} /nologo /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.5'}" />
             <echo level="Warning" message="Building..." />
             <exec program="${app.xbuild}"
                 basedir="${dirs.build}"
@@ -222,11 +222,11 @@
         <if test="${not framework.multitargeting}">
           <if test="${framework::get-family(microsoft.framework.specific) == 'mono'}" >
             <!-- Do clean and build in two steps since xbuild has a bug with using OutputPath and Rebuild together Bug #628525 at Novell -->
-            <echo level="Warning" message="Cleaning build..." if="${microsoft.framework.specific != 'mono-4.0'}" />
+            <echo level="Warning" message="Cleaning build..." if="${microsoft.framework.specific != 'mono-4.5'}" />
             <exec program="${app.xbuild}"
                 basedir="${dirs.build.windows.mono}"
                 workingdir="${dirs.build.windows.mono}"
-                commandline="${solution.path.windows.mono} /nologo /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.0'}" />
+                commandline="${solution.path.windows.mono} /nologo /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.5'}" />
             <echo level="Warning" message="Building...by running this command ${app.xbuild} ${solution.path.windows.mono} /nologo /property:Configuration=${msbuild.configuration} /verbosity:minimal" />
             <exec program="${app.xbuild}"
                 basedir="${dirs.build.windows.mono}"

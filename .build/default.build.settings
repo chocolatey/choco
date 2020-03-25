@@ -94,7 +94,7 @@
   <property name="fail.build.on.error" value="true" />
 
   <!-- FRAMEWORKS -->
-  <!-- microsoft.framework: vb6, net-1.0, net-1.1, net-2.0, net-3.5, net-4.0, net-4.5, netcf-1.0, netcf-2.0, silverlight-2.0, mono-1.0, mono-2.0, mono-3.5, mono-4.0, moonlight-2.0 (Enter multiple ones with a "," to take advantage of multitargeting) -->
+  <!-- microsoft.framework: vb6, net-1.0, net-1.1, net-2.0, net-3.5, net-4.0, net-4.5, netcf-1.0, netcf-2.0, silverlight-2.0, mono-1.0, mono-2.0, mono-3.5, mono-4.0, mono-4.5, moonlight-2.0 (Enter multiple ones with a "," to take advantage of multitargeting) -->
   <property name="microsoft.framework" value="net-4.0" overwrite="false" />
   <!-- language.short: vb,cs -->
   <property name="language.short" value="cs" overwrite="false" />
