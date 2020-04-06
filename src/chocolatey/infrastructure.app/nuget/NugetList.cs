@@ -65,14 +65,23 @@ namespace chocolatey.infrastructure.app.nuget
 
             if (configuration.ListCommand.Exact)
             {
-                var exactPackage = find_package(searchTermLower, version, configuration, packageRepository);
-
-                if (exactPackage == null) return new List<IPackage>().AsQueryable();
-
-                return new List<IPackage>()
+                if (configuration.AllVersions)
                 {
-                    exactPackage
-                }.AsQueryable();
+                    // convert from a search to getting packages by id.
+                    // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
+                    results = packageRepository.GetPackages().Where(x => x.Id.ToLower() == searchTermLower);
+                }
+                else
+                {
+                    var exactPackage = find_package(searchTermLower, version, configuration, packageRepository);
+
+                    if (exactPackage == null) return new List<IPackage>().AsQueryable();
+
+                    return new List<IPackage>()
+                    {
+                        exactPackage
+                    }.AsQueryable();
+                }
             }
 
             if (configuration.ListCommand.Page.HasValue)
