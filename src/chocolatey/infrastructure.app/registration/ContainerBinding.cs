@@ -80,6 +80,7 @@ namespace chocolatey.infrastructure.app.registration
                     var list = new List<ICommand>
                         {
                             new ChocolateyListCommand(container.GetInstance<IChocolateyPackageService>()),
+                            new ChocolateyHelpCommand(container),
                             new ChocolateyInfoCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyInstallCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyPinCommand(container.GetInstance<IChocolateyPackageInformationService>(), container.GetInstance<ILogger>(), container.GetInstance<INugetService>()),
