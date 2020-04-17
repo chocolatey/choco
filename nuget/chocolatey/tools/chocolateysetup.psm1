@@ -5,6 +5,7 @@ $tempDir = $env:TEMP
 $defaultChocolateyPathOld = "$sysDrive\Chocolatey"
 
 $originalForegroundColor = $host.ui.RawUI.ForegroundColor
+$netFx45ReleaseSubkeyValue = 378389
 
 function Write-ChocolateyWarning {
 param (
@@ -125,7 +126,7 @@ Creating Chocolatey folders if they do not already exist.
   }
 
   Add-ChocolateyProfile
-  Install-DotNet4IfMissing
+  Install-DotNet45IfMissing
   Invoke-Chocolatey-Initial
   if ($env:ChocolateyExitCode -eq $null -or $env:ChocolateyExitCode -eq '') {
     $env:ChocolateyExitCode = 0
@@ -648,58 +649,55 @@ if (Test-Path($ChocolateyProfile)) {
   }
 }
 
-$netFx4InstallTries = 0
+$netFx45InstallTries = 0
 
-function Install-DotNet4IfMissing {
+function Install-DotNet45IfMissing {
 param(
   $forceFxInstall = $false
 )
   # we can't take advantage of any chocolatey module functions, because they
-  # haven't been unpacked because they require .NET Framework 4.0
+  # haven't been unpacked because they require .NET Framework 4.5
 
-  Write-Debug "Install-DotNet4IfMissing called with `$forceFxInstall=$forceFxInstall"
-  $NetFxArch = "Framework"
-  if ([IntPtr]::Size -eq 8) {$NetFxArch="Framework64" }
+  Write-Debug "Install-DotNet45IfMissing called with `$forceFxInstall=$forceFxInstall"
 
-  $NetFx4ClientUrl = 'https://download.microsoft.com/download/5/6/2/562A10F9-C9F4-4313-A044-9C94E0A8FAC8/dotNetFx40_Client_x86_x64.exe'
-  $NetFx4FullUrl = 'https://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe'
-  $NetFx4Url = $NetFx4FullUrl
-  $NetFx4Path = "$tempDir"
-  $NetFx4InstallerFile = 'dotNetFx40_Full_x86_x64.exe'
-  $NetFx4Installer = Join-Path $NetFx4Path $NetFx4InstallerFile
+  $NetFx45FullUrl = 'https://download.microsoft.com/download/b/a/4/ba4a7e71-2906-4b2d-a0e1-80cf16844f5f/dotnetfx45_full_x86_x64.exe'
+  $NetFx45Url = $NetFx45FullUrl
+  $NetFx45Path = "$tempDir"
+  $NetFx45InstallerFile = 'dotnetfx45_full_x86_x64.exe'
+  $NetFx45Installer = Join-Path $NetFx45Path $NetFx45InstallerFile
 
-  if ((!(Test-Path "$env:SystemRoot\Microsoft.Net\$NetFxArch\v4.0.30319") -and !(Test-Path "C:\Windows\Microsoft.Net\$NetFxArch\v4.0.30319")) -or $forceFxInstall) {
-    Write-Output "'$env:SystemRoot\Microsoft.Net\$NetFxArch\v4.0.30319' was not found or this is forced"
-    if (!(Test-Path $NetFx4Path)) {
-      Write-Output "Creating folder `'$NetFx4Path`'"
-      $null = New-Item -Path "$NetFx4Path" -ItemType Directory
+  if (!((Get-ItemProperty "HKLM:SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").Release -ge $netFx45ReleaseSubKeyValue) -or $forceFxInstall) {
+    Write-Output "'HKLM:SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' - 'Release' subkey with value greater or equal than `'$netFx45ReleaseSubKeyValue`' was not found or this is forced"
+    if (!(Test-Path $NetFx45Path)) {
+      Write-Output "Creating folder `'$NetFx45Path`'"
+      $null = New-Item -Path "$NetFx45Path" -ItemType Directory
     }
 
-    $netFx4InstallTries += 1
+    $netFx45InstallTries += 1
 
-    if (!(Test-Path $NetFx4Installer)) {
-      Write-Output "Downloading `'$NetFx4Url`' to `'$NetFx4Installer`' - the installer is 40+ MBs, so this could take a while on a slow connection."
-      (New-Object Net.WebClient).DownloadFile("$NetFx4Url","$NetFx4Installer")
+    if (!(Test-Path $NetFx45Installer)) {
+      Write-Output "Downloading `'$NetFx45Url`' to `'$NetFx45Installer`' - the installer is 40+ MBs, so this could take a while on a slow connection."
+      (New-Object Net.WebClient).DownloadFile("$NetFx45Url","$NetFx45Installer")
     }
 
     $psi = New-Object System.Diagnostics.ProcessStartInfo
-    $psi.WorkingDirectory = "$NetFx4Path"
-    $psi.FileName = "$NetFx4InstallerFile"
+    $psi.WorkingDirectory = "$NetFx45Path"
+    $psi.FileName = "$NetFx45InstallerFile"
     # https://msdn.microsoft.com/library/ee942965(v=VS.100).aspx#command_line_options
     # http://blogs.msdn.com/b/astebner/archive/2010/05/12/10011664.aspx
     # For the actual setup.exe (if you want to unpack first) - /repair /x86 /x64 /ia64 /parameterfolder Client /q /norestart
     $psi.Arguments = "/q /norestart /repair"
 
-    Write-Output "Installing `'$NetFx4Installer`' - this may take awhile with no output."
+    Write-Output "Installing `'$NetFx45Installer`' - this may take awhile with no output."
     $s = [System.Diagnostics.Process]::Start($psi);
     $s.WaitForExit();
     if ($s.ExitCode -ne 0 -and $s.ExitCode -ne 3010) {
-      if ($netFx4InstallTries -ge 2) {
+      if ($netFx45InstallTries -ge 2) {
         Write-ChocolateyError ".NET Framework install failed with exit code `'$($s.ExitCode)`'. `n This will cause the rest of the install to fail."
-        throw "Error installing .NET Framework 4.0 (exit code $($s.ExitCode)). `n Please install the .NET Framework 4.0 manually and then try to install Chocolatey again. `n Download at `'$NetFx4Url`'"
+        throw "Error installing .NET Framework 4.5 (exit code $($s.ExitCode)). `n Please install the .NET Framework 4.5 manually and then try to install Chocolatey again. `n Download at `'$NetFx45Url`'"
       } else {
-        Write-ChocolateyWarning "Try #$netFx4InstallTries of .NET framework install failed with exit code `'$($s.ExitCode)`'. Trying again."
-        Install-DotNet4IfMissing $true
+        Write-ChocolateyWarning "Try #$netFx45InstallTries of .NET framework install failed with exit code `'$($s.ExitCode)`'. Trying again."
+        Install-DotNet45IfMissing $true
       }
     }
   }
