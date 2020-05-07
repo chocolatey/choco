@@ -56,31 +56,34 @@ None
   }
 
   if ($refreshEnv) {
-    Write-Output "Refreshing environment variables from the registry for powershell.exe. Please wait..."
+    Write-Output 'Refreshing environment variables from the registry for powershell.exe. Please wait...'
   } else {
-    Write-Verbose "Refreshing environment variables from the registry."
+    Write-Verbose 'Refreshing environment variables from the registry.'
   }
 
   $userName = $env:USERNAME
   $architecture = $env:PROCESSOR_ARCHITECTURE
   $psModulePath = $env:PSModulePath
 
-  #ordering is important here, $user comes after so we can override $machine
-  'Process', 'Machine', 'User' |
-    % {
-      $scope = $_
-      Get-EnvironmentVariableNames -Scope $scope |
-        % {
-          Set-Item "Env:$($_)" -Value (Get-EnvironmentVariable -Scope $scope -Name $_)
+  #ordering is important here, $user should override $machine...
+  $Scopes = 'Process', 'Machine'
+  if (($userName -ne 'SYSTEM') -and ($userName -ne "$($env:COMPUTERNAME)`$")) {
+    # but only if not running as the SYSTEM/machine in which case user can be ignored.
+    $Scopes += 'User'
+  }
+  foreach ($Scope in $Scopes) {
+    Get-EnvironmentVariableNames -Scope $Scope |
+        ForEach-Object {
+          Set-Item "Env:$($_)" -Value (Get-EnvironmentVariable -Scope $Scope -Name $_)
         }
-    }
+  }
 
   #Path gets special treatment b/c it munges the two together
   $paths = 'Machine', 'User' |
-    % {
+    ForEach-Object {
       (Get-EnvironmentVariable -Name 'PATH' -Scope $_) -split ';'
     } |
-    Select -Unique
+    Select-Object -Unique
   $Env:PATH = $paths -join ';'
 
   # PSModulePath is almost always updated by process, so we want to preserve it.
@@ -91,7 +94,7 @@ None
   if ($architecture) { $env:PROCESSOR_ARCHITECTURE = $architecture; }
 
   if ($refreshEnv) {
-    Write-Output "Finished"
+    Write-Output 'Finished'
   }
 }
 
