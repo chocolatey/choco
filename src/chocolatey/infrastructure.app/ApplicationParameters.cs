@@ -122,6 +122,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string ChocolateyCheckLastExitCode = "ChocolateyCheckLastExitCode";
             public static readonly string ChocolateyPowerShellHost = "ChocolateyPowerShellHost";
             public static readonly string ChocolateyForce = "ChocolateyForce";
+            public static readonly string ChocolateyExitOnRebootDetected = "ChocolateyExitOnRebootDetected";
         }
 
         /// <summary>

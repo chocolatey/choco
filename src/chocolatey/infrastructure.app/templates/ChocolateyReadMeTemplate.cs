@@ -108,6 +108,7 @@ Some environment variables are set based on options that are passed, configurati
 
  * ChocolateyEnvironmentDebug - Was `--debug` passed? If using the built-in PowerShell host, this is always true (but only logs debug messages to console if `--debug` was passed) (0.9.10+)
  * ChocolateyEnvironmentVerbose - Was `--verbose` passed? If using the built-in PowerShell host, this is always true (but only logs verbose messages to console if `--verbose` was passed). (0.9.10+)
+ * ChocolateyExitOnRebootDetected - Are we exiting on a detected reboot? Set by ` --exit-when-reboot-detected`  or the feature `exitOnRebootDetected` (0.10.16+)
  * ChocolateyForce - Was `--force` passed? (0.9.10+)
  * ChocolateyForceX86 - Was `-x86` passed? (CHECK)
  * ChocolateyRequestTimeout - How long before a web request will time out. Set by config `webRequestTimeoutSeconds` (CHECK)

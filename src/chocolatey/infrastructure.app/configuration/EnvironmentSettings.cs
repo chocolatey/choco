@@ -56,6 +56,7 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyExitOnRebootDetected, null);
 
             Environment.SetEnvironmentVariable("chocolateyProxyLocation", null);
             Environment.SetEnvironmentVariable("chocolateyProxyBypassList", null);
@@ -127,6 +128,7 @@ namespace chocolatey.infrastructure.app.configuration
 
             if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, "true");
             if (config.Force) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, "true");
+            if (config.Features.ExitOnRebootDetected) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyExitOnRebootDetected, "true");
             set_licensed_environment(config);
         }
 
