@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -324,6 +324,43 @@ namespace chocolatey.tests.infrastructure.app.services
                 infos.Count.ShouldEqual(1);
                 infos[0].ShouldEqual("Chocolatey would have searched for a nuspec file in \"c:\\packages\" and attempted to compile it.");
             }
+        }
+
+        public class when_NugetService_get_outdated: NugetServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+
+            public override void Context()
+            {
+                base.Context();
+
+                // Ideally we should mock the FindPackage method, however, it belongs to PackageRepositoryExtensions, which can not 
+                // be mocked. So use one name that can never exist here. 
+                config.PackageNames = "!!!";
+            }
+
+            public override void Because()
+            {
+                because = () => service.get_outdated(config);
+            }
+
+            public override void AfterEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            public void not_founded_package_should_be_warned()
+            {
+                Context();
+                because();
+
+                var infos = MockLogger.MessagesFor(LogLevel.Warn);
+                infos.Count.ShouldEqual(1);
+                infos[0].Trim().ShouldEqual("Package !!! was not founded.");
+            }
+
         }
     }
 }

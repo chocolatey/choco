@@ -23,6 +23,7 @@ namespace chocolatey.infrastructure.app.services
     using System.IO;
     using System.Linq;
     using System.Net;
+    using System.Text;
     using NuGet;
     using adapters;
     using commandline;
@@ -892,12 +893,19 @@ Please see https://chocolatey.org/docs/troubleshooting for more
 
             var originalConfig = config;
 
+            var notFoundedMessage = new StringBuilder();
+
             foreach (var packageName in packageNames)
             {
                 // reset config each time through
                 config = originalConfig.deep_copy();
 
                 var installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+                if (installedPackage == null)
+                {
+                    notFoundedMessage.AppendLine("Package {0} was not founded.".format_with(packageName));
+                    continue;
+                }
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
                 bool isPinned = pkgInfo.IsPinned;
 
@@ -943,6 +951,11 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
                 this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version, isPinned.to_string().to_lower()));
+            }
+
+            if (notFoundedMessage.Length > 0)
+            {
+                this.Log().Warn(notFoundedMessage.ToString());
             }
 
             return outdatedPackages;

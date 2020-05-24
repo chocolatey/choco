@@ -628,7 +628,11 @@ Would have determined packages that are out of date based on what is
  Output is package name | current version | available version | pinned?
 ");
 
-            config.PackageNames = ApplicationParameters.AllPackages;
+            if (config.PackageNames.Length == 0)
+            {
+                config.PackageNames = ApplicationParameters.AllPackages;
+            }
+
             config.UpgradeCommand.NotifyOnlyAvailableUpgrades = true;
 
             var output = config.RegularOutput;
