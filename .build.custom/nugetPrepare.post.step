@@ -12,7 +12,7 @@
   <property name="build.step.path" value="${project::get-buildfile-path()}" />
   <!-- build step customizations below this -->
 
-  <target name="go" depends="prep_nuget, unpack_files, copy_legal" />
+  <target name="go" depends="prep_nuget, unpack_files, copy_legal, remove_logs_config_folders" />
 
   <target name="prep_nuget">
     <echo level="Warning" message="Moving ${dirs.drop.nuget}${path.separator}lib${path.separator}console to ${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall." />
@@ -48,4 +48,11 @@
     <copy file="${dirs.current}${path.separator}${folder.documentation}${path.separator}legal${path.separator}CREDITS.md" tofile="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}CREDITS.txt" failonerror="true" />
     <copy file="${dirs.current}${path.separator}${folder.documentation}${path.separator}legal${path.separator}CREDITS.md" tofile="${dirs.drop.nuget}${path.separator}chocolatey.lib${path.separator}lib${path.separator}CREDITS.txt" failonerror="true" />
   </target>
+
+  <target name="remove_logs_config_folders">
+    <echo level="Warning" message="Removing subfolders for logs and config if they exist at ${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall" />
+    <delete dir="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}logs" />
+    <delete dir="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}config" />
+  </target>
+
 </project>
