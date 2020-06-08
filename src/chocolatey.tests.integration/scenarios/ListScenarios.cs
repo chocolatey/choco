@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +18,14 @@ namespace chocolatey.tests.integration.scenarios
 {
     using System.Collections.Generic;
     using System.Linq;
-    using NuGet;
-    using Should;
     using bdddoc.core;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.results;
+    using NuGet;
+    using Should;
 
     public class ListScenarios
     {
@@ -289,6 +290,36 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyListCommand))]
+        public class when_listing_local_packages_with_id_only : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.ListCommand.LocalOnly = true;
+                Configuration.ListCommand.IdOnly = true;
+                Configuration.Sources = ApplicationParameters.PackagesLocation;
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+            [Fact]
+            public void should_contain_package_name()
+            {
+                MockLogger.contains_message("upgradepackage").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_contain_any_version_number()
+            {
+                MockLogger.contains_message(".0").ShouldBeFalse();
+            }
+        }
+
+        [Concern(typeof(ChocolateyListCommand))]
         public class when_listing_local_packages_limiting_output : ScenariosBase
         {
             public override void Context()
@@ -338,6 +369,188 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("Running list with the following filter", LogLevel.Debug).ShouldBeFalse();
                 MockLogger.contains_message("Start of List", LogLevel.Debug).ShouldBeFalse();
                 MockLogger.contains_message("End of List", LogLevel.Debug).ShouldBeFalse();
+            }
+        }
+
+        [Concern(typeof(ChocolateyListCommand))]
+        public class when_listing_local_packages_limiting_output_with_id_only : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration.ListCommand.LocalOnly = true;
+                Configuration.ListCommand.IdOnly = true;
+                Configuration.Sources = ApplicationParameters.PackagesLocation;
+                Configuration.RegularOutput = false;
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+            [Fact]
+            public void should_contain_packages_id()
+            {
+                MockLogger.contains_message("upgradepackage").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_contain_any_version_number()
+            {
+                MockLogger.contains_message(".0").ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_contain_pipe()
+            {
+                MockLogger.contains_message("|").ShouldBeFalse();
+            }
+        }
+
+        [Concern(typeof(ChocolateyListCommand))]
+        public class when_listing_packages_with_no_sources_enabled : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Sources = null;
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+            [Fact]
+            public void should_have_no_sources_enabled_result()
+            {
+                MockLogger.contains_message("Unable to search for packages when there are no sources enabled for", LogLevel.Error).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_list_any_packages()
+            {
+                Results.Count().ShouldEqual(0);
+            }
+        }
+
+        [Concern(typeof(ChocolateyListCommand))]
+        public class when_searching_for_an_exact_package : ScenariosBase
+        {
+            public override void Context()
+            {
+                Configuration = Scenario.list();
+                Scenario.reset(Configuration);
+                Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + Constants.PackageExtension);
+                Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+
+                Configuration.ListCommand.Exact = true;
+                Configuration.Input = Configuration.PackageNames = "exactpackage";
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+            [Fact]
+            public void should_not_error()
+            {
+                // nothing necessary here
+            }
+
+            [Fact]
+            public void should_find_exactly_one_result()
+            {
+                Results.Count.ShouldEqual(1);
+            }
+
+            [Fact]
+            public void should_contain_packages_and_versions_with_a_space_between_them()
+            {
+                MockLogger.contains_message("exactpackage 1.0.0").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_contain_packages_that_do_not_match()
+            {
+                MockLogger.contains_message("exactpackage.dontfind").ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_summary()
+            {
+                MockLogger.contains_message("packages found").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_debugging_messages()
+            {
+                MockLogger.contains_message("Searching for package information", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("Start of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("End of List", LogLevel.Debug).ShouldBeTrue();
+            }
+        }        
+        
+        [Concern(typeof(ChocolateyListCommand))]
+        public class when_searching_for_an_exact_package_with_zero_results : ScenariosBase
+        {
+            public override void Context()
+            {
+                Configuration = Scenario.list();
+                Scenario.reset(Configuration);
+                Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + Constants.PackageExtension);
+                Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+
+                Configuration.ListCommand.Exact = true;
+                Configuration.Input = Configuration.PackageNames = "exactpackage123";
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+
+            [Fact]
+            public void should_not_error()
+            {
+                // nothing necessary here
+            }
+
+
+            [Fact]
+            public void should_not_have_any_results()
+            {
+                Results.Count.ShouldEqual(0);
+            }
+
+            [Fact]
+            public void should_not_contain_packages_that_do_not_match()
+            {
+                MockLogger.contains_message("exactpackage.dontfind").ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_summary()
+            {
+                MockLogger.contains_message("packages found").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_debugging_messages()
+            {
+                MockLogger.contains_message("Searching for package information", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("Start of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("End of List", LogLevel.Debug).ShouldBeTrue();
             }
         }
     }

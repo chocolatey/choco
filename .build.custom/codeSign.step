@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="CUSTOM Code Sign" default="go">
+  <!-- Project UppercuT - http://projectuppercut.org -->
+  <property name="build.config.settings" value="__NONE__" overwrite="false" />
+  <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
+  <property name="path.separator" value="${string::trim(path::combine(' ', ' '))}" />
+  <property name="dirs.current" value="${directory::get-current-directory()}" />
+  <property name="dirs.current.file" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <property name="folder.build_scripts" value="build" overwrite="false" />
+  <include buildfile="${dirs.current}${path.separator}${folder.build_scripts}${path.separator}default.build.settings" />
+  <property name="build.step.name" value="${project::get-name()}" />
+  <property name="build.step.path" value="${project::get-buildfile-path()}" />
+  <!-- build step customizations below this -->
+
+  <property name="code.cert.password" value="" />
+
+  <target name="go" depends="run_tasks" if="${run.codesign}" />
+
+  <!-- run_normal_tasks is called from run_tasks unless replace extension exists-->
+  <target name="run_normal_tasks"
+          depends="log_info, get_password, sign_assemblies, sign_powershell_files"
+          description="Signing assemblies" />
+
+  <target name="log_info">
+    <echo level="Warning" message="Signing the assemblies and powershell files if the system is set up correctly." />
+  </target>
+
+  <target name="get_password" if="${property::exists('path.code.cert.password')}">
+    <loadfile file="${path.code.cert.password}" property="code.cert.password" if="${file::exists(path.code.cert.password)}" />
+    <property name="code.cert.password" value="${string::trim(code.cert.password)}" />
+  </target>
+
+<!--
+C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\signtool.exe sign /t http://timestamp.digicert.com /fd SHA1 /f %CHOCOLATEY_OFFICIAL_CERT% /p [INSERT] /a "code_drop\chocolatey\console\choco.exe"
+-->
+
+  <target name="sign_assemblies" description="Signs the final assembly prior to packaging it up." if="${file::exists(app.signtool) and property::exists('path.code.cert')}">
+    <echo level="Warning" message="Signing the assemblies using ${app.signtool}." />
+    <property name="app.choco" value="${dirs.drop}${path.separator}chocolatey${path.separator}console${path.separator}choco.exe" />
+    <property name="lib.choco" value="${dirs.drop}${path.separator}chocolatey${path.separator}lib${path.separator}chocolatey.dll" />
+
+    <echo message='"${app.signtool}" sign /t "${code.cert.timestampserver}" /fd ${code.cert.algorithm} /f ${path.code.cert} /p [REDACTED] /a "${app.choco}"' />
+    <exec
+      program="${app.signtool}"
+      commandline='sign /t "${code.cert.timestampserver}" /fd ${code.cert.algorithm} /f ${path.code.cert} /p ${code.cert.password} /a "${app.choco}"'
+      if="${file::exists(app.signtool) and file::exists(path.code.cert)}"
+      failonerror="true"
+    />
+
+    <exec
+      program="${app.signtool}"
+      commandline='sign /t "${code.cert.timestampserver}" /fd ${code.cert.algorithm} /f ${path.code.cert} /p ${code.cert.password} /a "${lib.choco}"'
+      if="${file::exists(app.signtool) and file::exists(path.code.cert)}"
+      failonerror="true"
+    />
+
+    <property name="app.choco.nuget" value="${dirs.drop.nuget}${path.separator}chocolatey${path.separator}tools${path.separator}chocolateyInstall${path.separator}choco.exe" />
+    <property name="lib.choco.nuget" value="${dirs.drop.nuget}${path.separator}chocolatey.lib${path.separator}lib${path.separator}chocolatey.dll" />
+
+    <exec
+      program="${app.signtool}"
+      commandline='sign /t "${code.cert.timestampserver}" /fd ${code.cert.algorithm} /f ${path.code.cert} /p ${code.cert.password} /a "${app.choco.nuget}"'
+      if="${file::exists(app.signtool) and file::exists(path.code.cert) and run.nuget}"
+      failonerror="true"
+    />
+
+    <exec
+      program="${app.signtool}"
+      commandline='sign /t "${code.cert.timestampserver}" /fd ${code.cert.algorithm} /f ${path.code.cert} /p ${code.cert.password} /a "${lib.choco.nuget}"'
+      if="${file::exists(app.signtool) and file::exists(path.code.cert) and run.nuget}"
+      failonerror="true"
+    />
+
+    <foreach item="File" property="shim.filename">
+      <in>
+        <items>
+          <include name="${dirs.drop.nuget}/chocolatey/tools/chocolateyInstall/redirects/*.exe" />
+        </items>
+      </in>
+      <do>
+        <exec
+          program="${app.signtool}"
+          commandline='sign /t "${code.cert.timestampserver}" /fd ${code.cert.algorithm} /f ${path.code.cert} /p ${code.cert.password} /a "${shim.filename}"'
+          if="${file::exists(app.signtool) and file::exists(path.code.cert) and run.nuget}"
+          failonerror="true"
+        />
+      </do>
+    </foreach>
+
+    <!-- temporary - sign these as part of those tools build process -->
+    <foreach item="File" property="tools.filename">
+      <in>
+        <items>
+          <include name="${dirs.drop.nuget}/chocolatey/tools/chocolateyInstall/tools/checksum.exe" />
+          <include name="${dirs.drop.nuget}/chocolatey/tools/chocolateyInstall/tools/shimgen.exe" />
+        </items>
+      </in>
+      <do>
+        <exec
+          program="${app.signtool}"
+          commandline='sign /t "${code.cert.timestampserver}" /fd ${code.cert.algorithm} /f ${path.code.cert} /p ${code.cert.password} /a "${tools.filename}"'
+          if="${file::exists(app.signtool) and file::exists(path.code.cert) and run.nuget}"
+          failonerror="true"
+        />
+      </do>
+    </foreach>
+  </target>
+
+<!--
+$certPfx = "$env:CHOCOLATEY_OFFICIAL_CERT"
+$certPassword = Get-Content "$env:CHOCOLATEY_OFFICIAL_CERT_PASSWORD"
+$cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPfx, $certPassword)
+Set-AuthenticodeSignature -Filepath @("C:\ProgramData\chocolatey\helpers\chocolateyInstaller.psm1","C:\ProgramData\chocolatey\helpers\chocolateyProfile.psm1") -Cert $cert -TimeStampServer "http://timestamp.digicert.com" -IncludeChain NotRoot -HashAlgorithm SHA256
+-->
+
+  <target name="sign_powershell_files" description="Signs the final PowerShell files prior to packaging them up." if="${file::exists(app.powershell) and property::exists('path.code.cert')}">
+    <echo level="Warning" message="Signing the PowerShell files." />
+    <property name="apostrophe" value="'" />
+    <property name="powershell.filenames" value="remove" />
+    <foreach item="File" property="powershell.filename">
+      <in>
+        <items>
+          <!--exclude name="${dirs.drop.nuget}/chocolatey/tools/chocolateyInstall.ps1" /-->
+          <include name="${dirs.drop.nuget}/**/*.ps1" />
+          <include name="${dirs.drop.nuget}/**/*.psm1" />
+        </items>
+      </in>
+      <do>
+        <property name="powershell.filenames" value="${powershell.filenames + ', ' + apostrophe + path::get-full-path(powershell.filename) + apostrophe}" />
+      </do>
+    </foreach>
+    <property name="powershell.filenames" value="${string::replace(powershell.filenames, 'remove, ', '')}" />
+
+    <echo message="Signing PowerShell files - @(${powershell.filenames})" />
+
+    <exec
+      program="${app.powershell}"
+      commandline="$cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2('${path.code.cert}', '${code.cert.password}'); Set-AuthenticodeSignature -Filepath @(${powershell.filenames}) -Cert $cert -TimeStampServer '${code.cert.timestampserver}' -IncludeChain NotRoot -HashAlgorithm SHA256"
+      if="${file::exists(app.powershell) and string::contains(powershell.filenames,',') and file::exists(path.code.cert) and run.nuget}"
+      failonerror="true"
+    />
+  </target>
+</project>

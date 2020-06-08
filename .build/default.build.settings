@@ -60,9 +60,11 @@
 
   <property name="folder.settings" value="settings" overwrite="false" />
   <property name="dirs.settings" value="${dirs.current}${path.separator}${folder.settings}" overwrite="false" />
+  <property name="dirs.environments.settings" value="${dirs.settings}" overwrite="false" />
 
   <property name="folder.environment_files" value="environment.files" overwrite="false" />
   <property name="dirs.environment_files" value="${dirs.current}${path.separator}${folder.environment_files}" overwrite="false" />
+  <property name="dirs.build.environmentfiles" value="${dirs.build}${path.separator}${folder.environment_files}" overwrite="false" />
 
   <property name="folder.file_server" value="file.server" overwrite="false" />
   <property name="dirs.file_server" value="${dirs.current}${path.separator}${folder.file_server}" overwrite="false" />
@@ -92,7 +94,7 @@
   <property name="fail.build.on.error" value="true" />
 
   <!-- FRAMEWORKS -->
-  <!-- microsoft.framework: vb6, net-1.0, net-1.1, net-2.0, net-3.5, net-4.0, netcf-1.0, netcf-2.0, silverlight-2.0, mono-1.0, mono-2.0, mono-3.5, mono-4.0, moonlight-2.0 (Enter multiple ones with a "," to take advantage of multitargeting) -->
+  <!-- microsoft.framework: vb6, net-1.0, net-1.1, net-2.0, net-3.5, net-4.0, net-4.5, netcf-1.0, netcf-2.0, silverlight-2.0, mono-1.0, mono-2.0, mono-3.5, mono-4.0, mono-4.5, moonlight-2.0 (Enter multiple ones with a "," to take advantage of multitargeting) -->
   <property name="microsoft.framework" value="net-4.0" overwrite="false" />
   <!-- language.short: vb,cs -->
   <property name="language.short" value="cs" overwrite="false" />
@@ -186,12 +188,19 @@
 
   <property name="app.metrics" value="${dirs.program_files}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" overwrite="false" />
   <property name="app.metrics" value="${dirs.program_files_x86}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" if="${not file::exists(app.metrics)}" />
+  <property name="app.metrics" value="${dirs.program_files}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" overwrite="false" />
+  <property name="app.metrics" value="${dirs.program_files_x86}${path.separator}Microsoft Visual Studio 11.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" if="${not file::exists(app.metrics)}" />
+  <property name="app.metrics" value="${dirs.program_files_x86}${path.separator}Microsoft Visual Studio 11.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}Metrics.exe" if="${not file::exists(app.metrics)}" />
   <property name="run.metrics" value="${file::exists(app.metrics)}" overwrite="false" />
 
   <property name="app.fxcop" value="${path::get-full-path(dirs.program_files)}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}FxCopCmd.exe" overwrite="false" />
   <property name="app.fxcop" value="${path::get-full-path(dirs.program_files_x86)}${path.separator}Microsoft Visual Studio 10.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
   <property name="app.fxcop" value="${path::get-full-path(dirs.program_files)}${path.separator}Microsoft Fxcop 10.0${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
   <property name="app.fxcop" value="${path::get-full-path(dirs.program_files_x86)}${path.separator}Microsoft Fxcop 10.0${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
+  <property name="app.fxcop" value="${path::get-full-path(dirs.program_files)}${path.separator}Microsoft Visual Studio 11.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}FxCopCmd.exe" overwrite="false" />
+  <property name="app.fxcop" value="${path::get-full-path(dirs.program_files_x86)}${path.separator}Microsoft Visual Studio 11.0${path.separator}Team Tools${path.separator}Static Analysis Tools${path.separator}FxCop${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
+  <property name="app.fxcop" value="${path::get-full-path(dirs.program_files)}${path.separator}Microsoft Fxcop 11.0${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
+  <property name="app.fxcop" value="${path::get-full-path(dirs.program_files_x86)}${path.separator}Microsoft Fxcop 11.0${path.separator}FxCopCmd.exe" if="${not file::exists(app.fxcop)}" />
   <property name="app.fxcop_project" value="${project.name}.fxcop" overwrite="false" />
   <!--<property name="file.fxcop_project" value="${path::combine(dirs.solution, app.fxcop_project)}" overwrite="false" /-->
   <property name="file.fxcop_project" value="${dirs.current}${path.separator}${path_to_solution}${path.separator}${app.fxcop_project}" overwrite="false" />
@@ -216,7 +225,9 @@
   <property name="run.nuget" value="${directory::exists(dirs.nuget) and file::exists(app.nuget)}" overwrite="false" />
 
   <property name="app.ruby" value="ruby" overwrite="false" />
-  <property name="app.powershell" value="%WINDIR%${path.separator}System32${path.separator}WindowsPowerShell${path.separator}v1.0${path.separator}powershell.exe" overwrite="false" />
+  <property name="windows.dir" value="" />
+  <property name="windows.dir" value="${environment::get-variable('SystemRoot')}" if="${environment::variable-exists('SystemRoot')}" />
+  <property name="app.powershell" value="${windows.dir}${path.separator}System32${path.separator}WindowsPowerShell${path.separator}v1.0${path.separator}powershell.exe" overwrite="false" />
 
   <target name="load_uppercut_assemblies">
     <loadtasks assembly="${path.uppercut.assembly}" if="${file::exists(path.uppercut.assembly)}" />

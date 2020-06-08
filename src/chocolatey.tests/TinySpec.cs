@@ -38,6 +38,8 @@ namespace chocolatey.tests
             Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, string.Empty);
             MockLogger = new MockLogger();
             Log.InitializeWith(MockLogger);
+            // do not log trace messages
+            ILogExtensions.LogTraceMessages = false;
         }
 
         public virtual void before_everything()
@@ -145,18 +147,17 @@ namespace chocolatey.tests
         }
     }
 
-#if __MonoCS__
-     public class WindowsOnlyAttribute : IgnoreAttribute
+    public class WindowsOnlyAttribute : PlatformAttribute
     {
-        public WindowsOnlyAttribute() : base("This is a Windows only test")
+        public WindowsOnlyAttribute()
+        {
+            Exclude = "Mono, Linux, MacOsX, Linux";
+        }
+
+        public WindowsOnlyAttribute(string platforms) : base(platforms)
         {
         }
     }
-#else
-    public class WindowsOnlyAttribute : Attribute
-    {
-    }
-#endif
 
     public class IntegrationAttribute : CategoryAttribute
     {

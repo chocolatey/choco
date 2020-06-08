@@ -1,4 +1,5 @@
-﻿// Copyright © 2015 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +25,12 @@ namespace chocolatey.infrastructure.app.configuration
         public bool Disabled { get; set; }
 
         public bool Authenticated { get; set; }
+
+        public bool BypassProxy { get; set; }
+
+        public bool AllowSelfService { get; set; }
+
+        public bool VisibleToAdminOnly { get; set; }
 
         public int Priority { get; set; }
     }

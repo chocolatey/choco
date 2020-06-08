@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2019 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +16,18 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System.Collections.Concurrent;
     using configuration;
+    using results;
 
     public interface INugetService : ISourceRunner
     {
+        /// <summary>
+        ///   Get outdated packages
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config);
+
         /// <summary>
         ///   Run pack in noop mode.
         /// </summary>
@@ -48,5 +57,6 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="packageName">Name of the package.</param>
         void remove_rollback_directory_if_exists(string packageName);
+
     }
 }

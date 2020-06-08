@@ -7,4 +7,10 @@ SET DIR=%~d0%~p0%
 echo Make sure you have webtransform here for the merge. Continue?
 pause
 
-%DIR%..\ILMerge\ILMerge.exe NuGet.Core.dll /keyfile:%DIR%..\..\chocolatey.snk /out:%DIR%NuGet.Core.dll /targetplatform:v4,"%ProgramFiles(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /log:%DIR%ILMerge.DELETE.log /ndebug /allowDup
+mkdir %DIR%\output
+
+%DIR%..\ILMerge\ILMerge.exe NuGet.Core.dll /keyfile:%DIR%..\..\chocolatey.snk /out:%DIR%\output\NuGet.Core.dll /targetplatform:v4,"%ProgramFiles(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /log:%DIR%ILMerge.DELETE.log /allowDup
+REM %DIR%..\ILMerge\ILMerge.exe NuGet.Core.dll /keyfile:%DIR%..\..\chocolatey.snk /out:%DIR%NuGet.Core.dll /targetplatform:v4,"%ProgramFiles(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /log:%DIR%ILMerge.DELETE.log /ndebug /allowDup
+
+echo Copy the files from the output directory up to this directory and delete everything but this file, NuGet.Core.dll and NuGet.Core.pdb.
+pause

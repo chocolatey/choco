@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -80,14 +81,15 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="config">The configuration.</param>
         /// <param name="continueAction">The action to continue with for each noop test upgrade.</param>
         ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction);
-        
+
         /// <summary>
         ///   Upgrades packages from NuGet related feeds
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
+        /// <param name="beforeUpgradeAction">The action (if any) to run on any currently installed package before triggering the upgrade.</param>
         /// <returns>results of installs</returns>
-        ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction);
+        ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction = null);
 
         /// <summary>
         ///   Run uninstall in noop mode
@@ -101,7 +103,8 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
+        /// <param name="beforeUninstallAction">The action (if any) to run on any currently installed package before triggering the uninstall.</param>
         /// <returns>results of installs</returns>
-        ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction);
+        ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUninstallAction = null);
     }
 }

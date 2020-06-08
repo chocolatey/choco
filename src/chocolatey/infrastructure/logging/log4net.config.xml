@@ -12,12 +12,10 @@
     <mapping>
       <level value="ERROR" />
       <foreColor value="Red" />
-      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="WARN" />
       <foreColor value="Yellow" />
-      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="INFO" />
@@ -52,12 +50,10 @@
     <mapping>
       <level value="WARN" />
       <foreColor value="Magenta" />
-      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="INFO" />
       <foreColor value="Green" />
-      <backColor value="Black" />
     </mapping>
     <mapping>
       <level value="DEBUG" />
@@ -106,8 +102,43 @@
       <param name="LevelMin" value="ERROR" />
       <param name="LevelMax" value="FATAL" />
     </filter>
-  </appender>
+  </appender> 
   
+  <appender name="TraceLoggingColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
+    <mapping>
+      <level value="FATAL" />
+      <foreColor value="White" />
+      <backColor value="Red" />
+    </mapping>
+    <mapping>
+      <level value="ERROR" />
+      <foreColor value="Red" />
+      <backColor value="Black" />
+    </mapping>
+    <mapping>
+      <level value="WARN" />
+      <foreColor value="DarkMagenta" />
+      <backColor value="Black" />
+    </mapping>
+    <mapping>
+      <level value="INFO" />
+      <foreColor value="DarkGreen" />
+      <backColor value="Black" />
+    </mapping>
+    <mapping>
+      <level value="DEBUG" />
+      <foreColor value="DarkBlue" />
+      <backColor value="Gray" />
+    </mapping>
+    <layout type="log4net.Layout.PatternLayout">
+      <conversionPattern value="%message%newline" />
+    </layout>
+    <filter type="log4net.Filter.LevelRangeFilter">
+      <param name="LevelMin" value="FATAL" />
+      <param name="LevelMax" value="FATAL" />
+    </filter>
+  </appender>
+
   <root>
     <level value="DEBUG" />
   </root>
@@ -115,19 +146,28 @@
   <logger name="Important">
     <level value="DEBUG" />
     <appender-ref ref="ImportantLoggingColoredConsoleAppender" />
-  </logger>  
-  
+  </logger>
+
   <logger name="Verbose">
     <level value="DEBUG" />
     <appender-ref ref="VerboseLoggingColoredConsoleAppender" />
   </logger>
 
+  <logger name="Trace">
+    <level value="DEBUG" />
+    <appender-ref ref="TraceLoggingColoredConsoleAppender" />
+  </logger>
+
   <logger name="chocolatey">
     <level value="DEBUG"/>
     <appender-ref ref="NormalLoggingColoredConsoleAppender" />
-  </logger>  
-  
-  <logger name="logfile">
+  </logger>
+
+  <logger name="LogFileOnly">
+    <level value="DEBUG"/>
+  </logger>
+
+  <logger name="Rhino.Licensing">
     <level value="DEBUG"/>
   </logger>
 

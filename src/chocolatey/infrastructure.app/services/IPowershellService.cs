@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +16,10 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
+    using System.Management.Automation.Runspaces;
     using configuration;
+    using NuGet;
     using results;
 
     public interface IPowershellService
@@ -47,5 +51,22 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="packageResult">The package result.</param>
         /// <returns>true if the chocolateyUninstall.ps1 was found, even if it has failures</returns>
         bool uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
+
+        /// <summary>
+        ///   Noops the specified package before modify operation.
+        /// </summary>
+        /// <param name="packageResult">The package result.</param>
+        void before_modify_noop(PackageResult packageResult);
+
+        /// <summary>
+        ///   Runs any before modification script on the specified package.
+        /// </summary>
+        /// <param name="configuration">The configuration</param>
+        /// <param name="packageResult">The package result.</param>
+        /// <returns>true if the chocolateyBeforeModify.ps1 was found, even if it has failures</returns>
+        bool before_modify(ChocolateyConfiguration configuration, PackageResult packageResult);
+
+        void prepare_powershell_environment(IPackage package, ChocolateyConfiguration configuration, string packageDirectory);
+        PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript);
     }
 }

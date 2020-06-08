@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +28,7 @@ namespace chocolatey.infrastructure.configuration
 
         /// <summary>
         ///   Initializes application configuration with a configuration instance.
+        ///   DO NOT USE with API. Use `GetChocolatey` methods - accessing this directly in API can cause very bad side effects.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -36,7 +38,8 @@ namespace chocolatey.infrastructure.configuration
         }
 
         /// <summary>
-        ///   Gets the configuration settings.
+        ///   Gets the configuration settings. 
+        ///   DO NOT USE with API. Use `GetChocolatey` methods - accessing this directly in API can cause very bad side effects.
         /// </summary>
         /// <returns>
         ///   An instance of <see cref="ChocolateyConfiguration" /> if one has been initialized; defaults to new instance of

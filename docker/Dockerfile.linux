@@ -1,0 +1,21 @@
+FROM mono:5.20.1.19
+
+MAINTAINER Justin Phelps <linuturk@onitato.com>
+
+RUN apt-get update && apt-get install git -y
+
+COPY . /usr/local/src/choco/
+
+WORKDIR /usr/local/src/choco
+RUN chmod +x build.sh
+RUN chmod +x zip.sh
+RUN ./build.sh
+
+WORKDIR /usr/local/bin
+RUN ln -s /usr/local/src/choco/code_drop/chocolatey
+
+COPY docker/choco_wrapper /usr/local/bin/choco
+
+ENV ChocolateyInstall /usr/local/bin/chocolatey
+
+WORKDIR /root

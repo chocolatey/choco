@@ -32,9 +32,30 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'NoResources|AnyCPU'">
+    <OutputPath>bin\NoResources\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficial|AnyCPU'">
+    <OutputPath>bin\ReleaseOfficial\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="bdddoc">
       <HintPath>..\..\lib\bdddoc\bdddoc.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-client\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
@@ -87,6 +108,7 @@
     <Compile Include="Scenario.cs" />
     <Compile Include="scenarios\InstallScenarios.cs" />
     <Compile Include="scenarios\ListScenarios.cs" />
+    <Compile Include="scenarios\PackScenarios.cs" />
     <Compile Include="scenarios\PinScenarios.cs" />
     <Compile Include="scenarios\UninstallScenarios.cs" />
     <Compile Include="scenarios\UpgradeScenarios.cs" />
@@ -96,106 +118,321 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="context\badpackage\badpackage.1.0.nupkg">
+    <None Include="context\badpackage\1.0\badpackage.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\badpackage\badpackage.2.0.nupkg">
+    <None Include="context\badpackage\1.0\tools\chocolateyInstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\badpackage\badpackage.nuspec" />
-    <None Include="context\badpackage\tools\chocolateyInstall.ps1" />
-    <None Include="context\badpackage\tools\chocolateyUninstall.ps1" />
-    <None Include="context\conflictingdependency\conflictingdependency.1.0.1.nupkg">
+    <None Include="context\badpackage\1.0\tools\chocolateyUninstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\conflictingdependency\conflictingdependency.2.0.0.nupkg">
+    <None Include="context\badpackage\2.0\badpackage.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\conflictingdependency\conflictingdependency.2.1.0.nupkg">
+    <None Include="context\badpackage\2.0\tools\chocolateyInstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\conflictingdependency\conflictingdependency.nuspec" />
-    <None Include="context\conflictingdependency\tools\chocolateyinstall.ps1" />
-    <None Include="context\conflictingdependency\tools\chocolateyuninstall.ps1" />
-    <None Include="context\hasdependency\hasdependency.1.0.0.nupkg">
+    <None Include="context\badpackage\2.0\tools\chocolateyUninstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\hasdependency\hasdependency.1.0.1.nupkg">
+    <None Include="context\dependencies\conflictingdependency\1.0.1\conflictingdependency.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\hasdependency\hasdependency.1.1.0.nupkg">
+    <None Include="context\dependencies\conflictingdependency\1.0.1\tools\chocolateyinstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\hasdependency\hasdependency.1.5.0.nupkg">
+    <None Include="context\dependencies\conflictingdependency\1.0.1\tools\chocolateyuninstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\hasdependency\hasdependency.1.6.0.nupkg">
+    <None Include="context\dependencies\conflictingdependency\2.0.0\conflictingdependency.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\hasdependency\hasdependency.2.0.0.nupkg">
+    <None Include="context\dependencies\conflictingdependency\2.0.0\tools\chocolateyinstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\hasdependency\hasdependency.2.1.0.nupkg">
+    <None Include="context\dependencies\conflictingdependency\2.0.0\tools\chocolateyuninstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\hasdependency\hasdependency.nuspec" />
-    <None Include="context\hasdependency\tools\chocolateyinstall.ps1" />
-    <None Include="context\hasdependency\tools\chocolateyuninstall.ps1" />
-    <None Include="context\installpackage\installpackage.1.0.0.nupkg">
+    <None Include="context\dependencies\conflictingdependency\2.1.0\conflictingdependency.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\installpackage\installpackage.nuspec" />
-    <None Include="context\installpackage\tools\Casemismatch.exe.ignore" />
-    <None Include="context\installpackage\tools\chocolateyinstall.ps1" />
-    <None Include="context\installpackage\tools\chocolateyuninstall.ps1" />
-    <None Include="context\installpackage\tools\graphical.exe.gui" />
-    <None Include="context\installpackage\tools\not.installed.exe.ignore" />
-    <None Include="context\isdependency\isdependency.1.0.0.nupkg">
+    <None Include="context\dependencies\conflictingdependency\2.1.0\tools\chocolateyinstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\isdependency\isdependency.1.0.1.nupkg">
+    <None Include="context\dependencies\conflictingdependency\2.1.0\tools\chocolateyuninstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\isdependency\isdependency.1.1.0.nupkg">
+    <None Include="context\dependencies\conflict_with_dependency_tree\childdependencywithlooserversiondependency\1.0.0\childdependencywithlooserversiondependency.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\isdependency\isdependency.2.0.0.nupkg">
+    <None Include="context\dependencies\conflict_with_dependency_tree\toplevelhasexactversiondependency\1.0.0\toplevelhasexactversiondependency.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\isdependency\isdependency.2.1.0.nupkg">
+    <None Include="context\dependencies\hasdependency\1.0.0\hasdependency.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\isdependency\isdependency.nuspec" />
-    <None Include="context\isdependency\tools\chocolateyinstall.ps1" />
-    <None Include="context\isdependency\tools\chocolateyuninstall.ps1" />
-    <None Include="context\isexactversiondependency\isexactversiondependency.1.0.0.nupkg">
+    <None Include="context\dependencies\hasdependency\1.0.0\tools\chocolateyinstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\isexactversiondependency\isexactversiondependency.1.0.1.nupkg">
+    <None Include="context\dependencies\hasdependency\1.0.0\tools\chocolateyuninstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\isexactversiondependency\isexactversiondependency.1.1.0.nupkg">
+    <None Include="context\dependencies\hasdependency\1.0.1\hasdependency.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\isexactversiondependency\isexactversiondependency.2.0.0.nupkg">
+    <None Include="context\dependencies\hasdependency\1.0.1\tools\chocolateyinstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\isexactversiondependency\isexactversiondependency.nuspec" />
-    <None Include="context\isexactversiondependency\tools\chocolateyinstall.ps1" />
-    <None Include="context\isexactversiondependency\tools\chocolateyuninstall.ps1" />
+    <None Include="context\dependencies\hasdependency\1.0.1\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\1.1.0\hasdependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\1.1.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\1.1.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\1.5.0\hasdependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\1.5.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\1.5.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\1.6.0\hasdependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\1.6.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\1.6.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\2.0.0\hasdependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\2.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\2.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\2.1.0\hasdependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\2.1.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\hasdependency\2.1.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\exactpackage\exactpackage.dontfind\1.0.0\exactpackage.dontfind.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\exactpackage\exactpackage\1.0.0\exactpackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\installpackage\1.0.0\installpackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\installpackage\1.0.0\tools\Casemismatch.exe.ignore">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\installpackage\1.0.0\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\installpackage\1.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\installpackage\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\installpackage\1.0.0\tools\graphical.exe.gui">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\installpackage\1.0.0\tools\not.installed.exe.ignore">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\1.0.0\isdependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\1.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\1.0.1\isdependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\1.0.1\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\1.0.1\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\1.1.0\isdependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\1.1.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\1.1.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\2.0.0\isdependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\2.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\2.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\2.1.0\isdependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\2.1.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isdependency\2.1.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\1.0.0\isexactversiondependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\1.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\1.0.1\isexactversiondependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\1.0.1\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\1.0.1\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\1.1.0\isexactversiondependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\1.1.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\1.1.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\2.0.0\isexactversiondependency.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\2.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependencies\isexactversiondependency\2.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\nonterminatingerror\1.0\nonterminatingerror.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\nonterminatingerror\1.0\tools\chocolateyInstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\testing.packages.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\upgradepackage\tools\chocolateyinstall.ps1" />
-    <None Include="context\upgradepackage\tools\chocolateyuninstall.ps1" />
-    <None Include="context\upgradepackage\tools\graphical.exe.gui" />
-    <None Include="context\upgradepackage\upgradepackage.1.0.0.nupkg">
+    <None Include="context\upgradepackage\1.0.0\tools\chocolateyBeforeModify.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\upgradepackage\upgradepackage.1.1.0.nupkg">
+    <None Include="context\upgradepackage\1.0.0\tools\chocolateyinstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="context\upgradepackage\upgradepackage.nuspec" />
+    <None Include="context\upgradepackage\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.0.0\tools\console.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.0.0\tools\console.exe.config.install.xdt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.0.0\tools\graphical.exe.gui">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.0.0\upgradepackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.0\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.0\tools\console.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.0\tools\console.exe.config.install.xdt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.0\tools\graphical.exe.gui">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.0\upgradepackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta2\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta2\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta2\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta2\tools\console.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta2\tools\console.exe.config.install.xdt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta2\tools\graphical.exe.gui">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta2\upgradepackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta\tools\console.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta\tools\console.exe.config.install.xdt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta\tools\graphical.exe.gui">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta\upgradepackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -215,12 +452,48 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="context\installpackage\tools\casemismatch.exe" />
-    <Content Include="context\installpackage\tools\console.exe" />
-    <Content Include="context\installpackage\tools\graphical.exe" />
-    <Content Include="context\installpackage\tools\not.installed.exe" />
-    <Content Include="context\upgradepackage\tools\console.exe" />
-    <Content Include="context\upgradepackage\tools\graphical.exe" />
+    <None Include="context\installpackage\1.0.0\tools\casemismatch.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\installpackage\1.0.0\tools\console.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\installpackage\1.0.0\tools\graphical.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\installpackage\1.0.0\tools\not.installed.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.0.0\tools\console.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.0.0\tools\graphical.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.0\tools\console.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.0\tools\graphical.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="context\exactpackage\exactpackage.dontfind\1.0.0\tools\purpose.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="context\exactpackage\exactpackage\1.0.0\tools\purpose.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="context\upgradepackage\1.1.1-beta2\tools\console.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta2\tools\graphical.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta\tools\console.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\upgradepackage\1.1.1-beta\tools\graphical.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="infrastructure\filesystem\CopyMe.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

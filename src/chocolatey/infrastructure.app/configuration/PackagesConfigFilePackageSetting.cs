@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,6 +40,12 @@ namespace chocolatey.infrastructure.app.configuration
 
         [XmlAttribute(AttributeName = "packageParameters")]
         public string PackageParameters { get; set; }
+
+        [XmlAttribute(AttributeName = "applyPackageParametersToDependencies")]
+        public bool ApplyPackageParametersToDependencies { get; set; }
+
+        [XmlAttribute(AttributeName = "applyInstallArgumentsToDependencies")]
+        public bool ApplyInstallArgumentsToDependencies { get; set; }
 
         [XmlAttribute(AttributeName = "forceX86")]
         public bool ForceX86 { get; set; }

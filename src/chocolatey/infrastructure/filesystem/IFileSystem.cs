@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -121,8 +122,8 @@ namespace chocolatey.infrastructure.filesystem
         ///   Determines the file information given a path to an existing file
         /// </summary>
         /// <param name="filePath">Path to an existing file</param>
-        /// <returns>FileInfo object</returns>
-        FileInfo get_file_info_for(string filePath);
+        /// <returns>FileInfo object or reimplementation of a FileInfo object that works with greater than 260 chars</returns>
+        dynamic get_file_info_for(string filePath);
 
         /// <summary>
         ///   Gets the file mod date.
@@ -148,37 +149,37 @@ namespace chocolatey.infrastructure.filesystem
         /// <summary>
         ///   Determines if a file is a system file
         /// </summary>
-        /// <param name="file">File to check</param>
+        /// <param name="file">File to check - FileInfo or some representation of FileInfo</param>
         /// <returns>True if the file has the System attribute marked, otherwise false</returns>
-        bool is_system_file(FileInfo file);
+        bool is_system_file(dynamic file);
 
         /// <summary>
         ///   Determines if a file is a read only file
         /// </summary>
-        /// <param name="file">File to check</param>
+        /// <param name="file">File to check - FileInfo or some representation of FileInfo</param>
         /// <returns>True if the file has the ReadOnly attribute marked, otherwise false</returns>
-        bool is_readonly_file(FileInfo file);
+        bool is_readonly_file(dynamic file);
         
         /// <summary>
         ///   Determines if a file is a hidden file
         /// </summary>
-        /// <param name="file">File to check</param>
+        /// <param name="file">File to check - FileInfo or some representation of FileInfo</param>
         /// <returns>True if the file has the Hidden attribute marked, otherwise false</returns>
-        bool is_hidden_file(FileInfo file);
+        bool is_hidden_file(dynamic file);
 
         /// <summary>
         ///   Determines if a file is encrypted or not
         /// </summary>
-        /// <param name="file">File to check</param>
+        /// <param name="file">File to check - FileInfo or some representation of FileInfo</param>
         /// <returns>True if the file has the Encrypted attribute marked, otherwise false</returns>
-        bool is_encrypted_file(FileInfo file);
+        bool is_encrypted_file(dynamic file);
 
         /// <summary>
         ///   Determines the older of the file dates, Creation Date or Modified Date
         /// </summary>
-        /// <param name="file">File to analyze</param>
+        /// <param name="file">File to analyze - FileInfo or some representation of FileInfo</param>
         /// <returns>The oldest date on the file</returns>
-        string get_file_date(FileInfo file);
+        string get_file_date(dynamic file);
 
         /// <summary>
         ///   Moves a specified file to a new location, providing the option to specify a new file name.
@@ -203,6 +204,14 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="overwriteExisting">If there is an existing file already there, would you like to delete it?</param>
         /// <returns>true if copy was successful, otherwise false</returns>
         bool copy_file_unsafe(string sourceFilePath, string destinationFilePath, bool overwriteExisting);
+
+        /// <summary>
+        ///   Replace an existing file.
+        /// </summary>
+        /// <param name="sourceFilePath">Where is the file now?</param>
+        /// <param name="destinationFilePath">Where would you like it to go?</param>
+        /// <param name="backupFilePath">Where should the existing file be placed? Null if nowhere.</param>
+        void replace_file(string sourceFilePath, string destinationFilePath, string backupFilePath);
 
         /// <summary>
         ///   Deletes the specified file.
@@ -237,6 +246,13 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="filePath">Path to the file name</param>
         /// <returns>A file stream object for use after accessing the file</returns>
         FileStream open_file_readonly(string filePath);
+
+        /// <summary>
+        ///   Opens a file exlusively
+        /// </summary>
+        /// <param name="filePath">Path to the file name</param>
+        /// <returns>A file stream object for use after accessing the file</returns>
+        FileStream open_file_exclusive(string filePath);
 
         /// <summary>
         ///   Writes the file text to the specified path
@@ -304,15 +320,15 @@ namespace chocolatey.infrastructure.filesystem
         ///   Returns a DirectoryInfo object from a string
         /// </summary>
         /// <param name="directoryPath">Full path to the directory you want the directory information for</param>
-        /// <returns>DirectoryInfo object</returns>
-        DirectoryInfo get_directory_info_for(string directoryPath);
+        /// <returns>DirectoryInfo object or reimplementation of a DirectoryInfo object that works with greater than 248 chars</returns>
+        dynamic get_directory_info_for(string directoryPath);
 
         /// <summary>
         ///   Returns a DirectoryInfo object from a string to a filepath
         /// </summary>
         /// <param name="filePath">Full path to the file you want directory information for</param>
-        /// <returns>DirectoryInfo object</returns>
-        DirectoryInfo get_directory_info_from_file_path(string filePath);
+        /// <returns>DirectoryInfo object or reimplementation of a DirectoryInfo object that works with greater than 248 chars</returns>
+        dynamic get_directory_info_from_file_path(string filePath);
 
         /// <summary>
         ///   Creates all directories and subdirectories in the specified path.
@@ -357,11 +373,20 @@ namespace chocolatey.infrastructure.filesystem
         void delete_directory(string directoryPath, bool recursive, bool overrideAttributes);
 
         /// <summary>
+        ///  Deletes a directory
+        /// </summary>
+        /// <param name="directoryPath">The directory path.</param>
+        /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
+        /// <param name="overrideAttributes">Override the attributes, e.g. delete readonly and/or system files.</param>
+        /// <param name="isSilent">Should this method be silent? false by default</param>
+        void delete_directory(string directoryPath, bool recursive, bool overrideAttributes, bool isSilent);
+
+        /// <summary>
         ///   Deletes a directory if it exists
         /// </summary>
         /// <param name="directoryPath">The directory path.</param>
         /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
-        void delete_directory_if_exists(string directoryPath, bool recursive);
+        void delete_directory_if_exists(string directoryPath, bool recursive);      
 
         /// <summary>
         /// Deletes a directory if it exists
@@ -370,6 +395,15 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
         /// <param name="overrideAttributes">Override the attributes, e.g. delete readonly and/or system files.</param>
         void delete_directory_if_exists(string directoryPath, bool recursive, bool overrideAttributes);
+
+        /// <summary>
+        /// Deletes a directory if it exists
+        /// </summary>
+        /// <param name="directoryPath">The directory path.</param>
+        /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
+        /// <param name="overrideAttributes">Override the attributes, e.g. delete readonly and/or system files.</param>
+        /// <param name="isSilent">Should this method be silent? false by default</param>
+        void delete_directory_if_exists(string directoryPath, bool recursive, bool overrideAttributes, bool isSilent);
 
         #endregion
 

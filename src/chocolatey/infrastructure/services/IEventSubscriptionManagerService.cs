@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +29,7 @@ namespace chocolatey.infrastructure.services
         /// </summary>
         /// <typeparam name="Event">The type of the event.</typeparam>
         /// <param name="eventMessage">The message to publish.</param>
-        void publish<Event>(Event eventMessage) where Event : class, IEvent;
+        void publish<Event>(Event eventMessage) where Event : class, IMessage;
 
         /// <summary>
         ///   Subscribes to the specified event.
@@ -38,6 +39,6 @@ namespace chocolatey.infrastructure.services
         /// <param name="handleError">The error handler.</param>
         /// <param name="filter">The message filter.</param>
         /// <returns>The subscription as Disposable</returns>
-        IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IEvent;
+        IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage;
     }
 }

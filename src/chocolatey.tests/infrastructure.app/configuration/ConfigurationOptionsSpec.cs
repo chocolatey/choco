@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,11 +21,11 @@ namespace chocolatey.tests.infrastructure.app.configuration
     using System.IO;
     using System.Linq;
     using System.Text;
-    using Moq;
-    using Should;
     using chocolatey.infrastructure.adapters;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.commandline;
+    using Moq;
+    using Should;
 
     public class ConfigurationOptionsSpec
     {
@@ -39,13 +40,15 @@ namespace chocolatey.tests.infrastructure.app.configuration
 
             protected Mock<IConsole> console = new Mock<IConsole>();
             protected static StringBuilder helpMessageContents = new StringBuilder();
-            protected TextWriter writer = new StringWriter(helpMessageContents);
+            protected TextWriter errorWriter = new StringWriter(helpMessageContents);
+            protected TextWriter outputWriter = new StringWriter(helpMessageContents);
 
             public override void Context()
             {
                 ConfigurationOptions.initialize_with(new Lazy<IConsole>(() => console.Object));
                 ConfigurationOptions.reset_options();
-                console.Setup((c) => c.Error).Returns(writer);
+                console.Setup((c) => c.Error).Returns(errorWriter);
+                console.Setup((c) => c.Out).Returns(outputWriter);
             }
 
             protected Action because;
@@ -73,11 +76,11 @@ namespace chocolatey.tests.infrastructure.app.configuration
             public void should_set_help_options_by_default()
             {
                 setOptions = set =>
-                    {
-                        set.Contains("h").ShouldBeTrue();
-                        set.Contains("help").ShouldBeTrue();
-                        set.Contains("?").ShouldBeTrue();
-                    };
+                {
+                    set.Contains("h").ShouldBeTrue();
+                    set.Contains("help").ShouldBeTrue();
+                    set.Contains("?").ShouldBeTrue();
+                };
                 because();
             }
 
@@ -112,10 +115,7 @@ namespace chocolatey.tests.infrastructure.app.configuration
             public void should_not_run_validate_configuration_when_help_is_requested()
             {
                 args.Add("-h");
-                validateConfiguration = () =>
-                {
-                    "should".ShouldEqual("not be reached");
-                };
+                validateConfiguration = () => { "should".ShouldEqual("not be reached"); };
 
                 because();
             }
@@ -124,10 +124,7 @@ namespace chocolatey.tests.infrastructure.app.configuration
             public void should_run_validate_configuration_unless_help_is_requested()
             {
                 var wasCalled = false;
-                validateConfiguration = () =>
-                    {
-                        wasCalled = true;
-                    };
+                validateConfiguration = () => { wasCalled = true; };
 
                 because();
 
@@ -139,10 +136,10 @@ namespace chocolatey.tests.infrastructure.app.configuration
             {
                 var wasCalled = false;
                 afterParse = list =>
-                    {
-                        wasCalled = true;
-                        list.ShouldBeEmpty();
-                    };
+                {
+                    wasCalled = true;
+                    list.ShouldBeEmpty();
+                };
 
                 because();
 
@@ -155,10 +152,10 @@ namespace chocolatey.tests.infrastructure.app.configuration
                 args.Add("-h");
                 var wasCalled = false;
                 afterParse = list =>
-                    {
-                        wasCalled = true;
-                        list.ShouldBeEmpty();
-                    };
+                {
+                    wasCalled = true;
+                    list.ShouldBeEmpty();
+                };
 
                 because();
 
@@ -171,10 +168,10 @@ namespace chocolatey.tests.infrastructure.app.configuration
                 args.Add("--what-is=this");
                 var wasCalled = false;
                 afterParse = list =>
-                    {
-                        wasCalled = true;
-                        list.ShouldContain(args.First());
-                    };
+                {
+                    wasCalled = true;
+                    list.ShouldContain(args.First());
+                };
 
                 because();
 
@@ -187,10 +184,10 @@ namespace chocolatey.tests.infrastructure.app.configuration
                 args.Add("dude");
                 var wasCalled = false;
                 afterParse = list =>
-                    {
-                        wasCalled = true;
-                        list.ShouldContain(args.First());
-                    };
+                {
+                    wasCalled = true;
+                    list.ShouldContain(args.First());
+                };
 
                 because();
 
@@ -204,10 +201,10 @@ namespace chocolatey.tests.infrastructure.app.configuration
                 args.Add("/dude");
                 var wasCalled = false;
                 afterParse = list =>
-                    {
-                        wasCalled = true;
-                        list.ShouldContain(args.First());
-                    };
+                {
+                    wasCalled = true;
+                    list.ShouldContain(args.First());
+                };
 
                 because();
 
@@ -261,11 +258,11 @@ namespace chocolatey.tests.infrastructure.app.configuration
             public void should_set_option_when_specified_as_single_dash_for_timmy_and_other_option_short_values_are_passed_the_same_way()
             {
                 setOptions = set =>
-                    {
-                        set.Add("timmy", "sets the timmy switch", option => config.Verbose = option != null);
-                        set.Add("s|skip", "sets the skip switch", option => config.SkipPackageInstallProvider = option != null);
-                        set.Add("d|debug", "sets the debug switch", option => config.Debug = option != null);
-                    };
+                {
+                    set.Add("timmy", "sets the timmy switch", option => config.Verbose = option != null);
+                    set.Add("s|skip", "sets the skip switch", option => config.SkipPackageInstallProvider = option != null);
+                    set.Add("d|debug", "sets the debug switch", option => config.Debug = option != null);
+                };
                 args.Add("-timmy");
                 args.Add("-sd");
 
@@ -280,11 +277,11 @@ namespace chocolatey.tests.infrastructure.app.configuration
             public void should_set_option_when_specified_as_single_dash_for_lo_and_other_option_short_values_are_passed_the_same_way()
             {
                 setOptions = set =>
-                    {
-                        set.Add("lo|local-only", "sets the lo switch", option => config.ListCommand.LocalOnly = option != null);
-                        set.Add("l|lskip", "sets the skip switch", option => config.SkipPackageInstallProvider = option != null);
-                        set.Add("m|mdebug", "sets the debug switch", option => config.Debug = option != null);
-                    };
+                {
+                    set.Add("lo|local-only", "sets the lo switch", option => config.ListCommand.LocalOnly = option != null);
+                    set.Add("l|lskip", "sets the skip switch", option => config.SkipPackageInstallProvider = option != null);
+                    set.Add("m|mdebug", "sets the debug switch", option => config.Debug = option != null);
+                };
                 args.Add("-lo");
                 args.Add("-ml");
 
@@ -299,16 +296,33 @@ namespace chocolatey.tests.infrastructure.app.configuration
             [Fact]
             public void should_show_help_menu_when_passing_bundled_options_that_do_not_exist()
             {
-                setOptions = set =>
-                    {
-                        set.Add("w|wdebug", "sets the debug switch", option => config.Debug = option != null);
-                    };
+                setOptions = set => { set.Add("w|wdebug", "sets the debug switch", option => config.Debug = option != null); };
                 args.Add("-wz");
 
                 because();
 
                 config.Debug.ShouldBeFalse();
                 helpMessageContents.ToString().ShouldNotBeEmpty();
+            }
+
+            [Fact]
+            public void should_successfully_parse_help_option()
+            {
+                args.Add("-h");
+
+                because();
+
+                config.UnsuccessfulParsing.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_parse_unknown_option()
+            {
+                args.Add("-unknown");
+
+                because();
+
+                config.UnsuccessfulParsing.ShouldBeTrue();
             }
         }
     }

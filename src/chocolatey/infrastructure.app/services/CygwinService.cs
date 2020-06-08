@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -207,7 +208,7 @@ namespace chocolatey.infrastructure.app.services
         public void install_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
             var args = build_args(config, _installArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(get_exe(_rootDirectory), args));
+            this.Log().Info("Would have run '{0} {1}'".format_with(get_exe(_rootDirectory).escape_curly_braces(), args.escape_curly_braces()));
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
@@ -228,7 +229,7 @@ namespace chocolatey.infrastructure.app.services
                         {
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage));
+                            this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
 
                             if (InstalledRegex.IsMatch(logMessage))
                             {
@@ -242,7 +243,7 @@ namespace chocolatey.infrastructure.app.services
                         {
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage));
+                            this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
                         },
                     updateProcessPath: false,
                     allowUseWindow: true
@@ -263,7 +264,7 @@ namespace chocolatey.infrastructure.app.services
             return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction = null)
         {
             throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
         }
@@ -273,7 +274,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement uninstall".format_with(APP_NAME));
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUninstallAction = null)
         {
             throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
         }

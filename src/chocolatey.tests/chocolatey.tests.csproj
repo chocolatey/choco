@@ -31,10 +31,27 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'NoResources|AnyCPU'">
+    <OutputPath>bin\NoResources\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficial|AnyCPU'">
+    <OutputPath>bin\ReleaseOfficial\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-client\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
@@ -62,11 +79,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GetChocolateySpecs.cs" />
     <Compile Include="infrastructure.app\attributes\CommandForAttributeSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyApiKeyCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyConfigCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyFeatureCommandSpecs.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyInfoCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInstallCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyNewCommandSpecs.cs" />
@@ -79,16 +96,18 @@
     <Compile Include="infrastructure.app\commands\ChocolateyUnpackSelfCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommandSpecs.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigurationOptionsSpec.cs" />
+    <Compile Include="infrastructure.app\nuget\NugetCommonSpecs.cs" />
     <Compile Include="infrastructure.app\services\AutomaticUninstallerServiceSpecs.cs" />
     <Compile Include="infrastructure.app\services\FilesServiceSpecs.cs" />
     <Compile Include="infrastructure.app\services\NugetServiceSpecs.cs" />
     <Compile Include="infrastructure.app\services\RegistryServiceSpecs.cs" />
+    <Compile Include="infrastructure.app\services\TemplateServiceSpecs.cs" />
     <Compile Include="infrastructure\commands\ExternalCommandArgsBuilderSpecs.cs" />
     <Compile Include="infrastructure\commandline\InteractivePromptSpecs.cs" />
     <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />
     <Compile Include="infrastructure\commands\PowershellExecutorSpecs.cs" />
     <Compile Include="infrastructure\configuration\ConfigSpecs.cs" />
-    <Compile Include="infrastructure\cryptography\CrytpoHashProvider.cs" />
+    <Compile Include="infrastructure\cryptography\CrytpoHashProviderSpecs.cs" />
     <Compile Include="infrastructure\events\context\FakeEvent.cs" />
     <Compile Include="infrastructure\events\context\FakeSubscriber.cs" />
     <Compile Include="infrastructure\events\EventSubscriptionManagerSpecs.cs" />
@@ -118,9 +137,7 @@
       <Name>chocolatey.console</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="infrastructure.app\nuget\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

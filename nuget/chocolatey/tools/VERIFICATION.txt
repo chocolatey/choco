@@ -1,0 +1,23 @@
+Chocolatey comes from Chocolatey Software.
+
+To verify the binaries:
+
+* Ensure you have Git installed.
+* Run `git clone https://github.com/chocolatey/choco.git`
+* Switch to the tag of the released version. For instance: 
+    `git checkout 0.10.11`
+* Run `build.bat` (`.\build.bat` in PowerShell)
+* Once that is successfully completed, head into code_drop\chocolatey\console 
+    folder where you will find choco.exe.
+* Verify the checksum you find there with the checksum shown on the package 
+    page of the community repository.
+
+NOTE: For prereleases we don't always post a tag. However, the version of 
+      choco.exe in those prereleases does carry the git SHA as part of the 
+      version (informational version). So you can start out with downloading
+      the package (left menu on the community repo), then extract that as a 
+      zip file. If you right click on the choco.exe at the top level of 
+      tools\chocolateyInstall and choose "Properties", click on "Details", then
+      look at Product Version, you can see the SHA there. You would check out 
+      that specific SHA and then run the build.
+      

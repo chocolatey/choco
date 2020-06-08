@@ -23,12 +23,28 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'NoResources|AnyCPU'">
+    <OutputPath>bin\NoResources\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficial|AnyCPU'">
+    <OutputPath>bin\ReleaseOfficial\</OutputPath>
+    <DefineConstants>TRACE;FORCE_CHOCOLATEY_OFFICIAL_KEY</DefineConstants>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -44,13 +60,12 @@
   <ItemGroup>
     <EmbeddedResource Include="helpers\chocolateyInstaller.psm1" />
     <EmbeddedResource Include="helpers\functions\Format-FileSize.ps1" />
-    <EmbeddedResource Include="helpers\functions\Get-BinRoot.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-CheckSumValid.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-ChocolateyUnzip.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-ChocolateyWebFile.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-FtpFile.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-Installed.ps1" />
-    <EmbeddedResource Include="helpers\functions\Get-ProcessorBits.ps1" />
+    <EmbeddedResource Include="helpers\functions\Get-OSArchitectureWidth.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-UACEnabled.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-VirusCheckValid.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-WebFile.ps1" />
@@ -84,8 +99,6 @@
     <EmbeddedResource Include="redirects\cuninst.exe.ignore" />
     <EmbeddedResource Include="redirects\cup.exe.ignore" />
     <EmbeddedResource Include="redirects\cver.exe.ignore" />
-    <EmbeddedResource Include="tools\7za.exe.ignore" />
-    <EmbeddedResource Include="tools\7za.exe.manifest" />
     <EmbeddedResource Include="tools\checksum.exe.ignore" />
     <EmbeddedResource Include="tools\shimgen.exe.ignore" />
   </ItemGroup>
@@ -100,7 +113,6 @@
     <EmbeddedResource Include="redirects\cuninst.exe" />
     <EmbeddedResource Include="redirects\cup.exe" />
     <EmbeddedResource Include="redirects\cver.exe" />
-    <EmbeddedResource Include="tools\7za.exe" />
     <EmbeddedResource Include="tools\7zip.license.txt" />
     <EmbeddedResource Include="tools\checksum.exe" />
     <EmbeddedResource Include="tools\checksum.license.txt" />
@@ -124,6 +136,50 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="helpers\chocolateyScriptRunner.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="helpers\functions\Get-WebFileName.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="helpers\functions\Get-ToolsLocation.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="helpers\chocolateyProfile.psm1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="helpers\ChocolateyTabExpansion.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="helpers\functions\Set-PowerShellExitCode.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="helpers\functions\Install-Vsix.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="helpers\functions\Uninstall-ChocolateyEnvironmentVariable.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="tools\checksum.exe.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="helpers\functions\Get-UninstallRegistryKey.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="tools\7z.dll" />
+    <EmbeddedResource Include="tools\7z.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="tools\7z.exe.ignore" />
+    <EmbeddedResource Include="tools\7z.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="tools\7z.dll.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="helpers\functions\Write-FunctionCallLogMessage.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="helpers\functions\Get-PackageParameters.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

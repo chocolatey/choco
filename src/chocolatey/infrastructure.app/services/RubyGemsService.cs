@@ -1,4 +1,20 @@
-﻿namespace chocolatey.infrastructure.app.services
+﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 
+// You may obtain a copy of the License at
+// 
+// 	http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace chocolatey.infrastructure.app.services
 {
     using System;
     using System.Collections.Concurrent;
@@ -134,7 +150,7 @@
         public void list_noop(ChocolateyConfiguration config)
         {
             var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH, args));
+            this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH.escape_curly_braces(), args.escape_curly_braces()));
         }
 
         public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
@@ -152,17 +168,17 @@
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
                         if (!config.QuietOutput)
                         {
-                            this.Log().Info(e.Data);
+                            this.Log().Info(logMessage.escape_curly_braces());
                         }
                         else
                         {
-                            this.Log().Debug(() => "[{0}] {1}".format_with(APP_NAME, logMessage));
+                            this.Log().Debug(() => "[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
                         }
                     },
                 stdErrAction: (s, e) =>
                     {
                         if (string.IsNullOrWhiteSpace(e.Data)) return;
-                        this.Log().Error(() => "{0}".format_with(e.Data));
+                        this.Log().Error(() => "{0}".format_with(e.Data.escape_curly_braces()));
                     },
                 updateProcessPath: false
                 );
@@ -174,7 +190,7 @@
         {
             var args = ExternalCommandArgsBuilder.build_arguments(config, _installArguments);
             args = args.Replace(PACKAGE_NAME_TOKEN, config.PackageNames.Replace(';', ','));
-            this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH, args));
+            this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH.escape_curly_braces(), args.escape_curly_braces()));
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
@@ -193,7 +209,7 @@
                         {
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage));
+                            this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
                           
                             if (InstallingRegex.IsMatch(logMessage))
                             {
@@ -218,7 +234,7 @@
                         {
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage));
+                            this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
 
                             var packageName = get_value_from_output(logMessage, PackageNameErrorRegex, PACKAGE_NAME_GROUP);
 
@@ -246,7 +262,7 @@
             return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction = null)
         {
             throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
         }
@@ -256,7 +272,7 @@
             this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement uninstall".format_with(APP_NAME));
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUninstallAction = null)
         {
             throw new NotImplementedException("{0} does not implement uninstall".format_with(APP_NAME));
         }

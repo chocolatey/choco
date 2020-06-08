@@ -74,6 +74,7 @@
     <nant buildfile="${dirs.current.file}${path.separator}gemsPrepare.step" inheritall="true" failonerror="false" if="${run.gems}" />
     <nant buildfile="${dirs.current.file}${path.separator}gemsBuild.step" inheritall="true" failonerror="false" if="${run.gems}" />
     <nant buildfile="${dirs.current.file}${path.separator}nugetPrepare.step" inheritall="true" failonerror="false" if="${run.nuget}" />
+    <nant buildfile="${dirs.build_scripts_custom}${path.separator}codeSign.step" failonerror="true" inheritall="true" if="${run.codesign}" />
     <nant buildfile="${dirs.current.file}${path.separator}nugetBuild.step" inheritall="true" failonerror="false" if="${run.nuget}" />
   </target>
 

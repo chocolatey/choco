@@ -1,4 +1,6 @@
-﻿# Copyright 2011 - Present RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
+﻿# Copyright © 2017 Chocolatey Software, Inc.
+# Copyright © 2015 - 2017 RealDimensions Software, LLC
+# Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +16,10 @@
 
 $helpersPath = (Split-Path -parent $MyInvocation.MyCommand.Definition);
 
-$DebugPreference = "SilentlyContinue"
-if ($env:ChocolateyEnvironmentDebug -eq 'true') { $DebugPreference = "Continue"; }
-$VerbosePreference = "SilentlyContinue"
-if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $VerbosePreference = "Continue"; $verbosity = $true }
+$global:DebugPreference = "SilentlyContinue"
+if ($env:ChocolateyEnvironmentDebug -eq 'true') { $global:DebugPreference = "Continue"; }
+$global:VerbosePreference = "SilentlyContinue"
+if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $global:VerbosePreference = "Continue"; $verbosity = $true }
 
 $installArguments = $env:chocolateyInstallArguments
 
@@ -32,7 +34,7 @@ $packageParameters = $env:chocolateyPackageParameters
 # ensure module loading preference is on
 $PSModuleAutoLoadingPreference = "All";
 
-Write-Debug "Posh version is $($psversiontable.PsVersion.ToString())"
+Write-Debug "Host version is $($host.Version), PowerShell Version is '$($PSVersionTable.PSVersion)' and CLR Version is '$($PSVersionTable.CLRVersion)'."
 
 # grab functions from files
 Get-Item $helpersPath\functions\*.ps1 |
@@ -42,13 +44,47 @@ Get-Item $helpersPath\functions\*.ps1 |
 	  #Export-ModuleMember -Function $_.BaseName
     }
 
+# Export built-in functions prior to loading extensions so that 
+# extension-specific loading behavior can be used based on built-in
+# functions. This allows those overrides to be much more deterministic
+# This behavior was broken from v0.9.9.5 - v0.10.3.
+Export-ModuleMember -Function * -Alias * -Cmdlet *
+
+$currentAssemblies = [System.AppDomain]::CurrentDomain.GetAssemblies()
+
 # load extensions if they exist
 $extensionsPath = Join-Path "$helpersPath" '..\extensions'
-if(Test-Path($extensionsPath)) {
+if (Test-Path($extensionsPath)) {
   Write-Debug 'Loading community extensions'
+  Get-ChildItem $extensionsPath -recurse -filter "*.dll" | Select -ExpandProperty FullName | % {
+    $path = $_;
+    if ($path.Contains("extensions\chocolatey\lib-synced")) { continue }
+
+    try {
+      Write-Debug "Importing '$path'";
+      $fileNameWithoutExtension = $([System.IO.Path]::GetFileNameWithoutExtension($path))
+      Write-Debug "Loading '$fileNameWithoutExtension' extension.";
+      $loaded = $false
+      $currentAssemblies | % {
+		    $name = $_.GetName().Name
+        if ($name -eq $fileNameWithoutExtension) { 
+          Import-Module $_ 
+			    $loaded = $true
+        }
+	    }
+
+	    if (!$loaded) { Import-Module $path; }
+    } catch {
+      if ($env:ChocolateyPowerShellHost -eq 'true') {
+        Write-Warning "Import failed for '$path'.  Error: '$_'"
+      } else {
+        Write-Warning "Import failed for '$path'. If it depends on a newer version of the .NET framework, please make sure you are using the built-in PowerShell Host. Error: '$_'"
+      }
+    }
+  }
   #Resolve-Path $extensionsPath\**\*\*.psm1 | % { Write-Debug "Importing `'$_`'"; Import-Module $_.ProviderPath }
   Get-ChildItem $extensionsPath -recurse -filter "*.psm1" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }
-  Get-ChildItem $extensionsPath -recurse -filter "*.dll" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }
 }
 
+# todo: explore removing this for a future version
 Export-ModuleMember -Function * -Alias * -Cmdlet *

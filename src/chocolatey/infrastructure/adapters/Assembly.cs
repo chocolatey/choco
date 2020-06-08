@@ -1,4 +1,5 @@
-﻿// Copyright © 2011 - Present RealDimensions Software, LLC
+﻿// Copyright © 2017 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -67,14 +68,40 @@ namespace chocolatey.infrastructure.adapters
             return _assembly.GetManifestResourceStream(type, name);
         }
 
+        public AssemblyName GetName()
+        {
+            return _assembly.GetName();
+        }
+
+        public Type GetType(String name)
+        {
+            return _assembly.GetType(name);
+        }   
+        
+        public Type GetType(String name, bool throwOnError)
+        {
+            return _assembly.GetType(name,throwOnError);
+        }    
+        
+        public Type GetType(String name, bool throwOnError, bool ignoreCase)
+        {
+            return _assembly.GetType(name,throwOnError, ignoreCase);
+        }
+
+        public static IAssembly Load(byte[] rawAssembly)
+        {
+            return new Assembly(System.Reflection.Assembly.Load(rawAssembly));
+        } 
+        
+        public static IAssembly LoadFile(string path)
+        {
+           return new Assembly(System.Reflection.Assembly.LoadFile(path));
+        }
+
         public static IAssembly GetAssembly(Type type)
         {
             return new Assembly(System.Reflection.Assembly.GetAssembly(type));
             //return System.Reflection.Assembly.GetAssembly(type);
-        }
-        public AssemblyName GetName()
-        {
-            return _assembly.GetName();
         }
 
         public static IAssembly GetExecutingAssembly()
@@ -86,6 +113,21 @@ namespace chocolatey.infrastructure.adapters
         public static IAssembly GetCallingAssembly()
         {
             return new Assembly(System.Reflection.Assembly.GetCallingAssembly());
+        } 
+        
+        public static IAssembly GetEntryAssembly()
+        {
+            return new Assembly(System.Reflection.Assembly.GetEntryAssembly());
+        }
+
+        public static IAssembly set_assembly(System.Reflection.Assembly value)
+        {
+            return new Assembly(value);
+        }
+
+        public static implicit operator Assembly(System.Reflection.Assembly value)
+        {
+            return new Assembly(value);
         }
     }
 

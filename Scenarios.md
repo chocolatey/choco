@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 30 Scenario(s), 254 Observation(s) ]
+### ChocolateyInstallCommand [ 35 Scenario(s), 293 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -140,6 +140,7 @@
  * should have a graphical shim that is set for gui access
  * should have a successful package result
  * should have a version of one dot zero dot zero
+ * should have executed chocolateyInstall script
  * should install the expected version of the package
  * should install the package in the lib directory
  * should install where install location reports
@@ -223,6 +224,41 @@
  * should not have warning package result
  * should not install a package in the lib directory
 
+#### when installing a package that has nonterminating errors
+
+ * config should match package result name
+ * should contain a message that it installed successfully
+ * should have a successful package result
+ * should have a version of one dot zero
+ * should install the expected version of the package
+ * should install the package in the lib directory
+ * should install where install location reports
+ * should not have inconclusive package result
+ * should not have warning package result
+
+#### when installing a package that has nonterminating errors with fail on stderr
+
+ * should contain a warning message that it was unable to install a package
+ * should have an error package result
+ * should have expected error in package result
+ * should not have a successful package result
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should not install a package in the lib directory
+ * should put a package in the lib bad directory
+
+#### when installing a package with a dependent package that also depends on a less constrained but still valid dependency of the same package
+
+ * [PENDING] should contain a message that everything installed successfully
+ * [PENDING] should have a successful package result
+ * [PENDING] should install a package in the lib directory
+ * [PENDING] should install the dependency in the lib directory
+ * [PENDING] should install the expected version of the constrained dependency
+ * [PENDING] should install the expected version of the dependency
+ * [PENDING] should install where install location reports
+ * [PENDING] should not have inconclusive package result
+ * [PENDING] should not have warning package result
+
 #### when installing a package with config transforms
 
  * should add the insert value in the config due to XDT InsertIfMissing
@@ -280,6 +316,21 @@
  * [PENDING] should not upgrade the exact version dependency
  * [PENDING] should not upgrade the minimum version dependency
 
+#### when installing a package with dependencies on an older version of a package than is already installed
+
+ * [PENDING] should contain a message that it was unable to install any packages
+ * [PENDING] should have an error package result
+ * [PENDING] should not have a successful package result
+ * [PENDING] should not have inconclusive package result
+ * [PENDING] should not have warning package result
+ * [PENDING] should not install the conflicting package in the lib directory
+ * [PENDING] should not upgrade the exact version dependency
+
+#### when installing a package with no sources enabled
+
+ * should have no sources enabled result
+ * should not install any packages
+
 #### when installing a side by side package
 
  * config should match package result name
@@ -311,11 +362,14 @@
  * should not have a successful package result for missing package
  * should not have inconclusive package result
  * should not have warning package result
+ * should print out package from config file in message
+ * should specify config file is being used in message
 
 #### when noop installing a package
 
  * should contain a message that it would have run a powershell script
  * should contain a message that it would have used Nuget to install a package
+ * should not contain a message that it would have run powershell modification script
  * should not install a package in the lib directory
 
 #### when noop installing a package that does not exist
@@ -346,7 +400,7 @@
  * should not have inconclusive package result
  * should not have warning package result
 
-### ChocolateyListCommand [ 6 Scenario(s), 30 Observation(s) ]
+### ChocolateyListCommand [ 11 Scenario(s), 48 Observation(s) ]
 
 #### when listing local packages
 
@@ -363,6 +417,22 @@
  * should not contain packages and versions with a space between them
  * should only have messages related to package information
 
+#### when listing local packages limiting output with id only
+
+ * should contain packages id
+ * should not contain any version number
+ * should not contain pipe
+
+#### when listing local packages with id only
+
+ * should contain package name
+ * should not contain any version number
+
+#### when listing packages with no sources enabled
+
+ * should have no sources enabled result
+ * should not list any packages
+
 #### when searching all available packages
 
  * should contain a summary
@@ -377,6 +447,23 @@
  * should contain debugging messages
  * should contain packages and versions with a space between them
  * should not contain packages that do not match
+
+#### when searching for an exact package
+
+ * should contain a summary
+ * should contain debugging messages
+ * should contain packages and versions with a space between them
+ * should find exactly one result
+ * should not contain packages that do not match
+ * should not error
+
+#### when searching for an exact package with zero results
+
+ * should contain a summary
+ * should contain debugging messages
+ * should not contain packages that do not match
+ * should not error
+ * should not have any results
 
 #### when searching packages with no filter happy path
 
@@ -395,6 +482,23 @@
  * should contain packages and versions with a space between them
  * should contain tags
  * should not contain packages and versions with a pipe between them
+
+### ChocolateyPackCommand [ 3 Scenario(s), 6 Observation(s) ]
+
+#### when packing with an output directory
+
+ * generated package should be in specified output directory
+ * sources should be set to specified output directory
+
+#### when packing with properties
+
+ * generated package should be in current directory
+ * property settings should be logged as debug messages
+
+#### when packing without specifying an output directory
+
+ * generated package should be in current directory
+ * sources should be set to current directory
 
 ### ChocolateyPinCommand [ 9 Scenario(s), 12 Observation(s) ]
 
@@ -437,7 +541,7 @@
 
  * should contain success message
 
-### ChocolateyUninstallCommand [ 13 Scenario(s), 90 Observation(s) ]
+### ChocolateyUninstallCommand [ 13 Scenario(s), 93 Observation(s) ]
 
 #### when force uninstalling a package
 
@@ -468,6 +572,7 @@
 #### when noop uninstalling a package
 
  * should contain a message that it would have run a powershell script
+ * should contain a message that it would have run powershell modification script
  * should contain a message that it would have uninstalled a package
  * should not uninstall a package from the lib directory
 
@@ -484,6 +589,8 @@
  * should delete any files created during the install
  * should delete the rollback
  * should have a successful package result
+ * should have executed chocolateyBeforeModify script
+ * should have executed chocolateyUninstall script
  * should not have inconclusive package result
  * should not have warning package result
  * should remove the package from the lib directory
@@ -568,7 +675,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 26 Scenario(s), 214 Observation(s) ]
+### ChocolateyUpgradeCommand [ 36 Scenario(s), 295 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -808,6 +915,11 @@
  * should upgrade the minimum version dependency
  * should upgrade the package
 
+#### when upgrading a package with no sources enabled
+
+ * should have no sources enabled result
+ * should not have any packages upgraded
+
 #### when upgrading a package with readonly files
 
  * should contain a warning message that it upgraded successfully
@@ -843,6 +955,31 @@
  * should not upgrade the minimum version dependency
  * should upgrade the package
 
+#### when upgrading all packages happy path
+
+ * should report for all installed packages
+ * should skip packages without upgrades
+ * should upgrade packages with upgrades
+
+#### when upgrading all packages with except
+
+ * should report for all non skipped packages
+ * should skip packages in except list
+
+#### when upgrading all packages with prereleases installed
+
+ * should report for all installed packages
+ * should skip packages without upgrades
+ * should upgrade packages with upgrades
+ * should upgrade upgradepackage
+
+#### when upgrading all packages with prereleases installed with excludeprerelease specified
+
+ * should not upgrade upgradepackage
+ * should report for all installed packages
+ * should skip packages without upgrades
+ * should upgrade packages with upgrades
+
 #### when upgrading an existing package happy path
 
  * config should match package result name
@@ -851,7 +988,88 @@
  * should contain newer version in directory
  * should delete the rollback
  * should have a successful package result
+ * should have executed chocolateyBeforeModify before chocolateyInstall
+ * should have executed chocolateyBeforeModify script for original package
+ * should have executed chocolateyInstall script for new package
  * should match the upgrade version of one dot one dot zero
+ * should not have executed chocolateyBeforeModify script for new package
+ * should not have executed chocolateyUninstall script for original package
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should upgrade a package in the lib directory
+ * should upgrade the package
+ * should upgrade where install location reports
+
+#### when upgrading an existing package with prerelease available and prerelease specified
+
+ * config should match package result name
+ * should contain a warning message that it upgraded successfully
+ * should contain a warning message with old and new versions
+ * should contain newer version in directory
+ * should delete the rollback
+ * should have a successful package result
+ * should have executed chocolateyBeforeModify before chocolateyInstall
+ * should have executed chocolateyBeforeModify script for original package
+ * should have executed chocolateyInstall script for new package
+ * should match the upgrade version of the new beta
+ * should not have executed chocolateyBeforeModify script for new package
+ * should not have executed chocolateyUninstall script for original package
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should upgrade a package in the lib directory
+ * should upgrade the package
+ * should upgrade where install location reports
+
+#### when upgrading an existing package with prerelease available without prerelease specified
+
+ * should be the same version of the package
+ * should contain a message that no packages were upgraded
+ * should contain a message that you have the latest version available
+ * should have a successful package result
+ * should have inconclusive package result
+ * should match the original package version
+ * should not create a rollback
+ * should not have warning package result
+ * should not remove the package from the lib directory
+
+#### when upgrading an existing prerelease package with allow downgrade with excludeprelease and without prerelease specified
+
+ * should be the same version of the package
+ * should contain a message that no packages were upgraded
+ * should contain a message that you have the latest version available
+ * should have a successful package result
+ * should have inconclusive package result
+ * should not create a rollback
+ * should not have warning package result
+ * should not remove the package from the lib directory
+ * should only find the last stable version
+
+#### when upgrading an existing prerelease package with prerelease available with excludeprelease and without prerelease specified
+
+ * should be the same version of the package
+ * should contain a message that no packages were upgraded
+ * should contain a message that you have the latest version available
+ * should have a successful package result
+ * should have inconclusive package result
+ * should not create a rollback
+ * should not have warning package result
+ * should not remove the package from the lib directory
+ * should only find the last stable version
+
+#### when upgrading an existing prerelease package without prerelease specified
+
+ * config should match package result name
+ * should contain a warning message that it upgraded successfully
+ * should contain a warning message with old and new versions
+ * should contain newer version in directory
+ * should delete the rollback
+ * should have a successful package result
+ * should have executed chocolateyBeforeModify before chocolateyInstall
+ * should have executed chocolateyBeforeModify script for original package
+ * should have executed chocolateyInstall script for new package
+ * should match the upgrade version of the new beta
+ * should not have executed chocolateyBeforeModify script for new package
+ * should not have executed chocolateyUninstall script for original package
  * should not have inconclusive package result
  * should not have warning package result
  * should upgrade a package in the lib directory

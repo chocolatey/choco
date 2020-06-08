@@ -1,4 +1,5 @@
-// Copyright � 2011 - Present RealDimensions Software, LLC
+// Copyright © 2017 - 2018 Chocolatey Software, Inc
+// Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,21 +16,19 @@
 
 namespace chocolatey.tests.integration
 {
+    using System;
+    using System.Collections.Generic;
     using System.IO;
-    using System.Reflection;
-    using System.Threading;
-    using NuGet;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.nuget;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
+    using chocolatey.infrastructure.platforms;
 
     public class Scenario
     {
-
         private static IChocolateyPackageService _service;
 
         private static readonly DotNetFileSystem _fileSystem = new DotNetFileSystem();
@@ -88,24 +87,32 @@ namespace chocolatey.tests.integration
         {
             if (_service == null)
             {
-                _service= NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+                _service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
             }
+            var installConfig = config.deep_copy();
 
-            var originalPackageName = config.PackageNames;
-            var originalPackageVersion = config.Version;
+            installConfig.PackageNames = packageId;
+            installConfig.Version = version;
+            _service.install_run(installConfig);
 
-            config.PackageNames = packageId;
-            config.Version = version;
-            _service.install_run(config);
-            config.PackageNames = originalPackageName;
-            config.Version = originalPackageVersion;
-            //var pattern = "{0}.{1}{2}".format_with(packageId, string.IsNullOrWhiteSpace(version) ? "*" : version, Constants.PackageExtension);
-            //var files = _fileSystem.get_files(config.Sources, pattern);
-            //foreach (var file in files)
-            //{
-            //    var packageManager = NugetCommon.GetPackageManager(config, new ChocolateyNugetLogger(), null, null, false);
-            //    packageManager.InstallPackage(new OptimizedZipPackage(file), false,false);
-            //}
+            NUnitSetup.MockLogger.Messages.Clear();
+        }
+
+        public static void add_files(IEnumerable<Tuple<string, string>> files)
+        {
+            foreach (var file in files)
+            {
+                if (_fileSystem.file_exists(file.Item1))
+                {
+                    _fileSystem.delete_file(file.Item1);
+                }
+                _fileSystem.write_file(file.Item1, file.Item2);
+            }
+        }
+
+        public static void create_directory(string directoryPath)
+        {
+            _fileSystem.create_directory(directoryPath);
         }
 
         private static ChocolateyConfiguration baseline_configuration()
@@ -114,6 +121,19 @@ namespace chocolatey.tests.integration
             // prior commands, so ensure that all items go back to the default values here
             var config = NUnitSetup.Container.GetInstance<ChocolateyConfiguration>();
 
+            config.Information.PlatformType = PlatformType.Windows;
+            config.Information.IsInteractive = false;
+            config.Information.ChocolateyVersion = "1.2.3";
+            config.Information.PlatformVersion = new Version(6, 1, 0, 0);
+            config.Information.PlatformName = "Windows 7 SP1";
+            config.Information.ChocolateyVersion = "1.2.3";
+            config.Information.ChocolateyProductVersion = "1.2.3";
+            config.Information.FullName = "choco something something";
+            config.Information.Is64BitOperatingSystem = true;
+            config.Information.IsInteractive = false;
+            config.Information.IsUserAdministrator = true;
+            config.Information.IsProcessElevated = true;
+            config.Information.IsLicensedVersion = false;
             config.AcceptLicense = true;
             config.AllowMultipleVersions = false;
             config.AllowUnofficialBuild = true;
@@ -124,11 +144,14 @@ namespace chocolatey.tests.integration
             config.ForceDependencies = false;
             config.ForceX86 = false;
             config.HelpRequested = false;
+            config.UnsuccessfulParsing = false;
+            config.UnsuccessfulParsing = false;
             config.IgnoreDependencies = false;
             config.InstallArguments = string.Empty;
             config.Noop = false;
             config.OverrideArguments = false;
             config.Prerelease = false;
+            config.UpgradeCommand.ExcludePrerelease = false;
             config.PromptForConfirmation = false;
             config.RegularOutput = true;
             config.SkipPackageInstallProvider = false;
@@ -137,8 +160,23 @@ namespace chocolatey.tests.integration
             config.Debug = true;
             config.AllVersions = false;
             config.Verbose = false;
+            config.Trace = false;
             config.Input = config.PackageNames = string.Empty;
             config.ListCommand.LocalOnly = false;
+            config.ListCommand.Exact = false;
+            config.Features.UsePowerShellHost = true;
+            config.Features.AutoUninstaller = true;
+            config.Features.ChecksumFiles = true;
+            config.OutputDirectory = null;
+            config.Features.StopOnFirstPackageFailure = false;
+            config.UpgradeCommand.PackageNamesToSkip = string.Empty;
+            config.AllowDowngrade = false;
+            config.Features.FailOnStandardError = false;
+            config.ListCommand.IncludeVersionOverrides = false;
+            config.UpgradeCommand.FailOnNotInstalled = false;
+            config.PinCommand.Name = string.Empty;
+            config.PinCommand.Command = PinCommandType.unknown;
+            config.ListCommand.IdOnly = false;
 
             return config;
         }
@@ -170,7 +208,7 @@ namespace chocolatey.tests.integration
         public static ChocolateyConfiguration list()
         {
             var config = baseline_configuration();
-            config.CommandName = CommandNameType.list.to_string();
+            config.CommandName = "list";
 
             return config;
         }
@@ -178,7 +216,15 @@ namespace chocolatey.tests.integration
         public static ChocolateyConfiguration pin()
         {
             var config = baseline_configuration();
-            config.CommandName = CommandNameType.pin.to_string();
+            config.CommandName = "pin";
+
+            return config;
+        }
+
+        public static ChocolateyConfiguration pack()
+        {
+            var config = baseline_configuration();
+            config.CommandName = "pack";
 
             return config;
         }
