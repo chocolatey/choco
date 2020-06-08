@@ -231,6 +231,7 @@ namespace chocolatey.tests.infrastructure.app.services
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
             private readonly List<string> files = new List<string>();
             private readonly HashSet<string> directoryCreated = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            private readonly UTF8Encoding utf8WithoutBOM = new UTF8Encoding(false);
 
             public override void Context()
             {
@@ -249,6 +250,8 @@ namespace chocolatey.tests.infrastructure.app.services
                         });
                 fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\default"));
                 fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
+                    .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
+                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
                 fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
                 fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback(
@@ -322,6 +325,7 @@ namespace chocolatey.tests.infrastructure.app.services
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
             private readonly List<string> files = new List<string>();
             private readonly HashSet<string> directoryCreated = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            private readonly UTF8Encoding utf8WithoutBOM = new UTF8Encoding(false);
 
             public override void Context()
             {
@@ -340,6 +344,8 @@ namespace chocolatey.tests.infrastructure.app.services
                         });
                 fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
                 fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
+                    .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
+                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
                 fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
