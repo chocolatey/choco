@@ -25,6 +25,8 @@ namespace chocolatey.infrastructure.app.nuget
     {
         public FileConflictResolution ResolveFileConflict(string message)
         {
+            this.Log().Debug("[NuGet] {0}{1} Resolving by automatic overwrite.".format_with(message.escape_curly_braces(),System.Environment.NewLine));
+
             return FileConflictResolution.OverwriteAll;
         }
 
