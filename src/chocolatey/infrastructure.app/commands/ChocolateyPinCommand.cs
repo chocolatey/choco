@@ -111,9 +111,10 @@ This is especially helpful when running `choco upgrade` for all
             "chocolatey".Log().Info(@"
     choco pin
     choco pin list
-    choco pin add -n=git
-    choco pin add -n=git --version 1.2.3
-    choco pin remove --name git
+    choco pin add -n git
+    choco pin add --name=""'git'"" --version=""'1.2.3'""
+    choco pin add --name=""'git'"" --version=""'1.2.3'"" --reason=""'reasons available in business editions only'""
+    choco pin remove --name=""'git'""
 
 NOTE: See scripting in the command reference (`choco -?`) for how to 
  write proper scripts and integrations.
