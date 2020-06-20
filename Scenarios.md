@@ -720,7 +720,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 40 Scenario(s), 304 Observation(s) ]
+### ChocolateyUpgradeCommand [ 40 Scenario(s), 307 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -986,6 +986,8 @@
 #### when upgrading a package with shims
 
  * should create a shim
+ * should have had original shim
+ * should have shim target
  * should not have original shim
 
 #### when upgrading a package with shims that errors
@@ -995,6 +997,7 @@
 
 #### when upgrading a package with shims with noshims
 
+ * should have had original shim
  * should have shim target
  * should not create a shim
  * should not have original shim

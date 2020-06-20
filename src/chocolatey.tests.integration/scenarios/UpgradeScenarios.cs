@@ -3263,6 +3263,9 @@ namespace chocolatey.tests.integration.scenarios
         [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_shims : ScenariosBase
         {
+            private string _original_shim = string.Empty; 
+            private bool _original_shim_existed = false;
+
             public override void Context()
             {
                 Configuration = Scenario.upgrade();
@@ -3273,6 +3276,9 @@ namespace chocolatey.tests.integration.scenarios
                 Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
                 Scenario.install_package(Configuration, "shimupgrade", "1.0.0");
 
+                _original_shim = Path.Combine(Scenario.get_top_level(), "bin", "shimupgrade1.exe");
+                _original_shim_existed = File.Exists(_original_shim);
+
                 // version 3.0.0 is okay
                 Configuration.Version = "3.0.0";
             }
@@ -3280,6 +3286,23 @@ namespace chocolatey.tests.integration.scenarios
             public override void Because()
             {
                 Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_had_original_shim()
+            {
+                var errorMessage = "Original shim file was not created: {0}".format_with(_original_shim);
+
+                _original_shim_existed.ShouldBeTrue(errorMessage);
+            }
+
+            [Fact]
+            public void should_have_shim_target()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var target = Path.Combine(packageDir, "tools", "shimupgrade3.exe");
+
+                File.Exists(target).ShouldBeTrue();
             }
 
             [Fact]
@@ -3302,6 +3325,9 @@ namespace chocolatey.tests.integration.scenarios
         [Concern(typeof(ChocolateyUpgradeCommand))]
         public class when_upgrading_a_package_with_shims_with_noshims : ScenariosBase
         {
+            private string _original_shim = string.Empty; 
+            private bool _original_shim_existed = false;
+
             public override void Context()
             {
                 Configuration = Scenario.upgrade();
@@ -3312,6 +3338,9 @@ namespace chocolatey.tests.integration.scenarios
                 Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
                 Scenario.install_package(Configuration, "shimupgrade", "1.0.0");
 
+                _original_shim = Path.Combine(Scenario.get_top_level(), "bin", "shimupgrade1.exe");
+                _original_shim_existed = File.Exists(_original_shim);
+
                 // version 3.0.0 is okay
                 Configuration.Version = "3.0.0";
                 Configuration.NoShims = true;
@@ -3320,6 +3349,14 @@ namespace chocolatey.tests.integration.scenarios
             public override void Because()
             {
                 Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_had_original_shim()
+            {
+                var errorMessage = "Original shim file was not created: {0}".format_with(_original_shim);
+
+                _original_shim_existed.ShouldBeTrue(errorMessage);
             }
 
             [Fact]
