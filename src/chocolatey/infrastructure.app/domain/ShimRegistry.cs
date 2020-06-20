@@ -96,8 +96,6 @@ namespace chocolatey.infrastructure.app.domain
         public IList<ShimRecord> get_all(string packageName)
         {
             ensure_storage_exists(DataLevel.Latest);
-            var exeFiles = get_shim_exe_files();
-
             return _store.get_all_records(packageName);
         }
 
