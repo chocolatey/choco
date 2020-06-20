@@ -3298,5 +3298,54 @@ namespace chocolatey.tests.integration.scenarios
                 File.Exists(shimfile).ShouldBeTrue();
             }
         }
+
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_a_package_with_shims_with_noshims : ScenariosBase
+        {
+            public override void Context()
+            {
+                Configuration = Scenario.upgrade();
+                Scenario.reset(Configuration);
+                Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+
+                Configuration.PackageNames = Configuration.Input = "shimupgrade";
+                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "shimupgrade", "1.0.0");
+
+                // version 3.0.0 is okay
+                Configuration.Version = "3.0.0";
+                Configuration.NoShims = true;
+            }
+
+            public override void Because()
+            {
+                Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_shim_target()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var target = Path.Combine(packageDir, "tools", "shimupgrade3.exe");
+
+                File.Exists(target).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_original_shim()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimupgrade1.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "shimupgrade3.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+        }
     }
 }
