@@ -99,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="infrastructure.app\services\FilesServiceSpecs.cs" />
+    <Compile Include="infrastructure.app\shimtarget\ShimTargetSpecs.cs" />
     <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />
     <Compile Include="infrastructure\cryptography\CrytpoHashProviderSpecs.cs" />
     <Compile Include="infrastructure\filesystem\DotNetFileSystemSpecs.cs" />
@@ -507,6 +508,45 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="infrastructure\filesystem\Slipsum.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\outside.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\pkg.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\tools\.shiminclude">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\tools\!tools.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\tools\#tools.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\tools\prog\ignore-me.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\tools\prog\ignore-me.exe.ignore">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\tools\prog\sbin\prog.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\tools\prog\sbin\prog2.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\tools\prog\sbin\prog3.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\tools\prog\opt\opt.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\tools\prog\opt\opt2.cmd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="infrastructure.app\shimtarget\pkg\tools\prog\opt\opt3.vbs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
