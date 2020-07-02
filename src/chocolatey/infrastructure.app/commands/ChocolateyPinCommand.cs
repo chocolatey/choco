@@ -95,10 +95,10 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Pin Command");
             this.Log().Info(@"
-Pin a package to suppress upgrades. 
+Pin a package to suppress upgrades.
 
-This is especially helpful when running `choco upgrade` for all 
- packages, as it will automatically skip those packages. Another 
+This is especially helpful when running `choco upgrade` for all
+ packages, as it will automatically skip those packages. Another
  alternative is `choco upgrade --except=""pkg1,pk2""`.
 ");
 
@@ -116,7 +116,7 @@ This is especially helpful when running `choco upgrade` for all
     choco pin add --name=""'git'"" --version=""'1.2.3'"" --reason=""'reasons available in business editions only'""
     choco pin remove --name=""'git'""
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
@@ -129,8 +129,8 @@ Normal:
  - 0: operation was successful, no issues detected
  - -1 or 1: an error has occurred
 
-If you find other exit codes that we have not yet documented, please 
- file a ticket so we can document it at 
+If you find other exit codes that we have not yet documented, please
+ file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
 ");
