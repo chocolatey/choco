@@ -218,7 +218,7 @@ namespace chocolatey.infrastructure.app.domain
                     continue;
                 }
 
-                // remove from includes list if no patterns left
+                // remove matching patterns from includes list
                 var removedPatterns = exclude_patterns(excludedPatterns, includedPatterns);
 
                 // remove from includes list if no patterns left

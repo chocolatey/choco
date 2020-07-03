@@ -72,6 +72,7 @@ namespace chocolatey.infrastructure.app.domain
                 {
                     resolved = resolve_path(resolved, subDirs);
                 }
+
                 result.AddRange(resolved);
             }
 

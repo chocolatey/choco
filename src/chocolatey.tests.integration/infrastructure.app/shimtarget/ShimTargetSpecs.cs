@@ -120,7 +120,7 @@ namespace chocolatey.tests.integration.infrastructure.app.shimtarget
             public override void Context()
             {
                 base.Context();
-                _target = resolve_from_root(@"..\..\outside.exe");
+                _target = @"..\..\outside.exe";
                 string[] lines = { _target };
                 write_shim_include(lines);
             }
@@ -128,7 +128,7 @@ namespace chocolatey.tests.integration.infrastructure.app.shimtarget
             [Fact]
             public void the_target_should_exist()
             {
-                File.Exists(_target).ShouldBeTrue();
+                File.Exists(resolve_from_root(_target)).ShouldBeTrue();
             }
 
             [Fact]
