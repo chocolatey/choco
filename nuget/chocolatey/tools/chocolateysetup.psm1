@@ -622,7 +622,14 @@ param(
 
 # Adapted from http://www.west-wind.com/Weblog/posts/197245.aspx
 function Get-FileEncoding($Path) {
+  if ($PSVersionTable.PSVersion.Major -lt 6) {
+    Write-Debug "Detected Powershell version < 6 ; Using -Encoding byte parameter"
     $bytes = [byte[]](Get-Content $Path -Encoding byte -ReadCount 4 -TotalCount 4)
+  }
+  else {
+    Write-Debug "Detected Powershell version >= 6 ; Using -AsByteStream parameter"
+    $bytes = [byte[]](Get-Content $Path -AsByteStream -ReadCount 4 -TotalCount 4)
+    }
 
     if(!$bytes) { return 'utf8' }
 
