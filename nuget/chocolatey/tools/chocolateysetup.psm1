@@ -549,7 +549,7 @@ param(
 
 # Adapted from http://www.west-wind.com/Weblog/posts/197245.aspx
 function Get-FileEncoding($Path) {
-    $bytes = [byte[]](Get-Content $Path -Encoding byte -ReadCount 4 -TotalCount 4)
+    $bytes = [byte[]](Get-Content $Path -AsByteStream -ReadCount 4 -TotalCount 4)
 
     if(!$bytes) { return 'utf8' }
 
