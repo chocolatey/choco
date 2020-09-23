@@ -57,7 +57,7 @@ namespace chocolatey.infrastructure.synchronization
             init_mutex();
             try
             {
-                this.Log().Trace("Waiting on the mutext handle for {0} milliseconds".format_with(timeOut));
+                this.Log().Trace("Waiting on the mutex handle for {0} milliseconds".format_with(timeOut));
                 _hasHandle = _mutex.WaitOne(timeOut < 0 ? Timeout.Infinite : timeOut, exitContext: false);
 
                 if (_hasHandle == false)
