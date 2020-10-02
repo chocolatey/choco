@@ -355,7 +355,7 @@ namespace chocolatey.infrastructure.app.builders
                         .Add("trace",
                              "Trace - Show trace messaging. Very, very verbose trace messaging. Avoid except when needing super low-level .NET Framework debugging. Available in 0.10.4+.",
                              option => config.Trace = option != null)
-                        .Add("v|version",
+                        .Add("version",
                              "Version - Prints out the Chocolatey version.",
                              option => {})
                         .Add("nocolor|no-color",
