@@ -355,6 +355,9 @@ namespace chocolatey.infrastructure.app.builders
                         .Add("trace",
                              "Trace - Show trace messaging. Very, very verbose trace messaging. Avoid except when needing super low-level .NET Framework debugging. Available in 0.10.4+.",
                              option => config.Trace = option != null)
+                        .Add("version",
+                             "Version - Prints out the Chocolatey version.",
+                             option => config.Version = option != null)
                         .Add("nocolor|no-color",
                              "No Color - Do not show colorization in logging output. This overrides the feature '{0}', set to '{1}'. Available in 0.10.9+.".format_with(ApplicationParameters.Features.LogWithoutColor, config.Features.LogWithoutColor),
                              option => config.Features.LogWithoutColor = option != null)
