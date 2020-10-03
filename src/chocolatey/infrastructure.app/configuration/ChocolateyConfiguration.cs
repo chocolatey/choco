@@ -387,6 +387,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool UseEnhancedExitCodes { get; set; }
         public bool UseFipsCompliantChecksums { get; set; }
         public bool ShowNonElevatedWarnings { get; set; }
+        public bool AutomaticProcessElevation { get; set; }
         public bool ShowDownloadProgress { get; set; }
         public bool StopOnFirstPackageFailure { get; set; }
         public bool UseRememberedArgumentsForUpgrades { get; set; }
