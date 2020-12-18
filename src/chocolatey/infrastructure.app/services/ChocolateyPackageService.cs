@@ -467,7 +467,7 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
             else
             {
                 this.Log().Info(ChocolateyLoggers.Important, @"  Software install location not explicitly set, could be in package or
-  default install location if installer.");
+  default install location of installer.");
             }
         }
 
