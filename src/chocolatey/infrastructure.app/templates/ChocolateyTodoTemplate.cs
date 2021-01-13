@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.templates
 {
     public class ChocolateyTodoTemplate
     {
+        public static TemplateLanguage Language = TemplateLanguage.PlainText;
         public static string Template =
             @"TODO
 

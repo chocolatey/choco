@@ -104,14 +104,14 @@ namespace chocolatey.infrastructure.app.services
             var defaultTemplateOverride = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, "default");
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && (!_fileSystem.directory_exists(defaultTemplateOverride) || configuration.NewCommand.UseOriginalTemplate))
             {
-                generate_file_from_template(configuration, tokens, NuspecTemplate.Template, _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower)), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyInstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyinstall.ps1"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyBeforeModifyTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateybeforemodify.ps1"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyUninstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyuninstall.ps1"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyLicenseFileTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "LICENSE.txt"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyVerificationFileTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "VERIFICATION.txt"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyReadMeTemplate.Template, _fileSystem.combine_paths(packageLocation, "ReadMe.md"), Encoding.UTF8);
-                generate_file_from_template(configuration, tokens, ChocolateyTodoTemplate.Template, _fileSystem.combine_paths(packageLocation, "_TODO.txt"), Encoding.UTF8);
+                generate_file_from_template(configuration, tokens, NuspecTemplate.Template, _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower)), Encoding.UTF8, NuspecTemplate.Language);
+                generate_file_from_template(configuration, tokens, ChocolateyInstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyinstall.ps1"), Encoding.UTF8, ChocolateyInstallTemplate.Language);
+                generate_file_from_template(configuration, tokens, ChocolateyBeforeModifyTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateybeforemodify.ps1"), Encoding.UTF8, ChocolateyBeforeModifyTemplate.Language);
+                generate_file_from_template(configuration, tokens, ChocolateyUninstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyuninstall.ps1"), Encoding.UTF8, ChocolateyUninstallTemplate.Language);
+                generate_file_from_template(configuration, tokens, ChocolateyLicenseFileTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "LICENSE.txt"), Encoding.UTF8, ChocolateyLicenseFileTemplate.Language);
+                generate_file_from_template(configuration, tokens, ChocolateyVerificationFileTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "VERIFICATION.txt"), Encoding.UTF8, ChocolateyVerificationFileTemplate.Language);
+                generate_file_from_template(configuration, tokens, ChocolateyReadMeTemplate.Template, _fileSystem.combine_paths(packageLocation, "ReadMe.md"), Encoding.UTF8, ChocolateyReadMeTemplate.Language);
+                generate_file_from_template(configuration, tokens, ChocolateyTodoTemplate.Template, _fileSystem.combine_paths(packageLocation, "_TODO.txt"), Encoding.UTF8, ChocolateyTodoTemplate.Language);
             }
             else
             {
@@ -134,7 +134,7 @@ namespace chocolatey.infrastructure.app.services
                     }
                     else
                     {
-                        generate_file_from_template(configuration, tokens, _fileSystem.read_file(file), packageFileLocation, Encoding.UTF8);
+                        generate_file_from_template(configuration, tokens, _fileSystem.read_file(file), packageFileLocation, Encoding.UTF8, guessLanguageFromExtension(fileExtension));
                     }
                 }
             }
@@ -144,10 +144,23 @@ namespace chocolatey.infrastructure.app.services
                     configuration.NewCommand.Name, configuration.NewCommand.AutomaticPackage ? " (automatic)" : string.Empty, Environment.NewLine, packageLocation));
         }
 
-        public void generate_file_from_template(ChocolateyConfiguration configuration, TemplateValues tokens, string template, string fileLocation, Encoding encoding)
+        TemplateLanguage guessLanguageFromExtension(string extension)
         {
-            template = TokenReplacer.replace_tokens(tokens, template);
-            template = TokenReplacer.replace_tokens(tokens.AdditionalProperties, template);
+            switch (extension)
+            {
+                case "xml":
+                case "nuspec":
+                    return TemplateLanguage.XML;
+                default:
+                    return TemplateLanguage.PlainText;
+            }
+        }
+
+        public void generate_file_from_template(ChocolateyConfiguration configuration, TemplateValues tokens, string template, string fileLocation, Encoding encoding, TemplateLanguage language = TemplateLanguage.PlainText)
+        {
+
+            template = TokenReplacer.replace_tokens(tokens, template, targetLanguage: language);
+            template = TokenReplacer.replace_tokens(tokens.AdditionalProperties, template, targetLanguage: language);
 
             if (configuration.RegularOutput) this.Log().Info(() => "Generating template to a file{0} at '{1}'".format_with(Environment.NewLine, fileLocation));
             this.Log().Debug(() => "{0}".format_with(template));

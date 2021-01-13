@@ -16,18 +16,21 @@
 
 namespace chocolatey.infrastructure.tokens
 {
+    using chocolatey.infrastructure.app.templates;
     using System.Collections.Generic;
     using System.Reflection;
     using System.Text.RegularExpressions;
 
     public sealed class TokenReplacer
     {
-        public static string replace_tokens<TConfig>(TConfig configuration, string textToReplace, string tokenPrefix = "[[", string tokenSuffix = "]]")
+        public static string replace_tokens<TConfig>(TConfig configuration, string textToReplace, string tokenPrefix = "[[", string tokenSuffix = "]]", TemplateLanguage targetLanguage = TemplateLanguage.PlainText)
         {
             if (string.IsNullOrEmpty(textToReplace)) return string.Empty;
 
             IDictionary<string, string> dictionary = create_dictionary_from_configuration(configuration);
             if (dictionary.Count == 0) return textToReplace;
+
+            ITokenEscaper tokenEscaper = targetLanguage.GetTokenEscaper();
 
             var regex = new Regex("{0}(?<key>\\w+){1}".format_with(Regex.Escape(tokenPrefix), Regex.Escape(tokenSuffix)));
 
@@ -43,7 +46,7 @@ namespace chocolatey.infrastructure.tokens
                     }
 
                     string value = dictionary[key];
-                    return value;
+                    return tokenEscaper.escape(value);
                 });
 
             return output;

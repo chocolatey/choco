@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.templates
 {
     public class ChocolateyVerificationFileTemplate
     {
+        public static TemplateLanguage Language = TemplateLanguage.PlainText;
         public static string Template = @"
 Note: Include this file if including binaries you have the right to distribute. 
 Otherwise delete. this file. If you are the software author, you can change this

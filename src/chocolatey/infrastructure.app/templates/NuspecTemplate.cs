@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.templates
 {
     public class NuspecTemplate
     {
+        public static TemplateLanguage Language = TemplateLanguage.XML;
         public static string Template =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!-- Read this before creating packages: https://chocolatey.org/docs/create-packages -->

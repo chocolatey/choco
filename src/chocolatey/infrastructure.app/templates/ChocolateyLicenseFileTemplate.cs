@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.templates
 {
     public class ChocolateyLicenseFileTemplate
     {
+        public static TemplateLanguage Language = TemplateLanguage.PlainText;
         public static string Template =
             @"
 Note: Include this file if including binaries you have the right to distribute. 
