@@ -722,6 +722,8 @@ Would have determined packages that are out of date based on what is
                     if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
                     if (pkgSettings.ApplyInstallArgumentsToDependencies) packageConfig.ApplyInstallArgumentsToDependencies = true;
                     if (pkgSettings.ApplyPackageParametersToDependencies) packageConfig.ApplyPackageParametersToDependencies = true;
+                    if (pkgSettings.Force) packageConfig.Force = true;
+                    packageConfig.CommandExecutionTimeoutSeconds = pkgSettings.Timeout == -1 ? packageConfig.CommandExecutionTimeoutSeconds : pkgSettings.Timeout;
 
                     this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(packageConfig.PackageNames));
                     packageConfigs.Add(packageConfig);

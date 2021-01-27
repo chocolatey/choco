@@ -365,7 +365,7 @@ NOTE: The filename is only required to end in .config, the name is not required 
       <package id=""alloptions"" version=""0.1.1""
                source=""https://somewhere/api/v2/"" installArguments=""""
                packageParameters="""" forceX86=""false"" allowMultipleVersions=""false""
-               ignoreDependencies=""false""
+               ignoreDependencies=""false"" timeout=""1000"" force=""false""
                />
     </packages>
 
