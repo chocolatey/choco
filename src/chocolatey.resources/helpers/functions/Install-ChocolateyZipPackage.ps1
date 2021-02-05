@@ -54,6 +54,10 @@ a 32 bit installation on a 64 bit system.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
+.PARAMETER SpecificFolder
+OPTIONAL - This is a specific directory within zip file to extract. The
+folder and its contents will be extracted to the destination.
+
 .PARAMETER Url64bit
 OPTIONAL - If there is a 64 bit resource available, use this
 parameter. Chocolatey will automatically determine if the user is
