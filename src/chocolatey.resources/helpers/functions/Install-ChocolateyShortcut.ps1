@@ -49,7 +49,7 @@ As of v0.10.12, the directory will be created unless it contains environment
 variable expansion like `%AppData%\FooBar`.
 
 .PARAMETER Arguments
-OPTIONAL - Additonal arguments that should be passed along to the new
+OPTIONAL - Additional arguments that should be passed along to the new
 shortcut.
 
 .PARAMETER IconLocation
