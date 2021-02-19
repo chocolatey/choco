@@ -23,7 +23,7 @@ DEPRECATED - This adds a shortcut on the desktop to the specified file path.
 Determines the desktop folder and creates a shortcut to the specified
 file path. Will not throw errors if it fails.
 
-It is recommended you use `Install-ChocolateyShorctut` instead of this
+It is recommended you use `Install-ChocolateyShortcut` instead of this
 method as this has been deprecated.
 
 .NOTES
