@@ -27,7 +27,7 @@ It is recommended you use `Install-ChocolateyShortcut` instead of this
 method as this has been deprecated.
 
 .NOTES
-Deprecated in favor of [[`Install-ChocolateyShortcut`|HelpersInstallChocolateyShortcut]].
+Deprecated in favor of https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut.
 If this errors, such as it will if being installed under the local
 SYSTEM account, it will display a warning instead of failing a package
 installation.
