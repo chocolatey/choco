@@ -36,3 +36,5 @@ SolutionVersion.vb
 src/_dotCover.chocolatey/
 src/_dotTrace.chocolatey/
 src/chocolatey.sln.GhostDoc.xml
+
+docs/generated
