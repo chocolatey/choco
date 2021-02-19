@@ -101,7 +101,7 @@ if (!$pp['LICENSE']) { $pp['LICENSE'] = '1234' }
 >
 $pp = Get-PackageParameters
 if (!$pp['UserName']) { $pp['UserName'] = "$env:UserName" }
-# Requires Choocolatey v0.10.8+ for Read-Host -AsSecureString
+# Requires Chocolatey v0.10.8+ for Read-Host -AsSecureString
 if (!$pp['Password']) { $pp['Password'] = Read-Host "Enter password for $($pp['UserName']):" -AsSecureString}
 # fail the install/upgrade if not value is not determined
 if (!$pp['Password']) { throw "Package needs Password to install, that must be provided in params or in prompt." }
