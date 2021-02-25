@@ -408,16 +408,16 @@ namespace chocolatey.infrastructure.app.builders
                             "Proxy Location - Explicit proxy location. Overrides the default proxy location of '{0}'. Available for config settings in 0.9.9.9+, this CLI option available in 0.10.4+.".format_with(config.Proxy.Location),
                             option => config.Proxy.Location = option.remove_surrounding_quotes())
                         .Add("proxy-user=",
-                            "Proxy User Name - Explicit proxy user (optional). Requires explicitly proxy (`--proxy` or config setting). Overrides the default proxy user of '{0}'. Available for config settings in 0.9.9.9+, this CLI option available in 0.10.4+.".format_with(config.Proxy.User),
+                            "Proxy User Name - Explicit proxy user (optional). Requires explicit proxy (`--proxy` or config setting). Overrides the default proxy user of '{0}'. Available for config settings in 0.9.9.9+, this CLI option available in 0.10.4+.".format_with(config.Proxy.User),
                             option => config.Proxy.User = option.remove_surrounding_quotes())
                         .Add("proxy-password=",
-                            "Proxy Password - Explicit proxy password (optional) to be used with username. Requires explicitly proxy (`--proxy` or config setting) and user name.  Overrides the default proxy password (encrypted in settings if set). Available for config settings in 0.9.9.9+, this CLI option available in 0.10.4+.",
+                            "Proxy Password - Explicit proxy password (optional) to be used with username. Requires explicit proxy (`--proxy` or config setting) and user name.  Overrides the default proxy password (encrypted in settings if set). Available for config settings in 0.9.9.9+, this CLI option available in 0.10.4+.",
                             option => config.Proxy.EncryptedPassword = NugetEncryptionUtility.EncryptString(option.remove_surrounding_quotes()))
                         .Add("proxy-bypass-list=",
-                             "ProxyBypassList - Comma separated list of regex locations to bypass on proxy. Requires explicitly proxy (`--proxy` or config setting). Overrides the default proxy bypass list of '{0}'. Available in 0.10.4+.".format_with(config.Proxy.BypassList),
+                             "ProxyBypassList - Comma separated list of regex locations to bypass on proxy. Requires explicit proxy (`--proxy` or config setting). Overrides the default proxy bypass list of '{0}'. Available in 0.10.4+.".format_with(config.Proxy.BypassList),
                              option => config.Proxy.BypassList = option.remove_surrounding_quotes())
                         .Add("proxy-bypass-on-local",
-                             "Proxy Bypass On Local - Bypass proxy for local connections. Requires explicitly proxy (`--proxy` or config setting). Overrides the default proxy bypass on local setting of '{0}'. Available in 0.10.4+.".format_with(config.Proxy.BypassOnLocal),
+                             "Proxy Bypass On Local - Bypass proxy for local connections. Requires explicit proxy (`--proxy` or config setting). Overrides the default proxy bypass on local setting of '{0}'. Available in 0.10.4+.".format_with(config.Proxy.BypassOnLocal),
                              option => config.Proxy.BypassOnLocal = option != null)
                          .Add("log-file=",
                              "Log File to output to in addition to regular loggers. Available in 0.10.8+.",
