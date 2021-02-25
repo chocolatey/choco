@@ -237,7 +237,7 @@ param(
   $commandText = $commandText -replace 'https://chocolatey.org/docs/features-private-cdn', 'https://docs.chocolatey.org/en-us/features/private-cdn'
   $commandText = $commandText -replace 'https://chocolatey.org/docs/features-virus-check', 'https://docs.chocolatey.org/en-us/features/virus-check'
   $commandText = $commandText -replace 'https://chocolatey.org/docs/features-synchronize', 'https://docs.chocolatey.org/en-us/features/package-synchronization'
-  $commandText = $commandText -replace 'explicity', 'explicitly'
+  $commandText = $commandText -replace 'explicity', 'explicit'
   $commandText = $commandText -replace 'https://chocolatey.org/docs/features-create-packages-from-installers', 'https://docs.chocolatey.org/en-us/features/package-builder'
   $commandText = $commandText -replace 'See https://chocolatey.org/docs/features-create-packages-from-installers', 'See more information about [Package Builder features](xref:package-builder)'
   $commandText = $commandText -replace 'See https://docs.chocolatey.org/en-us/features/package-builder', 'See more information about [Package Builder features](xref:package-builder)'
