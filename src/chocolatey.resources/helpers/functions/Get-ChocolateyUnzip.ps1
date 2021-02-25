@@ -71,7 +71,7 @@ If it does not exist, it will be created.
 OPTIONAL - This is a specific directory within zip file to extract.
 
 .PARAMETER PackageName
-OPTIONAL - This will faciliate logging unzip activity for subsequent
+OPTIONAL - This will facilitate logging unzip activity for subsequent
 uninstalls
 
 .PARAMETER IgnoredArguments

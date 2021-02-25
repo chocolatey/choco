@@ -137,7 +137,7 @@ namespace chocolatey.infrastructure.app.templates
  https://github.com/chocolatey/chocolatey-test-environment
 
 6. Learn more about Chocolatey packaging - go through the workshop at
- https://github.com/ferventcoder/chocolatey-workshop
+ https://github.com/chocolatey/chocolatey-workshop
  You will learn about
  - General packaging
  - Customizing package behavior at runtime (package parameters)

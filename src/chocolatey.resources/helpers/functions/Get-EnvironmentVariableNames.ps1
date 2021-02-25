@@ -34,7 +34,7 @@ None
 A list of environment variables names.
 
 .PARAMETER Scope
-The environemnt variable target scope. This is `Process`, `User`, or
+The environment variable target scope. This is `Process`, `User`, or
 `Machine`.
 
 .EXAMPLE

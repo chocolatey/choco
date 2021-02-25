@@ -89,7 +89,7 @@ and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you
 provide checksums for all remote resources used.
 
 .PARAMETER ChecksumType
-The type of checkum that the file is validated with - valid
+The type of checksum that the file is validated with - valid
 values are 'md5', 'sha1', 'sha256' or 'sha512' - defaults to 'md5'.
 
 MD5 is not recommended as certain organizations need to use FIPS

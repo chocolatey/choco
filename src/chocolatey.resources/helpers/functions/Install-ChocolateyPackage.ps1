@@ -109,7 +109,7 @@ everything you call against that file, as in
 This is the 32 bit url to download the resource from. This resource can
 be used on 64 bit systems when a package has both a Url and Url64bit
 specified if a user passes `--forceX86`. If there is only a 64 bit url
-available, please remove do not use the paramter (only use Url64bit).
+available, please remove do not use the parameter (only use Url64bit).
 Will fail on 32bit systems if missing or if a user attempts to force
 a 32 bit installation on a 64 bit system.
 
@@ -153,7 +153,7 @@ and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you
 provide checksums for all remote resources used.
 
 .PARAMETER ChecksumType
-The type of checkum that the file is validated with - valid
+The type of checksum that the file is validated with - valid
 values are 'md5', 'sha1', 'sha256' or 'sha512' - defaults to 'md5'.
 
 MD5 is not recommended as certain organizations need to use FIPS
@@ -180,7 +180,7 @@ resource updates. You should look into [automatic packaging](https://chocolatey.
 to help provide that functionality.
 
 .PARAMETER ChecksumType64
-OPTIONAL - The type of checkum that the file is validated with - valid
+OPTIONAL - The type of checksum that the file is validated with - valid
 values are 'md5', 'sha1', 'sha256' or 'sha512' - defaults to
 ChecksumType parameter value.
 
