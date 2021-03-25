@@ -223,7 +223,7 @@ A commit should observe the following:
 
 A commit message should observe the following (based on ["A Note About Git Commit Messages"](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)):
 
-  * The first line of the commit message should be a short description around 50 characters in length and be prefixed with the GitHub issue it refers to with parentheses surrounding that. If the GitHub issue is #25, you should have `(GH-25)` prefixed to the message.
+  * The first line of the commit message should be a short description around 50 characters in length and be prefixed with the GitHub issue it refers to with parentheses surrounding that. If the GitHub issue is #25, you should have `(#25)` prefixed to the message. **NOTE:** Previously, the requirement was to use something like `(GH-25)` in commit messages, however, that approach has been deprecated.
   * If the commit is about documentation, the message should be prefixed with `(doc)`.
   * If it is a trivial commit or one of formatting/spaces fixes, it should be prefixed with `(maint)`.
   * After the subject, skip one line and fill out a body if the subject line is not informative enough.
@@ -236,7 +236,7 @@ A commit message should observe the following (based on ["A Note About Git Commi
 A good example of a commit message is as follows:
 
 ```
-(GH-7) Installation Adds All Required Folders
+(#7) Installation Adds All Required Folders
 
 Previously the installation script worked for the older version of
 Chocolatey. It does not work similarly for the newer version of choco
