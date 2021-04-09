@@ -1,6 +1,7 @@
 language: csharp
+dist: bionic
 mono:
-  - 5.20.1
+  - 6.12.0
 install:
   - sudo apt-get install mono-devel
   - nuget restore src/chocolatey.sln
