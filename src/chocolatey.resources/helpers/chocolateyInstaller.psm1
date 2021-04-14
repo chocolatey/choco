@@ -1,4 +1,4 @@
-﻿# Copyright © 2017 Chocolatey Software, Inc.
+# Copyright © 2017 Chocolatey Software, Inc.
 # Copyright © 2015 - 2017 RealDimensions Software, LLC
 # Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
@@ -73,7 +73,11 @@ if (Test-Path($extensionsPath)) {
         }
 	    }
 
-	    if (!$loaded) { Import-Module $path; }
+	    if (!$loaded) {
+        if ($fileNameWithoutExtension -ne "chocolateygui.licensed") {
+          Import-Module $path;
+        }
+      }
     } catch {
       if ($env:ChocolateyPowerShellHost -eq 'true') {
         Write-Warning "Import failed for '$path'.  Error: '$_'"
