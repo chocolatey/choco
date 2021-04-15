@@ -77,7 +77,7 @@ namespace chocolatey.infrastructure.app.templates
       something like Automatic Updater (AU) so that when a new version
       of the software becomes available, the new package version 
       automatically gets pushed up to the community repository. See
-      https://chocolatey.org/docs/automatic-packages#automatic-updater-au
+      https://docs.chocolatey.org/en-us/create/automatic-packages#automatic-updater-au
 
 2. Determine Package Type:
 

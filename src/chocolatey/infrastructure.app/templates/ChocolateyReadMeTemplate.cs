@@ -28,7 +28,7 @@ packages wiki link above.
 
 ## Automatic Packaging Updates?
 Consider making this package an automatic package, for the best
-maintainability over time. Read up at https://chocolatey.org/docs/automatic-packages
+maintainability over time. Read up at https://docs.chocolatey.org/en-us/create/automatic-packages
 
 ## Shim Generation
 Any executables you include in the package or download (but don't call

@@ -135,7 +135,7 @@ function Replace-CommonItems($text) {
   $text = $text -replace '(Pro[fessional]\s?/\s?Business)', '[$1](https://chocolatey.org/compare)'
   $text = $text -replace '([Ll]icensed editions)', '[$1](https://chocolatey.org/compare)'
   $text = $text -replace '([Ll]icensed versions)', '[$1](https://chocolatey.org/compare)'
-  $text = $text -replace '\(https://chocolatey.org/docs/automatic-packages\)', '(xref:automatic-packaging)'
+  $text = $text -replace '\(https://docs.chocolatey.org/en-us/create/automatic-packages\)', '(xref:automatic-packaging)'
   $text = $text -replace 'Learn more about using this at https://chocolatey.org/docs/how-to-parse-package-parameters-argument', '[Learn more](xref:parse-package-parameters)'
   $text = $text -replace 'at https://chocolatey.org/docs/how-to-parse-package-parameters-argument#step-3---use-core-community-extension', 'in [the docs](xref:parse-package-parameters#step-3-use-core-community-extension)'
   $text = $text -replace 'https://chocolatey.org/docs/how-to-parse-package-parameters-argument', 'https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument'
