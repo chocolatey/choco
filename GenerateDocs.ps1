@@ -234,7 +234,7 @@ param(
   $commandText = $commandText -replace '([Ll]icensed versions)', '[$1](https://chocolatey.org/compare)'
   $commandText = $commandText -replace 'https://raw.githubusercontent.com/wiki/chocolatey/choco/images', '/assets/images'
   $commandText = $commandText -replace 'https://chocolatey.org/docs/features-automatically-recompile-packages', 'https://docs.chocolatey.org/en-us/guides/create/recompile-packages'
-  $commandText = $commandText -replace 'https://chocolatey.org/docs/features-private-cdn', 'https://docs.chocolatey.org/en-us/features/private-cdn'
+  $commandText = $commandText -replace 'https://docs.chocolatey.org/en-us/features/private-cdn', 'https://docs.chocolatey.org/en-us/features/private-cdn'
   $commandText = $commandText -replace 'https://chocolatey.org/docs/features-virus-check', 'https://docs.chocolatey.org/en-us/features/virus-check'
   $commandText = $commandText -replace 'https://chocolatey.org/docs/features-synchronize', 'https://docs.chocolatey.org/en-us/features/package-synchronization'
   $commandText = $commandText -replace 'explicity', 'explicit'

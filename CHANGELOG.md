@@ -616,7 +616,7 @@ This further restricts the default installation location by removing all permiss
  * Get-UninstallRegistryKey function - see [#739](https://github.com/chocolatey/choco/issues/739)
  * Pro/Business - Ubiquitous Install Directory Switch - see [#258](https://github.com/chocolatey/choco/issues/258)
  * Pro/Business - Runtime Virus Scanning - see [virus scanning](https://chocolatey.org/docs/features-virus-check)
- * Pro/Business - Private CDN cache for downloads - see [private CDN cache](https://chocolatey.org/docs/features-private-cdn)
+ * Pro/Business - Private CDN cache for downloads - see [private CDN cache](https://docs.chocolatey.org/en-us/features/private-cdn)
  * Pro/Business - Sync "choco installed status" with "Windows installed status" - see [#567](https://github.com/chocolatey/choco/issues/567)
 
 ### BUG FIXES
