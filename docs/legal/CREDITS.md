@@ -43,7 +43,6 @@ The Chocolatey Community Team includes the committers and adds these fine folks:
 ### Contributors
  * [choco.exe](https://github.com/chocolatey/choco/graphs/contributors)
  * [Original Chocolatey - POSH choco](https://github.com/chocolatey/chocolatey/graphs/contributors)
- * [Community Package Repository / Chocolatey.org](https://github.com/chocolatey/chocolatey.org/graphs/contributors)
 
 ### Other Contributors
 **NOTE: NEEDS UPDATED**
