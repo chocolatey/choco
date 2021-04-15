@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,8 +50,8 @@ $packageArgs = @{
   softwareName  = '[[PackageName]]*' #part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
 
   # Checksums are now required as of 0.10.0.
-  # To determine checksums, you can get that from the original site if provided. 
-  # You can also use checksum.exe (choco install checksum) and use it 
+  # To determine checksums, you can get that from the original site if provided.
+  # You can also use checksum.exe (choco install checksum) and use it
   # e.g. checksum -t sha256 -f path\to\file
   checksum      = '[[Checksum]]'
   checksumType  = '[[ChecksumType]]' #default is md5, can also be sha1, sha256 or sha512
@@ -124,9 +124,9 @@ Install-ChocolateyPackage @packageArgs # https://chocolatey.org/docs/helpers-ins
 ##Will resolve to C:\Program Files\appname
 #$statementsToRun = ""/C `""$appPath\bin\installservice.bat`""""
 #Start-ChocolateyProcessAsAdmin $statementsToRun cmd -validExitCodes $validExitCodes
-    
-## add specific folders to the path - any executables found in the chocolatey package 
-## folder will already be on the path. This is used in addition to that or for cases 
+
+## add specific folders to the path - any executables found in the chocolatey package
+## folder will already be on the path. This is used in addition to that or for cases
 ## when a native installer doesn't add things to the path.
 ## - https://chocolatey.org/docs/helpers-install-chocolatey-path
 #Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights

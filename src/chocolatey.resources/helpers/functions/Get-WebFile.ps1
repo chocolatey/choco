@@ -131,7 +131,7 @@ param(
       $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
 	    $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
 	  }
-    
+
     if ($explicitProxyBypassList -ne $null -and $explicitProxyBypassList -ne '') {
       $proxy.BypassList =  $explicitProxyBypassList.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)
     }

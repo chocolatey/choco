@@ -5,7 +5,7 @@ about: Something went wrong with an installation? Want a package to be added to 
 
 STOP RIGHT HERE - DO NOT CREATE A TICKET FOR PACKAGES ON THIS REPOSITORY
 
-This is the repository for choco.exe, the command line interface for Chocolatey, and issues/feature suggestions should be limited to only choco. For a package failure, typically you would be reporting an issue with a package on the community package repository, which is not what this repository represents. In fact, the community repository and all of its packages represents about 5% of the packages in existence and less than half of the usage of choco itself. 
+This is the repository for choco.exe, the command line interface for Chocolatey, and issues/feature suggestions should be limited to only choco. For a package failure, typically you would be reporting an issue with a package on the community package repository, which is not what this repository represents. In fact, the community repository and all of its packages represents about 5% of the packages in existence and less than half of the usage of choco itself.
 
   In other words Chocolatey != Chocolatey.org Packages.
 

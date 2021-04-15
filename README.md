@@ -191,7 +191,7 @@ yum install mono-devel -y
 ```
 
   * [Fedora](https://www.mono-project.com/download/stable/#download-lin-fedora)
-  
+
 ```sh
 ### NOT FULLY TESTED AND WORKING ###
 

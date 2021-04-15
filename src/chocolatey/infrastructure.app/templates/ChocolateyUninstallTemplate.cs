@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,23 +58,23 @@ $packageArgs = @{
 $uninstalled = $false
 # Get-UninstallRegistryKey is new to 0.9.10, if supporting 0.9.9.x and below,
 # take a dependency on ""chocolatey-core.extension"" in your nuspec file.
-# This is only a fuzzy search if $softwareName includes '*'. Otherwise it is 
+# This is only a fuzzy search if $softwareName includes '*'. Otherwise it is
 # exact. In the case of versions in key names, we recommend removing the version
 # and using '*'.
 [array]$key = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']
 
 if ($key.Count -eq 1) {
-  $key | % { 
+  $key | % {
     $packageArgs['file'] = ""$($_.UninstallString)"" #NOTE: You may need to split this if it contains spaces, see below
-    
+
     if ($packageArgs['fileType'] -eq 'MSI') {
-      # The Product Code GUID is all that should be passed for MSI, and very 
-      # FIRST, because it comes directly after /x, which is already set in the 
+      # The Product Code GUID is all that should be passed for MSI, and very
+      # FIRST, because it comes directly after /x, which is already set in the
       # Uninstall-ChocolateyPackage msiargs (facepalm).
       $packageArgs['silentArgs'] = ""$($_.PSChildName) $($packageArgs['silentArgs'])""
-      
-      # Don't pass anything for file, it is ignored for msi (facepalm number 2) 
-      # Alternatively if you need to pass a path to an msi, determine that and 
+
+      # Don't pass anything for file, it is ignored for msi (facepalm number 2)
+      # Alternatively if you need to pass a path to an msi, determine that and
       # use it instead of the above in silentArgs, still very first
       $packageArgs['file'] = ''
     } else {
