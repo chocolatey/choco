@@ -97,11 +97,11 @@ Anything that doesn't contain source and key will list api keys.
     choco apikey -s ""https://push.chocolatey.org/"" -k=""123-123123-123""
     choco apikey -s ""http://internal_nexus"" -k=""user:password""
 
-https://chocolatey.org/api/v2, but the push url is https://push.chocolatey.org 
 For source location, this can be a folder/file share or an
 http location. When it comes to urls, they can be different from the packages
 url (where packages are searched and installed from). As an example, for
 Chocolatey's community package package repository, the package url is
+https://community.chocolatey.org/api/v2/, but the push url is https://push.chocolatey.org
 (and the deprecated https://chocolatey.org/ as a push url). Check the
 documentation for your choice of repository to learn what the push url is.
 
