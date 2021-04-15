@@ -484,7 +484,7 @@ If the package version is a prerelease and you didn't specify `--pre`,
 Version was specified as '{0}'. It is possible that version
  does not exist for '{1}' at the source specified.".format_with(config.Version.to_string(), packageName),
 @"
-Please see https://chocolatey.org/docs/troubleshooting for more 
+Please see https://docs.chocolatey.org/en-us/troubleshooting for more
  assistance.");
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     var noPkgResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));

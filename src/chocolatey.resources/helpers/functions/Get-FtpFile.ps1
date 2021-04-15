@@ -192,7 +192,7 @@ param(
 
     Set-PowerShellExitCode 404
     if ($env:DownloadCacheAvailable -eq 'true') {
-       throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message) `nThis package is likely not broken for licensed users - see https://chocolatey.org/docs/features-private-cdn."
+       throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message) `nThis package is likely not broken for licensed users - see https://docs.chocolatey.org/en-us/features/private-cdn."
     } else {
        throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"
     }

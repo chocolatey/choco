@@ -45,10 +45,10 @@ Submitting an Issue (or a Bug)? See the **[Submitting Issues](https://github.com
 Do not submit issues for missing `SolutionVersion.cs`. Please see [Compiling / Building Source](https://github.com/chocolatey/choco#compiling--building-source).
 
 ### Package Issue?
-Please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://chocolatey.org/docs/package-triage-process).
+Please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process).
 
 ### Package Request? Package Missing?
-If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://chocolatey.org/docs/package-triage-process#package-request-package-missing).
+If you are looking for packages to be added to the community feed (aka https://chocolatey.org/packages), please see [Package Requests](https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process#package-request-package-missing).
 
 ### Submitting an Enhancement / Feature Request?
 If this is for choco (the CLI tool), this is the right place. See below. Otherwise see [Submitting Issues](https://github.com/chocolatey/choco#submitting-issues) for enhancements to the website, enhancements to the ChocolateyGUI, etc.

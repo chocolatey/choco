@@ -410,10 +410,10 @@ This specifies that the source is a Windows Feature and we should
             "chocolatey".Log().Info(@"
  * How-To: A complete example of how you can use the PackageParameters argument
    when creating a Chocolatey Package can be seen at
-   https://chocolatey.org/docs/how-to-parse-package-parameters-argument
+   https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument
  * One may want to override the default installation directory of a
    piece of software. See
-   https://chocolatey.org/docs/getting-started#overriding-default-install-directory-or-other-advanced-install-concepts.
+   https://docs.chocolatey.org/en-us/getting-started#overriding-default-install-directory-or-other-advanced-install-concepts.
 
 ");
 

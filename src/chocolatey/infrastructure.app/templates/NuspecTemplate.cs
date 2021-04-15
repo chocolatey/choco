@@ -20,7 +20,7 @@ namespace chocolatey.infrastructure.app.templates
     {
         public static string Template =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!-- Read this before creating packages: https://chocolatey.org/docs/create-packages -->
+<!-- Read this before creating packages: https://docs.chocolatey.org/en-us/create/create-packages -->
 <!-- It is especially important to read the above link to understand additional requirements when publishing packages to the community feed aka dot org (https://chocolatey.org/packages). -->
 
 <!-- Test your packages in a test environment: https://github.com/chocolatey/chocolatey-test-environment -->

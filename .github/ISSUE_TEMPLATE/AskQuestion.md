@@ -5,7 +5,7 @@ about: Do you have a question?
 
 STOP RIGHT HERE - DO NOT CREATE A TICKET FOR A QUESTION ON THIS REPOSITORY
 
-1. Start with https://chocolatey.org/docs/troubleshooting (Troubleshooting) and https://chocolatey.org/docs/chocolatey-faqs (FAQs) to see if your question or issue already has an answer. You can also explore https://chocolatey.org/docs (which are pretty comprehensive, but not always the most searchable).
+1. Start with https://docs.chocolatey.org/en-us/troubleshooting (Troubleshooting) and https://docs.chocolatey.org/en-us/faqs (FAQs) to see if your question or issue already has an answer. You can also explore https://docs.chocolatey.org/en-us/ (which are pretty comprehensive, but not always the most searchable).
 2. If not found or resolved, please see https://chocolatey.org/support to see what avenues are available to you based on whether you are an open source user or a licensed customer (have a commercial edition).
 
 

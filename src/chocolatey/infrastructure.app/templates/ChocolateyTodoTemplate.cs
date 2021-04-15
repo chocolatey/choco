@@ -32,11 +32,11 @@ namespace chocolatey.infrastructure.app.templates
   `Install-ChocolateyInstallPackage`/`Get-ChocolateyUnzip` in
   tools\chocolateyInstall.ps1.
 
-  https://chocolatey.org/docs/community-packages-disclaimer#organizations
   You can also choose to download from internal urls, see the next
   section, but ignore whether you have distribution rights or not, it
   doesn't apply. Under no circumstances should download from the
   internet, it is completely unreliable. See
+  https://docs.chocolatey.org/en-us/community-repository/community-packages-disclaimer
   to understand the limitations of a publicly available repository.
 
  Community Repository?
@@ -58,7 +58,7 @@ namespace chocolatey.infrastructure.app.templates
     - Note: Packages built this way cannot be 100% reliable, but it's a
       constraint of publicly available packages and there is little
       that can be done to change that. See
-      https://chocolatey.org/docs/community-packages-disclaimer#organizations
+      https://docs.chocolatey.org/en-us/community-repository/community-packages-disclaimer
       to better understand the limitations of a publicly available
       repository.
     Download Location is Publicly Available?
@@ -90,10 +90,10 @@ namespace chocolatey.infrastructure.app.templates
   zip package) - cannot require administrative permissions to install
   or use
 - Config Package - sets config like files, registry keys, etc
-  Chocolatey - https://chocolatey.org/docs/how-to-create-extensions
 - Extension Package - Packages that add PowerShell functions to
+  Chocolatey - https://docs.chocolatey.org/en-us/features/extensions
 - Template Package - Packages that add templates like this for `choco
-  new -t=name` - https://chocolatey.org/docs/how-to-create-custom-package-templates
+  new -t=name` - https://docs.chocolatey.org/en-us/guides/create/create-custom-package-templates
 - Other - there are other types of packages as well, these are the main
   package types seen in the wild
 
@@ -126,7 +126,7 @@ namespace chocolatey.infrastructure.app.templates
   `Install-ChocolateyPackage` / `Install-ChocolateyZipPackage`.
 - Other needs (creating files, setting registry keys), use regular
   PowerShell to do so or see if there is a function already defined:
-  https://chocolatey.org/docs/helpers-reference
+  https://docs.chocolatey.org/en-us/create/functions
 - There may also be functions available in extension packages, see
   https://chocolatey.org/packages?q=id%3A.extension for examples and
   availability.

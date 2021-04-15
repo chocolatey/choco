@@ -156,7 +156,7 @@ We've also brought in the long desired logging with no colorization. You can set
 
 
 ## [0.10.8](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.8+is%3Aclosed) (August 30, 2017)
-With this release, Package Parameters are fully supported from both the user side and the packaging side. Check out [the documentation](https://chocolatey.org/docs/helpers-get-packageparameters) and check out the [walkthrough](https://chocolatey.org/docs/how-to-parse-package-parameters-argument) on how to use package parameters in your packaging. Note if you are pushing packages to the community repository, you must continue to take a dependency on the `chocolatey-core.extension` as a polyfill for older versions until at least six months after a new feature is released.
+With this release, Package Parameters are fully supported from both the user side and the packaging side. Check out [the documentation](https://docs.chocolatey.org/en-us/create/functions/get-packageparameters) and check out the [walkthrough](https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument) on how to use package parameters in your packaging. Note if you are pushing packages to the community repository, you must continue to take a dependency on the `chocolatey-core.extension` as a polyfill for older versions until at least six months after a new feature is released.
 
 What you can do with logging has greatly increased your ability to have more power over how it works and deeper output to determine errors (we've expanded `--trace` [#1379](https://github.com/chocolatey/choco/issues/1379)). This release also gives packagers and users more power when working with the AutoUninstaller - opt-out ([#1257](https://github.com/chocolatey/choco/issues/1257)) and passing arguments to the uninstaller ([#1133](https://github.com/chocolatey/choco/issues/1133)).
 
@@ -474,11 +474,11 @@ Checksums in package scripts are meant as a measure to validate the originally i
 **Can I shut this behavior off or opt out per package?**
 You can shut off the checksum requirement by enabling the feature `allowEmptyChecksums`. This will return Chocolatey to previous behavior. We strongly recommend against it.
 
-You can shut it off or turn it per package install/upgrade with `--allow-empty-checksums` and `--require-checksums`, respectively. See https://chocolatey.org/docs/commands-install / https://chocolatey.org/docs/commands-upgrade.
+You can shut it off or turn it per package install/upgrade with `--allow-empty-checksums` and `--require-checksums`, respectively. See https://docs.chocolatey.org/en-us/choco/commands/install / https://docs.chocolatey.org/en-us/choco/commands/upgrade.
 
 You can also disable the feature `allowEmptyChecksumsSecure` to enforce checksums for packages that download from secure locations (HTTPS).
 
-**Other things I should know?** Users also now have the ability to pass their own checksums and checksumtypes into the install. See https://chocolatey.org/docs/commands-install / https://chocolatey.org/docs/commands-upgrade.
+**Other things I should know?** Users also now have the ability to pass their own checksums and checksumtypes into the install. See https://docs.chocolatey.org/en-us/choco/commands/install / https://docs.chocolatey.org/en-us/choco/commands/upgrade.
 
 ### KNOWN ISSUES
  * [Known Issues](https://github.com/chocolatey/choco/labels/Bug)
@@ -562,7 +562,7 @@ Here's one you probably never knew existed - extensions. Chocolatey has had the 
 
 We redesigned our `choco new` default packaging template and we've made managing templates as easy as managing packages.
 
-`choco search`/`choco list` has so many enhancements, you may not need to visit dot org again. [See it in action](https://chocolatey.org/docs/commands-list#see-it-in-action).
+`choco search`/`choco list` has so many enhancements, you may not need to visit dot org again. [See it in action](https://docs.chocolatey.org/en-us/choco/commands/list#see-it-in-action).
 * [search -v provides moderation related information and a world of nuspec information](https://github.com/chocolatey/choco/issues/493)
 * [search by id only](https://github.com/chocolatey/choco/issues/663)
 * [search by id exact](https://github.com/chocolatey/choco/issues/453)
@@ -615,8 +615,8 @@ This further restricts the default installation location by removing all permiss
  * Uninstall-ChocolateyEnvironmentVariable function - see [#772](https://github.com/chocolatey/choco/issues/772)
  * Get-UninstallRegistryKey function - see [#739](https://github.com/chocolatey/choco/issues/739)
  * Pro/Business - Ubiquitous Install Directory Switch - see [#258](https://github.com/chocolatey/choco/issues/258)
- * Pro/Business - Runtime Virus Scanning - see [virus scanning](https://chocolatey.org/docs/features-virus-check)
- * Pro/Business - Private CDN cache for downloads - see [private CDN cache](https://chocolatey.org/docs/features-private-cdn)
+ * Pro/Business - Runtime Virus Scanning - see [virus scanning](https://docs.chocolatey.org/en-us/features/virus-check)
+ * Pro/Business - Private CDN cache for downloads - see [private CDN cache](https://docs.chocolatey.org/en-us/features/private-cdn)
  * Pro/Business - Sync "choco installed status" with "Windows installed status" - see [#567](https://github.com/chocolatey/choco/issues/567)
 
 ### BUG FIXES
@@ -994,13 +994,13 @@ We'll try to capture everything here that you should know about. Please call `ch
 
 ### FEATURES
  * In app documentation! Use `choco -?`, `choco -h` or `choco commandName -?` to learn about each command, complete with examples!
- * WhatIf/Noop mode for all commands (`--noop` can also be specified as `-whatif`) - see [Chocolatey #263](https://github.com/chocolatey/chocolatey/issues/263) and [Default Options and Switches](https://chocolatey.org/docs/commands-reference#how-to-pass-options-switches)
+ * WhatIf/Noop mode for all commands (`--noop` can also be specified as `-whatif`) - see [Chocolatey #263](https://github.com/chocolatey/chocolatey/issues/263) and [Default Options and Switches](https://docs.chocolatey.org/en-us/choco/commands#how-to-pass-options-switches)
  * Performs like a package manager, expect to see queries failing because of unmet dependency issues.
  * **New Commands:**
-   1. `pin` - Suppress upgrades. This allows you to 'pin' an install to a particular version - see [#1](https://github.com/chocolatey/choco/issues/1), [Chocolatey #5](https://github.com/chocolatey/chocolatey/issues/5) and [Pin Command](https://chocolatey.org/docs/commands-pin)
-   2. `apikey` - see [ApiKey Command](https://chocolatey.org/docs/commands-apikey)
-   3. `new` - see [New Command](https://chocolatey.org/docs/commands-new) and [Chocolatey #157](https://github.com/chocolatey/chocolatey/issues/157)
- * New ways to pass arguments! See [How to Pass Options/Switches](https://chocolatey.org/docs/commands-reference#how-to-pass-options-switches)
+   1. `pin` - Suppress upgrades. This allows you to 'pin' an install to a particular version - see [#1](https://github.com/chocolatey/choco/issues/1), [Chocolatey #5](https://github.com/chocolatey/chocolatey/issues/5) and [Pin Command](https://docs.chocolatey.org/en-us/choco/commands/pin)
+   2. `apikey` - see [ApiKey Command](https://docs.chocolatey.org/en-us/create/commands/api-key)
+   3. `new` - see [New Command](https://docs.chocolatey.org/en-us/create/commands/new) and [Chocolatey #157](https://github.com/chocolatey/chocolatey/issues/157)
+ * New ways to pass arguments! See [How to Pass Options/Switches](https://docs.chocolatey.org/en-us/choco/commands#how-to-pass-options-switches)
  * Did we mention there is a help menu that is actually helpful now? Shiny!
  * AutoUninstaller!!!! But it is not enabled by default this version. See [#15](https://github.com/chocolatey/choco/issues/15), [#9](https://github.com/chocolatey/choco/issues/9) and [Chocolatey #6](https://github.com/chocolatey/chocolatey/issues/6)
  * **New Helpers:**
@@ -1011,7 +1011,7 @@ Probably a lot of bug fixes that may not make it here, but here are the ones we 
 
  * Fix - Cannot upgrade from prerelease to same version released - see [Chocolatey #122](https://github.com/chocolatey/chocolatey/issues/122)
  * Fix - install `--force` should not use cache - see [Chocolatey #199](https://github.com/chocolatey/chocolatey/issues/199)
- * Fix - force dependencies as well - see [--force-dependencies](https://chocolatey.org/docs/commands-install) and [Chocolatey #199](https://github.com/chocolatey/chocolatey/issues/199)
+ * Fix - force dependencies as well - see [--force-dependencies](https://docs.chocolatey.org/en-us/choco/commands/install) and [Chocolatey #199](https://github.com/chocolatey/chocolatey/issues/199)
  * Fix - Chocolatey should not stop on error - see [Chocolatey #192](https://github.com/chocolatey/chocolatey/issues/192)
  * Fix - Upgrading does not remove previous version - see [Chocolatey #259](https://github.com/chocolatey/chocolatey/issues/259)
  * Fix - Non-elevated shell message spills errors - see [Chocolatey #540](https://github.com/chocolatey/chocolatey/issues/540)
@@ -1036,7 +1036,7 @@ Probably a lot of bug fixes that may not make it here, but here are the ones we 
  * Add $env:CHOCOLATEY_VERSION - see [Chocolatey #251](https://github.com/chocolatey/chocolatey/issues/251)
  * Replace ascii cue with visual cues - see [Chocolatey #376](https://github.com/chocolatey/chocolatey/pull/376)
  * Uninstall all versions of an app - see [Chocolatey #389](https://github.com/chocolatey/chocolatey/issues/389)
- * Add parameters in packages.config files - see [Packages.config](https://chocolatey.org/docs/commands-install#packages.config), [Chocolatey #472](https://github.com/chocolatey/chocolatey/issues/472), and [#10](https://github.com/chocolatey/choco/issues/10)
+ * Add parameters in packages.config files - see [Packages.config](https://docs.chocolatey.org/en-us/choco/commands/install#packages.config), [Chocolatey #472](https://github.com/chocolatey/chocolatey/issues/472), and [#10](https://github.com/chocolatey/choco/issues/10)
  * Choco pack should support `-version` - see [Chocolatey #526](https://github.com/chocolatey/chocolatey/issues/526)
  * Enhancements to Start-ChocolateyProcessAsAdmin - see [Chocolatey #564](https://github.com/chocolatey/chocolatey/pull/564)
  * Install-ChocolateyFileAssociation - add label to new file types - see [Chocolatey #564](https://github.com/chocolatey/chocolatey/pull/564)
