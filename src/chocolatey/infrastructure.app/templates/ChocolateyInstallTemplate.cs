@@ -73,7 +73,7 @@ $packageArgs = @{
   #silentArgs   = '-s'           # Ghost
   # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
   #silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
-                                 #       https://chocolatey.org/packages/autohotkey.portable
+                                 #       https://community.chocolatey.org/packages/autohotkey.portable
   #validExitCodes= @(0) #please insert other valid exit codes here
 }
 

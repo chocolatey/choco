@@ -108,7 +108,7 @@ to help provide that functionality.
 
 **NOTE:** To determine checksums, you can get that from the original
 site if provided. You can also use the [checksum tool available on
-the community feed](https://chocolatey.org/packages/checksum) (`choco install checksum`)
+the community feed](https://community.chocolatey.org/packages/checksum) (`choco install checksum`)
 and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you
 provide checksums for all remote resources used.
 

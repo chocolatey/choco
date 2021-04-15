@@ -40,7 +40,7 @@ Learn more about using this at https://docs.chocolatey.org/en-us/guides/create/p
 Available in 0.10.8+. If you need compatibility with older versions,
 take a dependency on the `chocolatey-core.extension` package which
 also provides this functionality. If you are pushing to the community
-package repository (https://chocolatey.org/packages), you are required
+package repository (https://community.chocolatey.org/packages), you are required
 to take a dependency on the core extension until January 2018. How to
 do this is explained at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument#step-3---use-core-community-extension.
 

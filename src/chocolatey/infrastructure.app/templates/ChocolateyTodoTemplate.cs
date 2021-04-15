@@ -128,7 +128,7 @@ namespace chocolatey.infrastructure.app.templates
   PowerShell to do so or see if there is a function already defined:
   https://docs.chocolatey.org/en-us/create/functions
 - There may also be functions available in extension packages, see
-  https://chocolatey.org/packages?q=id%3A.extension for examples and
+  https://community.chocolatey.org/packages?q=id%3A.extension for examples and
   availability.
 - Clean out the comments and sections you are not using.
 

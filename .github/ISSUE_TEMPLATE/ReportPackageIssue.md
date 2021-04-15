@@ -12,7 +12,7 @@ This is the repository for choco.exe, the command line interface for Chocolatey,
 For all things packages, you have two routes:
 
 1. If you are having issue with a package or you want to see an enhancement, please see https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process (Package Triage Process / Becoming a maintainer of existing packages).
-2. If you are looking for packages to be added to the community package repository (aka https://chocolatey.org/packages), please see https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process#package-request-package-missing (Package Requests).
+2. If you are looking for packages to be added to the community package repository (aka https://community.chocolatey.org/packages), please see https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process#package-request-package-missing (Package Requests).
 
 
 

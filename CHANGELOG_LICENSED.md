@@ -513,7 +513,7 @@ Uninstall-ChocolateyWindowsService -Name 'chocolatey-agent'
 
 
 ## 1.8.0 (November 16, 2016)
-Package Builder has some major improvements in this release, including a new UI! See https://chocolatey.org/blog/package-builder-announcements for details! While building some of the features for the enhancements for this release, we've made quite a few tweaks and fixes to Package Builder and we think you are going to like the results. Being able to generate packages from the installed software on a reference system is huge (`choco new --from-programs-and-features`)!
+Package Builder has some major improvements in this release, including a new UI! See https://blog.chocolatey.org/2016/11/package-builder-announcements/ for details! While building some of the features for the enhancements for this release, we've made quite a few tweaks and fixes to Package Builder and we think you are going to like the results. Being able to generate packages from the installed software on a reference system is huge (`choco new --from-programs-and-features`)!
 
 Pro users now have the ability to download packages (minus internalization). This is fantastic if you want to pull down a lot of packages quickly from a remote source. Or pull down packages and push them up to an internal source.
 

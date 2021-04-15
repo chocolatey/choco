@@ -21,7 +21,7 @@ namespace chocolatey.infrastructure.app.templates
         public static string Template =
             @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!-- Read this before creating packages: https://docs.chocolatey.org/en-us/create/create-packages -->
-<!-- It is especially important to read the above link to understand additional requirements when publishing packages to the community feed aka dot org (https://chocolatey.org/packages). -->
+<!-- It is especially important to read the above link to understand additional requirements when publishing packages to the community feed aka dot org (https://community.chocolatey.org/packages). -->
 
 <!-- Test your packages in a test environment: https://github.com/chocolatey/chocolatey-test-environment -->
 
@@ -83,7 +83,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
       <dependency id="""" />
       <dependency id=""chocolatey-core.extension"" version=""1.1.0"" />
     </dependencies>-->
-    <!-- chocolatey-core.extension - https://chocolatey.org/packages/chocolatey-core.extension
+    <!-- chocolatey-core.extension - https://community.chocolatey.org/packages/chocolatey-core.extension
          - You want to use Get-UninstallRegistryKey on less than 0.9.10 (in chocolateyUninstall.ps1)
          - You want to use Get-PackageParameters and on less than 0.11.0
          - You want to take advantage of other functions in the core community maintainer's team extension package

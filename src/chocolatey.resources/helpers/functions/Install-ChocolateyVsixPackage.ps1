@@ -75,16 +75,16 @@ originally intended file that was used in the creation of a package is
 the same file that is received at a future date. Since this is used for
 other steps in the process related to the community repository, it
 ensures that the file a user receives is the same file a maintainer
-resource updates. You should look into [automatic packaging](https://docs.chocolatey.org/en-us/create/automatic-packages) 
 and a moderator (if applicable), plus any moderation review has
 intended for you to receive with this package. If you are looking at a
 remote source that uses the same url for updates, you will need to
 ensure the package also stays updated in line with those remote
+resource updates. You should look into [automatic packaging](https://docs.chocolatey.org/en-us/create/automatic-packages)
 to help provide that functionality.
 
-the community feed](https://chocolatey.org/packages/checksum) (`choco install checksum`) 
 **NOTE:** To determine checksums, you can get that from the original
 site if provided. You can also use the [checksum tool available on
+the community feed](https://community.chocolatey.org/packages/checksum) (`choco install checksum`)
 and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you
 provide checksums for all remote resources used.
 
