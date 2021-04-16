@@ -214,10 +214,17 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void GetExecutablePath_should_find_existing_executable()
             {
-                FileSystem.get_executable_path("ls").ShouldEqual(
-                    Platform.get_platform() != PlatformType.Windows
-                        ? "/bin/ls"
-                        : "ls");
+                if (Platform.get_platform() == PlatformType.Windows)
+                {
+                    FileSystem.get_executable_path("ls").ShouldEqual("ls");
+                }
+                else
+                {
+                    new string[]
+                    {
+                        "/bin/ls", "/usr/bin/ls"
+                    }.ShouldContain(FileSystem.get_executable_path("ls"));
+                }
             }
 
             [Fact]
