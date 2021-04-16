@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.templates
 {
     public class ChocolateyReadMeTemplate
     {
+        public static TemplateLanguage Language = TemplateLanguage.PlainText;
         public static string Template =
             @"## Summary
 How do I create packages? See https://docs.chocolatey.org/en-us/create/create-packages

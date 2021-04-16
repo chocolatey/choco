@@ -147,6 +147,62 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
+        public class when_generate_file_from_template_is_called_on_xml_with_special_characters : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private readonly TemplateValues templateValues = new TemplateValues();
+            private readonly string template = "[[PackageName]]";
+            private const string fileLocation = "c:\\packages\\bob<>&'\".nuspec";
+            private string fileContent;
+
+            public override void Context()
+            {
+                base.Context();
+
+                fileSystem.Setup(x => x.write_file(It.Is((string fl) => fl == fileLocation), It.IsAny<string>(), Encoding.UTF8))
+                    .Callback((string filePath, string fileContent, Encoding encoding) => this.fileContent = fileContent);
+
+                templateValues.PackageName = "Bob<>&'\"";
+            }
+
+            public override void Because()
+            {
+                because = () => service.generate_file_from_template(config, templateValues, template, fileLocation, Encoding.UTF8, TemplateLanguage.XML);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            public void should_write_file_with_escaped_and_replaced_tokens()
+            {
+                because();
+
+                var debugs = MockLogger.MessagesFor(LogLevel.Debug);
+                debugs.Count.ShouldEqual(1);
+                debugs[0].ShouldEqual("Bob&lt;&gt;&amp;&apos;&quot;");
+            }
+
+            [Fact]
+            public void should_log_info_if_regular_output()
+            {
+                config.RegularOutput = true;
+
+                because();
+
+                var debugs = MockLogger.MessagesFor(LogLevel.Debug);
+                debugs.Count.ShouldEqual(1);
+                debugs[0].ShouldEqual("Bob&lt;&gt;&amp;&apos;&quot;");
+
+                var infos = MockLogger.MessagesFor(LogLevel.Info);
+                infos.Count.ShouldEqual(1);
+                infos[0].ShouldEqual(string.Format(@"Generating template to a file{0} at 'c:\packages\bob<>&'"".nuspec'", Environment.NewLine));
+            }
+        }
+
         public class when_generate_is_called_with_existing_directory : TemplateServiceSpecsBase
         {
             private Action because;

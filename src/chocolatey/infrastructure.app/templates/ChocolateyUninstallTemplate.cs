@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.templates
 {
     public class ChocolateyUninstallTemplate
     {
+        public static TemplateLanguage Language = TemplateLanguage.PlainText;
         public static string Template =
             @"# IMPORTANT: Before releasing this package, copy/paste the next 2 lines into PowerShell to remove all comments from this file:
 #   $f='c:\path\to\thisFile.ps1'
