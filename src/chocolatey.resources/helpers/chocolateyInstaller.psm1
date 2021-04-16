@@ -1,4 +1,4 @@
-﻿# Copyright © 2017 Chocolatey Software, Inc.
+# Copyright © 2017 Chocolatey Software, Inc.
 # Copyright © 2015 - 2017 RealDimensions Software, LLC
 # Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
@@ -40,11 +40,11 @@ Write-Debug "Host version is $($host.Version), PowerShell Version is '$($PSVersi
 Get-Item $helpersPath\functions\*.ps1 |
   ? { -not ($_.Name.Contains(".Tests.")) } |
     % {
-	  . $_.FullName;
-	  #Export-ModuleMember -Function $_.BaseName
+    . $_.FullName;
+    #Export-ModuleMember -Function $_.BaseName
     }
 
-# Export built-in functions prior to loading extensions so that 
+# Export built-in functions prior to loading extensions so that
 # extension-specific loading behavior can be used based on built-in
 # functions. This allows those overrides to be much more deterministic
 # This behavior was broken from v0.9.9.5 - v0.10.3.
@@ -66,14 +66,18 @@ if (Test-Path($extensionsPath)) {
       Write-Debug "Loading '$fileNameWithoutExtension' extension.";
       $loaded = $false
       $currentAssemblies | % {
-		    $name = $_.GetName().Name
-        if ($name -eq $fileNameWithoutExtension) { 
-          Import-Module $_ 
-			    $loaded = $true
+        $name = $_.GetName().Name
+        if ($name -eq $fileNameWithoutExtension) {
+          Import-Module $_
+          $loaded = $true
         }
-	    }
+      }
 
-	    if (!$loaded) { Import-Module $path; }
+      if (!$loaded) {
+        if ($fileNameWithoutExtension -ne "chocolateygui.licensed") {
+          Import-Module $path;
+        }
+      }
     } catch {
       if ($env:ChocolateyPowerShellHost -eq 'true') {
         Write-Warning "Import failed for '$path'.  Error: '$_'"
