@@ -88,7 +88,7 @@ Install-ChocolateyZipPackage
 #>
 param(
   [alias("file")][parameter(Mandatory=$false, Position=0)][string] $fileFullPath,
-  [parameter(Mandatory=$true, Position=1)][string] $destination,
+  [alias("unzipLocation")][parameter(Mandatory=$true, Position=1)][string] $destination,
   [parameter(Mandatory=$false, Position=2)][string] $specificFolder,
   [parameter(Mandatory=$false, Position=3)][string] $packageName,
   [alias("file64")][parameter(Mandatory=$false)][string] $fileFullPath64,
