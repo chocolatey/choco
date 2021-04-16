@@ -3,6 +3,7 @@ name: Choco.exe - Report Issue
 about: Did you find unexpected behavior?
 ---
 
+<!--
 Ensure you have read over Submitting Issues -
 https://github.com/chocolatey/choco#submitting-issues
 

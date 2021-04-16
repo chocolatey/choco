@@ -130,16 +130,16 @@ function Replace-CommonItems($text) {
 
   $text = $text.Replace("`n",$lineFeed)
   $text = $text -replace "\*\*NOTE:\*\*", "> :memo: **NOTE**"
-  $text = $text -replace '(community feed[s]?[^\]]|community repository)', '[$1](https://chocolatey.org/packages)'
+  $text = $text -replace '(community feed[s]?[^\]]|community repository)', '[$1](https://community.chocolatey.org/packages)'
   $text = $text -replace '(Chocolatey for Business|Chocolatey Professional|Chocolatey Pro)(?=[^\w])', '[$1](https://chocolatey.org/compare)'
   $text = $text -replace '(Pro[fessional]\s?/\s?Business)', '[$1](https://chocolatey.org/compare)'
   $text = $text -replace '([Ll]icensed editions)', '[$1](https://chocolatey.org/compare)'
   $text = $text -replace '([Ll]icensed versions)', '[$1](https://chocolatey.org/compare)'
-  $text = $text -replace '\(https://chocolatey.org/docs/automatic-packages\)', '(xref:automatic-packaging)'
-  $text = $text -replace 'Learn more about using this at https://chocolatey.org/docs/how-to-parse-package-parameters-argument', '[Learn more](xref:parse-package-parameters)'
-  $text = $text -replace 'at https://chocolatey.org/docs/how-to-parse-package-parameters-argument#step-3---use-core-community-extension', 'in [the docs](xref:parse-package-parameters#step-3-use-core-community-extension)'
-  $text = $text -replace 'https://chocolatey.org/docs/how-to-parse-package-parameters-argument', 'https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument'
-  $text = $text -replace '\[community feed\)\]\(https://chocolatey.org/packages\)', '[community feed](https://chocolatey.org/packages))'
+  $text = $text -replace '\(https://docs.chocolatey.org/en-us/create/automatic-packages\)', '(xref:automatic-packaging)'
+  $text = $text -replace 'Learn more about using this at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument', '[Learn more](xref:parse-package-parameters)'
+  $text = $text -replace 'at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument#step-3---use-core-community-extension', 'in [the docs](xref:parse-package-parameters#step-3-use-core-community-extension)'
+  $text = $text -replace 'https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument', 'https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument'
+  $text = $text -replace '\[community feed\)\]\(https://community.chocolatey.org/packages\)', '[community feed](https://community.chocolatey.org/packages))'
 
   Write-Output $text
 }
@@ -222,7 +222,7 @@ param(
   $commandText = $commandText -replace 'NOTE\:', '> :memo: **NOTE**'
   $commandText = $commandText -replace '\*> :memo: \*\*NOTE\*\*\*', '> :memo: **NOTE**'
   $commandText = $commandText -replace 'the command reference', '[how to pass arguments](xref:choco-commands#how-to-pass-options-switches)'
-  $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://chocolatey.org/packages)'
+  $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://comminty.chocolatey.org/packages)'
   #$commandText = $commandText -replace '\`(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[[`$1`|Commands$1]]'
   $commandText = $commandText -replace '\`([choco\s]*)(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[`$1$2`](xref:choco-command-$2)'
   $commandText = $commandText -replace '^(.+):\s(.+.gif)$', '![$1]($2)'
@@ -245,7 +245,7 @@ param(
   $commandText = $commandText -replace 'y.org/docs/features-package-reducer', 'y.org/docs/en-us/features/package-reducer'
   $commandText = $commandText -replace 'https://chocolatey.org/docs/features-package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
   $commandText = $commandText -replace 'https://chocolatey.org/docs/en-us/features/package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
-  $commandText = $commandText -replace '\[community feed\)\]\(https://chocolatey.org/packages\)', '[community feed](https://chocolatey.org/packages))'
+  $commandText = $commandText -replace '\[community feed\)\]\(https://community.chocolatey.org/packages\)', '[community feed](https://community.chocolatey.org/packages))'
 
   $optionsSwitches = @'
 ## $1

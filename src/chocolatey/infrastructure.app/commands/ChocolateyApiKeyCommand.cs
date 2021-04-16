@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,7 +61,7 @@ namespace chocolatey.infrastructure.app.commands
 
         public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
-            if (!configuration.ApiKeyCommand.Remove && !string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key) 
+            if (!configuration.ApiKeyCommand.Remove && !string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key)
                 && string.IsNullOrWhiteSpace(configuration.Sources))
             {
                 throw new ApplicationException("You must specify both 'source' and 'key' to set an API key.");
@@ -69,7 +69,7 @@ namespace chocolatey.infrastructure.app.commands
             if (configuration.ApiKeyCommand.Remove && string.IsNullOrWhiteSpace(configuration.Sources))
             {
                 throw new ApplicationException("You must specify 'source' to remove an API key.");
-                
+
             }
         }
 
@@ -77,7 +77,7 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "ApiKey Command");
             this.Log().Info(@"
-This lists api keys that are set or sets an api key for a particular   
+This lists api keys that are set or sets an api key for a particular
  source so it doesn't need to be specified every time.
 
 Anything that doesn't contain source and key will list api keys.
@@ -97,30 +97,30 @@ Anything that doesn't contain source and key will list api keys.
     choco apikey -s ""https://push.chocolatey.org/"" -k=""123-123123-123""
     choco apikey -s ""http://internal_nexus"" -k=""user:password""
 
-For source location, this can be a folder/file share or an 
-http location. When it comes to urls, they can be different from the packages 
-url (where packages are searched and installed from). As an example, for 
-Chocolatey's community package package repository, the package url is 
-https://chocolatey.org/api/v2, but the push url is https://push.chocolatey.org 
-(and the deprecated https://chocolatey.org/ as a push url). Check the 
-documentation for your choice of repository to learn what the push url is. 
+For source location, this can be a folder/file share or an
+http location. When it comes to urls, they can be different from the packages
+url (where packages are searched and installed from). As an example, for
+Chocolatey's community package package repository, the package url is
+https://community.chocolatey.org/api/v2/, but the push url is https://push.chocolatey.org
+(and the deprecated https://chocolatey.org/ as a push url). Check the
+documentation for your choice of repository to learn what the push url is.
 
-For the key, this can be an apikey that is provided by your source repository. 
-With some sources, like Nexus, this can be a NuGet API key or it could be a 
-user name and password specified as 'user:password' for the API key. Please see 
-your repository's documentation (for Nexus, please see 
+For the key, this can be an apikey that is provided by your source repository.
+With some sources, like Nexus, this can be a NuGet API key or it could be a
+user name and password specified as 'user:password' for the API key. Please see
+your repository's documentation (for Nexus, please see
 https://bit.ly/nexus2apikey).
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Connecting to Chocolatey.org (Community Package Repository)");
             "chocolatey".Log().Info(() => @"
-In order to save your API key for {0}, 
+In order to save your API key for {0},
  log in (or register, confirm and then log in) to
- {0}, go to {0}account, 
+ {0}, go to {0}account,
  copy the API Key, and then use it in the following command:
 
     choco apikey -k <your key here> -s {0}
@@ -135,8 +135,8 @@ Normal:
  - 0: operation was successful, no issues detected
  - -1 or 1: an error has occurred
 
-If you find other exit codes that we have not yet documented, please 
- file a ticket so we can document it at 
+If you find other exit codes that we have not yet documented, please
+ file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
 ");

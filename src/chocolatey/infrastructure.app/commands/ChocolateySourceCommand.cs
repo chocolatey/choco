@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,7 +48,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Name - the name of the source. Required with actions other than list. Defaults to empty.",
                      option => configuration.SourceCommand.Name = option.remove_surrounding_quotes())
                 .Add("s=|source=",
-                     "Source - The source. This can be a folder/file share or an http location. If it is a url, it will be a location you can go to in a browser and it returns OData with something that says Packages in the browser, similar to what you see when you go to https://chocolatey.org/api/v2/. Required with add action. Defaults to empty.",
+                     "Source - The source. This can be a folder/file share or an http location. If it is a url, it will be a location you can go to in a browser and it returns OData with something that says Packages in the browser, similar to what you see when you go to https://community.chocolatey.org/api/v2/. Required with add action. Defaults to empty.",
                      option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
@@ -64,13 +64,13 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
                 .Add("priority=",
                      "Priority - The priority order of this source as compared to other sources, lower is better. Defaults to 0 (no priority). All priorities above 0 will be evaluated first, then zero-based values will be evaluated in config file order. Available in 0.9.9.9+.",
-                     option => configuration.SourceCommand.Priority = int.Parse(option.remove_surrounding_quotes())) 
+                     option => configuration.SourceCommand.Priority = int.Parse(option.remove_surrounding_quotes()))
                  .Add("bypassproxy|bypass-proxy",
                      "Bypass Proxy - Should this source explicitly bypass any explicitly or system configured proxies? Defaults to false. Available in 0.10.4+.",
                      option => configuration.SourceCommand.BypassProxy = option != null)
                  .Add("allowselfservice|allow-self-service",
                      "Allow Self-Service - Should this source be allowed to be used with self-service? Requires business edition (v1.10.0+) with feature 'useBackgroundServiceWithSelfServiceSourcesOnly' turned on. Defaults to false. Available in 0.10.4+.",
-                     option => configuration.SourceCommand.AllowSelfService = option != null)   
+                     option => configuration.SourceCommand.AllowSelfService = option != null)
                  .Add("adminonly|admin-only",
                      "Visible to Administrators Only - Should this source be visible to non-administrators? Requires business edition (v1.12.2+). Defaults to false. Available in 0.10.8+.",
                      option => configuration.SourceCommand.VisibleToAdminsOnly = option != null)
@@ -104,7 +104,7 @@ namespace chocolatey.infrastructure.app.commands
             {
                 throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.SourceCommand.Command.to_string()));
             }
-            
+
             if (configuration.SourceCommand.Command == SourceCommandType.add && string.IsNullOrWhiteSpace(configuration.Sources))
             {
                 throw new ApplicationException("When specifying the subcommand 'add', you must also specify --source.".format_with(configuration.SourceCommand.Command.to_string()));
@@ -149,11 +149,11 @@ NOTE: Mostly compatible with older chocolatey client (0.9.8.x and
     choco source remove -n=bob
 
 When it comes to the source location, this can be a folder/file share or an http
-location. If it is a url, it will be a location you can go to in a browser and 
-it returns OData with something that says Packages in the browser, similar to 
-what you see when you go to https://chocolatey.org/api/v2/.
+location. If it is a url, it will be a location you can go to in a browser and
+it returns OData with something that says Packages in the browser, similar to
+what you see when you go to https://community.chocolatey.org/api/v2/.
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
@@ -166,8 +166,8 @@ Normal:
  - 0: operation was successful, no issues detected
  - -1 or 1: an error has occurred
 
-If you find other exit codes that we have not yet documented, please 
- file a ticket so we can document it at 
+If you find other exit codes that we have not yet documented, please
+ file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
 ");

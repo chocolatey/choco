@@ -13,7 +13,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>2017-2019 Chocolatey Software, Inc, 2011- 2017 RealDimensions Software, LLC</copyright>
     <!--<projectSourceUrl>https://github.com/chocolatey/choco</projectSourceUrl>
-    <docsUrl>https://chocolatey.org/docs</docsUrl>
+    <docsUrl>https://docs.chocolatey.org/en-us/</docsUrl>
     <mailingListUrl>https://groups.google.com/forum/#!forum/chocolatey</mailingListUrl>
     <bugTrackerUrl>https://github.com/chocolatey/choco/issues</bugTrackerUrl>-->
     <tags>nuget apt-get machine repository chocolatey</tags>
@@ -27,14 +27,14 @@ You can host your own sources and add them to Chocolatey, you can extend Chocola
 
 ### Information
 
- * [Chocolatey Website and Community Package Repository](https://chocolatey.org)
+ * [Chocolatey Website and Community Package Repository](https://community.chocolatey.org)
  * [Mailing List](http://groups.google.com/group/chocolatey) / [Release Announcements Only Mailing List](https://groups.google.com/group/chocolatey-announce) / [Build Status Mailing List](http://groups.google.com/group/chocolatey-build-status)
  * [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [Github](https://github.com/chocolatey)
- * [Blog](https://chocolatey.org/blog) / [Newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&amp;id=73b018498d)
- * [Documentation](https://chocolatey.org/docs) / [Support](https://chocolatey.org/support)
+ * [Blog](https://blog.chocolatey.org/) / [Newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&amp;id=73b018498d)
+ * [Documentation](https://docs.chocolatey.org/en-us/) / [Support](https://chocolatey.org/support)
 
 ### Commands
-There are quite a few commands you can call - you should check out the [command reference](https://chocolatey.org/docs/commands-reference). Here are the most common:
+There are quite a few commands you can call - you should check out the [command reference](https://docs.chocolatey.org/en-us/choco/commands). Here are the most common:
 
  * Help - choco -? or choco command -?
  * Search - choco search something
@@ -53,12 +53,12 @@ There are quite a few commands you can call - you should check out the [command 
  * Install webpi feature - choco install IIS7.5Express -source webpi
 
 #### More
-For more advanced commands and switches, use `choco -?` or `choco command -h`. You can also look at the [command reference](https://chocolatey.org/docs/commands-reference), including how you can force a package to install the x86 version of a package.
+For more advanced commands and switches, use `choco -?` or `choco command -h`. You can also look at the [command reference](https://docs.chocolatey.org/en-us/choco/commands), including how you can force a package to install the x86 version of a package.
 
 ### Create Packages?
-We have some great guidance on how to do that. Where? I'll give you a hint, it rhymes with socks! [Docs!](https://chocolatey.org/docs/create-packages)
+We have some great guidance on how to do that. Where? I'll give you a hint, it rhymes with socks! [Docs!](https://docs.chocolatey.org/en-us/create/create-packages)
 
-In that mess there is a link to the [PowerShell Chocolatey module reference](https://chocolatey.org/docs/helpers-reference).
+In that mess there is a link to the [PowerShell Chocolatey module reference](https://docs.chocolatey.org/en-us/create/functions).
 </description>
     <releaseNotes>
 See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md

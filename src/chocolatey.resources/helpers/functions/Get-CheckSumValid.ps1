@@ -45,7 +45,7 @@ to what is expected.
 
 .NOTES
 This uses the checksum.exe tool available separately at
-https://chocolatey.org/packages/checksum.
+https://community.chocolatey.org/packages/checksum.
 
 Options that affect checksum verification:
 
@@ -85,12 +85,12 @@ and a moderator (if applicable), plus any moderation review has
 intended for you to receive with this package. If you are looking at a
 remote source that uses the same url for updates, you will need to
 ensure the package also stays updated in line with those remote
-resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages)
+resource updates. You should look into [automatic packaging](https://docs.chocolatey.org/en-us/create/automatic-packages)
 to help provide that functionality.
 
 **NOTE:** To determine checksums, you can get that from the original
 site if provided. You can also use the [checksum tool available on
-the community feed](https://chocolatey.org/packages/checksum) (`choco install checksum`)
+the community feed](https://community.chocolatey.org/packages/checksum) (`choco install checksum`)
 and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you
 provide checksums for all remote resources used.
 
@@ -146,7 +146,7 @@ param(
 
     Write-Warning "Missing package checksums are not allowed (by default for HTTP/FTP, `n HTTPS when feature 'allowEmptyChecksumsSecure' is disabled) for `n safety and security reasons. Although we strongly advise against it, `n if you need this functionality, please set the feature `n 'allowEmptyChecksums' ('choco feature enable -n `n allowEmptyChecksums') `n or pass in the option '--allow-empty-checksums'. You can also pass `n checksums at runtime (recommended). See `choco install -?` for details."
     Write-Debug "If you are a maintainer attempting to determine the checksum for packaging purposes, please run `n 'choco install checksum' and run 'checksum -t sha256 -f $file' `n Ensure you do this for all remote resources."
-    if ($PSVersionTable.PSVersion.Major -ge 4){ 
+    if ($PSVersionTable.PSVersion.Major -ge 4){
       Write-Debug "Because you are running Powershell with a major version of v4 or greater, you could also opt to run `n '(Get-FileHash -Path $file -Algorithm SHA256).Hash' `n rather than install a separate tool."
     }
 

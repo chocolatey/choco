@@ -85,12 +85,12 @@ and a moderator (if applicable), plus any moderation review has
 intended for you to receive with this package. If you are looking at a
 remote source that uses the same url for updates, you will need to
 ensure the package also stays updated in line with those remote
-resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages)
+resource updates. You should look into [automatic packaging](https://docs.chocolatey.org/en-us/create/automatic-packages)
 to help provide that functionality.
 
 **NOTE:** To determine checksums, you can get that from the original
 site if provided. You can also use the [checksum tool available on
-the community feed](https://chocolatey.org/packages/checksum) (`choco install checksum`)
+the community feed](https://community.chocolatey.org/packages/checksum) (`choco install checksum`)
 and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you
 provide checksums for all remote resources used.
 
@@ -118,7 +118,7 @@ and a moderator (if applicable), plus any moderation review has
 intended for you to receive with this package. If you are looking at a
 remote source that uses the same url for updates, you will need to
 ensure the package also stays updated in line with those remote
-resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages)
+resource updates. You should look into [automatic packaging](https://docs.chocolatey.org/en-us/create/automatic-packages)
 to help provide that functionality.
 
 .PARAMETER ChecksumType64
@@ -203,7 +203,7 @@ param(
 
   if ($url -eq '' -or $url -eq $null) {
     $url = $file
-  } 
+  }
   if ($url64bit -eq '' -or $url64bit -eq $null) {
     $url64bit = $file64
   }
