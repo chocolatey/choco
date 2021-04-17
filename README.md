@@ -165,57 +165,7 @@ sudo apt-get update
 sudo apt-get install mono-devel -y
 ```
 
-  * [CentOS/RHEL](https://www.mono-project.com/download/stable/#download-lin-centos)
-
-```sh
-### NOT FULLY TESTED AND WORKING ###
-# Switch to root shell
-su
-# Add the EPEL
-yum install epel-release -y
-# Add the key
-pmkeys --import "http://pool.sks-keyservers.net/pks/lookup?op=get&search=0x3fa7e0328081bff6a14da29aa6a19b38d3d831ef"
-
-# Add the package repository
-# CentOS/RHEL 8
-su -c 'curl https://download.mono-project.com/repo/centos8-stable.repo | tee /etc/yum.repos.d/mono-centos8-stable.repo'
-# CentOS/RHEL 7
-su -c 'curl https://download.mono-project.com/repo/centos7-stable.repo | tee /etc/yum.repos.d/mono-centos7-stable.repo'
-# CentOS/RHEL 6
-rpm --import "http://pool.sks-keyservers.net/pks/lookup?op=get&search=0x3fa7e0328081bff6a14da29aa6a19b38d3d831ef"
-
-# Update your system
-yum update -y
-
-# Install mono-devel
-yum install mono-devel -y
-
-```
-
-  * [Fedora](https://www.mono-project.com/download/stable/#download-lin-fedora)
-
-```sh
-### NOT FULLY TESTED AND WORKING ###
-
-# Switch to root shell
-su
-# Add the key
-rpm --import "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF"
-
-# Add the package repository
-# Fedora 29
-su -c 'curl https://download.mono-project.com/repo/centos8-stable.repo | tee /etc/yum.repos.d/mono-centos8-stable.repo'
-# Fedora 28
-su -c 'curl https://download.mono-project.com/repo/centos7-stable.repo | tee /etc/yum.repos.d/mono-centos7-stable.repo'
-
-# Update
-dnf update
-
-# Install mono-devel
-dnf install mono-devel -y
-
-```
-
+ * Other Linux systems; see [Mono install instructions for Linux](https://www.mono-project.com/download/stable/#download-lin)
  * Xamarin Studio is helpful for working on source.
  * Consider adding the following to your `~/.profile` (or other relevant dot source file):
 
