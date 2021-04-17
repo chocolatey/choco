@@ -138,7 +138,7 @@ Running the build on Windows should produce an artifact that is tested and ready
 #### Other Platforms
 ##### Prerequisites:
 
- * Install and configure Mono 5.20.x (Other versions may work but have not been tested).
+ * Install and configure Mono. Mono 5.20 or newer should work, see the Dockerfile for the currently recommended version.
   * [Debian based](http://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives)
 
 ```sh
