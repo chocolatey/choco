@@ -342,6 +342,9 @@ Did you know Pro / Business automatically syncs with Programs and
 
             var pkgInfo = get_package_information(packageResult, config);
 
+            // initialize this here so it can be used for the install location later
+            bool powerShellRan = false;
+
             if (packageResult.Success && config.Information.PlatformType == PlatformType.Windows)
             {
                 if (!config.SkipPackageInstallProvider)
@@ -349,7 +352,7 @@ Did you know Pro / Business automatically syncs with Programs and
                     var installersBefore = _registryService.get_installer_keys();
                     var environmentBefore = get_environment_before(config, allowLogging: false);
 
-                    var powerShellRan = _powershellService.install(config, packageResult);
+                    powerShellRan = _powershellService.install(config, packageResult);
                     if (powerShellRan)
                     {
                         // we don't care about the exit code
@@ -411,6 +414,11 @@ Did you know Pro / Business automatically syncs with Programs and
                 {
                     Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, toolsLocation, EnvironmentVariableTarget.Process);
                 }
+            }
+
+            if (!powerShellRan && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation)))
+            {
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, packageResult.InstallLocation, EnvironmentVariableTarget.Process);
             }
 
             if (pkgInfo.RegistrySnapshot != null && pkgInfo.RegistrySnapshot.RegistryKeys.Any(k => !string.IsNullOrWhiteSpace(k.InstallLocation)))
