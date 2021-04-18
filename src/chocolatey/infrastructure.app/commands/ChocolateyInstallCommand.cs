@@ -27,7 +27,7 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
-    [CommandFor("install", "installs packages from various sources")]
+    [CommandFor("install", "installs packages using configured sources")]
     public class ChocolateyInstallCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;

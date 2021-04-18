@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
-    [CommandFor("push", "pushes a compiled nupkg")]
+    [CommandFor("push", "pushes a compiled nupkg to a source")]
     public class ChocolateyPushCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;
