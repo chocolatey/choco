@@ -1,0 +1,33 @@
+name: Chocolatey Builds
+
+on:
+  # Trigger on pushes to master and stable, or with pull requests
+  push:
+    branches:
+    - master
+    - stable
+  pull_request:
+    branches:
+    - master
+    - stable
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # Build using mono on Ubuntu
+  ubuntu-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build with Mono
+      run: |
+        chmod +x build.sh
+        $GITHUB_WORKSPACE//build.sh -v
+  # Build on Windows
+  windows-build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build with .Net Framework
+      run: build.bat -v
