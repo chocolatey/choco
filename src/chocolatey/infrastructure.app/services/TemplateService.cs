@@ -29,6 +29,7 @@ namespace chocolatey.infrastructure.app.services
 
     public class TemplateService : ITemplateService
     {
+        private readonly UTF8Encoding utf8WithoutBOM = new UTF8Encoding(false);
         private readonly IFileSystem _fileSystem;
         private readonly IList<string> _templateBinaryExtensions = new List<string> { 
             ".exe", ".msi", ".msu", ".msp", ".mst",
@@ -104,7 +105,7 @@ namespace chocolatey.infrastructure.app.services
             var defaultTemplateOverride = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, "default");
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && (!_fileSystem.directory_exists(defaultTemplateOverride) || configuration.NewCommand.UseOriginalTemplate))
             {
-                generate_file_from_template(configuration, tokens, NuspecTemplate.Template, _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower)), Encoding.UTF8);
+                generate_file_from_template(configuration, tokens, NuspecTemplate.Template, _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower)), utf8WithoutBOM);
                 generate_file_from_template(configuration, tokens, ChocolateyInstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyinstall.ps1"), Encoding.UTF8);
                 generate_file_from_template(configuration, tokens, ChocolateyBeforeModifyTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateybeforemodify.ps1"), Encoding.UTF8);
                 generate_file_from_template(configuration, tokens, ChocolateyUninstallTemplate.Template, _fileSystem.combine_paths(packageToolsLocation, "chocolateyuninstall.ps1"), Encoding.UTF8);
@@ -125,9 +126,13 @@ namespace chocolatey.infrastructure.app.services
                 {
                     var packageFileLocation = file.Replace(templatePath, packageLocation);
                     var fileExtension = _fileSystem.get_file_extension(packageFileLocation);
-                    if (fileExtension.is_equal_to(".nuspec")) packageFileLocation = _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower));
 
-                    if (_templateBinaryExtensions.Contains(fileExtension))
+                    if (fileExtension.is_equal_to(".nuspec"))
+                    {
+                        packageFileLocation = _fileSystem.combine_paths(packageLocation, "{0}.nuspec".format_with(tokens.PackageNameLower));
+                        generate_file_from_template(configuration, tokens, _fileSystem.read_file(file), packageFileLocation, utf8WithoutBOM);
+                    }
+                    else if (_templateBinaryExtensions.Contains(fileExtension))
                     {
                         this.Log().Debug(" Treating template file ('{0}') as binary instead of replacing templated values.".format_with(_fileSystem.get_file_name(file)));
                         _fileSystem.copy_file(file, packageFileLocation, overwriteExisting:true);

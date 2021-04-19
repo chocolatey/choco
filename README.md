@@ -1,7 +1,7 @@
 # Chocolatey - like yum or apt-get, but for Windows
 You can just call me choco.
 
-![Chocolatey Logo](https://cdn.rawgit.com/chocolatey/choco/14a627932c78c8baaba6bef5f749ebfa1957d28d/docs/logo/chocolateyicon.gif "Chocolatey")
+![Chocolatey Logo](https://rawcdn.githack.com/chocolatey/choco/14a627932c78c8baaba6bef5f749ebfa1957d28d/docs/logo/chocolateyicon.gif "Chocolatey")
 
 [![](https://img.shields.io/chocolatey/dt/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey) [![](https://img.shields.io/chocolatey/v/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey) [![Project Stats](https://www.openhub.net/p/chocolatey/widgets/project_thin_badge.gif)](https://www.openhub.net/p/chocolatey)
 
