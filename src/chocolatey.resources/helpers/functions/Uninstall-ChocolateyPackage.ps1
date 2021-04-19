@@ -107,7 +107,7 @@ Uninstall-ChocolateyZipPackage
 Get-UninstallRegistryKey
 #>
 param(
-  [parameter(Mandatory=$true, Position=0)][string] $packageName,
+  [parameter(Mandatory=$false, Position=0)][string] $packageName = $env:chocolateyPackageName,
   [parameter(Mandatory=$false, Position=1)]
   [alias("installerType")][string] $fileType = 'exe',
   [parameter(Mandatory=$false, Position=2)][string[]] $silentArgs = '',

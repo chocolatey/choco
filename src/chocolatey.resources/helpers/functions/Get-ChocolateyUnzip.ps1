@@ -90,7 +90,7 @@ param(
   [alias("file")][parameter(Mandatory=$false, Position=0)][string] $fileFullPath,
   [alias("unzipLocation")][parameter(Mandatory=$true, Position=1)][string] $destination,
   [parameter(Mandatory=$false, Position=2)][string] $specificFolder,
-  [parameter(Mandatory=$false, Position=3)][string] $packageName,
+  [parameter(Mandatory=$false, Position=3)][string] $packageName = $env:chocolateyPackageName,
   [alias("file64")][parameter(Mandatory=$false)][string] $fileFullPath64,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )

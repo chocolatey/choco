@@ -188,7 +188,7 @@ Get-WebFileName
 Get-FtpFile
 #>
 param(
-  [parameter(Mandatory=$true, Position=0)][string] $packageName,
+  [parameter(Mandatory=$false, Position=0)][string] $packageName = $env:chocolateyPackageName,
   [parameter(Mandatory=$true, Position=1)][string] $fileFullPath,
   [parameter(Mandatory=$false, Position=2)][string] $url = '',
   [parameter(Mandatory=$false, Position=3)]

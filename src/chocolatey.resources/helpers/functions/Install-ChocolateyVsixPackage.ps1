@@ -137,7 +137,7 @@ Install-ChocolateyInstallPackage
 Install-ChocolateyZipPackage
 #>
 param(
-  [alias("name")][parameter(Mandatory=$true, Position=0)][string] $packageName,
+  [alias("name")][parameter(Mandatory=$false, Position=0)][string] $packageName = $env:chocolateyPackageName,
   [alias("url")][parameter(Mandatory=$false, Position=1)][string] $vsixUrl,
   [alias("visualStudioVersion")][parameter(Mandatory=$false, Position=2)][int] $vsVersion = 0,
   [parameter(Mandatory=$false)][string] $checksum = '',
