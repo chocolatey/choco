@@ -66,15 +66,15 @@ None
   $psModulePath = $env:PSModulePath
 
   #ordering is important here, $user should override $machine...
-  $Scopes = 'Process', 'Machine'
-  if (($userName -ne 'SYSTEM') -and ($userName -ne "$($env:COMPUTERNAME)`$")) {
+  $ScopeList = 'Process', 'Machine'
+  if ($userName -notin 'SYSTEM', "${env:COMPUTERNAME}`$") {
     # but only if not running as the SYSTEM/machine in which case user can be ignored.
-    $Scopes += 'User'
+    $ScopeList += 'User'
   }
-  foreach ($Scope in $Scopes) {
+  foreach ($Scope in $ScopeList) {
     Get-EnvironmentVariableNames -Scope $Scope |
         ForEach-Object {
-          Set-Item "Env:$($_)" -Value (Get-EnvironmentVariable -Scope $Scope -Name $_)
+          Set-Item "Env:$_" -Value (Get-EnvironmentVariable -Scope $Scope -Name $_)
         }
   }
 
