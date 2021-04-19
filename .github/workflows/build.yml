@@ -30,4 +30,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build with .Net Framework
-      run: build.bat -v
+      run: .\build.bat -v
