@@ -694,7 +694,6 @@ Please see https://chocolatey.org/docs/troubleshooting for more
                 }
 
                 IPackage availablePackage = NugetList.find_package(packageName, version, config, packageManager.SourceRepository);
-                   
 
                 config.Prerelease = originalPrerelease;
 

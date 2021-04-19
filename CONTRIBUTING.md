@@ -62,13 +62,13 @@ The process for contributions is roughly as follows:
 ### Prerequisites
  * Submit the Enhancement ticket. You will need the issue id for your commits.
  * Ensure you have signed the Contributor License Agreement (CLA) - without this we are not able to take contributions that are not trivial.
-  * [Sign the Contributor License Agreement](https://www.clahub.com/agreements/chocolatey/choco).
+  * [Sign the Contributor License Agreement](https://cla-assistant.io/chocolatey/choco).
   * You must do this for each Chocolatey project that requires it.
   * If you are curious why we would require a CLA, we agree with Julien Ponge - take a look at his [post](https://julien.ponge.org/blog/in-defense-of-contributor-license-agreements/).
  * You agree to follow the [etiquette regarding communication](https://github.com/chocolatey/choco#etiquette-regarding-communication).
 
 #### Definition of Trivial Contributions
-It's hard to define what is a trivial contribution. Sometimes even a 1 character change can be considered significant. Unfortunately because it can be subjective, the decision on what is trivial comes from the committers of the project and not from folks contributing to the project. It is generally safe to assume that you may be subject to signing the [CLA](https://www.clahub.com/agreements/chocolatey/choco) and be prepared to do so. Ask in advance if you are not sure and for reasons are not able to sign the [CLA](https://www.clahub.com/agreements/chocolatey/choco).
+It's hard to define what is a trivial contribution. Sometimes even a 1 character change can be considered significant. Unfortunately because it can be subjective, the decision on what is trivial comes from the committers of the project and not from folks contributing to the project. It is generally safe to assume that you may be subject to signing the [CLA](https://cla-assistant.io/chocolatey/choco) and be prepared to do so. Ask in advance if you are not sure and for reasons are not able to sign the [CLA](https://cla-assistant.io/chocolatey/choco).
 
 What is generally considered trivial:
 
@@ -84,7 +84,6 @@ What is generally not considered trivial:
 
 Yes, and this aspect is not up for discussion. If you would like more resources on understanding CLAs, please see the following articles:
 
-* [What is a CLA and why do I care?](https://www.clahub.com/pages/why_cla)
 * [In defense of Contributor License Agreements](https://julien.ponge.org/blog/in-defense-of-contributor-license-agreements/)
 * [Contributor License Agreements](http://oss-watch.ac.uk/resources/cla)
 * Dissenting opinion - [Why your project doesn't need a Contributor License Agreement](https://sfconservancy.org/blog/2014/jun/09/do-not-need-cla/)
