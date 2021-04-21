@@ -31,3 +31,12 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build with .Net Framework
       run: .\build.bat -v
+  # Build using mono on MacOS
+  macos-build:
+    runs-on: macos-latest
+    steps:
+     - uses: actions/checkout@v2
+     - name: Build with Mono
+       run: |
+          chmod +x build.sh
+          $GITHUB_WORKSPACE//build.sh -v
