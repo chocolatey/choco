@@ -108,14 +108,12 @@
       <!-- Do clean and build in two steps since xbuild has a bug with using OutputPath and Rebuild together Bug #628525 at Novell -->
       <echo level="Warning" message="Cleaning build..." if="${microsoft.framework.specific != 'mono-4.5'}" />
       <exec program="${app.xbuild}"
-          basedir="/usr/bin"
           workingdir="${dirs.build}"
           commandline="${solution.path} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:minimal /noconsolelogger /target:Clean" if="${microsoft.framework.specific != 'mono-4.5'}" />
       <echo level="Warning" message="Building..." />
       <echo level="Warning" message="Working directory ${dirs.build}" />
       <echo level="Warning" message="Running ${app.xbuild} ${solution.path} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:detailed /toolsversion:${framework::get-version(microsoft.framework.specific)} /property:Platform='${msbuild.platform}' /property:TargetFrameworkVersion=v${framework::get-version(microsoft.framework.specific)} /l:${msbuild.logger};'${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml'" />
       <exec program="${app.xbuild}"
-          basedir="/usr/bin"
           workingdir="${dirs.build}"
           commandline="${solution.path} /nologo /property:OutputPath='${msbuild.outputpath}' /property:Configuration=${msbuild.configuration} /verbosity:detailed /toolsversion:4.0 /property:Platform='${msbuild.platform}'  /property:TargetFrameworkProfile='' /property:TargetFrameworkVersion=v${framework::get-version(microsoft.framework.specific)} /l:${msbuild.logger};'${dirs.build_results}${path.separator}msbuild-${microsoft.framework.specific}-results.xml'" />
     </if>
