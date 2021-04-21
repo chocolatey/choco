@@ -435,7 +435,7 @@ folder.");
                 uninstallSuccessAction: null,
                 addUninstallHandler: true);
 
-            var originalConfig = config;
+            var originalConfig = config.deep_copy();
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
@@ -614,7 +614,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-            var originalConfig = config;
+            var originalConfig = config.deep_copy();
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
@@ -890,7 +890,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             var packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
 
-            var originalConfig = config;
+            var originalConfig = config.deep_copy();
 
             foreach (var packageName in packageNames)
             {
@@ -1357,7 +1357,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     config.ForceDependencies = false;
                 });
 
-            var originalConfig = config;
+            var originalConfig = config.deep_copy();
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
