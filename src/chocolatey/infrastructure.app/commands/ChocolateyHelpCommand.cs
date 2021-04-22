@@ -197,7 +197,7 @@ based on choco not receiving things you think you are passing to it.
    upgrade or install (unless switched off explicitly).
  * If you are sharing the script with others, pass `--source` to be
    explicit about where the package is coming from. Use full link and
-   not source name ('https://chocolatey.org/api/v2' versus
+   not source name ('https://community.chocolatey.org/api/v2' versus
    'chocolatey').
  * If parsing output, you might want to use `--limit-output`/`-r` to
    get output in a more machine parseable format. NOTE: Not all
@@ -220,7 +220,7 @@ Now here is that example written with best practices (again line
  breaks added for readability - there are not line continuations
  for choco):
 
-  `choco upgrade pkg1 -y --source=""'https://chocolatey.org/api/v2'""
+  `choco upgrade pkg1 -y --source=""'https://community.chocolatey.org/api/v2'""
    --package-parameters=""'/Option:Value /Option2:value with spaces'""
    --c4b-option=""'Yaass'"" --option-that-is-new=""'dude upgrade'""`
 
