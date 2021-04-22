@@ -27,7 +27,7 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
-    [CommandFor("install", "installs packages from various sources")]
+    [CommandFor("install", "installs packages using configured sources")]
     public class ChocolateyInstallCommand : ICommand
     {
         private readonly IChocolateyPackageService _packageService;
@@ -279,7 +279,7 @@ NOTE: Chocolatey Pro / Business builds on top of a great open source
     choco install git -y --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'""
     choco install git -y --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'"" --install-arguments=""'/DIR=C:\git'""
     # Params are package parameters, passed to the package
-    # Install args are installer arguments, appended to the silentArgs 
+    # Install args are installer arguments, appended to the silentArgs
     #  in the package for the installer itself
     choco install nodejs.install --version 0.10.35
     choco install git -s ""'https://somewhere/out/there'""
@@ -304,9 +304,9 @@ NOTE: All of these will add to PATH variable. We'll be adding a special
  option to not allow PATH changes. Until then you will need to manually
  go modify Path to just one Ruby and then use something like uru
  (https://bitbucket.org/jonforums/uru) or pik
- (https://chocolatey.org/packages/pik) to switch between versions.
+ (https://community.chocolatey.org/packages/pik) to switch between versions.
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
@@ -410,10 +410,10 @@ This specifies that the source is a Windows Feature and we should
             "chocolatey".Log().Info(@"
  * How-To: A complete example of how you can use the PackageParameters argument
    when creating a Chocolatey Package can be seen at
-   https://chocolatey.org/docs/how-to-parse-package-parameters-argument
+   https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument
  * One may want to override the default installation directory of a
    piece of software. See
-   https://chocolatey.org/docs/getting-started#overriding-default-install-directory-or-other-advanced-install-concepts.
+   https://docs.chocolatey.org/en-us/getting-started#overriding-default-install-directory-or-other-advanced-install-concepts.
 
 ");
 

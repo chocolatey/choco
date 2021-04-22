@@ -2,7 +2,7 @@
 
 REPORTING A SECURITY FINDING?
 Stop, this is not the correct place to provide a security disclosure.
-Please go to https://chocolatey.org/security for the proper disclosure process.
+Please go to https://docs.chocolatey.org/en-us/information/security for the proper disclosure process.
 
 BEFORE YOU SUBMIT AN ISSUE:
 

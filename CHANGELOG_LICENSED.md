@@ -93,7 +93,7 @@ When we first released package reducer, it was in a preview mode to allow for fo
 ### FEATURES
  * Run background service interactively - sometimes you install applications that are unattended but cannot be silent.
 
-If you want self-service to interactively manage installations, run `choco feature enable --name=useBackgroundServiceInteractively`. This requires that you use the `ChocolateyLocalAdmin` account with the Chocolatey-managed password as passwords are not stored and the service would need to produce that at runtime. There are some security considerations and why this is not turned on by default. Please see [interactive self-service consideration](https://chocolatey.org/docs/features-agent-service#interactive-self-service-consideration).
+If you want self-service to interactively manage installations, run `choco feature enable --name=useBackgroundServiceInteractively`. This requires that you use the `ChocolateyLocalAdmin` account with the Chocolatey-managed password as passwords are not stored and the service would need to produce that at runtime. There are some security considerations and why this is not turned on by default. Please see [interactive self-service consideration](https://docs.chocolatey.org/en-us/features/self-service-anywhere#interactive-self-service-consideration).
 
 ### BUG FIXES
  * Windows Service Management Functions:
@@ -160,7 +160,7 @@ If you want self-service to interactively manage installations, run `choco featu
 
 ### IMPROVEMENTS
  * Self-Service / Background Mode:
-    * Allow commands to be configurable. Covered in more detail at https://chocolatey.org/docs/features-agent-service#setup.
+    * Allow commands to be configurable. Covered in more detail at https://docs.chocolatey.org/en-us/features/self-service-anywhere#setup.
 
 
 ## 1.12.3 (September 8, 2017)
@@ -231,13 +231,13 @@ Among the bug fixes, we've brought Package Internalizer to the MSP edition of Ch
 
     If you have a significant number of Chocolatey packages you manage, you may notice that you also may have a pretty significant space usage under the Chocolatey lib directory. Package reducer automatically decreases the size of nupkg files to around 5KB and removes installers and zips automatically from your package install directories. This may allow you to save GBs of usage for a large amount of packages being managed.
 
-    To learn more about Package Reducer and `choco optimize`, please see https://chocolatey.org/docs/features-package-reducer.
+    To learn more about Package Reducer and `choco optimize`, please see https://docs.chocolatey.org/en-us/features/package-reducer.
 
  * Package Audit (C4B) - Learn Who and When
 
     Reporting is very important, and auditing not only when your installations occurred but who installed them can be critical. There is nothing that presents this kind of information as easily as you will be able to gather it with Chocolatey for Business (C4B) and Package Audit.
 
-    To learn more about Package Audit, please see https://chocolatey.org/docs/features-package-audit.
+    To learn more about Package Audit, please see https://docs.chocolatey.org/en-us/features/package-audit.
 
 ### IMPROVEMENTS
  * Package Internalizer (Choco Download):
@@ -271,18 +271,18 @@ This release brings Package Throttle, Package Synchronizer's "Show All Packages 
 
     If you are using self-service functionality, when you upgrade to v1.10, you will need to go to those sources that you allow to be self-service and ensure they are selected to allow self-service (`choco source list`). Otherwise by default users are going to be locked out of using those sources. The move to opt-in is best from a security standpoint and we want to give you the ability to have folks opt-in to the better behavior.
 
-    To change this behavior back to the way it was previously, simply run `choco disable -n useBackgroundServiceWithSelfServiceSourcesOnly`. For more details see `choco feature list` or https://chocolatey.org/docs/chocolatey-configuration#self-service-background-mode
+    To change this behavior back to the way it was previously, simply run `choco disable -n useBackgroundServiceWithSelfServiceSourcesOnly`. For more details see `choco feature list` or https://docs.chocolatey.org/en-us/configuration#self-service-background-mode
 
 ### FEATURES
  * Package Throttle - Throttle Bandwidth / Rate Limit Download Speeds
 
-    By default, Chocolatey downloads packages and resources as fast as it can. Package Throttle gives you a way to slow down Chocolatey so it doesn't overwhelm any bandwidth restrictions you may have. This is done as both a setting and per package install/upgrade. This is in bits per second (not bytes, bits is what most network traffic is measured in). When adding at runtime, simply add `--bps=VALUE`. To set the value in the configuration, call `choco config set maximumDownloadRateBitsPerSecond VALUE`. For more details see https://chocolatey.org/docs/features-package-reducer.
+    By default, Chocolatey downloads packages and resources as fast as it can. Package Throttle gives you a way to slow down Chocolatey so it doesn't overwhelm any bandwidth restrictions you may have. This is done as both a setting and per package install/upgrade. This is in bits per second (not bytes, bits is what most network traffic is measured in). When adding at runtime, simply add `--bps=VALUE`. To set the value in the configuration, call `choco config set maximumDownloadRateBitsPerSecond VALUE`. For more details see https://docs.chocolatey.org/en-us/features/package-reducer.
 
  * Package Synchronizer's Show All Packages In Programs and Features
 
     This means packages that do not have an underlying installation can still show up in Programs and Features and be managed there as well, which allows for legacy inventory reporting systems to see all the software that is installed in the same way that Chocolatey is able to. A picture can probably best explain this feature, check out [All Package In Programs and Features](https://raw.githubusercontent.com/chocolatey/choco-wiki/e619d5d25018f9362d50749ee86554ebc4f4f04d/images/features/features_packages_in_programs_and_features.png)
 
-    To turn this feature on, simply run the following command `choco feature enable -n showAllPackagesInProgramsAndFeatures`. For more details on the feature, see https://chocolatey.org/docs/chocolatey-configuration#package-synchronizer and https://chocolatey.org/docs/features-synchronize. This does require one additional run of `choco` to take affect (same when disabling the feature), hopefully we can remove that in the future.
+    To turn this feature on, simply run the following command `choco feature enable -n showAllPackagesInProgramsAndFeatures`. For more details on the feature, see https://docs.chocolatey.org/en-us/configuration#package-synchronizer and https://docs.chocolatey.org/en-us/features/package-synchronization/packages-to-programs. This does require one additional run of `choco` to take affect (same when disabling the feature), hopefully we can remove that in the future.
 
  * Package-less Install / Direct Installer - Install and upgrade directly from installers (MSIs, EXEs, etc)!
 
@@ -383,7 +383,7 @@ This release brings Package Throttle, Package Synchronizer's "Show All Packages 
 This release brings the coveted PackageBuilder UI to the Pro+ license (minus auto detection) and adds a tabbed interface that allows you to fill out the entire nuspec. Package Synchronizer now has `choco sync` to compliment the automatic synchronization. The sync command brings all unmanaged software in Programs and Features under Chocolatey management.
 
 ### FEATURES
- * Package Synchronizer v2 - `choco sync` to associate existing packages with unmanaged software - see https://chocolatey.org/docs/features-synchronize#sync-command
+ * Package Synchronizer v2 - `choco sync` to associate existing packages with unmanaged software - see https://docs.chocolatey.org/en-us/features/package-synchronization/sync-command#sync-command
  * Package Builder UI:
     * Starts at Professional edition (minus autodetection)
     * Tabbed interface
@@ -418,7 +418,7 @@ This release brings the coveted PackageBuilder UI to the Pro+ license (minus aut
 
 ## 1.8.4 (January 5, 2017)
 ### FEATURES
- * Support Self-Service Install / Background Mode - see https://chocolatey.org/docs/features-agent-service
+ * Support Self-Service Install / Background Mode - see https://docs.chocolatey.org/en-us/features/self-service-anywhere
  * Manage Windows Services
 
  We've introduced some service management functions to the business edition. `Install-ChocolateyWindowsService`, `Uninstall-ChocolateyWindowsService`, `Start-ChocolateyWindowsService`, and `Stop-ChocolateyWindowsService`. Those will be documented soon enough. For now some example code should suffice.
@@ -513,7 +513,7 @@ Uninstall-ChocolateyWindowsService -Name 'chocolatey-agent'
 
 
 ## 1.8.0 (November 16, 2016)
-Package Builder has some major improvements in this release, including a new UI! See https://chocolatey.org/blog/package-builder-announcements for details! While building some of the features for the enhancements for this release, we've made quite a few tweaks and fixes to Package Builder and we think you are going to like the results. Being able to generate packages from the installed software on a reference system is huge (`choco new --from-programs-and-features`)!
+Package Builder has some major improvements in this release, including a new UI! See https://blog.chocolatey.org/2016/11/package-builder-announcements/ for details! While building some of the features for the enhancements for this release, we've made quite a few tweaks and fixes to Package Builder and we think you are going to like the results. Being able to generate packages from the installed software on a reference system is huge (`choco new --from-programs-and-features`)!
 
 Pro users now have the ability to download packages (minus internalization). This is fantastic if you want to pull down a lot of packages quickly from a remote source. Or pull down packages and push them up to an internal source.
 

@@ -109,7 +109,7 @@ everything you call against that file, as in
 This is the 32 bit url to download the resource from. This resource can
 be used on 64 bit systems when a package has both a Url and Url64bit
 specified if a user passes `--forceX86`. If there is only a 64 bit url
-available, please remove do not use the paramter (only use Url64bit).
+available, please remove do not use the parameter (only use Url64bit).
 Will fail on 32bit systems if missing or if a user attempts to force
 a 32 bit installation on a 64 bit system.
 
@@ -143,17 +143,17 @@ and a moderator (if applicable), plus any moderation review has
 intended for you to receive with this package. If you are looking at a
 remote source that uses the same url for updates, you will need to
 ensure the package also stays updated in line with those remote
-resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages)
+resource updates. You should look into [automatic packaging](https://docs.chocolatey.org/en-us/create/automatic-packages)
 to help provide that functionality.
 
 **NOTE:** To determine checksums, you can get that from the original
 site if provided. You can also use the [checksum tool available on
-the community feed](https://chocolatey.org/packages/checksum) (`choco install checksum`)
+the community feed](https://community.chocolatey.org/packages/checksum) (`choco install checksum`)
 and use it e.g. `checksum -t sha256 -f path\to\file`. Ensure you
 provide checksums for all remote resources used.
 
 .PARAMETER ChecksumType
-The type of checkum that the file is validated with - valid
+The type of checksum that the file is validated with - valid
 values are 'md5', 'sha1', 'sha256' or 'sha512' - defaults to 'md5'.
 
 MD5 is not recommended as certain organizations need to use FIPS
@@ -176,11 +176,11 @@ and a moderator (if applicable), plus any moderation review has
 intended for you to receive with this package. If you are looking at a
 remote source that uses the same url for updates, you will need to
 ensure the package also stays updated in line with those remote
-resource updates. You should look into [automatic packaging](https://chocolatey.org/docs/automatic-packages)
+resource updates. You should look into [automatic packaging](https://docs.chocolatey.org/en-us/create/automatic-packages)
 to help provide that functionality.
 
 .PARAMETER ChecksumType64
-OPTIONAL - The type of checkum that the file is validated with - valid
+OPTIONAL - The type of checksum that the file is validated with - valid
 values are 'md5', 'sha1', 'sha256' or 'sha512' - defaults to
 ChecksumType parameter value.
 
@@ -219,6 +219,13 @@ functionality (see links).
 
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
+
+.PARAMETER BeforeInstall Script
+Specifies the commands to run after download has completed but before install steps have begun.
+Available in 0.10.16+.
+
+Use this for starting an auxilary process such as AutoHotkey, so that any timeouts are not 
+affected by the time to download.
 
 .EXAMPLE
 >
@@ -271,8 +278,6 @@ Install-ChocolateyPackage @packageArgs
 >
 $packageName= 'bob'
 $toolsDir   = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$url        = 'https://somewhere.com/file.msi'
-$url64      = 'https://somewhere.com/file-x64.msi'
 $urlTransform = 'https://somewhere.com/file.mst'
 $mstFileLocation = Join-Path $toolsDir 'transform.mst'
 
@@ -359,6 +364,7 @@ param(
   [parameter(Mandatory=$false)]
   [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
   [parameter(Mandatory=$false)][switch]$useOriginalLocation,
+  [parameter(Mandatory=$false)][scriptblock] $beforeInstall,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   [string]$silentArgs = $silentArgs -join ' '
@@ -403,6 +409,10 @@ param(
                                       -ChecksumType64 $checksumType64 `
                                       -Options $options `
                                       -GetOriginalFileName
+  }
+
+  if ($beforeInstall) {
+    & $beforeInstall
   }
 
   Install-ChocolateyInstallPackage -PackageName $packageName `

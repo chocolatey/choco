@@ -84,7 +84,7 @@ DEPRECATION NOTICE - `choco version -lo` is deprecated. version command
             {
                 this.Log().Warn(ChocolateyLoggers.Important, @"
 DEPRECATION NOTICE - choco version command is deprecated and will be 
- removed in version 1.0.0. Please use `choco upgrade pkgname --noop` 
+ removed in version 1.0.0. Please use `choco outdated` 
  instead.");
 
             }

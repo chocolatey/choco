@@ -64,7 +64,7 @@ namespace chocolatey.infrastructure.licensing
  as is and be successful. You need to download nupkgs from the links in
  the trial email as your license will not be registered on the licensed
  repository. Please reference
- https://chocolatey.org/docs/installation-licensed#how-do-i-install-the-trial-edition
+ https://docs.chocolatey.org/en-us/licensed-extension/setup#how-do-i-install-the-trial-edition
  for specific instructions.");
                 }
             }

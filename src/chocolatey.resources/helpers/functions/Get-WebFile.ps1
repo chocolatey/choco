@@ -131,7 +131,7 @@ param(
       $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
 	    $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
 	  }
-    
+
     if ($explicitProxyBypassList -ne $null -and $explicitProxyBypassList -ne '') {
       $proxy.BypassList =  $explicitProxyBypassList.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries)
     }
@@ -179,15 +179,15 @@ param(
 
   if ($options.Headers.Count -gt 0) {
     Write-Debug "Setting custom headers"
-    foreach ($item in $options.Headers.GetEnumerator()) {
-      $uri = (new-object system.uri $url)
-      Write-Debug($item.Key + ':' + $item.Value)
-      switch ($item.Key) {
-        'Accept' {$req.Accept = $item.Value}
-        'Cookie' {$req.CookieContainer.SetCookies($uri, $item.Value)}
-        'Referer' {$req.Referer = $item.Value}
-        'User-Agent' {$req.UserAgent = $item.Value}
-        Default {$req.Headers.Add($item.Key, $item.Value)}
+    foreach ($key in $options.headers.keys) {
+      $uri = (New-Object -Typename system.uri $url)
+      switch ($key) {
+        'Accept' {$req.Accept = $options.headers.$key}
+        'Cookie' {$req.CookieContainer.SetCookies($uri, $options.headers.$key)}
+        'Referer' {$req.Referer = $options.headers.$key}
+        'User-Agent' {$req.UserAgent = $options.headers.$key}
+        'Authorization' {$re.Authorization = $options.headers.$key}
+        Default {$req.Headers.Add($key, $options.headers.$key)}
       }
     }
   }
@@ -209,7 +209,7 @@ param(
 
       if ($headers.ContainsKey("Content-Type")) {
         $contentType = $headers['Content-Type']
-        if ($contentType -ne $null) {
+        if ($null -ne $contentType) {
           if ($contentType.ToLower().Contains("text/html") -or $contentType.ToLower().Contains("text/plain")) {
             Write-Warning "$fileName is of content type $contentType"
             Set-Content -Path $binaryIsTextCheckFile -Value "$fileName has content type $contentType" -Encoding UTF8 -Force
@@ -315,7 +315,7 @@ param(
       }
     }
   } catch {
-    if ($req -ne $null) {
+    if ($null -ne $req) {
       $req.ServicePoint.MaxIdleTime = 0
       $req.Abort();
       # ruthlessly remove $req to ensure it isn't reused
@@ -326,12 +326,12 @@ param(
 
     Set-PowerShellExitCode 404
     if ($env:DownloadCacheAvailable -eq 'true') {
-       throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message) `nThis package is likely not broken for licensed users - see https://chocolatey.org/docs/features-private-cdn."
+       throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message) `nThis package is likely not broken for licensed users - see https://docs.chocolatey.org/en-us/features/private-cdn."
     } else {
        throw "The remote file either doesn't exist, is unauthorized, or is forbidden for url '$url'. $($_.Exception.Message)"
     }
   } finally {
-    if ($res -ne $null) {
+    if ($null -ne $res) {
       $res.Close()
     }
 

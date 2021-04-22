@@ -71,7 +71,7 @@ If it does not exist, it will be created.
 OPTIONAL - This is a specific directory within zip file to extract.
 
 .PARAMETER PackageName
-OPTIONAL - This will faciliate logging unzip activity for subsequent
+OPTIONAL - This will facilitate logging unzip activity for subsequent
 uninstalls
 
 .PARAMETER IgnoredArguments
@@ -88,7 +88,7 @@ Install-ChocolateyZipPackage
 #>
 param(
   [alias("file")][parameter(Mandatory=$false, Position=0)][string] $fileFullPath,
-  [parameter(Mandatory=$true, Position=1)][string] $destination,
+  [alias("unzipLocation")][parameter(Mandatory=$true, Position=1)][string] $destination,
   [parameter(Mandatory=$false, Position=2)][string] $specificFolder,
   [parameter(Mandatory=$false, Position=3)][string] $packageName,
   [alias("file64")][parameter(Mandatory=$false)][string] $fileFullPath64,

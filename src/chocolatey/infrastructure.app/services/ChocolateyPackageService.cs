@@ -66,14 +66,14 @@ experience to the next level at
 @"
 Did you know the proceeds of Pro (and some proceeds from other
  licensed editions) go into bettering the community infrastructure?
- Your support ensures an active community, keeps Chocolatey tip top,
+ Your support ensures an active community, keeps Chocolatey tip-top,
  plus it nets you some awesome features!
  https://chocolatey.org/compare",
 @"
 Did you know some organizations use Chocolatey completely internally
  without using the community repository or downloads from the internet?
  Wait until you see how Package Builder and Package Internalizer can
- help you achieve more, quicker and easier! Get your trial started
+ help you achieve more, quicker, and easier! Get your trial started
  today at https://chocolatey.org/compare",
 @"
 An organization needed total software management life cycle automation.
@@ -210,16 +210,14 @@ Did you know Pro / Business automatically syncs with Programs and
 
         private IEnumerable<PackageResult> report_registry_programs(ChocolateyConfiguration config, IEnumerable<IPackage> list)
         {
-            var itemsToRemoveFromMachine = list.Select(package => _packageInfoService.get_package_information(package)).
-                                                Where(p => p.RegistrySnapshot != null).
-                                                Select(p => p.RegistrySnapshot.RegistryKeys.FirstOrDefault()).
-                                                Where(p => p != null).
-                                                Select(p => p.DisplayName).ToList();
+            var itemsToRemoveFromMachine = list.Select(package => _packageInfoService.get_package_information(package)).Where(p => p.RegistrySnapshot != null).ToList();
 
             var count = 0;
-            var machineInstalled = _registryService.get_installer_keys().RegistryKeys.
-                                                Where((p) => p.is_in_programs_and_features() && !itemsToRemoveFromMachine.Contains(p.DisplayName) && !p.KeyPath.contains("choco-")).
-                                                OrderBy((p) => p.DisplayName).Distinct();
+            var machineInstalled = _registryService.get_installer_keys().RegistryKeys.Where(
+                p => p.is_in_programs_and_features() &&
+                     !itemsToRemoveFromMachine.Any(pkg => pkg.RegistrySnapshot.RegistryKeys.Any(k => k.DisplayName.is_equal_to(p.DisplayName))) &&
+                     !p.KeyPath.contains("choco-")).OrderBy(p => p.DisplayName).Distinct();
+
             this.Log().Info(() => "");
             foreach (var key in machineInstalled)
             {
@@ -338,7 +336,7 @@ Did you know Pro / Business automatically syncs with Programs and
             EnvironmentSettings.reset_environment_variables(config);
             set_pending(packageResult, config);
 
-            this.Log().Info("{0} package files {1} completed. Performing other installation steps.".format_with(packageResult.Name, commandName.to_string()));
+            this.Log().Info("{0} package files {1} completed. Continuing, performing other installation steps.".format_with(packageResult.Name, commandName.to_string()));
 
             var pkgInfo = get_package_information(packageResult, config);
 
@@ -433,7 +431,7 @@ Did you know Pro / Business automatically syncs with Programs and
                     this.Log().Warn(ChocolateyLoggers.Important, @"Chocolatey has detected a pending reboot after installing/upgrading
 package '{0}' - stopping further execution".format_with(packageResult.Name));
 
-                    throw new ApplicationException("Reboot required before continuing. Reboot and run same command again.");
+                    throw new ApplicationException("Reboot required before continuing. Reboot and run the same command again.");
                 }
             }
 
@@ -466,8 +464,8 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
             }
             else
             {
-                this.Log().Info(ChocolateyLoggers.Important, @"  Software install location not explicitly set, could be in package or
-  default install location if installer.");
+                this.Log().Info(ChocolateyLoggers.Important, @"  Software install location not explicitly set, it could be in package or
+  default install location of installer.");
             }
         }
 
@@ -568,12 +566,12 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
             if (string.IsNullOrWhiteSpace(config.Sources))
             {
                 this.Log().Error(ChocolateyLoggers.Important, @"Installation was NOT successful. There are no sources enabled for
- packages and none were passed as arguments.");
+ packages, and none were passed as arguments.");
                 Environment.ExitCode = 1;
                 return packageInstalls;
             }
 
-            this.Log().Info(@"By installing you accept licenses for the packages.");
+            this.Log().Info(@"By installing, you accept licenses for the packages.");
 
             get_environment_before(config, allowLogging: true);
 
@@ -697,7 +695,7 @@ Would have determined packages that are out of date based on what is
 
             if (!_fileSystem.file_exists(_fileSystem.get_full_path(packageConfigFile)))
             {
-                var logMessage = "Could not find '{0}' in the location specified.".format_with(packageConfigFile);
+                var logMessage = "'{0}' could not be found in the location specified.".format_with(packageConfigFile);
                 this.Log().Error(ChocolateyLoggers.Important, logMessage);
                 var results = packageInstalls.GetOrAdd(packageConfigFile, new PackageResult(packageConfigFile, null, null));
                 results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -761,7 +759,7 @@ Would have determined packages that are out of date based on what is
                 return new ConcurrentDictionary<string, PackageResult>();
             }
 
-            this.Log().Info(@"By upgrading you accept licenses for the packages.");
+            this.Log().Info(@"By upgrading, you accept licenses for the packages.");
 
             foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().Where(p => p.EndsWith(".config")).ToList())
             {
@@ -875,16 +873,16 @@ If a package uninstall is failing and/or you've already uninstalled the
  software outside of Chocolatey, you can attempt to run the command
  with `-n` to skip running a chocolateyUninstall script, additionally
  adding `--skip-autouninstaller` to skip an attempt to automatically
- remove system-installed software. This will only remove the packaging
- files and not things like software installed to Programs and Features.
+ remove system-installed software. Only the packaging files are removed
+ and not things like software installed to Programs and Features.
 
 If a package is failing because it is a dependency of another package
- or packages, then you may first need to consider if it needs removed
- as it is typically installed as a dependency for a reason. If you
- decide that you still want to remove it, head into
- `$env:ChocolateyInstall\lib` and find the package folder you want
- removed. Then delete the folder for the package. This option should
- only be used as a last resort.
+ or packages, then you may first need to consider if it needs to be
+ removed as packages have dependencies for a reason. If
+ you decide that you still want to remove it, head into
+ `$env:ChocolateyInstall\lib` and find the package folder you want to
+ be removed. Then delete the folder for the package. You should use
+ this option only as a last resort.
  ");
                 }
 
@@ -1006,7 +1004,7 @@ The recent package changes indicate a reboot is necessary.
                     this.Log().Warn(ChocolateyLoggers.Important, @"Chocolatey has detected a pending reboot after uninstalling
 package '{0}' - stopping further execution".format_with(packageResult.Name));
 
-                    throw new ApplicationException("Reboot required before continuing. Reboot and run same command again.");
+                    throw new ApplicationException("Reboot required before continuing. Reboot and run the same command again.");
                 }
             }
 
@@ -1208,12 +1206,12 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
                 {
                     this.Log().Error(ChocolateyLoggers.Important, @"
 Package location is not specific enough, cannot move bad package or
- rollback previous version. Erroneous install location captured as
+ rollback the previous version. Erroneous install location captured as
  '{0}'
 
 ATTENTION: You must take manual action to remove {1} from
  {2}. It will show incorrectly as installed
- until you do. To remove you can simply delete the folder in question.
+ until you do. To remove, you can simply delete the folder in question.
 ".format_with(packageResult.InstallLocation, packageResult.Name, ApplicationParameters.PackagesLocation));
                 }
                 else
@@ -1233,7 +1231,7 @@ ATTENTION: You must take manual action to remove {1} from
             {
                 FaultTolerance.try_catch_with_logging_exception(
                  () => _fileSystem.move_directory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation)),
-                 "Could not move bad package to failure directory It will show as installed.{0} {1}{0} The error".format_with(Environment.NewLine, packageResult.InstallLocation));
+                 "Could not move the bad package to the failure directory. It will show as installed.{0} {1}{0} The error".format_with(Environment.NewLine, packageResult.InstallLocation));
             }
         }
 

@@ -1,13 +1,13 @@
 ---
 name: Website - Report Issue / Suggest Feature
-about: Something weird about https://chocolatey.org or do you want to suggest a feature?
+about: Something weird about https://community.chocolatey.org or do you want to suggest a feature?
 ---
 
 STOP RIGHT HERE - DO NOT CREATE A TICKET FOR THE WEBSITE ON THIS REPOSITORY
 
 This is the repository for choco.exe, the command line interface for Chocolatey, and issues/feature suggestions should be limited to only choco.
 
-For Chocolatey Gallery aka Chocolatey Community Package Repository, you will need to head over to https://github.com/chocolatey/chocolatey.org and file a ticket there.
+For Chocolatey Gallery aka Chocolatey Community Package Repository, you will need to head over to https://github.com/chocolatey/home and file a ticket there.
 
 
 
