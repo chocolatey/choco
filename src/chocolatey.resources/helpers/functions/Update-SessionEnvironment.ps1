@@ -56,9 +56,9 @@ None
   }
 
   if ($refreshEnv) {
-    Write-Output "Refreshing environment variables from the registry for powershell.exe. Please wait..."
+    Write-Output 'Refreshing environment variables from the registry for powershell.exe. Please wait...'
   } else {
-    Write-Verbose "Refreshing environment variables from the registry."
+    Write-Verbose 'Refreshing environment variables from the registry.'
   }
 
   $userName = $env:USERNAME
@@ -94,7 +94,7 @@ None
   if ($architecture) { $env:PROCESSOR_ARCHITECTURE = $architecture; }
 
   if ($refreshEnv) {
-    Write-Output "Finished"
+    Write-Output 'Finished'
   }
 }
 
