@@ -65,15 +65,18 @@ None
   $architecture = $env:PROCESSOR_ARCHITECTURE
   $psModulePath = $env:PSModulePath
 
-  #ordering is important here, $user comes after so we can override $machine
-  'Process', 'Machine', 'User' |
-    % {
-      $scope = $_
-      Get-EnvironmentVariableNames -Scope $scope |
-        % {
-          Set-Item "Env:$($_)" -Value (Get-EnvironmentVariable -Scope $scope -Name $_)
+  #ordering is important here, $user should override $machine...
+  $ScopeList = 'Process', 'Machine'
+  if ($userName -notin 'SYSTEM', "${env:COMPUTERNAME}`$") {
+    # but only if not running as the SYSTEM/machine in which case user can be ignored.
+    $ScopeList += 'User'
+  }
+  foreach ($Scope in $ScopeList) {
+    Get-EnvironmentVariableNames -Scope $Scope |
+        ForEach-Object {
+          Set-Item "Env:$_" -Value (Get-EnvironmentVariable -Scope $Scope -Name $_)
         }
-    }
+  }
 
   #Path gets special treatment b/c it munges the two together
   $paths = 'Machine', 'User' |
