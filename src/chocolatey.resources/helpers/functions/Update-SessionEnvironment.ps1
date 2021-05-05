@@ -80,10 +80,10 @@ None
 
   #Path gets special treatment b/c it munges the two together
   $paths = 'Machine', 'User' |
-    % {
+    ForEach-Object {
       (Get-EnvironmentVariable -Name 'PATH' -Scope $_) -split ';'
     } |
-    Select -Unique
+    Select-Object -Unique
   $Env:PATH = $paths -join ';'
 
   # PSModulePath is almost always updated by process, so we want to preserve it.
