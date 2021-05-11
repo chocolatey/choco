@@ -22,7 +22,7 @@
   <property name="version.nuget.prerelease" value="beta" overwrite="false" />
   <property name="version.use.build_date" value="true" overwrite="false" />
   <property name="assembly.description" value="${project.name} is a product of ${company.name} - All Rights Reserved." overwrite="false" />
-  <property name="assembly.copyright" value="Copyright © 2017 - 2020 ${company.name} Copyright © 2011 - 2017, RealDimensions Software, LLC - All Rights Reserved." overwrite="false" />
+  <property name="assembly.copyright" value="Copyright © 2017 - 2021 ${company.name} Copyright © 2011 - 2017, RealDimensions Software, LLC - All Rights Reserved." overwrite="false" />
   <property name="sign.project_with_key" value="true" overwrite="false" />
 
   <!-- Build Features Overrides -->

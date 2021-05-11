@@ -10,7 +10,7 @@
     <iconUrl>https://raw.githubusercontent.com/chocolatey/choco/master/docs/logo/chocolateyicon.gif</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>2017-2019 Chocolatey Software, Inc, 2011- 2017 RealDimensions Software, LLC</copyright>
+    <copyright>2017-2021 Chocolatey Software, Inc, 2011- 2017 RealDimensions Software, LLC</copyright>
     <tags>apt-get machine repository chocolatey</tags>
     <summary>Chocolatey is the package manager for Windows (like apt-get but for Windows)</summary>
     <description>
