@@ -258,13 +258,18 @@ param(
   $additionalInstallArgs = $env:chocolateyInstallArguments;
   if ($additionalInstallArgs -eq $null) {
     $additionalInstallArgs = '';
-  } else {
-    if ($additionalInstallArgs -match 'INSTALLDIR' -or `
-      $additionalInstallArgs -match 'TARGETDIR' -or `
-      $additionalInstallArgs -match 'dir\=' -or `
-      $additionalInstallArgs -match '\/D\='
-    ) {
-@"
+  }
+  else {
+    #Use a Regex Or ('|') to do the match, instead of multiple '-or' clauses
+    $argPattern = @(
+      'INSTALLDIR'
+      'TARGETDIR'
+      'dir\='
+      '\/D\='
+  ) -join '|'
+
+    if ($additionalInstallArgs -match $argPattern) {
+      @"
 Pro / Business supports a single, ubiquitous install directory option.
  Stop the hassle of determining how to pass install directory overrides
  to install arguments for each package / installer type.
