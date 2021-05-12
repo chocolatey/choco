@@ -94,6 +94,13 @@ namespace chocolatey.infrastructure.app.commands
 
             "chocolatey".Log().Info(@"This is a listing of all of the different things you can pass to choco.
 ");
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
+
+            "chocolatey".Log().Info(@"
+ -v, --version
+     Version - Prints out the Chocolatey version. Available in 0.9.9+.
+");
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Commands");
             "chocolatey".Log().Info(@"
 {0}
