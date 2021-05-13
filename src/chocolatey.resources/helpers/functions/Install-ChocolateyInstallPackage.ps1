@@ -1,4 +1,4 @@
-﻿# Copyright © 2017 Chocolatey Software, Inc.
+﻿# Copyright © 2017 - 2021 Chocolatey Software, Inc.
 # Copyright © 2015 - 2017 RealDimensions Software, LLC
 # Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Install-ChocolateyInstallPackage {
-<#
+  <#
 .SYNOPSIS
 **NOTE:** Administrative Access Required.
 
@@ -210,18 +210,18 @@ Get-UninstallRegistryKey
 .LINK
 Start-ChocolateyProcessAsAdmin
 #>
-param(
-  [parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [parameter(Mandatory=$false, Position=1)]
-  [alias("installerType","installType")][string] $fileType = 'exe',
-  [parameter(Mandatory=$false, Position=2)][string[]] $silentArgs = '',
-  [alias("fileFullPath")][parameter(Mandatory=$false, Position=3)][string] $file,
-  [alias("fileFullPath64")][parameter(Mandatory=$false)][string] $file64,
-  [parameter(Mandatory=$false)] $validExitCodes = @(0),
-  [parameter(Mandatory=$false)]
-  [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+  param(
+    [parameter(Mandatory = $true, Position = 0)][string] $packageName,
+    [parameter(Mandatory = $false, Position = 1)]
+    [alias("installerType", "installType")][string] $fileType = 'exe',
+    [parameter(Mandatory = $false, Position = 2)][string[]] $silentArgs = '',
+    [alias("fileFullPath")][parameter(Mandatory = $false, Position = 3)][string] $file,
+    [alias("fileFullPath64")][parameter(Mandatory = $false)][string] $file64,
+    [parameter(Mandatory = $false)] $validExitCodes = @(0),
+    [parameter(Mandatory = $false)]
+    [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
+    [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+  )
   [string]$silentArgs = $silentArgs -join ' '
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
@@ -231,7 +231,8 @@ param(
   if ((Get-ProcessorBits 32) -or $env:ChocolateyForceX86 -eq 'true') {
     if (!$file) { throw "32-bit installation is not supported for $packageName"; }
     if ($file64) { $bitnessMessage = '32-bit '; }
-  } elseif ($file64) {
+  }
+  elseif ($file64) {
     $fileFullPath = $file64
     $bitnessMessage = '64-bit '
   }
@@ -248,7 +249,7 @@ param(
   }
 
   $installerTypeLower = $fileType.ToLower()
-  if ($installerTypeLower -ne 'msi' -and $installerTypeLower -ne 'exe' -and $installerTypeLower -ne 'msu') {
+  if ($installerTypeLower -notin 'msi', 'exe', 'msu', 'msp') {
     Write-Warning "FileType '$fileType' is unrecognized, using 'exe' instead."
     $fileType = 'exe'
   }
@@ -258,13 +259,18 @@ param(
   $additionalInstallArgs = $env:chocolateyInstallArguments;
   if ($additionalInstallArgs -eq $null) {
     $additionalInstallArgs = '';
-  } else {
-    if ($additionalInstallArgs -match 'INSTALLDIR' -or `
-      $additionalInstallArgs -match 'TARGETDIR' -or `
-      $additionalInstallArgs -match 'dir\=' -or `
-      $additionalInstallArgs -match '\/D\='
-    ) {
-@"
+  }
+  else {
+    #Use a Regex Or ('|') to do the match, instead of multiple '-or' clauses
+    $argPattern = @(
+      'INSTALLDIR'
+      'TARGETDIR'
+      'dir\='
+      '\/D\='
+  ) -join '|'
+
+    if ($additionalInstallArgs -match $argPattern) {
+      @"
 Pro / Business supports a single, ubiquitous install directory option.
  Stop the hassle of determining how to pass install directory overrides
  to install arguments for each package / installer type.
@@ -287,7 +293,8 @@ Pro / Business supports a single, ubiquitous install directory option.
   if ($env:ChocolateyInstall -and $ignoreFile -match [System.Text.RegularExpressions.Regex]::Escape($env:ChocolateyInstall)) {
     try {
       '' | out-file $ignoreFile
-    } catch {
+    }
+    catch {
       Write-Warning "Unable to generate `'$ignoreFile`'"
     }
   }
@@ -295,7 +302,8 @@ Pro / Business supports a single, ubiquitous install directory option.
   $workingDirectory = Get-Location -PSProvider "FileSystem"
   try {
     $workingDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
-  } catch {
+  }
+  catch {
     Write-Warning "Unable to set the working directory for installer to location of '$fileFullPath'"
     $workingDirectory = $env:TEMP
   }
@@ -303,24 +311,39 @@ Pro / Business supports a single, ubiquitous install directory option.
   try {
     # make sure any logging folder exists
     $pattern = "(?:['`"])([a-zA-Z]\:\\[^'`"]+)(?:[`"'])|([a-zA-Z]\:\\[\S]+)"
-    $silentArgs, $additionalInstallArgs | %{ Select-String $pattern -input $_ -AllMatches } |
-      % { $_.Matches } | % {
-        $argDirectory = $_.Groups[1]
-        if ($argDirectory -eq $null -or $argDirectory -eq '') { continue }
-        $argDirectory = [System.IO.Path]::GetFullPath([System.IO.Path]::GetDirectoryName($argDirectory))
-        Write-Debug "Ensuring '$argDirectory' exists"
-        if (![System.IO.Directory]::Exists($argDirectory)) { [System.IO.Directory]::CreateDirectory($argDirectory) | Out-Null }
-      }
-  } catch {
+    $silentArgs, $additionalInstallArgs | % { Select-String $pattern -input $_ -AllMatches } |
+    % { $_.Matches } | % {
+      $argDirectory = $_.Groups[1]
+      if ($argDirectory -eq $null -or $argDirectory -eq '') { continue }
+      $argDirectory = [System.IO.Path]::GetFullPath([System.IO.Path]::GetDirectoryName($argDirectory))
+      Write-Debug "Ensuring '$argDirectory' exists"
+      if (![System.IO.Directory]::Exists($argDirectory)) { [System.IO.Directory]::CreateDirectory($argDirectory) | Out-Null }
+    }
+  }
+  catch {
     Write-Debug "Error ensuring directories exist -  $($_.Exception.Message)"
   }
 
   if ($fileType -like 'msi') {
     $msiArgs = "/i `"$fileFullPath`""
+    $msiArgs = if ($overrideArguments) {
+      Write-Host "Overriding package arguments with '$additonalInstallArgs' (replacing '$silentArgs')"
+      "$msiArgs $additionalInstallArgs"
+    }
+    else {
+      "$msiArgs $silentArgs $additionalInstallArgs"
+    }
+
+    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
+  }
+
+  if ($fileType -like 'msp') {
+    $msiArgs = '/update "{0}"' -f $fileFullPath
     if ($overrideArguments) {
       Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
       $msiArgs = "$msiArgs $additionalInstallArgs";
-    } else {
+    }
+    else {
       $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
     }
 
@@ -331,16 +354,18 @@ Pro / Business supports a single, ubiquitous install directory option.
     if ($overrideArguments) {
       Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
       $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $fileFullPath -validExitCodes $validExitCodes -workingDirectory $workingDirectory
-    } else {
+    }
+    else {
       $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $fileFullPath -validExitCodes $validExitCodes -workingDirectory $workingDirectory
     }
   }
 
-  if($fileType -like 'msu') {
+  if ($fileType -like 'msu') {
     if ($overrideArguments) {
       Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
       $msuArgs = "`"$fileFullPath`" $additionalInstallArgs"
-    } else {
+    }
+    else {
       $msuArgs = "`"$fileFullPath`" $silentArgs $additionalInstallArgs"
     }
     $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory

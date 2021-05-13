@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -176,7 +176,7 @@ namespace chocolatey.console
         private static void warn_on_nuspec_or_nupkg_usage(string[] args, ChocolateyConfiguration config)
         {
             var commandLine = Environment.CommandLine;
-            if (!(commandLine.contains(" pack ") || commandLine.contains(" push ")) && (commandLine.contains(".nupkg") || commandLine.contains(".nuspec")))
+            if (!(commandLine.contains(" pack ") || commandLine.contains(" push ") || commandLine.contains("convert")) && (commandLine.contains(".nupkg") || commandLine.contains(".nuspec")))
             {
                 if (config.RegularOutput) "chocolatey".Log().Warn("The use of .nupkg or .nuspec in for package name or source is known to cause issues. Please use the package id from the nuspec `<id />` with `-s .` (for local folder where nupkg is found).");
             }

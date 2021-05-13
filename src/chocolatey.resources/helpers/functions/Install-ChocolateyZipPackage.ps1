@@ -1,4 +1,4 @@
-﻿# Copyright © 2017 Chocolatey Software, Inc.
+﻿# Copyright © 2017 - 2021 Chocolatey Software, Inc.
 # Copyright © 2015 - 2017 RealDimensions Software, LLC
 # Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
@@ -53,6 +53,10 @@ Will fail on 32bit systems if missing or if a user attempts to force
 a 32 bit installation on a 64 bit system.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
+
+.PARAMETER SpecificFolder
+OPTIONAL - This is a specific directory within zip file to extract. The
+folder and its contents will be extracted to the destination.
 
 .PARAMETER Url64bit
 OPTIONAL - If there is a 64 bit resource available, use this

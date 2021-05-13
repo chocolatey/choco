@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,6 +50,7 @@ namespace chocolatey.infrastructure.app.configuration
             PinCommand = new PinCommandConfiguration();
             OutdatedCommand = new OutdatedCommandConfiguration();
             Proxy = new ProxyConfiguration();
+            ExportCommand = new ExportCommandConfiguration();
 #if DEBUG
             AllowUnofficialBuild = true;
 #endif
@@ -334,6 +335,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </remarks>
         public OutdatedCommandConfiguration OutdatedCommand { get; set; }
 
+        public ExportCommandConfiguration ExportCommand { get; set; }
+
         /// <summary>
         /// Configuration related specifically to proxies.
         /// </summary>
@@ -383,7 +386,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool VirusCheck { get; set; }
         public bool FailOnInvalidOrMissingLicense { get; set; }
         public bool IgnoreInvalidOptionsSwitches { get; set; }
-        public bool UsePackageExitCodes { get; set; } 
+        public bool UsePackageExitCodes { get; set; }
         public bool UseEnhancedExitCodes { get; set; }
         public bool UseFipsCompliantChecksums { get; set; }
         public bool ShowNonElevatedWarnings { get; set; }
@@ -544,5 +547,13 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string EncryptedPassword { get; set; }
         public string BypassList { get; set; }
         public bool BypassOnLocal { get; set; }
+    }
+
+    [Serializable]
+    public sealed class ExportCommandConfiguration
+    {
+        public bool IncludeVersionNumbers { get; set; }
+
+        public string OutputFilePath { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿# Copyright © 2017 Chocolatey Software, Inc.
+﻿# Copyright © 2017 - 2021 Chocolatey Software, Inc.
 # Copyright © 2016 - 2017 Original authors from https://github.com/chocolatey/chocolatey-coreteampackages
 # Copyright © 2016 Miodrag Milić - https://github.com/majkinetor/au-packages/commit/bf95d56fe5851ee2e4f6f15f79c1a2877a7950a1
 #

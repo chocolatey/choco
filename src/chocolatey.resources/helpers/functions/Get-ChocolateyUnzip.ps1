@@ -1,4 +1,4 @@
-﻿# Copyright © 2017 Chocolatey Software, Inc.
+﻿# Copyright © 2017 - 2021 Chocolatey Software, Inc.
 # Copyright © 2015 - 2017 RealDimensions Software, LLC
 # Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
@@ -68,7 +68,8 @@ This is a directory where you would like the unzipped files to end up.
 If it does not exist, it will be created.
 
 .PARAMETER SpecificFolder
-OPTIONAL - This is a specific directory within zip file to extract.
+OPTIONAL - This is a specific directory within zip file to extract. The
+folder and its contents will be extracted to the destination.
 
 .PARAMETER PackageName
 OPTIONAL - This will facilitate logging unzip activity for subsequent

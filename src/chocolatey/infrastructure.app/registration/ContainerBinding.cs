@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -80,6 +80,7 @@ namespace chocolatey.infrastructure.app.registration
                     var list = new List<ICommand>
                         {
                             new ChocolateyListCommand(container.GetInstance<IChocolateyPackageService>()),
+                            new ChocolateyHelpCommand(container),
                             new ChocolateyInfoCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyInstallCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyPinCommand(container.GetInstance<IChocolateyPackageInformationService>(), container.GetInstance<ILogger>(), container.GetInstance<INugetService>()),
@@ -95,7 +96,8 @@ namespace chocolatey.infrastructure.app.registration
                             new ChocolateyApiKeyCommand(container.GetInstance<IChocolateyConfigSettingsService>()),
                             new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>()),
                             new ChocolateyVersionCommand(container.GetInstance<IChocolateyPackageService>()),
-                            new ChocolateyUpdateCommand(container.GetInstance<IChocolateyPackageService>())
+                            new ChocolateyUpdateCommand(container.GetInstance<IChocolateyPackageService>()),
+                            new ChocolateyExportCommand(container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>())
                         };
                     return list.AsReadOnly();
                 }, Lifestyle.Singleton);

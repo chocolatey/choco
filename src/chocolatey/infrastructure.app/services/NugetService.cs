@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -287,14 +287,7 @@ namespace chocolatey.infrastructure.app.services
             // Initialize the property provider based on what was passed in using the properties flag
             var propertyProvider = new DictionaryPropertyProvider(properties);
 
-            var basePath = nuspecDirectory;
-            if (config.Information.PlatformType != PlatformType.Windows)
-            {
-                //bug with nuspec and tools/** folder location on Windows.
-                basePath = "./";
-            }
-
-            var builder = new PackageBuilder(nuspecFilePath, basePath, propertyProvider, includeEmptyDirectories: true);
+            var builder = new PackageBuilder(nuspecFilePath, nuspecDirectory, propertyProvider, includeEmptyDirectories: true);
             if (!string.IsNullOrWhiteSpace(config.Version))
             {
                 builder.Version = new SemanticVersion(config.Version);
@@ -435,7 +428,7 @@ folder.");
                 uninstallSuccessAction: null,
                 addUninstallHandler: true);
 
-            var originalConfig = config;
+            var originalConfig = config.deep_copy();
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
@@ -614,7 +607,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-            var originalConfig = config;
+            var originalConfig = config.deep_copy();
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
@@ -890,7 +883,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             var packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
 
-            var originalConfig = config;
+            var originalConfig = config.deep_copy();
 
             foreach (var packageName in packageNames)
             {
@@ -1357,7 +1350,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     config.ForceDependencies = false;
                 });
 
-            var originalConfig = config;
+            var originalConfig = config.deep_copy();
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
@@ -1551,7 +1544,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             }
         }
 
-        private IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config)
+        public IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config)
         {
             //todo : move to deep copy for get all installed
             //var listConfig = config.deep_copy();

@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -214,10 +214,17 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void GetExecutablePath_should_find_existing_executable()
             {
-                FileSystem.get_executable_path("ls").ShouldEqual(
-                    Platform.get_platform() != PlatformType.Windows
-                        ? "/bin/ls"
-                        : "ls");
+                if (Platform.get_platform() == PlatformType.Windows)
+                {
+                    FileSystem.get_executable_path("ls").ShouldEqual("ls");
+                }
+                else
+                {
+                    new string[]
+                    {
+                        "/bin/ls", "/usr/bin/ls"
+                    }.ShouldContain(FileSystem.get_executable_path("ls"));
+                }
             }
 
             [Fact]

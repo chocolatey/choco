@@ -20,9 +20,9 @@ test:
 artifacts:
 - path: build_output\build_artifacts\compile\msbuild-net-4.0-results.xml
   name: Compile.xml
-- path: build_output\build_artifacts\nunit\index.html
+- path: build_output\build_artifacts\tests\index.html
   name: NUnitResults.html
-- path: build_output\build_artifacts\opencover\Html\index.htm
+- path: build_output\build_artifacts\codecoverage\Html\index.htm
   name: OpenCoverResults.htm
 - path: build_output\_BuildInfo.xml
   name: BuildInfo.xml

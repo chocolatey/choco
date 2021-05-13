@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2018 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -336,7 +336,9 @@ Did you know Pro / Business automatically syncs with Programs and
             EnvironmentSettings.reset_environment_variables(config);
             set_pending(packageResult, config);
 
-            this.Log().Info("{0} package files {1} completed. Continuing, performing other installation steps.".format_with(packageResult.Name, commandName.to_string()));
+            this.Log().Info(packageResult.ExitCode == 0
+                ? "{0} package files {1} completed. Performing other installation steps.".format_with(packageResult.Name, commandName.to_string())
+                : "{0} package files {1} failed with exit code {2}. Performing other installation steps.".format_with(packageResult.Name, commandName.to_string(), packageResult.ExitCode));
 
             var pkgInfo = get_package_information(packageResult, config);
 
