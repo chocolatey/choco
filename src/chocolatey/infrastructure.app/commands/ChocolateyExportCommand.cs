@@ -166,13 +166,14 @@ If you find other exit codes that we have not yet documented, please
                             xw.Flush();
                         }
 
-                        var fileExists = _fileSystem.file_exists(configuration.ExportCommand.OutputFilePath);
+                        var fullOutputFilePath = _fileSystem.get_full_path(configuration.ExportCommand.OutputFilePath);
+                        var fileExists = _fileSystem.file_exists(fullOutputFilePath);
 
                         // If the file doesn't already exist, just write the new one out directly
                         if (!fileExists)
                         {
                             _fileSystem.write_file(
-                                configuration.ExportCommand.OutputFilePath,
+                                fullOutputFilePath,
                                 stringWriter.GetStringBuilder().ToString(),
                                 new UTF8Encoding(false));
 
@@ -181,12 +182,12 @@ If you find other exit codes that we have not yet documented, please
 
 
                         // Otherwise, create an update file, and resiliently move it into place.
-                        var tempUpdateFile = configuration.ExportCommand.OutputFilePath + "." + Process.GetCurrentProcess().Id + ".update";
+                        var tempUpdateFile = fullOutputFilePath + "." + Process.GetCurrentProcess().Id + ".update";
                         _fileSystem.write_file(tempUpdateFile,
                             stringWriter.GetStringBuilder().ToString(),
                             new UTF8Encoding(false));
 
-                        _fileSystem.replace_file(tempUpdateFile, configuration.ExportCommand.OutputFilePath, configuration.ExportCommand.OutputFilePath + ".backup");
+                        _fileSystem.replace_file(tempUpdateFile, fullOutputFilePath, fullOutputFilePath + ".backup");
                     }
                 },
                 errorMessage: "Error exporting currently installed packages",
