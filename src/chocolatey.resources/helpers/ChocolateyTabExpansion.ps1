@@ -33,7 +33,7 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
       where { $_ -like "$filter*" }
 }
 
-$script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','optimize','pack','push','sync','-h','--help','pin','source','config','feature','apikey','export')
+$script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','optimize','pack','push','sync','-h','--help','pin','source','config','feature','apikey','export','help')
 
 # ensure these all have a space to start, or they will cause issues
 $allcommands = " --debug --verbose --trace --noop --help --accept-license --confirm --limit-output --no-progress --log-file='' --execution-timeout='' --cache-location='' --proxy='' --proxy-user='' --proxy-password='' --proxy-bypass-list='' --proxy-bypass-on-local --force --no-color"
