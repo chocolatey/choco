@@ -23,8 +23,10 @@ namespace chocolatey.infrastructure.registration
 
     public sealed class SecurityProtocol
     {
-        private const int TLS_1_1 = 768;
-        private const int TLS_1_2 = 3072;
+        private const SecurityProtocolType SystemDefault = (SecurityProtocolType)(0); //SystemDefault;
+        private const SecurityProtocolType tls11 = (SecurityProtocolType)(768);  // TLS_1_1
+        private const SecurityProtocolType tls12 = (SecurityProtocolType)(3072); // TLS_1_2;
+        private const SecurityProtocolType tls13 = (SecurityProtocolType)(12288);// TLS_1_3;
 
         public static void set_protocol(ChocolateyConfiguration config, bool provideWarning)
         {
@@ -34,9 +36,41 @@ namespace chocolatey.infrastructure.registration
                 // Framework 4.0. However if someone is running .NET 4.5 or 
                 // greater, they have in-place upgrades for System.dll, which
                 // will allow us to set these protocols directly.
-                const SecurityProtocolType tls11 = (SecurityProtocolType)TLS_1_1;
-                const SecurityProtocolType tls12 = (SecurityProtocolType)TLS_1_2;
-                ServicePointManager.SecurityProtocol = tls12 | tls11 | SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
+                
+                //Setting to system default to avoid carryover any default settings.
+                //System Default will be overwritten if any values added to it.
+                SecurityProtocolType allowedProtocolsList = SystemDefault;
+                foreach (string protocol in config.SecurityProtocols.AllowedSecurityProtocol.Split(','))
+                {
+                    switch (protocol.ToLower())
+                    {
+                        case "ssl3":
+                            allowedProtocolsList = allowedProtocolsList | SecurityProtocolType.Ssl3;
+                            break;
+                        case "tls":
+                            allowedProtocolsList = allowedProtocolsList | SecurityProtocolType.Tls;
+                            break;
+                        case "tls11":
+                            allowedProtocolsList = allowedProtocolsList | tls11;
+                            break;
+                        case "tls12":
+                            allowedProtocolsList = allowedProtocolsList | tls12;
+                            break;
+                        case "tls13":
+                            allowedProtocolsList = allowedProtocolsList | tls13;
+                            break;
+                        default:
+                            break;
+                    }
+                    
+                }
+
+                //If the value in configuration is empty then setting the value to match the minimum standards
+                //else set the value to the allowed list from configuration
+                if (allowedProtocolsList == SystemDefault)
+                    ServicePointManager.SecurityProtocol = tls12 | tls11 | SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
+                else
+                    ServicePointManager.SecurityProtocol = allowedProtocolsList;
             }
             catch (Exception)
             {
