@@ -22,6 +22,7 @@ namespace chocolatey.infrastructure.app.services
     using configuration;
     using filesystem;
     using infrastructure.commands;
+    using infrastructure.app.domain;
     using results;
 
     public class ShimGenerationService : IShimGenerationService
@@ -87,8 +88,10 @@ namespace chocolatey.infrastructure.app.services
                 return;
             }
 
-            //gather all .exes in the folder 
-            var exeFiles = _fileSystem.get_files(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
+            //gather all .exes in the folder
+            var shimManager = new ShimTargetManager(packageResult.InstallLocation);
+            var exeFiles = shimManager.get_shim_targets();
+
             foreach (string file in exeFiles.or_empty_list_if_null())
             {
                 if (_fileSystem.file_exists(file + ".ignore")) continue;
