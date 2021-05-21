@@ -177,12 +177,12 @@ namespace chocolatey.infrastructure.app.services
                                 package.IsApproved ? "{0} Package approved {1} on {2}.".format_with(
                                         Environment.NewLine,
                                         string.IsNullOrWhiteSpace(package.PackageReviewer) ? "as a trusted package" : "by " + package.PackageReviewer,
-                                        package.PackageApprovedDate.GetValueOrDefault().ToString("MMM dd yyyy HH:mm:ss")
+                                        package.PackageApprovedDate.GetValueOrDefault().ToString("ddd yyyy-MM-dd HH:mm:ss")
                                     ) : string.Empty,
                                 string.IsNullOrWhiteSpace(package.PackageTestResultStatus) || package.PackageTestResultStatus.is_equal_to("unknown") ? string.Empty : "{0} Package testing status: {1} on {2}.".format_with(
                                         Environment.NewLine,
                                         package.PackageTestResultStatus,
-                                        package.PackageValidationResultDate.GetValueOrDefault().ToString("MMM dd yyyy HH:mm:ss")
+                                        package.PackageValidationResultDate.GetValueOrDefault().ToString("ddd yyyy-MM-dd HH:mm:ss")
                                     ),
                                 package.DownloadCount <= 0 ? "n/a" : package.DownloadCount.to_string(),
                                 package.VersionDownloadCount <= 0 ? "n/a" : package.VersionDownloadCount.to_string(),
