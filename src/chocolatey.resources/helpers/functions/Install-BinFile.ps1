@@ -86,6 +86,13 @@ param(
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
+  if ($env:ChocolateyNoShims) {
+    Write-Debug "File shimming disabled for `'$($env:ChocolateyPackageName)`'."
+    Write-Debug "Removing any existing shim for `'$name`'."
+    Uninstall-BinFile $name $path
+    return
+  }
+
   $nugetPath = [System.IO.Path]::GetFullPath((Join-Path "$helpersPath" '..\'))
   $nugetExePath = Join-Path "$nugetPath" 'bin'
   $packageBatchFileName = Join-Path $nugetExePath "$name.bat"

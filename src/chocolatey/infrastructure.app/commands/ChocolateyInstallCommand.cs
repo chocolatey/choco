@@ -180,6 +180,12 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.UsePackageRepositoryOptimizations = false;
                          }
                      })
+                .Add("noshims|no-shims",
+                    "No Shims - Stop shims being created for the package. Defaults to false. Available in 0.10.16+.",
+                    option => configuration.NoShims = option != null)
+                .Add("noshimsglobal|no-shims-global",
+                    "No Shims Global - Stop shims being created for the package and its dependencies. Defaults to false. Available in 0.10.16+.",
+                    option => configuration.NoShimsGlobal = option != null)
                 ;
 
             //todo: package name can be a url / installertype

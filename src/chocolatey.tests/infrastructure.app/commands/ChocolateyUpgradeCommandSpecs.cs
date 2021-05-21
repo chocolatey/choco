@@ -217,6 +217,18 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 optionSet.Contains("p").ShouldBeTrue();
             }
+
+            [Fact]
+            public void should_add_noshims_to_the_option_set()
+            {
+                optionSet.Contains("noshims").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_noshimsglobal_to_the_option_set()
+            {
+                optionSet.Contains("noshimsglobal").ShouldBeTrue();
+            }
         }
 
         public class when_handling_additional_argument_parsing : ChocolateyUpgradeCommandSpecsBase

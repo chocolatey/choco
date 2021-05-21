@@ -398,11 +398,14 @@ namespace chocolatey.infrastructure.app.services
             Environment.SetEnvironmentVariable("chocolateyChecksumType64", null);
             Environment.SetEnvironmentVariable("chocolateyForceX86", null);
             Environment.SetEnvironmentVariable("DownloadCacheAvailable", null);
+            Environment.SetEnvironmentVariable("chocolateyNoShims", null);
+
+            var isDependency = PackageUtility.package_is_a_dependency(configuration, package.Id);
 
             // we only want to pass the following args to packages that would apply. 
             // like choco install git --params '' should pass those params to git.install, 
             // but not another package unless the switch apply-install-arguments-to-dependencies is used
-            if (!PackageUtility.package_is_a_dependency(configuration, package.Id) || configuration.ApplyInstallArgumentsToDependencies)
+            if (!isDependency || configuration.ApplyInstallArgumentsToDependencies)
             {
                 this.Log().Debug(ChocolateyLoggers.Verbose, "Setting installer args for {0}".format_with(package.Id));
                 Environment.SetEnvironmentVariable("installArguments", configuration.InstallArguments);
@@ -417,11 +420,18 @@ namespace chocolatey.infrastructure.app.services
 
             // we only want to pass package parameters to packages that would apply. 
             // but not another package unless the switch apply-package-parameters-to-dependencies is used
-            if (!PackageUtility.package_is_a_dependency(configuration, package.Id) || configuration.ApplyPackageParametersToDependencies)
+            if (!isDependency || configuration.ApplyPackageParametersToDependencies)
             {
                 this.Log().Debug(ChocolateyLoggers.Verbose, "Setting package parameters for {0}".format_with(package.Id));
                 Environment.SetEnvironmentVariable("packageParameters", configuration.PackageParameters);
                 Environment.SetEnvironmentVariable("chocolateyPackageParameters", configuration.PackageParameters);
+            }
+
+            // we only want to disable shimming for packages that would apply.
+            if (configuration.NoShimsGlobal || (!isDependency && configuration.NoShims))
+            {
+                this.Log().Debug(ChocolateyLoggers.Verbose, "Setting noshims for {0}".format_with(package.Id));
+                Environment.SetEnvironmentVariable("chocolateyNoShims", "true");
             }
 
             if (!string.IsNullOrWhiteSpace(configuration.DownloadChecksum))

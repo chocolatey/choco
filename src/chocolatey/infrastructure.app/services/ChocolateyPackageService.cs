@@ -344,6 +344,9 @@ Did you know Pro / Business automatically syncs with Programs and
 
             if (packageResult.Success && config.Information.PlatformType == PlatformType.Windows)
             {
+                // take the snapshot before running any install/uninstall scripts
+                _shimgenService.take_snapshot();
+
                 if (!config.SkipPackageInstallProvider)
                 {
                     var installersBefore = _registryService.get_installer_keys();

@@ -1047,5 +1047,43 @@ namespace chocolatey.tests.integration.scenarios
                 errorFound.ShouldBeTrue();
             }
         }
+
+        [Concern(typeof(ChocolateyUninstallCommand))]
+        public class when_uninstalling_a_package_that_forgets_to_call_uninstall_bin_file : ScenariosBase
+        {
+            private string shimFile;
+            private bool shimExisted;
+
+            public override void Context()
+            {
+                Configuration = Scenario.upgrade();
+                Scenario.reset(Configuration);
+                Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+
+                Configuration.PackageNames = Configuration.Input = "shimwithbinfile";
+                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "shimwithbinfile", "1.0.0");
+            }
+
+            public override void Because()
+            {
+                shimFile = Path.Combine(Scenario.get_top_level(), "bin", "shimwithbinfile1.exe");
+                shimExisted = File.Exists(shimFile);
+
+                Service.uninstall_run(Configuration);
+            }
+
+            [Fact]
+            public void should_have_had_a_shim()
+            {
+                shimExisted.ShouldBeTrue(shimFile);
+            }
+
+            [Fact]
+            public void should_have_removed_the_shim()
+            {
+                File.Exists(shimFile).ShouldBeFalse();
+            }
+        }
     }
 }
