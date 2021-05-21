@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.commands
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using attributes;
     using commandline;
     using configuration;
@@ -100,6 +101,21 @@ namespace chocolatey.infrastructure.app.commands
 
             if (!string.IsNullOrWhiteSpace(configuration.Sources))
             {
+                IEnumerable<string> sources = configuration.Sources.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (sources.Count() > 1)
+                {
+                    throw new ApplicationException("Multiple sources are not support by push command.");
+                }
+
+                var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Name.is_equal_to(configuration.Sources));
+                if (machineSource != null)
+                {
+                    "chocolatey".Log().Debug("Switching source name {0} to actual source value '{1}'.".format_with(configuration.Sources, machineSource.Key.to_string()));
+
+                    configuration.Sources = machineSource.Key;
+                }
+
                 var remoteSource = new Uri(configuration.Sources);
                 if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
                 {
@@ -167,7 +183,7 @@ A feed can be a local folder, a file share, the community feed
     choco push [<path to nupkg>] [<options/switches>]
     cpush [<path to nupkg>] [<options/switches>]
 
-NOTE: If there is more than one nupkg file in the folder, the command 
+NOTE: If there is more than one nupkg file in the folder, the command
  will require specifying the path to the file.
 ");
 
@@ -185,18 +201,18 @@ NOTE: See scripting in the command reference (`choco -?`) for how to
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Troubleshooting");
             "chocolatey".Log().Info(()=> @"
 To use this command, you must have your API key saved for the community
- feed (chocolatey.org) or the source you want to push to. Or you can 
- explicitly pass the apikey to the command. See `apikey` command help 
+ feed (chocolatey.org) or the source you want to push to. Or you can
+ explicitly pass the apikey to the command. See `apikey` command help
  for instructions on saving your key:
 
     choco apikey -?
 
-A common error is `Failed to process request. 'The specified API key 
- does not provide the authority to push packages.' The remote server 
- returned an error: (403) Forbidden..` This means the package already 
- exists with a different user (API key). The package could be unlisted. 
- You can verify by going to {0}packages/packageName. 
- Please contact the administrators of {0} if you see this 
+A common error is `Failed to process request. 'The specified API key
+ does not provide the authority to push packages.' The remote server
+ returned an error: (403) Forbidden..` This means the package already
+ exists with a different user (API key). The package could be unlisted.
+ You can verify by going to {0}packages/packageName.
+ Please contact the administrators of {0} if you see this
  and you don't see a good reason for it.
 ".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
 
