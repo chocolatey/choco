@@ -25,7 +25,9 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
+    using chocolatey.infrastructure.commands;
     using Moq;
+    using NuGet;
     using Should;
 
     public class ChocolateyInstallCommandSpecs
@@ -34,12 +36,16 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             protected ChocolateyInstallCommand command;
             protected Mock<IChocolateyPackageService> packageService = new Mock<IChocolateyPackageService>();
+            protected Mock<IChocolateyPackageInformationService> chocolateyPackageInformationService = new Mock<IChocolateyPackageInformationService>();
+            protected Mock<INugetService> nugetService = new Mock<INugetService>();
+            protected Mock<ILogger> nugetLogger = new Mock<ILogger>();
             protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
                 configuration.Sources = "bob";
-                command = new ChocolateyInstallCommand(packageService.Object);
+                var chocolateyPinCommand = new ChocolateyPinCommand(chocolateyPackageInformationService.Object, nugetLogger.Object, nugetService.Object);
+                command = new ChocolateyInstallCommand(packageService.Object, chocolateyPinCommand, nugetLogger.Object);
             }
         }
 
@@ -234,6 +240,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_add_short_version_of_password_to_the_option_set()
             {
                 optionSet.Contains("p").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_pinVersion_to_the_option_set()
+            {
+                optionSet.Contains("pin-version").ShouldBeTrue();
             }
         }
 
