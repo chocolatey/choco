@@ -106,11 +106,12 @@ namespace chocolatey.infrastructure.app.nuget
             }
 
             var updatedSources = new StringBuilder();
+            var priorityRepositories = new Dictionary<int, IList<IPackageRepository>>();
             foreach (var sourceValue in sources.or_empty_list_if_null())
             {
-
                 var source = sourceValue;
                 var bypassProxy = false;
+                int priority = 0;
                 if (configuration.MachineSources.Any(m => m.Name.is_equal_to(source) || m.Key.is_equal_to(source)))
                 {
                     try
@@ -128,6 +129,11 @@ namespace chocolatey.infrastructure.app.nuget
                             bypassProxy = machineSource.BypassProxy;
                             if (bypassProxy) "chocolatey".Log().Debug("Source '{0}' is configured to bypass proxies.".format_with(source));
                         }
+                        if (machineSource != null && machineSource.Priority > 0)
+                        {
+                            priority = machineSource.Priority;
+                            "chocolatey".Log().Debug("Source '{0}' is configured with priority of {1}".format_with(source, priority));
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -139,19 +145,52 @@ namespace chocolatey.infrastructure.app.nuget
 
                 try
                 {
+                    IPackageRepository packageRepository;
                     var uri = new Uri(source);
                     if (uri.IsFile || uri.IsUnc)
                     {
-                        repositories.Add(new ChocolateyLocalPackageRepository(uri.LocalPath) { Logger = nugetLogger });
+                        packageRepository = new ChocolateyLocalPackageRepository(uri.LocalPath) { Logger = nugetLogger };
                     }
                     else
                     {
-                        repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri, bypassProxy) { UserAgent = "Chocolatey Core" }, packageDownloader) { Logger = nugetLogger });
+                        packageRepository = new DataServicePackageRepository(new RedirectedHttpClient(uri, bypassProxy) { UserAgent = "Chocolatey Core" }, packageDownloader)
+                        { Logger = nugetLogger };
+                    }
+
+                    if (priority <= 0)
+                    {
+                        if (priority < 0)
+                        {
+                            "chocolatey".Log().Warn("The source '{0}' is configured with priority {1}. Negative priority is not supported and will use Priority 0 instead", packageRepository.Source, priority);
+                        }
+                        repositories.Add(packageRepository);
+                    } else if (priorityRepositories.ContainsKey(priority))
+                    {
+                        var existingRepositories = priorityRepositories[priority];
+                        existingRepositories.Add(packageRepository);
+                    } else
+                    {
+                        priorityRepositories.Add(priority, new List<IPackageRepository> { packageRepository });
                     }
                 }
                 catch (Exception)
                 {
-                    repositories.Add(new ChocolateyLocalPackageRepository(source) { Logger = nugetLogger });
+                    var packageRepository = new ChocolateyLocalPackageRepository(source) { Logger = nugetLogger };
+                    if (priority <= 0)
+                    {
+                        if (priority < 0)
+                        {
+                            "chocolatey".Log().Warn("The source '{0}' is configured with priority {1}. Negative priority is not supported and will use Priority 0 instead", packageRepository.Source, priority);
+                        }
+                        repositories.Add(packageRepository);
+                    } else if (priorityRepositories.ContainsKey(priority))
+                    {
+                        var existingRepositories = priorityRepositories[priority];
+                        existingRepositories.Add(packageRepository);
+                    } else
+                    {
+                        priorityRepositories.Add(priority, new List<IPackageRepository> { packageRepository });
+                    }
                 }
             }
 
@@ -160,12 +199,31 @@ namespace chocolatey.infrastructure.app.nuget
                 configuration.Sources = updatedSources.Remove(updatedSources.Length - 1, 1).to_string();
             }
 
-            var repository = new AggregateRepository(repositories, ignoreFailingRepositories: true)
+            IPackageRepository repository = new AggregateRepository(repositories, ignoreFailingRepositories: true)
             {
                 IgnoreFailingRepositories = true,
                 Logger = nugetLogger,
                 ResolveDependenciesVertically = true
             };
+
+            foreach (var keyValuePriorityRepositories in priorityRepositories.OrderByDescending(p => p.Key))
+            {
+                var priorityRepository = repository as PriorityAggregateRepository;
+                if (priorityRepository == null)
+                {
+                    repository = priorityRepository = new PriorityAggregateRepository(repository, configuration)
+                    {
+                        Logger = nugetLogger
+                    };
+                }
+
+                priorityRepository.AddRepository(keyValuePriorityRepositories.Key, new AggregateRepository(keyValuePriorityRepositories.Value)
+                {
+                    IgnoreFailingRepositories = true,
+                    Logger = nugetLogger,
+                    ResolveDependenciesVertically = true
+                });
+            }
 
             return repository;
         }
