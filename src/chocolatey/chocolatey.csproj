@@ -116,6 +116,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyExportCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInfoCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyHelpCommand.cs" />
+    <Compile Include="infrastructure.app\nuget\PriorityAggregateRepository.cs" />
     <Compile Include="infrastructure\cryptography\DefaultEncryptionUtility.cs" />
     <Compile Include="infrastructure\adapters\IEncryptionUtility.cs" />
     <Compile Include="infrastructure.app\validations\GlobalConfigurationValidation.cs" />
