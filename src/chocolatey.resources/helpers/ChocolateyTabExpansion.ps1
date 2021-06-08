@@ -111,17 +111,17 @@ function ChocolateyTabExpansion($lastBlock) {
   switch -regex ($lastBlock -replace "^$(Get-AliasPattern choco) ","") {
 
     # Handles uninstall package names
-    "^uninstall\s+(?<package>[^\.][^-\s]*)$" {
+    "^uninstall.*\s+(?<package>[^-\.\s][^\s]*)$" {
       chocoLocalPackages $matches['package']
     }
 
     # Handles install package names
-    "^(install)\s+(?<package>[^\.][^-\s]+)$" {
+    "^(install).*\s+(?<package>[^-\.\s][^\s]*)$" {
       chocoRemotePackages $matches['package']
     }
 
     # Handles upgrade / uninstall package names
-    "^upgrade\s+(?<package>[^\.][^-\s]*)$" {
+    "^upgrade.*\s+(?<package>[^-\.\s][^\s]*)$" {
       chocoLocalPackagesUpgrade $matches['package']
     }
 
