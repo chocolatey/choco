@@ -18,6 +18,7 @@ namespace chocolatey
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Reflection;
     using infrastructure.licensing;
     using SimpleInjector;
@@ -47,16 +48,21 @@ namespace chocolatey
     {
         private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof(Lets));
 
-        private static GetChocolatey set_up()
+        private static GetChocolatey set_up(bool initializeLogging)
         {
             add_assembly_resolver();
 
-            return new GetChocolatey();
+            return new GetChocolatey(initializeLogging);
         }
 
         public static GetChocolatey GetChocolatey()
         {
-            return GlobalMutex.enter(() => set_up(), 10);
+            return GetChocolatey(initializeLogging: true);
+        }
+
+        public static GetChocolatey GetChocolatey(bool initializeLogging)
+        {
+            return GlobalMutex.enter(() => set_up(initializeLogging), 10);
         }
 
         private static ResolveEventHandler _handler = null;
@@ -122,12 +128,24 @@ namespace chocolatey
         /// Initializes a new instance of the <see cref="GetChocolatey"/> class.
         /// </summary>
         public GetChocolatey()
+            : this(initializeLogging: true)
         {
-            Log4NetAppenderConfiguration.configure(null, excludeLoggerNames: ChocolateyLoggers.Trace.to_string());
-            Bootstrap.initialize();
-            Log.InitializeWith(new AggregateLog(new List<ILog>() { new Log4NetLog(), _logSinkLogger }));
-            _license = License.validate_license();
+        }
+
+        public GetChocolatey(bool initializeLogging)
+        {
             _container = SimpleInjectorContainer.Container;
+            if (initializeLogging)
+            {
+                string loggingLocation = ApplicationParameters.LoggingLocation;
+                var fileSystem = _container.GetInstance<IFileSystem>();
+                fileSystem.create_directory_if_not_exists(loggingLocation);
+
+                Log4NetAppenderConfiguration.configure(loggingLocation, excludeLoggerNames: ChocolateyLoggers.Trace.to_string());
+                Log.InitializeWith(new AggregateLog(new List<ILog>() { new Log4NetLog(), _logSinkLogger }));
+                "chocolatey".Log().Debug("XmlConfiguration is now operational");
+            }
+            _license = License.validate_license();
         }
 
         /// <summary>
@@ -137,8 +155,28 @@ namespace chocolatey
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
         public GetChocolatey SetCustomLogging(ILog logger)
         {
-            Log.InitializeWith(logger, resetLoggers: false);
-            drain_log_sink(logger);
+            return SetCustomLogging(logger, logExistingMessages: true, addToExistingLoggers: false);
+        }
+
+        public GetChocolatey SetCustomLogging(ILog logger, bool logExistingMessages)
+        {
+            return SetCustomLogging(logger, logExistingMessages, addToExistingLoggers: false);
+        }
+
+        public GetChocolatey SetCustomLogging(ILog logger, bool logExistingMessages, bool addToExistingLoggers)
+        {
+            var aggregateLog = new AggregateLog(new List<ILog> { logger });
+            if (addToExistingLoggers)
+            {
+                aggregateLog = new AggregateLog(new List<ILog> { logger, Log.GetLoggerFor("chocolatey") });
+            }
+
+            Log.InitializeWith(aggregateLog, resetLoggers: false);
+            if (logExistingMessages)
+            {
+                drain_log_sink(logger);
+            }
+
             return this;
         }
 
