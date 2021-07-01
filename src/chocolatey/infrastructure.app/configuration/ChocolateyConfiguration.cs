@@ -51,6 +51,7 @@ namespace chocolatey.infrastructure.app.configuration
             OutdatedCommand = new OutdatedCommandConfiguration();
             Proxy = new ProxyConfiguration();
             ExportCommand = new ExportCommandConfiguration();
+            SecurityProtocols = new SecurityProtocolsConfiguration();
 #if DEBUG
             AllowUnofficialBuild = true;
 #endif
@@ -344,6 +345,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
         public ProxyConfiguration Proxy { get; set; }
+
+        /// <summary>
+        /// Security protocol configuration to allow the
+        /// specific list of communication protocol
+        /// </summary>
+        public SecurityProtocolsConfiguration SecurityProtocols { get; set; }
     }
 
     [Serializable]
@@ -556,4 +563,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         public string OutputFilePath { get; set; }
     }
+
+    [Serializable]
+    public sealed class SecurityProtocolsConfiguration
+    {
+        public string AllowedSecurityProtocol  { get; set; }
+    }
+
 }
