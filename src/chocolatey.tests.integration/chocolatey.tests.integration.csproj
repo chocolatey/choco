@@ -235,6 +235,12 @@
     <None Include="context\exactpackage\exactpackage.dontfind\1.0.0\exactpackage.dontfind.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\exactpackage\exactpackage\0.9.0\exactpackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\exactpackage\exactpackage\1.0.0-beta1\exactpackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\exactpackage\exactpackage\1.0.0\exactpackage.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -477,6 +483,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="context\exactpackage\exactpackage.dontfind\1.0.0\tools\purpose.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="context\exactpackage\exactpackage\0.9.0\tools\purpose.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="context\exactpackage\exactpackage\1.0.0-beta1\tools\purpose.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="context\exactpackage\exactpackage\1.0.0\tools\purpose.txt">

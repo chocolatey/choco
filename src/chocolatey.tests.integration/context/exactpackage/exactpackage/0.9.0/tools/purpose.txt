@@ -1,0 +1,1 @@
+when running choco list exactpackage -e --all, this package should be in the resulting list.

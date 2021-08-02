@@ -1,0 +1,1 @@
+When running choco list exactpackage -a --all --pre, this package should be in the returned results.
