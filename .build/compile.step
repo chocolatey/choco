@@ -75,7 +75,7 @@
       if="${platform::is-unix()}"
       >
       <arg value='"${app.nuget}"' />
-      <arg value='restore "${solution.path}"' />
+      <arg value='restore "${solution.path}" -DisableParallelProcessing' />
     </exec>
   </target>
 
