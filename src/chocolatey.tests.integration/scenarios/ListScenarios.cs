@@ -496,8 +496,8 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("Start of List", LogLevel.Debug).ShouldBeTrue();
                 MockLogger.contains_message("End of List", LogLevel.Debug).ShouldBeTrue();
             }
-        }        
-        
+        }
+
         [Concern(typeof(ChocolateyListCommand))]
         public class when_searching_for_an_exact_package_with_zero_results : ScenariosBase
         {
