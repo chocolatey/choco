@@ -400,7 +400,7 @@
  * should not have inconclusive package result
  * should not have warning package result
 
-### ChocolateyListCommand [ 11 Scenario(s), 48 Observation(s) ]
+### ChocolateyListCommand [ 13 Scenario(s), 56 Observation(s) ]
 
 #### when listing local packages
 
@@ -447,6 +447,20 @@
  * should contain debugging messages
  * should contain packages and versions with a space between them
  * should not contain packages that do not match
+
+#### when searching for all packages including prerelease with exact id
+
+ * should find all versions in descending order
+ * should find only packages with exact id
+ * should find three results
+ * should not error
+
+#### when searching for all packages with exact id
+
+ * should find all non prerelease versions in descending order
+ * should find only packages with exact id
+ * should find two results
+ * should not error
 
 #### when searching for an exact package
 
