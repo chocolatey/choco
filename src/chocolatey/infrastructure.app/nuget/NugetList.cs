@@ -59,17 +59,23 @@ namespace chocolatey.infrastructure.app.nuget
                 isServiceBased = packageRepository is IServiceBasedRepository;
             }
 
-            IQueryable<IPackage> results = packageRepository.Search(searchTermLower, configuration.Prerelease);
-
             SemanticVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? new SemanticVersion(configuration.Version) : null;
+            IQueryable<IPackage> results;
 
-            if (configuration.ListCommand.Exact)
+            if (!configuration.ListCommand.Exact)
+            {
+                results = packageRepository.Search(searchTermLower, configuration.Prerelease);
+            }
+            else
             {
                 if (configuration.AllVersions)
                 {
                     // convert from a search to getting packages by id.
                     // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
-                    results = packageRepository.GetPackages().Where(x => x.Id.ToLower() == searchTermLower);
+                    results = packageRepository.GetPackages().Where(p => p.Id.ToLower() == searchTermLower)
+                        .AsEnumerable()
+                        .Where(p => configuration.Prerelease || p.IsReleaseVersion())
+                        .AsQueryable();
                 }
                 else
                 {
