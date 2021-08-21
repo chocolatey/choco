@@ -8,7 +8,7 @@
     <title>Chocolatey</title>
     <authors>Chocolatey Software, Inc</authors>
     <projectUrl>https://github.com/chocolatey/choco</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/chocolatey/choco/master/docs/logo/chocolateyicon.gif</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/chocolatey/choco/master/docs/logo/chocolateyicon.png</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>2017-2021 Chocolatey Software, Inc, 2011-2017 RealDimensions Software, LLC</copyright>
