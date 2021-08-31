@@ -16,8 +16,8 @@
   <!-- ASSEMBLY VARIABLES -->
   <property name="version.use_semanticversioning" value="true" overwrite="false" />
   <property name="version.major" value="0" overwrite="false" />
-  <property name="version.minor" value="10" overwrite="false" />
-  <property name="version.patch" value="16" overwrite="false" />
+  <property name="version.minor" value="11" overwrite="false" />
+  <property name="version.patch" value="0" overwrite="false" />
   <property name="version.fix" value="0" overwrite="false" />
   <property name="version.nuget.prerelease" value="beta" overwrite="false" />
   <property name="version.use.build_date" value="true" overwrite="false" />
