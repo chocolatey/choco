@@ -131,7 +131,7 @@ namespace chocolatey.infrastructure.app.services
 
             this.Log().Debug(() => " Preparing uninstall key '{0}' for '{1}'".format_with(key.UninstallString.to_string().escape_curly_braces(), key.DisplayName.to_string().escape_curly_braces()));
 
-            if ((!string.IsNullOrWhiteSpace(key.InstallLocation) && !_fileSystem.directory_exists(key.InstallLocation)) || !_registryService.installer_value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation))
+            if ((!string.IsNullOrWhiteSpace(key.InstallLocation) && !_fileSystem.directory_exists(key.InstallLocation.to_string().remove_surrounding_quotes())) || !_registryService.installer_value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation))
             {
                 this.Log().Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".format_with(!string.IsNullOrEmpty(key.DisplayName.to_string()) ? key.DisplayName.to_string().escape_curly_braces() : "The application"));
                 this.Log().Debug(() => " Searched for install path '{0}' - found? {1}".format_with(key.InstallLocation.to_string().escape_curly_braces(), _fileSystem.directory_exists(key.InstallLocation)));
