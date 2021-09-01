@@ -222,7 +222,7 @@ Allows splatting with arguments that do not apply. Do not use directly.
 
 .PARAMETER BeforeInstall Script
 Specifies the commands to run after download has completed but before install steps have begun.
-Available in 0.10.16+.
+Available in 0.11.0+.
 
 Use this for starting an auxilary process such as AutoHotkey, so that any timeouts are not 
 affected by the time to download.
