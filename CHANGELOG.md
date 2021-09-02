@@ -3,7 +3,7 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
-## [0.11.0](https://github.com/chocolatey/choco/issues?q=is%3Aclosed+milestone%3A0.11.0) (unreleased)
+## [0.11.0](https://github.com/chocolatey/choco/issues?q=is%3Aclosed+milestone%3A0.11.0) (September 2nd, 2021)
 ### BREAKING CHANGES
  * Disable importing / loading of DLL in the extension folder - see [#2333](https://github.com/chocolatey/choco/issues/2333)
  * choco list -e -a returns pre-releases even when --pre is not passed - see [#2304](https://github.com/chocolatey/choco/issues/2304)
@@ -24,7 +24,7 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
  * Fix - Incorrect output regarding package files when package can't be found to be downloaded - see [#1962](https://github.com/chocolatey/choco/issues/1962)
 
 ### IMPROVEMENTS
- * TBD - see [#2266](https://github.com/chocolatey/choco/issues/2266)
+ * [Security] XML External Entity attack in log4net (CVE-2018-1285) - see [#2266](https://github.com/chocolatey/choco/issues/2266)
  * Provide ability to export all currently installed packages to a packages.config file - see [#357](https://github.com/chocolatey/choco/issues/357)
  * Provide ability to execute PowerShell script right before installation starts when using Install-ChocolateyPackage - see [#1060](https://github.com/chocolatey/choco/issues/1060)
  * Add ChocolateyExitOnRebootDetected feature setting to environment variables for usage within package scripts - see [#1983](https://github.com/chocolatey/choco/issues/1983)
