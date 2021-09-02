@@ -14,34 +14,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$helpersPath = (Split-Path -parent $MyInvocation.MyCommand.Definition);
+$helpersPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 $global:DebugPreference = "SilentlyContinue"
-if ($env:ChocolateyEnvironmentDebug -eq 'true') { $global:DebugPreference = "Continue"; }
+if ($env:ChocolateyEnvironmentDebug -eq 'true') {
+    $global:DebugPreference = "Continue"
+}
 $global:VerbosePreference = "SilentlyContinue"
-if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $global:VerbosePreference = "Continue"; $verbosity = $true }
+if ($env:ChocolateyEnvironmentVerbose -eq 'true') {
+    $global:VerbosePreference = "Continue"
+    $verbosity = $true
+}
+
+$overrideArgs = $env:chocolateyInstallOverride -eq 'true'
+
+$forceX86 = $env:chocolateyForceX86 -eq 'true'
 
 $installArguments = $env:chocolateyInstallArguments
-
-$overrideArgs = $false
-if ($env:chocolateyInstallOverride -eq 'true') { $overrideArgs = $true }
-
-$forceX86 = $false
-if ($env:chocolateyForceX86 -eq 'true') { $forceX86 = $true }
 
 $packageParameters = $env:chocolateyPackageParameters
 
 # ensure module loading preference is on
-$PSModuleAutoLoadingPreference = "All";
+$PSModuleAutoLoadingPreference = "All"
 
 Write-Debug "Host version is $($host.Version), PowerShell Version is '$($PSVersionTable.PSVersion)' and CLR Version is '$($PSVersionTable.CLRVersion)'."
 
-# grab functions from files
-Get-Item $helpersPath\functions\*.ps1 |
-  ? { -not ($_.Name.Contains(".Tests.")) } |
-    % {
-    . $_.FullName;
-    #Export-ModuleMember -Function $_.BaseName
+# Import functions from files
+Get-Item -Path "$helpersPath\functions\*.ps1" |
+    Where-Object { -not $_.Name.Contains(".Tests.") } |
+    ForEach-Object {
+        . $_.FullName
     }
 
 # Export built-in functions prior to loading extensions so that
@@ -52,10 +54,9 @@ Export-ModuleMember -Function * -Alias * -Cmdlet *
 
 $currentAssemblies = [System.AppDomain]::CurrentDomain.GetAssemblies()
 
-# load extensions if they exist
-$extensionsPath = Join-Path "$helpersPath" '..\extensions'
+# Load community extensions if they exist
+$extensionsPath = Join-Path $helpersPath -ChildPath '..\extensions'
 if (Test-Path $extensionsPath) {
-
     $licensedExtensionPath = Join-Path $extensionsPath -ChildPath 'chocolatey\chocolatey.licensed.dll'
     if (Test-Path $licensedExtensionPath) {
         Write-Debug "Importing '$licensedExtensionPath'"
@@ -65,8 +66,9 @@ if (Test-Path $extensionsPath) {
         $licensedAssembly = $currentAssemblies |
             Where-Object { $_.GetName().Name -eq 'chocolatey.licensed' } |
             Select-Object -First 1
+
         if ($licensedAssembly) {
-            # already loaded, just import the existing assembly as a module
+            # It's already loaded, just import the existing assembly as a module for PowerShell to use
             Import-Module $licensedAssembly
         }
         else {
@@ -75,8 +77,13 @@ if (Test-Path $extensionsPath) {
         }
     }
 
-  Write-Debug 'Loading community extensions'
-  Get-ChildItem $extensionsPath -recurse -filter "*.psm1" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }
+    Write-Debug 'Loading community extensions'
+    Get-ChildItem -Path $extensionsPath -Recurse -Filter '*.psm1' |
+        Select-Object -ExpandProperty FullName |
+        ForEach-Object {
+            Write-Debug "Importing '$_'"
+            Import-Module $_
+        }
 }
 
 # todo: explore removing this for a future version
