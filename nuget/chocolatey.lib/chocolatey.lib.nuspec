@@ -31,7 +31,7 @@ This is the Chocolatey Library (API / DLL) package which allows Chocolatey to be
  * [Documentation](https://docs.chocolatey.org/en-us/) / [Support](https://chocolatey.org/support)
 
 </description>
-    <releaseNotes>See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
+    <releaseNotes>See all - https://docs.chocolatey.org/en-us/choco/release-notes
     </releaseNotes>
     <dependencies>
       <dependency id="log4net" version="2.0.3" />
