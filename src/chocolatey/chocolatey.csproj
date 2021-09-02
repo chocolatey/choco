@@ -67,8 +67,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AlphaFS.2.1.3\lib\net40\AlphaFS.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.3\lib\net40-client\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.12\lib\net40-client\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
