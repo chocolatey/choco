@@ -8,7 +8,7 @@
     <title>Chocolatey</title>
     <authors>Chocolatey Software, Inc</authors>
     <projectUrl>https://github.com/chocolatey/choco</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/chocolatey/choco/master/docs/logo/chocolateyicon.gif</iconUrl>
+    <iconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>2017-2021 Chocolatey Software, Inc, 2011-2017 RealDimensions Software, LLC</copyright>
@@ -61,7 +61,7 @@ We have some great guidance on how to do that. Where? I'll give you a hint, it r
 In that mess there is a link to the [PowerShell Chocolatey module reference](https://docs.chocolatey.org/en-us/create/functions).
 </description>
     <releaseNotes>
-See all - https://github.com/chocolatey/choco/blob/stable/CHANGELOG.md
+See all - https://docs.chocolatey.org/en-us/choco/release-notes
     </releaseNotes>
   </metadata>
 </package>

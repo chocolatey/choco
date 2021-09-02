@@ -3,6 +3,50 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
+## [0.11.0](https://github.com/chocolatey/choco/issues?q=is%3Aclosed+milestone%3A0.11.0) (September 2nd, 2021)
+### BREAKING CHANGES
+ * Disable importing / loading of DLL in the extension folder - see [#2333](https://github.com/chocolatey/choco/issues/2333)
+ * choco list -e -a returns pre-releases even when --pre is not passed - see [#2304](https://github.com/chocolatey/choco/issues/2304)
+
+### BUG FIXES
+ * Fix - Prevent creation of empty nuget.config in user appdata folder - see [#2233](https://github.com/chocolatey/choco/issues/2233)
+ * Fix - Upgrade all with remembered arguments changes packages to pre-release - see [#2111](https://github.com/chocolatey/choco/issues/2111)
+ * Fix - Software applications are being reported as not being managed by Chocolatey when their associated package is installed - see [#2092](https://github.com/chocolatey/choco/issues/2092)
+ * Fix - Unable to remove API Key with choco apikey command - see [#1889](https://github.com/chocolatey/choco/issues/1889)
+ * Fix - Not all package versions are returned when running running choco list --all-versions --exact - see [#1843](https://github.com/chocolatey/choco/issues/1843)
+ * Fix - Upgrade all reuses overridden package parameters when useRememberedArgumentsForUpgrades feature is turned on - see [#1443](https://github.com/chocolatey/choco/issues/1443)
+ * Fix - choco pack fails when running on Mono when current directory is not the same one that contains the .nuspec being packed - see [#2263](https://github.com/chocolatey/choco/issues/2263)
+ * Fix - Running choco pack on Mono on Linux will not include any files in .nupkg if there is no files element in the .nuspec - see [#2258](https://github.com/chocolatey/choco/issues/2258)
+ * Fix - Nuspec files with forward slash creates nested layer of directories when packed on Windows - see [#2166](https://github.com/chocolatey/choco/issues/2166)
+ * Fix - Prevent loading of Chocolatey GUI Licensed Extension assembly - see [#2078](https://github.com/chocolatey/choco/issues/2078)
+ * Fix - Working directory always being replaced with configured cache location when using Start-ChocolateyProcessAsAdmin - see [#2051](https://github.com/chocolatey/choco/issues/2051)
+ * Fix - Temp location can change unexpectedly when using System credentials - see [#2044](https://github.com/chocolatey/choco/issues/2044)
+ * Fix - Incorrect output regarding package files when package can't be found to be downloaded - see [#1962](https://github.com/chocolatey/choco/issues/1962)
+
+### IMPROVEMENTS
+ * [Security] XML External Entity attack in log4net (CVE-2018-1285) - see [#2266](https://github.com/chocolatey/choco/issues/2266)
+ * Provide ability to export all currently installed packages to a packages.config file - see [#357](https://github.com/chocolatey/choco/issues/357)
+ * Provide ability to execute PowerShell script right before installation starts when using Install-ChocolateyPackage - see [#1060](https://github.com/chocolatey/choco/issues/1060)
+ * Add ChocolateyExitOnRebootDetected feature setting to environment variables for usage within package scripts - see [#1983](https://github.com/chocolatey/choco/issues/1983)
+ * Only search top level package folders when running the remove pending packages task - see [#1866](https://github.com/chocolatey/choco/issues/1866)
+ * Change default repository in the chocolatey.config to community.chocolatey.org - see [#2231](https://github.com/chocolatey/choco/issues/2231)
+ * Support UnzipLocation as an alias to Destination parameter in the Get-ChocolateyUnzip function - see [#2203](https://github.com/chocolatey/choco/issues/2203)
+ * API - Allow Lets.GetChocolatey to not initialize logging - see [#2124](https://github.com/chocolatey/choco/issues/2124)
+ * Provide ability to install msp patch files using Install-ChocolateyInstallPackage function - see [#2112](https://github.com/chocolatey/choco/issues/2112)
+ * Add ability to use authorization headers in the Get-WebFile function - see [#1998](https://github.com/chocolatey/choco/issues/1998)
+ * Ensure nuspec files generated from the choco new command use UTF-8 without a byte order mark - see [#1364](https://github.com/chocolatey/choco/issues/1364)
+ * Provide top level help command explaining what commands can be executed - see [#944](https://github.com/chocolatey/choco/issues/944)
+ * Ensure correct path separator in nuspec files is used on different operating systems - see [#502](https://github.com/chocolatey/choco/issues/502)
+ * Remove unused variable in uninstall template generated from choco new command - see [#2114](https://github.com/chocolatey/choco/issues/2114)
+
+### DOCUMENTATION
+ * Clarify the SpecificFolder parameter for helper functions - see [#2190](https://github.com/chocolatey/choco/issues/2190)
+ * Update deprecation notice to use outdated command when using version command - see [#2048](https://github.com/chocolatey/choco/issues/2048)
+ * Include information about --version option in choco help documentation - see [#2049](https://github.com/chocolatey/choco/issues/2049)
+ * Fix examples for Install-ChocolateyPackage function - see [#1899](https://github.com/chocolatey/choco/issues/1899)
+ * Terminology improvements in choco.exe help output - see [#1861](https://github.com/chocolatey/choco/issues/1861)
+ * Wrong error message shown when using Get-ChocolateyWebFile and forcex86 - see [#1859](https://github.com/chocolatey/choco/issues/1859)
+
 ## [0.10.15](https://github.com/chocolatey/choco/issues?q=milestone%3A0.10.15+is%3Aclosed) (June 3, 2019)
 ### BUG FIXES
  * Fix - list/search/info - searching with --exact or info results in Object reference not set to an instance of an object - see [#1837](https://github.com/chocolatey/choco/issues/1837)
