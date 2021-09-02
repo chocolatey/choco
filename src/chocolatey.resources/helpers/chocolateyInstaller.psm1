@@ -54,9 +54,28 @@ $currentAssemblies = [System.AppDomain]::CurrentDomain.GetAssemblies()
 
 # load extensions if they exist
 $extensionsPath = Join-Path "$helpersPath" '..\extensions'
-if (Test-Path($extensionsPath)) {
+if (Test-Path $extensionsPath) {
+
+    $licensedExtensionPath = Join-Path $extensionsPath -ChildPath 'chocolatey\chocolatey.licensed.dll'
+    if (Test-Path $licensedExtensionPath) {
+        Write-Debug "Importing '$licensedExtensionPath'"
+        Write-Debug "Loading 'chocolatey.licensed' extension"
+
+        # Attempt to import module via already-loaded assembly
+        $licensedAssembly = $currentAssemblies |
+            Where-Object { $_.GetName().Name -eq 'chocolatey.licensed' } |
+            Select-Object -First 1
+        if ($licensedAssembly) {
+            # already loaded, just import the existing assembly as a module
+            Import-Module $licensedAssembly
+        }
+        else {
+            # Fallback: load the extension DLL from the path directly.
+            Import-Module $licensedExtensionPath
+        }
+    }
+
   Write-Debug 'Loading community extensions'
-  #Resolve-Path $extensionsPath\**\*\*.psm1 | % { Write-Debug "Importing `'$_`'"; Import-Module $_.ProviderPath }
   Get-ChildItem $extensionsPath -recurse -filter "*.psm1" | Select -ExpandProperty FullName | % { Write-Debug "Importing `'$_`'"; Import-Module $_; }
 }
 
