@@ -29,9 +29,9 @@ You can just call me choco.
 <!-- /TOC -->
 
 ## Build Status
-TeamCity  | AppVeyor | Travis | GitHub Action
-------------- | ------------- | ------------- | -------------
-[![TeamCity Build Status](https://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/jfxywa3xuwowt20w/branch/master?svg=true)](https://ci.appveyor.com/project/ferventcoder/choco/branch/master) | [![Travis Build Status](https://travis-ci.org/chocolatey/choco.svg?branch=master)](https://travis-ci.org/chocolatey/choco) | [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/master?logo=github)]((https://github.com/chocolatey/choco/actions/workflows/build.yml))
+| TeamCity                                                                                                                                         | AppVeyor                                                                                                                                                                          | GitHub Action                                                                                                                                                                                                  |
+|--------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![TeamCity Build Status](https://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/lv4u2v0v02dj3svu/branch/master?svg=true)](https://ci.appveyor.com/project/chocolatey/choco/branch/master)   | [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/master?logo=github)]((https://github.com/chocolatey/choco/actions/workflows/build.yml)) |
 
 ## Chat Room
 Come join in the conversation about Chocolatey in our Gitter Chat Room.
