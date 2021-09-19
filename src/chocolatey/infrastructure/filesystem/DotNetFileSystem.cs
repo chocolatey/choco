@@ -175,7 +175,7 @@ namespace chocolatey.infrastructure.filesystem
 
         public string get_current_assembly_path()
         {
-            return Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty);
+            return Assembly.GetExecutingAssembly().CodeBase.Replace(Platform.get_platform() == PlatformType.Windows ? "file:///" : "file://", string.Empty);
         }
 
         #endregion
