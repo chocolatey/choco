@@ -37,4 +37,6 @@ src/_dotCover.chocolatey/
 src/_dotTrace.chocolatey/
 src/chocolatey.sln.GhostDoc.xml
 
+chocolatey.official.snk
+
 docs/generated
