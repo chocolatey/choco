@@ -9,12 +9,14 @@ WORKDIR /usr/local/src/choco
 RUN chmod +x *.sh
 
 ARG buildscript="build.sh"
-RUN ./$buildscript
 
 RUN if [ "$buildscript" = "build.official.sh" ]; then \
+    export CHOCOLATEY_OFFICIAL_KEY="/usr/local/src/choco/chocolatey.official.snk"; \
+    ./$buildscript; \
     cp docker/choco_official_wrapper code_drop/chocolatey/console/choco_wrapper; \
   else \
-    cp docker/choco_wrapper code_drop/chocolatey/console/choco_wrapper; \    
+    ./$buildscript; \
+    cp docker/choco_wrapper code_drop/chocolatey/console/choco_wrapper; \
   fi;
 
 
