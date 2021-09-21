@@ -222,7 +222,7 @@ param(
   $commandText = $commandText -replace 'NOTE\:', '> :memo: **NOTE**'
   $commandText = $commandText -replace '\*> :memo: \*\*NOTE\*\*\*', '> :memo: **NOTE**'
   $commandText = $commandText -replace 'the command reference', '[how to pass arguments](xref:choco-commands#how-to-pass-options-switches)'
-  $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://community.chocolatey.org/packages)'
+  $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://comminty.chocolatey.org/packages)'
   #$commandText = $commandText -replace '\`(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[[`$1`|Commands$1]]'
   $commandText = $commandText -replace '\`([choco\s]*)(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[`$1$2`](xref:choco-command-$2)'
   $commandText = $commandText -replace '^(.+):\s(.+.gif)$', '![$1]($2)'
