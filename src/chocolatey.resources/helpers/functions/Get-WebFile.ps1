@@ -186,7 +186,6 @@ param(
         'Cookie' {$req.CookieContainer.SetCookies($uri, $options.headers.$key)}
         'Referer' {$req.Referer = $options.headers.$key}
         'User-Agent' {$req.UserAgent = $options.headers.$key}
-        'Authorization' {$req.Authorization = $options.headers.$key}
         Default {$req.Headers.Add($key, $options.headers.$key)}
       }
     }
