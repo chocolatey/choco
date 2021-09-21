@@ -9,7 +9,7 @@ https://github.com/chocolatey/choco#submitting-issues
 
 Please check to see if your issue already exists with a quick search of the issues. Start with one relevant term and then add if you get too many results.
 
-NOTE: Keep in mind we have an etiquette regarding communication that we expect folks to observe when they are looking for support in the Chocolatey community. https://github.com/chocolatey/choco/blob/master/README.md#etiquette-regarding-communication
+NOTE: Keep in mind we have an etiquette regarding communication that we expect folks to observe when they are looking for support in the Chocolatey community. https://github.com/chocolatey/choco/blob/develop/README.md#etiquette-regarding-communication
 -->
 
 ### What You Are Seeing?

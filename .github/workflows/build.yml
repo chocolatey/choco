@@ -1,15 +1,15 @@
 name: Chocolatey Builds
 
 on:
-  # Trigger on pushes to master and stable, or with pull requests
+  # Trigger on pushes to master and develop, or with pull requests
   push:
     branches:
     - master
-    - stable
+    - develop
   pull_request:
     branches:
     - master
-    - stable
+    - develop
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

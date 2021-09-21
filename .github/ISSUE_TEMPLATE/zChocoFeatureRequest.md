@@ -4,7 +4,7 @@ about: How can we make Chocolatey work better for you? Is there additional funct
 ---
 
 <!--
-Please observe https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md guidelines prior to creating your issue.
+Please observe https://github.com/chocolatey/choco/blob/develop/CONTRIBUTING.md guidelines prior to creating your issue.
 
-NOTE: Keep in mind we have an etiquette regarding communication that we expect folks to observe when they are looking for support in the Chocolatey community. https://github.com/chocolatey/choco/blob/master/README.md#etiquette-regarding-communication
+NOTE: Keep in mind we have an etiquette regarding communication that we expect folks to observe when they are looking for support in the Chocolatey community. https://github.com/chocolatey/choco/blob/develop/README.md#etiquette-regarding-communication
 -->

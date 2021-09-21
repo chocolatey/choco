@@ -39,7 +39,7 @@ Please follow these decision criteria to see if you are in the right location or
 ### Reporting an Issue/Bug?
 ![submitting issues](https://cloud.githubusercontent.com/assets/63502/12534440/fc223b74-c21e-11e5-9a41-1ffc1c9af48f.png)
 
-Submitting an Issue (or a Bug)? See the **[Submitting Issues](https://github.com/chocolatey/choco#submitting-issues) section** in the [README](https://github.com/chocolatey/choco/blob/master/README.md#submitting-issues).
+Submitting an Issue (or a Bug)? See the **[Submitting Issues](https://github.com/chocolatey/choco#submitting-issues) section** in the [README](https://github.com/chocolatey/choco/blob/develop/README.md#submitting-issues).
 
 #### SolutionVersion.cs
 Do not submit issues for missing `SolutionVersion.cs`. Please see [Compiling / Building Source](https://github.com/chocolatey/choco#compiling--building-source).
@@ -127,7 +127,7 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
     * More covered below in the [**Prepare commits**](#prepare-commits) section.
  * Test your changes and please help us out by updating and implementing some automated tests. It is recommended that all contributors spend some time looking over the tests in the source code. You can't go wrong emulating one of the existing tests and then changing it specific to the behavior you are testing.
     * While not an absolute requirement, automated tests will help reviewers feel comfortable about your changes, which gets your contributions accepted faster.
- * Please do not update your branch from the master unless we ask you to. See the responding to feedback section below.
+ * Please do not update your branch from the develop unless we ask you to. See the responding to feedback section below.
 
 ### Code Format / Design
 #### CSharp
@@ -254,7 +254,7 @@ Prerequisites:
 
 Submitting PR:
 
- * Once you feel it is ready, submit the pull request to the `chocolatey/choco` repository against the `master` branch ([more information on this can be found here](https://help.github.com/articles/creating-a-pull-request)) unless specifically requested to submit it against another branch (usually `stable` in these instances).
+ * Once you feel it is ready, submit the pull request to the `chocolatey/choco` repository against the `develop` branch ([more information on this can be found here](https://help.github.com/articles/creating-a-pull-request)) unless specifically requested to submit it against another branch (for example, a `hotfix` or `release` branch).
   * In the case of a larger change that is going to require more discussion, please submit a PR sooner. Waiting until you are ready may mean more changes than you are interested in if the changes are taking things in a direction the committers do not want to go.
  * In the pull request, outline what you did and point to specific conversations (as in URLs) and issues that you are are resolving. This is a tremendous help for us in evaluation and acceptance.
  * Once the pull request is in, please do not delete the branch or close the pull request (unless something is wrong with it).
@@ -268,10 +268,10 @@ If we have comments or questions when we do evaluate it and receive no response,
 Sometimes we may need you to rebase your commit against the latest code before we can review it further. If this happens, you can do the following:
 
  * `git fetch upstream` (upstream would be the mainstream repo or `chocolatey/choco` in this case)
- * `git checkout master`
- * `git rebase upstream/master`
+ * `git checkout develop`
+ * `git rebase upstream/develop`
  * `git checkout your-branch`
- * `git rebase master`
+ * `git rebase develop`
  * Fix any merge conflicts
  * `git push origin your-branch` (origin would be your GitHub repo or `your-github-username/choco` in this case). You may need to `git push origin your-branch --force` to get the commits pushed. This is generally acceptable with topic branches not in the mainstream repository.
 
@@ -281,7 +281,7 @@ The only reasons a pull request should be closed and resubmitted are as follows:
   * When there are updates made to the original by someone other than the original contributor (and the PR is not open for contributions). Then the old branch is closed with a note on the newer branch this supersedes #github_number.
 
 ## Other General Information
-The helpers/utility functions that are available to the packages are what we consider the API. If you are working in the API, please note that you will need to maintain backwards compatibility. If you plan to rename a function or make it more generic, you must provide an alias in the [chocolateyInstaller.psm1](https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/chocolateyInstaller.psm1) as part of what gets exported. You should not remove or reorder parameters, only add optional parameters to the end. They should be named and not positional (we are moving away from positional parameters as much as possible).
+The helpers/utility functions that are available to the packages are what we consider the API. If you are working in the API, please note that you will need to maintain backwards compatibility. If you plan to rename a function or make it more generic, you must provide an alias in the [chocolateyInstaller.psm1](https://github.com/chocolatey/choco/blob/develop/src/chocolatey.resources/helpers/chocolateyInstaller.psm1) as part of what gets exported. You should not remove or reorder parameters, only add optional parameters to the end. They should be named and not positional (we are moving away from positional parameters as much as possible).
 
 If you reformat code or hit core functionality without an approval from a person on the Chocolatey Team, it's likely that no matter how awesome it looks afterwards, it will probably not get accepted. Reformatting code makes it harder for us to evaluate exactly what was changed.
 

@@ -31,7 +31,7 @@ You can just call me choco.
 ## Build Status
 | TeamCity                                                                                                                                         | AppVeyor                                                                                                                                                                          | GitHub Action                                                                                                                                                                                                  |
 |--------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [![TeamCity Build Status](https://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/lv4u2v0v02dj3svu/branch/master?svg=true)](https://ci.appveyor.com/project/chocolatey/choco/branch/master)   | [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/master?logo=github)]((https://github.com/chocolatey/choco/actions/workflows/build.yml)) |
+| [![TeamCity Build Status](https://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/lv4u2v0v02dj3svu/branch/develop?svg=true)](https://ci.appveyor.com/project/chocolatey/choco/branch/develop)   | [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/develop?logo=github)]((https://github.com/chocolatey/choco/actions/workflows/build.yml)) |
 
 ## Chat Room
 Come join in the conversation about Chocolatey in our Gitter Chat Room.
@@ -98,7 +98,7 @@ Prerequisites:
 
  * The issue has to do with choco itself and is not a package or website issue.
  * Please check to see if your issue already exists with a quick search of the issues. Start with one relevant term and then add if you get too many results.
- * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) guidelines.
+ * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/develop/CONTRIBUTING.md) guidelines.
  * You are not submitting a question - questions are better served as [emails](https://groups.google.com/group/chocolatey) or [gitter chat questions](https://gitter.im/chocolatey/choco).
  * Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
@@ -113,10 +113,10 @@ Submitting a ticket:
  * Include screenshots and/or animated gifs whenever possible, they help show us exactly what the problem is.
 
 ## Contributing
-If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md).
+If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [CONTRIBUTING](https://github.com/chocolatey/choco/blob/develop/CONTRIBUTING.md).
 
 ## Committers
-Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey/choco/blob/master/COMMITTERS.md).
+Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey/choco/blob/develop/COMMITTERS.md).
 
 ### Compiling / Building Source
 There is a `build.bat`/`build.sh` file that creates a necessary generated file named `SolutionVersion.cs`. It must be run at least once before Visual Studio will build.
