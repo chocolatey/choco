@@ -112,7 +112,6 @@
     <Compile Include="infrastructure.app\services\NugetServiceSpecs.cs" />
     <Compile Include="infrastructure.app\services\RegistryServiceSpecs.cs" />
     <Compile Include="infrastructure.app\services\TemplateServiceSpecs.cs" />
-    <Compile Include="infrastructure.app\utility\ArgumentsUtilitySpecs.cs" />
     <Compile Include="infrastructure\commands\ExternalCommandArgsBuilderSpecs.cs" />
     <Compile Include="infrastructure\commandline\InteractivePromptSpecs.cs" />
     <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />
