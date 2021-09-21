@@ -3,7 +3,7 @@ This covers changes for the "chocolatey" and "chocolatey.lib" packages, which ar
 
 **NOTE**: If you have a licensed edition of Chocolatey ("chocolatey.extension"), refer to this in tandem with [Chocolatey Licensed CHANGELOG](https://github.com/chocolatey/choco/blob/master/CHANGELOG_LICENSED.md).
 
-## [0.11.1](https://github.com/chocolatey/choco/issues?q=is%3Aclosed+milestone%3A0.11.1) (September 2nd, 2021)
+## [0.11.1]() (September 2nd, 2021)
 ### BUG FIXES
  * Fix - Chocolatey Licensed Extension is not loaded into PowerShell process when using v0.11.0 - see [#2340](https://github.com/chocolatey/choco/issues/2340)
 
