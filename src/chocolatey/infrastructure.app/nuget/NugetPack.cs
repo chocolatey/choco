@@ -36,6 +36,11 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 using (Stream stream = fileSystem.create_file(outputPath))
                 {
+                    // Truncate if needed, as Mono fails to truncate
+                    if (stream.Length > 0)
+                    {
+                        stream.SetLength(0);
+                    }
                     builder.Save(stream);
                 }
             }
