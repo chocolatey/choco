@@ -65,8 +65,8 @@ Array of exit codes indicating success. Defaults to `@(0)`.
 
 .PARAMETER WorkingDirectory
 The working directory for the running process. Defaults to
-`Get-Location`. If current location is a UNC path, uses
-`$env:TEMP` for default as of 0.10.14.
+`$null`. If current location is a UNC path, uses `$env:TEMP` for default
+ as of 0.10.14.
 
 Available in 0.10.1+.
 
