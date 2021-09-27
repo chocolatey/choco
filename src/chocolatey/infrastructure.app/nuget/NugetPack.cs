@@ -22,6 +22,7 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Linq;
     using NuGet;
     using IFileSystem = filesystem.IFileSystem;
+    using chocolatey.infrastructure.platforms;
 
     // ReSharper disable InconsistentNaming
 
@@ -61,8 +62,9 @@ namespace chocolatey.infrastructure.app.nuget
             // Always exclude the nuspec file
             // Review: This exclusion should be done by the package builder because it knows which file would collide with the auto-generated
             // manifest file.
+            var filter = Platform.get_platform() == PlatformType.Windows ? @"**\*" : "**/*";
             var excludes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var wildCards = excludes.Concat(new[] {@"**\*" + Constants.ManifestExtension, @"**\*" + Constants.PackageExtension});
+            var wildCards = excludes.Concat(new[] { filter + Constants.ManifestExtension, filter + Constants.PackageExtension });
 
             PathResolver.FilterPackageFiles(packageFiles, ResolvePath, wildCards);
         }
