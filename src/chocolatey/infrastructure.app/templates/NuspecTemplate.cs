@@ -98,7 +98,6 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
   <files>
     <!-- this section controls what actually gets packaged into the Chocolatey package -->
     <file src=""tools\**"" target=""tools"" />
-    <!--Building from Linux? You may need this instead: <file src=""tools/**"" target=""tools"" />-->
   </files>
 </package>
 ";
