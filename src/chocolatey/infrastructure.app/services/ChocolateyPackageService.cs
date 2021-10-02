@@ -722,6 +722,8 @@ Would have determined packages that are out of date based on what is
                     if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
                     if (pkgSettings.ApplyInstallArgumentsToDependencies) packageConfig.ApplyInstallArgumentsToDependencies = true;
                     if (pkgSettings.ApplyPackageParametersToDependencies) packageConfig.ApplyPackageParametersToDependencies = true;
+                    SourceType sourceType;
+                    if (Enum.TryParse(pkgSettings.Source, true, out sourceType)) packageConfig.SourceType = sourceType;
 
                     this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(packageConfig.PackageNames));
                     packageConfigs.Add(packageConfig);
