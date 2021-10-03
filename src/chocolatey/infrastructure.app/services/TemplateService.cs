@@ -102,6 +102,27 @@ namespace chocolatey.infrastructure.app.services
                 this.Log().Debug(() => " {0}={1}".format_with(additionalProperty.Key, additionalProperty.Value));
             }
 
+            // Attempt to set the name of the template that will be used to generate the new package
+            // If no template name has been passed at the command line, check to see if there is a defaultTemplateName set in the
+            // chocolatey.config file. If there is, and this template exists on disk, use it.
+            // Otherwise, revert to the built in default template.
+            // In addition, if the command line option to use the built-in template has been set, respect that
+            // and use the built in template.
+            var defaultTemplateName = configuration.DefaultTemplateName;
+            if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && !string.IsNullOrWhiteSpace(defaultTemplateName) && !configuration.NewCommand.UseOriginalTemplate)
+            {
+                var defaultTemplateNameLocation = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, defaultTemplateName);
+                if (!_fileSystem.directory_exists(defaultTemplateNameLocation))
+                {
+                    this.Log().Warn(() => "defaultTemplateName configuration value has been set to '{0}', but no template with that name exists in '{1}'. Reverting to default template.".format_with(defaultTemplateName, ApplicationParameters.TemplatesLocation));
+                }
+                else
+                {
+                    this.Log().Debug(() => "Setting TemplateName to '{0}'".format_with(defaultTemplateName));
+                    configuration.NewCommand.TemplateName = defaultTemplateName;
+                }
+            }
+
             var defaultTemplateOverride = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, "default");
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && (!_fileSystem.directory_exists(defaultTemplateOverride) || configuration.NewCommand.UseOriginalTemplate))
             {
