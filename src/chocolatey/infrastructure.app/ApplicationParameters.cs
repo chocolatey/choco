@@ -174,6 +174,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string ProxyBypassOnLocal = "proxyBypassOnLocal";
             public static readonly string WebRequestTimeoutSeconds = "webRequestTimeoutSeconds";
             public static readonly string UpgradeAllExceptions = "upgradeAllExceptions";
+            public static readonly string DefaultTemplateName = "defaultTemplateName";
         }
 
         public static class Features
