@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ namespace chocolatey.infrastructure.app.services
     {
         private readonly UTF8Encoding utf8WithoutBOM = new UTF8Encoding(false);
         private readonly IFileSystem _fileSystem;
-        private readonly IList<string> _templateBinaryExtensions = new List<string> { 
+        private readonly IList<string> _templateBinaryExtensions = new List<string> {
             ".exe", ".msi", ".msu", ".msp", ".mst",
             ".7z", ".zip", ".rar", ".gz", ".iso", ".tar", ".sfx",
             ".dmg",
@@ -122,7 +122,7 @@ namespace chocolatey.infrastructure.app.services
                 if (!_fileSystem.directory_exists(templatePath)) throw new ApplicationException("Unable to find path to requested template '{0}'. Path should be '{1}'".format_with(configuration.NewCommand.TemplateName, templatePath));
 
                 this.Log().Info(configuration.QuietOutput ? logger : ChocolateyLoggers.Important, "Generating package from custom template at '{0}'.".format_with(templatePath));
-                
+
                 // Create directory structure from template so as to include empty directories
                 foreach (var directory in _fileSystem.get_directories(templatePath, "*.*", SearchOption.AllDirectories))
                 {
