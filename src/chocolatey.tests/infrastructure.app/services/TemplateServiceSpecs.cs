@@ -21,11 +21,13 @@ namespace chocolatey.tests.infrastructure.app.services
     using System.IO;
     using System.Linq;
     using System.Text;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.app.templates;
     using chocolatey.infrastructure.filesystem;
     using Moq;
+    using NUnit.Framework;
     using Should;
 
     public class TemplateServiceSpecs
@@ -527,6 +529,299 @@ namespace chocolatey.tests.infrastructure.app.services
                 files[3].ShouldEqual("c:\\packages\\Bob\\tools\\lower\\another.ps1");
 
                 MockLogger.MessagesFor(LogLevel.Info).Last().ShouldEqual(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
+            }
+        }
+
+        public class when_generate_is_called_with_defaulttemplatename_in_configuration_but_template_folder_doesnt_exist : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+
+            public override void Context()
+            {
+                base.Context();
+
+                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                    .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
+
+                config.NewCommand.Name = "Bob";
+                config.DefaultTemplateName = "msi";
+            }
+
+            public override void Because()
+            {
+                because = () => service.generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_use_null_value_for_template()
+            {
+                because();
+
+                config.NewCommand.TemplateName.ShouldBeNull();
+            }
+        }
+
+        public class when_generate_is_called_with_defaulttemplatename_in_configuration_and_template_folder_exists : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private string verifiedDirectoryPath;
+
+            public override void Context()
+            {
+                base.Context();
+
+                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                    .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
+                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "msi"))).Returns<string>(
+                    x =>
+                    {
+                        verifiedDirectoryPath = x;
+                        return true;
+                    });
+
+                config.NewCommand.Name = "Bob";
+                config.DefaultTemplateName = "msi";
+            }
+
+            public override void Because()
+            {
+                because = () => service.generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_use_template_name_from_configuration()
+            {
+                because();
+
+                config.NewCommand.TemplateName.ShouldEqual("msi");
+            }
+        }
+
+        public class when_generate_is_called_with_defaulttemplatename_in_configuration_and_template_name_option_set : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private string verifiedDirectoryPath;
+
+            public override void Context()
+            {
+                base.Context();
+
+                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                    .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
+                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
+                    x =>
+                    {
+                        verifiedDirectoryPath = x;
+                        return true;
+                    });
+
+                config.NewCommand.Name = "Bob";
+                config.NewCommand.TemplateName = "zip";
+                config.DefaultTemplateName = "msi";
+            }
+
+            public override void Because()
+            {
+                because = () => service.generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_use_template_name_from_command_line_option()
+            {
+                because();
+
+                config.NewCommand.TemplateName.ShouldEqual("zip");
+            }
+        }
+
+        public class when_generate_is_called_with_built_in_option_set : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private string verifiedDirectoryPath;
+
+            public override void Context()
+            {
+                base.Context();
+
+                config.NewCommand.Name = "Bob";
+                config.NewCommand.UseOriginalTemplate = true;
+            }
+
+            public override void Because()
+            {
+                because = () => service.generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_use_null_value_for_template()
+            {
+                because();
+
+                config.NewCommand.TemplateName.ShouldBeNull();
+            }
+        }
+
+        public class when_generate_is_called_with_built_in_option_set_and_defaulttemplate_in_configuration : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private string verifiedDirectoryPath;
+
+            public override void Context()
+            {
+                base.Context();
+
+                config.NewCommand.Name = "Bob";
+                config.NewCommand.UseOriginalTemplate = true;
+                config.DefaultTemplateName = "msi";
+            }
+
+            public override void Because()
+            {
+                because = () => service.generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_use_null_value_for_template()
+            {
+                because();
+
+                config.NewCommand.TemplateName.ShouldBeNull();
+            }
+        }
+
+        public class when_generate_is_called_with_built_in_option_set_and_template_name_option_set_and_template_folder_exists : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private string verifiedDirectoryPath;
+
+            public override void Context()
+            {
+                base.Context();
+
+                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                    .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
+                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
+                    x =>
+                    {
+                        verifiedDirectoryPath = x;
+                        return true;
+                    });
+
+                config.NewCommand.Name = "Bob";
+                config.NewCommand.TemplateName = "zip";
+                config.NewCommand.UseOriginalTemplate = true;
+            }
+
+            public override void Because()
+            {
+                because = () => service.generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_use_template_name_from_command_line_option()
+            {
+                because();
+
+                config.NewCommand.TemplateName.ShouldEqual("zip");
+            }
+        }
+
+        public class when_generate_is_called_with_built_in_option_set_and_template_name_option_set_and_defaulttemplatename_set_and_template_folder_exists : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private string verifiedDirectoryPath;
+
+            public override void Context()
+            {
+                base.Context();
+
+                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                    .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
+                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
+                    x =>
+                    {
+                        verifiedDirectoryPath = x;
+                        return true;
+                    });
+
+                config.NewCommand.Name = "Bob";
+                config.NewCommand.TemplateName = "zip";
+                config.DefaultTemplateName = "msi";
+                config.NewCommand.UseOriginalTemplate = true;
+            }
+
+            public override void Because()
+            {
+                because = () => service.generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_use_template_name_from_command_line_option()
+            {
+                because();
+
+                config.NewCommand.TemplateName.ShouldEqual("zip");
             }
         }
     }
