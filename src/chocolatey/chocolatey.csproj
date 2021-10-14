@@ -74,9 +74,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Core, Version=2.8.2.0, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+    <Reference Include="NuGet.Core, Version=2.11.0.0, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Chocolatey-NuGet.Core.2.11.0.20210506\lib\net4\NuGet.Core.dll</HintPath>
+      <HintPath>..\..\lib\Chocolatey-NuGet.Core.2.11.0.20211014\lib\net4\NuGet.Core.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Licensing">
       <HintPath>..\..\lib\Rhino.Licensing\Rhino.Licensing.dll</HintPath>
