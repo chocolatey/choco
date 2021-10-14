@@ -19,6 +19,7 @@ namespace chocolatey.tests.integration
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
@@ -80,6 +81,32 @@ namespace chocolatey.tests.integration
             foreach (var file in files.or_empty_list_if_null())
             {
                 _fileSystem.copy_file(_fileSystem.get_full_path(file), _fileSystem.combine_paths(config.Sources, _fileSystem.get_file_name(file)), overwriteExisting: true);
+            }
+        }
+
+        public static void add_packages_to_priority_source_location(ChocolateyConfiguration config, string pattern)
+        {
+            var priorityMachineSource = config.MachineSources.FirstOrDefault(m => m.Name == "Source-Priority-1");
+            if (priorityMachineSource == null)
+            {
+                priorityMachineSource = new MachineSourceConfiguration
+                {
+                    Name = "Source-Priority-1",
+                    Priority = 1,
+                    Key = _fileSystem.get_full_path(_fileSystem.combine_paths(get_top_level(), "packages_priority"))
+                };
+
+                config.Sources = config.Sources + ";" + priorityMachineSource.Name;
+                config.MachineSources.Add(priorityMachineSource);
+            }
+
+            _fileSystem.create_directory_if_not_exists(priorityMachineSource.Key);
+            var contextDir = _fileSystem.combine_paths(get_top_level(), "context");
+            var files = _fileSystem.get_files(contextDir, pattern, SearchOption.AllDirectories);
+
+            foreach (var file in files.or_empty_list_if_null())
+            {
+                _fileSystem.copy_file(_fileSystem.get_full_path(file), _fileSystem.combine_paths(priorityMachineSource.Key, _fileSystem.get_file_name(file)), overwriteExisting: true);
             }
         }
 
@@ -156,6 +183,7 @@ namespace chocolatey.tests.integration
             config.RegularOutput = true;
             config.SkipPackageInstallProvider = false;
             config.Sources = _fileSystem.get_full_path(_fileSystem.combine_paths(get_top_level(), "packages"));
+            config.MachineSources.Clear();
             config.Version = null;
             config.Debug = true;
             config.AllVersions = false;
