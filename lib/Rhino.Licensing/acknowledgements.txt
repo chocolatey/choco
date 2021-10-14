@@ -1,1 +1,0 @@
-Rhino Licensing is making use of the excellent log4net logging framework
