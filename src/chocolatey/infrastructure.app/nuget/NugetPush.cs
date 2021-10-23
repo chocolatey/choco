@@ -51,9 +51,18 @@ namespace chocolatey.infrastructure.app.nuget
             catch (InvalidOperationException ex)
             {
                 var message = ex.Message;
-                if (!string.IsNullOrWhiteSpace(message) && (message.Contains("(406)") || message.Contains("(409)")))
+                if (!string.IsNullOrWhiteSpace(message))
                 {
-                    throw new ApplicationException("An error has occurred. It's possible the package version already exists on the repository.", ex);
+                    if (config.Sources == ApplicationParameters.ChocolateyCommunityFeedPushSource && message.Contains("already exists and cannot be modified"))
+                    {
+                        throw new ApplicationException("An error has occurred. This package version already exists on the repository and cannot be modified.{0}Package versions that are approved, rejected, or exempted cannot be modified.{0}See https://docs.chocolatey.org/en-us/community-repository/moderation/ for more information".format_with(Environment.NewLine), ex);
+                    }
+
+                    if (message.Contains("(406)") || message.Contains("(409)"))
+                    {
+                        // Let this fall through so the actual error message is shown when the exception is re-thrown
+                        "chocolatey".Log().Error("An error has occurred. It's possible the package version already exists on the repository or a nuspec element is invalid. See error below...");
+                    }
                 }
 
                 throw;
