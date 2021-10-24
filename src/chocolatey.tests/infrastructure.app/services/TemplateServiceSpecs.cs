@@ -26,7 +26,6 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.app.templates;
     using chocolatey.infrastructure.filesystem;
     using Moq;
-    using NUnit.Framework;
     using Should;
 
     public class TemplateServiceSpecs
@@ -350,6 +349,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
                 fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
                     .Returns(new[] { "templates\\test\\template.nuspec", "templates\\test\\random.txt", "templates\\test\\tools\\chocolateyInstall.ps1", "templates\\test\\tools\\lower\\another.ps1" });
+                fileSystem.Setup(x => x.get_directories(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
+                    .Returns(new[] { "templates\\test", "templates\\test\\tools", "templates\\test\\tools\\lower" });
                 fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback(
                     (string directory) =>
                     {
@@ -379,8 +380,6 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
             public void should_generate_all_files_and_directories()
             {
                 because();
@@ -401,8 +400,6 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
             public void should_generate_all_files_and_directories_even_with_outputdirectory()
             {
                 config.OutputDirectory = "c:\\packages";
@@ -487,8 +484,6 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
             public void should_generate_all_files_and_directories()
             {
                 because();
@@ -511,8 +506,6 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
             public void should_generate_all_files_and_directories_even_with_outputdirectory()
             {
                 config.OutputDirectory = "c:\\packages";
