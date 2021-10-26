@@ -49,14 +49,7 @@ namespace chocolatey.infrastructure.app.nuget
             // Choco previously dealt with this by taking the path of least resistance and manually filtering out and sort unwanted packages
             // This result in blocking operations that didn't let service based repositories, like OData, take care of heavy lifting on the server.
             bool isServiceBased;
-            var priorityAggregateRepo = packageRepository as PriorityAggregateRepository;
             var aggregateRepo = packageRepository as AggregateRepository;
-            if (priorityAggregateRepo != null)
-            {
-                aggregateRepo = priorityAggregateRepo.ToAggregateRepository();
-                packageRepository = aggregateRepo;
-            }
-            
             if (aggregateRepo != null)
             {
                 isServiceBased = aggregateRepo.Repositories.All(repo => repo is IServiceBasedRepository);
@@ -192,27 +185,6 @@ namespace chocolatey.infrastructure.app.nuget
             packageName = packageName.to_string().ToLower(CultureInfo.CurrentCulture);
             // find the package based on version using older method
             if (version != null) return repository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
-
-            var priorityRepository = repository as PriorityAggregateRepository;
-            if (priorityRepository != null)
-            {
-                // Returns an IEnumerable of Tuple
-                // Item1 = the priority
-                // Item2 = the repository list for that priority
-                foreach (var groupedRepositories in priorityRepository.GetOrderedRepositories())
-                {
-                    var packageResults = new List<IPackage>();
-                    foreach (var priorityAggregatedRepository in groupedRepositories.Item2)
-                    {
-                        packageResults.Add(find_package(packageName, version, config, priorityAggregatedRepository));
-                    }
-
-                    if (packageResults.Count > 0)
-                    {
-                        return packageResults.ToList().OrderByDescending(x => x.Version).FirstOrDefault();
-                    }
-                }
-            }
 
             // we should always be using an aggregate repository
             var aggregateRepository = repository as AggregateRepository;
