@@ -204,7 +204,12 @@ namespace chocolatey.infrastructure.app.nuget
                     var packageResults = new List<IPackage>();
                     foreach (var priorityAggregatedRepository in groupedRepositories.Item2)
                     {
-                        packageResults.Add(find_package(packageName, version, config, priorityAggregatedRepository));
+                        var foundPackage = find_package(packageName, version, config, priorityAggregatedRepository);
+
+                        if (foundPackage != null)
+                        {
+                            packageResults.Add(foundPackage);
+                        }
                     }
 
                     if (packageResults.Count > 0)
