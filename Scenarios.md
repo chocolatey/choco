@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 37 Scenario(s), 305 Observation(s) ]
+### ChocolateyInstallCommand [ 35 Scenario(s), 293 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -350,24 +350,6 @@
  * should have inconclusive package result
  * should still have a package in the lib directory
  * should still have the expected version of the package installed
-
-#### when installing new package from priority source
-
- * should have a successful package result
- * should install a package in the lib directory
- * should install lower version of package
- * should install where install location reports
- * should not have inconclusive package result
- * should not have warning package result
-
-#### when installing new package from priority source with repository optimization
-
- * should have a successful package result
- * should install a package in the lib directory
- * should install lower version of package
- * should install where install location reports
- * should not have inconclusive package result
- * should not have warning package result
 
 #### when installing packages with packages config
 
