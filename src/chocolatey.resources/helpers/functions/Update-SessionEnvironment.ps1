@@ -67,7 +67,7 @@ None
 
   #ordering is important here, $user should override $machine...
   $ScopeList = 'Process', 'Machine'
-  if ($userName -notin 'SYSTEM', "${env:COMPUTERNAME}`$") {
+  if ('SYSTEM', "${env:COMPUTERNAME}`$" -notcontains $userName) {
     # but only if not running as the SYSTEM/machine in which case user can be ignored.
     $ScopeList += 'User'
   }
