@@ -249,7 +249,7 @@ Start-ChocolateyProcessAsAdmin
   }
 
   $installerTypeLower = $fileType.ToLower()
-  if ($installerTypeLower -notin 'msi', 'exe', 'msu', 'msp') {
+  if ('msi', 'exe', 'msu', 'msp' -notcontains $installerTypeLower) {
     Write-Warning "FileType '$fileType' is unrecognized, using 'exe' instead."
     $fileType = 'exe'
   }

@@ -62,18 +62,24 @@ if (Test-Path $extensionsPath) {
         Write-Debug "Importing '$licensedExtensionPath'"
         Write-Debug "Loading 'chocolatey.licensed' extension"
 
-        # Attempt to import module via already-loaded assembly
-        $licensedAssembly = $currentAssemblies |
-            Where-Object { $_.GetName().Name -eq 'chocolatey.licensed' } |
-            Select-Object -First 1
+        try {
+            # Attempt to import module via already-loaded assembly
+            $licensedAssembly = $currentAssemblies |
+                Where-Object { $_.GetName().Name -eq 'chocolatey.licensed' } |
+                Select-Object -First 1
 
-        if ($licensedAssembly) {
-            # It's already loaded, just import the existing assembly as a module for PowerShell to use
-            Import-Module $licensedAssembly
+            if ($licensedAssembly) {
+                # It's already loaded, just import the existing assembly as a module for PowerShell to use
+                Import-Module $licensedAssembly
+            }
+            else {
+                # Fallback: load the extension DLL from the path directly.
+                Import-Module $licensedExtensionPath
+            }
         }
-        else {
-            # Fallback: load the extension DLL from the path directly.
-            Import-Module $licensedExtensionPath
+        catch {
+            # Only write a warning if the Licensed extension failed to load in some way.
+            Write-Warning "Import failed for Chocolatey Licensed Extension. Error: '$_'"
         }
     }
 
