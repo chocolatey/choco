@@ -28,6 +28,7 @@ namespace chocolatey.infrastructure.app.services
     using infrastructure.commands;
     using logging;
     using results;
+    using platforms;
 
     /// <summary>
     ///   Alternative Source for Cygwin
@@ -126,6 +127,8 @@ namespace chocolatey.infrastructure.app.services
 
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
         {
+            if (Platform.get_platform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+
             var runnerConfig = new ChocolateyConfiguration
                 {
                     Sources = ApplicationParameters.PackagesLocation,
