@@ -60,6 +60,11 @@ namespace chocolatey.infrastructure.app.commands
         {
             configuration.Input = string.Join(" ", unparsedArguments); // path to .nupkg - assume relative
 
+            if (string.IsNullOrWhiteSpace(configuration.Sources) && !string.IsNullOrWhiteSpace(configuration.PushCommand.DefaultSource))
+            {
+                configuration.Sources = configuration.PushCommand.DefaultSource;
+            }
+
             if (string.IsNullOrWhiteSpace(configuration.Sources))
             {
                 configuration.Sources = ApplicationParameters.ChocolateyCommunityFeedPushSource;
