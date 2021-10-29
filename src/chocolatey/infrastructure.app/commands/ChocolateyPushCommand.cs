@@ -63,6 +63,12 @@ namespace chocolatey.infrastructure.app.commands
             if (string.IsNullOrWhiteSpace(configuration.Sources) && !string.IsNullOrWhiteSpace(configuration.PushCommand.DefaultSource))
             {
                 configuration.Sources = configuration.PushCommand.DefaultSource;
+
+                // Can't put this in handle_validation, since "disabled" is not a URI, it would fail earlier
+                if (configuration.Sources.is_equal_to("disabled"))
+                {
+                    throw new ApplicationException("Default push source is disabled. Please pass a source to push to, such as --source={0}".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+                }
             }
 
             if (string.IsNullOrWhiteSpace(configuration.Sources))
