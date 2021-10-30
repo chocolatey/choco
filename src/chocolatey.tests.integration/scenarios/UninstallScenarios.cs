@@ -60,6 +60,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_noop_uninstalling_a_package : ScenariosBase
         {
             public override void Context()
@@ -135,6 +137,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_happy_path : ScenariosBase
         {
             private PackageResult packageResult;
@@ -343,6 +347,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_with_readonly_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -409,6 +415,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -563,6 +571,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_with_added_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -661,6 +671,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -759,6 +771,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_force_uninstalling_a_package_with_added_and_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -940,6 +954,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;
