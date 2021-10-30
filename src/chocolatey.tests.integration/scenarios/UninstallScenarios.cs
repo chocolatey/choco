@@ -326,7 +326,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var packagesConfig = "{0}\\context\\testing.packages.config".format_with(Scenario.get_top_level());
+                var packagesConfig = "{0}{1}context{1}testing.packages.config".format_with(Scenario.get_top_level(), Path.DirectorySeparatorChar);
                 Configuration.PackageNames = Configuration.Input = packagesConfig;
             }
 
