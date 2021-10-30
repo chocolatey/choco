@@ -24,6 +24,8 @@
   <target name="go" depends="run_tasks" />
 
   <target name="run_all_tests" depends="prepare, set_nunit_failure_mode, get_test_dlls_all, run_tests, generate_report" description="Like go but runs all tests" />
+  
+  <target name="run_integration_tests" depends="prepare, set_nunit_failure_mode, get_test_dlls_integration, run_tests, generate_report" description="Like go but runs the integration tests" />
 
   <!-- run_normal_tasks is called from run_tasks unless replace extension exists -->
   <target name="run_normal_tasks"
@@ -96,6 +98,33 @@
 
     <property name="args.test_runner" value="${dlls.test} ${test.args}" />
   </target>
+
+  <target name="get_test_dlls_integration">
+    <echo level="Warning" message="Getting all test dlls (including integration tests) based on name in directory ${path::get-full-path(dirs.build.code)}." />
+    <property name="dll.names" value="" />
+    <foreach item="File" property="dll.filename">
+      <in>
+        <items>
+          <exclude name="${dirs.build.code}/lib/**" />
+          <exclude name="${dirs.build.code}/_PublishedApplications/**" />
+          <exclude name="${dirs.build.code}/**/TestFu.dll" />
+          <include name="${dirs.build.code}/**/*Test*.Integration*dll" />
+          <include name="${dirs.build.code}/**/*test*.integration*dll" />
+          <include name="${dirs.build.code}/**/*Spec*.Integration*dll" />
+          <include name="${dirs.build.code}/**/*spec*.integration*dll" />
+        </items>
+      </in>
+      <do>
+        <property name="dll.names" value="${dll.names + ' ' + string::replace(string::replace(dll.filename,path::get-full-path(dirs.build.code) + '\',''),'\',path.separator) + ''}" />
+      </do>
+    </foreach>
+
+    <property name="dlls.test" value="${dll.names}" />
+    <echo level="Warning" message="Running NUnit against these test dlls - ${dlls.test}." />
+
+    <property name="args.test_runner" value="${dlls.test} ${test.args} ${nunit.separator}exclude=&quot;NotWorking,Ignore,notworking,ignore&quot;" />
+  </target>
+
 
   <target name="run_tests" depends="prepare" description="Running Unit Tests">
     <if test="${dlls.test != ''}">
