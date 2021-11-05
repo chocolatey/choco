@@ -19,7 +19,7 @@ jobs:
         chmod +x build.sh
         $GITHUB_WORKSPACE//build.sh -v
     - name: Test with Nunit on Mono
-      run: $GITHUB_WORKSPACE//test.sh
+      run: $GITHUB_WORKSPACE//test.sh integration
     - name: Upload Ubuntu build results
       uses: actions/upload-artifact@v2
       # Always upload build results
@@ -67,7 +67,7 @@ jobs:
           chmod +x build.sh
           $GITHUB_WORKSPACE//build.sh -v
      - name: Test with Nunit on Mono
-       run: $GITHUB_WORKSPACE//test.sh
+       run: $GITHUB_WORKSPACE//test.sh integration
      - name: Upload MacOS build results
        uses: actions/upload-artifact@v2
        # Always upload build results
