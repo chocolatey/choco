@@ -1,15 +1,15 @@
-name: Chocolatey Builds
+name: Chocolatey Integration Tests
 
 on:
-  # Trigger on pushes and on pull requests
-  push:
-  pull_request:
-
+  schedule:
+    # Run at 10:47pm, at a random  minute to reduce load on GH Actions
+    - cron:  '47 22 * * *'
+  
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  # Build using mono on Ubuntu
+  # Build and test using mono on Ubuntu
   ubuntu-build:
     runs-on: ubuntu-latest
     steps:
@@ -18,6 +18,8 @@ jobs:
       run: |
         chmod +x build.sh
         $GITHUB_WORKSPACE//build.sh -v
+    - name: Test with Nunit on Mono
+      run: $GITHUB_WORKSPACE//test.sh
     - name: Upload Ubuntu build results
       uses: actions/upload-artifact@v2
       # Always upload build results
@@ -28,13 +30,15 @@ jobs:
           build_output/build_artifacts/tests/index.html
           build_output/_BuildInfo.xml
           build_output/build.log    
-  # Build on Windows
+  # Build and test on Windows
   windows-build:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
     - name: Build with .Net Framework
       run: .\build.bat -v
+    - name: Test with Nunit on .Net Framework
+      run: .\test.bat integration
     - name: Upload Windows build results
       uses: actions/upload-artifact@v2
       # Always upload build results
@@ -53,7 +57,7 @@ jobs:
       with:
         name: windows-build-nupkg
         path: code_drop\nuget\*.nupkg
-  # Build using mono on MacOS
+  # Build and test using mono on MacOS
   macos-build:
     runs-on: macos-latest
     steps:
@@ -62,6 +66,8 @@ jobs:
        run: |
           chmod +x build.sh
           $GITHUB_WORKSPACE//build.sh -v
+     - name: Test with Nunit on Mono
+       run: $GITHUB_WORKSPACE//test.sh
      - name: Upload MacOS build results
        uses: actions/upload-artifact@v2
        # Always upload build results

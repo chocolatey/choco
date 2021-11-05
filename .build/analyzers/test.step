@@ -35,6 +35,11 @@
     <call target="set_normal_failure_mode" />
   </target>
 
+  <target name="integration">
+    <nant buildfile="${dirs.current.file}${path.separator}nunit.test.step" target="run_integration_tests" inheritall="true" if="${test.framework == 'nunit'}" />
+    <call target="set_normal_failure_mode" />
+  </target>
+
   <target name="open_results">
     <nant buildfile="${dirs.current.file}${path.separator}mbunit2.test.step" target="open_results" inheritall="true" if="${test.framework == 'mbunit2'}" />
     <nant buildfile="${dirs.current.file}${path.separator}gallio.test.step" target="open_results" inheritall="true" if="${test.framework == 'gallio'}" />

@@ -27,7 +27,8 @@ goto finish
 
 :usage
 echo.
-echo Usage: test.bat
+echo Usage: test.bat - run unit tests
+echo Usage: test.bat integration - run integration tests
 echo Usage: test.bat all - to run all tests
 echo.
 goto finish
