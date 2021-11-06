@@ -5,9 +5,6 @@ init:
 - git config --global user.name "Chocolatey yo"
 nuget:
   disable_publish_on_pr: true
-environment:
-  COVERALLS_REPO_TOKEN:
-    secure: GWDFHkyZwDvbtYzPCHt29njjcm1blAwuTcbT0IEyJZoRSC/soUAa8dwXIlA6l/Fj
 build_script:
 - build.bat -v
 test:
