@@ -257,7 +257,7 @@ NOTE: `all` is a special package keyword that will allow you to install
  feed. THIS IS NOT YET REIMPLEMENTED.
 
 NOTE: Any package name ending with .config is considered a
- 'packages.config' file. Please see https://bit.ly/packages_config
+ 'packages.config' file. Please see https://ch0.co/packages_config
 
 NOTE: Chocolatey Pro / Business builds on top of a great open source
  experience with quite a few features that enhance the your use of the
