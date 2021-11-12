@@ -121,7 +121,7 @@ namespace chocolatey.tests.integration
             // prior commands, so ensure that all items go back to the default values here
             var config = NUnitSetup.Container.GetInstance<ChocolateyConfiguration>();
 
-            config.Information.PlatformType = PlatformType.Windows;
+            config.Information.PlatformType = Platform.get_platform();
             config.Information.IsInteractive = false;
             config.Information.ChocolateyVersion = "1.2.3";
             config.Information.PlatformVersion = new Version(6, 1, 0, 0);

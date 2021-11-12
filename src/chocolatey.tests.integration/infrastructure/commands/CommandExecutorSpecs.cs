@@ -20,6 +20,7 @@ namespace chocolatey.tests.integration.infrastructure.commands
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
+    using NUnit.Framework;
     using Should;
 
     public class CommandExecutorSpecs
@@ -35,6 +36,8 @@ namespace chocolatey.tests.integration.infrastructure.commands
             }
         }
 
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_CommandExecutor_errors : CommandExecutorSpecsBase
         {
             private int result;
@@ -77,6 +80,8 @@ namespace chocolatey.tests.integration.infrastructure.commands
             }
         }
 
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_CommandExecutor_is_given_a_nonexisting_process : CommandExecutorSpecsBase
         {
             private string result;

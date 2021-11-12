@@ -28,6 +28,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.results;
     using NuGet;
+    using NUnit.Framework;
     using Should;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
@@ -55,6 +56,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_noop_installing_a_package : ScenariosBase
         {
             public override void Context()
@@ -150,6 +153,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_installing_a_package_happy_path : ScenariosBase
         {
             private PackageResult packageResult;
@@ -327,7 +332,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var packagesConfig = "{0}\\context\\testing.packages.config".format_with(Scenario.get_top_level());
+                var packagesConfig = "{0}{1}context{1}testing.packages.config".format_with(Scenario.get_top_level(), Path.DirectorySeparatorChar);
                 Configuration.PackageNames = Configuration.Input = packagesConfig;
                 Scenario.add_packages_to_source_location(Configuration, "hasdependency.1.0.0*" + Constants.PackageExtension);
                 Scenario.add_packages_to_source_location(Configuration, "isdependency.1.0.0*" + Constants.PackageExtension);
@@ -539,6 +544,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_force_installing_an_already_installed_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -641,6 +648,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_force_installing_an_already_installed_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;
@@ -720,6 +729,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_force_installing_an_already_installed_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult packageResult;
@@ -820,6 +831,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_force_installing_an_already_installed_package_with_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1083,6 +1096,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_installing_a_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1262,6 +1277,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_installing_a_package_that_has_nonterminating_errors_with_fail_on_stderr : ScenariosBase
         {
             private PackageResult packageResult;
@@ -3107,6 +3124,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_installing_a_package_from_a_nupkg_file : ScenariosBase
         {
             private PackageResult packageResult;
@@ -3114,7 +3133,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                Configuration.PackageNames = Configuration.Input = "{0}\\installpackage.1.0.0.nupkg".format_with(Configuration.Sources);
+                Configuration.PackageNames = Configuration.Input = "{0}{1}installpackage.1.0.0.nupkg".format_with(Configuration.Sources, Path.DirectorySeparatorChar);
             }
 
             public override void Because()
@@ -3279,6 +3298,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_installing_a_package_with_config_transforms : ScenariosBase
         {
             private PackageResult packageResult;

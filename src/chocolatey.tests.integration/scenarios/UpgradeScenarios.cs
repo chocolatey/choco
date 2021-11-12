@@ -202,6 +202,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_an_existing_package_happy_path : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -339,6 +341,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_an_existing_package_with_prerelease_available_without_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -429,6 +433,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_an_existing_package_with_prerelease_available_and_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -573,6 +579,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_an_existing_prerelease_package_without_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -906,6 +914,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_force_upgrading_a_package : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1106,6 +1116,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_force_upgrading_a_package_that_does_not_have_available_upgrades : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1202,7 +1214,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var packagesConfig = "{0}\\context\\testing.packages.config".format_with(Scenario.get_top_level());
+                var packagesConfig = "{0}{1}context{1}testing.packages.config".format_with(Scenario.get_top_level(), Path.DirectorySeparatorChar);
                 Configuration.PackageNames = Configuration.Input = packagesConfig;
             }
 
@@ -1219,6 +1231,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_readonly_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1319,6 +1333,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1426,6 +1442,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1527,6 +1545,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_added_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1606,6 +1626,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1783,6 +1805,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_that_is_not_installed : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1854,6 +1878,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_that_is_not_installed_and_failing_on_not_installed : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1942,6 +1968,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;
@@ -2790,6 +2818,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_config_transforms : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -2886,6 +2916,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_config_transforms_when_config_was_edited : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -3055,6 +3087,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_all_packages_with_prereleases_installed : ScenariosBase
         {
             public override void Context()

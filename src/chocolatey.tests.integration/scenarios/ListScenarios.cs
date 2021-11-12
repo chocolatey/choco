@@ -25,6 +25,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.results;
     using NuGet;
+    using NUnit.Framework;
     using Should;
 
     public class ListScenarios
@@ -58,6 +59,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_list_available_packages_only_once()
             {
                 MockLogger.contains_message_count("upgradepackage").ShouldEqual(1);
