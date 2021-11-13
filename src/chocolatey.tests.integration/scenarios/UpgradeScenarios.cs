@@ -2818,8 +2818,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_config_transforms : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -2916,8 +2914,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_config_transforms_when_config_was_edited : ScenariosBase
         {
             private PackageResult _packageResult;
