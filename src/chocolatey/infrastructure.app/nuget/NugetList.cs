@@ -21,8 +21,8 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Globalization;
     using System.Linq;
 
-    using NuGet;
     using configuration;
+    using NuGet;
 
     // ReSharper disable InconsistentNaming
 
@@ -49,7 +49,18 @@ namespace chocolatey.infrastructure.app.nuget
             // Choco previously dealt with this by taking the path of least resistance and manually filtering out and sort unwanted packages
             // This result in blocking operations that didn't let service based repositories, like OData, take care of heavy lifting on the server.
             bool isServiceBased;
+
+            var priorityRepo = packageRepository as ChocolateyPriorityRepository;
+
+            if (priorityRepo != null)
+            {
+                // To get all of the results that we need, we need to convert this repository
+                // to a aggregate repository.
+                packageRepository = make_aggregate_repository(priorityRepo);
+            }
+
             var aggregateRepo = packageRepository as AggregateRepository;
+
             if (aggregateRepo != null)
             {
                 isServiceBased = aggregateRepo.Repositories.All(repo => repo is IServiceBasedRepository);
@@ -186,6 +197,20 @@ namespace chocolatey.infrastructure.app.nuget
             // find the package based on version using older method
             if (version != null) return repository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
 
+            var priorityRepository = repository as ChocolateyPriorityRepository;
+
+            if (priorityRepository != null)
+            {
+                var package = find_package(packageName, version, config, priorityRepository.PrimaryRepository);
+                
+                if (package == null)
+                {
+                    package = find_package(packageName, version, config, priorityRepository.SecondaryRepository);
+                }
+                
+                return package;
+            }
+
             // we should always be using an aggregate repository
             var aggregateRepository = repository as AggregateRepository;
             if (aggregateRepository != null)
@@ -263,6 +288,28 @@ namespace chocolatey.infrastructure.app.nuget
             return results.ToList().OrderByDescending(x => x.Version).FirstOrDefault();
         }
 
+        private static AggregateRepository make_aggregate_repository(ChocolateyPriorityRepository priorityRepository)
+        {
+            var repositories = new List<IPackageRepository>();
+
+            foreach (var repository in new[] { priorityRepository.PrimaryRepository, priorityRepository.SecondaryRepository })
+            {
+                if (repository is ChocolateyPriorityRepository)
+                {
+                    repositories.AddRange(make_aggregate_repository((ChocolateyPriorityRepository)repository).Repositories);
+                }
+                else if (repository is AggregateRepository)
+                {
+                    repositories.AddRange(((AggregateRepository)repository).Repositories);
+                }
+                else
+                {
+                    repositories.Add(repository);
+                }
+            }
+
+            return new AggregateRepository(repositories, ignoreFailingRepositories: true);
+        }
     }
 
     // ReSharper restore InconsistentNaming

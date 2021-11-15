@@ -19,9 +19,11 @@ namespace chocolatey.tests.integration
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
+    using chocolatey.infrastructure.app.nuget;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
@@ -41,6 +43,11 @@ namespace chocolatey.tests.integration
         public static string get_package_install_path()
         {
             return _fileSystem.combine_paths(get_top_level(), "lib");
+        }
+
+        public static string get_directory_path_in_top_level(params string[] paths)
+        {
+            return _fileSystem.combine_paths(get_top_level(), paths);
         }
 
         public static void reset(ChocolateyConfiguration config)
@@ -80,6 +87,70 @@ namespace chocolatey.tests.integration
             foreach (var file in files.or_empty_list_if_null())
             {
                 _fileSystem.copy_file(_fileSystem.get_full_path(file), _fileSystem.combine_paths(config.Sources, _fileSystem.get_file_name(file)), overwriteExisting: true);
+            }
+        }
+
+        public static void add_packages_to_priority_source_location(ChocolateyConfiguration config, string pattern, int priority = 1)
+        {
+            string sourceKey = "Source-Priority-" + priority;
+            string directory = _fileSystem.get_full_path(get_directory_path_in_top_level("packages_priority_" + priority));
+            add_machine_source(config, sourceKey, directory, priority);
+            var contextDir = get_directory_path_in_top_level("context");
+            var files = _fileSystem.get_files(contextDir, pattern, SearchOption.AllDirectories);
+
+            foreach (var file in files.or_empty_list_if_null())
+            {
+                _fileSystem.copy_file(_fileSystem.get_full_path(file), _fileSystem.combine_paths(directory, _fileSystem.get_file_name(file)), overwriteExisting: true);
+            }
+        }
+
+        public static void add_machine_source(ChocolateyConfiguration config, string name, string directoryOrUrl, int priority = 0, bool allowSelfService = false, bool bypassProxy = false, bool visibleToAdminsOnly = false, string certificate = null, string certificatePassword = null, string userName = null, string password = null, bool createDirectory = true)
+        {
+            if (!string.IsNullOrEmpty(certificatePassword))
+            {
+                certificatePassword = NugetEncryptionUtility.EncryptString(certificatePassword);
+            }
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                password = NugetEncryptionUtility.EncryptString(password);
+            }
+
+            if (createDirectory)
+            {
+                _fileSystem.create_directory_if_not_exists(directoryOrUrl);
+            }
+
+            var source = config.MachineSources.FirstOrDefault(c => c.Name.is_equal_to(name));
+
+            if (source == null)
+            {
+                source = new MachineSourceConfiguration
+                {
+                    AllowSelfService = allowSelfService,
+                    BypassProxy = bypassProxy,
+                    Certificate = certificate,
+                    EncryptedCertificatePassword = certificatePassword,
+                    EncryptedPassword = password,
+                    Key = directoryOrUrl,
+                    Name = name,
+                    Priority = priority,
+                    Username = userName,
+                    VisibleToAdminsOnly = visibleToAdminsOnly
+                };
+                config.MachineSources.Add(source);
+                config.Sources += ";" + source.Name;
+            }
+            else
+            {
+                source.AllowSelfService = allowSelfService;
+                source.BypassProxy = bypassProxy;
+                source.Certificate = certificate;
+                source.EncryptedCertificatePassword = certificatePassword;
+                source.EncryptedPassword = password;
+                source.Key = directoryOrUrl;
+                source.Priority = priority;
+                source.VisibleToAdminsOnly = visibleToAdminsOnly;
             }
         }
 
@@ -156,6 +227,7 @@ namespace chocolatey.tests.integration
             config.RegularOutput = true;
             config.SkipPackageInstallProvider = false;
             config.Sources = _fileSystem.get_full_path(_fileSystem.combine_paths(get_top_level(), "packages"));
+            config.MachineSources.Clear();
             config.Version = null;
             config.Debug = true;
             config.AllVersions = false;

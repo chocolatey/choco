@@ -3210,5 +3210,81 @@ namespace chocolatey.tests.integration.scenarios
                 upgradePackageResult.Count.ShouldEqual(0, "upgradepackage should not be in the results list");
             }
         }
+
+
+
+        [Concern(typeof(ChocolateyUpgradeCommand))]
+        public class when_upgrading_existing_package_from_priority_source : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "upgradepackage";
+                Scenario.install_package(Configuration, "upgradepackage", "1.0.0");
+                Scenario.add_packages_to_source_location(Configuration, "upgradepackage.1.1.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "upgradepackage.1.1.1-beta2" + Constants.PackageExtension);
+                Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0*" + Constants.PackageExtension);
+                Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.1-beta" + Constants.PackageExtension);
+                Configuration.Prerelease = true;
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_install_where_install_location_reports()
+            {
+                foreach (var packageResult in Results)
+                {
+                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_install_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_upgrade_to_expected_version_in_priority_repository()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Version.ShouldEqual("1.1.1-beta");
+                }
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+        }
     }
 }

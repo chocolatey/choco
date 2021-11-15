@@ -3016,6 +3016,69 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
+        public class when_installing_non_existing_package_from_priority_source : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "non-existing";
+                var directory = Scenario.get_directory_path_in_top_level("package_priority");
+                Scenario.add_machine_source(Configuration, "Priority-Source", directory);
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_not_install_where_install_location_reports()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_install_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_report_package_not_found()
+            {
+                foreach (var packageResult in Results)
+                {
+                    var message = packageResult.Value.Messages.First();
+                    message.MessageType.ShouldEqual(ResultType.Error);
+                    message.Message.ShouldStartWith("non-existing not installed. The package was not found with the source(s) listed.");
+                }
+            }
+        }
+
+        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_with_a_dependent_package_that_also_depends_on_a_less_constrained_but_still_valid_dependency_of_the_same_package : ScenariosBase
         {
             public override void Context()
@@ -3421,6 +3484,154 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Results.Count().ShouldEqual(0);
             }
+
+            [Concern(typeof(ChocolateyInstallCommand))]
+            public class when_installing_new_package_from_priority_source_with_repository_optimization : ScenariosBase
+            {
+                public override void Context()
+                {
+                    base.Context();
+                    Configuration.PackageNames = Configuration.Input = "upgradepackage";
+                    Configuration.Features.UsePackageRepositoryOptimizations = true;
+                    Configuration.Sources = Configuration.Sources + ";chocolatey"; // Needed, otherwise we can't do repository optimizations
+                    Configuration.MachineSources.Add(new MachineSourceConfiguration
+                    {
+                        Name = "chocolatey",
+                        Key = "https://community.chocolatey.org/api/v2"
+                    });
+                    Scenario.add_packages_to_source_location(Configuration, "upgradepackage.1.1.0*" + Constants.PackageExtension);
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0*" + Constants.PackageExtension);
+                }
+
+                public override void Because()
+                {
+                    Results = Service.install_run(Configuration);
+                }
+
+                [Fact]
+                public void should_install_where_install_location_reports()
+                {
+                    foreach (var packageResult in Results)
+                    {
+                        Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    }
+                }
+
+                [Fact]
+                public void should_install_a_package_in_the_lib_directory()
+                {
+                    var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                    Directory.Exists(packageDir).ShouldBeTrue();
+                }
+
+                [Fact]
+                public void should_install_lower_version_of_package()
+                {
+                    foreach (var packageResult in Results)
+                    {
+                        packageResult.Value.Version.ShouldEqual("1.0.0");
+                    }
+                }
+
+                [Fact]
+                public void should_have_a_successful_package_result()
+                {
+                    foreach (var packageResult in Results)
+                    {
+                        packageResult.Value.Success.ShouldBeTrue();
+                    }
+                }
+
+                [Fact]
+                public void should_not_have_inconclusive_package_result()
+                {
+                    foreach (var packageResult in Results)
+                    {
+                        packageResult.Value.Inconclusive.ShouldBeFalse();
+                    }
+                }
+
+                [Fact]
+                public void should_not_have_warning_package_result()
+                {
+                    foreach (var packageResult in Results)
+                    {
+                        packageResult.Value.Warning.ShouldBeFalse();
+                    }
+                }
+            }
+
+            [Concern(typeof(ChocolateyInstallCommand))]
+            public class when_installing_new_package_from_priority_source : ScenariosBase
+            {
+                public override void Context()
+                {
+                    base.Context();
+                    Configuration.PackageNames = Configuration.Input = "upgradepackage";
+                    Scenario.add_packages_to_source_location(Configuration, "upgradepackage.1.1.0*" + Constants.PackageExtension);
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0*" + Constants.PackageExtension);
+                }
+
+                public override void Because()
+                {
+                    Results = Service.install_run(Configuration);
+                }
+
+                [Fact]
+                public void should_install_where_install_location_reports()
+                {
+                    foreach (var packageResult in Results)
+                    {
+                        Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    }
+                }
+
+                [Fact]
+                public void should_install_a_package_in_the_lib_directory()
+                {
+                    var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                    Directory.Exists(packageDir).ShouldBeTrue();
+                }
+
+                [Fact]
+                public void should_install_lower_version_of_package()
+                {
+                    foreach (var packageResult in Results)
+                    {
+                        packageResult.Value.Version.ShouldEqual("1.0.0");
+                    }
+                }
+
+                [Fact]
+                public void should_have_a_successful_package_result()
+                {
+                    foreach (var packageResult in Results)
+                    {
+                        packageResult.Value.Success.ShouldBeTrue();
+                    }
+                }
+
+                [Fact]
+                public void should_not_have_inconclusive_package_result()
+                {
+                    foreach (var packageResult in Results)
+                    {
+                        packageResult.Value.Inconclusive.ShouldBeFalse();
+                    }
+                }
+
+                [Fact]
+                public void should_not_have_warning_package_result()
+                {
+                    foreach (var packageResult in Results)
+                    {
+                        packageResult.Value.Warning.ShouldBeFalse();
+                    }
+                }
+            }
+
         }
     }
 }

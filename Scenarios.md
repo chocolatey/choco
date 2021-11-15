@@ -1,6 +1,6 @@
 ## Chocolatey Usage Scenarios
 
-### ChocolateyInstallCommand [ 35 Scenario(s), 293 Observation(s) ]
+### ChocolateyInstallCommand [ 38 Scenario(s), 310 Observation(s) ]
 
 #### when force installing a package that depends on an unavailable newer version of an installed dependency forcing dependencies
 
@@ -351,6 +351,32 @@
  * should still have a package in the lib directory
  * should still have the expected version of the package installed
 
+#### when installing new package from priority source
+
+ * should have a successful package result
+ * should install a package in the lib directory
+ * should install lower version of package
+ * should install where install location reports
+ * should not have inconclusive package result
+ * should not have warning package result
+
+#### when installing new package from priority source with repository optimization
+
+ * should have a successful package result
+ * should install a package in the lib directory
+ * should install lower version of package
+ * should install where install location reports
+ * should not have inconclusive package result
+ * should not have warning package result
+
+#### when installing non existing package from priority source
+
+ * should not have inconclusive package result
+ * should not have warning package result
+ * should not install a package in the lib directory
+ * should not install where install location reports
+ * should report package not found
+
 #### when installing packages with packages config
 
  * should contain a message that upgradepackage with an expected specified version was installed
@@ -689,7 +715,7 @@
 
  * should throw an error that it is not allowed
 
-### ChocolateyUpgradeCommand [ 36 Scenario(s), 295 Observation(s) ]
+### ChocolateyUpgradeCommand [ 37 Scenario(s), 301 Observation(s) ]
 
 #### when force upgrading a package
 
@@ -1089,6 +1115,15 @@
  * should upgrade a package in the lib directory
  * should upgrade the package
  * should upgrade where install location reports
+
+#### when upgrading existing package from priority source
+
+ * should have a successful package result
+ * should install a package in the lib directory
+ * should install upgrade to expected version in priority repository
+ * should install where install location reports
+ * should not have inconclusive package result
+ * should not have warning package result
 
 #### when upgrading packages with packages config
 
