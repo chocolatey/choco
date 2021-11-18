@@ -408,6 +408,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 handle_extension_packages(config, packageResult);
                 handle_template_packages(config, packageResult);
                 pkgInfo.Arguments = capture_arguments(config, packageResult);
+                pkgInfo.IsPinned = config.PinPackage;
             }
 
             var toolsLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyToolsLocation);

@@ -218,6 +218,10 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.UsePackageRepositoryOptimizations = false;
                          }
                      })
+                .Add("pin|pinpackage|pin-package",
+                    "Pin Package - Add a pin to the package after upgrade. Available in 1.2.0+",
+                    option => configuration.PinPackage = option != null
+                    )
                 ;
         }
 

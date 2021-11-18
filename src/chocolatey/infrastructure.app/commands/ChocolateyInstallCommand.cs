@@ -179,6 +179,10 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.UsePackageRepositoryOptimizations = false;
                          }
                      })
+                .Add("pin|pinpackage|pin-package",
+                    "Pin Package - Add a pin to the package after install. Available in 1.2.0+",
+                    option => configuration.PinPackage = option != null
+                    )
                 ;
 
             //todo: #770 package name can be a url / installertype
