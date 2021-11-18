@@ -108,7 +108,7 @@ namespace chocolatey.infrastructure.app.commands
                       {
                           if (option != null) configuration.Features.AllowEmptyChecksums = true;
                       })
-                 .Add("allowemptychecksumsecure|allowemptychecksumssecure|allow-empty-checksums-secure",
+                .Add("allowemptychecksumsecure|allowemptychecksumssecure|allow-empty-checksums-secure",
                       "Allow Empty Checksums Secure - Allow packages to have empty checksums for downloaded resources from secure locations (HTTPS). Overrides the default feature '{0}' set to '{1}'. Available in 0.10.0+.".format_with(ApplicationParameters.Features.AllowEmptyChecksumsSecure, configuration.Features.AllowEmptyChecksumsSecure.to_string()),
                       option =>
                       {
@@ -146,20 +146,20 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.UsePackageExitCodes = false;
                          }
                      })
-                 .Add("usepackagecodes|usepackageexitcodes|use-package-codes|use-package-exit-codes",
+                .Add("usepackagecodes|usepackageexitcodes|use-package-codes|use-package-exit-codes",
                      "UsePackageExitCodes - Package scripts can provide exit codes. Use those for choco's exit code when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010.  Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
                      option => configuration.Features.UsePackageExitCodes = option != null
                      )
-                 .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
+                .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
                      "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
                      )
-                 .Add("exitwhenrebootdetected|exit-when-reboot-detected",
+                .Add("exitwhenrebootdetected|exit-when-reboot-detected",
                      "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}. Overrides the default feature '{3}' set to '{4}'. Available in 0.10.12+.".format_with
                      (ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend, ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
                      option => configuration.Features.ExitOnRebootDetected = option != null
                      )
-                 .Add("ignoredetectedreboot|ignore-detected-reboot",
+                .Add("ignoredetectedreboot|ignore-detected-reboot",
                      "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with
                      (ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
                      option =>
