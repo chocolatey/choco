@@ -277,7 +277,7 @@ namespace chocolatey
         /// Registers a container component. Does not require a dependency on Simple Injector.
         /// Will override existing component if registered.
         /// </summary>
-        /// <typeparam name="Service">The type of the ervice.</typeparam>
+        /// <typeparam name="Service">The type of the service.</typeparam>
         /// <param name="implementationCreator">The implementation creator.</param>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
         /// <remarks>

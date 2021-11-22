@@ -164,7 +164,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.Noop = true;
-                Configuration.PackageNames = Configuration.Input = "nonexistingpackage";
+                Configuration.PackageNames = Configuration.Input = "nonexistentpackage";
             }
 
             public override void Because()
@@ -178,7 +178,7 @@ namespace chocolatey.tests.integration.scenarios
                 bool expectedMessage = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Error).or_empty_list_if_null())
                 {
-                    if (message.Contains("nonexistingpackage not installed. The package was not found with the source(s) listed")) expectedMessage = true;
+                    if (message.Contains("nonexistentpackage not installed. The package was not found with the source(s) listed")) expectedMessage = true;
                 }
 
                 expectedMessage.ShouldBeTrue();
@@ -728,7 +728,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        public class when_upgrading_an_existing_prerelease_package_with_prerelease_available_with_excludeprelease_and_without_prerelease_specified : ScenariosBase
+        public class when_upgrading_an_existing_prerelease_package_with_prerelease_available_with_excludeprerelease_and_without_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
 
@@ -820,7 +820,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        public class when_upgrading_an_existing_prerelease_package_with_allow_downgrade_with_excludeprelease_and_without_prerelease_specified : ScenariosBase
+        public class when_upgrading_an_existing_prerelease_package_with_allow_downgrade_with_excludeprerelease_and_without_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
 
@@ -1696,7 +1696,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                Configuration.PackageNames = Configuration.Input = "nonexistingpackage";
+                Configuration.PackageNames = Configuration.Input = "nonexistentpackage";
             }
 
             public override void Because()
@@ -1719,7 +1719,7 @@ namespace chocolatey.tests.integration.scenarios
                 bool expectedMessage = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Error).or_empty_list_if_null())
                 {
-                    if (message.Contains("nonexistingpackage not installed. The package was not found with the source(s) listed")) expectedMessage = true;
+                    if (message.Contains("nonexistentpackage not installed. The package was not found with the source(s) listed")) expectedMessage = true;
                 }
 
                 expectedMessage.ShouldBeTrue();

@@ -42,7 +42,7 @@ namespace chocolatey.infrastructure.xml
         }
 
         /// <summary>
-        ///   Allow direct assigment to string
+        ///   Allow direct assignment to string
         ///   string str = cdata;
         /// </summary>
         /// <param name="cdata"></param>

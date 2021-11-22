@@ -114,7 +114,7 @@ namespace chocolatey.infrastructure.app.services
         }
 
         /// <summary>
-        ///   Evaluates registry keys and updates the snapshop with items
+        ///   Evaluates registry keys and updates the snapshot with items
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="snapshot">The snapshot.</param>

@@ -328,7 +328,7 @@ Pro / Business supports a single, ubiquitous install directory option.
   if ($fileType -like 'msi') {
     $msiArgs = "/i `"$fileFullPath`""
     $msiArgs = if ($overrideArguments) {
-      Write-Host "Overriding package arguments with '$additonalInstallArgs' (replacing '$silentArgs')"
+      Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')"
       "$msiArgs $additionalInstallArgs"
     }
     else {

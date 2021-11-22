@@ -17,7 +17,7 @@
 function Get-ChocolateyWebFile {
 <#
 .SYNOPSIS
-Downloads a file from the internets.
+Downloads a file from the internet.
 
 .DESCRIPTION
 This will download a file from a url, tracking with a progress bar.

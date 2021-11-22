@@ -93,7 +93,7 @@ namespace chocolatey.infrastructure.synchronization
         }
 
         /// <summary>
-        /// Enters the Global Mutext
+        /// Enters the Global Mutex
         /// </summary>
         /// <typeparam name="T">The return type</typeparam>
         /// <param name="func">The function to perform.</param>

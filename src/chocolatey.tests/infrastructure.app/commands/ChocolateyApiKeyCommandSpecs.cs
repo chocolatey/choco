@@ -133,7 +133,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 configuration.ApiKeyCommand.Key = "bob";
                 configuration.Sources = "";
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -142,11 +142,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
             }
@@ -172,7 +172,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 configuration.ApiKeyCommand.Remove = true;
                 configuration.Sources = "";
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -181,11 +181,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
             }

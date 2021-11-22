@@ -485,7 +485,7 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
 
         private void create_ignore_files_for_executables(string installLocation, bool is64Bit)
         {
-            // If we are using a 64 bit architecure, we want to ignore exe's targetting x86
+            // If we are using a 64 bit architecture, we want to ignore exe's targeting x86
             // This is done by adding a .ignore file into the package folder for each exe to ignore
             var exeFiles32Bit = (_fileSystem.directory_exists(_fileSystem.combine_paths(installLocation, "tools\\x86")) ? _fileSystem.get_files(_fileSystem.combine_paths(installLocation, "tools\\x86"), pattern: "*.exe", option: SearchOption.AllDirectories) : new List<string>()).ToArray();
             var exeFiles64Bit = (_fileSystem.directory_exists(_fileSystem.combine_paths(installLocation, "tools\\x64")) ? _fileSystem.get_files(_fileSystem.combine_paths(installLocation, "tools\\x64"), pattern: "*.exe", option: SearchOption.AllDirectories) : new List<string>()).ToArray();

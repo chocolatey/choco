@@ -1,5 +1,5 @@
 ﻿$thisScriptFolder = (Split-Path -parent $MyInvocation.MyCommand.Definition)
-$chocInstallVariableName = "ChocolateyInstall"
+$chocoInstallVariableName = "ChocolateyInstall"
 $sysDrive = $env:SystemDrive
 $tempDir = $env:TEMP
 $defaultChocolateyPathOld = "$sysDrive\Chocolatey"
@@ -224,24 +224,24 @@ param(
 
   $environmentTarget = [System.EnvironmentVariableTarget]::User
   # removing old variable
-  Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue $null -variableType $environmentTarget
+  Install-ChocolateyEnvironmentVariable -variableName "$chocoInstallVariableName" -variableValue $null -variableType $environmentTarget
   if (Test-ProcessAdminRights) {
     Write-Debug "Administrator installing so using Machine environment variable target instead of User."
     $environmentTarget = [System.EnvironmentVariableTarget]::Machine
     # removing old variable
-    Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue $null -variableType $environmentTarget
+    Install-ChocolateyEnvironmentVariable -variableName "$chocoInstallVariableName" -variableValue $null -variableType $environmentTarget
   } else {
     Write-ChocolateyWarning "Setting ChocolateyInstall Environment Variable on USER and not SYSTEM variables.`n  This is due to either non-administrator install OR the process you are running is not being run as an Administrator."
   }
 
-  Write-Output "Creating $chocInstallVariableName as an environment variable (targeting `'$environmentTarget`') `n  Setting $chocInstallVariableName to `'$folder`'"
+  Write-Output "Creating $chocoInstallVariableName as an environment variable (targeting `'$environmentTarget`') `n  Setting $chocoInstallVariableName to `'$folder`'"
   Write-ChocolateyWarning "It's very likely you will need to close and reopen your shell `n  before you can use choco."
-  Install-ChocolateyEnvironmentVariable -variableName "$chocInstallVariableName" -variableValue "$folder" -variableType $environmentTarget
+  Install-ChocolateyEnvironmentVariable -variableName "$chocoInstallVariableName" -variableValue "$folder" -variableType $environmentTarget
 }
 
 function Get-ChocolateyInstallFolder(){
   Write-Debug "Get-ChocolateyInstallFolder"
-  [Environment]::GetEnvironmentVariable($chocInstallVariableName)
+  [Environment]::GetEnvironmentVariable($chocoInstallVariableName)
 }
 
 function Create-DirectoryIfNotExists($folderName){
@@ -473,13 +473,13 @@ param(
   }
 
   Write-Debug "Unpacking files required for Chocolatey."
-  $chocInstallFolder = Join-Path $thisScriptFolder "chocolateyInstall"
-  $chocoExe = Join-Path $chocInstallFolder 'choco.exe'
+  $chocoInstallFolder = Join-Path $thisScriptFolder "chocolateyInstall"
+  $chocoExe = Join-Path $chocoInstallFolder 'choco.exe'
   $chocoExeDest = Join-Path $chocolateyPath 'choco.exe'
   Copy-Item $chocoExe $chocoExeDest -force
 
-  Write-Debug "Copying the contents of `'$chocInstallFolder`' to `'$chocolateyPath`'."
-  Copy-Item $chocInstallFolder\* $chocolateyPath -Recurse -Force
+  Write-Debug "Copying the contents of `'$chocoInstallFolder`' to `'$chocolateyPath`'."
+  Copy-Item $chocoInstallFolder\* $chocolateyPath -Recurse -Force
 }
 
 function Ensure-ChocolateyLibFiles {
@@ -493,7 +493,7 @@ param(
 
   if (!(Test-Path("$chocoPkgDirectory\chocolatey.nupkg"))) {
     Write-Output "chocolatey.nupkg file not installed in lib.`n Attempting to locate it from bootstrapper."
-    $chocoZipFile = Join-Path $tempDir "chocolatey\chocInstall\chocolatey.zip"
+    $chocoZipFile = Join-Path $tempDir "chocolatey\chocoInstall\chocolatey.zip"
 
     Write-Debug "First the zip file at '$chocoZipFile'."
     Write-Debug "Then from a neighboring chocolatey.*nupkg file '$thisScriptFolder/../../'."
@@ -579,7 +579,7 @@ param(
 function Initialize-ChocolateyPath {
 param(
   [string]$chocolateyExePath = "$($env:ALLUSERSPROFILE)\chocolatey\bin",
-  [string]$chocolateyExePathVariable = "%$($chocInstallVariableName)%\bin"
+  [string]$chocolateyExePathVariable = "%$($chocoInstallVariableName)%\bin"
 )
   Write-Debug "Initialize-ChocolateyPath"
   Write-Debug "Initializing Chocolatey Path if required"
@@ -597,7 +597,7 @@ param(
 function Process-ChocolateyBinFiles {
 param(
   [string]$chocolateyExePath = "$($env:ALLUSERSPROFILE)\chocolatey\bin",
-  [string]$chocolateyExePathVariable = "%$($chocInstallVariableName)%\bin"
+  [string]$chocolateyExePathVariable = "%$($chocoInstallVariableName)%\bin"
 )
   Write-Debug "Process-ChocolateyBinFiles"
   $processedMarkerFile = Join-Path $chocolateyExePath '_processed.txt'
@@ -801,7 +801,7 @@ function Invoke-Chocolatey-Initial {
     & $chocoExe -v | Out-Null
     Write-Debug "Chocolatey execution completed successfully."
   } catch {
-    Write-ChocolateyWarning "Unable to run Chocolately at this time.  It is likely that .Net Framework installation requires a system reboot"
+    Write-ChocolateyWarning "Unable to run Chocolatey at this time.  It is likely that .Net Framework installation requires a system reboot"
   }
 }
 

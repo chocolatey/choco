@@ -33,7 +33,7 @@ namespace chocolatey.infrastructure.app.services
         PackageFiles read_from_file(string filepath);
 
         /// <summary>
-        /// Saves the files snapshot to the specifed file path.
+        /// Saves the files snapshot to the specified file path.
         /// </summary>
         /// <param name="snapshot">The snapshot.</param>
         /// <param name="filePath">The file path.</param>

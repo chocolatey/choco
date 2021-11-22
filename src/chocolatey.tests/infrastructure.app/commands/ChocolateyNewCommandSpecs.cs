@@ -307,7 +307,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_throw_when_Name_is_not_set()
             {
                 configuration.NewCommand.Name = "";
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -316,11 +316,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
             }

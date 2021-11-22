@@ -248,7 +248,7 @@ namespace chocolatey.infrastructure.filesystem
         FileStream open_file_readonly(string filePath);
 
         /// <summary>
-        ///   Opens a file exlusively
+        ///   Opens a file exclusively
         /// </summary>
         /// <param name="filePath">Path to the file name</param>
         /// <returns>A file stream object for use after accessing the file</returns>
@@ -273,7 +273,7 @@ namespace chocolatey.infrastructure.filesystem
         ///   Writes a stream to a specified file path.
         /// </summary>
         /// <param name="filePath">The file path.</param>
-        /// <param name="getStream">A defferred function of getting the stream</param>
+        /// <param name="getStream">A deferred function of getting the stream</param>
         void write_file(string filePath, Func<Stream> getStream);
 
         #endregion

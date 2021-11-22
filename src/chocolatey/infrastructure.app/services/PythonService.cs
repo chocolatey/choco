@@ -272,7 +272,7 @@ namespace chocolatey.infrastructure.app.services
 
             args = args.Replace(LOG_LEVEL_TOKEN, config.Debug ? "-vvv" : "");
 
-            if (config.CommandName.is_equal_to("intall"))
+            if (config.CommandName.is_equal_to("install"))
             {
                 args = args.Replace(FORCE_TOKEN, config.Force ? "--ignore-installed" : "");
             }
