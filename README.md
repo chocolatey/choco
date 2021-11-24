@@ -38,11 +38,9 @@ You can just call me choco.
 | [![TeamCity Build Status](https://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/lv4u2v0v02dj3svu/branch/develop?svg=true)](https://ci.appveyor.com/project/chocolatey/choco/branch/develop)   | [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/develop?logo=github)]((https://github.com/chocolatey/choco/actions/workflows/build.yml)) |
 
 ## Chat Room
-Come join in the conversation about Chocolatey in our Gitter Chat Room.
+Come join in the conversation about Chocolatey in our Community Chat Room.
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chocolatey/choco?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Or, you can find us in IRC at #chocolatey on freenode. IRC is not as often checked by committers, so it is recommended you stick to Gitter if you need more timely assistance.
+![Discord](https://img.shields.io/discord/778552361454141460)
 
 Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
@@ -103,7 +101,7 @@ Prerequisites:
  * The issue has to do with choco itself and is not a package or website issue.
  * Please check to see if your issue already exists with a quick search of the issues. Start with one relevant term and then add if you get too many results.
  * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/develop/CONTRIBUTING.md) guidelines.
- * You are not submitting a question - questions are better served as [emails](https://groups.google.com/group/chocolatey) or [gitter chat questions](https://gitter.im/chocolatey/choco).
+ * You are not submitting a question - questions are better served as [emails](https://groups.google.com/group/chocolatey) or [Community Chat questions](https://ch0.co/community-support).
  * Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
 Submitting a ticket:

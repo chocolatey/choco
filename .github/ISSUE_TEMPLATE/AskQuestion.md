@@ -11,7 +11,7 @@ STOP RIGHT HERE - DO NOT CREATE A TICKET FOR A QUESTION ON THIS REPOSITORY
 
 The best routes for getting questions answered when the documentation doesn't serve what you need is the mailing list or in chat:
 - email - http://groups.google.com/group/chocolatey
-- chat - https://gitter.im/chocolatey/choco
+- chat - https://ch0.co/community-support
 
 
 
