@@ -40,7 +40,7 @@ You can just call me choco.
 ## Chat Room
 Come join in the conversation about Chocolatey in our Community Chat Room.
 
-![Discord](https://img.shields.io/discord/778552361454141460)
+[![Discord](https://img.shields.io/discord/778552361454141460?logo=Discord)](https://ch0.co/community)
 
 Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
