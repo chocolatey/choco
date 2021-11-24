@@ -97,7 +97,7 @@ If you work for an organization that does not allow you to contribute without at
 Start with [Prerequisites](#prerequisites) and make sure you can sign the Contributor License Agreement (CLA).
 
 ### Get Buyoff Or Find Open Community Issues/Features
- * Through a Github issue (preferred), through the [mailing list](https://groups.google.com/forum/#!forum/chocolatey), or through [Community Chat](https://ch0.co/community-support), talk about a feature you would like to see (or a bug fix), and why it should be in Chocolatey.
+ * Through a GitHub issue (preferred), through the [mailing list](https://groups.google.com/forum/#!forum/chocolatey), or through [Community Chat](https://ch0.co/community-support), talk about a feature you would like to see (or a bug fix), and why it should be in Chocolatey.
    * If approved through the mailing list or in Community chat, ensure the accompanying GitHub issue is created with information and a link back to the mailing list discussion (or the Community Chat conversation).
  * Once you get a nod from one of the [Chocolatey Team](https://github.com/chocolatey?tab=members), you can start on the feature.
  * Alternatively, if a feature is on the issues list with the [Up For Grabs](https://github.com/chocolatey/choco/issues?q=is%3Aopen+is%3Aissue+label%3A%22Up+For+Grabs%22) label, it is open for a community member (contributor) to patch. You should comment that you are signing up for it on the issue so someone else doesn't also sign up for the work.
