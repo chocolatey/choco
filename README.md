@@ -63,7 +63,7 @@ If you are using a [commercial edition of Chocolatey](https://chocolatey.org/com
 
 ## Information
  * [Chocolatey Website and Community Package Repository](https://community.chocolatey.org)
- * [Mailing List](http://groups.google.com/group/chocolatey) / [Release Announcements Only Mailing List](https://groups.google.com/group/chocolatey-announce) / [Build Status Mailing List](http://groups.google.com/group/chocolatey-build-status)
+ * [Mailing List](https://groups.google.com/group/chocolatey) / [Release Announcements Only Mailing List](https://groups.google.com/group/chocolatey-announce) / [Build Status Mailing List](http://groups.google.com/group/chocolatey-build-status)
  * [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [GitHub](https://github.com/chocolatey)
  * [Blog](https://blog.chocolatey.org/) / [Newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&id=73b018498d)
  * [Documentation](https://docs.chocolatey.org/en-us/) / [Support](https://chocolatey.org/support)
@@ -141,7 +141,7 @@ Running the build on Windows should produce an artifact that is tested and ready
 ##### Prerequisites:
 
  * Install and configure Mono. Mono 5.20 or newer should work, see the Dockerfile for the currently recommended version.
-  * [Debian based](http://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives)
+  * [Debian based](https://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives)
 
 ```sh
 # install prerequisites
@@ -174,7 +174,7 @@ sudo apt-get install mono-devel -y
 ```sh
 # mono
 # http://www.michaelruck.de/2010/03/solving-pkg-config-and-mono-35-profile.html
-# http://cloudgen.wordpress.com/2013/03/06/configure-nant-to-run-under-mono-3-06-beta-for-mac-osx/
+# https://cloudgen.wordpress.com/2013/03/06/configure-nant-to-run-under-mono-3-06-beta-for-mac-osx/
 export PKG_CONFIG_PATH=/opt/local/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig:$PKG_CONFIG_PATH
 ```
 
