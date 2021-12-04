@@ -150,6 +150,11 @@ namespace chocolatey.infrastructure.app
         /// </summary>
         public static readonly bool AllowPrompts = true;
 
+        /// <summary>
+        /// This is a readonly bool set to true. It is only shifted for specs.
+        /// </summary>
+        public static readonly bool CheckPackageIdsNonWindows = true;
+
         public static class ExitCodes
         {
             public static readonly int ErrorFailNoActionReboot = 350;

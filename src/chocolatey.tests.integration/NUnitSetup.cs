@@ -102,6 +102,9 @@ namespace chocolatey.tests.integration
             field = typeof(ApplicationParameters).GetField("LockTransactionalInstallFiles");
             field.SetValue(null, false);
 
+            field = typeof(ApplicationParameters).GetField("CheckPackageIdsNonWindows");
+            field.SetValue(null, false);
+
             // we need to speed up specs a bit, so only try filesystem locking operations twice
             field = fileSystem.GetType().GetField("TIMES_TO_TRY_OPERATION", BindingFlags.Instance | BindingFlags.NonPublic);
             if (field != null)

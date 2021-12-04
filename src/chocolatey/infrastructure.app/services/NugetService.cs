@@ -447,7 +447,7 @@ folder.");
                 //todo: get smarter about realizing multiple versions have been installed before and allowing that
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
-                if (Platform.get_platform() != PlatformType.Windows && !packageName.EndsWith(".template"))
+                if (ApplicationParameters.CheckPackageIdsNonWindows && Platform.get_platform() != PlatformType.Windows && !packageName.EndsWith(".template"))
                 {
                     if (config.Force)
                     {
