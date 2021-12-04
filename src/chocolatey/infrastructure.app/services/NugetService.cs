@@ -447,6 +447,23 @@ folder.");
                 //todo: get smarter about realizing multiple versions have been installed before and allowing that
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
+                if (Platform.get_platform() != PlatformType.Windows && !packageName.EndsWith(".template"))
+                {
+                    if (config.Force)
+                    {
+                        string logMessage = "{0} is not a supported package on non-Windows systems.{1}Only template packages are currently supported.{1}Bypassing check and installing anyway as force is specified".format_with(packageName, Environment.NewLine);
+                        this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                    }
+                    else
+                    {
+                        string logMessage = "{0} is not a supported package on non-Windows systems.{1}Only template packages are currently supported.".format_with(packageName, Environment.NewLine);
+                        var noPkgResult = packageInstalls.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
+                        noPkgResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                        this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                        continue;
+                    }
+                }
+
                 if (installedPackage != null && (version == null || version == installedPackage.Version) && !config.Force)
                 {
                     string logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".format_with(installedPackage.Id, installedPackage.Version, Environment.NewLine);
