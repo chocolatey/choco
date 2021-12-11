@@ -113,6 +113,8 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyTemplateCommand.cs" />
+    <Compile Include="infrastructure.app\domain\TemplateCommandType.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyExportCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInfoCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyHelpCommand.cs" />

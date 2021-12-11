@@ -19,24 +19,32 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Text;
     using configuration;
-    using filesystem;
     using logging;
     using templates;
     using tokens;
+    using NuGet;
+    using nuget;
+    using IFileSystem = filesystem.IFileSystem;
 
     public class TemplateService : ITemplateService
     {
         private readonly UTF8Encoding utf8WithoutBOM = new UTF8Encoding(false);
         private readonly IFileSystem _fileSystem;
+        private readonly ILogger _nugetLogger;
+
         private readonly IList<string> _templateBinaryExtensions = new List<string> {
             ".exe", ".msi", ".msu", ".msp", ".mst",
             ".7z", ".zip", ".rar", ".gz", ".iso", ".tar", ".sfx",
             ".dmg",
             ".cer", ".crt", ".der", ".p7b", ".pfx", ".p12", ".pem"
             };
+
+        private readonly string _builtInTemplateOverrideName = "default";
+        private readonly string _builtInTemplateName = "built-in";
 
         public TemplateService(IFileSystem fileSystem)
         {
@@ -187,6 +195,155 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Debug(() => "{0}".format_with(template));
             _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(fileLocation));
             _fileSystem.write_file(fileLocation, template, encoding);
+        }
+
+        public void list_noop(ChocolateyConfiguration configuration)
+        {
+            if (string.IsNullOrWhiteSpace(configuration.TemplateCommand.Name))
+            {
+                this.Log().Info(() => "Would have listed templates in {0}".format_with(ApplicationParameters.TemplatesLocation));
+            }
+            else
+            {
+                this.Log().Info(() => "Would have listed information about {0}".format_with(configuration.TemplateCommand.Name));
+            }
+        }
+
+        public void list(ChocolateyConfiguration configuration)
+        {
+            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
+                new PackageDownloader(),
+                installSuccessAction: null,
+                uninstallSuccessAction: null,
+                addUninstallHandler: false);
+
+            var templateDirList = _fileSystem.get_directories(ApplicationParameters.TemplatesLocation).ToList();
+            var isBuiltInTemplateOverriden = templateDirList.Contains(_fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, _builtInTemplateOverrideName));
+            var isBuiltInOrDefaultTemplateDefault = string.IsNullOrWhiteSpace(configuration.DefaultTemplateName) || !templateDirList.Contains(_fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.DefaultTemplateName));
+
+            if (string.IsNullOrWhiteSpace(configuration.TemplateCommand.Name))
+            {
+                if (templateDirList.Any())
+                {
+                    foreach (var templateDir in templateDirList)
+                    {
+                        configuration.TemplateCommand.Name = _fileSystem.get_file_name(templateDir);
+                        list_custom_template_info(configuration, packageManager);
+                    }
+
+                    this.Log().Info(configuration.RegularOutput ? "{0} Custom templates found at {1}{2}".format_with(templateDirList.Count(), ApplicationParameters.TemplatesLocation, Environment.NewLine) : string.Empty);
+                }
+                else
+                {
+                    this.Log().Info(configuration.RegularOutput ? "No custom templates installed in {0}{1}".format_with(ApplicationParameters.TemplatesLocation, Environment.NewLine) : string.Empty);
+                }
+
+                list_built_in_template_info(configuration, isBuiltInTemplateOverriden, isBuiltInOrDefaultTemplateDefault);
+            }
+            else
+            {
+                if (templateDirList.Contains(_fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.TemplateCommand.Name)))
+                {
+                    list_custom_template_info(configuration, packageManager);
+                    if (configuration.TemplateCommand.Name == _builtInTemplateName || configuration.TemplateCommand.Name == _builtInTemplateOverrideName)
+                    {
+                        list_built_in_template_info(configuration, isBuiltInTemplateOverriden, isBuiltInOrDefaultTemplateDefault);
+                    }
+                }
+                else
+                {
+                    if (configuration.TemplateCommand.Name.ToLowerInvariant() == _builtInTemplateName || configuration.TemplateCommand.Name.ToLowerInvariant() == _builtInTemplateOverrideName)
+                    {
+                        // We know that the template is not overriden since the template directory was checked
+                        list_built_in_template_info(configuration, isBuiltInTemplateOverriden, isBuiltInOrDefaultTemplateDefault);
+                    }
+                    else
+                    {
+                        throw new ApplicationException("Unable to find requested template '{0}'".format_with(configuration.TemplateCommand.Name));
+                    }
+                }
+            }
+        }
+
+        protected void list_custom_template_info(ChocolateyConfiguration configuration, IPackageManager packageManager)
+        {
+            var pkg = packageManager.LocalRepository.FindPackage("{0}.template".format_with(configuration.TemplateCommand.Name));
+            var templateInstalledViaPackage = (pkg != null);
+
+            var pkgVersion = templateInstalledViaPackage ? pkg.Version.to_string() : "0.0.0";
+            var pkgTitle = templateInstalledViaPackage ? pkg.Title : "{0} (Unmanaged)".format_with(configuration.TemplateCommand.Name);
+            var pkgSummary = templateInstalledViaPackage ?
+                (pkg.Summary != null && !string.IsNullOrWhiteSpace(pkg.Summary.to_string()) ? "{0}".format_with(pkg.Summary.escape_curly_braces().to_string()) : string.Empty) : string.Empty;
+            var pkgDescription = templateInstalledViaPackage ? pkg.Description.escape_curly_braces().Replace("\n    ", "\n").Replace("\n", "\n  ") : string.Empty;
+            var pkgFiles = "  {0}".format_with(string.Join("{0}  "
+                .format_with(Environment.NewLine), _fileSystem.get_files(_fileSystem
+                    .combine_paths(ApplicationParameters.TemplatesLocation, configuration.TemplateCommand.Name), "*", SearchOption.AllDirectories)));
+            var isOverridingBuiltIn = configuration.TemplateCommand.Name == _builtInTemplateOverrideName;
+            var isDefault = string.IsNullOrWhiteSpace(configuration.DefaultTemplateName) ? isOverridingBuiltIn : (configuration.DefaultTemplateName == configuration.TemplateCommand.Name);
+
+            if (configuration.RegularOutput)
+            {
+                if (configuration.Verbose)
+                {
+                    this.Log().Info(@"Template name: {0}
+Version: {1}
+Default template: {2}
+{3}Title: {4}
+{5}{6}
+List of files:
+{7}
+".format_with(configuration.TemplateCommand.Name,
+                        pkgVersion,
+                        isDefault,
+                        isOverridingBuiltIn ? "This template is overriding the built in template{0}".format_with(Environment.NewLine) : string.Empty,
+                        pkgTitle,
+                        string.IsNullOrEmpty(pkgSummary) ? "Template not installed as a package" : "Summary: {0}".format_with(pkgSummary),
+                        string.IsNullOrEmpty(pkgDescription) ? string.Empty : "{0}Description:{0}  {1}".format_with(Environment.NewLine, pkgDescription),
+                        pkgFiles));
+                }
+                else
+                {
+                    this.Log().Info("{0} {1} {2}".format_with((isDefault ? '*' : ' '), configuration.TemplateCommand.Name, pkgVersion));
+                }
+            }
+            else
+            {
+                this.Log().Info("{0}|{1}".format_with(configuration.TemplateCommand.Name, pkgVersion));
+            }
+        }
+
+        protected void list_built_in_template_info(ChocolateyConfiguration configuration, bool isOverridden, bool isDefault)
+        {
+            if (configuration.RegularOutput)
+            {
+                if (isOverridden)
+                {
+                    this.Log().Info("Built-in template overriden by 'default' template.{0}".format_with(Environment.NewLine));
+                }
+                else
+                {
+                    if (isDefault)
+                    {
+                        this.Log().Info("Built-in template is default.{0}".format_with(Environment.NewLine));
+                    }
+                    else
+                    {
+                        this.Log().Info("Built-in template is not default, it can be specified if the --built-in parameter is used{0}".format_with(Environment.NewLine));
+                    }
+                }
+                if (configuration.Verbose)
+                {
+                    this.Log().Info("Help about the built-in template can be found with 'choco new --help'{0}".format_with(Environment.NewLine));
+                }
+            }
+            else
+            {
+                //If reduced output, only print out the built in template if it is not overriden
+                if (!isOverridden)
+                {
+                    this.Log().Info("built-in|0.0.0");
+                }
+            }
         }
     }
 }
