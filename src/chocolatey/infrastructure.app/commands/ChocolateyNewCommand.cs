@@ -181,7 +181,7 @@ If you find other exit codes that we have not yet documented, please
 
         public virtual void noop(ChocolateyConfiguration configuration)
         {
-            _templateService.noop(configuration);
+            _templateService.generate_noop(configuration);
         }
 
         public virtual void run(ChocolateyConfiguration configuration)

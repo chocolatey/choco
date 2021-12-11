@@ -20,7 +20,7 @@ namespace chocolatey.infrastructure.app.services
 
     public interface ITemplateService
     {
-        void noop(ChocolateyConfiguration configuration);
+        void generate_noop(ChocolateyConfiguration configuration);
         void generate(ChocolateyConfiguration configuration);
     }
 }

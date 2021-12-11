@@ -45,7 +45,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_noop_is_called : TemplateServiceSpecsBase
+        public class when_generate_noop_is_called : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -61,7 +61,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.noop(config);
+                because = () => service.generate_noop(config);
             }
 
             public override void BeforeEachSpec()

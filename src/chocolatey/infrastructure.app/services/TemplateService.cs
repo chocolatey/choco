@@ -43,7 +43,7 @@ namespace chocolatey.infrastructure.app.services
             _fileSystem = fileSystem;
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public void generate_noop(ChocolateyConfiguration configuration)
         {
             var templateLocation = _fileSystem.combine_paths(configuration.OutputDirectory ?? _fileSystem.get_current_directory(), configuration.NewCommand.Name);
             this.Log().Info(() => "Would have generated a new package specification at {0}".format_with(templateLocation));

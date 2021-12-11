@@ -343,7 +343,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_call_service_noop()
             {
-                templateService.Verify(c => c.noop(configuration), Times.Once);
+                templateService.Verify(c => c.generate_noop(configuration), Times.Once);
             }
         }
 
