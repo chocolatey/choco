@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ namespace chocolatey.infrastructure.app.services
     {
         private readonly UTF8Encoding utf8WithoutBOM = new UTF8Encoding(false);
         private readonly IFileSystem _fileSystem;
-        private readonly IList<string> _templateBinaryExtensions = new List<string> { 
+        private readonly IList<string> _templateBinaryExtensions = new List<string> {
             ".exe", ".msi", ".msu", ".msp", ".mst",
             ".7z", ".zip", ".rar", ".gz", ".iso", ".tar", ".sfx",
             ".dmg",
@@ -102,6 +102,27 @@ namespace chocolatey.infrastructure.app.services
                 this.Log().Debug(() => " {0}={1}".format_with(additionalProperty.Key, additionalProperty.Value));
             }
 
+            // Attempt to set the name of the template that will be used to generate the new package
+            // If no template name has been passed at the command line, check to see if there is a defaultTemplateName set in the
+            // chocolatey.config file. If there is, and this template exists on disk, use it.
+            // Otherwise, revert to the built in default template.
+            // In addition, if the command line option to use the built-in template has been set, respect that
+            // and use the built in template.
+            var defaultTemplateName = configuration.DefaultTemplateName;
+            if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && !string.IsNullOrWhiteSpace(defaultTemplateName) && !configuration.NewCommand.UseOriginalTemplate)
+            {
+                var defaultTemplateNameLocation = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, defaultTemplateName);
+                if (!_fileSystem.directory_exists(defaultTemplateNameLocation))
+                {
+                    this.Log().Warn(() => "defaultTemplateName configuration value has been set to '{0}', but no template with that name exists in '{1}'. Reverting to default template.".format_with(defaultTemplateName, ApplicationParameters.TemplatesLocation));
+                }
+                else
+                {
+                    this.Log().Debug(() => "Setting TemplateName to '{0}'".format_with(defaultTemplateName));
+                    configuration.NewCommand.TemplateName = defaultTemplateName;
+                }
+            }
+
             var defaultTemplateOverride = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, "default");
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && (!_fileSystem.directory_exists(defaultTemplateOverride) || configuration.NewCommand.UseOriginalTemplate))
             {
@@ -122,7 +143,7 @@ namespace chocolatey.infrastructure.app.services
                 if (!_fileSystem.directory_exists(templatePath)) throw new ApplicationException("Unable to find path to requested template '{0}'. Path should be '{1}'".format_with(configuration.NewCommand.TemplateName, templatePath));
 
                 this.Log().Info(configuration.QuietOutput ? logger : ChocolateyLoggers.Important, "Generating package from custom template at '{0}'.".format_with(templatePath));
-                
+
                 // Create directory structure from template so as to include empty directories
                 foreach (var directory in _fileSystem.get_directories(templatePath, "*.*", SearchOption.AllDirectories))
                 {

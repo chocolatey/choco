@@ -146,6 +146,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ContainsLegacyPackageInstalls { get; set; }
         public int CommandExecutionTimeoutSeconds { get; set; }
         public int WebRequestTimeoutSeconds { get; set; }
+        public string DefaultTemplateName { get; set; }
 
         /// <summary>
         ///   One or more source locations set by configuration or by command line. Separated by semi-colon
