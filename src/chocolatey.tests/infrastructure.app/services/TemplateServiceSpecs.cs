@@ -436,7 +436,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                
+
                 fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\nested\\path");
                 fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns(
