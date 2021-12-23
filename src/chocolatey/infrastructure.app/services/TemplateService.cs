@@ -122,6 +122,14 @@ namespace chocolatey.infrastructure.app.services
                 if (!_fileSystem.directory_exists(templatePath)) throw new ApplicationException("Unable to find path to requested template '{0}'. Path should be '{1}'".format_with(configuration.NewCommand.TemplateName, templatePath));
 
                 this.Log().Info(configuration.QuietOutput ? logger : ChocolateyLoggers.Important, "Generating package from custom template at '{0}'.".format_with(templatePath));
+                
+                // Create directory structure from template so as to include empty directories
+                foreach (var directory in _fileSystem.get_directories(templatePath, "*.*", SearchOption.AllDirectories))
+                {
+                    var packageDirectoryLocation = directory.Replace(templatePath, packageLocation);
+                    this.Log().Debug("Creating directory {0}".format_with(packageDirectoryLocation));
+                    _fileSystem.create_directory_if_not_exists(packageDirectoryLocation);
+                }
                 foreach (var file in _fileSystem.get_files(templatePath, "*.*", SearchOption.AllDirectories))
                 {
                     var packageFileLocation = file.Replace(templatePath, packageLocation);
