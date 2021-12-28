@@ -26,6 +26,7 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.app.templates;
     using chocolatey.infrastructure.filesystem;
+    using chocolatey.infrastructure.services;
     using Moq;
     using NUnit.Framework;
     using Should;
@@ -36,12 +37,14 @@ namespace chocolatey.tests.infrastructure.app.services
         {
             protected TemplateService service;
             protected Mock<IFileSystem> fileSystem = new Mock<IFileSystem>();
+            protected Mock<IXmlService> xmlService = new Mock<IXmlService>();
 
             public override void Context()
             {
                 fileSystem.ResetCalls();
+                xmlService.ResetCalls();
 
-                service = new TemplateService(fileSystem.Object);
+                service = new TemplateService(fileSystem.Object, xmlService.Object);
             }
         }
 

@@ -23,6 +23,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Reflection;
     using System.Text;
     using configuration;
+    using infrastructure.services;
     using logging;
     using templates;
     using tokens;
@@ -35,6 +36,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly UTF8Encoding utf8WithoutBOM = new UTF8Encoding(false);
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _nugetLogger;
+        private readonly IXmlService _xmlService;
 
         private readonly IList<string> _templateBinaryExtensions = new List<string> {
             ".exe", ".msi", ".msu", ".msp", ".mst",
@@ -45,10 +47,12 @@ namespace chocolatey.infrastructure.app.services
 
         private readonly string _builtInTemplateOverrideName = "default";
         private readonly string _builtInTemplateName = "built-in";
+        private readonly string _templateParameterCacheFilename = ".parameters";
 
-        public TemplateService(IFileSystem fileSystem)
+        public TemplateService(IFileSystem fileSystem, IXmlService xmlService)
         {
             _fileSystem = fileSystem;
+            _xmlService = xmlService;
         }
 
         public void generate_noop(ChocolateyConfiguration configuration)
@@ -148,6 +152,7 @@ namespace chocolatey.infrastructure.app.services
                 configuration.NewCommand.TemplateName = string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) ? "default" : configuration.NewCommand.TemplateName;
 
                 var templatePath = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.NewCommand.TemplateName);
+                var templateParameterCachePath = _fileSystem.combine_paths(templatePath, _templateParameterCacheFilename);
                 if (!_fileSystem.directory_exists(templatePath)) throw new ApplicationException("Unable to find path to requested template '{0}'. Path should be '{1}'".format_with(configuration.NewCommand.TemplateName, templatePath));
 
                 this.Log().Info(configuration.QuietOutput ? logger : ChocolateyLoggers.Important, "Generating package from custom template at '{0}'.".format_with(templatePath));
@@ -173,6 +178,10 @@ namespace chocolatey.infrastructure.app.services
                     {
                         this.Log().Debug(" Treating template file ('{0}') as binary instead of replacing templated values.".format_with(_fileSystem.get_file_name(file)));
                         _fileSystem.copy_file(file, packageFileLocation, overwriteExisting:true);
+                    }
+                    else if (templateParameterCachePath.is_equal_to(file))
+                    {
+                        this.Log().Debug("{0} is the parameter cache file, ignoring".format_with(file));
                     }
                     else
                     {
@@ -280,6 +289,7 @@ namespace chocolatey.infrastructure.app.services
                     .combine_paths(ApplicationParameters.TemplatesLocation, configuration.TemplateCommand.Name), "*", SearchOption.AllDirectories)));
             var isOverridingBuiltIn = configuration.TemplateCommand.Name == _builtInTemplateOverrideName;
             var isDefault = string.IsNullOrWhiteSpace(configuration.DefaultTemplateName) ? isOverridingBuiltIn : (configuration.DefaultTemplateName == configuration.TemplateCommand.Name);
+            var templateParams = "  {0}".format_with(string.Join("{0}  ".format_with(Environment.NewLine), get_template_parameters(configuration, templateInstalledViaPackage)));
 
             if (configuration.RegularOutput)
             {
@@ -292,6 +302,8 @@ Default template: {2}
 {5}{6}
 List of files:
 {7}
+List of Parameters:
+{8}
 ".format_with(configuration.TemplateCommand.Name,
                         pkgVersion,
                         isDefault,
@@ -299,7 +311,8 @@ List of files:
                         pkgTitle,
                         string.IsNullOrEmpty(pkgSummary) ? "Template not installed as a package" : "Summary: {0}".format_with(pkgSummary),
                         string.IsNullOrEmpty(pkgDescription) ? string.Empty : "{0}Description:{0}  {1}".format_with(Environment.NewLine, pkgDescription),
-                        pkgFiles));
+                        pkgFiles,
+                        templateParams));
                 }
                 else
                 {
@@ -344,6 +357,52 @@ List of files:
                     this.Log().Info("built-in|0.0.0");
                 }
             }
+        }
+
+        protected IEnumerable<string> get_template_parameters(ChocolateyConfiguration configuration, bool templateInstalledViaPackage)
+        {
+            // If the template was installed via package, the cache file gets removed on upgrade, so the cache file would be up to date if it exists
+            if (templateInstalledViaPackage)
+            {
+                var templateDirectory = _fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.TemplateCommand.Name);
+                var cacheFilePath = _fileSystem.combine_paths(templateDirectory, _templateParameterCacheFilename);
+
+                if (!_fileSystem.file_exists(cacheFilePath))
+                {
+                    _xmlService.serialize(get_template_parameters_from_files(configuration).ToList(), cacheFilePath);
+                }
+
+                return _xmlService.deserialize<List<string>>(cacheFilePath);
+            }
+            // If the template is not installed via a package, always read the parameters directly as the template may have been updated manually
+
+            return get_template_parameters_from_files(configuration).ToList();
+        }
+
+        protected HashSet<string> get_template_parameters_from_files(ChocolateyConfiguration configuration)
+        {
+            var filesList = _fileSystem.get_files(_fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.TemplateCommand.Name), "*", SearchOption.AllDirectories);
+            var parametersList = new HashSet<string>();
+
+            foreach (var filePath in filesList)
+            {
+                if (_templateBinaryExtensions.Contains(_fileSystem.get_file_extension(filePath)))
+                {
+                    this.Log().Debug("{0} is a binary file, not reading parameters".format_with(filePath));
+                    continue;
+                }
+
+                if (_fileSystem.get_file_name(filePath) == _templateParameterCacheFilename)
+                {
+                    this.Log().Debug("{0} is the parameter cache file, not reading parameters".format_with(filePath));
+                    continue;
+                }
+
+                var fileContents = _fileSystem.read_file(filePath);
+                parametersList.UnionWith(TokenReplacer.get_tokens(fileContents, "[[", "]]"));
+            }
+
+            return parametersList;
         }
     }
 }
