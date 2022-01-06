@@ -210,5 +210,18 @@ namespace chocolatey
             return input;
         }
 
+
+        /// <summary>
+        /// Determines if a string matches a regular expression
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <param name="pattern">The regular expression</param>
+        /// <param name="options">The options for the regular expression. Defaults to ignore case</param>
+        /// <returns>If the regular expressions matches the input</returns>
+        public static bool match(this string input, string pattern, RegexOptions options = RegexOptions.IgnoreCase)
+        {
+            return Regex.IsMatch(input, pattern, options);
+        }
+
     }
 }
