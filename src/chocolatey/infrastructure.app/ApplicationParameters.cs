@@ -115,6 +115,7 @@ namespace chocolatey.infrastructure.app
 
             public static readonly string ChocolateyToolsLocation = "ChocolateyToolsLocation";
             public static readonly string ChocolateyPackageInstallLocation = "ChocolateyPackageInstallLocation";
+            public static readonly string ChocolateyInstalledSoftwareName = "ChocolateyInstalledSoftwareName";
             public static readonly string ChocolateyPackageInstallerType = "ChocolateyInstallerType";
             public static readonly string ChocolateyPackageExitCode = "ChocolateyExitCode";
             public static readonly string ChocolateyIgnoreChecksums = "ChocolateyIgnoreChecksums";

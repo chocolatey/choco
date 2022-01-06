@@ -121,6 +121,14 @@ only use the ones available with the package. Available in 0.9.10+.
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
+.PARAMETER SoftwareName
+Specifies the display name of the installed software as shown in 
+Programs & Features. Can be an exact string or contain wildcards ("*").
+Available in 0.12.0+
+
+Use this to filter any software installed during the package installation
+script to ensure the correct software install location is found.
+
 .EXAMPLE
 >
 $packageName= 'bob'
@@ -220,6 +228,7 @@ Start-ChocolateyProcessAsAdmin
     [parameter(Mandatory = $false)] $validExitCodes = @(0),
     [parameter(Mandatory = $false)]
     [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
+    [parameter(Mandatory=$false)][string] $softwareName = '',
     [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
   )
   [string]$silentArgs = $silentArgs -join ' '
@@ -370,6 +379,8 @@ Pro / Business supports a single, ubiquitous install directory option.
     }
     $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
   }
+
+  $env:ChocolateyInstalledSoftwareName = $softwareName
 
   Write-Host "$packageName has been installed."
 }

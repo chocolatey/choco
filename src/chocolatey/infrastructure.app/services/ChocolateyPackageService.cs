@@ -427,8 +427,30 @@ Did you know Pro / Business automatically syncs with Programs and
 
             if (pkgInfo.RegistrySnapshot != null && pkgInfo.RegistrySnapshot.RegistryKeys.Any(k => !string.IsNullOrWhiteSpace(k.InstallLocation)))
             {
-                var key = pkgInfo.RegistrySnapshot.RegistryKeys.FirstOrDefault(k => !string.IsNullOrWhiteSpace(k.InstallLocation));
-                if (key != null) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, key.InstallLocation, EnvironmentVariableTarget.Process);
+                string installedSoftwareRegexFilter;
+                if (string.IsNullOrWhiteSpace(ApplicationParameters.Environment.ChocolateyInstalledSoftwareName))
+                {
+                    installedSoftwareRegexFilter = ".*";
+                }
+                else
+                {
+                    installedSoftwareRegexFilter = "^" + ApplicationParameters.Environment.ChocolateyInstalledSoftwareName.regex_escape().Replace("\\*", ".*") + "$";
+                }
+
+                var filteredKey = pkgInfo.RegistrySnapshot.RegistryKeys.FirstOrDefault(k =>
+                    !string.IsNullOrWhiteSpace(k.InstallLocation) && !string.IsNullOrWhiteSpace(k.DisplayName) && k.DisplayName.match(installedSoftwareRegexFilter));
+
+                var unfilteredKey = pkgInfo.RegistrySnapshot.RegistryKeys.FirstOrDefault(k => !string.IsNullOrWhiteSpace(k.InstallLocation));
+
+                if (filteredKey != null)
+                {
+                    Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, filteredKey.InstallLocation, EnvironmentVariableTarget.Process);
+                }
+                else if (unfilteredKey != null)
+                {
+                    this.Log().Warn("Software display name {0} did not match filter {1}".format_with(unfilteredKey.DisplayName, ApplicationParameters.Environment.ChocolateyInstalledSoftwareName));
+                    this.Log().Warn("Ensure the software installed correct, and if it did, the softwareName filter is incorrect.");
+                }
             }
 
             update_package_information(pkgInfo);

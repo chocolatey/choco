@@ -48,6 +48,7 @@ namespace chocolatey.infrastructure.app.configuration
         public static void reset_environment_variables(ChocolateyConfiguration config)
         {
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, null);
+            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyInstalledSoftwareName, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageExitCode, null);
 

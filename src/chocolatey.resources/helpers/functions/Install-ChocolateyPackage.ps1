@@ -227,6 +227,14 @@ Available in 0.11.0+.
 Use this for starting an auxilary process such as AutoHotkey, so that any timeouts are not 
 affected by the time to download.
 
+.PARAMETER SoftwareName
+Specifies the display name of the installed software as shown in 
+Programs & Features. Can be an exact string or contain wildcards ("*").
+Available in 0.12.0+
+
+Use this to filter any software installed during the package installation
+script to ensure the correct software install location is found.
+
 .EXAMPLE
 >
 $packageName= 'bob'
@@ -365,6 +373,7 @@ param(
   [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
   [parameter(Mandatory=$false)][switch]$useOriginalLocation,
   [parameter(Mandatory=$false)][scriptblock] $beforeInstall,
+  [parameter(Mandatory=$false)][string] $softwareName = '',
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
   [string]$silentArgs = $silentArgs -join ' '
@@ -420,5 +429,6 @@ param(
                                    -SilentArgs $silentArgs `
                                    -File $filePath `
                                    -ValidExitCodes $validExitCodes `
-                                   -UseOnlyPackageSilentArguments:$useOnlyPackageSilentArguments
+                                   -UseOnlyPackageSilentArguments:$useOnlyPackageSilentArguments `
+                                   -SoftwareName $softwareName
 }
