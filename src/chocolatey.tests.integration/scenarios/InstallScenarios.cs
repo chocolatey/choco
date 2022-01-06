@@ -552,8 +552,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_force_installing_an_already_installed_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -563,7 +561,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Scenario.install_package(Configuration, "installpackage", "1.0.0");
-                var fileToModify = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileToModify = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
                 File.WriteAllText(fileToModify, modifiedText);
 
                 Configuration.Force = true;
@@ -600,7 +598,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_remove_and_re_add_the_package_files_in_the_lib_directory()
             {
-                var modifiedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var modifiedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
                 File.ReadAllText(modifiedFile).ShouldNotEqual(modifiedText);
             }
 

@@ -683,8 +683,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -692,7 +690,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
                 File.WriteAllText(fileChanged, "hellow");
             }
 
@@ -705,7 +703,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_keep_the_changed_file()
             {
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
                 File.Exists(fileChanged).ShouldBeTrue();
             }
@@ -787,8 +785,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_force_uninstalling_a_package_with_added_and_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -796,7 +792,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
                 File.WriteAllText(fileChanged, "hellow");
                 var fileAdded = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "dude.txt");
                 File.WriteAllText(fileAdded, "hellow");
@@ -828,7 +824,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_not_keep_the_changed_file()
             {
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
                 File.Exists(fileChanged).ShouldBeFalse();
             }

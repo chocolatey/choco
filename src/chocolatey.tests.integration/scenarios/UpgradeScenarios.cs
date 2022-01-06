@@ -1630,8 +1630,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1639,7 +1637,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
                 File.WriteAllText(fileChanged, "hellow");
             }
 
@@ -1652,7 +1650,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_update_the_changed_file()
             {
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
                 File.ReadAllText(fileChanged).ShouldNotEqual("hellow");
             }
