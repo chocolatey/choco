@@ -223,5 +223,14 @@ namespace chocolatey
             return Regex.IsMatch(input, pattern, options);
         }
 
+        /// <summary>
+        /// Escapes a string for use in a regular expression
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The string with all regular expression special characters escaped</returns>
+        public static string regex_escape(this string input)
+        {
+            return Regex.Escape(input);
+        }
     }
 }
