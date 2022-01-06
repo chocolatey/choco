@@ -56,8 +56,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_noop_installing_a_package : ScenariosBase
         {
             public override void Context()
@@ -92,6 +90,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_contain_a_message_that_it_would_have_run_a_powershell_script()
             {
                 MockLogger.contains_message("chocolateyinstall.ps1", LogLevel.Info).ShouldBeTrue();
@@ -153,8 +153,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_installing_a_package_happy_path : ScenariosBase
         {
             private PackageResult packageResult;
@@ -188,6 +186,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_create_a_shim_for_console_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
@@ -196,6 +196,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_create_a_shim_for_graphical_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
@@ -228,6 +230,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_a_console_shim_that_is_set_for_non_gui_access()
             {
                 var messages = new List<string>();
@@ -253,6 +257,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_a_graphical_shim_that_is_set_for_gui_access()
             {
                 var messages = new List<string>();
@@ -320,6 +326,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyInstall_script()
             {
                 MockLogger.contains_message("installpackage v1.0.0 has been installed", LogLevel.Info).ShouldBeTrue();
@@ -3124,8 +3132,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_installing_a_package_from_a_nupkg_file : ScenariosBase
         {
             private PackageResult packageResult;
@@ -3165,6 +3171,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_create_a_shim_for_console_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
@@ -3173,6 +3181,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_create_a_shim_for_graphical_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
@@ -3205,6 +3215,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_a_console_shim_that_is_set_for_non_gui_access()
             {
                 var messages = new List<string>();
@@ -3230,6 +3242,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_a_graphical_shim_that_is_set_for_gui_access()
             {
                 var messages = new List<string>();
