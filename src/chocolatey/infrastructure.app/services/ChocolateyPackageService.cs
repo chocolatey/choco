@@ -814,9 +814,13 @@ Would have determined packages that are out of date based on what is
 
         private void before_package_modify(PackageResult packageResult, ChocolateyConfiguration config)
         {
-            if (!config.SkipPackageInstallProvider)
+            if (!config.SkipPackageInstallProvider && config.Information.PlatformType == PlatformType.Windows)
             {
                 _powershellService.before_modify(config, packageResult);
+            }
+            else
+            {
+                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping beforemodify Powershell script due to non-Windows.");
             }
         }
 
