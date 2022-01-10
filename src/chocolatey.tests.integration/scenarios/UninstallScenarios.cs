@@ -60,8 +60,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_noop_uninstalling_a_package : ScenariosBase
         {
             public override void Context()
@@ -96,12 +94,16 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_contain_a_message_that_it_would_have_run_a_powershell_script()
             {
                 MockLogger.contains_message("chocolateyuninstall.ps1").ShouldBeTrue();
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_contain_a_message_that_it_would_have_run_powershell_modification_script()
             {
                 MockLogger.contains_message("chocolateyBeforeModify.ps1").ShouldBeTrue();
@@ -137,8 +139,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_happy_path : ScenariosBase
         {
             private PackageResult packageResult;
@@ -166,6 +166,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_console_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
@@ -174,6 +176,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_graphical_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
@@ -226,12 +230,16 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyBeforeModify_script()
             {
                 MockLogger.contains_message("installpackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyUninstall_script()
             {
                 MockLogger.contains_message("installpackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
@@ -573,8 +581,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_with_added_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -620,6 +626,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_console_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
@@ -628,6 +636,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_graphical_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
@@ -673,8 +683,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -682,7 +690,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
                 File.WriteAllText(fileChanged, "hellow");
             }
 
@@ -695,7 +703,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_keep_the_changed_file()
             {
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
                 File.Exists(fileChanged).ShouldBeTrue();
             }
@@ -720,6 +728,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_console_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
@@ -728,6 +738,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_graphical_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
@@ -773,8 +785,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_force_uninstalling_a_package_with_added_and_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -782,7 +792,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
                 File.WriteAllText(fileChanged, "hellow");
                 var fileAdded = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "dude.txt");
                 File.WriteAllText(fileAdded, "hellow");
@@ -814,7 +824,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_not_keep_the_changed_file()
             {
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
                 File.Exists(fileChanged).ShouldBeFalse();
             }
@@ -828,6 +838,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_console_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
@@ -836,6 +848,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_graphical_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
