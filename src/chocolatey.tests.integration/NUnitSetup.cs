@@ -50,7 +50,7 @@ namespace chocolatey.tests.integration
             // deep copy so we don't have the same configuration and 
             // don't have to worry about issues using it
             var config = Container.GetInstance<ChocolateyConfiguration>().deep_copy();
-            config.Information.PlatformType = PlatformType.Windows;
+            config.Information.PlatformType = Platform.get_platform();
             config.Information.IsInteractive = false;
             config.PromptForConfirmation = false;
             config.Force = true;
