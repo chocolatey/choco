@@ -85,6 +85,8 @@ Export all currently installed packages to a file.
 This is especially helpful when re-building a machine that was created
 using Chocolatey.  Export all packages to a file, and then re-install
 those packages onto new machine using `choco install packages.config`.
+
+NOTE: Available with 0.11.0+.
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"

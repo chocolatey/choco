@@ -45,7 +45,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_noop_is_called : TemplateServiceSpecsBase
+        public class when_generate_noop_is_called : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -61,7 +61,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.noop(config);
+                because = () => service.generate_noop(config);
             }
 
             public override void BeforeEachSpec()
@@ -822,6 +822,43 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 config.NewCommand.TemplateName.ShouldEqual("zip");
+            }
+        }
+
+        public class when_list_noop_is_called : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+
+            public override void Because()
+            {
+                because = () => service.list_noop(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.reset();
+            }
+
+            [Fact]
+            public void should_log_template_location_if_no_template_name()
+            {
+                because();
+
+                var infos = MockLogger.MessagesFor(LogLevel.Info);
+                infos.Count.ShouldEqual(1);
+                infos[0].ShouldEqual("Would have listed templates in {0}".format_with(ApplicationParameters.TemplatesLocation));
+            }
+
+            [Fact]
+            public void should_log_template_name_if_template_name()
+            {
+                config.TemplateCommand.Name = "msi";
+                because();
+
+                var infos = MockLogger.MessagesFor(LogLevel.Info);
+                infos.Count.ShouldEqual(1);
+                infos[0].ShouldEqual("Would have listed information about {0}".format_with(config.TemplateCommand.Name));
             }
         }
     }
