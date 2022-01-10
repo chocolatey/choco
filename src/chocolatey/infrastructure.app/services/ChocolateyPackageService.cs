@@ -396,7 +396,7 @@ Did you know Pro / Business automatically syncs with Programs and
             }
             else
             {
-                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping Powershell and shimgen portions of the install due to non-Windows.");
+                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping PowerShell and shimgen portions of the install due to non-Windows.");
             }
 
             if (packageResult.Success)
@@ -820,7 +820,7 @@ Would have determined packages that are out of date based on what is
             }
             else
             {
-                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping beforemodify Powershell script due to non-Windows.");
+                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping beforemodify PowerShell script due to non-Windows.");
             }
         }
 
@@ -1006,7 +1006,7 @@ The recent package changes indicate a reboot is necessary.
             }
             else
             {
-                this.Log().Info(ChocolateyLoggers.Important, () => " Skipping Powershell, shimgen, and autoUninstaller portions of the uninstall due to non-Windows.");
+                this.Log().Info(ChocolateyLoggers.Important, () => " Skipping PowerShell, shimgen, and autoUninstaller portions of the uninstall due to non-Windows.");
             }
 
             if (packageResult.Success)
