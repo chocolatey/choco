@@ -396,7 +396,7 @@ Did you know Pro / Business automatically syncs with Programs and
             }
             else
             {
-                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping Powershell and shimgen portions of the install due to non-Windows.");
+                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping PowerShell and shimgen portions of the install due to non-Windows.");
             }
 
             if (packageResult.Success)
@@ -814,9 +814,13 @@ Would have determined packages that are out of date based on what is
 
         private void before_package_modify(PackageResult packageResult, ChocolateyConfiguration config)
         {
-            if (!config.SkipPackageInstallProvider)
+            if (!config.SkipPackageInstallProvider && config.Information.PlatformType == PlatformType.Windows)
             {
                 _powershellService.before_modify(config, packageResult);
+            }
+            else
+            {
+                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping beforemodify PowerShell script due to non-Windows.");
             }
         }
 
@@ -982,20 +986,28 @@ The recent package changes indicate a reboot is necessary.
                 packageResult.InstallLocation += ".{0}".format_with(packageResult.Package.Version.to_string());
             }
 
-            _shimgenService.uninstall(config, packageResult);
-
-            if (!config.SkipPackageInstallProvider)
+            //These items only apply to windows systems.
+            if (config.Information.PlatformType == PlatformType.Windows)
             {
-                _powershellService.uninstall(config, packageResult);
-            }
+                _shimgenService.uninstall(config, packageResult);
 
-            if (packageResult.Success)
+                if (!config.SkipPackageInstallProvider)
+                {
+                    _powershellService.uninstall(config, packageResult);
+                }
+
+                if (packageResult.Success)
+                {
+                    _autoUninstallerService.run(packageResult, config);
+                }
+
+                // we don't care about the exit code
+                CommandExecutor.execute_static(_shutdownExe, "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
+            }
+            else
             {
-                _autoUninstallerService.run(packageResult, config);
+                this.Log().Info(ChocolateyLoggers.Important, () => " Skipping PowerShell, shimgen, and autoUninstaller portions of the uninstall due to non-Windows.");
             }
-
-            // we don't care about the exit code
-            if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute_static(_shutdownExe, "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
 
             if (packageResult.Success)
             {

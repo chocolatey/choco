@@ -490,6 +490,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;

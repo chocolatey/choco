@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.app.commands
                      "RemoveDependencies - Uninstall dependencies when uninstalling package(s). Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
                 .Add("n|skippowershell|skip-powershell|skipscripts|skip-scripts|skip-automation-scripts",
-                     "Skip Powershell - Do not run chocolateyUninstall.ps1. Defaults to false.",
+                     "Skip PowerShell - Do not run chocolateyUninstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 .Add("ignorepackagecodes|ignorepackageexitcodes|ignore-package-codes|ignore-package-exit-codes",
                      "IgnorePackageExitCodes - Exit with a 0 for success and 1 for non-success, no matter what package scripts provide for exit codes. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),

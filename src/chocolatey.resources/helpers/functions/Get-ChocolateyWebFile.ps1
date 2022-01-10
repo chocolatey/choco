@@ -306,7 +306,7 @@ param(
       $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
     } catch {
       if ($PSVersionTable.PSVersion -lt (New-Object 'Version' 3,0)) {
-        Write-Debug "Converting Security Protocol to SSL3 only for Powershell v2"
+        Write-Debug "Converting Security Protocol to SSL3 only for PowerShell v2"
         # this should last for the entire duration
         $originalProtocol = [System.Net.ServicePointManager]::SecurityProtocol
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Ssl3
