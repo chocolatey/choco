@@ -386,7 +386,6 @@ Did you know Pro / Business automatically syncs with Programs and
                 _filesService.ensure_compatible_file_attributes(packageResult, config);
                 _configTransformService.run(packageResult, config);
 
-                //review: is this a Windows only kind of thing?
                 pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
 
                 var is32Bit = !config.Information.Is64BitProcess || config.ForceX86;
@@ -397,6 +396,11 @@ Did you know Pro / Business automatically syncs with Programs and
             else
             {
                 if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping PowerShell and shimgen portions of the install due to non-Windows.");
+                if (packageResult.Success)
+                {
+                    _configTransformService.run(packageResult, config);
+                    pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
+                }
             }
 
             if (packageResult.Success)

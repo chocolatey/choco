@@ -3298,8 +3298,6 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyInstallCommand))]
-        [WindowsOnly]
-        [Platform(Exclude = "Mono")]
         public class when_installing_a_package_with_config_transforms : ScenariosBase
         {
             private PackageResult packageResult;
