@@ -206,7 +206,6 @@ namespace chocolatey.infrastructure.app
         public static readonly string ConfigFileTransformExtension = ".install.xdt";
         public static readonly string[] ShimDirectorFileExtensions = new string[] { ".gui", ".ignore" };
 
-        public static readonly string HashProviderFileTooBig = "UnableToDetectChanges_FileTooBig";
         public static readonly string HashProviderFileLocked = "UnableToDetectChanges_FileLocked";
 
         /// <summary>
