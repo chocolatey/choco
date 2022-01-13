@@ -396,6 +396,11 @@ namespace chocolatey.infrastructure.app.services
                 else
                 {
                     this.Log().Warn(NoChangeMessage);
+
+                    if (configuration.Features.UseEnhancedExitCodes && Environment.ExitCode == 0)
+                    {
+                        Environment.ExitCode = 2;
+                    }
                 }
             }
         }
