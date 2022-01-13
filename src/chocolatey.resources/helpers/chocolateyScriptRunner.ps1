@@ -1,4 +1,4 @@
-﻿param(
+param(
   [alias("ia","installArgs")][string] $installArguments = '',
   [alias("o","override","overrideArguments","notSilent")]
   [switch] $overrideArgs = $false,
@@ -59,10 +59,6 @@ if (-not $scriptSuccess) {
 } 
 
 $exitCode = 0
-if ($env:ChocolateyCheckLastExitCode -ne $null -and $env:ChocolateyCheckLastExitCode -eq 'true' -and $lastExecutableExitCode -ne $null -and $lastExecutableExitCode -ne '') {
-  $exitCode = $lastExecutableExitCode
-}
-
 if ($exitCode -eq 0 -and -not $scriptSuccess) {
   $exitCode = 1
 }

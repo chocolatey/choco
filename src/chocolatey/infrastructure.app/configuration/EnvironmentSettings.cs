@@ -91,7 +91,7 @@ namespace chocolatey.infrastructure.app.configuration
             if (!config.Features.ChecksumFiles) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyIgnoreChecksums, "true");
             if (config.Features.AllowEmptyChecksums) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksums, "true");
             if (config.Features.AllowEmptyChecksumsSecure) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, "true");
-            if (config.Features.ScriptsCheckLastExitCode) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyCheckLastExitCode, "true");
+
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
 
             if (config.CommandExecutionTimeoutSeconds != 0)

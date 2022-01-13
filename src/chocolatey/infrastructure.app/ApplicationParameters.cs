@@ -120,7 +120,6 @@ namespace chocolatey.infrastructure.app
             public static readonly string ChocolateyIgnoreChecksums = "ChocolateyIgnoreChecksums";
             public static readonly string ChocolateyAllowEmptyChecksums = "ChocolateyAllowEmptyChecksums";
             public static readonly string ChocolateyAllowEmptyChecksumsSecure = "ChocolateyAllowEmptyChecksumsSecure";
-            public static readonly string ChocolateyCheckLastExitCode = "ChocolateyCheckLastExitCode";
             public static readonly string ChocolateyPowerShellHost = "ChocolateyPowerShellHost";
             public static readonly string ChocolateyForce = "ChocolateyForce";
             public static readonly string ChocolateyExitOnRebootDetected = "ChocolateyExitOnRebootDetected";
@@ -194,7 +193,6 @@ namespace chocolatey.infrastructure.app
             public static readonly string UsePackageExitCodes = "usePackageExitCodes";
             public static readonly string UseEnhancedExitCodes = "useEnhancedExitCodes";
             public static readonly string UseFipsCompliantChecksums = "useFipsCompliantChecksums";
-            public static readonly string ScriptsCheckLastExitCode = "scriptsCheckLastExitCode";
             public static readonly string ShowNonElevatedWarnings = "showNonElevatedWarnings";
             public static readonly string ShowDownloadProgress = "showDownloadProgress";
             public static readonly string StopOnFirstPackageFailure = "stopOnFirstPackageFailure";
