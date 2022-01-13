@@ -363,7 +363,15 @@ namespace chocolatey.infrastructure.app.services
                     _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                     this.Log().Info(() => "Updated API key for {0}".FormatWith(configuration.Sources));
                 }
-                else this.Log().Warn(NoChangeMessage);
+                else
+                {
+                    this.Log().Warn(NoChangeMessage);
+
+                    if (configuration.Features.UseEnhancedExitCodes && Environment.ExitCode == 0)
+                    {
+                        Environment.ExitCode = 2;
+                    }
+                }
             }
         }
 
