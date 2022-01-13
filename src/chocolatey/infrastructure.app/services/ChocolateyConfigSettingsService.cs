@@ -160,6 +160,11 @@ namespace chocolatey.infrastructure.app.services
                     {
                         this.Log().Warn(NoChangeMessage);
                     }
+                    
+                    if (configuration.Features.UseEnhancedExitCodes && Environment.ExitCode == 0)
+                    {
+                        Environment.ExitCode = 2;
+                    }
                 }
                 else
                 {
@@ -201,6 +206,11 @@ namespace chocolatey.infrastructure.app.services
                 {
                     this.Log().Warn(NoChangeMessage);
                 }
+
+                if (configuration.Features.UseEnhancedExitCodes && Environment.ExitCode == 0)
+                {
+                    Environment.ExitCode = 2;
+                }
             }
         }
 
@@ -222,6 +232,11 @@ namespace chocolatey.infrastructure.app.services
                 {
                     this.Log().Warn(NoChangeMessage);
                 }
+
+                if (configuration.Features.UseEnhancedExitCodes && Environment.ExitCode == 0)
+                {
+                    Environment.ExitCode = 2;
+                }
             }
         }
 
@@ -242,6 +257,11 @@ namespace chocolatey.infrastructure.app.services
                 if (!configuration.QuietOutput)
                 {
                     this.Log().Warn(NoChangeMessage);
+                }
+
+                if (configuration.Features.UseEnhancedExitCodes && Environment.ExitCode == 0)
+                {
+                    Environment.ExitCode = 2;
                 }
             }
         }
