@@ -455,6 +455,11 @@ namespace chocolatey.infrastructure.app.services
                 if (configuration.ConfigCommand.ConfigValue.IsEqualTo(currentValue.ToStringSafe()))
                 {
                     this.Log().Warn(NoChangeMessage);
+                    
+                    if (configuration.Features.UseEnhancedExitCodes && Environment.ExitCode == 0)
+                    {
+                        Environment.ExitCode = 2;
+                    }
                 }
                 else
                 {
@@ -472,6 +477,11 @@ namespace chocolatey.infrastructure.app.services
             if (config == null || string.IsNullOrEmpty(config.Value))
             {
                 this.Log().Warn(NoChangeMessage);
+
+                if (configuration.Features.UseEnhancedExitCodes && Environment.ExitCode == 0)
+                {
+                    Environment.ExitCode = 2;
+                }
             }
             else
             {
