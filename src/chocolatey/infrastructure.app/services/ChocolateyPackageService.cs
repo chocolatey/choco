@@ -731,8 +731,8 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             }
             finally
             {
-                var installFailures = ReportActionSummary(packageInstalls, "installed");
-                if (installFailures != 0 && Environment.ExitCode == 0)
+                var actionSummaryResults = ReportActionSummary(packageInstalls, "installed");
+                if (actionSummaryResults.failures != 0 && Environment.ExitCode == 0)
                 {
                     Environment.ExitCode = 1;
                 }
@@ -931,7 +931,7 @@ Would have determined packages that are out of date based on what is
 
             if (config.RegularOutput)
             {
-                var noopFailures = ReportActionSummary(noopUpgrades, "can upgrade");
+                var actionSummaryResult = ReportActionSummary(noopUpgrades, "can upgrade");
             }
 
             RandomlyNotifyAboutLicensedFeatures(config);
@@ -991,10 +991,15 @@ Would have determined packages that are out of date based on what is
             }
             finally
             {
-                var upgradeFailures = ReportActionSummary(packageUpgrades, "upgraded");
-                if (upgradeFailures != 0 && Environment.ExitCode == 0)
+                var actionSummaryResult = ReportActionSummary(packageUpgrades, "upgraded");
+                if (actionSummaryResult.failures != 0 && Environment.ExitCode == 0)
                 {
                     Environment.ExitCode = 1;
+                }
+
+                if ((actionSummaryResult.successes + actionSummaryResult.failures == 0) && Environment.ExitCode == 0)
+                {
+                    Environment.ExitCode = 2;
                 }
 
                 RandomlyNotifyAboutLicensedFeatures(config);
@@ -1085,13 +1090,13 @@ Would have determined packages that are out of date based on what is
             }
             finally
             {
-                var uninstallFailures = ReportActionSummary(packageUninstalls, "uninstalled");
-                if (uninstallFailures != 0 && Environment.ExitCode == 0)
+                var actionSummaryResults = ReportActionSummary(packageUninstalls, "uninstalled");
+                if (actionSummaryResults.failures != 0 && Environment.ExitCode == 0)
                 {
                     Environment.ExitCode = 1;
                 }
 
-                if (uninstallFailures != 0)
+                if (actionSummaryResults.failures != 0)
                 {
                     this.Log().Warn(@"
 If a package uninstall is failing and/or you've already uninstalled the
@@ -1239,7 +1244,7 @@ If a package is failing because it is a dependency of another package
             }
         }
 
-        private int ReportActionSummary(ConcurrentDictionary<string, PackageResult> packageResults, string actionName)
+        private (int successes, int failures, int warnings, int rebootPackages) ReportActionSummary(ConcurrentDictionary<string, PackageResult> packageResults, string actionName)
         {
             var successes = packageResults.OrEmpty().Where(p => p.Value.Success && !p.Value.Inconclusive).OrderBy(p => p.Value.Name);
             var failures = packageResults.Count(p => !p.Value.Success);
@@ -1307,7 +1312,7 @@ The recent package changes indicate a reboot is necessary.
                 }
             }
 
-            return failures;
+            return (successes.Count(), failures, warnings, rebootPackages);
         }
 
         public virtual void HandlePackageUninstall(PackageResult packageResult, ChocolateyConfiguration config)

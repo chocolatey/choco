@@ -336,6 +336,7 @@ Exit codes that normally result from running this command.
 Normal:
  - 0: operation was successful, no issues detected
  - -1 or 1: an error has occurred
+ - 2: nothing to do, no packages outdated
 
 Package Exit Codes:
  - 1641: success, reboot initiated
