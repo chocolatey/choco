@@ -90,6 +90,8 @@ namespace chocolatey.infrastructure.services
                                            // If there's no errors and it's valid, go ahead and replace the bad file with the backup.
                                            if (validConfig != null)
                                            {
+                                               // Close fileReader so that we can copy the file without it being locked.
+                                               fileReader.Close();
                                                _fileSystem.copy_file(xmlFilePath + ".backup", xmlFilePath, overwriteExisting: true);
                                            }
 
