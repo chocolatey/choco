@@ -323,6 +323,7 @@ function Move-GeneratedFiles {
   Move-Item -Path "$docsFolder\choco\commands\new.md" -Destination "$docsFolder\create\commands\new.md"
   Move-Item -Path "$docsFolder\choco\commands\pack.md" -Destination "$docsFolder\create\commands\pack.md"
   Move-Item -Path "$docsFolder\choco\commands\push.md" -Destination "$docsFolder\create\commands\push.md"
+  Move-Item -Path "$docsFolder\choco\commands\template.md" -Destination "$docsFolder\create\commands\template.md"
 }
 
 function Generate-CommandReference($commandName, $order) {
@@ -564,6 +565,7 @@ The following are experimental or use not recommended:
   Generate-CommandReference 'Pack' '20'
   Generate-CommandReference 'ApiKey' '30'
   Generate-CommandReference 'Push' '40'
+  Generate-CommandReference 'Template' '50'
 
   Generate-TopLevelCommandReference
   Move-GeneratedFiles
