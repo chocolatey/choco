@@ -92,6 +92,10 @@ namespace chocolatey.infrastructure.app.services
         private IEnumerable<string> get_hook_scripts(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command, bool isPreHook)
         {
             List<string> hookScriptPaths = new List<string>();
+
+            // If skipping hook scripts, return an empty list
+            if (configuration.SkipHookScripts) return hookScriptPaths;
+
             string filenameBase;
 
             if (isPreHook)

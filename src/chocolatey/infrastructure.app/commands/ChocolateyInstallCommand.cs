@@ -183,6 +183,10 @@ namespace chocolatey.infrastructure.app.commands
                     "Pin Package - Add a pin to the package after install. Available in 1.2.0+",
                     option => configuration.PinPackage = option != null
                     )
+                .Add("skiphooks|skip-hooks",
+                    "Skip hooks - Do not run hook scripts. Available in 1.2.0+",
+                    option => configuration.SkipHookScripts = option != null
+                    )
                 ;
 
             //todo: #770 package name can be a url / installertype

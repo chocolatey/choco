@@ -133,6 +133,10 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.ExitOnRebootDetected = false;
                          }
                      })
+                .Add("skiphooks|skip-hooks",
+                    "Skip hooks - Do not run hook scripts. Available in 1.2.0+",
+                    option => configuration.SkipHookScripts = option != null
+                    )
                 ;
         }
 
