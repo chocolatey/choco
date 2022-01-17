@@ -233,7 +233,7 @@ choco uninstall: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/
     choco uninstall ruby --version 1.8.7.37402
     choco uninstall nodejs.install --all-versions
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");

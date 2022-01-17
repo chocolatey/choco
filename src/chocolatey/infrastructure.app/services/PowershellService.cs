@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -288,8 +288,8 @@ namespace chocolatey.infrastructure.app.services
                     {
                         this.Log().Warn(
                             () =>
-                            @"Only an exit code of non-zero will fail the package by default. Set 
- `--failonstderr` if you want error messages to also fail a script. See 
+                            @"Only an exit code of non-zero will fail the package by default. Set
+ `--failonstderr` if you want error messages to also fail a script. See
  `choco -h` for details.");
                     }
 
@@ -399,8 +399,8 @@ namespace chocolatey.infrastructure.app.services
             Environment.SetEnvironmentVariable("chocolateyForceX86", null);
             Environment.SetEnvironmentVariable("DownloadCacheAvailable", null);
 
-            // we only want to pass the following args to packages that would apply. 
-            // like choco install git --params '' should pass those params to git.install, 
+            // we only want to pass the following args to packages that would apply.
+            // like choco install git --params '' should pass those params to git.install,
             // but not another package unless the switch apply-install-arguments-to-dependencies is used
             if (!PackageUtility.package_is_a_dependency(configuration, package.Id) || configuration.ApplyInstallArgumentsToDependencies)
             {
@@ -415,7 +415,7 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
 
-            // we only want to pass package parameters to packages that would apply. 
+            // we only want to pass package parameters to packages that would apply.
             // but not another package unless the switch apply-package-parameters-to-dependencies is used
             if (!PackageUtility.package_is_a_dependency(configuration, package.Id) || configuration.ApplyPackageParametersToDependencies)
             {
@@ -520,7 +520,7 @@ namespace chocolatey.infrastructure.app.services
                 if (requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase)) return null;
 
                 this.Log().Debug(ChocolateyLoggers.Verbose, "Attempting to load assembly {0} failed:{1} {2}".format_with(requestedAssembly.Name, Environment.NewLine, ex.Message.escape_curly_braces()));
-                
+
                 return null;
             }
         }
@@ -603,7 +603,7 @@ if ((Test-Path(""{0}"")) -and ($profile -eq $null -or $profile -eq '')) {{
 
                     pipeline.Commands.Add(new Command(recreateProfileScript, isScript: true, useLocalScope: false));
 
-                    // The PowerShell Output Redirection bug affects System.Management.Automation 
+                    // The PowerShell Output Redirection bug affects System.Management.Automation
                     // it appears with v3 more than others. It is already known to affect v2
                     // this implements the redirection fix from the post below, fixed up with some comments
                     // http://www.leeholmes.com/blog/2008/07/30/workaround-the-os-handles-position-is-not-what-filestream-expected/

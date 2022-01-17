@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -144,7 +144,7 @@ NOTE: Chocolatey for Business can create complete packages by just
  pointing the new command to native installers!
 
 NOTE: Chocolatey for Business can also download and internalize remote
- resources from existing packages so that existing packages can be used 
+ resources from existing packages so that existing packages can be used
  without being tied to the internet.
  This is called automatic recompile.
 ");
@@ -156,7 +156,7 @@ NOTE: Chocolatey for Business can also download and internalize remote
     choco new bob silentargs=""'/S'"" url=""'https://somewhere/out/there.msi'""
     choco new bob --outputdirectory Packages
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
@@ -169,8 +169,8 @@ Normal:
  - 0: operation was successful, no issues detected
  - -1 or 1: an error has occurred
 
-If you find other exit codes that we have not yet documented, please 
- file a ticket so we can document it at 
+If you find other exit codes that we have not yet documented, please
+ file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
 ");

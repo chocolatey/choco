@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.app.validations
                     Message = @"When attempting to halt execution of a Chocolatey command based on a
    request for a system reboot, it is necessary to have the
    usePackageExitCodes feature enabled.  Use the following command:
-     choco feature enable -name={0} 
+     choco feature enable -name={0}
    to enable this feature (exit code 1).
 ".format_with(ApplicationParameters.Features.UsePackageExitCodes),
                     Status = ValidationStatus.Error,

@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -117,7 +117,7 @@ namespace chocolatey.infrastructure.app.services
             if (!package_install_directory_is_correct(directory)) return packageFiles;
 
             this.Log().Debug(() => "Capturing package files in '{0}'".format_with(directory));
-            //gather all files in the folder 
+            //gather all files in the folder
             var files = _fileSystem.get_files(directory, pattern: "*.*", option: SearchOption.AllDirectories);
             foreach (string file in files.or_empty_list_if_null().Where(f => !f.EndsWith(ApplicationParameters.PackagePendingFileName)))
             {
@@ -131,7 +131,7 @@ namespace chocolatey.infrastructure.app.services
         {
             var hash = _hashProvider.hash_file(file);
             this.Log().Debug(ChocolateyLoggers.Verbose, () => " Found '{0}'{1}  with checksum '{2}'".format_with(file, Environment.NewLine, hash));
-            
+
             return new PackageFile { Path = file, Checksum = hash };
         }
     }

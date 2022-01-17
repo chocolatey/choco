@@ -433,7 +433,7 @@ namespace chocolatey
         public ChocolateyConfiguration GetConfiguration()
         {
             ensure_environment();
-            
+
             // ensure_original_configuration() already calls create_configuration()
             // so no need to repeat, just grab the result
             var configuration = ensure_original_configuration(

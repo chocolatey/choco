@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ namespace chocolatey.infrastructure.app.services
         public static readonly Regex AlreadyInstalledRegex = new Regex(@"No products to be installed \(either not available or already installed\)", RegexOptions.Compiled);
         //public static readonly Regex NotInstalled = new Regex(@"not installed", RegexOptions.Compiled);
         public static readonly Regex PackageNameRegex = new Regex(@"'(?<{0}>[^']*)'".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
-      
+
         private readonly IDictionary<string, ExternalCommandArgument> _listArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
         private readonly IDictionary<string, ExternalCommandArgument> _installArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -228,7 +228,7 @@ namespace chocolatey.infrastructure.app.services
                                 this.Log().Info(ChocolateyLoggers.Important, "{0}".format_with(packageName));
                                 return;
                             }
-                           
+
                             if (InstalledRegex.IsMatch(logMessage))
                             {
                                 this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));

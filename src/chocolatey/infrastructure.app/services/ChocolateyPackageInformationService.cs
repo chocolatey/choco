@@ -76,12 +76,12 @@ namespace chocolatey.infrastructure.app.services
             var deserializationErrorMessage = @"
 A corrupt .registry file exists at {0}.
  Open this file in a text editor, and remove/escape any characters that
- are regarded as illegal within XML strings not surrounded by CData. 
+ are regarded as illegal within XML strings not surrounded by CData.
  These are typically the characters &, `<`, and `>`. Again, this
  is an XML document, so you will see many < and > characters, so just
- focus exclusively in the string values not surrounded by CData. Once 
+ focus exclusively in the string values not surrounded by CData. Once
  these have been corrected, rename the .registry.bad file to .registry.
- Once saved, try running the same Chocolatey command that was just 
+ Once saved, try running the same Chocolatey command that was just
  executed, so verify problem is fixed.
  NOTE: It will not be possible to rename the file in Windows Explorer.
  Instead, you can use the following PowerShell command:
@@ -102,9 +102,9 @@ A corrupt .registry file exists at {0}.
             catch (Exception e)
             {
                 if (_config.RegularOutput) this.Log().Warn(@"A .registry file at '{0}'
- has errored attempting to read it. This file will be renamed to 
+ has errored attempting to read it. This file will be renamed to
  '{1}' The error:
- {2} 
+ {2}
  ".format_with(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE), _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE), e.ToString()));
 
                 FaultTolerance.try_catch_with_logging_exception(
