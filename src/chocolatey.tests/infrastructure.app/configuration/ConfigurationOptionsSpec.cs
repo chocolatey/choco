@@ -67,6 +67,7 @@ namespace chocolatey.tests.infrastructure.app.configuration
                 validateConfiguration = () => { };
                 helpMessage = () => { };
                 helpMessageContents.Clear();
+                ConfigurationOptions.reset_options();
             }
         }
 
