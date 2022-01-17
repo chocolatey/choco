@@ -647,6 +647,7 @@ Would have determined packages that are out of date based on what is
             config.RegularOutput = false;
             var outdatedPackages = _nugetService.get_outdated(config);
             config.RegularOutput = output;
+            var outdatedPackageCount = outdatedPackages.Count(p => p.Value.Success && !p.Value.Inconclusive);
 
             if (config.RegularOutput)
             {
@@ -654,7 +655,7 @@ Would have determined packages that are out of date based on what is
                 this.Log().Warn(() => @"{0}{1} has determined {2} package(s) are outdated. {3}".format_with(
                     Environment.NewLine,
                     ApplicationParameters.Name,
-                    outdatedPackages.Count(p => p.Value.Success && !p.Value.Inconclusive),
+                    outdatedPackageCount,
                     upgradeWarnings == 0 ? string.Empty : "{0} {1} package(s) had warnings.".format_with(Environment.NewLine, upgradeWarnings)
                     ));
 
@@ -668,8 +669,8 @@ Would have determined packages that are out of date based on what is
                 }
             }
 
-            if (config.Features.UseEnhancedExitCodes && outdatedPackages.Count != 0 && Environment.ExitCode == 0)
             // outdated packages, return 2
+            if (config.Features.UseEnhancedExitCodes && outdatedPackageCount != 0 && Environment.ExitCode == 0)
             {
                 Environment.ExitCode = 2;
             }
