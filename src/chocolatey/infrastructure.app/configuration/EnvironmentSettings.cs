@@ -213,7 +213,7 @@ namespace chocolatey.infrastructure.app.configuration
             var machineVariables = convert_to_case_insensitive_dictionary(Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Machine));
             var userVariables = convert_to_case_insensitive_dictionary(Environment.GetEnvironmentVariables(EnvironmentVariableTarget.User));
 
-            // refresh current values with updated values, mathine first
+            // refresh current values with updated values, machine first
             refresh_environment_variables(machineVariables);
 
             //if the user is SYSTEM, we should not even look at user Variables
