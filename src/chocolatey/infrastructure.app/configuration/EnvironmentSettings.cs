@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,14 +91,14 @@ namespace chocolatey.infrastructure.app.configuration
             if (!config.Features.ChecksumFiles) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyIgnoreChecksums, "true");
             if (config.Features.AllowEmptyChecksums) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksums, "true");
             if (config.Features.AllowEmptyChecksumsSecure) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, "true");
-            if (config.Features.ScriptsCheckLastExitCode) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyCheckLastExitCode, "true");
+
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.to_string() + "000");
 
             if (config.CommandExecutionTimeoutSeconds != 0)
             {
                 Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.to_string() + "000");
             }
-            
+
             if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
                 var proxyCreds = string.Empty;
@@ -113,7 +113,7 @@ namespace chocolatey.infrastructure.app.configuration
                 }
 
                 Environment.SetEnvironmentVariable("http_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
-                Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location)); 
+                Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".format_with(proxyCreds, config.Proxy.Location));
                 Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
 
                 if (!string.IsNullOrWhiteSpace(config.Proxy.BypassList))
@@ -195,7 +195,7 @@ namespace chocolatey.infrastructure.app.configuration
         /// </remarks>
         public static void update_environment_variables()
         {
-            // grab original values 
+            // grab original values
             var originalEnvironmentVariables = convert_to_case_insensitive_dictionary(Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Process));
             var userName = originalEnvironmentVariables[ApplicationParameters.Environment.Username].to_string();
             var architecture = originalEnvironmentVariables[ApplicationParameters.Environment.ProcessorArchitecture].to_string();
@@ -259,8 +259,8 @@ namespace chocolatey.infrastructure.app.configuration
             if (!updatedPsModulePath.contains(ApplicationParameters.PowerShellModulePathProcessProgramFiles))
             {
                 updatedPsModulePath = "{0};{1}".format_with(ApplicationParameters.PowerShellModulePathProcessProgramFiles, updatedPsModulePath).Replace(";;", ";");
-            }            
-            
+            }
+
             if (!updatedPsModulePath.contains(ApplicationParameters.PowerShellModulePathProcessDocuments))
             {
                 updatedPsModulePath = "{0};{1}".format_with(ApplicationParameters.PowerShellModulePathProcessDocuments, updatedPsModulePath).Replace(";;", ";");

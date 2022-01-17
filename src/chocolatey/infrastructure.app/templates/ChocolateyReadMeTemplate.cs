@@ -138,7 +138,6 @@ The following are experimental or use not recommended:
  * ChocolateyIgnoreChecksums - Was `--ignore-checksums` passed or the feature `checksumFiles` turned off? (0.9.9.9+)
  * ChocolateyAllowEmptyChecksums - Was `--allow-empty-checksums` passed or the feature `allowEmptyChecksums` turned on? (0.10.0+)
  * ChocolateyAllowEmptyChecksumsSecure - Was `--allow-empty-checksums-secure` passed or the feature `allowEmptyChecksumsSecure` turned on? (0.10.0+)
- * ChocolateyCheckLastExitCode - Should Chocolatey check LASTEXITCODE? Is the feature `scriptsCheckLastExitCode` turned on? (0.10.3+)
  * ChocolateyChecksum32 - Was `--download-checksum` passed? (0.10.0+)
  * ChocolateyChecksumType32 - Was `--download-checksum-type` passed? (0.10.0+)
  * ChocolateyChecksum64 - Was `--download-checksum-x64` passed? (0.10.0)+
