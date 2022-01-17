@@ -89,6 +89,41 @@ namespace chocolatey.infrastructure.app.services
             return string.Empty;
         }
 
+        private IEnumerable<string> get_hook_scripts(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command, bool isPreHook)
+        {
+            List<string> hookScriptPaths = new List<string>();
+            string filenameBase;
+
+            if (isPreHook)
+            {
+                filenameBase = "pre-";
+            }
+            else
+            {
+                filenameBase = "post-";
+            }
+
+            switch (command)
+            {
+                case CommandNameType.install:
+                    filenameBase += "install-";
+                    break;
+                case CommandNameType.uninstall:
+                    filenameBase += "uninstall-";
+                    break;
+                case CommandNameType.upgrade:
+                    filenameBase += "beforemodify-";
+                    break;
+                default:
+                    throw new ApplicationException("Could not find CommandNameType '{0}' to get hook scripts".format_with(command));
+            }
+
+            hookScriptPaths.AddRange(_fileSystem.get_files(ApplicationParameters.HooksLocation, "{0}all.ps1".format_with(filenameBase), SearchOption.AllDirectories));
+            hookScriptPaths.AddRange(_fileSystem.get_files(ApplicationParameters.HooksLocation, "{0}{1}.ps1".format_with(filenameBase, packageResult.Name), SearchOption.AllDirectories));
+
+            return hookScriptPaths;
+        }
+
         public void noop_action(PackageResult packageResult, CommandNameType command)
         {
             var chocoInstall = get_script_for_action(packageResult, command);
@@ -134,7 +169,7 @@ namespace chocolatey.infrastructure.app.services
             return _fileSystem.combine_paths(ApplicationParameters.InstallLocation, "helpers");
         }
 
-        public string wrap_script_with_module(string script, ChocolateyConfiguration config)
+        public string wrap_script_with_module(string script, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList, ChocolateyConfiguration config)
         {
             var installerModule = _fileSystem.combine_paths(get_helpers_folder(), "chocolateyInstaller.psm1");
             var scriptRunner = _fileSystem.combine_paths(get_helpers_folder(), "chocolateyScriptRunner.ps1");
@@ -148,18 +183,20 @@ namespace chocolatey.infrastructure.app.services
                     installerModule,
                     scriptRunner,
                     string.IsNullOrWhiteSpace(_customImports) ? string.Empty : "& {0}".format_with(_customImports.EndsWith(";") ? _customImports : _customImports + ";"),
-                    get_script_arguments(script, config)
+                    get_script_arguments(script, hookPreScriptPathList, hookPostScriptPathList, config)
                 );
         }
 
-        private string get_script_arguments(string script, ChocolateyConfiguration config)
+        private string get_script_arguments(string script, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList, ChocolateyConfiguration config)
         {
-            return "-packageScript '{0}' -installArguments '{1}' -packageParameters '{2}'{3}{4}".format_with(
+            return "-packageScript '{0}' -installArguments '{1}' -packageParameters '{2}'{3}{4}{5}{6}".format_with(
                 script,
                 prepare_powershell_arguments(config.InstallArguments),
                 prepare_powershell_arguments(config.PackageParameters),
                 config.ForceX86 ? " -forceX86" : string.Empty,
-                config.OverrideArguments ? " -overrideArgs" : string.Empty
+                config.OverrideArguments ? " -overrideArgs" : string.Empty,
+                hookPreScriptPathList.Any() ? " -preRunHookScripts {0}".format_with(string.Join(",", hookPreScriptPathList)) : string.Empty,
+                hookPostScriptPathList.Any() ? " -postRunHookScripts {0}".format_with(string.Join(",", hookPostScriptPathList)) : string.Empty
              );
         }
 
@@ -192,61 +229,80 @@ namespace chocolatey.infrastructure.app.services
             }
 
             var chocoPowerShellScript = get_script_for_action(packageResult, command);
-            if (!string.IsNullOrEmpty(chocoPowerShellScript))
+
+            var hookPreScriptPathList = get_hook_scripts(configuration, packageResult, command, true);
+            var hookPostScriptPathList = get_hook_scripts(configuration, packageResult, command, false);
+
+            foreach (var hookScriptPath in hookPreScriptPathList.Concat(hookPostScriptPathList).or_empty_list_if_null())
+            {
+                this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".format_with(chocoPowerShellScript));
+                string hookScriptContents = _fileSystem.read_file(hookScriptPath);
+                this.Log().Debug(() => hookScriptContents.escape_curly_braces());
+            }
+
+            if (!string.IsNullOrEmpty(chocoPowerShellScript) || hookPreScriptPathList.Any() || hookPostScriptPathList.Any())
             {
                 var failure = false;
                 var package = packageResult.Package;
                 prepare_powershell_environment(package, configuration, packageDirectory);
-
-                this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".format_with(chocoPowerShellScript));
-                string chocoPowerShellScriptContents = _fileSystem.read_file(chocoPowerShellScript);
-                // leave this way, doesn't take it through formatting.
-                this.Log().Debug(() => chocoPowerShellScriptContents.escape_curly_braces());
-
                 bool shouldRun = !configuration.PromptForConfirmation;
 
-                if (!shouldRun)
+                if (!string.IsNullOrEmpty(chocoPowerShellScript))
                 {
-                    this.Log().Info(ChocolateyLoggers.Important, () => "The package {0} wants to run '{1}'.".format_with(package.Id, _fileSystem.get_file_name(chocoPowerShellScript)));
-                    this.Log().Info(ChocolateyLoggers.Important, () => "Note: If you don't run this script, the installation will fail.");
-                    this.Log().Info(ChocolateyLoggers.Important, () => @"Note: To confirm automatically next time, use '-y' or consider:");
-                    this.Log().Info(ChocolateyLoggers.Important, () => @"choco feature enable -n allowGlobalConfirmation");
+                    this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".format_with(chocoPowerShellScript));
+                    string chocoPowerShellScriptContents = _fileSystem.read_file(chocoPowerShellScript);
+                    // leave this way, doesn't take it through formatting.
+                    this.Log().Debug(() => chocoPowerShellScriptContents.escape_curly_braces());
 
-                    var selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run the script?",
-                        new[] { "yes", "all - yes to all", "no", "print" },
-                        defaultChoice: null,
-                        requireAnswer: true,
-                        allowShortAnswer: true,
-                        shortPrompt: true
-                        );
-
-                    if (selection.is_equal_to("print"))
+                    if (!shouldRun)
                     {
-                        this.Log().Info(ChocolateyLoggers.Important, "------ BEGIN SCRIPT ------");
-                        this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents.escape_curly_braces()));
-                        this.Log().Info(ChocolateyLoggers.Important, "------- END SCRIPT -------");
-                        selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run this script?",
-                            new[] { "yes", "no" },
+                        this.Log().Info(ChocolateyLoggers.Important, () => "The package {0} wants to run '{1}'.".format_with(package.Id, _fileSystem.get_file_name(chocoPowerShellScript)));
+                        this.Log().Info(ChocolateyLoggers.Important, () => "Note: If you don't run this script, the installation will fail.");
+                        this.Log().Info(ChocolateyLoggers.Important, () => @"Note: To confirm automatically next time, use '-y' or consider:");
+                        this.Log().Info(ChocolateyLoggers.Important, () => @"choco feature enable -n allowGlobalConfirmation");
+
+                        var selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run the script?",
+                            new[] { "yes", "all - yes to all", "no", "print" },
                             defaultChoice: null,
                             requireAnswer: true,
                             allowShortAnswer: true,
                             shortPrompt: true
-                            );
-                    }
+                        );
 
-                    if (selection.is_equal_to("yes")) shouldRun = true;
-                    if (selection.is_equal_to("all - yes to all"))
-                    {
-                        configuration.PromptForConfirmation = false;
-                        shouldRun = true;
+                        if (selection.is_equal_to("print"))
+                        {
+                            this.Log().Info(ChocolateyLoggers.Important, "------ BEGIN SCRIPT ------");
+                            this.Log().Info(() => "{0}{1}{0}".format_with(Environment.NewLine, chocoPowerShellScriptContents.escape_curly_braces()));
+                            this.Log().Info(ChocolateyLoggers.Important, "------- END SCRIPT -------");
+                            selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run this script?",
+                                new[] { "yes", "no" },
+                                defaultChoice: null,
+                                requireAnswer: true,
+                                allowShortAnswer: true,
+                                shortPrompt: true
+                            );
+                        }
+
+                        if (selection.is_equal_to("yes")) shouldRun = true;
+                        if (selection.is_equal_to("all - yes to all"))
+                        {
+                            configuration.PromptForConfirmation = false;
+                            shouldRun = true;
+                        }
+
+                        if (selection.is_equal_to("no"))
+                        {
+                            //MSI ERROR_INSTALL_USEREXIT - 1602 - https://support.microsoft.com/en-us/kb/304888 / https://msdn.microsoft.com/en-us/library/aa376931.aspx
+                            //ERROR_INSTALL_CANCEL - 15608 - https://msdn.microsoft.com/en-us/library/windows/desktop/ms681384.aspx
+                            Environment.ExitCode = 15608;
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Error, "User canceled powershell portion of installation for '{0}'.{1} Specify -n to skip automated script actions.".format_with(chocoPowerShellScript, Environment.NewLine)));
+                        }
                     }
-                    if (selection.is_equal_to("no"))
-                    {
-                        //MSI ERROR_INSTALL_USEREXIT - 1602 - https://support.microsoft.com/en-us/kb/304888 / https://msdn.microsoft.com/en-us/library/aa376931.aspx
-                        //ERROR_INSTALL_CANCEL - 15608 - https://msdn.microsoft.com/en-us/library/windows/desktop/ms681384.aspx
-                        Environment.ExitCode = 15608;
-                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, "User canceled powershell portion of installation for '{0}'.{1} Specify -n to skip automated script actions.".format_with(chocoPowerShellScript, Environment.NewLine)));
-                    }
+                }
+                else
+                {
+                    shouldRun = true;
+                    this.Log().Info("No package automation script, running only hooks", ChocolateyLoggers.Important);
                 }
 
                 if (shouldRun)
@@ -266,8 +322,8 @@ namespace chocolatey.infrastructure.app.services
                     try
                     {
                         result = configuration.Features.UsePowerShellHost
-                                    ? Execute.with_timeout(configuration.CommandExecutionTimeoutSeconds).command(() => run_host(configuration, chocoPowerShellScript, null), result)
-                                    : run_external_powershell(configuration, chocoPowerShellScript);
+                                    ? Execute.with_timeout(configuration.CommandExecutionTimeoutSeconds).command(() => run_host(configuration, chocoPowerShellScript, null, hookPreScriptPathList, hookPostScriptPathList), result)
+                                    : run_external_powershell(configuration, chocoPowerShellScript, hookPreScriptPathList, hookPostScriptPathList);
                     }
                     catch (Exception ex)
                     {
@@ -328,11 +384,11 @@ namespace chocolatey.infrastructure.app.services
             return installerRun;
         }
 
-        private PowerShellExecutionResults run_external_powershell(ChocolateyConfiguration configuration, string chocoPowerShellScript)
+        private PowerShellExecutionResults run_external_powershell(ChocolateyConfiguration configuration, string chocoPowerShellScript, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList)
         {
             var result = new PowerShellExecutionResults();
             result.ExitCode = PowershellExecutor.execute(
-                wrap_script_with_module(chocoPowerShellScript, configuration),
+                wrap_script_with_module(chocoPowerShellScript, hookPreScriptPathList, hookPostScriptPathList, configuration),
                 _fileSystem,
                 configuration.CommandExecutionTimeoutSeconds,
                 (s, e) =>
@@ -533,14 +589,15 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
-        public PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript)
+        public PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList)
         {
             // since we control output in the host, always set these true
             Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
             Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
 
             var result = new PowerShellExecutionResults();
-            string commandToRun = wrap_script_with_module(chocoPowerShellScript, config);
+
+            string commandToRun = wrap_script_with_module(chocoPowerShellScript, hookPreScriptPathList, hookPostScriptPathList, config);
             var host = new PoshHost(config);
             this.Log().Debug(() => "Calling built-in PowerShell host with ['{0}']".format_with(commandToRun.escape_curly_braces()));
 
