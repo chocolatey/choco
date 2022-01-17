@@ -668,8 +668,8 @@ Would have determined packages that are out of date based on what is
                 }
             }
 
-            // oudated packages, return 2
             if (config.Features.UseEnhancedExitCodes && outdatedPackages.Count != 0 && Environment.ExitCode == 0)
+            // outdated packages, return 2
             {
                 Environment.ExitCode = 2;
             }
