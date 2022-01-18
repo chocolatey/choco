@@ -52,17 +52,13 @@ $lastExecutableExitCode = $LASTEXITCODE
 
 if ($lastExecutableExitCode -ne $null -and $lastExecutableExitCode -ne '') {
   Write-Debug "The last executable that ran had an exit code of '$lastExecutableExitCode'."
-} 
+}
 
 if (-not $scriptSuccess) {
  Write-Debug "The script exited with a failure."
-} 
-
-$exitCode = 0
-if ($env:ChocolateyCheckLastExitCode -ne $null -and $env:ChocolateyCheckLastExitCode -eq 'true' -and $lastExecutableExitCode -ne $null -and $lastExecutableExitCode -ne '') {
-  $exitCode = $lastExecutableExitCode
 }
 
+$exitCode = 0
 if ($exitCode -eq 0 -and -not $scriptSuccess) {
   $exitCode = 1
 }

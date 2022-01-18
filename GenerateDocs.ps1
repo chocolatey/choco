@@ -323,6 +323,7 @@ function Move-GeneratedFiles {
   Move-Item -Path "$docsFolder\choco\commands\new.md" -Destination "$docsFolder\create\commands\new.md"
   Move-Item -Path "$docsFolder\choco\commands\pack.md" -Destination "$docsFolder\create\commands\pack.md"
   Move-Item -Path "$docsFolder\choco\commands\push.md" -Destination "$docsFolder\create\commands\push.md"
+  Move-Item -Path "$docsFolder\choco\commands\template.md" -Destination "$docsFolder\create\commands\template.md"
 }
 
 function Generate-CommandReference($commandName, $order) {
@@ -517,7 +518,6 @@ The following are experimental or use not recommended:
  * ChocolateyIgnoreChecksums - Was `--ignore-checksums` passed or the feature `checksumFiles` turned off? (0.9.9.9+)
  * ChocolateyAllowEmptyChecksums - Was `--allow-empty-checksums` passed or the feature `allowEmptyChecksums` turned on? (0.10.0+)
  * ChocolateyAllowEmptyChecksumsSecure - Was `--allow-empty-checksums-secure` passed or the feature `allowEmptyChecksumsSecure` turned on? (0.10.0+)
- * ChocolateyCheckLastExitCode - Should Chocolatey check LASTEXITCODE? Is the feature `scriptsCheckLastExitCode` turned on? (0.10.3+)
  * ChocolateyChecksum32 - Was `--download-checksum` passed? (0.10.0+)
  * ChocolateyChecksumType32 - Was `--download-checksum-type` passed? (0.10.0+)
  * ChocolateyChecksum64 - Was `--download-checksum-x64` passed? (0.10.0)+
@@ -565,6 +565,7 @@ The following are experimental or use not recommended:
   Generate-CommandReference 'Pack' '20'
   Generate-CommandReference 'ApiKey' '30'
   Generate-CommandReference 'Push' '40'
+  Generate-CommandReference 'Template' '50'
 
   Generate-TopLevelCommandReference
   Move-GeneratedFiles

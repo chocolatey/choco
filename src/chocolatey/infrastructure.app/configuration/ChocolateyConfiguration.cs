@@ -346,7 +346,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
         public ProxyConfiguration Proxy { get; set; }
-        
+
         /// <summary>
         ///   Configuration related specifically to Template command
         /// </summary>
@@ -409,9 +409,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ExitOnRebootDetected { get; set; }
         public bool LogValidationResultsOnWarnings { get; set; }
         public bool UsePackageRepositoryOptimizations { get; set; }
-
-        //todo remove in 0.11.0
-        public bool ScriptsCheckLastExitCode { get; set; }
     }
 
     //todo: retrofit other command configs this way
@@ -566,7 +563,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         public string OutputFilePath { get; set; }
     }
-    
+
     [Serializable]
     public sealed class TemplateCommandConfiguration
     {
