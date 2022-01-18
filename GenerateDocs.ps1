@@ -324,6 +324,7 @@ function Move-GeneratedFiles {
   Move-Item -Path "$docsFolder\choco\commands\pack.md" -Destination "$docsFolder\create\commands\pack.md"
   Move-Item -Path "$docsFolder\choco\commands\push.md" -Destination "$docsFolder\create\commands\push.md"
   Move-Item -Path "$docsFolder\choco\commands\template.md" -Destination "$docsFolder\create\commands\template.md"
+  Move-Item -Path "$docsFolder\choco\commands\convert.md" -Destination "$docsFolder\create\commands\convert.md"
 }
 
 function Generate-CommandReference($commandName, $order) {
@@ -349,6 +350,11 @@ function Generate-CommandReference($commandName, $order) {
   $commandOutput += @("  - docs/commands-$commandNameLower")
 
   if($commandName -eq 'Features') {
+    $commandOutput += @("ShowInNavbar: false")
+    $commandOutput += @("ShowInSidebar: false")
+  }
+
+  if($commandName -eq 'Templates') {
     $commandOutput += @("ShowInNavbar: false")
     $commandOutput += @("ShowInSidebar: false")
   }
@@ -566,6 +572,8 @@ The following are experimental or use not recommended:
   Generate-CommandReference 'ApiKey' '30'
   Generate-CommandReference 'Push' '40'
   Generate-CommandReference 'Template' '50'
+  Generate-CommandReference 'Templates' '55'
+  Generate-CommandReference 'Convert' '60'
 
   Generate-TopLevelCommandReference
   Move-GeneratedFiles
