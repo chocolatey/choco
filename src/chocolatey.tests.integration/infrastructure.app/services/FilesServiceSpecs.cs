@@ -28,6 +28,7 @@ namespace chocolatey.tests.integration.infrastructure.app.services
     using chocolatey.infrastructure.results;
     using chocolatey.infrastructure.services;
     using Moq;
+    using NUnit.Framework;
     using Should;
 
     public class FilesServiceSpecs
@@ -88,6 +89,8 @@ namespace chocolatey.tests.integration.infrastructure.app.services
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_log_a_warning_about_locked_files()
             {
                 bool lockedFiles = false;

@@ -342,6 +342,9 @@ Did you know Pro / Business automatically syncs with Programs and
 
             var pkgInfo = get_package_information(packageResult, config);
 
+            // initialize this here so it can be used for the install location later
+            bool powerShellRan = false;
+
             if (packageResult.Success && config.Information.PlatformType == PlatformType.Windows)
             {
                 if (!config.SkipPackageInstallProvider)
@@ -349,7 +352,7 @@ Did you know Pro / Business automatically syncs with Programs and
                     var installersBefore = _registryService.get_installer_keys();
                     var environmentBefore = get_environment_before(config, allowLogging: false);
 
-                    var powerShellRan = _powershellService.install(config, packageResult);
+                    powerShellRan = _powershellService.install(config, packageResult);
                     if (powerShellRan)
                     {
                         // we don't care about the exit code
@@ -383,7 +386,6 @@ Did you know Pro / Business automatically syncs with Programs and
                 _filesService.ensure_compatible_file_attributes(packageResult, config);
                 _configTransformService.run(packageResult, config);
 
-                //review: is this a Windows only kind of thing?
                 pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
 
                 var is32Bit = !config.Information.Is64BitProcess || config.ForceX86;
@@ -393,7 +395,12 @@ Did you know Pro / Business automatically syncs with Programs and
             }
             else
             {
-                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping Powershell and shimgen portions of the install due to non-Windows.");
+                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping PowerShell and shimgen portions of the install due to non-Windows.");
+                if (packageResult.Success)
+                {
+                    _configTransformService.run(packageResult, config);
+                    pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
+                }
             }
 
             if (packageResult.Success)
@@ -411,6 +418,11 @@ Did you know Pro / Business automatically syncs with Programs and
                 {
                     Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, toolsLocation, EnvironmentVariableTarget.Process);
                 }
+            }
+
+            if (!powerShellRan && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation)))
+            {
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, packageResult.InstallLocation, EnvironmentVariableTarget.Process);
             }
 
             if (pkgInfo.RegistrySnapshot != null && pkgInfo.RegistrySnapshot.RegistryKeys.Any(k => !string.IsNullOrWhiteSpace(k.InstallLocation)))
@@ -806,9 +818,13 @@ Would have determined packages that are out of date based on what is
 
         private void before_package_modify(PackageResult packageResult, ChocolateyConfiguration config)
         {
-            if (!config.SkipPackageInstallProvider)
+            if (!config.SkipPackageInstallProvider && config.Information.PlatformType == PlatformType.Windows)
             {
                 _powershellService.before_modify(config, packageResult);
+            }
+            else
+            {
+                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping beforemodify PowerShell script due to non-Windows.");
             }
         }
 
@@ -974,20 +990,28 @@ The recent package changes indicate a reboot is necessary.
                 packageResult.InstallLocation += ".{0}".format_with(packageResult.Package.Version.to_string());
             }
 
-            _shimgenService.uninstall(config, packageResult);
-
-            if (!config.SkipPackageInstallProvider)
+            //These items only apply to windows systems.
+            if (config.Information.PlatformType == PlatformType.Windows)
             {
-                _powershellService.uninstall(config, packageResult);
-            }
+                _shimgenService.uninstall(config, packageResult);
 
-            if (packageResult.Success)
+                if (!config.SkipPackageInstallProvider)
+                {
+                    _powershellService.uninstall(config, packageResult);
+                }
+
+                if (packageResult.Success)
+                {
+                    _autoUninstallerService.run(packageResult, config);
+                }
+
+                // we don't care about the exit code
+                CommandExecutor.execute_static(_shutdownExe, "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
+            }
+            else
             {
-                _autoUninstallerService.run(packageResult, config);
+                this.Log().Info(ChocolateyLoggers.Important, () => " Skipping PowerShell, shimgen, and autoUninstaller portions of the uninstall due to non-Windows.");
             }
-
-            // we don't care about the exit code
-            if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.execute_static(_shutdownExe, "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.get_current_directory(), (s, e) => { }, (s, e) => { }, false, false);
 
             if (packageResult.Success)
             {

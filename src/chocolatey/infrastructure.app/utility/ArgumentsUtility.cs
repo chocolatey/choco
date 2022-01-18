@@ -41,8 +41,6 @@ namespace chocolatey.infrastructure.app.utility
              || commandArguments.contains("-key=")
              || commandArguments.contains("-apikey")
              || commandArguments.contains("-api-key")
-             || commandArguments.contains("-apikey")
-             || commandArguments.contains("-api-key")
             ;
         }
     }

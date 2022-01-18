@@ -33,7 +33,7 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
       where { $_ -like "$filter*" }
 }
 
-$script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','optimize','pack','push','sync','-h','--help','pin','source','config','feature','apikey','export','help','--version')
+$script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','optimize','pack','push','sync','-h','--help','pin','source','config','feature','apikey','export','help','template','--version')
 
 # ensure these all have a space to start, or they will cause issues
 $allcommands = " --debug --verbose --trace --noop --help --accept-license --confirm --limit-output --no-progress --log-file='' --execution-timeout='' --cache-location='' --proxy='' --proxy-user='' --proxy-password='' --proxy-bypass-list='' --proxy-bypass-on-local --force --no-color"
@@ -63,6 +63,7 @@ $commandOptions = @{
   sync = "--output-directory='' --id='' --package-id='' -?" + $allcommands
   optimize = "--deflate-nupkg-only --id='' -?" + $allcommands
   export = "--include-version-numbers --output-file-path='' -?" + $allcommands
+  template = "--name=''" + $allcommands
 }
 
 try {
@@ -162,6 +163,11 @@ function ChocolateyTabExpansion($lastBlock) {
     # Handles config first tab
     "^(config)\s+(?<subcommand>[^-\s]*)$" {
       @('list','get','set','unset','-?') | where { $_ -like "$($matches['subcommand'])*" }
+    }
+    
+    # Handles template first tab
+    "^(template)\s+(?<subcommand>[^-\s]*)$" {
+        @('list', 'info', '-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles more options after others

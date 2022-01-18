@@ -74,7 +74,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
                 FileSystem.get_executable_path("cmd.exe").ShouldEqual(
                     Platform.get_platform() == PlatformType.Windows
                         ? "c:\\windows\\system32\\cmd.exe"
-                        : "cmd",
+                        : "cmd.exe",
                     StringComparer.OrdinalIgnoreCase
                 );
             }
@@ -139,6 +139,8 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void GetFiles_should_return_files_that_meet_the_pattern_regardless_of_case()
             {
                 string filePath = FileSystem.combine_paths(ContextPath, "chocolateyInstall.ps1");
@@ -189,6 +191,8 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
         }
 
         [Category("Integration")]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_setting_file_attributes_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Context()

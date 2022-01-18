@@ -11,4 +11,4 @@ For Chocolatey Gallery aka Chocolatey Community Package Repository, you will nee
 
 
 
-NOTE: Keep in mind we have an etiquette regarding communication that we expect folks to observe when they are looking for support in the Chocolatey community. https://github.com/chocolatey/choco/blob/master/README.md#etiquette-regarding-communication
+NOTE: Keep in mind we have an etiquette regarding communication that we expect folks to observe when they are looking for support in the Chocolatey community. https://github.com/chocolatey/choco/blob/develop/README.md#etiquette-regarding-communication

@@ -5,9 +5,6 @@ init:
 - git config --global user.name "Chocolatey yo"
 nuget:
   disable_publish_on_pr: true
-environment:
-  COVERALLS_REPO_TOKEN:
-    secure: GWDFHkyZwDvbtYzPCHt29njjcm1blAwuTcbT0IEyJZoRSC/soUAa8dwXIlA6l/Fj
 build_script:
 - build.bat -v
 test:
@@ -39,10 +36,5 @@ notifications:
   - chocolatey-build-status@googlegroups.com
   subject: AppVeyor - choco Build Notification
   on_build_success: false
-  on_build_failure: true
-  on_build_status_changed: true
-- provider: Webhook
-  url: https://webhooks.gitter.im/e/ef0d02785675d16d0cad
-  on_build_success: true
   on_build_failure: true
   on_build_status_changed: true

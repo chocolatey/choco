@@ -334,14 +334,23 @@ namespace chocolatey.infrastructure.app.services
             {
                 this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
-Your package may be subject to moderation. A moderator will review the
-package prior to acceptance. You should have received an email. If you
-don't hear back from moderators within 1-3 business days, please reply
-to the email and ask for status or use contact site admins on the
-package page to contact moderators.
+Your package will go through automated checks and may be subject to
+human moderation. You should receive email(s) with the automated
+testing results. If you don't receive them within 1-3 business days,
+please use the 'Contact Site Admins' on the package page to contact the
+moderators. If your package is subject to human moderation there is no
+guarantee on the length of time that this can take to complete. This
+depends on the availability of moderators, number of packages in the
+queue at this time, as well as many other factors.
+
+You can check where your package is in the moderation queue here:
+https://ch0.co/moderation
+
+For more information about the moderation process, see the docs:
+https://docs.chocolatey.org/en-us/community-repository/moderation/
 
 Please ensure your registered email address is correct and emails from
-noreply at chocolatey dot org are not being sent to your spam/junk
+moderation at chocolatey dot org are not being sent to your spam/junk
 folder.");
             }
         }
@@ -437,6 +446,12 @@ folder.");
 
                 //todo: get smarter about realizing multiple versions have been installed before and allowing that
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+
+                if (Platform.get_platform() != PlatformType.Windows && !packageName.EndsWith(".template"))
+                {
+                    string logMessage = "{0} is not a supported package on non-Windows systems.{1}Only template packages are currently supported.".format_with(packageName, Environment.NewLine);
+                    this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                }
 
                 if (installedPackage != null && (version == null || version == installedPackage.Version) && !config.Force)
                 {

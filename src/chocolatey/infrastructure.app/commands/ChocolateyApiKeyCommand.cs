@@ -109,7 +109,7 @@ For the key, this can be an apikey that is provided by your source repository.
 With some sources, like Nexus, this can be a NuGet API key or it could be a
 user name and password specified as 'user:password' for the API key. Please see
 your repository's documentation (for Nexus, please see
-https://bit.ly/nexus2apikey).
+https://ch0.co/nexus2apikey).
 
 NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.

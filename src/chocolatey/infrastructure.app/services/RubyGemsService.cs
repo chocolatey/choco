@@ -26,6 +26,7 @@ namespace chocolatey.infrastructure.app.services
     using infrastructure.commands;
     using logging;
     using results;
+    using platforms;
 
     public sealed class RubyGemsService : ISourceRunner
     {
@@ -113,6 +114,8 @@ namespace chocolatey.infrastructure.app.services
 
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
         {
+            if (Platform.get_platform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+
             var runnerConfig = new ChocolateyConfiguration
                 {
                     PackageNames = RUBY_PORTABLE_PACKAGE,

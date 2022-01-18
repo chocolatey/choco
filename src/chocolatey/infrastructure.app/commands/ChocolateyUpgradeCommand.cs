@@ -81,7 +81,7 @@ namespace chocolatey.infrastructure.app.commands
                      "IgnoreDependencies - Ignore dependencies when upgrading package(s). Defaults to false.",
                      option => configuration.IgnoreDependencies = option != null)
                 .Add("n|skippowershell|skip-powershell|skipscripts|skip-scripts|skip-automation-scripts",
-                     "Skip Powershell - Do not run chocolateyInstall.ps1. Defaults to false.",
+                     "Skip PowerShell - Do not run chocolateyInstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 .Add("failonunfound|fail-on-unfound",
                      "Fail On Unfound Packages - If a package is not found in sources specified, fail instead of warn.",

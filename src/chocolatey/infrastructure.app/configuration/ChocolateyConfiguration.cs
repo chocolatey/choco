@@ -51,6 +51,7 @@ namespace chocolatey.infrastructure.app.configuration
             OutdatedCommand = new OutdatedCommandConfiguration();
             Proxy = new ProxyConfiguration();
             ExportCommand = new ExportCommandConfiguration();
+            TemplateCommand = new TemplateCommandConfiguration();
 #if DEBUG
             AllowUnofficialBuild = true;
 #endif
@@ -146,6 +147,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ContainsLegacyPackageInstalls { get; set; }
         public int CommandExecutionTimeoutSeconds { get; set; }
         public int WebRequestTimeoutSeconds { get; set; }
+        public string DefaultTemplateName { get; set; }
 
         /// <summary>
         ///   One or more source locations set by configuration or by command line. Separated by semi-colon
@@ -344,6 +346,14 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
         public ProxyConfiguration Proxy { get; set; }
+
+        /// <summary>
+        ///   Configuration related specifically to Template command
+        /// </summary>
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public TemplateCommandConfiguration TemplateCommand { get;  set; }
     }
 
     [Serializable]
@@ -399,9 +409,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ExitOnRebootDetected { get; set; }
         public bool LogValidationResultsOnWarnings { get; set; }
         public bool UsePackageRepositoryOptimizations { get; set; }
-
-        //todo remove in 0.11.0
-        public bool ScriptsCheckLastExitCode { get; set; }
     }
 
     //todo: retrofit other command configs this way
@@ -555,5 +562,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IncludeVersionNumbers { get; set; }
 
         public string OutputFilePath { get; set; }
+    }
+
+    [Serializable]
+    public sealed class TemplateCommandConfiguration
+    {
+        public TemplateCommandType Command { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.app
     using adapters;
     using filesystem;
     using Environment = System.Environment;
+    using chocolatey.infrastructure.platforms;
 
     /// <summary>
     ///   Application constants and settings for the application
@@ -46,9 +47,9 @@ namespace chocolatey.infrastructure.app
         // start from the assembly location and if unfound, head to the machine
         // locations instead. This is a merge of official and Debug modes.
         private static IAssembly _assemblyForLocation = Assembly.GetEntryAssembly().UnderlyingType != null ? Assembly.GetEntryAssembly() : Assembly.GetExecutingAssembly();
-        public static readonly string InstallLocation = _fileSystem.file_exists(_fileSystem.combine_paths(_fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace("file:///", string.Empty)), "chocolatey.dll")) ||
-                                                        _fileSystem.file_exists(_fileSystem.combine_paths(_fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace("file:///", string.Empty)), "choco.exe")) ?
-                _fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace("file:///", string.Empty)) :
+        public static readonly string InstallLocation = _fileSystem.file_exists(_fileSystem.combine_paths(_fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace(Platform.get_platform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)), "chocolatey.dll")) ||
+                                                        _fileSystem.file_exists(_fileSystem.combine_paths(_fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace(Platform.get_platform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)), "choco.exe")) ?
+                _fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace(Platform.get_platform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)) :
                 !string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName)) ?
                     System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) :
                     @"C:\ProgramData\Chocolatey"
@@ -119,7 +120,6 @@ namespace chocolatey.infrastructure.app
             public static readonly string ChocolateyIgnoreChecksums = "ChocolateyIgnoreChecksums";
             public static readonly string ChocolateyAllowEmptyChecksums = "ChocolateyAllowEmptyChecksums";
             public static readonly string ChocolateyAllowEmptyChecksumsSecure = "ChocolateyAllowEmptyChecksumsSecure";
-            public static readonly string ChocolateyCheckLastExitCode = "ChocolateyCheckLastExitCode";
             public static readonly string ChocolateyPowerShellHost = "ChocolateyPowerShellHost";
             public static readonly string ChocolateyForce = "ChocolateyForce";
             public static readonly string ChocolateyExitOnRebootDetected = "ChocolateyExitOnRebootDetected";
@@ -173,6 +173,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string ProxyBypassOnLocal = "proxyBypassOnLocal";
             public static readonly string WebRequestTimeoutSeconds = "webRequestTimeoutSeconds";
             public static readonly string UpgradeAllExceptions = "upgradeAllExceptions";
+            public static readonly string DefaultTemplateName = "defaultTemplateName";
         }
 
         public static class Features
@@ -192,7 +193,6 @@ namespace chocolatey.infrastructure.app
             public static readonly string UsePackageExitCodes = "usePackageExitCodes";
             public static readonly string UseEnhancedExitCodes = "useEnhancedExitCodes";
             public static readonly string UseFipsCompliantChecksums = "useFipsCompliantChecksums";
-            public static readonly string ScriptsCheckLastExitCode = "scriptsCheckLastExitCode";
             public static readonly string ShowNonElevatedWarnings = "showNonElevatedWarnings";
             public static readonly string ShowDownloadProgress = "showDownloadProgress";
             public static readonly string StopOnFirstPackageFailure = "stopOnFirstPackageFailure";

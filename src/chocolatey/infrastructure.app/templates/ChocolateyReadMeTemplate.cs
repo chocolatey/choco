@@ -108,7 +108,7 @@ Some environment variables are set based on options that are passed, configurati
 
  * ChocolateyEnvironmentDebug - Was `--debug` passed? If using the built-in PowerShell host, this is always true (but only logs debug messages to console if `--debug` was passed) (0.9.10+)
  * ChocolateyEnvironmentVerbose - Was `--verbose` passed? If using the built-in PowerShell host, this is always true (but only logs verbose messages to console if `--verbose` was passed). (0.9.10+)
- * ChocolateyExitOnRebootDetected - Are we exiting on a detected reboot? Set by ` --exit-when-reboot-detected`  or the feature `exitOnRebootDetected` (0.10.16+)
+ * ChocolateyExitOnRebootDetected - Are we exiting on a detected reboot? Set by ` --exit-when-reboot-detected`  or the feature `exitOnRebootDetected` (0.11.0+)
  * ChocolateyForce - Was `--force` passed? (0.9.10+)
  * ChocolateyForceX86 - Was `-x86` passed? (CHECK)
  * ChocolateyRequestTimeout - How long before a web request will time out. Set by config `webRequestTimeoutSeconds` (CHECK)
@@ -138,7 +138,6 @@ The following are experimental or use not recommended:
  * ChocolateyIgnoreChecksums - Was `--ignore-checksums` passed or the feature `checksumFiles` turned off? (0.9.9.9+)
  * ChocolateyAllowEmptyChecksums - Was `--allow-empty-checksums` passed or the feature `allowEmptyChecksums` turned on? (0.10.0+)
  * ChocolateyAllowEmptyChecksumsSecure - Was `--allow-empty-checksums-secure` passed or the feature `allowEmptyChecksumsSecure` turned on? (0.10.0+)
- * ChocolateyCheckLastExitCode - Should Chocolatey check LASTEXITCODE? Is the feature `scriptsCheckLastExitCode` turned on? (0.10.3+)
  * ChocolateyChecksum32 - Was `--download-checksum` passed? (0.10.0+)
  * ChocolateyChecksumType32 - Was `--download-checksum-type` passed? (0.10.0+)
  * ChocolateyChecksum64 - Was `--download-checksum-x64` passed? (0.10.0)+

@@ -97,7 +97,8 @@ namespace chocolatey.infrastructure.app.registration
                             new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>()),
                             new ChocolateyVersionCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyUpdateCommand(container.GetInstance<IChocolateyPackageService>()),
-                            new ChocolateyExportCommand(container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>())
+                            new ChocolateyExportCommand(container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>()),
+                            new ChocolateyTemplateCommand(container.GetInstance<ITemplateService>())
                         };
                     return list.AsReadOnly();
                 }, Lifestyle.Singleton);

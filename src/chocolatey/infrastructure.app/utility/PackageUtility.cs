@@ -17,6 +17,7 @@ namespace chocolatey.infrastructure.app.utility
 {
     using System;
     using configuration;
+    using platforms;
 
     public class PackageUtility
     {
@@ -36,10 +37,10 @@ namespace chocolatey.infrastructure.app.utility
             {
                 if (packageName.is_equal_to(package)
                     || packageName.contains(package + ".")
-                    || (packageName.contains(package)
-                        && (packageName.contains(".nupkg")
-                            || packageName.contains(".nuspec")
-                            || packageName.contains("\\")
+                    || (package.contains(packageName)
+                        && (package.contains(".nupkg")
+                            || package.contains(".nuspec")
+                            || package.contains("{0}".format_with(Platform.get_platform() == PlatformType.Windows ? "\\" : "/"))
                         )
                     )
                 )

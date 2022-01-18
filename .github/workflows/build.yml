@@ -1,15 +1,9 @@
 name: Chocolatey Builds
 
 on:
-  # Trigger on pushes to master and stable, or with pull requests
+  # Trigger on pushes and on pull requests
   push:
-    branches:
-    - master
-    - stable
   pull_request:
-    branches:
-    - master
-    - stable
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,6 +18,16 @@ jobs:
       run: |
         chmod +x build.sh
         $GITHUB_WORKSPACE//build.sh -v
+    - name: Upload Ubuntu build results
+      uses: actions/upload-artifact@v2
+      # Always upload build results
+      if: ${{ always() }}
+      with:
+        name: ubuntu-build-results
+        path: |
+          build_output/build_artifacts/tests/index.html
+          build_output/_BuildInfo.xml
+          build_output/build.log    
   # Build on Windows
   windows-build:
     runs-on: windows-latest
@@ -31,6 +35,24 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build with .Net Framework
       run: .\build.bat -v
+    - name: Upload Windows build results
+      uses: actions/upload-artifact@v2
+      # Always upload build results
+      if: ${{ always() }}
+      with:
+        name: windows-build-results
+        path: |
+          build_output\build_artifacts\tests\index.html
+          build_output\build_artifacts\codecoverage\Html\index.htm
+          build_output\_BuildInfo.xml
+          build_output\build.log
+          code_drop\build_artifacts\ilmerge\ilmerge.log
+          code_drop\build_artifacts\ilmerge\ilmergedll.log
+    - name: Upload Windows build .nupkg
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-build-nupkg
+        path: code_drop\nuget\*.nupkg
   # Build using mono on MacOS
   macos-build:
     runs-on: macos-latest
@@ -40,6 +62,16 @@ jobs:
        run: |
           chmod +x build.sh
           $GITHUB_WORKSPACE//build.sh -v
+     - name: Upload MacOS build results
+       uses: actions/upload-artifact@v2
+       # Always upload build results
+       if: ${{ always() }}
+       with:
+         name: macos-build-results
+         path: |
+           build_output/build_artifacts/tests/index.html
+           build_output/_BuildInfo.xml
+           build_output/build.log
   # Build using Mono in Docker on Ubuntu
   docker-build:
     runs-on: ubuntu-latest

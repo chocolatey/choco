@@ -305,12 +305,16 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
                 MockLogger.contains_message("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyBeforeModify_before_chocolateyInstall()
             {
                 MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null()
@@ -332,6 +336,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyInstall_script_for_new_package()
             {
                 MockLogger.contains_message("upgradepackage 1.1.0 Installed", LogLevel.Info).ShouldBeTrue();
@@ -539,12 +545,16 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
                 MockLogger.contains_message("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyBeforeModify_before_chocolateyInstall()
             {
                 MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null()
@@ -566,6 +576,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyInstall_script_for_new_package()
             {
                 MockLogger.contains_message("upgradepackage 1.1.1-beta2 Installed", LogLevel.Info).ShouldBeTrue();
@@ -685,12 +697,16 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
                 MockLogger.contains_message("upgradepackage 1.1.1-beta Before Modification", LogLevel.Info).ShouldBeTrue();
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyBeforeModify_before_chocolateyInstall()
             {
                 MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null()
@@ -712,6 +728,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyInstall_script_for_new_package()
             {
                 MockLogger.contains_message("upgradepackage 1.1.1-beta2 Installed", LogLevel.Info).ShouldBeTrue();
@@ -1202,7 +1220,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var packagesConfig = "{0}\\context\\testing.packages.config".format_with(Scenario.get_top_level());
+                var packagesConfig = "{0}{1}context{1}testing.packages.config".format_with(Scenario.get_top_level(), Path.DirectorySeparatorChar);
                 Configuration.PackageNames = Configuration.Input = packagesConfig;
             }
 
@@ -1219,6 +1237,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_readonly_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1319,6 +1339,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1426,6 +1448,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1613,7 +1637,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
                 File.WriteAllText(fileChanged, "hellow");
             }
 
@@ -1626,7 +1650,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_update_the_changed_file()
             {
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
                 File.ReadAllText(fileChanged).ShouldNotEqual("hellow");
             }
@@ -1854,6 +1878,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_that_is_not_installed_and_failing_on_not_installed : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1942,6 +1968,8 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Concern(typeof(ChocolateyUpgradeCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_upgrading_a_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;

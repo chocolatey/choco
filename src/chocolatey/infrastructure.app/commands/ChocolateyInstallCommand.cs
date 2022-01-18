@@ -83,7 +83,7 @@ namespace chocolatey.infrastructure.app.commands
                      "ForceDependencies - Force dependencies to be reinstalled when force installing package(s). Must be used in conjunction with --force. Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
                 .Add("n|skippowershell|skip-powershell|skipscripts|skip-scripts|skip-automation-scripts",
-                     "Skip Powershell - Do not run chocolateyInstall.ps1. Defaults to false.",
+                     "Skip PowerShell - Do not run chocolateyInstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
@@ -257,7 +257,7 @@ NOTE: `all` is a special package keyword that will allow you to install
  feed. THIS IS NOT YET REIMPLEMENTED.
 
 NOTE: Any package name ending with .config is considered a
- 'packages.config' file. Please see https://bit.ly/packages_config
+ 'packages.config' file. Please see https://ch0.co/packages_config
 
 NOTE: Chocolatey Pro / Business builds on top of a great open source
  experience with quite a few features that enhance the your use of the

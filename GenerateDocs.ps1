@@ -24,7 +24,7 @@ $psModuleLocation = [System.IO.Path]::GetFullPath("$thisDirectory\src\chocolatey
 $docsFolder = [System.IO.Path]::GetFullPath("$thisDirectory\docs\generated")
 $chocoExe = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\chocolatey\console\choco.exe")
 $lineFeed = "`r`n"
-$sourceLocation = 'https://github.com/chocolatey/choco/blob/stable/'
+$sourceLocation = 'https://github.com/chocolatey/choco/blob/master/'
 $sourceCommands = $sourceLocation + 'src/chocolatey/infrastructure.app/commands'
 $sourceFunctions = $sourceLocation + 'src/chocolatey.resources/helpers/functions'
 $global:powerShellReferenceTOC = @'
@@ -222,7 +222,7 @@ param(
   $commandText = $commandText -replace 'NOTE\:', '> :memo: **NOTE**'
   $commandText = $commandText -replace '\*> :memo: \*\*NOTE\*\*\*', '> :memo: **NOTE**'
   $commandText = $commandText -replace 'the command reference', '[how to pass arguments](xref:choco-commands#how-to-pass-options-switches)'
-  $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://comminty.chocolatey.org/packages)'
+  $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://community.chocolatey.org/packages)'
   #$commandText = $commandText -replace '\`(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[[`$1`|Commands$1]]'
   $commandText = $commandText -replace '\`([choco\s]*)(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[`$1$2`](xref:choco-command-$2)'
   $commandText = $commandText -replace '^(.+):\s(.+.gif)$', '![$1]($2)'
@@ -323,6 +323,7 @@ function Move-GeneratedFiles {
   Move-Item -Path "$docsFolder\choco\commands\new.md" -Destination "$docsFolder\create\commands\new.md"
   Move-Item -Path "$docsFolder\choco\commands\pack.md" -Destination "$docsFolder\create\commands\pack.md"
   Move-Item -Path "$docsFolder\choco\commands\push.md" -Destination "$docsFolder\create\commands\push.md"
+  Move-Item -Path "$docsFolder\choco\commands\template.md" -Destination "$docsFolder\create\commands\template.md"
 }
 
 function Generate-CommandReference($commandName, $order) {
@@ -517,7 +518,6 @@ The following are experimental or use not recommended:
  * ChocolateyIgnoreChecksums - Was `--ignore-checksums` passed or the feature `checksumFiles` turned off? (0.9.9.9+)
  * ChocolateyAllowEmptyChecksums - Was `--allow-empty-checksums` passed or the feature `allowEmptyChecksums` turned on? (0.10.0+)
  * ChocolateyAllowEmptyChecksumsSecure - Was `--allow-empty-checksums-secure` passed or the feature `allowEmptyChecksumsSecure` turned on? (0.10.0+)
- * ChocolateyCheckLastExitCode - Should Chocolatey check LASTEXITCODE? Is the feature `scriptsCheckLastExitCode` turned on? (0.10.3+)
  * ChocolateyChecksum32 - Was `--download-checksum` passed? (0.10.0+)
  * ChocolateyChecksumType32 - Was `--download-checksum-type` passed? (0.10.0+)
  * ChocolateyChecksum64 - Was `--download-checksum-x64` passed? (0.10.0)+
@@ -536,32 +536,37 @@ The following are experimental or use not recommended:
   $global:powerShellReferenceTOC | Out-File $fileName -Encoding UTF8 -Force
 
   Write-Host "Generating command reference markdown files"
-  Generate-CommandReference 'List' '60'
-  Generate-CommandReference 'Search' '100'
-  Generate-CommandReference 'Info' '40'
-  Generate-CommandReference 'Install' '50'
-  Generate-CommandReference 'Pin' '90'
-  Generate-CommandReference 'Outdated' '80'
-  Generate-CommandReference 'Upgrade' '200'
-  Generate-CommandReference 'Uninstall' '170'
   Generate-CommandReference 'Config' '10'
-  Generate-CommandReference 'Source' '120'
-  Generate-CommandReference 'Sources' '130'
-  Generate-CommandReference 'Feature' '30'
-  Generate-CommandReference 'Features' '35'
+  Generate-CommandReference 'Download' '20'
+  Generate-CommandReference 'Export' '30'
+  Generate-CommandReference 'Feature' '40'
+  Generate-CommandReference 'Features' '45'
+  Generate-CommandReference 'Help' '50'
+  Generate-CommandReference 'Info' '60'
+  Generate-CommandReference 'Install' '70'
+  Generate-CommandReference 'List' '80'
+  Generate-CommandReference 'Optimize' '90'
+  Generate-CommandReference 'Outdated' '100'
+  Generate-CommandReference 'Pin' '110'
+  Generate-CommandReference 'Search' '120'
+  Generate-CommandReference 'SetApiKey' '130'
+  Generate-CommandReference 'Source' '140'
+  Generate-CommandReference 'Sources' '150'
+  Generate-CommandReference 'Support' '160'
+  Generate-CommandReference 'Sync' '170'
+  Generate-CommandReference 'Synchronize' '180'
+  Generate-CommandReference 'Uninstall' '190'
+  Generate-CommandReference 'UnpackSelf' '200'
+  Generate-CommandReference 'Update' '210'
+  Generate-CommandReference 'Upgrade' '220'
+  Generate-CommandReference 'Version' '230'
+
   Generate-CommandReference 'New' '10'
   Generate-CommandReference 'Pack' '20'
   Generate-CommandReference 'ApiKey' '30'
-  Generate-CommandReference 'SetApiKey' '110'
   Generate-CommandReference 'Push' '40'
-  Generate-CommandReference 'UnpackSelf' '180'
-  Generate-CommandReference 'Update' '190'
-  Generate-CommandReference 'Version' '210'
-  Generate-CommandReference 'Download' '20'
-  Generate-CommandReference 'Support' '140'
-  Generate-CommandReference 'Sync' '150'
-  Generate-CommandReference 'Synchronize' '160'
-  Generate-CommandReference 'Optimize' '70'
+  Generate-CommandReference 'Template' '50'
+
   Generate-TopLevelCommandReference
   Move-GeneratedFiles
 

@@ -175,7 +175,7 @@ namespace chocolatey.infrastructure.filesystem
 
         public string get_current_assembly_path()
         {
-            return Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", string.Empty);
+            return Assembly.GetExecutingAssembly().CodeBase.Replace(Platform.get_platform() == PlatformType.Windows ? "file:///" : "file://", string.Empty);
         }
 
         #endregion
@@ -649,7 +649,10 @@ namespace chocolatey.infrastructure.filesystem
         public void move_directory(string directoryPath, string newDirectoryPath)
         {
             if (string.IsNullOrWhiteSpace(directoryPath) || string.IsNullOrWhiteSpace(newDirectoryPath)) throw new ApplicationException("You must provide a directory to move from or to.");
-            if (combine_paths(directoryPath, "").is_equal_to(combine_paths(Environment.GetEnvironmentVariable("SystemDrive"), ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
+            
+            //Linux/MacOS do not have a SystemDrive environment variable, instead, everything is under "/"
+            var systemDrive = Platform.get_platform() == PlatformType.Windows ? Environment.GetEnvironmentVariable("SystemDrive") : "/";
+            if (combine_paths(directoryPath, "").is_equal_to(combine_paths(systemDrive, ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
 
             try
             {
@@ -741,7 +744,10 @@ namespace chocolatey.infrastructure.filesystem
         public void delete_directory(string directoryPath, bool recursive, bool overrideAttributes, bool isSilent)
         {
             if (string.IsNullOrWhiteSpace(directoryPath)) throw new ApplicationException("You must provide a directory to delete.");
-            if (combine_paths(directoryPath, "").is_equal_to(combine_paths(Environment.GetEnvironmentVariable("SystemDrive"), ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
+
+            //Linux / MacOS do not have a SystemDrive environment variable, instead, everything is under "/"
+            var systemDrive = Platform.get_platform() == PlatformType.Windows ? Environment.GetEnvironmentVariable("SystemDrive") : "/";
+            if (combine_paths(directoryPath, "").is_equal_to(combine_paths(systemDrive, ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
 
             if (overrideAttributes)
             {
