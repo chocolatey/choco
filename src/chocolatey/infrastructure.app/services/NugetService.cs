@@ -482,7 +482,7 @@ folder.");
             _fileSystem.EnsureDirectoryExists(ApplicationParameters.PackagesLocation);
             var packageResultsToReturn = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
-            //todo: #23 handle all
+            SetRemotePackageNamesIfAllSpecified(config, () => { });
 
             NuGetVersion version = !string.IsNullOrWhiteSpace(config.Version) ? NuGetVersion.Parse(config.Version) : null;
             if (config.Force) config.AllowDowngrade = true;
@@ -2728,6 +2728,33 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             }
 
             return allPackages;
+        }
+
+        private void SetRemotePackageNamesIfAllSpecified(ChocolateyConfiguration config, Action customAction)
+        {
+            if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
+            {
+                foreach (string repositoryUrl in ApplicationParameters.PublicNugetSources)
+                {
+                    if (config.Sources.contains(repositoryUrl))
+                    {
+                        throw new ApplicationException("Installing all packages from {0} is not supported.{1}Only internal nuget repositories are supported."
+                            .format_with(repositoryUrl, Environment.NewLine));
+                    }
+                }
+
+                var isQuiet = config.QuietOutput;
+                config.QuietOutput = true;
+                var input = config.Input;
+                config.Input = string.Empty;
+                var remotePackageList = list_run(config).Select(p => p.Name).ToList();
+                config.QuietOutput = isQuiet;
+                config.Input = input;
+
+                config.PackageNames = remotePackageList.@join(ApplicationParameters.PackageNamesSeparator);
+
+                if (customAction != null) customAction.Invoke();
+            }
         }
 
 #pragma warning disable IDE1006
