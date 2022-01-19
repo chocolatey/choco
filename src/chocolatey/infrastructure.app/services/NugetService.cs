@@ -970,7 +970,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             var projectContext = new ChocolateyNuGetProjectContext(config, _nugetLogger);
 
             var configIgnoreDependencies = config.IgnoreDependencies;
-            var allLocalPackages = SetPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; }).ToList();
+            var allLocalPackages = SetLocalPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; }).ToList();
             config.IgnoreDependencies = configIgnoreDependencies;
             var localPackageListValid = true;
 
@@ -1591,7 +1591,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             var outdatedPackages = new ConcurrentDictionary<string, PackageResult>();
 
-            var allPackages = SetPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; });
+            var allPackages = SetLocalPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; });
             var packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty().ToList();
 
             config.CreateBackup();
@@ -2141,7 +2141,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 }
             }
 
-            SetPackageNamesIfAllSpecified(config, () =>
+            SetLocalPackageNamesIfAllSpecified(config, () =>
                 {
                     // force remove the item, ignore the dependencies
                     // as those are going to be picked up anyway
@@ -2682,7 +2682,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             return installedPackages;
         }
 
-        private IEnumerable<PackageResult> SetPackageNamesIfAllSpecified(ChocolateyConfiguration config, Action customAction)
+        private IEnumerable<PackageResult> SetLocalPackageNamesIfAllSpecified(ChocolateyConfiguration config, Action customAction)
         {
             var allPackages = GetInstalledPackages(config);
             if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
