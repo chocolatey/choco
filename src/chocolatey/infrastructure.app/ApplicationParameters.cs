@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Security.Principal;
 using chocolatey.infrastructure.adapters;
 using chocolatey.infrastructure.filesystem;
@@ -101,6 +102,8 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyCommunityFeedPushSource = "https://push.chocolatey.org/";
         public static readonly string ChocolateyCommunityGalleryUrl = "https://community.chocolatey.org/";
         public static readonly string ChocolateyCommunityFeedSource = "https://community.chocolatey.org/api/v2/";
+        public static readonly string NuGetPublicFeedSourceV2 = "https://www.nuget.org/api/v2/";
+        public static readonly string NuGetPublicFeedSourceV3 = "https://api.nuget.org/v3/index.json";
         public static readonly string ChocolateyLicensedFeedSource = "https://licensedpackages.chocolatey.org/api/v2/";
         public static readonly string ChocolateyLicensedFeedSourceName = "chocolatey.licensed";
         public static readonly string UserAgent = "Chocolatey Command Line";
@@ -110,6 +113,15 @@ namespace chocolatey.infrastructure.app
         public static readonly string PowerShellModulePathProcessDocuments = _fileSystem.CombinePaths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "WindowsPowerShell\\Modules");
         public static readonly string LocalSystemSidString = "S-1-5-18";
         public static readonly SecurityIdentifier LocalSystemSid = new SecurityIdentifier(LocalSystemSidString);
+        public static readonly List<string> PublicNuGetSources = new List<string>()
+        {
+            ChocolateyCommunityFeedSource,
+            ChocolateyCommunityFeedPushSource,
+            ChocolateyCommunityFeedPushSourceOld,
+            NuGetPublicFeedSourceV2,
+            NuGetPublicFeedSourceV3,
+            ChocolateyLicensedFeedSource,
+        };
 
         private static string GetHttpCacheLocation()
         {
