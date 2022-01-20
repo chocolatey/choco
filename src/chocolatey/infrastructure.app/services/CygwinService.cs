@@ -218,6 +218,11 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> Install(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
         {
+            if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
+            {
+                throw new NotImplementedException("Alternative sources do not allow the use of the 'all' package name/keyword.");
+            }
+
             var args = BuildArgs(config, _installArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 

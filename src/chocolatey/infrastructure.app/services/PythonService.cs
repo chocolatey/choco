@@ -358,6 +358,11 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> Install(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
         {
+            if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
+            {
+                throw new NotImplementedException("Alternative sources do not allow the use of the 'all' package name/keyword.");
+            }
+
             EnsureExecutablePathSet();
             var args = BuildArguments(config, _installArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
@@ -441,7 +446,7 @@ namespace chocolatey.infrastructure.app.services
         {
             if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
             {
-                throw new NotImplementedException("The all keyword is not available for alternate sources");
+                throw new NotImplementedException("Alternative sources do not allow the use of the 'all' package name/keyword.");
             }
 
             EnsureExecutablePathSet();
