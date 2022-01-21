@@ -92,7 +92,7 @@ NOTE: Available with 0.12.0+."
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
-    choco pin [list]|info [<options/switches>]");
+    choco template [list]|info [<options/switches>]");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
