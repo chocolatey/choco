@@ -75,6 +75,8 @@ namespace chocolatey.infrastructure.app.runners
                 }
 
                 SetSourceType(config, container);
+                IncludeConfiguredSources(config);
+
                 // guaranteed that all settings are set.
                 EnvironmentSettings.SetEnvironmentVariables(config);
 
@@ -128,6 +130,29 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             config.SourceType = sourceType;
 
             this.Log().Debug(() => "The source '{0}' evaluated to a '{1}' source type".FormatWith(config.Sources, sourceType));
+        }
+
+        private void IncludeConfiguredSources(ChocolateyConfiguration config)
+        {
+            if (config.IncludeConfiguredSources)
+            {
+                if (config.SourceType != SourceTypes.Normal)
+                {
+                    this.Log().Warn("Not including sources from chocolatey.config file because '{0}' is an alternative source.".FormatWith(config.Sources));
+                }
+                else
+                {
+                    foreach (var machineSource in config.MachineSources.OrEmpty())
+                    {
+                        if (!config.Sources.ContainsSafe(machineSource.Key))
+                        {
+                            config.Sources += ";" + machineSource.Key;
+                        }
+                    }
+
+                    this.Log().Debug("Including sources from chocolatey.config file.");
+                }
+            }
         }
 
         public void FailOnMissingOrInvalidLicenseIfFeatureSet(ChocolateyConfiguration config)

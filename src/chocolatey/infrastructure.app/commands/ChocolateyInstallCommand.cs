@@ -205,6 +205,10 @@ namespace chocolatey.infrastructure.app.commands
                     "Skip hooks - Do not run hook scripts. Available in 1.2.0+",
                     option => configuration.SkipHookScripts = option != null
                     )
+                .Add("include-configured-sources",
+                    "Include Configured Sources - When using the '--source' option, this appends the sources that have been saved into the chocolatey.config file by 'source' command.  Available in 2.3.0+",
+                    option => configuration.IncludeConfiguredSources = option != null
+                    )
                 ;
 
             //todo: #770 package name can be a url / installertype

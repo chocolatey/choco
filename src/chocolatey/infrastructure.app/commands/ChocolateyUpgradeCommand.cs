@@ -254,6 +254,10 @@ namespace chocolatey.infrastructure.app.commands
                     "Ignore Pinned - Ignores any pins and upgrades the package(s) anyway. Available in 2.3.0+",
                     option => configuration.UpgradeCommand.IgnorePinned = option != null
                     )
+                .Add("include-configured-sources",
+                    "Include Configured Sources - When using the '--source' option, this appends the sources that have been saved into the chocolatey.config file by 'source' command.  Available in 2.3.0+",
+                    option => configuration.IncludeConfiguredSources = option != null
+                    )
                 ;
         }
 
