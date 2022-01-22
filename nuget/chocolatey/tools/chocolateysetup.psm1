@@ -76,19 +76,19 @@ function Remove-ShimWithAuthenticodeSignature {
 function Remove-UnsupportedShimFiles {
   param([string[]]$Paths)
 
-  $shims = @('cpack.exe')
+  $shims = @("cpack.exe", "cver.exe")
 
   $Paths | ForEach-Object {
     $path = $_
     $shims | ForEach-Object { Join-Path $path $_ } | Where-Object { Test-Path $_ } | ForEach-Object {
-      $path = $_
-      Write-Debug "Removing shim from '$path'."
+      $shimPath = $_
+      Write-Debug "Removing shim from '$shimPath'."
 
       try {
-        Remove-ShimWithAuthenticodeSignature -filePath $path
+        Remove-ShimWithAuthenticodeSignature -filePath $shimPath
       }
       catch {
-        Write-ChocolateyWarning "Unable to remove '$path'. Please remove the file manually."
+        Write-ChocolateyWarning "Unable to remove '$shimPath'. Please remove the file manually."
       }
     }
   }
@@ -387,7 +387,7 @@ param(
     $from = "$chocolateyPathOld\bin"
     $to = "$chocolateyPath\bin"
     # TODO: This exclusion list needs to be updated once shims are removed
-    $exclude = @("choco.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpush.exe", "cuninst.exe", "cup.exe", "cver.exe", "RefreshEnv.cmd")
+    $exclude = @("choco.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpush.exe", "cuninst.exe", "cup.exe", "RefreshEnv.cmd")
     Get-ChildItem -Path $from -recurse -Exclude $exclude |
       % {
         Write-Debug "Copying $_ `n to $to"
