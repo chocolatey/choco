@@ -1,4 +1,4 @@
-# Copyright © 2017 - 2021 Chocolatey Software, Inc.
+﻿# Copyright © 2017 - 2021 Chocolatey Software, Inc.
 # Copyright © 2015 - 2017 RealDimensions Software, LLC
 # Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
