@@ -1,4 +1,5 @@
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.xmlReport
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.XmlReport
@@ -53,8 +54,8 @@ object Chocolatey : BuildType({
                         Install-WindowsFeature -Name NET-Framework-Features
                     }
 
-                    choco install windows-sdk-7.1 --confirm --no-progress
-                    choco install netfx-4.0.3-devpack --confirm --no-progress
+                    choco install windows-sdk-7.1 netfx-4.0.3-devpack --confirm --no-progress
+                    exit ${'$'}LastExitCode
                 """.trimIndent()
             }
         }
@@ -64,13 +65,9 @@ object Chocolatey : BuildType({
             type = "PrepareSigningEnvironment"
         }
 
-        powerShell {
-            name = "Build"
-            scriptMode = script {
-                content = """
-                    .\\build.official.bat -D:version.fix=%build.counter%
-                """.trimIndent()
-            }
+        script {
+            name = "Call UppercuT"
+            scriptContent = "call build.official.bat -D:version.fix=%build.counter%"
         }
 
         nuGetPublish {
