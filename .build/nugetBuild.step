@@ -45,6 +45,7 @@
     <property name="nuget.version" value="${nuget.version + '-' + version.fix}" if="${version.fix != '0' and version.use.build_date}" />
     <!-- version.use.build_date -->
     <echo level="Warning" message="Using ${nuget.version} as the version for the nuget package(s)." />
+    <echo level="Warning" message="##teamcity[buildNumber '${nuget.version}']" if="${run.teamcity}" />
   </target>
 
   <target name="build_nugget">
