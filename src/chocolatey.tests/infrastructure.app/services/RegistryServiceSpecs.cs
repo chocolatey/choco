@@ -144,6 +144,6 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        //todo a subkey that exists only in 32 bit mode (must create it to test it though)
+        //todo: #2580 a subkey that exists only in 32 bit mode (must create it to test it though)
     }
 }

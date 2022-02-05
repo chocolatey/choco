@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             // http://www.indigorose.com/forums/threads/23686-How-to-Set-the-Default-Application-Directory
             // http://www.indigorose.com/webhelp/suf70/Program_Reference/Screen_Types/Select_Install_Folder/Properties.htm
             // http://www.indigorose.com/webhelp/suf70/Program_Reference/Variables/Session_Variables.htm#AppFolder
-            // todo: basically we need an environment variable for AppFolder
+            // todo: #2582 basically we need an environment variable for AppFolder
             CustomInstallLocation = "";
             Language = "";
             //OtherInstallOptions = "\"/T:{0}\"".format_with(InstallTokens.TEMP_LOCATION);

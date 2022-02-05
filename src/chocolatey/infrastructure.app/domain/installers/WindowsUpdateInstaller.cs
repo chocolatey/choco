@@ -28,7 +28,7 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public WindowsUpdateInstaller()
         {
-            //todo: fully qualify wusa
+            //todo: #2583 fully qualify wusa
             InstallExecutable = "wusa.exe";
             SilentInstall = "\"{0}\" /quiet".format_with(InstallTokens.INSTALLER_LOCATION);
             NoReboot = "/norestart";

@@ -41,7 +41,7 @@ namespace chocolatey.infrastructure.registration
             catch (Exception)
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
-                //todo: provide this warning with the ability to opt out of seeing it again so we can move it up to more prominent visibility and not just the verbose log
+                //todo: #2585 provide this warning with the ability to opt out of seeing it again so we can move it up to more prominent visibility and not just the verbose log
                 if (provideWarning)
                 {
                 "chocolatey".Log().Warn(ChocolateyLoggers.Verbose,

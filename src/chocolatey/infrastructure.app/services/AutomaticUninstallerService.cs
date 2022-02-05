@@ -122,7 +122,7 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
 
-            //todo: if there is a local package, look to use it in the future
+            //todo: #2562 if there is a local package, look to use it in the future
             if (string.IsNullOrWhiteSpace(key.UninstallString))
             {
                 this.Log().Info(" Skipping auto uninstaller - '{0}' does not have an uninstall string.".format_with(!string.IsNullOrEmpty(key.DisplayName.to_string()) ? key.DisplayName.to_string().escape_curly_braces() : "The application"));
@@ -187,7 +187,7 @@ namespace chocolatey.infrastructure.app.services
 
             if (!key.HasQuietUninstall)
             {
-                //todo: ultimately we should merge keys
+                //todo: #2563 ultimately we should merge keys
                 uninstallArgs += " " + installer.build_uninstall_command_arguments();
             }
 

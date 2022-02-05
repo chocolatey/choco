@@ -16,13 +16,13 @@
 
 namespace chocolatey.infrastructure.app.utility
 {
-    //todo: maybe find a better name/location for this
+    //todo: #2560 maybe find a better name/location for this
 
     public static class ArgumentsUtility
     {
         public static bool arguments_contain_sensitive_information(string commandArguments)
         {
-            //todo:this check is naive, we should switch to regex
+            //todo: #2561 this check is naive, we should switch to regex
             //this picks up cases where arguments are passed with '-' and '--'
             return commandArguments.contains("-install-arguments-sensitive")
              || commandArguments.contains("-package-parameters-sensitive")

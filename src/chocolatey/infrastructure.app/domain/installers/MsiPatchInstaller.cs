@@ -22,7 +22,7 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public MsiPatchInstaller()
         {
-            //todo: fully qualify msiexec
+            //todo: #2573 fully qualify msiexec
             InstallExecutable = "msiexec.exe";
             SilentInstall = "/p \"{0}\" /qn".format_with(InstallTokens.INSTALLER_LOCATION);
             // http://msdn.microsoft.com/en-us/library/aa371101.aspx
