@@ -413,6 +413,11 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction = null)
         {
+            if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
+            {
+                throw new NotImplementedException("The all keyword is not available for alternate sources");
+            }
+
             set_executable_path_if_not_set();
             var args = build_args(config, _upgradeArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
