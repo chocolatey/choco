@@ -291,7 +291,7 @@ param(
     $acl = (Get-Item $folder).GetAccessControl('Access,Owner')
 
     Write-Debug "Removing existing permissions."
-    $acl.Access | % { $acl.RemoveAccessRuleAll($_) }
+    $acl.Access | ForEach-Object { $acl.RemoveAccessRuleAll($_) }
 
     $inheritanceFlags = ([Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [Security.AccessControl.InheritanceFlags]::ObjectInherit)
     $propagationFlags = [Security.AccessControl.PropagationFlags]::None
@@ -368,7 +368,7 @@ param(
 
     $chocolateyExePathOld = Join-Path $chocolateyPathOld 'bin'
     'Machine', 'User' |
-    % {
+    ForEach-Object {
       $path = Get-EnvironmentVariable -Name 'PATH' -Scope $_
       $updatedPath = [System.Text.RegularExpressions.Regex]::Replace($path,[System.Text.RegularExpressions.Regex]::Escape($chocolateyExePathOld) + '(?>;)?', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
       if ($updatedPath -ne $path) {
@@ -389,7 +389,7 @@ param(
     # TODO: This exclusion list needs to be updated once shims are removed
     $exclude = @("choco.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpush.exe", "cuninst.exe", "cup.exe", "RefreshEnv.cmd")
     Get-ChildItem -Path $from -recurse -Exclude $exclude |
-      % {
+      ForEach-Object {
         Write-Debug "Copying $_ `n to $to"
         if ($_.PSIsContainer) {
           Copy-Item $_ -Destination (Join-Path $to $_.Parent.FullName.Substring($from.length)) -Force -ErrorAction SilentlyContinue
@@ -415,7 +415,7 @@ param(
   if (Test-Path $chocolateyPathOld) {
     Write-ChocolateyWarning "This action will result in Log Errors, you can safely ignore those. `n You may need to finish removing '$chocolateyPathOld' manually."
     try {
-      Get-ChildItem -Path "$chocolateyPathOld" | % {
+      Get-ChildItem -Path "$chocolateyPathOld" | ForEach-Object {
         if (Test-Path $_.FullName) {
           Write-Debug "Removing $_ unless matches .log"
           Remove-Item $_.FullName -exclude *.log -recurse -force -ErrorAction SilentlyContinue
@@ -438,11 +438,11 @@ param(
   Write-Debug "Install-ChocolateyFiles"
 
   Write-Debug "Removing install files in chocolateyInstall, helpers, redirects, and tools"
-  "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" | % {
+  "$chocolateyPath\chocolateyInstall", "$chocolateyPath\helpers", "$chocolateyPath\redirects", "$chocolateyPath\tools" | ForEach-Object {
     #Write-Debug "Checking path $_"
 
     if (Test-Path $_) {
-      Get-ChildItem -Path "$_" | % {
+      Get-ChildItem -Path "$_" | ForEach-Object {
         #Write-Debug "Checking child path $_ ($($_.FullName))"
         if (Test-Path $_.FullName) {
           Write-Debug "Removing $_ unless matches .log"
@@ -504,9 +504,9 @@ param(
     }
 
     if (!(Test-Path("$chocoPkgDirectory\chocolatey.nupkg"))) {
-      $chocoPkg = Get-ChildItem "$thisScriptFolder/../../" | ?{$_.name -match "^chocolatey.*nupkg" } | Sort name -Descending | Select -First 1
+      $chocoPkg = Get-ChildItem "$thisScriptFolder/../../" | Where-Object{$_.name -match "^chocolatey.*nupkg" } | Sort-Object name -Descending | Select-Object -First 1
       if ($chocoPkg -ne '') { $chocoPkg = $chocoPkg.FullName }
-      "$chocoZipFile", "$chocoPkg" | % {
+      "$chocoZipFile", "$chocoPkg" | ForEach-Object {
         if ($_ -ne $null -and $_ -ne '') {
           if (Test-Path $_) {
             Write-Debug "Copying '$_' to '$chocoPkgDirectory\chocolatey.nupkg'."

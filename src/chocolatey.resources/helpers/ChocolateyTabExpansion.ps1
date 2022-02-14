@@ -29,8 +29,8 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
     if ($currentArguments -ne $null -and $currentArguments.Trim() -ne '') { $currentOptions = $currentArguments.Trim() -split ' ' }
 
     $commands.$command.Replace("  "," ") -split ' ' |
-      where { $_ -notmatch "^(?:$($currentOptions -join '|' -replace "=", "\="))(?:\S*)\s?$" } |
-      where { $_ -like "$filter*" }
+      Where-Object { $_ -notmatch "^(?:$($currentOptions -join '|' -replace "=", "\="))(?:\S*)\s?$" } |
+      Where-Object { $_ -like "$filter*" }
 }
 
 $script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','optimize','pack','push','sync','-h','--help','pin','source','config','feature','apikey','export','help','template','--version')
@@ -80,9 +80,9 @@ function script:chocoCommands($filter) {
         $cmdList += $someCommands -like "$filter*"
     } else {
         $cmdList += (& $script:choco -h) |
-            where { $_ -match '^  \S.*' } |
-            foreach { $_.Split(' ', [StringSplitOptions]::RemoveEmptyEntries) } |
-            where { $_ -like "$filter*" }
+            Where-Object { $_ -match '^  \S.*' } |
+            ForEach-Object { $_.Split(' ', [StringSplitOptions]::RemoveEmptyEntries) } |
+            Where-Object { $_ -like "$filter*" }
     }
 
     $cmdList #| sort
@@ -90,21 +90,21 @@ function script:chocoCommands($filter) {
 
 function script:chocoLocalPackages($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
-    @(& $script:choco list $filter -lo -r --id-starts-with) | %{ $_.Split('|')[0] }
+    @(& $script:choco list $filter -lo -r --id-starts-with) | ForEach-Object{ $_.Split('|')[0] }
 }
 
 function script:chocoLocalPackagesUpgrade($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
-    @('all|') + @(& $script:choco list $filter -lo -r --id-starts-with) | where { $_ -like "$filter*" } | %{ $_.Split('|')[0] }
+    @('all|') + @(& $script:choco list $filter -lo -r --id-starts-with) | Where-Object { $_ -like "$filter*" } | ForEach-Object{ $_.Split('|')[0] }
 }
 
 function script:chocoRemotePackages($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
-    @('packages.config|') + @(& $script:choco search $filter --page='0' --page-size='30' -r --id-starts-with --order-by-popularity) | where { $_ -like "$filter*" } | %{ $_.Split('|')[0] }
+    @('packages.config|') + @(& $script:choco search $filter --page='0' --page-size='30' -r --id-starts-with --order-by-popularity) | Where-Object { $_ -like "$filter*" } | ForEach-Object{ $_.Split('|')[0] }
 }
 
 function Get-AliasPattern($exe) {
-  $aliases = @($exe) + @(Get-Alias | where { $_.Definition -eq $exe } | select -Exp Name)
+  $aliases = @($exe) + @(Get-Alias | Where-Object { $_.Definition -eq $exe } | Select-Object -Exp Name)
 
   "($($aliases -join '|'))"
 }
@@ -129,46 +129,46 @@ function ChocolateyTabExpansion($lastBlock) {
 
     # Handles list/search first tab
     "^(list|search)\s+(?<subcommand>[^-\s]*)$" {
-      @('<filter>','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('<filter>','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles new first tab
     "^(new)\s+(?<subcommand>[^-\s]*)$" {
-      @('<name>','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('<name>','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles pack first tab
     "^(pack)\s+(?<subcommand>[^-\s]*)$" {
-      @('<PathtoNuspec>','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('<PathtoNuspec>','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles push first tab
     "^(push)\s+(?<subcommand>[^-\s]*)$" {
-      @('<PathtoNupkg>','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('<PathtoNupkg>','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles source first tab
     "^(source)\s+(?<subcommand>[^-\s]*)$" {
-      @('list','add','remove','disable','enable','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('list','add','remove','disable','enable','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles pin first tab
     "^(pin)\s+(?<subcommand>[^-\s]*)$" {
-      @('list','add','remove','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('list','add','remove','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles feature first tab
     "^(feature)\s+(?<subcommand>[^-\s]*)$" {
-      @('list','disable','enable','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('list','disable','enable','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
     # Handles config first tab
     "^(config)\s+(?<subcommand>[^-\s]*)$" {
-      @('list','get','set','unset','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('list','get','set','unset','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles template first tab
     "^(template)\s+(?<subcommand>[^-\s]*)$" {
-        @('list', 'info', '-?') | where { $_ -like "$($matches['subcommand'])*" }
+        @('list', 'info', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles more options after others

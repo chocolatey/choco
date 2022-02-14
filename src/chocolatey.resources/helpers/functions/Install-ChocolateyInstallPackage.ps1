@@ -228,7 +228,7 @@ Start-ChocolateyProcessAsAdmin
 
   $bitnessMessage = ''
   $fileFullPath = $file
-  if ((Get-ProcessorBits 32) -or $env:ChocolateyForceX86 -eq 'true') {
+  if ((Get-OSArchitectureWidth 32) -or $env:ChocolateyForceX86 -eq 'true') {
     if (!$file) { throw "32-bit installation is not supported for $packageName"; }
     if ($file64) { $bitnessMessage = '32-bit '; }
   }
@@ -311,8 +311,8 @@ Pro / Business supports a single, ubiquitous install directory option.
   try {
     # make sure any logging folder exists
     $pattern = "(?:['`"])([a-zA-Z]\:\\[^'`"]+)(?:[`"'])|([a-zA-Z]\:\\[\S]+)"
-    $silentArgs, $additionalInstallArgs | % { Select-String $pattern -input $_ -AllMatches } |
-    % { $_.Matches } | % {
+    $silentArgs, $additionalInstallArgs | ForEach-Object { Select-String $pattern -input $_ -AllMatches } |
+    ForEach-Object { $_.Matches } | ForEach-Object {
       $argDirectory = $_.Groups[1]
       if ($argDirectory -eq $null -or $argDirectory -eq '') { continue }
       $argDirectory = [System.IO.Path]::GetFullPath([System.IO.Path]::GetDirectoryName($argDirectory))

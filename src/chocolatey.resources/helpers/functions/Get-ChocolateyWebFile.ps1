@@ -229,7 +229,7 @@ param(
   $checksum32 = $checksum
   $checksumType32 = $checksumType
   $bitWidth = 32
-  if (Get-ProcessorBits 64) {
+  if (Get-OSArchitectureWidth 64) {
     $bitWidth = 64
   }
   Write-Debug "CPU is $bitWidth bit"
