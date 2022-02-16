@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>zip.template</id>
+    <version>1.0.0</version>
+    <packageSourceUrl>https://github.com/ferventcoder/chocolatey-packages</packageSourceUrl>
+    <owners>Rob Reynolds, Chocolatey</owners>
+    <title>Chocolatey Zip Template</title>
+    <authors>Rob Reynolds, The Chocolatey Team</authors>
+    <projectUrl>https://github.com/chocolatey/choco</projectUrl>
+    <iconUrl>https://github.com/chocolatey/choco/raw/master/docs/logo/chocolateyicon.gif</iconUrl>
+    <copyright>RealDimensions Software, LLC - 2016-Present</copyright>
+    <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <!--<docsUrl>At what url are the software docs located?</docsUrl>-->
+    <tags>zip package template</tags>
+    <projectSourceUrl>https://github.com/chocolatey/choco</projectSourceUrl>
+    <summary>Zip Chocolatey template</summary>
+    <description>### Chocolatey Zip Template
+This adds a template for archive (zipped) packages.
+    
+    </description>
+  </metadata>
+  <files>
+    <file src="templates\**" target="templates" />
+  </files>
+</package>

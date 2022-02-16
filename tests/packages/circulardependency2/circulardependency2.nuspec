@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>circulardependency2</id>
+    <version>0.0.1</version>
+    <title>circulardependency2 (Install)</title>
+    <authors>Chocolatey Software</authors>
+    <tags>circulardependency1 SPACE_SEPARATED</tags>
+    <summary>Test of circular dependencies</summary>
+    <description>Circular dependencies are not supported by Chocolatey. `choco install` should fail when it encounters them.
+    </description>
+    <dependencies>
+      <dependency id="circulardependency1" />
+    </dependencies>
+  </metadata>
+</package>

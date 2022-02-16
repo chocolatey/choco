@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <!-- == PACKAGE SPECIFIC SECTION == -->
+    <id>mvcmusicstore-db</id>
+    <version>1.0.0</version>
+
+    <!-- == SOFTWARE SPECIFIC SECTION == -->
+    <title>Mvc Music Store Database</title>
+    <authors>Nobody</authors>
+    <tags>mvcmusicstore db</tags>
+    <summary>Mvc Music Store Database</summary>
+    <description>This is the code that releases the database</description>
+    <releaseNotes>v1.0.0 - Initial Release</releaseNotes>
+    <dependencies>
+      <dependency id="roundhouse" version="0.8.6" />
+    </dependencies>
+    
+  </metadata>
+  <files>
+    <!-- this section controls what actually gets packaged into the Chocolatey package -->
+    <file src="tools\**" target="tools" />
+    <!--Building from Linux? You may need this instead: <file src="tools/**" target="tools" />-->
+  </files>
+</package>
