@@ -738,6 +738,7 @@ Would have determined packages that are out of date based on what is
                     if (pkgSettings.ApplyPackageParametersToDependencies) packageConfig.ApplyPackageParametersToDependencies = true;
                     SourceType sourceType;
                     if (Enum.TryParse(pkgSettings.Source, true, out sourceType)) packageConfig.SourceType = sourceType;
+                    if (pkgSettings.PinPackage) packageConfig.PinPackage = true;
                     if (pkgSettings.Force) packageConfig.Force = true;
                     packageConfig.CommandExecutionTimeoutSeconds = pkgSettings.ExecutionTimeout == -1 ? packageConfig.ExecutionTimeout : pkgSettings.CommandExecutionTimeoutSeconds;
                     if (pkgSettings.Prerelease) packageConfig.Prerelease = true;
