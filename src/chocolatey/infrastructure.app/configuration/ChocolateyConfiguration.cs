@@ -735,6 +735,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         public bool IncludeVersionNumbers { get; set; }
         public bool IncludeRememberedPackageArguments { get; set; }
+        public bool ExcludePins { get; set; }
 
         public string OutputFilePath { get; set; }
     }

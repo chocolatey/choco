@@ -56,7 +56,7 @@ $commandOptions = @{
     config    = "--name='' --value=''"
     feature   = "--name=''"
     apikey    = "--source='' --api-key='' --remove"
-    export    = "--include-version-numbers --output-file-path=''  --include-remembered-arguments"
+    export    = "--include-version-numbers --output-file-path=''  --include-remembered-arguments --exclude-pins"
     template  = "--name=''"
     cache     = "--expired"
     rule      = "--name=''"

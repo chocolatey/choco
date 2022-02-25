@@ -120,6 +120,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 _optionSet.Contains("include-remembered-arguments").Should().BeTrue();
             }
+
+            [Fact]
+            public void Should_add_exclude_pins_to_the_option_set()
+            {
+                _optionSet.Contains("exclude-pins").Should().BeTrue();
+            }
         }
 
         public class When_handling_additional_argument_parsing : ChocolateyExportCommandSpecsBase
