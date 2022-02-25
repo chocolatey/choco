@@ -64,6 +64,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("include-arguments|include-remembered-arguments",
                     "Include Remembered Arguments - controls whether or not remembered arguments for each package appear in generated file.  Defaults to false. Available in 2.3.0+",
                     option => configuration.ExportCommand.IncludeRememberedPackageArguments = option != null)
+                .Add("exclude-pins",
+                    "Exclude Pins - controls whether or not pins are included. Only applies if remembered arguments are exported. Defaults to false. Available in 2.4.0+",
+                    option => configuration.ExportCommand.ExcludePins = option != null)
                 ;
         }
 
@@ -108,6 +111,7 @@ those packages onto new machine using `choco install packages.config`.
     choco export
     choco export --include-version-numbers
     choco export --include-version-numbers --include-remembered-arguments
+    choco export --include-remembered-arguments --exclude-pins
     choco export ""'c:\temp\packages.config'""
     choco export ""'c:\temp\packages.config'"" --include-version-numbers
     choco export -o=""'c:\temp\packages.config'""
@@ -145,7 +149,12 @@ If you find other exit codes that we have not yet documented, please
 
         public void DryRun(ChocolateyConfiguration configuration)
         {
-            this.Log().Info("Export would have been with options: {0} Output File Path={1}{0} Include Version Numbers:{2}{0} Include Remembered Arguments: {3}".FormatWith(Environment.NewLine, configuration.ExportCommand.OutputFilePath, configuration.ExportCommand.IncludeVersionNumbers, configuration.ExportCommand.IncludeRememberedPackageArguments));
+            this.Log().Info("Export would have been with options: {0} Output File Path={1}{0} Include Version Numbers:{2}{0} Include Remembered Arguments: {3}{0}  Exclude Pins: {4}".FormatWith(
+                Environment.NewLine,
+                configuration.ExportCommand.OutputFilePath,
+                configuration.ExportCommand.IncludeVersionNumbers,
+                configuration.ExportCommand.IncludeRememberedPackageArguments,
+                configuration.ExportCommand.ExcludePins));
         }
 
         public void Run(ChocolateyConfiguration configuration)
@@ -206,6 +215,11 @@ If you find other exit codes that we have not yet documented, please
                                     // if (!string.IsNullOrWhiteSpace(configuration.CacheLocation)) packageElement.CacheLocation = configuration.CacheLocation;
                                     // if (configuration.Features.FailOnStandardError) packageElement.FailOnStderr = true;
                                     // if (!configuration.Features.UsePowerShellHost) packageElement.UseSystemPowershell = true;
+
+                                    if (!configuration.ExportCommand.ExcludePins && pkgInfo.IsPinned)
+                                    {
+                                        xw.WriteAttributeString("pinPackage", "true");
+                                    }
 
                                     // Make sure to reset the configuration so as to be able to parse the next set of remembered arguments
                                     configuration.RevertChanges();
