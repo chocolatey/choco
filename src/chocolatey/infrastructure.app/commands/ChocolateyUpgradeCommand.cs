@@ -29,8 +29,6 @@ namespace chocolatey.infrastructure.app.commands
     [CommandFor("upgrade", "upgrades packages from various sources")]
     public class ChocolateyUpgradeCommand : ICommand
     {
-        //todo v1 Deprecation reseal this class and remove virtuals
-
         private readonly IChocolateyPackageService _packageService;
 
         public ChocolateyUpgradeCommand(IChocolateyPackageService packageService)
