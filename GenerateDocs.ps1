@@ -79,7 +79,6 @@ These are the functions from above as one list.
 
 * [Install-ChocolateyZipPackage](xref:install-chocolateyzippackage)
 * [Install-ChocolateyPowershellCommand](xref:install-chocolateypowershellcommand)
-* [Write-ChocolateyFailure](xref:write-chocolateyfailure)
 * [Get-ChocolateyWebFile](xref:get-chocolateywebfile)
 * [Get-ChocolateyUnzip](xref:get-chocolateyunzip)
 * [Install-ChocolateyPath](xref:install-chocolateypath) - when specifying user path
