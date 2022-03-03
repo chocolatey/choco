@@ -83,7 +83,6 @@ These are the functions from above as one list.
 * [Get-ChocolateyUnzip](xref:get-chocolateyunzip)
 * [Install-ChocolateyPath](xref:install-chocolateypath) - when specifying user path
 * [Install-ChocolateyEnvironmentVariable](xref:install-chocolateyenvironmentvariable) - when specifying user path
-* [Install-ChocolateyDesktopLink](xref:install-chocolateydesktoplink) - **DEPRECATED** - see [Install-ChocolateyShortcut](xref:install-chocolateyshortcut)
 * [Install-ChocolateyPinnedTaskBarItem](xref:install-chocolateypinnedtaskbaritem)
 * [Install-ChocolateyShortcut](xref:install-chocolateyshortcut) - v0.9.9+
 * [Update-SessionEnvironment](xref:update-sessionenvironment)

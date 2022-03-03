@@ -69,7 +69,6 @@
     <EmbeddedResource Include="helpers\functions\Get-VirusCheckValid.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-WebFile.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-WebHeaders.ps1" />
-    <EmbeddedResource Include="helpers\functions\Install-ChocolateyDesktopLink.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyEnvironmentVariable.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyExplorerMenuItem.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyFileAssociation.ps1" />
