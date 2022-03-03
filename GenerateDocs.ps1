@@ -57,13 +57,6 @@ These functions call other functions and many times may be the only thing you ne
 * [Install-ChocolateyPowershellCommand](xref:install-chocolateypowershellcommand)
 * [Install-ChocolateyVsixPackage](xref:install-chocolateyvsixpackage)
 
-## Error / Success Functions
-
-* [Write-ChocolateySuccess](xref:write-chocolateysuccess) - **DEPRECATED**
-* [Write-ChocolateyFailure](xref:write-chocolateyfailure) - **DEPRECATED**
-
-You really don't need a try catch with Chocolatey PowerShell files anymore.
-
 ## More Functions
 
 ### Administrative Access Functions
@@ -86,7 +79,6 @@ These are the functions from above as one list.
 
 * [Install-ChocolateyZipPackage](xref:install-chocolateyzippackage)
 * [Install-ChocolateyPowershellCommand](xref:install-chocolateypowershellcommand)
-* [Write-ChocolateySuccess](xref:write-chocolateysuccess)
 * [Write-ChocolateyFailure](xref:write-chocolateyfailure)
 * [Get-ChocolateyWebFile](xref:get-chocolateywebfile)
 * [Get-ChocolateyUnzip](xref:get-chocolateyunzip)

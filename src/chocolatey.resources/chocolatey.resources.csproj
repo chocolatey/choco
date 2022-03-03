@@ -86,7 +86,6 @@
     <EmbeddedResource Include="helpers\functions\UnInstall-ChocolateyZipPackage.ps1" />
     <EmbeddedResource Include="helpers\functions\Update-SessionEnvironment.ps1" />
     <EmbeddedResource Include="helpers\functions\Write-ChocolateyFailure.ps1" />
-    <EmbeddedResource Include="helpers\functions\Write-ChocolateySuccess.ps1" />
     <EmbeddedResource Include="redirects\choco.exe.ignore" />
     <EmbeddedResource Include="redirects\chocolatey.exe.ignore" />
     <EmbeddedResource Include="redirects\cinst.exe.ignore" />

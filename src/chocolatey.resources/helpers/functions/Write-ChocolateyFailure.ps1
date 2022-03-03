@@ -43,9 +43,6 @@ The message to throw an error with.
 
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
-
-.LINK
-Write-ChocolateySuccess
 #>
 param(
   [string] $packageName,
