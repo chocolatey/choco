@@ -21,6 +21,7 @@ using chocolatey.infrastructure.results;
 using NuGet.Configuration;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using NUnit.Framework;
 
 namespace chocolatey.tests.integration.scenarios
 {
@@ -140,7 +141,10 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.ContainsMessage("upgradepackage|1.0.0").Should().BeTrue();
             }
 
+            // Windows only because decryption fallback on Mac/Linux logs a message
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void Should_only_have_messages_related_to_package_information()
             {
                 MockLogger.Messages.Should()
