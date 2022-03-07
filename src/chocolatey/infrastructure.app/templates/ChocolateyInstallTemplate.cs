@@ -158,18 +158,6 @@ Install-ChocolateyPackage @packageArgs # https://docs.chocolatey.org/en-us/creat
 # despite the name ""Install-ChocolateyZipPackage"" this also works with 7z archives
 #Install-ChocolateyZipPackage $packageName $url $toolsDir $url64
 ## END PORTABLE EXAMPLE
-
-## [DEPRECATING] PORTABLE EXAMPLE
-#$binRoot = Get-BinRoot
-#$installDir = Join-Path $binRoot ""$packageName""
-#Write-Host ""Adding `'$installDir`' to the path and the current shell path""
-#Install-ChocolateyPath ""$installDir""
-#$env:Path = ""$($env:Path);$installDir""
-
-# if removing $url64, please remove from here
-# despite the name ""Install-ChocolateyZipPackage"" this also works with 7z archives
-#Install-ChocolateyZipPackage ""$packageName"" ""$url"" ""$installDir"" ""$url64""
-## END PORTABLE EXAMPLE
 ";
 
         public static string AutomaticPackageNotes =
