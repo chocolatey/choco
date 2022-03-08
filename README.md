@@ -33,9 +33,10 @@ You can just call me choco.
 <!-- /TOC -->
 
 ## Build Status
-| TeamCity                                                                                                                                         | AppVeyor                                                                                                                                                                          | GitHub Action                                                                                                                                                                                                  |
-|--------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [![TeamCity Build Status](https://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/lv4u2v0v02dj3svu/branch/develop?svg=true)](https://ci.appveyor.com/project/chocolatey/choco/branch/develop)   | [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/develop?logo=github)]((https://github.com/chocolatey/choco/actions/workflows/build.yml)) |
+
+| GitHub Action                                                                                                                                                                                                  |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/develop?logo=github)](https://github.com/chocolatey/choco/actions/workflows/build.yml)  |
 
 ## Chat Room
 Come join in the conversation about Chocolatey in our Community Chat Room.
