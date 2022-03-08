@@ -215,7 +215,6 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void set_config_items(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
-            config.CacheLocation = Environment.ExpandEnvironmentVariables(set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder. Replaces `$env:TEMP` value for choco.exe process. It is highly recommended this be set to make Chocolatey more deterministic in cleanup."));
             if (string.IsNullOrWhiteSpace(config.CacheLocation))
             {
                 config.CacheLocation = fileSystem.get_temp_path(); // System.Environment.GetEnvironmentVariable("TEMP");
@@ -232,7 +231,11 @@ namespace chocolatey.infrastructure.app.builders
             if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.combine_paths(ApplicationParameters.InstallLocation, "temp");
 
             var commandExecutionTimeoutSeconds = 0;
-            var commandExecutionTimeout = set_config_item(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CommandExecutionTimeoutSeconds.to_string()) ? ApplicationParameters.DefaultWaitForExitInSeconds.to_string() : configFileSettings.CommandExecutionTimeoutSeconds.to_string(), "Default timeout for command execution. '0' for infinite (starting in 0.10.4).");
+            var commandExecutionTimeout = configFileSettings.ConfigSettings
+                .Where(f => f.Key.is_equal_to(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds))
+                .Select(c => c.Value)
+                .FirstOrDefault();
+
             int.TryParse(commandExecutionTimeout, out commandExecutionTimeoutSeconds);
             config.CommandExecutionTimeoutSeconds = commandExecutionTimeoutSeconds;
             if (commandExecutionTimeout != "0" && commandExecutionTimeoutSeconds <= 0)
