@@ -58,7 +58,8 @@ namespace chocolatey.infrastructure.app.services
             {
                 if (skip_source(source, configuration)) continue;
 
-                if (!configuration.QuietOutput) {
+                if (!configuration.QuietOutput)
+                {
                     if (configuration.RegularOutput)
                     {
                         this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}|Bypass Proxy - {5}|Self-Service - {6}|Admin Only - {7}.".format_with(
@@ -87,7 +88,8 @@ namespace chocolatey.infrastructure.app.services
                         ));
                     }
                 }
-                list.Add(new ChocolateySource {
+                list.Add(new ChocolateySource
+                {
                     Id = source.Id,
                     Value = source.Value,
                     Disabled = source.Disabled,
@@ -134,9 +136,9 @@ namespace chocolatey.infrastructure.app.services
                     configuration.SourceCommand.Password.is_equal_to(currentPassword) &&
                     configuration.SourceCommand.CertificatePassword.is_equal_to(currentCertificatePassword) &&
                     configuration.SourceCommand.Certificate.is_equal_to(source.Certificate) &&
-                    configuration.SourceCommand.BypassProxy == source.BypassProxy && 
+                    configuration.SourceCommand.BypassProxy == source.BypassProxy &&
                     configuration.SourceCommand.AllowSelfService == source.AllowSelfService &&
-                    configuration.SourceCommand.VisibleToAdminsOnly == source.VisibleToAdminsOnly 
+                    configuration.SourceCommand.VisibleToAdminsOnly == source.VisibleToAdminsOnly
                     )
                 {
                     if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
@@ -284,7 +286,7 @@ namespace chocolatey.infrastructure.app.services
 
                     if (keyAction != null)
                     {
-                        keyAction.Invoke(new ConfigFileApiKeySetting {Key = apiKeyValue, Source = apiKey.Source});
+                        keyAction.Invoke(new ConfigFileApiKeySetting { Key = apiKeyValue, Source = apiKey.Source });
                     }
                 }
             }
@@ -295,7 +297,7 @@ namespace chocolatey.infrastructure.app.services
                     var keyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();
                     if (keyAction != null)
                     {
-                        keyAction.Invoke(new ConfigFileApiKeySetting {Key = keyValue, Source = apiKey.Source});
+                        keyAction.Invoke(new ConfigFileApiKeySetting { Key = keyValue, Source = apiKey.Source });
                     }
                 }
             }
@@ -309,10 +311,10 @@ namespace chocolatey.infrastructure.app.services
             if (apiKey == null)
             {
                 configFileSettings.ApiKeys.Add(new ConfigFileApiKeySetting
-                    {
-                        Source = configuration.Sources,
-                        Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key),
-                    });
+                {
+                    Source = configuration.Sources,
+                    Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key),
+                });
 
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
