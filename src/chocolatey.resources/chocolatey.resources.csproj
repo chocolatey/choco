@@ -69,7 +69,6 @@
     <EmbeddedResource Include="helpers\functions\Get-VirusCheckValid.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-WebFile.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-WebHeaders.ps1" />
-    <EmbeddedResource Include="helpers\functions\Install-ChocolateyDesktopLink.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyEnvironmentVariable.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyExplorerMenuItem.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyFileAssociation.ps1" />
@@ -85,9 +84,6 @@
     <EmbeddedResource Include="helpers\functions\Uninstall-ChocolateyPackage.ps1" />
     <EmbeddedResource Include="helpers\functions\UnInstall-ChocolateyZipPackage.ps1" />
     <EmbeddedResource Include="helpers\functions\Update-SessionEnvironment.ps1" />
-    <EmbeddedResource Include="helpers\functions\Write-ChocolateyFailure.ps1" />
-    <EmbeddedResource Include="helpers\functions\Write-ChocolateySuccess.ps1" />
-    <EmbeddedResource Include="helpers\functions\Write-FileUpdateLog.ps1" />
     <EmbeddedResource Include="redirects\choco.exe.ignore" />
     <EmbeddedResource Include="redirects\chocolatey.exe.ignore" />
     <EmbeddedResource Include="redirects\cinst.exe.ignore" />
