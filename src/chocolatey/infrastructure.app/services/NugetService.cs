@@ -39,7 +39,7 @@ namespace chocolatey.infrastructure.app.services
     using IFileSystem = filesystem.IFileSystem;
     using chocolatey.infrastructure.app.utility;
 
-    //todo - this monolith is too large. Refactor once test coverage is up.
+    //todo: #2575 - this monolith is too large. Refactor once test coverage is up.
 
     public class NugetService : INugetService
     {
@@ -307,7 +307,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 throw new ApplicationException("Unable to create nupkg. See the log for error details.");
             }
-            //todo: v1 analyze package
+            //todo: #602 analyze package
             //if (package != null)
             //{
             //    AnalyzePackage(package);
@@ -357,7 +357,7 @@ folder.");
 
         public void install_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            //todo: noop should see if packages are already installed and adjust message, amiright?!
+            //todo: #2576 noop should see if packages are already installed and adjust message, amiright?!
 
             this.Log().Info("{0} would have used NuGet to install packages (if they are not already installed):{1}{2}".format_with(
                 ApplicationParameters.Name,
@@ -382,7 +382,7 @@ folder.");
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
-            //todo: handle all
+            //todo: #23 handle all
 
             SemanticVersion version = !string.IsNullOrWhiteSpace(config.Version) ? new SemanticVersion(config.Version) : null;
             if (config.Force) config.AllowDowngrade = true;
@@ -444,7 +444,7 @@ folder.");
                 // reset config each time through
                 config = originalConfig.deep_copy();
 
-                //todo: get smarter about realizing multiple versions have been installed before and allowing that
+                //todo: #2577 get smarter about realizing multiple versions have been installed before and allowing that
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
                 if (Platform.get_platform() != PlatformType.Windows && !packageName.EndsWith(".template"))
@@ -737,7 +737,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (pkgInfo != null && pkgInfo.IsSideBySide)
                 {
-                    //todo: get smarter about realizing multiple versions have been installed before and allowing that
+                    //todo: #103 get smarter about realizing multiple versions have been installed before and allowing that
                 }
 
                 var packageResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
@@ -1299,7 +1299,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
                     else
                     {
-                        //todo:allow cleaning of pkgstore files
+                        //todo: #2578 allow cleaning of pkgstore files
                     }
                 };
 
@@ -1561,7 +1561,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         public IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config)
         {
-            //todo : move to deep copy for get all installed
+            //todo: #2579 move to deep copy for get all installed
             //var listConfig = config.deep_copy();
             //listConfig.ListCommand.LocalOnly = true;
             //listConfig.Noop = false;

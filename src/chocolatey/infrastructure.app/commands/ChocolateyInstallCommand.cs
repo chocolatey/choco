@@ -182,7 +182,7 @@ namespace chocolatey.infrastructure.app.commands
                      })
                 ;
 
-            //todo: package name can be a url / installertype
+            //todo: #770 package name can be a url / installertype
         }
 
         public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)

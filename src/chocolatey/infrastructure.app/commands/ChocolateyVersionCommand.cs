@@ -29,7 +29,7 @@ namespace chocolatey.infrastructure.app.commands
     {
         private readonly IChocolateyPackageService _packageService;
 
-        //todo: v1 Deprecation - remove version
+        //todo: #2468 v1 Deprecation - remove version
 
         public ChocolateyVersionCommand(IChocolateyPackageService packageService)
             : base(packageService)

@@ -74,7 +74,7 @@ namespace chocolatey.infrastructure.app.registration
             container.Register<ICommandExecutor, CommandExecutor>(Lifestyle.Singleton);
             container.Register(() => new CustomString(string.Empty));
 
-            //todo:refactor - this should be autowired
+            //todo: #2572 refactor - this should be autowired
             container.Register<IEnumerable<ICommand>>(() =>
                 {
                     var list = new List<ICommand>

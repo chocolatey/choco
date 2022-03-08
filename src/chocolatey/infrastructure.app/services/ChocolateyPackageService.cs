@@ -362,7 +362,7 @@ Did you know Pro / Business automatically syncs with Programs and
                     var installersDifferences = _registryService.get_installer_key_differences(installersBefore, _registryService.get_installer_keys());
                     if (installersDifferences.RegistryKeys.Count != 0)
                     {
-                        //todo v1 - note keys passed in
+                        //todo: #2567 - note keys passed in
                         pkgInfo.RegistrySnapshot = installersDifferences;
 
                         var key = installersDifferences.RegistryKeys.FirstOrDefault();
@@ -380,7 +380,7 @@ Did you know Pro / Business automatically syncs with Programs and
                     IEnumerable<GenericRegistryValue> environmentChanges;
                     IEnumerable<GenericRegistryValue> environmentRemovals;
                     get_log_environment_changes(config, environmentBefore, out environmentChanges, out environmentRemovals);
-                    //todo: record this with package info
+                    //todo: #564 record this with package info
                 }
 
                 _filesService.ensure_compatible_file_attributes(packageResult, config);
@@ -1015,7 +1015,7 @@ The recent package changes indicate a reboot is necessary.
 
             if (packageResult.Success)
             {
-                //todo: v2 clean up package information store for things no longer installed (call it compact?)
+                //todo: #2568 v2 clean up package information store for things no longer installed (call it compact?)
                 uninstall_cleanup(config, packageResult);
             }
             else

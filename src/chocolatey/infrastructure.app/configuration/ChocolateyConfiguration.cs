@@ -168,7 +168,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </summary>
         public bool UnsuccessfulParsing { get; set; }
 
-        // TODO: Should look into using mutually exclusive output levels - Debug, Info (Regular), Error (Quiet)
+        // todo: #2564 Should look into using mutually exclusive output levels - Debug, Info (Regular), Error (Quiet)
         // Verbose and Important are not part of the levels at all
         /// <summary>
         /// Gets or sets a value indicating whether output should be limited.
@@ -411,7 +411,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool UsePackageRepositoryOptimizations { get; set; }
     }
 
-    //todo: retrofit other command configs this way
+    //todo: #2565 retrofit other command configs this way
 
     [Serializable]
     public sealed class ListCommandConfiguration

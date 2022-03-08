@@ -27,7 +27,7 @@ namespace chocolatey.infrastructure.licensing
         public bool IsValid { get; set; }
         public bool AssemblyLoaded { get; set; }
         public IAssembly Assembly { get; set; }
-        //todo: get version
+        //todo: #2566 get version
         public string Version { get; set; }
         public string InvalidReason { get; set; }
         public DateTime? ExpirationDate { get; set; }

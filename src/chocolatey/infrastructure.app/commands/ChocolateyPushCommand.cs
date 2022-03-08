@@ -64,7 +64,7 @@ namespace chocolatey.infrastructure.app.commands
                 //    "DisableBuffering -  Disable buffering when pushing to an HTTP(S) server to decrease memory usage. Note that when this option is enabled, integrated windows authentication might not work.",
                 //    option => configuration.PushCommand.DisableBuffering = option)
                 ;
-            //todo: push command - allow disable buffering?
+            //todo: #2569 push command - allow disable buffering?
         }
 
         public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
