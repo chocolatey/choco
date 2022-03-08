@@ -50,22 +50,15 @@ namespace chocolatey.infrastructure.licensing
                 catch (Exception ex)
                 {
                     "chocolatey".Log().Error(
-@"Error when attempting to load chocolatey licensed assembly. Ensure
- that chocolatey.licensed.dll exists at
- '{0}'.
- The error message itself may be helpful:{1} {2}".format_with(
-                    ApplicationParameters.LicensedAssemblyLocation,
-                    Environment.NewLine,
-                    ex.Message
-                    ));
-                    "chocolatey".Log().Warn(ChocolateyLoggers.Important,@" Install the Chocolatey Licensed Extension package with
- `choco install chocolatey.extension` to remove this license warning.
- TRIALS: If you have a trial license, you cannot use the above command
- as is and be successful. You need to download nupkgs from the links in
- the trial email as your license will not be registered on the licensed
- repository. Please reference
- https://docs.chocolatey.org/en-us/licensed-extension/setup#how-do-i-install-the-trial-edition
- for specific instructions.");
+                        @"A valid Chocolatey license was found, but the chocolatey.licensed.dll assembly could not be loaded:
+  {0}
+Ensure that the chocolatey.licensed.dll exists at the following path:
+ '{1}'".format_with(ex.Message, ApplicationParameters.LicensedAssemblyLocation));
+
+                    "chocolatey".Log().Warn(
+                        ChocolateyLoggers.Important,
+                        @"To resolve this, install the Chocolatey Licensed Extension package with
+ `choco install chocolatey.extension`");
                 }
             }
 
