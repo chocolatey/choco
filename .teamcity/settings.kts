@@ -34,7 +34,16 @@ project {
 object Chocolatey : BuildType({
     name = "Build"
 
-    artifactRules = "code_drop/nuget/*.nupkg"
+    artifactRules = """
+        build_output/build_artifacts/compile/msbuild-net-4.0-results.xml
+        build_output/build_artifacts/tests/index.html
+        build_output/build_artifacts/codecoverage/Html/index.htm
+        build_output/_BuildInfo.xml
+        build_output/build.log
+        code_drop/build_artifacts/ilmerge/ilmerge.log
+        code_drop/build_artifacts/ilmerge/ilmergedll.log
+        code_drop/nuget/*.nupkg
+    """.trimIndent()
 
     params {
         text("env.CHOCOLATEY_SOURCE", "https://hermes.chocolatey.org:8443/repository/choco-internal-testing/", readOnly = true, allowEmpty = false)
