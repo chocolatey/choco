@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -163,7 +163,7 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
                      "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
-                     ) 
+                     )
                  .Add("skip-if-not-installed|only-upgrade-installed|skip-when-not-installed",
                      "Skip Packages Not Installed - if a package is not installed, do not install it during the upgrade process. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with(ApplicationParameters.Features.SkipPackageUpgradesWhenNotInstalled, configuration.Features.SkipPackageUpgradesWhenNotInstalled.to_string()),
                      option => configuration.Features.SkipPackageUpgradesWhenNotInstalled = option != null
@@ -172,10 +172,10 @@ namespace chocolatey.infrastructure.app.commands
                      "Install Missing Packages When Not Installed - if a package is not installed, install it as part of running upgrade (typically default behavior). Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with(ApplicationParameters.Features.SkipPackageUpgradesWhenNotInstalled, configuration.Features.SkipPackageUpgradesWhenNotInstalled.to_string()),
                      option =>
                      {
-                        if (option != null)
-                        {
-                            configuration.Features.SkipPackageUpgradesWhenNotInstalled = false;
-                        }
+                         if (option != null)
+                         {
+                             configuration.Features.SkipPackageUpgradesWhenNotInstalled = false;
+                         }
                      })
                  .Add("exclude-pre|exclude-prerelease|exclude-prereleases",
                      "Exclude Prerelease - Should prerelease be ignored for upgrades? Will be ignored if you pass `--pre`. Available in 0.10.4+.",
@@ -341,7 +341,7 @@ In addition to the above exit codes, you may also see reboot exit codes
  the feature '{0}' to also be turned on to work properly.
  Available in v0.10.12+.
 ".format_with(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected));
-            
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"
 choco upgrade: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_upgrade.gif

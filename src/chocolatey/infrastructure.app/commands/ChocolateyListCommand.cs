@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,7 +60,7 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.ListCommand.IncludeRegistryPrograms = option != null)
                 .Add("a|all|allversions|all-versions",
                      "AllVersions - include results from all versions.",
-                     option => configuration.AllVersions = option != null)              
+                     option => configuration.AllVersions = option != null)
                 .Add("version=",
                      "Version - Specific version of a package to return.",
                      option => configuration.Version = option.remove_surrounding_quotes())
@@ -77,7 +77,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
                      option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
                 .Add("page=",
-                     "Page - the 'page' of results to return. Defaults to return all results. Available in 0.9.10+.", 
+                     "Page - the 'page' of results to return. Defaults to return all results. Available in 0.9.10+.",
                      option =>
                          {
                              int page;
@@ -107,13 +107,13 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.ListCommand.IdStartsWith = option != null)
                  .Add("order-by-popularity",
                      "OrderByPopularity - Sort by package results by popularity. Available in 0.9.10+.",
-                     option => configuration.ListCommand.OrderByPopularity = option != null)    
+                     option => configuration.ListCommand.OrderByPopularity = option != null)
                  .Add("approved-only",
                      "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository. Available in 0.9.10+.",
-                     option => configuration.ListCommand.ApprovedOnly = option != null)   
+                     option => configuration.ListCommand.ApprovedOnly = option != null)
                  .Add("download-cache|download-cache-only",
                      "DownloadCacheAvailable - Only return packages that have a download cache available - this option will filter out results not from the community repository. Available in 0.9.10+.",
-                     option => configuration.ListCommand.DownloadCacheAvailable = option != null) 
+                     option => configuration.ListCommand.DownloadCacheAvailable = option != null)
                  .Add("not-broken",
                      "NotBroken - Only return packages that are not failing testing - this option only filters out failing results from the community feed. It will not filter against other sources. Available in 0.9.10+.",
                      option => configuration.ListCommand.NotBroken = option != null)
@@ -182,7 +182,7 @@ NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
-      
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
             "chocolatey".Log().Info(@"
 Exit codes that normally result from running this command.
@@ -205,7 +205,7 @@ If you find other exit codes that we have not yet documented, please
  https://github.com/chocolatey/choco/issues/new/choose.
 
 ".format_with(ApplicationParameters.Features.UseEnhancedExitCodes));
-           
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"
 choco search: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_search.gif
