@@ -107,9 +107,9 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_add_short_version_of_timeout_to_the_option_set()
+            public void should_not_add_short_version_of_timeout_to_the_option_set()
             {
-                optionSet.Contains("t").ShouldBeTrue();
+                optionSet.Contains("t").ShouldBeFalse();
             }
         }
 
