@@ -64,6 +64,8 @@
   <property name="code.cert.timestampserver" value="http://timestamp.digicert.com" />
   <property name="code.cert.subjectname" value="Chocolatey Software, Inc." />
   <property name="run.teamcity" value="${environment::variable-exists('TEAMCITY_VERSION') and msbuild.configuration == 'ReleaseOfficial'}" overwrite="false" />
+  <property name="version.gitTag" value="" />
+  <property name="version.gitTag" value="${environment::get-variable('TEAMCITY_GIT_TAG')}" if="${environment::variable-exists('TEAMCITY_GIT_TAG')}" />
   <!-- When Windows 2003 is no longer supported, switch to SHA256 -->
   <property name="code.cert.algorithm" value="SHA1" />
 

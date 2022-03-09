@@ -1,29 +1,11 @@
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.powerShell
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.xmlReport
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.XmlReport
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.commitStatusPublisher
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.nuGetPublish
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
-
-/*
-The settings script is an entry point for defining a TeamCity
-project hierarchy. The script should contain a single call to the
-project() function with a Project instance or an init function as
-an argument.
-VcsRoots, BuildTypes, Templates, and subprojects can be
-registered inside the project using the vcsRoot(), buildType(),
-template(), and subProject() methods respectively.
-To debug settings scripts in command-line, run the
-    mvnDebug org.jetbrains.teamcity:teamcity-configs-maven-plugin:generate
-command and attach your debugger to the port 8000.
-To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
--> Tool Windows -> Maven Projects), find the generate task node
-(Plugins -> teamcity-configs -> teamcity-configs:generate), the
-'Debug' option is available in the context menu for the task.
-*/
 
 version = "2021.2"
 
@@ -32,6 +14,7 @@ project {
 }
 
 object Chocolatey : BuildType({
+    id = AbsoluteId("Chocolatey")
     name = "Build"
 
     artifactRules = """
@@ -48,10 +31,15 @@ object Chocolatey : BuildType({
     params {
         text("env.CHOCOLATEY_SOURCE", "https://hermes.chocolatey.org:8443/repository/choco-internal-testing/", readOnly = true, allowEmpty = false)
         password("env.CHOCOLATEY_API_KEY", "credentialsJSON:c0c84719-2f46-595e-b40b-e545c83c8e9b", display = ParameterDisplay.HIDDEN, readOnly = true)
+        param("env.TEAMCITY_GIT_TAG", "")
     }
 
     vcs {
         root(DslContext.settingsRoot)
+
+        branchFilter = """
+            +:*
+        """.trimIndent()
     }
 
     steps {
@@ -74,6 +62,22 @@ object Chocolatey : BuildType({
             type = "PrepareSigningEnvironment"
         }
 
+        powerShell {
+            name = "Find tag if one exists"
+            scriptMode = script {
+                content = """
+                    ${'$'}tagName = git tag -l --points-at HEAD
+
+                    if (${'$'}tagName) {
+                        Write-Host "Found tag ${'$'}tagName"
+                        Write-Host "##teamcity[setParameter name='env.TEAMCITY_GIT_TAG' value='${'$'}tagName']"
+                    } else {
+                        Write-Host "No tag found for current commit"
+                    }
+                """.trimIndent()
+            }
+        }
+
         script {
             name = "Call UppercuT"
             scriptContent = "call build.official.bat -D:version.fix=%build.counter%"
@@ -83,7 +87,7 @@ object Chocolatey : BuildType({
             name = "Publish Packages"
 
             conditions {
-                matches("teamcity.build.branch", "^(develop|release/.*|hotfix/.*)${'$'}")
+                matches("teamcity.build.branch", "^(develop|release/.*|hotfix/.*|tags/.*)${'$'}")
             }
 
             toolPath = "%teamcity.tool.NuGet.CommandLine.DEFAULT%"
@@ -95,13 +99,23 @@ object Chocolatey : BuildType({
 
     triggers {
         vcs {
+            branchFilter = ""
         }
     }
 
     features {
         xmlReport {
             reportType = XmlReport.XmlReportType.NUNIT
-            rules = "code_drop/build_artifacts/tests/test-results.xml"
+            rules = "build_output/build_artifacts/tests/test-results.xml"
+        }
+
+        pullRequests {
+            vcsRootExtId = "${DslContext.settingsRoot}"
+            provider = github {
+                authType = token {
+                    token = "%system.GitHubPAT%"
+                }
+            }
         }
     }
 })
