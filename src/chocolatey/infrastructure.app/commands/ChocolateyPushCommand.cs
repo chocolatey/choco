@@ -167,14 +167,14 @@ NOTE: If there is more than one nupkg file in the folder, the command
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
-    choco push --source https://chocolatey.org/
-    choco push --source ""'https://chocolatey.org/'"" --execution-timeout 500
-    choco push --source ""'https://chocolatey.org/'"" -k=""'123-123123-123'""
+    choco push --source {0}
+    choco push --source ""'{0}'"" --execution-timeout 500
+    choco push --source ""'{0}'"" -k=""'123-123123-123'""
 
 NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
-");
+".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Troubleshooting");
             "chocolatey".Log().Info(() => @"
@@ -192,7 +192,7 @@ A common error is `Failed to process request. 'The specified API key
  You can verify by going to {0}packages/packageName.
  Please contact the administrators of {0} if you see this
  and you don't see a good reason for it.
-".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+".format_with(ApplicationParameters.ChocolateyCommunityGalleryUrl));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
             "chocolatey".Log().Info(@"
