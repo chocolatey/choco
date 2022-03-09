@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -151,8 +151,7 @@ Chocolatey will attempt to push a compiled nupkg to a package feed.
  Some may prefer to use `cpush` as a shortcut for `choco push`.
 
 NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
- with options and switches. Default push location is deprecated and 
- will be removed by v1. In most cases you can still pass options and 
+ with options and switches. In most cases you can still pass options and 
  switches with one dash (`-`). For more details, see 
  the command reference (`choco -?`).
 
@@ -161,6 +160,13 @@ A feed can be a local folder, a file share, the community feed
  feeds, it has a requirement that it implements the proper OData
  endpoints required for NuGet packages.
 ".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+
+            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
+            "chocolatey".Log().Warn(@"
+Default push location is deprecated and will be removed by v2.0.0.
+It is recommended to always specify the source you want to push to
+using the `--source` argument.
+");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
