@@ -43,6 +43,7 @@
     <property name="nuget.version" value="${nuget.version + '-' + pkg.build.date}" if="${version.use.build_date and version.nuget.prerelease != ''}" />
     <property name="nuget.version" value="${nuget.version + '.' + version.fix}" if="${version.fix != '0' and not version.use.build_date}" />
     <property name="nuget.version" value="${nuget.version + '-' + version.fix}" if="${version.fix != '0' and version.use.build_date}" />
+    <property name="nuget.version" value="${version.gitTag}"  if="${version.gitTag != ''}" />
     <!-- version.use.build_date -->
     <echo level="Warning" message="Using ${nuget.version} as the version for the nuget package(s)." />
     <echo level="Warning" message="##teamcity[buildNumber '${nuget.version}']" if="${run.teamcity}" />
