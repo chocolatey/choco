@@ -62,28 +62,6 @@ namespace chocolatey.infrastructure.app.commands
             if (string.IsNullOrWhiteSpace(configuration.Sources))
             {
                 configuration.Sources = ApplicationParameters.ChocolateyCommunityFeedPushSource;
-                var newSourceKey = _configSettingsService.get_api_key(configuration, null);
-
-                if (string.IsNullOrWhiteSpace(newSourceKey))
-                {
-                    configuration.Sources = ApplicationParameters.ChocolateyCommunityFeedPushSourceOld;
-                    var oldSourceKey = _configSettingsService.get_api_key(configuration, null);
-
-                    if (string.IsNullOrWhiteSpace(oldSourceKey))
-                    {
-                        configuration.Sources = ApplicationParameters.ChocolateyCommunityFeedPushSource;
-                    }
-                    else
-                    {
-                        this.Log().Warn(ChocolateyLoggers.Important, @"ACTION: Please update your apikey to use
-  '{0}'
- instead of
-  '{1}'.
- The latter source url is now considered deprecated and will not be
- checked as the default source in Chocolatey v1.0. For details, run
- `choco apikey -?`".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource, ApplicationParameters.ChocolateyCommunityFeedPushSourceOld));
-                    }
-                }
             }
 
             if (!string.IsNullOrWhiteSpace(configuration.Sources))
