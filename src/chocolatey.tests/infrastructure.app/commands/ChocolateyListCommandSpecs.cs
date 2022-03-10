@@ -367,8 +367,10 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_report_deprecation_of_remote_sources()
             {
                 MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain(@"Using list with remote sources is deprecated and will be made local only in v2.0.0,
-use the commands search or find instead for remote sources.");
+                MockLogger.Messages["Warn"].ShouldContain(@"Using the list command with remote sources is deprecated and will be made
+to only list locally installed packages in v2.0.0. Use the search, or find,
+command to find packages on remote sources (such as the Chocolatey Community
+Repository).");
             }
         }
 
@@ -439,11 +441,13 @@ use the commands search or find instead for remote sources.");
             }
 
             [Fact]
-            public void should_not_report_any_warning_messages()
+            public void should_report_deprecation_of_remote_sources()
             {
                 MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain(@"Using list with remote sources is deprecated and will be made local only in v2.0.0,
-use the commands search or find instead for remote sources.");
+                MockLogger.Messages["Warn"].ShouldContain(@"Using the list command with remote sources is deprecated and will be made
+to only list locally installed packages in v2.0.0. Use the search, or find,
+command to find packages on remote sources (such as the Chocolatey Community
+Repository).");
             }
         }
 

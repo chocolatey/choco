@@ -158,8 +158,7 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "List/Search Command");
             this.Log().Info(@"
-Chocolatey will perform a search for a package local or remote. Some 
- may prefer to use `clist` as a shortcut for `choco list`.
+Chocolatey will perform a search for a package local or remote.
 
 NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below) 
  with options and switches. In most cases you can still pass options 
@@ -171,13 +170,13 @@ NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
             {
                 "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
                 "chocolatey".Log().Warn(@"
-Starting in v2.0.0 the list command will be made local
-only and will only work with the installed packages.
-All options available for connecting to sources will be removed and can only
-be used when using `search` or `find`.
+Starting in v2.0.0 the list command will be made local only and will only
+ work with the installed packages. All options available for connecting
+ to sources will be removed and can only be used when using `search` or
+ `find`.
 
 To avoid breakage, change any calls made to remote sources to use `choco search`
-or `choco find` instead. These will continue to work as usual.
+ or `choco find` instead. These will continue to work as usual.
 ");
             }
 
@@ -303,7 +302,8 @@ This specifies that the source is a Windows Feature and we should
         }
 
         // Marked as obsolete on purpose so we remember to remove
-        // this method when we make list local only.
+        // this method when we make list local only, currently this
+        // is planned for v2.0.0, with #158.
         [Obsolete("Remove once list is made local only!")]
         private void log_deprecation_warning(ChocolateyConfiguration configuration)
         {
@@ -316,8 +316,10 @@ This specifies that the source is a Windows Feature and we should
                     logger = ChocolateyLoggers.Normal;
                 }
 
-                this.Log().Warn(logger, @"Using list with remote sources is deprecated and will be made local only in v2.0.0,
-use the commands search or find instead for remote sources.");
+                this.Log().Warn(logger, @"Using the list command with remote sources is deprecated and will be made
+to only list locally installed packages in v2.0.0. Use the search, or find,
+command to find packages on remote sources (such as the Chocolatey Community
+Repository).");
             }
         }
     }
