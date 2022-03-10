@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -200,7 +200,7 @@ or `choco find` instead. These will continue to work as usual.
     choco search git --source=""'https://somewhere/out/there'""
     choco search bob -s ""'https://somewhere/protected'"" -u user -p pass
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
@@ -218,12 +218,12 @@ Enhanced:
  - -1 or 1: an error has occurred
  - 2: no results (enhanced)
 
-NOTE: Starting in v0.10.12, if you have the feature '{0}' 
- turned on, then choco will provide enhanced exit codes that allow 
+NOTE: Starting in v0.10.12, if you have the feature '{0}'
+ turned on, then choco will provide enhanced exit codes that allow
  better integration and scripting.
 
-If you find other exit codes that we have not yet documented, please 
- file a ticket so we can document it at 
+If you find other exit codes that we have not yet documented, please
+ file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
 ".format_with(ApplicationParameters.Features.UseEnhancedExitCodes));
@@ -241,19 +241,19 @@ choco {0}: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/c
 Will be removed for the list command in v2.0.0.");
             }
 
-            "chocolatey".Log().Info(@" 
+            "chocolatey".Log().Info(@"
 Available in 0.9.10+.
 
 WebPI
-This specifies the source is Web PI (Web Platform Installer) and that 
- we are searching for a WebPI product, such as IISExpress. If you do 
- not have the Web PI command line installed, it will install that first 
+This specifies the source is Web PI (Web Platform Installer) and that
+ we are searching for a WebPI product, such as IISExpress. If you do
+ not have the Web PI command line installed, it will install that first
  and then perform the search requested.
  e.g. `choco {0} --source webpi`
 
 Windows Features
-This specifies that the source is a Windows Feature and we should 
- install via the Deployment Image Servicing and Management tool (DISM) 
+This specifies that the source is a Windows Feature and we should
+ install via the Deployment Image Servicing and Management tool (DISM)
  on the local machine.
  e.g. `choco {0} --source windowsfeatures`
 ".format_with(configuration.CommandName));
