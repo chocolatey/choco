@@ -185,8 +185,9 @@ or `choco find` instead. These will continue to work as usual.
             // TODO: use command name in usage and examples, instead of hard
             // coding the names?
             "chocolatey".Log().Info(@"
-    choco search <filter> [<options/switches>]
+    choco find <filter> [<options/switches>]
     choco list <filter> [<options/switches>]
+    choco search <filter> [<options/switches>]
     clist <filter> [<options/switches>]
 ");
 
