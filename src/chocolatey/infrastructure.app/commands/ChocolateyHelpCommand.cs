@@ -99,7 +99,7 @@ namespace chocolatey.infrastructure.app.commands
             "chocolatey".Log().Warn(@"
 The shims `chocolatey`, `cinst`, `clist`, `cpush`, `cuninst` and `cup` are deprecated.
 We recommend updating all scripts to use their full command equivalent as these will be
-removed in v2.0.0 of Chocolatey
+removed in v2.0.0 of Chocolatey.
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
 
@@ -167,7 +167,8 @@ Following this guide will ensure your experience is not frustrating
 based on choco not receiving things you think you are passing to it.
 
  * For consistency, always use `choco`, not `choco.exe`. Never use
-   shortcut commands like `cinst` or `cup` (The shortcuts `cinst` and `cup` will be removed in v2.0.0).
+   shortcut commands like `cinst` or `cup` (The shortcuts `cinst`
+   and `cup` will be removed in v2.0.0).
  * Always have the command as the first argument to `choco`. e.g.
    `choco install`, where `install` is the command.
  * If there is a subcommand, ensure that is the second argument. e.g.

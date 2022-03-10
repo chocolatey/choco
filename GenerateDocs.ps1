@@ -364,8 +364,8 @@ function Generate-CommandReference($commandName, $order) {
 > - `cuninst` (Shortcut for `cuninst`)
 > - `cup` (Shortcut for `choco upgrade`)
 >
-> We recommend to update any scripts calling these shims to instead call the full command instead,
-> as these shims will be removed in Chocolatey v2.0.0.
+> We recommend that any scripts calling these shims be updated to use the full command, as
+> these shims will be removed in Chocolatey v2.0.0.
 
 "@)
 
