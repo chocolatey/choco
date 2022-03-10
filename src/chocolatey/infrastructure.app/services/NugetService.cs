@@ -1662,8 +1662,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         protected virtual ChocolateyConfiguration SetConfigFromRememberedArguments(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo, CommandNameType commandType = CommandNameType.Upgrade)
         {
             if (string.IsNullOrWhiteSpace(packageInfo.Arguments)) return config;
-            if (commandType == CommandNameType.upgrade && !config.Features.UseRememberedArgumentsForUpgrades) return config;
-            if (commandType == CommandNameType.uninstall && !config.Features.UseRememberedArgumentsForUninstalls) return config;
+            if (commandType == CommandNameType.Upgrade && !config.Features.UseRememberedArgumentsForUpgrades) return config;
+            if (commandType == CommandNameType.Uninstall && !config.Features.UseRememberedArgumentsForUninstalls) return config;
 
             var packageArgumentsUnencrypted = packageInfo.Arguments.ContainsSafe(" --") && packageInfo.Arguments.ToStringSafe().Length > 4 ? packageInfo.Arguments : NugetEncryptionUtility.DecryptString(packageInfo.Arguments);
 
@@ -1734,12 +1734,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             var packageArgumentsUnencrypted = packageInfo.Arguments.ContainsSafe(" --") && packageInfo.Arguments.ToStringSafe().Length > 4 ? packageInfo.Arguments : NugetEncryptionUtility.DecryptString(packageInfo.Arguments);
 
-            var sensitiveArgs = true;
-            if (!ArgumentsUtility.SensitiveArgumentsProvided(packageArgumentsUnencrypted))
-            {
-                sensitiveArgs = false;
-                this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding remembered arguments: {1}".FormatWith(packageInfo.Package.Id, packageArgumentsUnencrypted.EscapeCurlyBraces()));
-            }
+            var sensitiveArgs = ArgumentsUtility.SensitiveArgumentsProvided(packageArgumentsUnencrypted);
 
             var packageArgumentsSplit = packageArgumentsUnencrypted.Split(new[] { " --" }, StringSplitOptions.RemoveEmptyEntries);
             var packageArguments = new List<string>();
@@ -1754,9 +1749,17 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     if (optionValue.StartsWith("'")) optionValue.UnquoteSafe();
                 }
 
+                //Don't add install arguments during uninstall. We don't want a argument for the installer to be passed to the uninstaller.
+                if (string.Equals(optionName, "install-arguments", StringComparison.OrdinalIgnoreCase) && commandType == CommandNameType.Uninstall) continue;
+                if (string.Equals(optionName, "override-argument", StringComparison.OrdinalIgnoreCase) && commandType == CommandNameType.Uninstall) continue;
+
                 if (sensitiveArgs)
                 {
                     this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding '{1}' to arguments. Values not shown due to detected sensitive arguments".FormatWith(packageInfo.Package.Id, optionName.EscapeCurlyBraces()));
+                }
+                else
+                {
+                    this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding '{1}' to arguments with a value of '{2}'".FormatWith(packageInfo.Package.Id, optionName.EscapeCurlyBraces(), optionValue.EscapeCurlyBraces()));
                 }
                 packageArguments.Add("--{0}{1}".FormatWith(optionName, string.IsNullOrWhiteSpace(optionValue) ? string.Empty : "=" + optionValue));
             }
@@ -2382,6 +2385,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
+
+                config = GetPackageConfigFromRememberedArguments(config, pkgInfo);
 
                 if (performAction)
                 {
