@@ -556,6 +556,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ShowDownloadProgress { get; set; }
         public bool StopOnFirstPackageFailure { get; set; }
         public bool UseRememberedArgumentsForUpgrades { get; set; }
+        public bool UseRememberedArgumentsForUninstalls { get; set; }
         public bool IgnoreUnfoundPackagesOnUpgradeOutdated { get; set; }
         public bool SkipPackageUpgradesWhenNotInstalled { get; set; }
         public bool RemovePackageInformationOnUninstall { get; set; }
