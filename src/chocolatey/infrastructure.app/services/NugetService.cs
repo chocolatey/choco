@@ -1781,9 +1781,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         }
 
         [Obsolete("This method is deprecated and will be removed in v3.")]
-        protected virtual ChocolateyConfiguration SetConfigFromRememberedArguments(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
+        protected virtual ChocolateyConfiguration SetConfigFromRememberedArguments(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo, CommandNameType commandType = CommandNameType.Upgrade)
         {
-            if (!config.Features.UseRememberedArgumentsForUpgrades || string.IsNullOrWhiteSpace(packageInfo.Arguments))
+            if ((commandType == CommandNameType.Upgrade && !config.Features.UseRememberedArgumentsForUpgrades) ||
+                (commandType == CommandNameType.Uninstall && !config.Features.UseRememberedArgumentsForUninstalls) || string.IsNullOrWhiteSpace(packageInfo.Arguments))
             {
                 return config;
             }
@@ -1794,7 +1795,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             if (!ArgumentsUtility.SensitiveArgumentsProvided(packageArgumentsUnencrypted))
             {
                 sensitiveArgs = false;
-                this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding remembered arguments for upgrade: {1}".FormatWith(packageInfo.Package.Id, packageArgumentsUnencrypted.EscapeCurlyBraces()));
+                this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding remembered arguments: {1}".FormatWith(packageInfo.Package.Id, packageArgumentsUnencrypted.EscapeCurlyBraces()));
             }
 
             var packageArgumentsSplit = packageArgumentsUnencrypted.Split(new[] { " --" }, StringSplitOptions.RemoveEmptyEntries);
@@ -1815,7 +1816,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (sensitiveArgs)
                 {
-                    this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding '{1}' to upgrade arguments. Values not shown due to detected sensitive arguments".FormatWith(packageInfo.Package.Id, optionName.EscapeCurlyBraces()));
+                    this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding '{1}' to arguments. Values not shown due to detected sensitive arguments".FormatWith(packageInfo.Package.Id, optionName.EscapeCurlyBraces()));
                 }
                 packageArguments.Add("--{0}{1}".FormatWith(optionName, string.IsNullOrWhiteSpace(optionValue) ? string.Empty : "=" + optionValue));
             }
@@ -1873,10 +1874,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         /// </summary>
         /// <param name="config">The original configuration.</param>
         /// <param name="packageInfo">The package information.</param>
+        /// <param name="commandType">The command type</param>
         /// <returns>The modified configuration, so it can be used</returns>
-        public virtual ChocolateyConfiguration GetPackageConfigFromRememberedArguments(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
+        public virtual ChocolateyConfiguration GetPackageConfigFromRememberedArguments(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo, CommandNameType commandType = CommandNameType.Upgrade)
         {
-            if (!config.Features.UseRememberedArgumentsForUpgrades || string.IsNullOrWhiteSpace(packageInfo.Arguments))
+            if ((commandType == CommandNameType.Upgrade && !config.Features.UseRememberedArgumentsForUpgrades) ||
+                (commandType == CommandNameType.Uninstall && !config.Features.UseRememberedArgumentsForUninstalls) || string.IsNullOrWhiteSpace(packageInfo.Arguments))
             {
                 return config;
             }

@@ -74,9 +74,10 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="config">The original configuration.</param>
         /// <param name="packageInfo">The package information.</param>
+        /// <param name="commandType">The command type</param>
         /// <returns>The modified configuration, so it can be used</returns>
         ChocolateyConfiguration GetPackageConfigFromRememberedArguments(ChocolateyConfiguration config,
-            ChocolateyPackageInformation packageInfo);
+            ChocolateyPackageInformation packageInfo, CommandNameType commandType = CommandNameType.Upgrade);
 
 #pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
