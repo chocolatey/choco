@@ -314,6 +314,7 @@ param(
 
     $from = "$chocolateyPathOld\bin"
     $to = "$chocolateyPath\bin"
+    # TODO: This exclusion list needs to be updated once shims are removed
     $exclude = @("choco.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpack.exe", "cpush.exe", "cuninst.exe", "cup.exe", "cver.exe", "RefreshEnv.cmd")
     Get-ChildItem -Path $from -recurse -Exclude $exclude |
       % {

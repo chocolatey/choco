@@ -114,7 +114,6 @@ NOTE: For chocolatey.org, you must update the source to be secure.".format_with(
             this.Log().Info(ChocolateyLoggers.Important, "Push Command");
             this.Log().Info(@"
 Chocolatey will attempt to push a compiled nupkg to a package feed.
- Some may prefer to use `cpush` as a shortcut for `choco push`.
 
 NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
  with options and switches. In most cases you can still pass options and 
@@ -132,12 +131,16 @@ A feed can be a local folder, a file share, the community feed
 Default push location is deprecated and will be removed by v2.0.0.
 It is recommended to always specify the source you want to push to
 using the `--source` argument.
+
+Starting in v2.0.0 the shortcut `cpush` will be removed and can not be used
+to push packages anymore. We recommend you make sure that you always
+use the full command going forward (`choco push`).
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco push [<path to nupkg>] [<options/switches>]
-    cpush [<path to nupkg>] [<options/switches>]
+    cpush [<path to nupkg>] [<options/switches>] (DEPRECATED, will be removed in v2.0.0)
 
 NOTE: If there is more than one nupkg file in the folder, the command
  will require specifying the path to the file.
