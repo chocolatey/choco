@@ -267,8 +267,7 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Upgrade Command");
             this.Log().Info(@"
-Upgrades a package or a list of packages. Some may prefer to use `cup`
- as a shortcut for `choco upgrade`. If you do not have a package
+Upgrades a package or a list of packages. If you do not have a package
  installed, upgrade will install it.
 
 NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
@@ -277,10 +276,17 @@ NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
  dash (`-`). For more details, see the command reference (`choco -?`).
 ");
 
+            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
+            "chocolatey".Log().Warn(@"
+Starting in v2.0.0 the shortcut `cup` will be removed and can not be used
+to upgrade or install packages anymore. We recommend you make sure that you always
+use the full command going forward (`choco upgrade`).
+");
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco upgrade <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
-    cup <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
+    cup <pkg|all> [<pkg2> <pkgN>] [<options/switches>] (DEPRECATED, will be removed in v2.0.0)
 
 NOTE: `all` is a special package keyword that will allow you to upgrade
  all currently installed packages.
