@@ -183,7 +183,7 @@ or `choco find` instead. These will continue to work as usual.
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             // TODO: use command name in usage and examples, instead of hard
-            // codeing the names?
+            // coding the names?
             "chocolatey".Log().Info(@"
     choco search <filter> [<options/switches>]
     choco list <filter> [<options/switches>]
