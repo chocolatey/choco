@@ -151,6 +151,25 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
+            public void should_not_check_for_fallback_community_url()
+            {
+                reset();
+                configuration.Sources = "";
+                configSettingsService.Setup(c => c.get_api_key(
+                    It.Is<ChocolateyConfiguration>(config => config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)),
+                    null))
+                    .Returns(apiKey);
+                because();
+
+                configuration.Sources.ShouldEqual(ApplicationParameters.ChocolateyCommunityFeedPushSource);
+                configSettingsService.Verify(c => c.get_api_key(
+                    It.Is<ChocolateyConfiguration>(config => config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)),
+                    null),
+                    Times.Never);
+                configuration.PushCommand.Key.ShouldNotEqual(apiKey);
+            }
+
+            [Fact]
             public void should_not_set_the_apiKey_if_source_is_not_found()
             {
                 reset();
