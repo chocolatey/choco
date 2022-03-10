@@ -4,7 +4,6 @@
   - [Committers](#committers)
   - [Chocolatey Community Team](#chocolatey-community-team)
   - [Contributors](#contributors)
-  - [Other Contributors](#other-contributors)
 - [Third Party Licenses - Development](#third-party-licenses---development)
 - [Third Party Licenses - Runtime](#third-party-licenses---runtime)
   - [7-Zip](#7-zip)
@@ -21,47 +20,39 @@
 <!-- /TOC -->
 
 ## Committers & Contributors
-Chocolatey has been the the thoughts, ideas, and work of a large community. While [Rob](https://github.com/ferventcoder) heads up direction and plays a primary role in development, there are several people that have really been a part of making Chocolatey what it is today.
-
+Chocolatey has been the thoughts, ideas, and work of a large community. While [Rob](https://github.com/ferventcoder) heads up direction and plays a primary role in development, there are several people that have really been a part of making Chocolatey what it is today.
 
 ### Committers
-These are the committers to Chocolatey/Choco repositories:
 
- * [Core Development Team](https://github.com/orgs/chocolatey/teams/developers)
-   * [Rob Reynolds](https://github.com/ferventcoder) - Creator of Chocolatey, committer, vision, direction, community feed moderator
-   * [Gary Ewan Park](https://github.com/gep13) - Committer, Chocolatey GUI, community feed moderator
-   * [Matt Wrock](https://github.com/mwrock) - Committer, Creator of BoxStarter, community feed moderator
-   * [Rich Siegel](https://github.com/rismoney) - Committer, Creator of Puppet provider
-   * [Richard Simpson](https://github.com/RichiCoder1) - created and maintains the new Chocolatey GUI
+These are the committers to the chocolatey/choco repository:
+
+* [Chocolatey Development Team](https://github.com/orgs/chocolatey/teams/developers)
+* The project [contributors](https://github.com/chocolatey/choco/graphs/contributors)
+* A few of the [very special people](https://github.com/orgs/chocolatey/teams/chocolatey-alumni) we are grateful to.
 
 ### Chocolatey Community Team
-The Chocolatey Community Team includes the committers and adds these fine folks:
 
-* [Community Package Repository Moderation Team](https://github.com/orgs/chocolatey/teams/community-moderators)
-* [Chocolatey Core Community Maintainers Team](https://github.com/orgs/chocolatey/teams/community-maintainers)
+The Chocolatey Community Team manage the [Chocolatey Community Chocolatey Packages repository](https://github.com/chocolatey-community/chocolatey-packages) and includes these fine folks:
+
+* [Chocolatey Community Repository Moderation Team](https://github.com/orgs/chocolatey-community/teams/community-moderators/members)
+* [Chocolatey Community Chocolatey Packages Maintainers Team](https://github.com/orgs/chocolatey-community/teams/community-maintainers/members)
+* [Chocolatey Community Chocolatey Packages Contributors](https://github.com/chocolatey-community/chocolatey-packages/graphs/contributors)
 
 ### Contributors
- * [choco.exe](https://github.com/chocolatey/choco/graphs/contributors)
+
+ * [Chocolatey CLI](https://github.com/chocolatey/choco/graphs/contributors)
  * [Original Chocolatey - POSH choco](https://github.com/chocolatey/chocolatey/graphs/contributors)
 
-### Other Contributors
-**NOTE: NEEDS UPDATED**
-
- * Nekresh (https://github.com/nekresh) - Contributing code and ideas on direction
- * Chris Ortman (https://github.com/chrisortman) - package contributions and thoughts on where to take it
- * Svein Arne Ackenhausen (https://github.com/acken) - suggestions and thoughts on features and packages
- * Marcel Hoyer - suggestions on making this stuff work without administrative access to a machine
- * Jason Jarrett (https://github.com/staxmanade) - contributing code and ideas
-
 ## Third Party Licenses - Development
-Choco is built, tested and analyzed with the following fantastic frameworks (in no particular order):
+
+Chocolatey CLI is built, tested and analyzed with the following fantastic frameworks (in no particular order):
 
  * ILMerge
  * UppercuT (NAnt)
  * PublishedApplications
  * NuGet.exe
 
-Choco is tested and analyzed with the following rockstar frameworks (in no particular order):
+Chocolatey CLI is tested and analyzed with the following rockstar frameworks (in no particular order):
 
  * bdddoc
  * NUnit
@@ -71,13 +62,14 @@ Choco is tested and analyzed with the following rockstar frameworks (in no parti
  * OpenCover
  * ReportGenerator
 
-We would like to credit other super sweet tools/frameworks that aid in the development of choco:
+We would like to credit other super sweet tools/frameworks that aid in the development of Chocolatey CLI:
 
  * ReSharper
  * NuGet Framework
 
 ## Third Party Licenses - Runtime
-Chocolatey open source uses a number of 3rd party components. Their details are below (order is alphabetical).
+
+Chocolatey CLI open source uses a number of 3rd party components. Their details are below (order is alphabetical).
 
 <!-- TOC -->
 
