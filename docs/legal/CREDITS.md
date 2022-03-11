@@ -4,7 +4,6 @@
   - [Committers](#committers)
   - [Chocolatey Community Team](#chocolatey-community-team)
   - [Contributors](#contributors)
-  - [Other Contributors](#other-contributors)
 - [Third Party Licenses - Development](#third-party-licenses---development)
 - [Third Party Licenses - Runtime](#third-party-licenses---runtime)
   - [7-Zip](#7-zip)
@@ -21,63 +20,57 @@
 <!-- /TOC -->
 
 ## Committers & Contributors
-Chocolatey has been the the thoughts, ideas, and work of a large community. While [Rob](https://github.com/ferventcoder) heads up direction and plays a primary role in development, there are several people that have really been a part of making Chocolatey what it is today.
 
+Chocolatey has been the thoughts, ideas, and work of a large community. While [Rob](https://github.com/ferventcoder) heads up direction and plays a primary role in development, there are several people that have really been a part of making Chocolatey what it is today.
 
 ### Committers
-These are the committers to Chocolatey/Choco repositories:
 
- * [Core Development Team](https://github.com/orgs/chocolatey/teams/developers)
-   * [Rob Reynolds](https://github.com/ferventcoder) - Creator of Chocolatey, committer, vision, direction, community feed moderator
-   * [Gary Ewan Park](https://github.com/gep13) - Committer, Chocolatey GUI, community feed moderator
-   * [Matt Wrock](https://github.com/mwrock) - Committer, Creator of BoxStarter, community feed moderator
-   * [Rich Siegel](https://github.com/rismoney) - Committer, Creator of Puppet provider
-   * [Richard Simpson](https://github.com/RichiCoder1) - created and maintains the new Chocolatey GUI
+These are the committers to the chocolatey/choco repository:
+
+- [Chocolatey Development Team](https://github.com/orgs/chocolatey/teams/developers)
+- The project [contributors](https://github.com/chocolatey/choco/graphs/contributors)
+- A few of the [very special people](https://github.com/orgs/chocolatey/teams/chocolatey-alumni) we are grateful to.
 
 ### Chocolatey Community Team
-The Chocolatey Community Team includes the committers and adds these fine folks:
 
-* [Community Package Repository Moderation Team](https://github.com/orgs/chocolatey/teams/community-moderators)
-* [Chocolatey Core Community Maintainers Team](https://github.com/orgs/chocolatey/teams/community-maintainers)
+The Chocolatey Community Team manage the [Chocolatey Community Chocolatey Packages repository](https://github.com/chocolatey-community/chocolatey-packages) and includes these fine folks:
+
+- [Chocolatey Community Repository Moderation Team](https://github.com/orgs/chocolatey-community/teams/community-moderators/members)
+- [Chocolatey Community Chocolatey Packages Maintainers Team](https://github.com/orgs/chocolatey-community/teams/community-maintainers/members)
+- [Chocolatey Community Chocolatey Packages Contributors](https://github.com/chocolatey-community/chocolatey-packages/graphs/contributors)
 
 ### Contributors
- * [choco.exe](https://github.com/chocolatey/choco/graphs/contributors)
- * [Original Chocolatey - POSH choco](https://github.com/chocolatey/chocolatey/graphs/contributors)
 
-### Other Contributors
-**NOTE: NEEDS UPDATED**
-
- * Nekresh (https://github.com/nekresh) - Contributing code and ideas on direction
- * Chris Ortman (https://github.com/chrisortman) - package contributions and thoughts on where to take it
- * Svein Arne Ackenhausen (https://github.com/acken) - suggestions and thoughts on features and packages
- * Marcel Hoyer - suggestions on making this stuff work without administrative access to a machine
- * Jason Jarrett (https://github.com/staxmanade) - contributing code and ideas
+- [Chocolatey CLI](https://github.com/chocolatey/choco/graphs/contributors)
+- [Original Chocolatey - POSH choco](https://github.com/chocolatey/chocolatey/graphs/contributors)
 
 ## Third Party Licenses - Development
-Choco is built, tested and analyzed with the following fantastic frameworks (in no particular order):
 
- * ILMerge
- * UppercuT (NAnt)
- * PublishedApplications
- * NuGet.exe
+Chocolatey CLI is built, tested and analyzed with the following fantastic frameworks (in no particular order):
 
-Choco is tested and analyzed with the following rockstar frameworks (in no particular order):
+- ILMerge
+- UppercuT (NAnt)
+- PublishedApplications
+- NuGet.exe
 
- * bdddoc
- * NUnit
- * Moq
- * TinySpec
- * Should
- * OpenCover
- * ReportGenerator
+Chocolatey CLI is tested and analyzed with the following rockstar frameworks (in no particular order):
 
-We would like to credit other super sweet tools/frameworks that aid in the development of choco:
+- bdddoc
+- NUnit
+- Moq
+- TinySpec
+- Should
+- OpenCover
+- ReportGenerator
 
- * ReSharper
- * NuGet Framework
+We would like to credit other super sweet tools/frameworks that aid in the development of Chocolatey CLI:
+
+- ReSharper
+- NuGet Framework
 
 ## Third Party Licenses - Runtime
-Chocolatey open source uses a number of 3rd party components. Their details are below (order is alphabetical).
+
+Chocolatey CLI open source uses a number of 3rd party components. Their details are below (order is alphabetical).
 
 <!-- TOC -->
 
@@ -99,20 +92,21 @@ Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives. [Lice
 
 ~~~
   7-Zip
-
+  ~~~~~
   License for use and distribution
-  --------------------------------
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  7-Zip Copyright (C) 1999-2016 Igor Pavlov.
+  7-Zip Copyright (C) 1999-2021 Igor Pavlov.
 
-  Licenses for files are:
+  The licenses for files are:
 
-    1) 7z.dll: GNU LGPL + unRAR restriction
-    2) All other files:  GNU LGPL
+    1) 7z.dll:
+         - The "GNU LGPL" as main license for most of the code
+         - The "GNU LGPL" with "unRAR license restriction" for some code
+         - The "BSD 3-clause License" for some code
+    2) All other files: the "GNU LGPL".
 
-  The GNU LGPL + unRAR restriction means that you must follow both
-  GNU LGPL rules and unRAR restriction rules.
-
+  Redistributions in binary form must reproduce related license information from this file.
 
   Note:
     You can use 7-Zip on any computer, including a computer in a commercial
@@ -136,8 +130,41 @@ Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives. [Lice
     http://www.gnu.org/
 
 
-  unRAR restriction
-  -----------------
+
+
+  BSD 3-clause License
+  --------------------
+
+    The "BSD 3-clause License" is used for the code in 7z.dll that implements LZFSE data decompression.
+    That code was derived from the code in the "LZFSE compression library" developed by Apple Inc,
+    that also uses the "BSD 3-clause License":
+
+    ----
+    Copyright (c) 2015-2016, Apple Inc. All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+    1.  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+    2.  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
+        in the documentation and/or other materials provided with the distribution.
+
+    3.  Neither the name of the copyright holder(s) nor the names of any contributors may be used to endorse or promote products derived
+        from this software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    ----
+
+
+
+
+  unRAR license restriction
+  -------------------------
 
     The decompression engine for RAR archives was developed using source
     code of unRAR program.
@@ -154,7 +181,6 @@ Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives. [Lice
 
   --
   Igor Pavlov
-
 ~~~
 
 ### AlphaFS
@@ -725,57 +751,72 @@ Chocolatey uses [Rx](http://reactivex.io/) for schedules and internal messaging.
 ~~~
 
 ### Shim Generator (shimgen)
-Chocolatey uses [shimgen](https://github.com/chocolatey/shimgen) to generate shim executables that call the original binaries. [License terms](https://github.com/chocolatey/choco/blob/782a1cd228df548661e6c4eb5bb49b347025f85a/src/chocolatey.resources/tools/shimgen.license.txt):
+Chocolatey uses [shimgen](https://github.com/chocolatey/shimgen) to generate shim executables that call the original binaries. [License terms](https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/tools/shimgen.license.txt):
 
 ~~~
-  Shim Generator - shimgen.exe
-  Copyright (C) 2013 - 2017 RealDimensions Software, LLC ("RDS")
-  ===================================================================
-  Grant of License
-  ===================================================================
-  You may use Shim Generator ("shimgen.exe") only with the official Chocolatey
-  client. The use of shimgen.exe for any other reason is strictly prohibited.
+Shim Generator - shimgen.exe
+Copyright (C) 2017 - Present Chocolatey Software, Inc ("CHOCOLATEY")
+Copyright (C) 2013 - 2017 RealDimensions Software, LLC ("RDS")
+===================================================================
+Grant of License
+===================================================================
+ATTENTION: Shim Generator ("shimgen.exe") is a closed source application with
+a proprietary license and its use is strictly limited to the terms of this 
+license agreement.
 
-  If you would like to use this software for any other reason, you must obtain a
-  personal or commercial license to do so. To do that you must contact RDS at
-  ferventcoder.com.
+RealDimensions Software, LLC ("RDS") grants Chocolatey Software, Inc a revocable, 
+non-exclusive license to distribute and use shimgen.exe with the official 
+Chocolatey client (https://chocolatey.org). This license file must be stored in 
+Chocolatey source next to shimgen.exe and distributed with every copy of 
+shimgen.exe. The distribution or use of shimgen.exe outside of these terms 
+without the express written permission of RDS is strictly prohibited.
 
-  This software is not free to distribute apart from the Chocolatey client. If you
-  would like to distribute this software outside of use through Chocolatey, you
-  must receive written permission from the software owner.
+While the source for shimgen.exe is closed source, the shims have reference 
+source at https://github.com/chocolatey/shimgen/tree/master/shim.
 
-  ===================================================================
-  End-User License Agreement
-  ===================================================================
-  EULA - Shim Generator
+===================================================================
+End-User License Agreement
+===================================================================
+EULA - Shim Generator
 
-  IMPORTANT- READ CAREFULLY: This RealDimensions Software ("RDS") End-User License
-  Agreement ("EULA") is a legal agreement between you ("END USER") and RDS for all
-  RDS products, controls, source code, demos, intermediate files, media, printed
-  materials, and "online" or electronic documentation ("SOFTWARE PRODUCT(S)")
-  contained with this distribution.
+IMPORTANT- READ CAREFULLY: This RealDimensions Software, LLC ("RDS") End-User License
+Agreement ("EULA") is a legal agreement between you ("END USER") and RDS for all 
+RDS products, controls, source code, demos, intermediate files, media, printed 
+materials, and "online" or electronic documentation (collectively "SOFTWARE 
+PRODUCT(S)") contained with this distribution.
 
-  RDS grants to END USER as an individual, a personal, nonexclusive license to
-  install and use the SOFTWARE PRODUCT(S) for the sole purpose of use with the
-  official Chocolatey client. By installing, copying, or otherwise using the
-  SOFTWARE PRODUCT(S), END USER agrees to be bound by the terms of this EULA. If
-  END USER does not agree to any part of the terms of this EULA, DO NOT INSTALL,
-  USE, OR EVALUATE, ANY PART, FILE OR PORTION OF THE SOFTWARE PRODUCT(S).
+RDS grants to you as an individual or entity, a personal, non-exclusive license 
+to install and use the SOFTWARE PRODUCT(S) for the sole purpose of use with the 
+official Chocolatey client. By installing, copying, or otherwise using the 
+SOFTWARE PRODUCT(S), END USER agrees to be bound by the terms of this EULA. If 
+END USER does not agree to any part of the terms of this EULA, DO NOT INSTALL, 
+USE, OR EVALUATE, ANY PART, FILE OR PORTION OF THE SOFTWARE PRODUCT(S).
 
-  ALL SOFTWARE PRODUCT(S) are licensed not sold. If END USER is an individual,
-  END USER must acquire an individual license for the SOFTWARE PRODUCT(S) from RDS
-  or its authorized resellers. If END USER is an entity, END USER must acquire an
-  individual license for each machine running the SOFTWARE PRODUCT(S) within your
-  organization from RDS or its authorized resellers. Both Virtual and Physical
-  Machines running the SOFTWARE PRODUCT(S) must be counted in the SOFTWARE
-  PRODUCT(S) licenses quantity of the organization.
+In no event shall RDS be liable to END USER for damages, including any direct, 
+indirect, special, incidental, or consequential damages of any character arising
+as a result of the use or inability to use the SOFTWARE PRODUCT(S) (including 
+but not limited to damages for loss of goodwill, work stoppage, computer failure
+or malfunction, or any and all other commercial damages or losses).
 
-  ===================================================================
-  Commercial / Personal Licensing
-  ===================================================================
-  Shim Generator (shimgen.exe) is also offered under personal and commercial
-  licenses. You can learn more about this option by contacting RDS at
-  http://ferventcoder.com
+The liability of RDS to END USER for any reason and upon any cause of action 
+related to the performance of the work under this agreement whether in tort or 
+in contract or otherwise shall be limited to the amount paid by the END USER to 
+RDS pursuant to this agreement or as determined by written agreement signed 
+by both RDS and END USER.
+
+ALL SOFTWARE PRODUCT(S) are licensed not sold. If you are an individual, you 
+must acquire an individual license for the SOFTWARE PRODUCT(S) from RDS or its 
+authorized resellers. If you are an entity, you must acquire an individual license 
+for each machine running the SOFTWARE PRODUCT(S) within your organization from RDS 
+or its authorized resellers. Both virtual and physical machines running the SOFTWARE 
+PRODUCT(S) must be counted in the SOFTWARE PRODUCT(S) licenses quantity of the 
+organization.
+
+===================================================================
+Commercial / Personal Licensing
+===================================================================
+Shim Generator ("shimgen.exe") is also offered under personal and commercial 
+licenses. You can learn more by contacting Chocolatey at https://chocolatey.org/contact.
 ~~~
 
 ### SimpleInjector
