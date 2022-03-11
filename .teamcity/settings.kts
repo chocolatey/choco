@@ -2,6 +2,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.pullRequests
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.xmlReport
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.XmlReport
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.nuGetPublish
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
@@ -104,7 +105,7 @@ object Chocolatey : BuildType({
     }
 
     features {
-        XmlReport {
+        xmlReport {
             reportType = XmlReport.XmlReportType.NUNIT
             rules = "build_output/build_artifacts/tests/test-results.xml"
         }
