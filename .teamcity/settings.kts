@@ -30,8 +30,6 @@ object Chocolatey : BuildType({
     """.trimIndent()
 
     params {
-        text("env.CHOCOLATEY_SOURCE", "https://hermes.chocolatey.org:8443/repository/choco-internal-testing/", readOnly = true, allowEmpty = false)
-        password("env.CHOCOLATEY_API_KEY", "credentialsJSON:c0c84719-2f46-595e-b40b-e545c83c8e9b", display = ParameterDisplay.HIDDEN, readOnly = true)
         param("env.TEAMCITY_GIT_TAG", "")
     }
 
@@ -93,8 +91,8 @@ object Chocolatey : BuildType({
 
             toolPath = "%teamcity.tool.NuGet.CommandLine.DEFAULT%"
             packages = "code_drop/nuget/*.nupkg"
-            serverUrl = "%env.CHOCOLATEY_SOURCE%"
-            apiKey = "%env.CHOCOLATEY_API_KEY%"
+            serverUrl = "%env.NUGETDEV_SOURCE%"
+            apiKey = "%env.NUGETDEV_API_KEY%"
         }
     }
 
