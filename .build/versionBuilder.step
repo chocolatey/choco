@@ -47,7 +47,7 @@
 
   <target name="generate_assembly_info" description="Generate assembly info">
     <property name="version.assembly" value="${version.major}.${version.minor}.${version.build}.${version.revision}" />
-    <property name="version.assembly" value="${version.major}.${version.minor}.${version.patch}.${version.fix}"  if="${version.use_semanticversioning}" />
+    <property name="version.assembly" value="${version.major}.${version.minor}.${version.patch}.${version.fix}" if="${version.use_semanticversioning}" />
     <property name="version.assembly" value="${version.gitTag}" if="${version.gitTag != ''}" />
     <echo level="Warning" message="Generating SolutionVersion.${language.short} with assembly version ${version.assembly}." />
     <property name="version.file" value="${version.major}.${version.minor}.${version.build}.${version.revision}" />
