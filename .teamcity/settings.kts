@@ -27,6 +27,7 @@ object Chocolatey : BuildType({
         code_drop/build_artifacts/ilmerge/ilmerge.log
         code_drop/build_artifacts/ilmerge/ilmergedll.log
         code_drop/nuget/*.nupkg
+        src/SolutionVersion.cs
     """.trimIndent()
 
     params {
