@@ -30,13 +30,77 @@ param (
   }
 }
 
+function Remove-ShimWithAuthenticodeSignature {
+  param (
+    [string] $filePath
+  )
+  if (!(Test-Path $filePath)) {
+    return
+  }
+
+  $signature = Get-AuthenticodeSignature $filePath -ErrorAction SilentlyContinue
+
+  if (!$signature -or !$signature.SignerCertificate) {
+    Write-ChocolateyWarning "Shim found in $filePath, but was not signed. Ignoring removal..."
+    return
+  }
+
+  $possibleSignatures = @(
+    'RealDimensions Software, LLC'
+    'Chocolatey Software, Inc\.'
+  )
+
+  $possibleSignatures | ForEach-Object {
+    if ($signature.SignerCertificate.Subject -match "$_") {
+      Write-Output "Removing shim $filePath"
+      $null = Remove-Item "$filePath"
+
+      if (Test-Path "$filePath.ignore") {
+        $null = Remove-Item "$filePath.ignore"
+      }
+
+      if (Test-Path "$filePath.old") {
+        $null = Remove-Item "$filePath.old"
+      }
+    }
+  }
+
+  # This means the file was found, however did not get removed as it contained a authenticode signature that
+  # is not ours.
+  if (Test-Path $filePath) {
+    Write-ChocolateyWarning "Shim found in $filePath, but did not match our signature. Ignoring removal..."
+    return
+  }
+}
+
+function Remove-UnsupportedShimFiles {
+  param([string[]]$Paths)
+
+  $shims = @('cpack.exe')
+
+  $Paths | ForEach-Object {
+    $path = $_
+    $shims | ForEach-Object { Join-Path $path $_ } | Where-Object { Test-Path $_ } | ForEach-Object {
+      $path = $_
+      Write-Debug "Removing shim from '$path'."
+
+      try {
+        Remove-ShimWithAuthenticodeSignature -filePath $path
+      }
+      catch {
+        Write-ChocolateyWarning "Unable to remove '$path'. Please remove the file manually."
+      }
+    }
+  }
+}
+
 function Initialize-Chocolatey {
 <#
   .DESCRIPTION
     This will initialize the Chocolatey tool by
       a) setting up the "chocolateyPath" (the location where all chocolatey nuget packages will be installed)
       b) Installs chocolatey into the "chocolateyPath"
-            c) Instals .net 4.0 if needed
+            c) Installs .net 4.0 if needed
       d) Adds Chocolatey to the PATH environment variable so you have access to the choco commands.
   .PARAMETER  ChocolateyPath
     Allows you to override the default path of (C:\ProgramData\chocolatey\) by specifying a directory chocolatey will install nuget packages.
@@ -107,6 +171,12 @@ Creating Chocolatey folders if they do not already exist.
   Create-DirectoryIfNotExists $chocolateyExePath
   Create-DirectoryIfNotExists $chocolateyLibPath
 
+  $possibleShimPaths = @(
+    Join-Path "$chocolateyPath" "redirects"
+    Join-Path "$thisScriptFolder" "chocolateyInstall\redirects"
+  )
+  Remove-UnsupportedShimFiles -Paths $possibleShimPaths
+
   Install-ChocolateyFiles $chocolateyPath
   Ensure-ChocolateyLibFiles $chocolateyLibPath
 
@@ -142,6 +212,8 @@ You may need to shut down and restart powershell and/or consoles
   if (-not $allowInsecureRootInstall) {
     Remove-OldChocolateyInstall $defaultChocolateyPathOld
   }
+
+  Remove-UnsupportedShimFiles -Paths $chocolateyExePath
 }
 
 function Set-ChocolateyInstallFolder {
@@ -315,7 +387,7 @@ param(
     $from = "$chocolateyPathOld\bin"
     $to = "$chocolateyPath\bin"
     # TODO: This exclusion list needs to be updated once shims are removed
-    $exclude = @("choco.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpack.exe", "cpush.exe", "cuninst.exe", "cup.exe", "cver.exe", "RefreshEnv.cmd")
+    $exclude = @("choco.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpush.exe", "cuninst.exe", "cup.exe", "cver.exe", "RefreshEnv.cmd")
     Get-ChildItem -Path $from -recurse -Exclude $exclude |
       % {
         Write-Debug "Copying $_ `n to $to"
