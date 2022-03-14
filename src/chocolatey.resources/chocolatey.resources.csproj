@@ -91,7 +91,6 @@
     <EmbeddedResource Include="redirects\cpush.exe.ignore" />
     <EmbeddedResource Include="redirects\cuninst.exe.ignore" />
     <EmbeddedResource Include="redirects\cup.exe.ignore" />
-    <EmbeddedResource Include="redirects\cver.exe.ignore" />
     <EmbeddedResource Include="tools\checksum.exe.ignore" />
     <EmbeddedResource Include="tools\shimgen.exe.ignore" />
   </ItemGroup>
@@ -104,7 +103,6 @@
     <EmbeddedResource Include="redirects\cpush.exe" />
     <EmbeddedResource Include="redirects\cuninst.exe" />
     <EmbeddedResource Include="redirects\cup.exe" />
-    <EmbeddedResource Include="redirects\cver.exe" />
     <EmbeddedResource Include="tools\7zip.license.txt" />
     <EmbeddedResource Include="tools\checksum.exe" />
     <EmbeddedResource Include="tools\checksum.license.txt" />
