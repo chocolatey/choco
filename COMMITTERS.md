@@ -115,7 +115,7 @@ Please be VERY familiar with [CONTRIBUTING](https://github.com/chocolatey/choco/
  * Did the user create a branch with these changes? If it is on their default branch (i.e. develop), please ask them to review [CONTRIBUTING](https://github.com/chocolatey/choco/blob/develop/CONTRIBUTING.md).
  * Did the user reformat files and they should not have? Was is just white-space? You can try adding [?w=1](https://github.com/blog/967-github-secrets) to the URL on GitHub.
  * Are there tests? We really want any new contributions to contain tests so unless the committer believes this code really needs to be in the code base and is willing to write the tests, then we need to ask the contributor to make a good faith effort in adding test cases. Ask them to review the [contributing document](https://github.com/chocolatey/choco/blob/develop/CONTRIBUTING.md) and provide tests. **Note:** Some commits may be refactoring which wouldn't necessarily add additional test sets.
- * Is the code documented properly? Does this additional set of changes require changes to the [wiki](https://github.com/chocolatey/choco/wiki)?
+ * Is the code documented properly? Does this additional set of changes require changes to the [documentation](https://docs.chocolatey.org)?
  * Was this code warranted? Did the contributor follow the process of gaining approval for big change sets? If not please have them review the [contributing document](https://github.com/chocolatey/choco/blob/develop/CONTRIBUTING.md) and ask that they follow up with a case for putting the code into the code base on the mailing list.
 
 #### Review the Code
@@ -131,7 +131,7 @@ Unless there is something wrong with the code, we don't ask contributors to reba
 ## Merging
 Once you have reviewed the change set and determined it is ready for merge, the next steps are to bring it local and evaluate the code further by actually working with it, running the tests locally and adding any additional commits or fix-ups that are necessary in a local branch.
 
-When merging the user's contribution, it should be done with `git merge --log --no-ff` to create a merge commit so that in case there is an issue it becomes easier to revert later, and so that we can see where the code came from should we ever need to go find it later (more information on this can be found [here](https://www.kernel.org/pub/software/scm/git/docs/git-merge.html) and also a discussion on why this is a good idea [here](https://differential.com/insights/best-way-to-merge-a-github-pull-request/)).
+When merging the user's contribution, it should be done with `git merge --log --no-ff` to create a merge commit so that in case there is an issue it becomes easier to revert later, and so that we can see where the code came from should we ever need to go find it later (more information on this can be found [here](https://www.kernel.org/pub/software/scm/git/docs/git-merge.html) and also a discussion on why this is a good idea [here](https://web.archive.org/web/20190529002804/https://differential.com/insights/best-way-to-merge-a-github-pull-request/)).
 
 ### Pull Request Retargeting
 Because we ask contributors to target develop, sometimes a fix/enhancement may need to be retargeted to a hotfix, or release, branch. This process is somewhat easy thanks to git. In most cases you won't even need to ask the user to do this for you.
@@ -150,5 +150,5 @@ Because we ask contributors to target develop, sometimes a fix/enhancement may n
 
 References
 
- * http://pivotallabs.com/git-rebase-onto/
+ * [http://pivotallabs.com/git-rebase-onto/ (Archive)](https://web.archive.org/web/20150709101404/http://pivotallabs.com:80/git-rebase-onto/)
  * http://git-scm.com/book/ch3-6.html
