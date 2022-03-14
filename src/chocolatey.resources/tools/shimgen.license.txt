@@ -1,4 +1,5 @@
 Shim Generator - shimgen.exe
+Copyright (C) 2017 - Present Chocolatey Software, Inc ("CHOCOLATEY")
 Copyright (C) 2013 - 2017 RealDimensions Software, LLC ("RDS")
 ===================================================================
 Grant of License
@@ -59,4 +60,4 @@ organization.
 Commercial / Personal Licensing
 ===================================================================
 Shim Generator ("shimgen.exe") is also offered under personal and commercial 
-licenses. You can learn more by contacting RDS at http://ferventcoder.com.
+licenses. You can learn more by contacting Chocolatey at https://chocolatey.org/contact.
