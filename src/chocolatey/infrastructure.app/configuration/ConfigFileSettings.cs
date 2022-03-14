@@ -27,11 +27,11 @@ namespace chocolatey.infrastructure.app.configuration
     [XmlRoot("chocolatey")]
     public class ConfigFileSettings
     {
-        [Obsolete("This will be removed in v1 of Chocolatey")]
+        [Obsolete("This will be removed once CCM v0.7.0 is no longer supported. Possibly in Chocolatey CLI v2.0.0.")]
         [XmlElement(ElementName = "cacheLocation")]
         public string CacheLocation { get; set; }
 
-        [Obsolete("This will be removed in v1 of Chocolatey")]
+        [Obsolete("This will be removed once CCM v0.7.0 is no longer supported. Possibly in Chocolatey CLI v2.0.0.")]
         [XmlElement(ElementName = "commandExecutionTimeoutSeconds")]
         public int CommandExecutionTimeoutSeconds { get; set; }
 
