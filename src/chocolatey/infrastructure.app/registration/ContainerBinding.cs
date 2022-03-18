@@ -74,7 +74,7 @@ namespace chocolatey.infrastructure.app.registration
             container.Register<ICommandExecutor, CommandExecutor>(Lifestyle.Singleton);
             container.Register(() => new CustomString(string.Empty));
 
-            //todo:refactor - this should be autowired
+            //todo: #2572 refactor - this should be autowired
             container.Register<IEnumerable<ICommand>>(() =>
                 {
                     var list = new List<ICommand>
@@ -95,8 +95,6 @@ namespace chocolatey.infrastructure.app.registration
                             new ChocolateyFeatureCommand(container.GetInstance<IChocolateyConfigSettingsService>()),
                             new ChocolateyApiKeyCommand(container.GetInstance<IChocolateyConfigSettingsService>()),
                             new ChocolateyUnpackSelfCommand(container.GetInstance<IFileSystem>()),
-                            new ChocolateyVersionCommand(container.GetInstance<IChocolateyPackageService>()),
-                            new ChocolateyUpdateCommand(container.GetInstance<IChocolateyPackageService>()),
                             new ChocolateyExportCommand(container.GetInstance<INugetService>(), container.GetInstance<IFileSystem>()),
                             new ChocolateyTemplateCommand(container.GetInstance<ITemplateService>())
                         };

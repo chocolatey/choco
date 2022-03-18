@@ -269,7 +269,7 @@ namespace chocolatey.infrastructure.app.services
                 var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageName, null, null));
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageName);
 
-                //todo: detect windows feature is already enabled
+                //todo: #2574 detect windows feature is already enabled
                 /*
                       $checkStatement=@"
                     `$dismInfo=(cmd /c `"$dism /Online /Get-FeatureInfo /FeatureName:$packageName`")
@@ -353,7 +353,7 @@ namespace chocolatey.infrastructure.app.services
                 var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageName, null, null));
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageName);
 
-                //todo: detect windows feature is already disabled
+                //todo: #2574 detect windows feature is already disabled
                 /*
                       $checkStatement=@"
                     `$dismInfo=(cmd /c `"$dism /Online /Get-FeatureInfo /FeatureName:$packageName`")

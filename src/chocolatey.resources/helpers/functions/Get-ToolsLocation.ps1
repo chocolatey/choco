@@ -31,8 +31,8 @@ same package directory could get tricky.
 
 .NOTES
 This is the successor to the poorly named `Get-BinRoot`. Available as
-`Get-ToolsLocation` in 0.9.10+. If you need compatibility with pre
-0.9.10, please use `Get-BinRoot`.
+`Get-ToolsLocation` in 0.9.10+. The Alias `Get-BinRoot` will be removed
+in version 2.0.0.
 
 Sets an environment variable called `ChocolateyToolsLocation`. If the
 older `ChocolateyBinRoot` is set, it uses the value from that and
@@ -49,7 +49,7 @@ None
   Write-FunctionCallLogMessage -Invocation $invocation -Parameters $PSBoundParameters
 
   if ($invocation -ne $null -and $invocation.InvocationName -ne $null -and $invocation.InvocationName.ToLower() -eq 'get-binroot') {
-    Write-Host "Get-BinRoot is going to be deprecated in v1 and removed in v2. It has been replaced with Get-ToolsLocation (starting with v0.9.10), however many packages no longer require a special separate directory since package folders no longer have versions on them. Some do though and should continue to use Get-ToolsLocation."
+    Write-Warning "Get-BinRoot was deprecated in v1 and will be removed in v2. It has been replaced with Get-ToolsLocation (starting with v0.9.10), however many packages no longer require a special separate directory since package folders no longer have versions on them. Some do though and should continue to use Get-ToolsLocation."
   }
 
   $toolsLocation = $env:ChocolateyToolsLocation

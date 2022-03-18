@@ -49,7 +49,7 @@ namespace chocolatey.infrastructure.app.runners
 
             if (command == null)
             {
-                //todo add a search among other location/extensions for the command
+                //todo: #2581 add a search among other location/extensions for the command
                 if (!string.IsNullOrWhiteSpace(config.CommandName))
                 {
                     throw new Exception(@"Could not find a command registered that meets '{0}'.

@@ -107,9 +107,9 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_add_short_version_of_timeout_to_the_option_set()
+            public void should_not_add_short_version_of_timeout_to_the_option_set()
             {
-                optionSet.Contains("t").ShouldBeTrue();
+                optionSet.Contains("t").ShouldBeFalse();
             }
         }
 
@@ -148,6 +148,25 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
 
                 configuration.Sources.ShouldEqual(ApplicationParameters.ChocolateyCommunityFeedPushSource);
+            }
+
+            [Fact]
+            public void should_not_check_for_fallback_community_url()
+            {
+                reset();
+                configuration.Sources = "";
+                configSettingsService.Setup(c => c.get_api_key(
+                    It.Is<ChocolateyConfiguration>(config => config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)),
+                    null))
+                    .Returns(apiKey);
+                because();
+
+                configuration.Sources.ShouldEqual(ApplicationParameters.ChocolateyCommunityFeedPushSource);
+                configSettingsService.Verify(c => c.get_api_key(
+                    It.Is<ChocolateyConfiguration>(config => config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)),
+                    null),
+                    Times.Never);
+                configuration.PushCommand.Key.ShouldNotEqual(apiKey);
             }
 
             [Fact]

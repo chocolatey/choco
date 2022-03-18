@@ -31,6 +31,7 @@
   <target name="get_version">
     <property name="version.file" value="${version.major}.${version.minor}.${version.build}.${version.revision}" />
     <property name="version.file" value="${version.major}.${version.minor}.${version.patch}.${version.build}" if="${version.use_semanticversioning}" />
+    <property name="version.file" value="${version.gitTag}.0" if="${version.gitTag != ''}" />
   </target>
 
   <target name="get_project_output_files">

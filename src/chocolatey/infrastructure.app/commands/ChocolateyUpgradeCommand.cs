@@ -29,8 +29,6 @@ namespace chocolatey.infrastructure.app.commands
     [CommandFor("upgrade", "upgrades packages from various sources")]
     public class ChocolateyUpgradeCommand : ICommand
     {
-        //todo v1 Deprecation reseal this class and remove virtuals
-
         private readonly IChocolateyPackageService _packageService;
 
         public ChocolateyUpgradeCommand(IChocolateyPackageService packageService)
@@ -165,7 +163,7 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
                      "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
-                     ) 
+                     )
                  .Add("skip-if-not-installed|only-upgrade-installed|skip-when-not-installed",
                      "Skip Packages Not Installed - if a package is not installed, do not install it during the upgrade process. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with(ApplicationParameters.Features.SkipPackageUpgradesWhenNotInstalled, configuration.Features.SkipPackageUpgradesWhenNotInstalled.to_string()),
                      option => configuration.Features.SkipPackageUpgradesWhenNotInstalled = option != null
@@ -174,10 +172,10 @@ namespace chocolatey.infrastructure.app.commands
                      "Install Missing Packages When Not Installed - if a package is not installed, install it as part of running upgrade (typically default behavior). Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with(ApplicationParameters.Features.SkipPackageUpgradesWhenNotInstalled, configuration.Features.SkipPackageUpgradesWhenNotInstalled.to_string()),
                      option =>
                      {
-                        if (option != null)
-                        {
-                            configuration.Features.SkipPackageUpgradesWhenNotInstalled = false;
-                        }
+                         if (option != null)
+                         {
+                             configuration.Features.SkipPackageUpgradesWhenNotInstalled = false;
+                         }
                      })
                  .Add("exclude-pre|exclude-prerelease|exclude-prereleases",
                      "Exclude Prerelease - Should prerelease be ignored for upgrades? Will be ignored if you pass `--pre`. Available in 0.10.4+.",
@@ -269,8 +267,7 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Upgrade Command");
             this.Log().Info(@"
-Upgrades a package or a list of packages. Some may prefer to use `cup`
- as a shortcut for `choco upgrade`. If you do not have a package
+Upgrades a package or a list of packages. If you do not have a package
  installed, upgrade will install it.
 
 NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
@@ -279,10 +276,17 @@ NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
  dash (`-`). For more details, see the command reference (`choco -?`).
 ");
 
+            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
+            "chocolatey".Log().Warn(@"
+Starting in v2.0.0 the shortcut `cup` will be removed and can not be used
+to upgrade or install packages anymore. We recommend you make sure that you always
+use the full command going forward (`choco upgrade`).
+");
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco upgrade <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
-    cup <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
+    cup <pkg|all> [<pkg2> <pkgN>] [<options/switches>] (DEPRECATED, will be removed in v2.0.0)
 
 NOTE: `all` is a special package keyword that will allow you to upgrade
  all currently installed packages.
@@ -343,7 +347,7 @@ In addition to the above exit codes, you may also see reboot exit codes
  the feature '{0}' to also be turned on to work properly.
  Available in v0.10.12+.
 ".format_with(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected));
-            
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"
 choco upgrade: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_upgrade.gif

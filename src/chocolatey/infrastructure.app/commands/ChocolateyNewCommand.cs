@@ -66,7 +66,6 @@ namespace chocolatey.infrastructure.app.commands
                     "BuiltInTemplate - Use the original built-in template instead of any override. Available in 0.9.10+.",
                     option => configuration.NewCommand.UseOriginalTemplate = option != null)
                 ;
-            //todo: more built-in templates
         }
 
         public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)

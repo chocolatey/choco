@@ -67,7 +67,7 @@ functions that you can use, these are sometimes called the helpers.
 https://docs.chocolatey.org/en-us/create/functions
 
 A note about a couple:
-* Get-BinRoot - this is a horribly named function that doesn't do what new folks think it does. It gets you the 'tools' root, which by default is set to 'c:\tools', not the chocolateyInstall bin folder - see https://docs.chocolatey.org/en-us/create/functions/get-toolslocation
+* Get-ToolsLocation - used to get you the 'tools' root, which by default is set to 'c:\tools', not the chocolateyInstall bin folder - see https://docs.chocolatey.org/en-us/create/functions/get-toolslocation
 * Install-BinFile - used for non-exe files - executables are automatically shimmed... - see https://docs.chocolatey.org/en-us/create/functions/install-binfile
 * Uninstall-BinFile - used for non-exe files - executables are automatically shimmed - see https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
 

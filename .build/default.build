@@ -87,8 +87,10 @@
     <!--<nant buildfile="${dirs.current.file}${path.separator}versioners${path.separator}vss.step" inheritall="true" if="${source_control_type=='vss'}" />-->
 
     <property name="version.revision" value="${environment::get-variable('uc.app.revision')}" if="${environment::variable-exists('uc.app.revision')}" />
+    <property name="version.revision" value="${version.gitTag}" if="${version.gitTag != ''}" />
     <property name="version.hash" value="${environment::get-variable('uc.app.revision.hash')}" if="${environment::variable-exists('uc.app.revision.hash')}" />
     <property name="version.hash" value="${version.revision}" if="${version.hash == '0'}" />
+    <property name="version.hash" value="${version.gitTag}" if="${version.gitTag != ''}" />
     <echo level="Warning" message="Using revision number: ${version.revision} and hash: ${version.hash}." />
   </target>
 

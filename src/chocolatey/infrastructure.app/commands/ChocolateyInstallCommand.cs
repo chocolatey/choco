@@ -23,7 +23,6 @@ namespace chocolatey.infrastructure.app.commands
     using commandline;
     using configuration;
     using infrastructure.commands;
-    using infrastructure.configuration;
     using logging;
     using services;
 
@@ -182,7 +181,7 @@ namespace chocolatey.infrastructure.app.commands
                      })
                 ;
 
-            //todo: package name can be a url / installertype
+            //todo: #770 package name can be a url / installertype
         }
 
         public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
@@ -238,8 +237,7 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Install Command");
             this.Log().Info(@"
 Installs a package or a list of packages (sometimes specified as a
- packages.config). Some may prefer to use `cinst` as a shortcut for
- `choco install`.
+ packages.config).
 
 NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
  with options and switches. Add `-y` for previous behavior with no
@@ -247,10 +245,17 @@ NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
  dash (`-`). For more details, see the command reference (`choco -?`).
 ");
 
+            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
+            "chocolatey".Log().Warn(@"
+Starting in v2.0.0 the shortcut `cinst` will be removed and can not be used
+to install packages anymore. We recommend you make sure that you always
+use the full command going forward (`choco install`).
+");
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco install <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>]
-    cinst <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>]
+    cinst <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>] (DEPRECATED, will be removed in v2.0.0)
 
 NOTE: `all` is a special package keyword that will allow you to install
  all packages from a custom feed. Will not work with Chocolatey default

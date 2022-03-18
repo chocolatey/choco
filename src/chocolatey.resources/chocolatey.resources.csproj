@@ -69,7 +69,6 @@
     <EmbeddedResource Include="helpers\functions\Get-VirusCheckValid.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-WebFile.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-WebHeaders.ps1" />
-    <EmbeddedResource Include="helpers\functions\Install-ChocolateyDesktopLink.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyEnvironmentVariable.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyExplorerMenuItem.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyFileAssociation.ps1" />
@@ -85,18 +84,13 @@
     <EmbeddedResource Include="helpers\functions\Uninstall-ChocolateyPackage.ps1" />
     <EmbeddedResource Include="helpers\functions\UnInstall-ChocolateyZipPackage.ps1" />
     <EmbeddedResource Include="helpers\functions\Update-SessionEnvironment.ps1" />
-    <EmbeddedResource Include="helpers\functions\Write-ChocolateyFailure.ps1" />
-    <EmbeddedResource Include="helpers\functions\Write-ChocolateySuccess.ps1" />
-    <EmbeddedResource Include="helpers\functions\Write-FileUpdateLog.ps1" />
     <EmbeddedResource Include="redirects\choco.exe.ignore" />
     <EmbeddedResource Include="redirects\chocolatey.exe.ignore" />
     <EmbeddedResource Include="redirects\cinst.exe.ignore" />
     <EmbeddedResource Include="redirects\clist.exe.ignore" />
-    <EmbeddedResource Include="redirects\cpack.exe.ignore" />
     <EmbeddedResource Include="redirects\cpush.exe.ignore" />
     <EmbeddedResource Include="redirects\cuninst.exe.ignore" />
     <EmbeddedResource Include="redirects\cup.exe.ignore" />
-    <EmbeddedResource Include="redirects\cver.exe.ignore" />
     <EmbeddedResource Include="tools\checksum.exe.ignore" />
     <EmbeddedResource Include="tools\shimgen.exe.ignore" />
   </ItemGroup>
@@ -106,11 +100,9 @@
     <EmbeddedResource Include="redirects\chocolatey.exe" />
     <EmbeddedResource Include="redirects\cinst.exe" />
     <EmbeddedResource Include="redirects\clist.exe" />
-    <EmbeddedResource Include="redirects\cpack.exe" />
     <EmbeddedResource Include="redirects\cpush.exe" />
     <EmbeddedResource Include="redirects\cuninst.exe" />
     <EmbeddedResource Include="redirects\cup.exe" />
-    <EmbeddedResource Include="redirects\cver.exe" />
     <EmbeddedResource Include="tools\7zip.license.txt" />
     <EmbeddedResource Include="tools\checksum.exe" />
     <EmbeddedResource Include="tools\checksum.license.txt" />

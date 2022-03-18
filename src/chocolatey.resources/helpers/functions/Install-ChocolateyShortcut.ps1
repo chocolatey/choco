@@ -111,9 +111,6 @@ Install-ChocolateyShortcut `
   -PinToTaskbar
 
 .LINK
-Install-ChocolateyDesktopLink
-
-.LINK
 Install-ChocolateyExplorerMenuItem
 
 .LINK

@@ -15,9 +15,9 @@
 
   <!-- ASSEMBLY VARIABLES -->
   <property name="version.use_semanticversioning" value="true" overwrite="false" />
-  <property name="version.major" value="0" overwrite="false" />
-  <property name="version.minor" value="12" overwrite="false" />
-  <property name="version.patch" value="1" overwrite="false" />
+  <property name="version.major" value="1" overwrite="false" />
+  <property name="version.minor" value="0" overwrite="false" />
+  <property name="version.patch" value="0" overwrite="false" />
   <property name="version.fix" value="0" overwrite="false" />
   <property name="version.nuget.prerelease" value="" overwrite="false" />
   <property name="version.use.build_date" value="false" overwrite="false" />
@@ -58,9 +58,14 @@
 
   <property name="app.signtool" value="C:${path.separator}Program Files${path.separator}Microsoft SDKs${path.separator}Windows${path.separator}v7.0A${path.separator}Bin${path.separator}signtool.exe" />
   <property name="app.signtool" value="C:${path.separator}Program Files (x86)${path.separator}Microsoft SDKs${path.separator}Windows${path.separator}v7.0A${path.separator}Bin${path.separator}signtool.exe" if="${not file::exists(app.signtool)}" />
+  <property name="app.signtool" value="C:${path.separator}Program Files${path.separator}Microsoft SDKs${path.separator}Windows${path.separator}v7.1${path.separator}Bin${path.separator}signtool.exe" if="${not file::exists(app.signtool)}" />
   <property name="path.code.cert" value="${environment::get-variable('CHOCOLATEY_OFFICIAL_CERT')}" if="${environment::variable-exists('CHOCOLATEY_OFFICIAL_CERT')}" />
   <property name="path.code.cert.password" value="${environment::get-variable('CHOCOLATEY_OFFICIAL_CERT_PASSWORD')}" if="${environment::variable-exists('CHOCOLATEY_OFFICIAL_CERT_PASSWORD')}" />
   <property name="code.cert.timestampserver" value="http://timestamp.digicert.com" />
+  <property name="code.cert.subjectname" value="Chocolatey Software, Inc." />
+  <property name="run.teamcity" value="${environment::variable-exists('TEAMCITY_VERSION') and msbuild.configuration == 'ReleaseOfficial'}" overwrite="false" />
+  <property name="version.gitTag" value="" />
+  <property name="version.gitTag" value="${environment::get-variable('TEAMCITY_GIT_TAG')}" if="${environment::variable-exists('TEAMCITY_GIT_TAG')}" />
   <!-- When Windows 2003 is no longer supported, switch to SHA256 -->
   <property name="code.cert.algorithm" value="SHA1" />
 

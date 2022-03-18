@@ -93,7 +93,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 if (_fileSystem.file_exists(file + ".ignore")) continue;
                 bool isGui = _fileSystem.file_exists(file + ".gui");
-                //todo: v2 be able to determine gui automatically
+                //todo: #2586 v2 be able to determine gui automatically
 
                 var args = ExternalCommandArgsBuilder.build_arguments(configuration, _shimGenArguments);
                 var shimLocation = _fileSystem.combine_paths(ApplicationParameters.ShimsLocation, _fileSystem.get_file_name(file));
