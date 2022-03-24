@@ -35,6 +35,10 @@ namespace chocolatey.infrastructure.app.runners
     using logging;
     using Console = System.Console;
     using Environment = System.Environment;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using System.Diagnostics;
+    using Alphaleonis.Win32.Filesystem;
 
     public sealed class GenericRunner
     {
@@ -67,7 +71,23 @@ namespace chocolatey.infrastructure.app.runners
 
                 if (command.may_require_admin_access())
                 {
-                    warn_when_admin_needs_elevation(config);
+                    if (!config.Features.AutomaticProcessElevation)
+                    { 
+                        warn_when_admin_needs_elevation(config);
+                    } else {
+                        var needElevation = (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator);
+
+                        if (needElevation)
+                        {
+                            "chocolatey".Log().Info(() => $"Command '{config.CommandName}' requires elevation - starting child process... ('automaticProcessElevation' feature is on)");
+                            var args = Environment.GetCommandLineArgs().Skip(1).ToList();
+                            //args.AddRange(new[] { "-waitpid", System.Diagnostics.Process.GetCurrentProcess().Id.ToString()});
+                            var proc = StartElevatedProcess(true, $"'{config.CommandName}'-command", args.ToArray());
+                            proc.WaitForExit();
+                            "chocolatey".Log().Info(() => "Exiting with {0}".format_with(proc.ExitCode));
+                            Environment.Exit(proc.ExitCode);
+                        }
+                    }
                 }
 
                 set_source_type(config);
@@ -110,6 +130,57 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             }
 
             return command;
+        }
+
+        /// <summary>
+        /// Starts console process with elevated priviledges. If end-user presses "No" to elevation prompt will throw exception.
+        /// </summary>
+        /// <param name="startFromMainApplicationDirectory">true = starts from main application directory, false = start from package directory / package name</param>
+        /// <param name="commandName">command name</param>
+        /// <param name="args">arguments to calling process</param>
+        /// <returns>process if started successfully</returns>
+        public static System.Diagnostics.Process StartElevatedProcess(bool startFromMainApplicationDirectory, String commandName, string[] args)
+        {
+            String cmdLine = EscapeArguments(args);
+            bool hideCommandPrompt = args.Contains("-gui");
+            String exe;
+
+            exe = ApplicationParameters.ApplicationExecutableName + ".exe";
+            if (startFromMainApplicationDirectory)
+            {
+                exe = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), exe);
+            }
+            else
+            {
+                exe = Path.Combine(ApplicationParameters.PackagesLocation, ApplicationParameters.ApplicationExecutableName, exe);
+            }
+
+            var startInfo = new ProcessStartInfo();
+            startInfo.UseShellExecute = true;
+            startInfo.WorkingDirectory = Environment.CurrentDirectory;
+            startInfo.FileName = exe;
+            startInfo.Arguments = cmdLine;
+            startInfo.Verb = "runas";
+            if (hideCommandPrompt)
+            { 
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            }
+
+            try
+            {
+                System.Diagnostics.Process proc = System.Diagnostics.Process.Start(startInfo);
+                return proc;
+            }
+            catch (Exception ex)
+            {
+                System.ComponentModel.Win32Exception wex = ex as System.ComponentModel.Win32Exception;
+                if (wex != null && wex.NativeErrorCode == 1223 /*ERROR_CANCELLED*/)
+                {
+                    throw new Exception($"{commandName} requires elevated priviledges to run");
+                }
+
+                throw ex;
+            }
         }
 
         private void set_source_type(ChocolateyConfiguration config)
@@ -323,6 +394,43 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                     Environment.Exit(-1);
                 }
             }
+        }
+
+        /// <summary>
+        /// Copied from: http://csharptest.net/529/how-to-correctly-escape-command-line-arguments-in-c/index.html
+        /// 
+        /// Quotes all arguments that contain whitespace, or begin with a quote and returns a single
+        /// argument string for use with Process.Start().
+        /// </summary>
+        /// <param name="args">A list of strings for arguments, may not contain null, '\0', '\r', or '\n'</param>
+        /// <returns>The combined list of escaped/quoted strings</returns>
+        /// <exception cref="System.ArgumentNullException">Raised when one of the arguments is null</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Raised if an argument contains '\0', '\r', or '\n'</exception>
+        public static string EscapeArguments(params string[] args)
+        {
+            StringBuilder arguments = new StringBuilder();
+            Regex invalidChar = new Regex("[\x00\x0a\x0d]");//  these can not be escaped
+            Regex needsQuotes = new Regex(@"\s|""");//          contains whitespace or two quote characters
+            Regex escapeQuote = new Regex(@"(\\*)(""|$)");//    one or more '\' followed with a quote or end of string
+            for (int carg = 0; args != null && carg < args.Length; carg++)
+            {
+                if (args[carg] == null) { throw new ArgumentNullException("args[" + carg + "]"); }
+                if (invalidChar.IsMatch(args[carg])) { throw new ArgumentOutOfRangeException("args[" + carg + "]"); }
+                if (args[carg] == String.Empty) { arguments.Append("\"\""); }
+                else if (!needsQuotes.IsMatch(args[carg])) { arguments.Append(args[carg]); }
+                else
+                {
+                    arguments.Append('"');
+                    arguments.Append(escapeQuote.Replace(args[carg], m =>
+                    m.Groups[1].Value + m.Groups[1].Value +
+                    (m.Groups[2].Value == "\"" ? "\\\"" : "")
+                    ));
+                    arguments.Append('"');
+                }
+                if (carg + 1 < args.Length)
+                    arguments.Append(' ');
+            }
+            return arguments.ToString();
         }
 
     }

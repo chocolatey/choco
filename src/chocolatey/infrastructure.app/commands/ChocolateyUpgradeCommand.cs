@@ -377,7 +377,7 @@ NOTE: Options and switches apply to all items passed, so if you are
 
         public virtual bool may_require_admin_access()
         {
-            return true;
+            return ChocolateyInstallCommand.InstallOrUpgradeRequiresElevation();
         }
     }
 }

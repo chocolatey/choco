@@ -443,9 +443,33 @@ NOTE: Options and switches apply to all items passed, so if you are
             _packageService.install_run(configuration);
         }
 
+        public static bool InstallOrUpgradeRequiresElevation()
+        {
+            var config = Config.get_configuration_settings();
+            if (config == null) return true;
+
+            // If we are only downloading package, no need for elevated priviledges
+            if (config.SkipPackageInstallProvider)
+                return false;
+
+            // We don't perform anything, no need for elevation
+            if (config.Noop)
+                return false;
+
+            // Local installation only, no need to access directory outside of library area
+            if (config.CommandName == "install" && config.Input == ApplicationParameters.ApplicationExecutableName)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
+
         public virtual bool may_require_admin_access()
         {
-            return true;
+            return InstallOrUpgradeRequiresElevation();
         }
     }
 }

@@ -29,6 +29,11 @@ namespace chocolatey.infrastructure.app
     public static class ApplicationParameters
     {
         private static readonly IFileSystem _fileSystem = new DotNetFileSystem();
+
+        /// <summary>
+        /// If you create any new fork, makes sense to change this name, just to avoid confusion to "choco".
+        /// </summary>
+        public static string ApplicationExecutableName = "choco";
         public static readonly string ChocolateyInstallEnvironmentVariableName = "ChocolateyInstall";
         public static readonly string Name = "Chocolatey";
 
@@ -195,6 +200,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string UseEnhancedExitCodes = "useEnhancedExitCodes";
             public static readonly string UseFipsCompliantChecksums = "useFipsCompliantChecksums";
             public static readonly string ShowNonElevatedWarnings = "showNonElevatedWarnings";
+            public static readonly string AutomaticProcessElevation = "automaticProcessElevation";
             public static readonly string ShowDownloadProgress = "showDownloadProgress";
             public static readonly string StopOnFirstPackageFailure = "stopOnFirstPackageFailure";
             public static readonly string UseRememberedArgumentsForUpgrades = "useRememberedArgumentsForUpgrades";
