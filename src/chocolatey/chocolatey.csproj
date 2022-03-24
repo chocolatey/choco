@@ -114,6 +114,8 @@
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyTemplateCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyUpdateCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyVersionCommand.cs" />
     <Compile Include="infrastructure.app\domain\TemplateCommandType.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyExportCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInfoCommand.cs" />
