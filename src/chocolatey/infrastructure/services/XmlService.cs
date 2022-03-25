@@ -24,7 +24,6 @@ namespace chocolatey.infrastructure.services
     using System.Xml.Serialization;
     using cryptography;
     using filesystem;
-    using logging;
     using tolerance;
     using synchronization;
 
