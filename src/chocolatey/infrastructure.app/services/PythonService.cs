@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -233,7 +233,7 @@ namespace chocolatey.infrastructure.app.services
                     return;
                 }
             }
-            
+
             var topLevelPath = string.Empty;
             var python34PathKey = _registryService.get_key(RegistryHive.LocalMachine, "SOFTWARE\\Python\\PythonCore\\3.4\\InstallPath");
             if (python34PathKey != null)
@@ -248,7 +248,7 @@ namespace chocolatey.infrastructure.app.services
                     topLevelPath = python27PathKey.GetValue("", string.Empty).to_string();
                 }
             }
-            
+
             if (string.IsNullOrWhiteSpace(topLevelPath))
             {
                 var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
@@ -262,7 +262,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 _exePath = pipPath;
             }
-            
+
             if (string.IsNullOrWhiteSpace(_exePath)) throw new FileNotFoundException("Unable to find pip");
         }
 
@@ -413,6 +413,11 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction = null)
         {
+            if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
+            {
+                throw new NotImplementedException("The all keyword is not available for alternate sources");
+            }
+
             set_executable_path_if_not_set();
             var args = build_args(config, _upgradeArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
