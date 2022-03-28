@@ -21,7 +21,6 @@ namespace chocolatey.infrastructure.licensing
     using information;
     using logging;
     using registration;
-    using Environment = System.Environment;
 
     public static class License
     {
@@ -40,7 +39,11 @@ namespace chocolatey.infrastructure.licensing
 #endif
                     var licensedAssembly = AssemblyResolution.resolve_or_load_assembly(ApplicationParameters.LicensedChocolateyAssemblySimpleName, chocolateyPublicKey, ApplicationParameters.LicensedAssemblyLocation);
 
-                    if (licensedAssembly == null) throw new ApplicationException("Unable to load licensed assembly.");
+                    if (licensedAssembly == null)
+                    {
+                        throw new ApplicationException("Unable to load licensed assembly.");
+                    }
+
                     license.AssemblyLoaded = true;
                     license.Assembly = licensedAssembly;
                     license.Version = VersionInformation.get_current_informational_version(licensedAssembly);

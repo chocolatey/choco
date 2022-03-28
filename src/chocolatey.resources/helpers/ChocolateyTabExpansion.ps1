@@ -164,7 +164,7 @@ function ChocolateyTabExpansion($lastBlock) {
     "^(config)\s+(?<subcommand>[^-\s]*)$" {
       @('list','get','set','unset','-?') | where { $_ -like "$($matches['subcommand'])*" }
     }
-    
+
     # Handles template first tab
     "^(template)\s+(?<subcommand>[^-\s]*)$" {
         @('list', 'info', '-?') | where { $_ -like "$($matches['subcommand'])*" }
