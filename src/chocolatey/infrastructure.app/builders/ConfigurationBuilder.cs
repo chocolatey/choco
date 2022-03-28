@@ -309,6 +309,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.LogValidationResultsOnWarnings = set_feature_flag(ApplicationParameters.Features.LogValidationResultsOnWarnings, configFileSettings, defaultEnabled: true, description: "Log validation results on warnings - Should the validation results be logged if there are warnings? Available in 0.10.12+.");
             config.Features.UsePackageRepositoryOptimizations = set_feature_flag(ApplicationParameters.Features.UsePackageRepositoryOptimizations, configFileSettings, defaultEnabled: true, description: "Use Package Repository Optimizations - Turn on optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should generally be left enabled, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Available in 0.10.14+.");
             config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
+            config.DisableCompatibilityChecks = set_feature_flag(ApplicationParameters.Features.DisableCompatibilityChecks, configFileSettings, defaultEnabled: false, description: "Disable Compatibility Checks - Should a warning we shown, before and after command execution, when a runtime compatibility check determines that there is an incompatibility between Chocolatey and Chocolatey Licensed Extension. Available in 1.1.0+");
         }
 
         private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings, bool defaultEnabled, string description)
@@ -423,6 +424,9 @@ namespace chocolatey.infrastructure.app.builders
                          .Add("log-file=",
                              "Log File to output to in addition to regular loggers. Available in 0.10.8+.",
                              option => config.AdditionalLogFileLocation= option.remove_surrounding_quotes())
+                        .Add("skipcompatibilitychecks|skip-compatibility-checks",
+                            "SkipCompatibilityChecks - Prevent warnings being shown before and after command execution when a runtime compatibility problem is found between the version of Chocolatey and the Chocolatey Licensed Extension. Available in 1.1.0+",
+                            option => config.DisableCompatibilityChecks = option != null)
                         ;
                 },
                 (unparsedArgs) =>

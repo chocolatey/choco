@@ -46,6 +46,9 @@ namespace chocolatey.console
         private static void Main(string[] args)
         // ReSharper restore InconsistentNaming
         {
+            ChocolateyConfiguration config = null;
+            ChocolateyLicense license = null;
+
             try
             {
                 add_assembly_resolver();
@@ -57,12 +60,12 @@ namespace chocolatey.console
                 Log4NetAppenderConfiguration.configure(loggingLocation, excludeLoggerNames: ChocolateyLoggers.Trace.to_string());
                 Bootstrap.initialize();
                 Bootstrap.startup();
-                var license = License.validate_license();
+                license = License.validate_license();
                 var container = SimpleInjectorContainer.Container;
 
                 "LogFileOnly".Log().Info(() => "".PadRight(60, '='));
 
-                var config = Config.get_configuration_settings();
+                config = Config.get_configuration_settings();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
                 var warnings = new List<string>();
@@ -74,6 +77,11 @@ namespace chocolatey.console
                      license,
                      warning => { warnings.Add(warning); }
                      );
+
+                if (!license.IsCompatible && !config.DisableCompatibilityChecks)
+                {
+                    write_warning_for_incompatible_versions();
+                }
 
                 if (config.Features.LogWithoutColor)
                 {
@@ -163,6 +171,11 @@ namespace chocolatey.console
             }
             finally
             {
+                if (license != null && !license.IsCompatible && config != null && !config.DisableCompatibilityChecks)
+                {
+                    write_warning_for_incompatible_versions();
+                }
+
                 "chocolatey".Log().Debug(() => "Exiting with {0}".format_with(Environment.ExitCode));
 #if DEBUG
                 "chocolatey".Log().Info(() => "Exiting with {0}".format_with(Environment.ExitCode));
@@ -268,6 +281,31 @@ namespace chocolatey.console
             Console.WriteLine("Press enter to continue...");
             Console.ReadKey();
 #endif
+        }
+
+        private static void write_warning_for_incompatible_versions()
+        {
+            "chocolatey".Log().Warn(
+                ChocolateyLoggers.Important,
+                @"WARNING!
+
+You are running a version of Chocolatey that may not be compatible with
+the currently installed version of the chocolatey.extension package.
+Running Chocolatey with the current version of the chocolatey.extension
+package is an unsupported configuration.
+
+See https://ch0.co/compatibility for more information.
+
+If you are in the process of modifying the chocolatey.extension package,
+you can ignore this warning.
+
+Additionally, you can ignore these warnings by either setting the
+DisableCompatibilityChecks feature:
+
+choco feature enable --name=""'disableCompatibilityChecks'""
+
+Or by passing the --skip-compatibility-checks option when executing a
+command.");
         }
     }
 }

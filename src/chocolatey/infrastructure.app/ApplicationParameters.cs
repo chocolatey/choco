@@ -205,6 +205,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string ExitOnRebootDetected = "exitOnRebootDetected";
             public static readonly string LogValidationResultsOnWarnings = "logValidationResultsOnWarnings";
             public static readonly string UsePackageRepositoryOptimizations = "usePackageRepositoryOptimizations";
+            public static readonly string DisableCompatibilityChecks = "disableCompatibilityChecks";
         }
 
         public static class Messages
