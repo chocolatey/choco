@@ -680,9 +680,9 @@ function Add-ChocolateyProfile {
       #"" | Out-File $profileFile -Encoding UTF8
     }
 
-    # Check authenticode, but only if file is greater than 4 bytes
+    # Check authenticode, but only if file is greater than 5 bytes
     $profileFileInfo = New-Object System.IO.FileInfo($profileFile)
-    if ($profileFileInfo.Length -ge 5) {
+    if ($profileFileInfo.Length -gt 5) {
       $signature = Get-AuthenticodeSignature $profile
       if ($signature.Status -ne 'NotSigned') {
         Write-Warning "Not setting tab completion: File is Authenticode signed at '$profile'."
