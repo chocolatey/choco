@@ -47,6 +47,27 @@ namespace chocolatey.infrastructure.licensing
                     license.AssemblyLoaded = true;
                     license.Assembly = licensedAssembly;
                     license.Version = VersionInformation.get_current_informational_version(licensedAssembly);
+
+                    // The licensed assembly is installed, check its supported Chocolatey versions and/or the assembly
+                    // version so we can attempt to determine whether it's compatible with this version of Chocolatey.
+                    var minimumChocolateyVersionString = VersionInformation.get_minimum_chocolatey_version(licensedAssembly);
+                    "chocolatey".Log().Debug("Minimum Chocolatey Version: '{0}'".format_with(minimumChocolateyVersionString));
+                    var currentChocolateyVersionString = VersionInformation.get_current_assembly_version();
+                    "chocolatey".Log().Debug("Current Chocolatey Version: '{0}'".format_with(currentChocolateyVersionString));
+                    var currentChocolateyLicensedVersionString = VersionInformation.get_current_assembly_version(licensedAssembly);
+                    "chocolatey".Log().Debug("Current Chocolatey Licensed Version: '{0}'".format_with(currentChocolateyLicensedVersionString));
+
+                    var minimumChocolateyVersion = new Version(minimumChocolateyVersionString);
+                    var currentChocolateyVersion = new Version(currentChocolateyVersionString);
+                    var currentChocolateyLicensedVersion = new Version(currentChocolateyLicensedVersionString);
+
+                    license.IsCompatible = true;
+
+                    if (currentChocolateyVersion < minimumChocolateyVersion || (minimumChocolateyVersion == Version.Parse("1.0.0") && currentChocolateyLicensedVersion.Major < 4))
+                    {
+                        license.IsCompatible = false;
+                    }
+
                     Type licensedComponent = licensedAssembly.GetType(ApplicationParameters.LicensedComponentRegistry, throwOnError: false, ignoreCase: true);
                     SimpleInjectorContainer.add_component_registry_class(licensedComponent);
                 }

@@ -31,6 +31,7 @@ namespace chocolatey.infrastructure.licensing
         public string Version { get; set; }
         public string InvalidReason { get; set; }
         public DateTime? ExpirationDate { get; set; }
+        public bool IsCompatible { get; set; }
 
         public bool is_licensed_version()
         {

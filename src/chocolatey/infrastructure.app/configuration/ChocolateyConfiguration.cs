@@ -34,6 +34,7 @@ namespace chocolatey.infrastructure.app.configuration
         {
             RegularOutput = true;
             PromptForConfirmation = true;
+            DisableCompatibilityChecks = false;
             SourceType = SourceType.normal;
             Information = new InformationCommandConfiguration();
             Features = new FeaturesConfiguration();
@@ -184,6 +185,16 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>This has only been implemented for NuGet List</remarks>
         public bool QuietOutput { get; set; }
         public bool PromptForConfirmation { get; set; }
+
+        /// <summary>
+        /// Gets or set a value indicating whether runtime Chocolatey compatibility checks
+        /// should be completed or not. Overriding this value is only expected on systems
+        /// where the user is explicitly opting out of these checks, for example, when
+        /// they are running a perpetual license, where the version is known to not be
+        /// compliant, but also that most things "should" work.
+        /// </summary>
+        public bool DisableCompatibilityChecks { get; set; }
+
         public bool AcceptLicense { get; set; }
         public bool AllowUnofficialBuild { get; set; }
         public string AdditionalLogFileLocation { get; set; }
