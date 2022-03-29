@@ -132,6 +132,7 @@ namespace chocolatey.infrastructure.licensing
             {
                 //free version
                 chocolateyLicense.LicenseType = ChocolateyLicenseType.Foss;
+                chocolateyLicense.IsCompatible = true;
             }
 
             return chocolateyLicense;
