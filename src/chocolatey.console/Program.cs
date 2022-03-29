@@ -78,7 +78,7 @@ namespace chocolatey.console
                      warning => { warnings.Add(warning); }
                      );
 
-                if (!license.IsCompatible && !config.DisableCompatibilityChecks)
+                if (license.is_licensed_version() && !license.IsCompatible && !config.DisableCompatibilityChecks)
                 {
                     write_warning_for_incompatible_versions();
                 }
@@ -171,7 +171,7 @@ namespace chocolatey.console
             }
             finally
             {
-                if (license != null && !license.IsCompatible && config != null && !config.DisableCompatibilityChecks)
+                if (license != null && license.is_licensed_version() && !license.IsCompatible && config != null && !config.DisableCompatibilityChecks)
                 {
                     write_warning_for_incompatible_versions();
                 }

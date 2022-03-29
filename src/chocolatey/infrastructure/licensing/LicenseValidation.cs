@@ -31,7 +31,8 @@ namespace chocolatey.infrastructure.licensing
         {
             var chocolateyLicense = new ChocolateyLicense
             {
-                LicenseType = ChocolateyLicenseType.Unknown
+                LicenseType = ChocolateyLicenseType.Unknown,
+                IsCompatible = true
             };
 
             var regularLogOutput = determine_if_regular_output_for_logging();
