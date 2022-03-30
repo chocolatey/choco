@@ -315,6 +315,7 @@ function Move-GeneratedFiles {
   Move-Item -Path "$docsFolder\choco\commands\pack.md" -Destination "$docsFolder\create\commands\pack.md"
   Move-Item -Path "$docsFolder\choco\commands\push.md" -Destination "$docsFolder\create\commands\push.md"
   Move-Item -Path "$docsFolder\choco\commands\template.md" -Destination "$docsFolder\create\commands\template.md"
+  Move-Item -Path "$docsFolder\choco\commands\templates.md" -Destination "$docsFolder\create\commands\templates.md"
   Move-Item -Path "$docsFolder\choco\commands\convert.md" -Destination "$docsFolder\create\commands\convert.md"
 }
 
@@ -356,7 +357,7 @@ function Generate-CommandReference($commandName, $order) {
   $commandOutput += @(@"
 > :memo: **WARNING** SHIM DEPRECATION
 >
-> In version 1.0.0 of Chocolatey Open Source we have deprecated the following shims/shortcuts:
+> With the release of Chocolatey CLI v1.0.0 we have deprecated the following shims/shortcuts:
 >
 > - `chocolatey` (Alias for `choco`)
 > - `cinst` (Shortcut for `choco install`)
@@ -365,7 +366,7 @@ function Generate-CommandReference($commandName, $order) {
 > - `cup` (Shortcut for `choco upgrade`)
 >
 > We recommend that any scripts calling these shims be updated to use the full command, as
-> these shims will be removed in Chocolatey v2.0.0.
+> these shims will be removed in Chocolatey CLI v2.0.0.
 
 "@)
 
@@ -553,6 +554,7 @@ The following are experimental or use not recommended:
   Generate-CommandReference 'Config' '10'
   Generate-CommandReference 'Download' '20'
   Generate-CommandReference 'Export' '30'
+  Generate-CommandReference 'Find' '35'
   Generate-CommandReference 'Feature' '40'
   Generate-CommandReference 'Features' '45'
   Generate-CommandReference 'Help' '50'
@@ -571,9 +573,7 @@ The following are experimental or use not recommended:
   Generate-CommandReference 'Synchronize' '180'
   Generate-CommandReference 'Uninstall' '190'
   Generate-CommandReference 'UnpackSelf' '200'
-  Generate-CommandReference 'Update' '210'
   Generate-CommandReference 'Upgrade' '220'
-  Generate-CommandReference 'Version' '230'
 
   Generate-CommandReference 'New' '10'
   Generate-CommandReference 'Pack' '20'
