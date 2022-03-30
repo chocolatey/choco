@@ -11,12 +11,19 @@ if ($null -ne $licensedAssembly) {
     # The licensed assembly is installed, check its supported Chocolatey versions and/or the assembly
     # version so we can attempt to determine whether it's compatible with this version of Chocolatey.
     $attributeData = $licensedAssembly.GetCustomAttributes($true)
-    
+
     $minVersion = $attributeData |
         Where-Object { $_.TypeId -like '*MinimumChocolateyVersion*' } |
         Select-Object -ExpandProperty Version -First 1
 
-    $messageBorder = '=' * ([System.Console]::BufferWidth - 10)
+    $borderWidth = 70
+    try {
+        $borderWidth = [System.Console]::BufferWidth - 10
+    } catch {
+        # Do nothing. This means we're in a non-interactive environment without a console attached.
+    }
+
+    $messageBorder = '=' * $borderWidth
     $extensionVersionWarning = @"
 $messageBorder
 
