@@ -36,7 +36,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         It "Displays published date in format M/DD/YYYY" {
-            $Output.String | Should -Match "Published: (?<month>\d{1,2})\/(?<day>\d{2})\/(?<year>\d{4})"
+            $Output.String | Should -Match "Published: (?<month>\d{1,2})\/(?<day>\d{1,2})\/(?<year>\d{4})"
         }
 
         It "Displays the title of the package" {
