@@ -241,7 +241,6 @@ $packageArgs = @{
   url64bit      = $url64
   silentArgs    = "/qn /norestart"
   validExitCodes= @(0, 3010, 1641)
-  softwareName  = 'Bob*'
   checksum      = '12345'
   checksumType  = 'sha256'
   checksum64    = '123356'
@@ -265,7 +264,6 @@ $packageArgs = @{
   url64bit      = $url64
   silentArgs    = "/qn /norestart MSIPROPERTY=`"true`""
   validExitCodes= @(0, 3010, 1641)
-  softwareName  = 'Bob*'
   checksum      = '12345'
   checksumType  = 'sha256'
   checksum64    = '123356'
@@ -291,7 +289,6 @@ $packageArgs = @{
   file          = $fileLocation
   silentArgs    = "/qn /norestart TRANSFORMS=`"$mstFileLocation`""
   validExitCodes= @(0, 3010, 1641)
-  softwareName  = 'Bob*'
 }
 
 Install-ChocolateyInstallPackage @packageArgs
