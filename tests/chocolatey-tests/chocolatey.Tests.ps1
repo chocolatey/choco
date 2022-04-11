@@ -102,12 +102,14 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     }
 
+    # This is skipped when not run in CI because it modifies the local system.
     # Issue: https://github.com/chocolatey/choco/issues/2233
-    It "Does not create nuget configuration file in application data" -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta")) {
+    It "Does not create nuget configuration file in application data" -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta"))) {
         $path | Should -Not -Exist
     }
 
-    Context "File signing (<_.FullName>)" -Foreach @($PowerShellFiles; $ExecutableFiles; $StrongNamingKeyFiles) -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0")) {
+    # This is skipped when not run in CI because it requires signed executables.
+    Context "File signing (<_.FullName>)" -Foreach @($PowerShellFiles; $ExecutableFiles; $StrongNamingKeyFiles) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0"))) {
         BeforeAll {
             $FileUnderTest = $_
             $SignerCert = (Get-AuthenticodeSignature (Get-ChocoPath)).SignerCertificate
@@ -166,7 +168,8 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
 
     # These tests are not a true test of PowerShell v2 compatibility as -Version 2 does not guarantee that things run exactly as in a PowerShell 2 instance, but it is as close as we can get in a testing environment.
     # Full proper testing on v2 would require a VM with only v2 installed.
-    Context "PowerShell v2 compatibility" {
+    # This is skipped when not run in CI because it modifies the local system.
+    Context "PowerShell v2 compatibility" -Skip:(-not $env:TEST_KITCHEN) {
         BeforeAll {
             # TODO: This doesn't work on client OSes (might be Install-WindowsOptionalFeature). Make sure this works on both server and client.
             Install-WindowsFeature powershell-v2
@@ -190,7 +193,8 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     }
 
-    Context 'License warning is worded properly' -Tag FossOnly -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0')) {
+    # This is skipped when not run in CI because it modifies the local system.
+    Context 'License warning is worded properly' -Tag FossOnly -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
             $null = Invoke-Choco install chocolatey-license-business -y
             $Output = Invoke-Choco list -lo
@@ -208,7 +212,8 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     }
 
-    Context 'PowerShell Profile comments updated correctly' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0')) {
+    # This is skipped when not run in CI because it modifies the local system.
+    Context 'PowerShell Profile comments updated correctly' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
             Remove-Item $Profile.CurrentUserCurrentHost -ErrorAction Ignore
             New-Item $Profile.CurrentUserCurrentHost -Force
@@ -233,7 +238,8 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     }
 
-    Context 'PowerShell Profile properly updated when Windows thinks a 5 byte file is signed' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0')) {
+    # This is skipped when not run in CI because it modifies the local system.
+    Context 'PowerShell Profile properly updated when Windows thinks a 5 byte file is signed' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
         BeforeAll {
             New-Item $Profile.CurrentUserCurrentHost -Force
             "" | Set-Content -Path $Profile.CurrentUserCurrentHost -Encoding UTF8
@@ -256,7 +262,8 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     }
 
-    Context 'Ensure we <Removal> shims during upgrade' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0')) -Foreach @(
+    # This is skipped when not run in CI because it requires signed executables
+    Context 'Ensure we <Removal> shims during upgrade' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -Foreach @(
         @{
             RemovedShims = $RemovedShims
             Signed       = $true
@@ -317,17 +324,16 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     }
 
-    # This is an initial pass at testing `Get-FileEncoding` It's not exported by `chocolateySetup.psm1`
-    # For right now this is skipped due to the complexities of testing it.
+    # This is skipped when not run in CI because it modifies the local system.
     Context 'Get-FileEncoding works under <_>' -Tag PowerShell7 -Foreach @(
         'pwsh'
         'powershell'
-    ) -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0')) {
+    ) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
         BeforeAll {
             New-ChocolateyInstallSnapshot
             # TODO: Internalize pwsh and powershell packages...
             $pwshInstall = Invoke-Choco install $_ -y -s https://community.chocolatey.org/api/v2/
-            $ChocoUnzipped = "$env:TEMP/$(New-Guid)"
+            $ChocoUnzipped = "$(Get-TempDirectory)/$(New-Guid)"
             $modulePath = "$ChocoUnzipped/tools/chocolateySetup.psm1"
 
             if (Test-Path $ChocoUnzipped) {
