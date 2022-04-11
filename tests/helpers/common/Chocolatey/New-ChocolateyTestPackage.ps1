@@ -25,11 +25,10 @@
     process {
         $NuspecFile = Get-Item "$TestPath\$Name\$Version\$Name.nuspec"
 
-        # TODO: Update to use something other than Write-Host
-        Write-Host "Building '$($NuspecFile.Count)' packages"
+        Write-Verbose "Building '$($NuspecFile.Count)' packages"
 
         foreach ($Package in $NuspecFile) {
-            Write-Host "Building '$($Package.Name)' with '$($Package.FullName)'"
+            Write-Verbose "Building '$($Package.Name)' with '$($Package.FullName)'"
             $ExpectedPackage = Join-Path $Destination "$Name.$Version.nupkg"
 
             if (-not (Test-Path $ExpectedPackage)) {

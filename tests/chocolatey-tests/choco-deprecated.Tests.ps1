@@ -54,8 +54,7 @@ Describe "Deprecated Chocolatey Helper Commands" -Skip:(-not (Test-ChocolateyVer
         $null = Invoke-Choco new $PackageName --version 1.0.0
         $TemplateOutput = Get-ChildItem -Path $PackageName -Recurse | Select-String -Pattern 'Get-BinRoot'
         $HelperUnderTest > "$PackageName/tools/chocolateyInstall.ps1"
-        $Pack = Invoke-Choco pack "$PackageName/$PackageName.nuspec"
-        Write-Host $Pack.String
+        $null = Invoke-Choco pack "$PackageName/$PackageName.nuspec"
         $Output = Invoke-Choco install $PackageName --source . -y
     }
 
