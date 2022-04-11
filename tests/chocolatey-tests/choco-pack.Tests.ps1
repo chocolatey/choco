@@ -26,7 +26,7 @@ $invalidFailures = @(
 
 Describe "choco pack" -Tag Chocolatey, PackCommand {
     BeforeAll {
-        $testPackageLocation = "$env:TEMP\ChocolateyTests\packages"
+        $testPackageLocation = "$(Get-TempDirectory)ChocolateyTests\packages"
         Initialize-ChocolateyTestInstall -Source $testPackageLocation
 
         Push-Location "$PSScriptRoot\testnuspecs"
@@ -286,7 +286,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         '--out', '--outdir', '--outputdirectory', '--output-directory'
     ) {
         BeforeAll {
-            $OutDirectory = "$env:TEMP\ChocoPackOutput"
+            $OutDirectory = "$(Get-TempDirectory)ChocoPackOutput"
             if (Test-Path $OutDirectory) {
                 Remove-Item "$OutDirectory\*.nupkg" -ErrorAction SilentlyContinue
             }
@@ -318,7 +318,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         '--out={0}', '--outdir={0}', '--outputdirectory={0}', '--output-directory={0}'
     ) {
         BeforeAll {
-            $OutDirectory = "$env:TEMP\ChocoPackOutput"
+            $OutDirectory = "$(Get-TempDirectory)ChocoPackOutput"
             if (Test-Path $OutDirectory) {
                 Remove-Item "$OutDirectory\*.nupkg" -ErrorAction SilentlyContinue
             }

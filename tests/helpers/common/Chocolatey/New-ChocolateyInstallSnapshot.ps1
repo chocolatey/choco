@@ -6,7 +6,7 @@
     [CmdletBinding()]
     param(
         # The location to create the temporary installation
-        [string]$SnapshotPath = "$env:SystemDrive\ChocolateyTests\snapshots\$(New-Guid)",
+        [string]$SnapshotPath = "$(Get-TempDirectory)ChocolateyTests\snapshots\$(New-Guid)",
         # Whether the current work directory should be moved to the package
         # path
         [Alias('SetWorkDir')]

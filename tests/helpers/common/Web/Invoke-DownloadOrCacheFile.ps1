@@ -17,7 +17,7 @@
         [string]$OutFile
     )
 
-    $cacheDirectory = "$env:TEMP\ChocolateyDownloadCache"
+    $cacheDirectory = "$(Get-TempDirectory)ChocolateyDownloadCache"
     # we do a naive implementation of acquiring the file name.
     if (!$fileName) {
         $fileName = Split-Path $url -Leaf

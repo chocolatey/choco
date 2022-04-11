@@ -4,7 +4,7 @@
 
 Describe "choco pin" -Tag Chocolatey, PinCommand {
     BeforeAll {
-        $testPackageLocation = "$env:TEMP\ChocolateyTests\packages"
+        $testPackageLocation = "$(Get-TempDirectory)ChocolateyTests\packages"
         Initialize-ChocolateyTestInstall -Source $testPackageLocation
 
         Invoke-Choco install installpackage --version 1.0.0 -confirm

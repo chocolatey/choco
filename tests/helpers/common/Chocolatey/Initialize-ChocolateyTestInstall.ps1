@@ -6,7 +6,7 @@
     [CmdletBinding()]
     param(
         # The location to create the temporary installation
-        [string]$Directory = "$env:SystemDrive\ChocolateyTests\original",
+        [string]$Directory = "$(Get-TempDirectory)ChocolateyTests\original",
 
         # A source to add, disabling all others
         [string]$Source,

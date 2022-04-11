@@ -1,4 +1,4 @@
-﻿Import-Module helpers/common-helpers
+Import-Module helpers/common-helpers
 
 # https://github.com/chocolatey/choco/blob/master/src/chocolatey.tests.integration/scenarios/InstallScenarios.cs
 
@@ -1271,7 +1271,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         @{ Name = 'Root of drive with trailing slash' ; Path = 'C:\' }
         @{ Name = 'Root of drive without trailing slash' ; Path = 'C:' }
         @{ Name = 'Windows System32' ; Path = 'C:\Windows\System32' }
-        @{ Name = 'Non-existentfolder' ; Path = "$($env:TEMP)\$(New-Guid)" }
+        @{ Name = 'Non-existentfolder' ; Path = "$(Get-TempDirectory)$(New-Guid)" }
     ) {
         param($Name, $Path)
         BeforeAll {

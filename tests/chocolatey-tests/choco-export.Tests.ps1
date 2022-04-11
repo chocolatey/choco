@@ -405,11 +405,11 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
 
     Context "Exporting to a path that do not exist" {
         BeforeAll {
-            if (Test-Path "$env:TEMP\TestInvalidPath") {
-                Remove-Item -Recurse -Path "$env:TEMP\TestInvalidPath"
+            if (Test-Path "$(Get-TempDirectory)TestInvalidPath") {
+                Remove-Item -Recurse -Path "$(Get-TempDirectory)TestInvalidPath"
             }
 
-            $Output = Invoke-Choco export "$env:TEMP\TestInvalidPath\packages.config"
+            $Output = Invoke-Choco export "$(Get-TempDirectory)TestInvalidPath\packages.config"
         }
 
         It "Exits with Failure (1)" {

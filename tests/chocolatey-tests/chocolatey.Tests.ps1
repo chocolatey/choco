@@ -333,7 +333,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             New-ChocolateyInstallSnapshot
             # TODO: Internalize pwsh and powershell packages...
             $pwshInstall = Invoke-Choco install $_ -y -s https://community.chocolatey.org/api/v2/
-            $ChocoUnzipped = "$(Get-TempDirectory)/$(New-Guid)"
+            $ChocoUnzipped = "$(Get-TempDirectory)$(New-Guid)"
             $modulePath = "$ChocoUnzipped/tools/chocolateySetup.psm1"
 
             if (Test-Path $ChocoUnzipped) {
