@@ -53,6 +53,7 @@ namespace chocolatey.infrastructure.app.services
         public static readonly Regex PackageNameRegex = new Regex(@"/(?<{0}>[^/]*).tar.".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
 
         private readonly IDictionary<string, ExternalCommandArgument> _installArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
+        private readonly IDictionary<string, ExternalCommandArgument> _upgradeArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
         public CygwinService(ICommandExecutor commandExecutor, INugetService nugetService, IFileSystem fileSystem, IRegistryService registryService)
         {
@@ -69,6 +70,7 @@ namespace chocolatey.infrastructure.app.services
         private void set_cmd_args_dictionaries()
         {
             set_install_dictionary(_installArguments);
+            set_upgrade_dictionary(_upgradeArguments);
         }
 
         /// <summary>
@@ -118,6 +120,49 @@ namespace chocolatey.infrastructure.app.services
                     QuoteValue = false,
                     Required = true
                 });
+        }
+
+        /// <summary>
+        ///   Sets upgrade dictionary
+        /// </summary>
+        private void set_upgrade_dictionary(IDictionary<string, ExternalCommandArgument> args)
+        {
+            //args.Add("_cmd_c_", new ExternalCommandArgument { ArgumentOption = "/c", Required = true });
+            //args.Add("_app_", new ExternalCommandArgument
+            //{
+            //    ArgumentOption = "",
+            //    ArgumentValue = _fileSystem.combine_paths(INSTALL_ROOT_TOKEN, "cygwinsetup.exe"),
+            //    QuoteValue = false,
+            //    UseValueOnly = true,
+            //    Required = true
+            //});
+            args.Add("_quiet_", new ExternalCommandArgument {ArgumentOption = "--quiet-mode", Required = true});
+            args.Add("_no_desktop_", new ExternalCommandArgument {ArgumentOption = "--no-desktop", Required = true});
+            args.Add("_no_startmenu_", new ExternalCommandArgument {ArgumentOption = "--no-startmenu", Required = true});
+            args.Add("_root_", new ExternalCommandArgument
+                {
+                    ArgumentOption = "--root ",
+                    ArgumentValue = INSTALL_ROOT_TOKEN,
+                    QuoteValue = false,
+                    Required = true
+                });
+            args.Add("_local_pkgs_dir_", new ExternalCommandArgument
+                {
+                    ArgumentOption = "--local-package-dir ",
+                    ArgumentValue = "{0}\\packages".format_with(INSTALL_ROOT_TOKEN),
+                    QuoteValue = false,
+                    Required = true
+                });
+
+            args.Add("_site_", new ExternalCommandArgument
+                {
+                    ArgumentOption = "--site ",
+                    ArgumentValue = "http://mirrors.kernel.org/sourceware/cygwin/",
+                    QuoteValue = false,
+                    Required = true
+                });
+
+            args.Add("_upgrade_", new ExternalCommandArgument {ArgumentOption = "--upgrade-also", Required = true});
         }
 
         public SourceType SourceType
@@ -263,13 +308,64 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement upgrade".format_with(APP_NAME));
+            if (!config.PackageNames.Equals("all"))
+            {
+                throw new ApplicationException("{0} does not support upgrading individual packages. Either use install or upgrade all".format_with(APP_NAME));
+            }
+
+            var args = build_args(config, _upgradeArguments);
+            this.Log().Info("Would have run '{0} {1}'".format_with(get_exe(_rootDirectory).escape_curly_braces(), args.escape_curly_braces()));
             return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
         }
 
         public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction = null)
         {
-            throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
+            if (!config.PackageNames.Equals("all"))
+            {
+                throw new ApplicationException("{0} does not support upgrading individual packages. Either use install or upgrade all".format_with(APP_NAME));
+            }
+
+            var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
+            var args = build_args(config, _upgradeArguments);
+
+            var exitCode = _commandExecutor.execute(
+                get_exe(_rootDirectory),
+                args,
+                config.CommandExecutionTimeoutSeconds,
+                _fileSystem.get_current_directory(),
+                (s, e) =>
+                    {
+                        var logMessage = e.Data;
+                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
+
+                        if (InstalledRegex.IsMatch(logMessage))
+                        {
+                            var packageName = get_value_from_output(logMessage, PackageNameRegex, PACKAGE_NAME_GROUP);
+                            var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
+                            results.Messages.Add(new ResultMessage(ResultType.Note, packageName));
+                            if (!string.IsNullOrWhiteSpace(packageName))
+                            {
+                                this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".format_with(packageName));
+                            }
+                        }
+                    },
+                (s, e) =>
+                    {
+                        var logMessage = e.Data;
+                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
+                    },
+                updateProcessPath: false,
+                allowUseWindow: true
+                );
+
+            if (exitCode != 0)
+            {
+                Environment.ExitCode = exitCode;
+            }
+
+            return packageResults;
         }
 
         public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
@@ -279,7 +375,7 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUninstallAction = null)
         {
-            throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
+            throw new NotImplementedException("{0} does not implement uninstall".format_with(APP_NAME));
         }
 
         /// <summary>
