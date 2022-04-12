@@ -75,6 +75,9 @@ likely your script folder. If unzipping to your package folder, the path
 will be like
 `"$(Split-Path -Parent $MyInvocation.MyCommand.Definition)\\file.exe"`
 
+.PARAMETER SpecificFolder
+OPTIONAL - This is a specific directory within zip file to extract.
+
 .PARAMETER Checksum
 The checksum hash value of the Url resource. This allows a checksum to
 be validated for files that are not local. The checksum type is covered
@@ -200,7 +203,7 @@ param(
 
   $chocTempDir = $env:TEMP
   $tempDir = Join-Path $chocTempDir "$($env:chocolateyPackageName)"
-  if ($env:chocolateyPackageVersion -ne $null) { $tempDir = Join-Path $tempDir "$($env:chocolateyPackageVersion)"; }
+  if ($null -ne $env:chocolateyPackageVersion) { $tempDir = Join-Path $tempDir "$($env:chocolateyPackageVersion)"; }
   $tempDir = $tempDir -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
   $downloadFilePath = Join-Path $tempDir "$($packageName)Install.$fileType"
