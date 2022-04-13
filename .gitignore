@@ -40,3 +40,5 @@ src/chocolatey.sln.GhostDoc.xml
 chocolatey.official.snk
 
 docs/generated
+
+.vagrant
