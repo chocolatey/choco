@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>business-only-license</id>
+    <version>19.0.0.0</version>
+    <owners>Igor Pavlov</owners>
+    <title>7-Zip (Install)</title>
+    <authors>Igor Pavlov</authors>
+    <copyright>Copyright (c) 1999-2018 Igor Pavlov</copyright>
+    <tags>7-zip admin</tags>
+    <description>This package can be used to validate only business licenses can install this package.</description>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+    <file src="icons\**" target="icons" />
+  </files>
+</package>

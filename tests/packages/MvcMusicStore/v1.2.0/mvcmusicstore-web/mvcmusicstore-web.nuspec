@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <!-- == PACKAGE SPECIFIC SECTION == -->
+    <id>mvcmusicstore-web</id>
+    <version>1.2.0</version>
+
+    <!-- == SOFTWARE SPECIFIC SECTION == -->
+    <title>Mvc Music Store Web</title>
+    <authors>Nobody</authors>
+    <tags>mvcmusicstore-web SPACE_SEPARATED</tags>
+    <summary>Mvc Music Store Website</summary>
+    <description>This is the code that releases the website</description>
+    <releaseNotes>v1.2.0 - Minor upgrade</releaseNotes>
+  </metadata>
+  <files>
+    <!-- this section controls what actually gets packaged into the Chocolatey package -->
+    <file src="tools\**" target="tools" />
+    <!--Building from Linux? You may need this instead: <file src="tools/**" target="tools" />-->
+  </files>
+</package>

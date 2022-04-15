@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>hasbeforeinstallblock</id>
+    <version>1.0.0</version>
+    <title>hasbeforeinstallblock (Using ChocolateyGUI)</title>
+    <authors>Who Wants It</authors>
+    <projectUrl>https://test.com</projectUrl>
+    <tags>hasbeforeinstallblock remote before-install</tags>
+    <summary>Remote MSI installation package with a before install block</summary>
+    <description>
+This package can be used for testing both downloading remote MSI installers from a known location (GitHub),
+as well as testing whether the new functionality in 0.10.16 that adds the ability to run a before install block
+works as expected.
+
+Additionally, this package can be used to test against different type of checksums as well.
+The parameter '/Algorithm' can be used to test the actual algorithm, and the parameter '/Checksum' can be used
+to test with a different checksum value.
+    </description>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

@@ -1,0 +1,1 @@
+﻿Write-Host "Created by package template"

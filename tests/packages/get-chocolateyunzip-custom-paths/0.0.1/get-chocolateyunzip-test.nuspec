@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>get-chocolateyunzip-custom-paths</id>
+    <version>0.0.1</version>
+    <title>get-chocolateyunzip-custom-paths (Install)</title>
+    <authors>Test</authors>
+    <owners>Test</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Package to test Get-ChocolateyUnzip. Specifically designed for testing custom paths like those identified in https://github.com/chocolatey/chocolatey-licensed-issues/issues/284</description>
+    <summary>Package to test Get-ChocolateyUnzip</summary>
+    <tags>get-chocolateyunzip issue test</tags>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

@@ -1,0 +1,1 @@
+This package is intended to test wether enhancement request https://github.com/chocolatey/choco/issues/2203 is implemented.

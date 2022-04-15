@@ -1,0 +1,2 @@
+The purpose of this package is that when all of the valid nuspec elements are specified, the package can be created.
+The package metadata is based on a package already available on the Community Repository.

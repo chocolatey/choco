@@ -1,0 +1,11 @@
+﻿===================================
+TODO for get-chocolateyunzip-licensed
+===================================
+
+This TODO has been generated after running Package Builder against Programs and Features.
+There are some things that are required to finish out the creation of this package.
+This doesn't serve as a complete list.
+
+
+This package needs the following items to be complete:
+ * tools\ChocolateyInstall.ps1 - Set silent arguments
