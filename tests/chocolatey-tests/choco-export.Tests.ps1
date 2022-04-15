@@ -15,7 +15,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         $expectedHeader = Get-ExpectedChocolateyHeader
         Initialize-ChocolateyTestInstall
 
-        # TODO: Consolidate these recurring package lists
+        # TODO: Consolidate these recurring package lists - https://github.com/chocolatey/choco/issues/2691
         # Let us install some known packages
         $null = @(
             'installpackage=1.0.0'
@@ -111,6 +111,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
 
     Context "Runs export without additional arguments" {
         BeforeDiscovery {
+            # TODO: Consolidate these recurring package lists - https://github.com/chocolatey/choco/issues/2691
             # We set this here, so we can reuse them between different contexts
             $expectedExports = @(
                 "chocolatey"
@@ -146,7 +147,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
 
     Context "Runs export with including versions (<_>)" -Foreach @("--include-version-numbers", "--include-version") {
         BeforeDiscovery {
-            # TODO: Consolidate these recurring package lists
+            # TODO: Consolidate these recurring package lists - https://github.com/chocolatey/choco/issues/2691
             # We set this here, so we can reuse them between different contexts
             $expectedExports = @(
                 @{
@@ -202,7 +203,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
 
     Context "Runs export with output path" {
         BeforeDiscovery {
-            # TODO: Consolidate these recurring package lists
+            # TODO: Consolidate these recurring package lists - https://github.com/chocolatey/choco/issues/2691
             # We set this here, so we can reuse them between different contexts
             $expectedExports = @(
                 "chocolatey"
@@ -239,7 +240,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
 
     Context "Runs export with including versions (<_>)" -Foreach @("--include-version-numbers", "--include-version") {
         BeforeDiscovery {
-            # TODO: Consolidate these recurring package lists
+            # TODO: Consolidate these recurring package lists - https://github.com/chocolatey/choco/issues/2691
             # We set this here, so we can reuse them between different contexts
             $expectedExports = @(
                 @{
@@ -295,7 +296,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
 
     Context "Runs export with output path argument '<_>" -Foreach @("--output-file-path={0}"; "-o {0}") {
         BeforeDiscovery {
-            # TODO: Consolidate these recurring package lists
+            # TODO: Consolidate these recurring package lists - https://github.com/chocolatey/choco/issues/2691
             # We set this here, so we can reuse them between different contexts
             $expectedExports = @(
                 "chocolatey"
@@ -349,7 +350,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
     ) {
         BeforeDiscovery {
-            # TODO: Consolidate these recurring package lists
+            # TODO: Consolidate these recurring package lists - https://github.com/chocolatey/choco/issues/2691
             # We set this here, so we can reuse them between different contexts
             $expectedExports = @(
                 @{

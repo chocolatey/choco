@@ -1,6 +1,5 @@
 ﻿Import-Module helpers/common-helpers
 
-# TODO: These tests need to be skipped by default and optionally ran if desired (on CI, or on a system where we don't mind removing the nuget config)
 Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolatey {
     BeforeDiscovery {
         $ChocolateyDirectoriesToCheck = @(
@@ -22,7 +21,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     BeforeAll {
-        # TODO: Both this thumbprint and strong name key should be in an environment variable. Update when new kitchen-pester is available.
+        # TODO: Both this thumbprint and strong name key should be in an environment variable. Update when new kitchen-pester is available. - https://github.com/chocolatey/choco/issues/2692
         $ChocolateyThumbprint = '83AC7D88C66CB8680BCE802E0F0F5C179722764B'
         $ChocolateyStrongNameKey = '79d02ea9cad655eb'
         # These lines are part of testing the issue
