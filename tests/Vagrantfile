@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "StefanScherer/windows_2022"
+  config.vm.box = "StefanScherer/windows_2019"
   config.vm.boot_timeout = 600
 
   # windows
