@@ -1,4 +1,4 @@
-#load nuget:?package=Chocolatey.Cake.Recipe&version=0.6.1
+#load nuget:?package=Chocolatey.Cake.Recipe&version=0.13.2
 
 ///////////////////////////////////////////////////////////////////////////////
 // TOOLS
@@ -165,10 +165,10 @@ BuildParameters.SetParameters(context: Context,
                             getScriptsToSign: getScriptsToSign,
                             getFilesToSign: getFilesToSign,
                             getILMergeConfigs: getILMergeConfigs,
-                            preferDotNetGlobalToolUsage: true);
+                            preferDotNetGlobalToolUsage: !IsRunningOnWindows());
 
 ToolSettings.SetToolSettings(context: Context,
-                            buildMSBuildToolVersion: MSBuildToolVersion.VS2019);
+                            buildMSBuildToolVersion: MSBuildToolVersion.NET40);
 
 BuildParameters.PrintParameters(Context);
 

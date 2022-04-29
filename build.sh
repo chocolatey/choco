@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eo pipefail
 
 ##########################################################################
 # This is the Cake bootstrapper script for Linux and OS X.
@@ -18,6 +19,10 @@ PACKAGES_CONFIG_MD5=$TOOLS_DIR/packages.config.md5sum
 ADDINS_PACKAGES_CONFIG=$ADDINS_DIR/packages.config
 MODULES_PACKAGES_CONFIG=$MODULES_DIR/packages.config
 
+export CAKE_PATHS_TOOLS=$TOOLS_DIR
+export CAKE_PATHS_ADDINS=$ADDINS_DIR
+export CAKE_PATHS_MODULES=$MODULES_DIR
+
 # Define md5sum or md5 depending on Linux/OSX
 MD5_EXE=
 if [[ "$(uname -s)" == "Darwin" ]]; then
@@ -27,7 +32,7 @@ else
 fi
 
 # Define default arguments.
-SCRIPT="recipe.cake"
+SCRIPT=$SCRIPT_DIR/recipe.cake
 CAKE_ARGUMENTS=()
 
 # Parse arguments.
@@ -114,7 +119,12 @@ if [ ! -f "$CAKE_EXE" ]; then
 fi
 
 # Start Cake
-exec mono "$CAKE_EXE" $SCRIPT --bootstrap
+mono "$CAKE_EXE" $SCRIPT --bootstrap
 if [ $? -eq 0 ]; then
-    exec mono "$CAKE_EXE" $SCRIPT "${CAKE_ARGUMENTS[@]}"
+    mono "$CAKE_EXE" $SCRIPT "${CAKE_ARGUMENTS[@]}"
 fi
+
+# Clean up environment variables that were created earlier in this bootstrapper
+unset CAKE_PATHS_TOOLS
+unset CAKE_PATHS_ADDINS
+unset CAKE_PATHS_MODULES

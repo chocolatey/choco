@@ -1,33 +1,12 @@
 @echo off
+setlocal enableextensions enabledelayedexpansion
+set psscript="%~dp0/build.ps1"
+echo ==================================================
+echo ============= WRAP POWERSHELL SCRIPT =============
+echo ==================================================
 
-::Project UppercuT - http://uppercut.googlecode.com
-::No edits to this file are required - http://uppercut.pbwiki.com
+echo calling %psscript% with args %*
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%psscript%' -Configuration ReleaseOfficial %*"
 
-if '%1' == '/?' goto usage
-if '%1' == '-?' goto usage
-if '%1' == '?' goto usage
-if '%1' == '/help' goto usage
-
-SET DIR=%cd%
-SET BUILD_DIR=%~d0%~p0%
-SET NANT="%BUILD_DIR%lib\Nant\nant.exe"
-SET build.config.settings="%DIR%\.uppercut"
-
-%NANT% /logger:"NAnt.Core.DefaultLogger" /quiet /nologo /f:"%BUILD_DIR%.build\default.build" -D:build.config.settings=%build.config.settings% -D:msbuild.configuration="ReleaseOfficial" %*
-
-if %ERRORLEVEL% NEQ 0 goto errors
-
-call %DIR%\documentscenarios.bat
-
-goto finish
-
-:usage
-echo.
-echo Usage: build.official.bat
-echo.
-goto finish
-
-:errors
-EXIT /B %ERRORLEVEL%
-
-:finish
+echo ==================================================
+endlocal
