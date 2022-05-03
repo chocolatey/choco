@@ -79,8 +79,8 @@ object Chocolatey : BuildType({
         }
 
         script {
-            name = "Call UppercuT"
-            scriptContent = "call build.official.bat -D:version.fix=%build.counter%"
+            name = "Run Build"
+            scriptContent = "call build.official.bat"
         }
 
         nuGetPublish {
