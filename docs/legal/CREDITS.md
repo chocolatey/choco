@@ -49,7 +49,6 @@ The Chocolatey Community Team manage the [Chocolatey Community Chocolatey Packag
 Chocolatey CLI is built, tested and analyzed with the following fantastic frameworks (in no particular order):
 
 - ILMerge
-- PublishedApplications
 - NuGet.exe
 
 Chocolatey CLI is tested and analyzed with the following rockstar frameworks (in no particular order):
