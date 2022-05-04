@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@ namespace chocolatey.tests.integration.scenarios
 {
     using System;
     using System.IO;
-    using bdddoc.core;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
@@ -41,7 +40,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPackCommand))]
         public class when_packing_without_specifying_an_output_directory : ScenariosBase
         {
             private readonly string package_path = Path.Combine(Scenario.get_top_level(), "test-package.0.1.0.nupkg");
@@ -79,7 +77,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPackCommand))]
         public class when_packing_with_an_output_directory : ScenariosBase
         {
             private readonly string package_path = Path.Combine("PackageOutput", "test-package.0.1.0.nupkg");
@@ -115,7 +112,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPackCommand))]
         public class when_packing_with_properties : ScenariosBase
         {
             private readonly string package_path = Path.Combine(Scenario.get_top_level(), "test-package.0.1.0.nupkg");
@@ -179,8 +175,8 @@ namespace chocolatey.tests.integration.scenarios
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
   </metadata>
-</package>";      
-        
+</package>";
+
         private const string NuspecContentWithChocolateyData = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
   <metadata>

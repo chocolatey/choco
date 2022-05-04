@@ -53,7 +53,6 @@ Chocolatey CLI is built, tested and analyzed with the following fantastic framew
 
 Chocolatey CLI is tested and analyzed with the following rockstar frameworks (in no particular order):
 
-- bdddoc
 - NUnit
 - Moq
 - TinySpec
