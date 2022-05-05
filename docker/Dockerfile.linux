@@ -1,7 +1,13 @@
 ARG monoversion="6.12"
 FROM mono:${monoversion} as build
 
-RUN apt-get update && apt-get install git -y
+RUN echo deb http://deb.debian.org/debian buster-backports main | tee /etc/apt/sources.list.d/buster-backports.list; \
+    apt-get update && apt-get install -t buster-backports git -y
+
+RUN curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb; \
+    dpkg -i packages-microsoft-prod.deb; \
+    apt-get update; \
+    apt-get install -y dotnet-sdk-6.0
 
 COPY . /usr/local/src/choco/
 
@@ -15,7 +21,7 @@ RUN if [ "$buildscript" = "build.official.sh" ]; then \
     ./$buildscript; \
     cp docker/choco_official_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \
   else \
-    ./$buildscript; \
+    ./$buildscript --verbosity=diagnostic; \
     cp docker/choco_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \
   fi;
 
