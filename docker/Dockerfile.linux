@@ -1,6 +1,19 @@
 ARG monoversion="6.12"
 FROM mono:${monoversion} as build
 
+ARG github_actions="false"
+ARG github_ref
+ARG github_repository
+ARG github_base_ref
+ARG github_head_ref
+ARG github_run_number
+
+ENV GITHUB_REF=$github_ref
+ENV GITHUB_REPOSITORY=$github_repository
+ENV GITHUB_BASE_REF=$github_base_ref
+ENV GITHUB_HEAD_REF=$github_head_ref
+ENV GITHUB_RUN_NUMBER=$github_run_number
+
 RUN echo deb http://deb.debian.org/debian buster-backports main | tee /etc/apt/sources.list.d/buster-backports.list; \
     apt-get update && apt-get install -t buster-backports git -y
 
@@ -16,7 +29,10 @@ RUN chmod +x *.sh
 
 ARG buildscript="build.sh"
 
-RUN if [ "$buildscript" = "build.official.sh" ]; then \
+RUN if [ "$github_actions" = "true" ]; then \
+    export GITHUB_ACTIONS=$github_actions; \
+  fi; \
+  if [ "$buildscript" = "build.official.sh" ]; then \
     export CHOCOLATEY_OFFICIAL_KEY="/usr/local/src/choco/chocolatey.official.snk"; \
     ./$buildscript; \
     cp docker/choco_official_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \

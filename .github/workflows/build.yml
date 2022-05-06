@@ -96,3 +96,10 @@ jobs:
           file: docker/Dockerfile.linux
           push: false
           tags: chocolatey/choco:latest
+          build-args: |
+            "github_actions=true"
+            "github_ref=${{ github.ref }}"
+            "github_repository=${{ github.repository }}"
+            "github_base_ref=${{ github.base_ref }}"
+            "github_head_ref=${{ github.head_ref }}"
+            "github_run_number=${{ github.run_number }}"
