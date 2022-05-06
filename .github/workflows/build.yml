@@ -28,6 +28,9 @@ jobs:
         name: ubuntu-build-results
         path: |
           code_drop/TestResults/issues-report.html
+          code_drop/TestResults/NUnit/TestResult.xml
+          code_drop/Packages/NuGet/*.nupkg
+          code_drop/MsBuild.log
   # Build on Windows
   windows-build:
     runs-on: windows-2019
@@ -44,16 +47,22 @@ jobs:
       with:
         name: windows-build-results
         path: |
-          code_drop\TestResults/issues-report.html
+          code_drop\TestResults\issues-report.html
+          code_drop\TestResults\NUnit\TestResult.xml
+          code_drop\TestCoverage\lcov.info
+          code_drop\TestCoverage\OpenCover.xml
           code_drop\ilmerge-chocoexe.log
           code_drop\ilmerge-chocolateydll.log
-    - name: Upload Windows build .nupkg
-      uses: actions/upload-artifact@v2
-      with:
-        name: windows-build-nupkg
-        path: |
           code_drop\Packages\NuGet\*.nupkg
           code_drop\Packages\Chocolatey\*.nupkg
+          code_drop\MsBuild.log
+    - uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: |
+          code_drop\TestCoverage\lcov.info
+        flag-name: run-${{ matrix.os }}
+        parallel: true
   # Build using mono on MacOS
   macos-build:
     runs-on: macos-latest
@@ -64,7 +73,7 @@ jobs:
     - name: Build with Mono
       run: |
         chmod +x build.sh
-        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic
+        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI
     - name: Upload MacOS build results
       uses: actions/upload-artifact@v2
       # Always upload build results
@@ -73,6 +82,9 @@ jobs:
         name: macos-build-results
         path: |
           code_drop/TestResults/issues-report.html
+          code_drop/TestResults/NUnit/TestResult.xml
+          code_drop/Packages/NuGet/*.nupkg
+          code_drop/MsBuild.log
   # Build using Mono in Docker on Ubuntu
   docker-build:
     runs-on: ubuntu-latest
@@ -103,3 +115,12 @@ jobs:
             "github_base_ref=${{ github.base_ref }}"
             "github_head_ref=${{ github.head_ref }}"
             "github_run_number=${{ github.run_number }}"
+  upload-code-coverage-results:
+    needs: [ubuntu-build, windows-build, macos-build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        parallel-finished: true
