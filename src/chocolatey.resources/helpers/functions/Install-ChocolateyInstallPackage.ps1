@@ -311,14 +311,15 @@ Pro / Business supports a single, ubiquitous install directory option.
   try {
     # make sure any logging folder exists
     $pattern = "(?:['`"])([a-zA-Z]\:\\[^'`"]+)(?:[`"'])|([a-zA-Z]\:\\[\S]+)"
-    $silentArgs, $additionalInstallArgs | ForEach-Object { Select-String $pattern -input $_ -AllMatches } |
-    ForEach-Object { $_.Matches } | ForEach-Object {
-      $argDirectory = $_.Groups[1]
-      if ($argDirectory -eq $null -or $argDirectory -eq '') { continue }
-      $argDirectory = [System.IO.Path]::GetFullPath([System.IO.Path]::GetDirectoryName($argDirectory))
-      Write-Debug "Ensuring '$argDirectory' exists"
-      if (![System.IO.Directory]::Exists($argDirectory)) { [System.IO.Directory]::CreateDirectory($argDirectory) | Out-Null }
-    }
+    $silentArgs, $additionalInstallArgs | 
+      ForEach-Object { Select-String $pattern -input $_ -AllMatches } |
+      ForEach-Object { $_.Matches } | ForEach-Object {
+        $argDirectory = $_.Groups[1]
+        if ($argDirectory -eq $null -or $argDirectory -eq '') { continue }
+        $argDirectory = [System.IO.Path]::GetFullPath([System.IO.Path]::GetDirectoryName($argDirectory))
+        Write-Debug "Ensuring '$argDirectory' exists"
+        if (![System.IO.Directory]::Exists($argDirectory)) { [System.IO.Directory]::CreateDirectory($argDirectory) | Out-Null }
+      }
   }
   catch {
     Write-Debug "Error ensuring directories exist -  $($_.Exception.Message)"

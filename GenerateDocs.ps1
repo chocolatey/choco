@@ -96,7 +96,7 @@ These are the functions from above as one list.
 function Get-Aliases($commandName){
 
   $aliasOutput = ''
-  Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | ForEach-Object{ $aliasOutput += "``$($_.Name)``$lineFeed"}
+  Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | ForEach-Object { $aliasOutput += "``$($_.Name)``$lineFeed"}
 
   if ($aliasOutput -eq $null -or $aliasOutput -eq '') {
     $aliasOutput = 'None'
@@ -111,7 +111,7 @@ function Convert-Example($objItem) {
 
 ~~~powershell
 $($objItem.Code.Replace("`n",$lineFeed))
-$($objItem.remarks | Where-Object { $_.Text -ne ''} | ForEach-Object { Write-Output $_.Text.Replace("`n", $lineFeed) })
+$($objItem.remarks | Where-Object { $_.Text } | ForEach-Object { $_.Text.Replace("`n", $lineFeed) })
 ~~~
 "@
 }
@@ -304,7 +304,10 @@ function Generate-TopLevelCommandReference {
   $commandOutput += @("$lineFeed~~~$lineFeed")
   $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco -h``. $lineFeed")
 
-  $commandOutput | ForEach-Object{ Convert-CommandText($_) } | ForEach-Object{ Convert-CommandReferenceSpecific($_) } | Out-File $fileName -Encoding UTF8 -Force
+  $commandOutput | 
+      ForEach-Object { Convert-CommandText($_) } |
+      ForEach-Object { Convert-CommandReferenceSpecific($_) } |
+      Out-File $fileName -Encoding UTF8 -Force
 }
 
 function Move-GeneratedFiles {
@@ -373,7 +376,9 @@ function Generate-CommandReference($commandName, $order) {
   $commandOutput += $(& $chocoExe $commandName.ToLower() -h -r)
   $commandOutput += @("$lineFeed~~~$lineFeed$lineFeed[Command Reference](xref:choco-commands)")
   $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco $($commandName.ToLower()) -h``. $lineFeed")
-  $commandOutput | ForEach-Object{ Convert-CommandText $_ $commandName.ToLower() } | Out-File $fileName -Encoding UTF8 -Force
+  $commandOutput | 
+      ForEach-Object { Convert-CommandText $_ $commandName.ToLower() } | 
+      Out-File $fileName -Encoding UTF8 -Force
 }
 
 try

@@ -504,7 +504,10 @@ param(
     }
 
     if (!(Test-Path("$chocoPkgDirectory\chocolatey.nupkg"))) {
-      $chocoPkg = Get-ChildItem "$thisScriptFolder/../../" | Where-Object{$_.name -match "^chocolatey.*nupkg" } | Sort-Object name -Descending | Select-Object -First 1
+      $chocoPkg = Get-ChildItem "$thisScriptFolder/../../" | 
+        Where-Object {$_.name -match "^chocolatey.*nupkg" } | 
+        Sort-Object name -Descending | 
+        Select-Object -First 1
       if ($chocoPkg -ne '') { $chocoPkg = $chocoPkg.FullName }
       "$chocoZipFile", "$chocoPkg" | ForEach-Object {
         if ($_ -ne $null -and $_ -ne '') {

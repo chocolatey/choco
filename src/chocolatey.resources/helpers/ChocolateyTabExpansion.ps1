@@ -90,17 +90,21 @@ function script:chocoCommands($filter) {
 
 function script:chocoLocalPackages($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
-    @(& $script:choco list $filter -lo -r --id-starts-with) | ForEach-Object{ $_.Split('|')[0] }
+    @(& $script:choco list $filter -lo -r --id-starts-with) | ForEach-Object { $_.Split('|')[0] }
 }
 
 function script:chocoLocalPackagesUpgrade($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
-    @('all|') + @(& $script:choco list $filter -lo -r --id-starts-with) | Where-Object { $_ -like "$filter*" } | ForEach-Object{ $_.Split('|')[0] }
+    @('all|') + @(& $script:choco list $filter -lo -r --id-starts-with) | 
+      Where-Object { $_ -like "$filter*" } | 
+      ForEach-Object { $_.Split('|')[0] }
 }
 
 function script:chocoRemotePackages($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
-    @('packages.config|') + @(& $script:choco search $filter --page='0' --page-size='30' -r --id-starts-with --order-by-popularity) | Where-Object { $_ -like "$filter*" } | ForEach-Object{ $_.Split('|')[0] }
+    @('packages.config|') + @(& $script:choco search $filter --page='0' --page-size='30' -r --id-starts-with --order-by-popularity) | 
+      Where-Object { $_ -like "$filter*" } | 
+      ForEach-Object { $_.Split('|')[0] }
 }
 
 function Get-AliasPattern($exe) {
