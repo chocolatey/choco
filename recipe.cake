@@ -64,8 +64,8 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
 
 Func<FilePathCollection> getScriptsToSign = () =>
 {
-    var scriptsToSign = GetFiles(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/**/*.ps1") +
-                        GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/**/*.ps1");
+    var scriptsToSign = GetFiles(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/**/*.{ps1|psm1}") +
+                        GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/**/*.{ps1|psm1}");
 
     Information("The following PowerShell scripts have been selected to be signed...");
     foreach (var scriptToSign in scriptsToSign)
@@ -78,8 +78,10 @@ Func<FilePathCollection> getScriptsToSign = () =>
 
 Func<FilePathCollection> getFilesToSign = () =>
 {
-    var filesToSign = GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey_merged/chocolatey.dll")
-                    + GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco_merged/choco.exe");
+    var filesToSign = GetFiles(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib/chocolatey.dll")
+                    + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe")
+                    + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/tools/{checksum|shimgen}.exe")
+                    + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/redirects/*.exe");
 
     Information("The following assemblies have been selected to be signed...");
     foreach (var fileToSign in filesToSign)
@@ -96,7 +98,8 @@ Func<FilePathCollection> getFilesToSign = () =>
 
 Task("Prepare-Chocolatey-Packages")
     .IsDependeeOf("Create-Chocolatey-Packages")
-    .IsDependentOn("Sign-PowerShellScripts")
+    .IsDependeeOf("Sign-PowerShellScripts")
+    .IsDependeeOf("Sign-Assemblies")
     .WithCriteria(() => BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows, "Skipping because not running on Windows")
     .Does(() =>
 {
@@ -131,7 +134,8 @@ Task("Prepare-Chocolatey-Packages")
 
 Task("Prepare-NuGet-Packages")
     .IsDependeeOf("Create-NuGet-Packages")
-    .IsDependentOn("Sign-PowerShellScripts")
+    .IsDependeeOf("Sign-PowerShellScripts")
+    .IsDependeeOf("Sign-Assemblies")
     .Does(() =>
 {
     // Copy legal documents
