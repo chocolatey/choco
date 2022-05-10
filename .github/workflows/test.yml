@@ -14,6 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Cache Tools
+      uses: actions/cache@v2.1.6
+      with:
+        path: tools
+        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Test with NUnit on Mono
       run: |
         chmod +x build.sh
@@ -33,6 +40,13 @@ jobs:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Cache Tools
+      uses: actions/cache@v2.1.6
+      with:
+        path: tools
+        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Test with NUnit on .Net Framework
       run: .\build.bat  --verbosity=diagnostic --target=test --testExecutionType=all
     - name: Upload Windows build results
@@ -51,18 +65,25 @@ jobs:
   macos-build:
     runs-on: macos-latest
     steps:
-     - uses: actions/checkout@v2
-     - name: Test with NUnit on Mono
-       run: |
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Cache Tools
+      uses: actions/cache@v2.1.6
+      with:
+        path: tools
+        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+    - name: Test with NUnit on Mono
+      run: |
           chmod +x build.sh
           $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=test --testExecutionType=all
-     - name: Upload MacOS build results
-       uses: actions/upload-artifact@v2
-       # Always upload build results
-       if: ${{ always() }}
-       with:
-         name: macos-build-results
-         path: |
-           code_drop/TestResults/issues-report.html
-           code_drop/TestResults/NUnit/TestResult.xml
-           code_drop/MsBuild.log
+    - name: Upload MacOS build results
+      uses: actions/upload-artifact@v2
+      # Always upload build results
+      if: ${{ always() }}
+      with:
+        name: macos-build-results
+        path: |
+          code_drop/TestResults/issues-report.html
+          code_drop/TestResults/NUnit/TestResult.xml
+          code_drop/MsBuild.log

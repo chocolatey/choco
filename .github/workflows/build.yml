@@ -16,6 +16,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Cache Tools
+      uses: actions/cache@v2.1.6
+      with:
+        path: tools
+        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Build with Mono
       run: |
         chmod +x build.sh
@@ -38,6 +43,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Cache Tools
+      uses: actions/cache@v2.1.6
+      with:
+        path: tools
+        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Build with .Net Framework
       run: ./build.ps1 --verbosity=diagnostic --target=CI
     - name: Upload Windows build results
@@ -70,6 +80,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Cache Tools
+      uses: actions/cache@v2.1.6
+      with:
+        path: tools
+        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Build with Mono
       run: |
         chmod +x build.sh
@@ -89,19 +104,20 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      -
-        name: Set up QEMU
+      - name: Cache Tools
+        uses: actions/cache@v2.1.6
+        with:
+          path: tools
+          key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-      -
-        name: Build and push
+      - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: .
