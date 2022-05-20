@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -617,6 +617,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     },
                 uninstallSuccessAction: null,
                 addUninstallHandler: false);
+
+            var localRepository = packageManager.LocalRepository as ChocolateyLocalPackageRepository;
+
+            if (localRepository != null)
+            {
+                localRepository.IgnoreVersionedDirectories = !config.AllowMultipleVersions;
+            }
 
             var configIgnoreDependencies = config.IgnoreDependencies;
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });

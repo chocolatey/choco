@@ -48,6 +48,42 @@ namespace chocolatey.infrastructure.app.nuget
         {
         }
 
+        public bool IgnoreVersionedDirectories { get; set; }
+
+        public override IQueryable<IPackage> GetPackages()
+        {
+            var packages = base.GetPackages();
+
+            if (IgnoreVersionedDirectories)
+            {
+                packages = packages.Where(ExcludeVersionedDirectories).ToList().AsQueryable();
+            }
+
+            return packages;
+        }
+
+        public override IPackage FindPackage(string packageId, SemanticVersion version)
+        {
+            if (IgnoreVersionedDirectories)
+            {
+                return FindPackagesById(packageId).FirstOrDefault(package => package.Version >= version);
+            }
+
+            return base.FindPackage(packageId, version);
+        }
+
+        public override IEnumerable<IPackage> FindPackagesById(string packageId)
+        {
+            var packages = base.FindPackagesById(packageId);
+
+            if (IgnoreVersionedDirectories)
+            {
+                packages = packages.Where(ExcludeVersionedDirectories);
+            }
+
+            return packages;
+        }
+
         public override void AddPackage(IPackage package)
         {
             string packageFilePath = GetPackageFilePath(package);
@@ -70,6 +106,19 @@ namespace chocolatey.infrastructure.app.nuget
                 })));
                 FileSystem.AddFileWithCheck(manifestFilePath, manifest.Save);
             }
+        }
+
+        private bool ExcludeVersionedDirectories(IPackage package)
+        {
+            var directoryPath = PathResolver.GetInstallPath(package);
+            if (string.IsNullOrWhiteSpace(directoryPath))
+            {
+                return true;
+            }
+
+            var directoryName = Path.GetFileName(directoryPath);
+
+            return string.Compare(directoryName, package.Id + "." + package.Version, StringComparison.OrdinalIgnoreCase) != 0;
         }
 
         private string GetManifestFilePath(string packageId, SemanticVersion version)
