@@ -63,8 +63,10 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
 
     Context "Adjusting Feature Settings" {
         BeforeDiscovery {
-            # Get the features this way so we're working with the entire list, and not just what was in the config file initially
-            $FeaturesToTest = (Invoke-Choco feature list -r).Lines | ConvertFrom-ChocolateyOutput -Command Feature
+            # Get the features this way so we're working with the entire list, and not just what was in the config file initially.
+            # We additionally want to ignore any presence of removed features
+            # as these are not intended to work as expected, even when present.
+            $FeaturesToTest = (Invoke-Choco feature list -r).Lines | ConvertFrom-ChocolateyOutput -Command Feature | Where-Object Name -ne 'scriptsCheckLastExitCode'
         }
 
         BeforeAll {
