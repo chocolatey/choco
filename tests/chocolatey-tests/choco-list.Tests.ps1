@@ -26,6 +26,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand {
         Invoke-Choco install installpackage --version 1.0.0 --confirm
         Invoke-Choco install upgradepackage --version 1.0.0 --confirm
         $VersionRegex = "[^v]\d+\.\d+\.\d+"
+        # Ensure that we remove any compatibility package before running the tests
+        $null = Invoke-Choco uninstall chocolatey-compatibility.extension -y --force
     }
 
     AfterAll {
