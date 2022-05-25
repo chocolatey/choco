@@ -96,6 +96,6 @@ exit $command.Count
         @{ Name = 'cver' }
         @{ Name = 'cpack' }
     ) {
-        Get-Command "$Name.exe" -ErrorAction SilentlyContinue | Should -HaveCount 0
+        Get-ChildItem -Path $env:ChocolateyInstall -Name "$Name.exe" -Recurse -ErrorAction SilentlyContinue | Should -HaveCount 0
     }
 }
