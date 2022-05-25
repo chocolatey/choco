@@ -3,6 +3,8 @@
 Describe "Ensuring removed things are removed" -Tag Removed, Chocolatey {
     BeforeAll {
         Initialize-ChocolateyTestInstall
+        # Ensure that we do not have any compatibility layer package installed
+        $null = Invoke-Choco uninstall chocolatey-compatibility.extension -y --force
         New-ChocolateyInstallSnapshot
     }
 
