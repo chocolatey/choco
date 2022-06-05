@@ -217,7 +217,8 @@ namespace chocolatey.infrastructure.app.services
                         defaultChoice: null,
                         requireAnswer: true,
                         allowShortAnswer: true,
-                        shortPrompt: true
+                        shortPrompt: true,
+                        timeoutInSeconds: 30
                         );
 
                     if (selection.is_equal_to("print"))
@@ -230,7 +231,8 @@ namespace chocolatey.infrastructure.app.services
                             defaultChoice: null,
                             requireAnswer: true,
                             allowShortAnswer: true,
-                            shortPrompt: true
+                            shortPrompt: true,
+                            timeoutInSeconds: 30
                             );
                     }
 
