@@ -269,7 +269,7 @@ param(
 
   # If we're on 64 bit or attempting to force 64 bit and there is no
   # 64 bit url, we need to throw an error.
-  if (Get-ProcessorBits 64) {
+  if (Get-OSArchitectureWidth 64) {
       if ($url64bit -eq $null -or $url64bit -eq '') {
         throw "$url64bit was not given."
   }
