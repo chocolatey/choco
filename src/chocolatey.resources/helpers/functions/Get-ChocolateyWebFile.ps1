@@ -261,8 +261,18 @@ param(
 
   # If we're on 32 bit or attempting to force 32 bit and there is no
   # 32 bit url, we need to throw an error.
-  if ($url -eq $null -or $url -eq '') {
-    throw "This package does not support $bitPackage architecture."
+  if (Get-OSArchitectureWidth 32) {
+      if ($url -eq $null -or $url -eq '') {
+        throw "$url was not given."
+  }
+  }
+
+  # If we're on 64 bit or attempting to force 64 bit and there is no
+  # 64 bit url, we need to throw an error.
+  if (Get-ProcessorBits 64) {
+      if ($url64bit -eq $null -or $url64bit -eq '') {
+        throw "$url64bit was not given."
+  }
   }
 
   # determine if the url can be SSL/TLS
