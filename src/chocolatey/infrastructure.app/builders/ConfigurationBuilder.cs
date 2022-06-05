@@ -255,6 +255,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Proxy.BypassOnLocal = set_config_item(ApplicationParameters.ConfigSettings.ProxyBypassOnLocal, configFileSettings, "true", "Bypass proxy for local connections. Available in 0.10.4+.").is_equal_to(bool.TrueString);
             config.UpgradeCommand.PackageNamesToSkip = set_config_item(ApplicationParameters.ConfigSettings.UpgradeAllExceptions, configFileSettings, string.Empty, "A comma-separated list of package names that should not be upgraded when running `choco upgrade all'. Defaults to empty. Available in 0.10.14+.");
             config.DefaultTemplateName = set_config_item(ApplicationParameters.ConfigSettings.DefaultTemplateName, configFileSettings, string.Empty, "Default template name used when running 'choco new' command. Available in 0.12.0+.");
+            config.SecurityProtocols.AllowedSecurityProtocol = set_config_item(ApplicationParameters.ConfigSettings.AllowedSecurityProtocols, configFileSettings, "ssl3,tls,tls11,tls12,tls13", "Allowed security protocols. Available in 1.1.1+.");
         }
 
         private static string set_config_item(string configName, ConfigFileSettings configFileSettings, string defaultValue, string description, bool forceSettingValue = false)

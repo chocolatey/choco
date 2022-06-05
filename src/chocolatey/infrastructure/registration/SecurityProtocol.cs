@@ -23,8 +23,12 @@ namespace chocolatey.infrastructure.registration
 
     public sealed class SecurityProtocol
     {
-        private const int TLS_1_1 = 768;
-        private const int TLS_1_2 = 3072;
+        private const SecurityProtocolType SYSTEM_DEFAULT = (SecurityProtocolType)(0);
+        private const SecurityProtocolType SSL_3 = (SecurityProtocolType)(48);
+        private const SecurityProtocolType TLS_1_0 = (SecurityProtocolType)(192);
+        private const SecurityProtocolType TLS_1_1 = (SecurityProtocolType)(768);
+        private const SecurityProtocolType TLS_1_2 = (SecurityProtocolType)(3072);
+        private const SecurityProtocolType TLS_1_3 = (SecurityProtocolType)(12288);
 
         public static void set_protocol(ChocolateyConfiguration config, bool provideWarning)
         {
@@ -34,14 +38,41 @@ namespace chocolatey.infrastructure.registration
                 // Framework 4.0. However if someone is running .NET 4.5 or 
                 // greater, they have in-place upgrades for System.dll, which
                 // will allow us to set these protocols directly.
-                const SecurityProtocolType tls11 = (SecurityProtocolType)TLS_1_1;
-                const SecurityProtocolType tls12 = (SecurityProtocolType)TLS_1_2;
-                ServicePointManager.SecurityProtocol = tls12 | tls11 | SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
+                SecurityProtocolType allowedProtocolsList = SYSTEM_DEFAULT;
+                foreach (string protocol in config.SecurityProtocols.AllowedSecurityProtocol.Split(','))
+                {
+                    switch (protocol.to_lower())
+                    {
+                        case "ssl3":
+                            allowedProtocolsList = allowedProtocolsList | SSL_3;
+                            break;
+                        case "tls":
+                            allowedProtocolsList = allowedProtocolsList | TLS_1_0;
+                            break;
+                        case "tls11":
+                            allowedProtocolsList = allowedProtocolsList | TLS_1_1;
+                            break;
+                        case "tls12":
+                            allowedProtocolsList = allowedProtocolsList | TLS_1_2;
+                            break;
+                        case "tls13":
+                            allowedProtocolsList = allowedProtocolsList | TLS_1_3;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (allowedProtocolsList == SYSTEM_DEFAULT)
+                    ServicePointManager.SecurityProtocol = TLS_1_3 | TLS_1_2 | TLS_1_1 | TLS_1_0 | SSL_3;
+                else
+                    ServicePointManager.SecurityProtocol = allowedProtocolsList;
             }
             catch (Exception)
             {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
-                //todo: #2585 provide this warning with the ability to opt out of seeing it again so we can move it up to more prominent visibility and not just the verbose log
+                if (string.IsNullOrWhiteSpace(config.SecurityProtocols.AllowedSecurityProtocol)){
+                    ServicePointManager.SecurityProtocol = TLS_1_0 | SSL_3;
+                }
+                //todo: provide this warning with the ability to opt out of seeing it again so we can move it up to more prominent visibility and not just the verbose log
                 if (provideWarning)
                 {
                 "chocolatey".Log().Warn(ChocolateyLoggers.Verbose,

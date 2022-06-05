@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System.Collections.Generic;
     using System.Reflection;
     using System.Text;
+using chocolatey.infrastructure.registration;
     using domain;
     using logging;
     using platforms;
@@ -53,6 +54,7 @@ namespace chocolatey.infrastructure.app.configuration
             Proxy = new ProxyConfiguration();
             ExportCommand = new ExportCommandConfiguration();
             TemplateCommand = new TemplateCommandConfiguration();
+            SecurityProtocols = new SecurityProtocolsConfiguration();
 #if DEBUG
             AllowUnofficialBuild = true;
 #endif
@@ -365,6 +367,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
         public TemplateCommandConfiguration TemplateCommand { get;  set; }
+
+        /// <summary>
+        /// Security protocol configuration to allow the
+        /// specific list of communication protocol
+        /// </summary>
+        public SecurityProtocolsConfiguration SecurityProtocols { get; set; }
     }
 
     [Serializable]
@@ -580,5 +588,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         public TemplateCommandType Command { get; set; }
         public string Name { get; set; }
+    }
+
+    [Serializable]
+    public sealed class SecurityProtocolsConfiguration
+    {
+        public string AllowedSecurityProtocol { get; set; }
     }
 }
