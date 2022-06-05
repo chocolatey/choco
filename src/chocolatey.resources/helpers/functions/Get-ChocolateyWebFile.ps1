@@ -42,7 +42,7 @@ This is the full path of the resulting file name.
 .PARAMETER Url
 This is the 32 bit url to download the resource from. This resource can
 be used on 64 bit systems when a package has both a Url and Url64bit
-specified if a user passes `--forceX86`. If there is only a 64 bit url
+specified if a user passes `--force32Bit`. If there is only a 64 bit url
 available, please remove do not use the parameter (only use Url64bit).
 Will fail on 32bit systems if missing or if a user attempts to force
 a 32 bit installation on a 64 bit system.
@@ -250,9 +250,9 @@ param(
     }
   }
 
-  $forceX86 = $env:chocolateyForceX86;
-  if ($forceX86) {
-    Write-Debug "User specified -x86 so forcing 32 bit"
+  $force32Bit = $env:chocolateyForce32Bit;
+  if ($force32Bit) {
+    Write-Debug "User specified -32bit so forcing 32 bit"
     if ($url32bit -ne $url64bit) { $bitPackage = '32 bit' }
     $url = $url32bit
     $checksum =  $checksum32

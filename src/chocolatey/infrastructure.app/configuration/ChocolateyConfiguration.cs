@@ -220,7 +220,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string PackageNames { get; set; }
 
         public bool Prerelease { get; set; }
-        public bool ForceX86 { get; set; }
+        public bool Force32Bit { get; set; }
         public string InstallArguments { get; set; }
         public bool OverrideArguments { get; set; }
         public bool NotSilent { get; set; }

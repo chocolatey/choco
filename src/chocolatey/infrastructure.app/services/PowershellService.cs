@@ -158,7 +158,7 @@ namespace chocolatey.infrastructure.app.services
                 script,
                 prepare_powershell_arguments(config.InstallArguments),
                 prepare_powershell_arguments(config.PackageParameters),
-                config.ForceX86 ? " -forceX86" : string.Empty,
+                config.Force32Bit ? " -force32bit" : string.Empty,
                 config.OverrideArguments ? " -overrideArgs" : string.Empty
              );
         }
@@ -396,7 +396,7 @@ namespace chocolatey.infrastructure.app.services
             Environment.SetEnvironmentVariable("chocolateyChecksum64", null);
             Environment.SetEnvironmentVariable("chocolateyChecksumType32", null);
             Environment.SetEnvironmentVariable("chocolateyChecksumType64", null);
-            Environment.SetEnvironmentVariable("chocolateyForceX86", null);
+            Environment.SetEnvironmentVariable("chocolateyForce32Bit", null);
             Environment.SetEnvironmentVariable("DownloadCacheAvailable", null);
 
             // we only want to pass the following args to packages that would apply. 
@@ -446,9 +446,9 @@ namespace chocolatey.infrastructure.app.services
                 Environment.SetEnvironmentVariable("chocolateyChecksumType64", configuration.DownloadChecksumType64);
             }
 
-            if (configuration.ForceX86)
+            if (configuration.Force32Bit)
             {
-                Environment.SetEnvironmentVariable("chocolateyForceX86", "true");
+                Environment.SetEnvironmentVariable("chocolateyForce32Bit", "true");
             }
 
             if (configuration.NotSilent)

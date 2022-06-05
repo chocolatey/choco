@@ -228,7 +228,7 @@ Start-ChocolateyProcessAsAdmin
 
   $bitnessMessage = ''
   $fileFullPath = $file
-  if ((Get-ProcessorBits 32) -or $env:ChocolateyForceX86 -eq 'true') {
+  if ((Get-ProcessorBits 32) -or $env:ChocolateyForce32Bit -eq 'true') {
     if (!$file) { throw "32-bit installation is not supported for $packageName"; }
     if ($file64) { $bitnessMessage = '32-bit '; }
   }

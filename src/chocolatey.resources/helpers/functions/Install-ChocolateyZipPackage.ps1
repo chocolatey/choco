@@ -47,7 +47,7 @@ recommended that it matches the package id.
 .PARAMETER Url
 This is the 32 bit url to download the resource from. This resource can
 be used on 64 bit systems when a package has both a Url and Url64bit
-specified if a user passes `--forceX86`. If there is only a 64 bit url
+specified if a user passes `--force32Bit`. If there is only a 64 bit url
 available, please remove do not use the parameter (only use Url64bit).
 Will fail on 32bit systems if missing or if a user attempts to force
 a 32 bit installation on a 64 bit system.
