@@ -388,7 +388,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
                 pkgInfo.FilesSnapshot = _filesService.capture_package_files(packageResult, config);
 
-                var is32Bit = !config.Information.Is64BitProcess || config.Force32Bit;
+                var is32Bit = !config.Information.Is64BitProcess || config.ForceX86;
                 create_ignore_files_for_executables(packageResult.InstallLocation, !is32Bit);
 
                 if (packageResult.Success) _shimgenService.install(config, packageResult);
@@ -530,7 +530,7 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
 
             if (config.Prerelease) arguments.Append(" --prerelease");
             if (config.IgnoreDependencies) arguments.Append(" --ignore-dependencies");
-            if (config.Force32Bit) arguments.Append(" --force32bit");
+            if (config.ForceX86) arguments.Append(" --forcex86");
 
             if (!string.IsNullOrWhiteSpace(config.InstallArguments)) arguments.Append(" --install-arguments=\"'{0}'\"".format_with(config.InstallArguments));
             if (config.OverrideArguments) arguments.Append(" --override-arguments");
@@ -730,7 +730,7 @@ Would have determined packages that are out of date based on what is
                     packageConfig.Version = pkgSettings.Version;
                     packageConfig.InstallArguments = string.IsNullOrWhiteSpace(pkgSettings.InstallArguments) ? packageConfig.InstallArguments : pkgSettings.InstallArguments;
                     packageConfig.PackageParameters = string.IsNullOrWhiteSpace(pkgSettings.PackageParameters) ? packageConfig.PackageParameters : pkgSettings.PackageParameters;
-                    if (pkgSettings.Force32Bit) packageConfig.Force32Bit = true;
+                    if (pkgSettings.ForceX86) packageConfig.ForceX86 = true;
                     if (pkgSettings.AllowMultipleVersions) packageConfig.AllowMultipleVersions = true;
                     if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
                     if (pkgSettings.ApplyInstallArgumentsToDependencies) packageConfig.ApplyInstallArgumentsToDependencies = true;

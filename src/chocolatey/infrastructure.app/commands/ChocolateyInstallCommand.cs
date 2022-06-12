@@ -48,9 +48,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("pre|prerelease",
                      "Prerelease - Include Prereleases? Defaults to false.",
                      option => configuration.Prerelease = option != null)
-                .Add("32bit|force32bit",
-                     "Force32Bit - Force 32 bit installation on 64 bit systems. Defaults to false.",
-                     option => configuration.Force32Bit = option != null)
+                .Add("x86|forcex86",
+                     "ForceX86 - Force x86 (32bit) installation on 64 bit systems. Defaults to false.",
+                     option => configuration.ForceX86 = option != null)
                 .Add("ia=|installargs=|install-args=|installarguments=|install-arguments=",
                      "InstallArguments - Install Arguments to pass to the native installer in the package. Defaults to unspecified.",
                      option => configuration.InstallArguments = option.remove_surrounding_quotes())
@@ -369,7 +369,7 @@ NOTE: The filename is only required to end in .config, the name is not required 
       <package id=""chocolateytestpackage"" version=""0.1"" source=""somelocation"" />
       <package id=""alloptions"" version=""0.1.1""
                source=""https://somewhere/api/v2/"" installArguments=""""
-               packageParameters="""" force32bit=""false"" allowMultipleVersions=""false""
+               packageParameters="""" forceX86=""false"" allowMultipleVersions=""false""
                ignoreDependencies=""false""
                />
     </packages>

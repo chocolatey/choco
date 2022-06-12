@@ -28,7 +28,7 @@ if ($env:ChocolateyEnvironmentVerbose -eq 'true') {
 
 $overrideArgs = $env:chocolateyInstallOverride -eq 'true'
 
-$force32Bit = $env:chocolateyForce32Bit -eq 'true'
+$forceX86 = $env:chocolateyForceX86 -eq 'true'
 
 $installArguments = $env:chocolateyInstallArguments
 

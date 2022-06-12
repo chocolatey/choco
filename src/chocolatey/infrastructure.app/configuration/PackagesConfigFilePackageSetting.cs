@@ -47,8 +47,8 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "applyInstallArgumentsToDependencies")]
         public bool ApplyInstallArgumentsToDependencies { get; set; }
 
-        [XmlAttribute(AttributeName = "force32bit")]
-        public bool Force32Bit { get; set; }
+        [XmlAttribute(AttributeName = "forceX86")]
+        public bool ForceX86 { get; set; }
 
         [XmlAttribute(AttributeName = "allowMultipleVersions")]
         public bool AllowMultipleVersions { get; set; }

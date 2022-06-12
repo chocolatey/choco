@@ -92,7 +92,7 @@ The following are more advanced settings:
 
  * ChocolateyPackageParameters - Parameters to use with packaging, not the same as install arguments (which are passed directly to the native installer). Based on `--package-parameters`. (0.9.8.22+)
  * CHOCOLATEY_VERSION - The version of Choco you normally see. Use if you are 'lighting' things up based on choco version. (0.9.9+) - Otherwise take a dependency on the specific version you need.
- * ChocolateyForce32Bit = If available and set to 'true', then user has requested 32bit version. (0.9.9+) - Automatically handled in built in Choco functions.
+ * ChocolateyForceX86 = If available and set to 'true', then user has requested 32bit version. (0.9.9+) - Automatically handled in built in Choco functions.
  * OS_PLATFORM - Like Windows, OSX, Linux. (0.9.9+)
  * OS_VERSION - The version of OS, like 6.1 something something for Windows. (0.9.9+)
  * OS_NAME - The reported name of the OS. (0.9.9+)
@@ -110,7 +110,7 @@ Some environment variables are set based on options that are passed, configurati
  * ChocolateyEnvironmentVerbose - Was `--verbose` passed? If using the built-in PowerShell host, this is always true (but only logs verbose messages to console if `--verbose` was passed). (0.9.10+)
  * ChocolateyExitOnRebootDetected - Are we exiting on a detected reboot? Set by ` --exit-when-reboot-detected`  or the feature `exitOnRebootDetected` (0.11.0+)
  * ChocolateyForce - Was `--force` passed? (0.9.10+)
- * ChocolateyForce32Bit - Was `-32bit` passed? (CHECK)
+ * ChocolateyForceX86 - Was `-x86` passed? (CHECK)
  * ChocolateyRequestTimeout - How long before a web request will time out. Set by config `webRequestTimeoutSeconds` (CHECK)
  * ChocolateyResponseTimeout - How long to wait for a download to complete? Set by config `commandExecutionTimeoutSeconds` (CHECK)
  * ChocolateyPowerShellHost - Are we using the built-in PowerShell host? Set by `--use-system-powershell` or the feature `powershellHost` (0.9.10+)

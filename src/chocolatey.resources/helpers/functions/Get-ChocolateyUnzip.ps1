@@ -100,7 +100,7 @@ param(
 
    $bitnessMessage = ''
     $zipfileFullPath=$fileFullPath
-  if ((Get-ProcessorBits 32) -or $env:ChocolateyForce32Bit -eq 'true') {
+  if ((Get-ProcessorBits 32) -or $env:ChocolateyForceX86 -eq 'true') {
     if (!$fileFullPath) { throw "32-bit archive is not supported for $packageName"; }
     if ($fileFullPath64) { $bitnessMessage = '32-bit '; }
   } elseif ($fileFullPath64) {

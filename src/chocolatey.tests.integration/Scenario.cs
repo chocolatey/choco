@@ -142,7 +142,7 @@ namespace chocolatey.tests.integration
             config.ContainsLegacyPackageInstalls = false;
             config.Force = false;
             config.ForceDependencies = false;
-            config.Force32Bit = false;
+            config.ForceX86 = false;
             config.HelpRequested = false;
             config.UnsuccessfulParsing = false;
             config.UnsuccessfulParsing = false;
