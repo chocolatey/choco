@@ -267,11 +267,17 @@ param(
   }
   }
 
+  if (Get-OSArchitectureWidth 32){
+      if (($url -eq $null -or $url -eq '') -and ($url64bit -ne $null -or $url64bit -ne '')){
+          throw "This package does not support $bitPackage architecture."
+      }
+  }
+
   # If we're on 64 bit or attempting to force 64 bit and there is no
   # 64 bit url, we need to throw an error.
   if (Get-OSArchitectureWidth 64) {
-      if ($url64bit -eq $null -or $url64bit -eq '') {
-        throw "$url64bit was not given."
+      if (($url64bit -eq $null -or $url64bit -eq '') -or ($url -eq $null -or $url -eq '')) {
+        throw "$url64bit or $url was not given."
   }
   }
 
