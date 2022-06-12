@@ -2,7 +2,7 @@
   [alias("ia","installArgs")][string] $installArguments = '',
   [alias("o","override","overrideArguments","notSilent")]
   [switch] $overrideArgs = $false,
-  [alias("x86")][switch] $forceX86 = $false,
+  [alias("x86","32bit","force32Bit")][switch] $forceX86 = $false,
   [alias("params","parameters","pkgParams")][string]$packageParameters = '',
   [string]$packageScript
 )
