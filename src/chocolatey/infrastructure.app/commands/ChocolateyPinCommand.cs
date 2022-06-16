@@ -19,7 +19,6 @@ namespace chocolatey.infrastructure.app.commands
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using NuGet;
     using attributes;
     using commandline;
     using configuration;

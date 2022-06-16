@@ -20,7 +20,6 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.Management.Automation.Runspaces;
     using configuration;
-    using NuGet;
     using results;
 
     public interface IPowershellService

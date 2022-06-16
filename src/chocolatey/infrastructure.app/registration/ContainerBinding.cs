@@ -28,7 +28,6 @@ namespace chocolatey.infrastructure.app.registration
     using chocolatey.infrastructure.logging;
     using chocolatey.infrastructure.services;
     using infrastructure.configuration;
-    using NuGet;
     using SimpleInjector;
     using Assembly = adapters.Assembly;
 

@@ -18,7 +18,6 @@ namespace chocolatey.infrastructure.app.nuget
 {
     using System;
     using System.IO;
-    using NuGet;
     using configuration;
     using logging;
 

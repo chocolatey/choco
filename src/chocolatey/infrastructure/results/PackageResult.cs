@@ -19,7 +19,6 @@ namespace chocolatey.infrastructure.results
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
-    using NuGet;
 
     /// <summary>
     ///   Outcome of package installation

@@ -24,7 +24,6 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using Moq;
-    using NuGet;
     using Should;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 

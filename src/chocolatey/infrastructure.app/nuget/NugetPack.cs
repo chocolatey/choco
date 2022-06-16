@@ -20,7 +20,6 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using NuGet;
     using IFileSystem = filesystem.IFileSystem;
     using chocolatey.infrastructure.platforms;
 

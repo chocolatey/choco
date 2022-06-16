@@ -17,7 +17,6 @@
 namespace chocolatey.infrastructure.app.domain
 {
     using System;
-    using NuGet;
 
     public sealed class ChocolateyPackageInformation
     {

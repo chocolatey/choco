@@ -30,7 +30,6 @@ namespace chocolatey.infrastructure.app.services
     using guards;
     using logging;
     using nuget;
-    using NuGet;
     using platforms;
     using results;
     using tolerance;

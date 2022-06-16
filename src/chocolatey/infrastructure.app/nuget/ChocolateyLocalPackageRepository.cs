@@ -22,7 +22,6 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Linq;
     using System.Runtime.Versioning;
     using System.Threading;
-    using NuGet;
 
     // ReSharper disable InconsistentNaming
 

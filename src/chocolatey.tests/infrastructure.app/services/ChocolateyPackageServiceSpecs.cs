@@ -26,7 +26,6 @@ using chocolatey.infrastructure.filesystem;
 using chocolatey.infrastructure.results;
 using chocolatey.infrastructure.services;
 using Moq;
-using NuGet;
 using NUnit.Framework;
 using Should;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;

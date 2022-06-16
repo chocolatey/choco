@@ -28,7 +28,6 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.results;
-    using NuGet;
     using NUnit.Framework;
     using Should;
 

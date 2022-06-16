@@ -26,7 +26,6 @@ namespace chocolatey.infrastructure.app.registration
     using chocolatey.infrastructure.services;
     using chocolatey.infrastructure.tasks;
     using chocolatey.infrastructure.validations;
-    using NuGet;
     using CryptoHashProvider = cryptography.CryptoHashProvider;
     using IFileSystem = filesystem.IFileSystem;
     using IHashProvider = cryptography.IHashProvider;

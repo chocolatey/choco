@@ -31,7 +31,6 @@ namespace chocolatey.infrastructure.app.services
     using infrastructure.commands;
     using infrastructure.registration;
     using logging;
-    using NuGet;
     using powershell;
     using results;
     using utility;

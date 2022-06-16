@@ -21,7 +21,6 @@ namespace chocolatey.tests.infrastructure.app.nuget
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.nuget;
     using Moq;
-    using NuGet;
     using Should;
 
     public class NugetCommonSpecs

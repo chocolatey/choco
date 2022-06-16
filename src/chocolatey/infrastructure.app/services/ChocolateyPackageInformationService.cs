@@ -21,7 +21,6 @@ namespace chocolatey.infrastructure.app.services
     using System.IO;
     using System.Text;
     using configuration;
-    using NuGet;
     using domain;
     using infrastructure.configuration;
     using tolerance;

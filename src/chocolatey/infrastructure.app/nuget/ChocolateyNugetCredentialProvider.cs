@@ -21,7 +21,6 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Net;
     using System.Text.RegularExpressions;
     using commandline;
-    using NuGet;
     using configuration;
     using logging;
 

@@ -28,7 +28,6 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.commandline;
     using chocolatey.infrastructure.results;
     using Moq;
-    using NuGet;
     using Should;
 
     public class ChocolateyPinCommandSpecs

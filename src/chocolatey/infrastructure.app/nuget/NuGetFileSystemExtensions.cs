@@ -19,7 +19,6 @@ namespace chocolatey.infrastructure.app.nuget
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using NuGet;
 
     // ReSharper disable InconsistentNaming
 

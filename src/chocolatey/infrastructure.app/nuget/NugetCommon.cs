@@ -24,7 +24,6 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Text;
     using adapters;
     using infrastructure.configuration;
-    using NuGet;
     using configuration;
     using logging;
     using Console = adapters.Console;
