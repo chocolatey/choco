@@ -195,7 +195,7 @@ Running the build on Mono produces an artifact similar to Windows but may have m
 ### Installing on Other Platforms:
 
  1. Get a copy of the source code and build.
- 1. Copy (or link) the contents of `./code_drop/chocolatey/console` to your preferred install directory. On Linux, the preferred directory is `/opt/chocolatey`
+ 1. Copy (or link) the contents of `./code_drop/temp/_PublishedApps/choco` to your preferred install directory. On Linux, the preferred directory is `/opt/chocolatey`
  1. Export the `ChocolateyInstall` environment variable, pointing to the install directory the build output was copied too.
  1. Copy `./docker/choco_wrapper` to a directory on the `$PATH`, rename to `choco`, and if the install directory is something else than `/opt/chocolatey`, then edit it to point to the correct path.
 

@@ -42,3 +42,11 @@ chocolatey.official.snk
 docs/generated
 
 .vagrant
+
+# Build related
+tools/**
+!tools/packages.config
+!tools/Addins/packages.config
+!tools/Modules/packages.config
+BuildArtifacts/
+code_drop/

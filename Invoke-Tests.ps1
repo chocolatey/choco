@@ -28,7 +28,7 @@ $packageRegex = 'chocolatey\.\d.*\.nupkg'
 
 # Use TstPkg as TestPackage has ValidateScript that can't be circumvented
 if (-not $TestPackage) {
-    $TstPkg = Get-ChildItem $PSScriptRoot/code_drop/nuget -Filter *.nupkg | Where-Object Name -Match $packageRegex
+    $TstPkg = Get-ChildItem $PSScriptRoot/code_drop/Packages/Chocolatey -Filter *.nupkg | Where-Object Name -Match $packageRegex
 }
 else {
     $TstPkg = Get-ChildItem $TestPackage

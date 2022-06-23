@@ -10,7 +10,19 @@ Tests for Chocolatey are written in C# or in PowerShell depending on what type o
 
 ### NUnit Tests
 
-The NUnit tests get run automtically when you run `./build.bat`, and you can also run them without completing the full build process by running `./test.bat`.
+The NUnit tests get run automatically when you run `./build.bat` or `./build.sh`, and you can also run them without completing the full build process by running `./build.bat --target=test-nunit --exclusive`, or `./build.sh --target=test-nunit --exclusive`.
+
+### NUnit Integration Tests
+
+If you need to run the integration tests, you can do so using: `./build.bat --target=test-nunit --exclusive --testExecutionType=integration`, or `./build.sh --target=test-nunit --exclusive --testExecutionType=integration`.
+
+### All NUnit Integration Tests
+
+If you need to run all the tests, you can do so using: `./build.bat --target=test-nunit --exclusive --testExecutionType=all`, or `./build.sh --target=test-nunit --exclusive --testExecutionType=all`.
+
+### Skipping NUnit Tests
+
+If you need to skip the execution of tests, you can run the following: `./build.bat --testExecutionType=none`, or `./build.sh --testExecutionType=none`.
 
 ### Pester Tests
 

@@ -1,7 +1,26 @@
 ARG monoversion="6.12"
 FROM mono:${monoversion} as build
 
-RUN apt-get update && apt-get install git -y
+ARG github_actions="false"
+ARG github_ref
+ARG github_repository
+ARG github_base_ref
+ARG github_head_ref
+ARG github_run_number
+
+ENV GITHUB_REF=$github_ref
+ENV GITHUB_REPOSITORY=$github_repository
+ENV GITHUB_BASE_REF=$github_base_ref
+ENV GITHUB_HEAD_REF=$github_head_ref
+ENV GITHUB_RUN_NUMBER=$github_run_number
+
+RUN echo deb http://deb.debian.org/debian buster-backports main | tee /etc/apt/sources.list.d/buster-backports.list; \
+    apt-get update && apt-get install -t buster-backports git -y
+
+RUN curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb; \
+    dpkg -i packages-microsoft-prod.deb; \
+    apt-get update; \
+    apt-get install -y dotnet-sdk-6.0
 
 COPY . /usr/local/src/choco/
 
@@ -10,13 +29,16 @@ RUN chmod +x *.sh
 
 ARG buildscript="build.sh"
 
-RUN if [ "$buildscript" = "build.official.sh" ]; then \
+RUN if [ "$github_actions" = "true" ]; then \
+    export GITHUB_ACTIONS=$github_actions; \
+  fi; \
+  if [ "$buildscript" = "build.official.sh" ]; then \
     export CHOCOLATEY_OFFICIAL_KEY="/usr/local/src/choco/chocolatey.official.snk"; \
     ./$buildscript; \
-    cp docker/choco_official_wrapper code_drop/chocolatey/console/choco_wrapper; \
+    cp docker/choco_official_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \
   else \
-    ./$buildscript; \
-    cp docker/choco_wrapper code_drop/chocolatey/console/choco_wrapper; \
+    ./$buildscript --verbosity=diagnostic; \
+    cp docker/choco_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \
   fi;
 
 
@@ -36,7 +58,7 @@ LABEL org.opencontainers.image.base.name="index.docker.io/library/mono:${monover
 
 ENV ChocolateyInstall /opt/chocolatey
 
-COPY --from=build /usr/local/src/choco/code_drop/chocolatey/console /opt/chocolatey
+COPY --from=build /usr/local/src/choco/code_drop/temp/_PublishedApps/choco /opt/chocolatey
 
 RUN mkdir /opt/chocolatey/lib; \
   cp /opt/chocolatey/choco_wrapper usr/local/bin/choco; \
