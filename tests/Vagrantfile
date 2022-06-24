@@ -38,7 +38,7 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder '../', '/chocoRoot'
 
   config.vm.provision "shell", inline: <<-SHELL
-    cscript c:/windows/system32/slmgr.vbs /rearm
+    cscript c:/windows/system32/slmgr.vbs /rearm | Out-Null
     Set-ExecutionPolicy Bypass -Scope Process -Force
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
     iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
@@ -53,6 +53,8 @@ Vagrant.configure("2") do |config|
     Write-Host "Files have been copied, beginning build process. You may see some red warning text regarding VsVersionToYearString, this can be safely ignored"
     $CakeOutput = ./build.bat
     if ($LastExitCode -ne 0) {
+      Set-Content c:/chocoRoot/buildOutput.txt -Value $CakeOutput
+      Write-Host "The build has failed. Please see the buildOutput.txt file at the root of the repository for details"
       exit $LastExitCode
     }
 
