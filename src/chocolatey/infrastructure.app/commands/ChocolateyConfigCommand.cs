@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -116,11 +116,11 @@ NOTE: `Unset` subcommand available in 0.9.10+.
     choco config unset proxy
     choco config unset --name proxy
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
-            
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
             "chocolatey".Log().Info(@"
 Exit codes that normally result from running this command.
@@ -129,8 +129,8 @@ Normal:
  - 0: operation was successful, no issues detected
  - -1 or 1: an error has occurred
 
-If you find other exit codes that we have not yet documented, please 
- file a ticket so we can document it at 
+If you find other exit codes that we have not yet documented, please
+ file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
 ");

@@ -307,7 +307,7 @@ NOTE: Chocolatey Pro / Business automatically synchronizes with
     choco upgrade git -y --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'""
     choco upgrade git -y --params=""'/GitAndUnixToolsOnPath /NoAutoCrlf'"" --install-args=""'/DIR=C:\git'""
     # Params are package parameters, passed to the package
-    # Install args are installer arguments, appended to the silentArgs 
+    # Install args are installer arguments, appended to the silentArgs
     #  in the package for the installer itself
     choco upgrade nodejs.install --version 0.10.35
     choco upgrade git -s ""'https://somewhere/out/there'""
@@ -315,7 +315,7 @@ NOTE: Chocolatey Pro / Business automatically synchronizes with
     choco upgrade all
     choco upgrade all --except=""'skype,conemu'""
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");

@@ -86,7 +86,7 @@ List information installed templates.
 
 Both manually installed templates and templates installed via
  .template packages are displayed.
- 
+
 NOTE: Available with 0.12.0+."
 );
 

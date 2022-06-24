@@ -115,7 +115,7 @@ namespace chocolatey.infrastructure.app.commands
                      "OrderByPopularity - Sort by package results by popularity. Available in 0.9.10+.",
                      option => configuration.ListCommand.OrderByPopularity = option != null)
                  .Add("approved-only",
-                     "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository. Available in 0.9.10+." + deprecationNotice,
+                    "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository. Available in 0.9.10+." + deprecationNotice,
                      option => configuration.ListCommand.ApprovedOnly = option != null)
                  .Add("download-cache|download-cache-only",
                      "DownloadCacheAvailable - Only return packages that have a download cache available - this option will filter out results not from the community repository. Available in 0.9.10+." + deprecationNotice,
@@ -160,9 +160,9 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(@"
 Chocolatey will perform a search for a package local or remote.
 
-NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below) 
- with options and switches. In most cases you can still pass options 
- and switches  with one dash (`-`). For more details, see 
+NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
+ with options and switches. In most cases you can still pass options
+ and switches  with one dash (`-`). For more details, see
  the command reference (`choco -?`).
 ");
 

@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -96,7 +96,7 @@ namespace chocolatey.infrastructure.adapters
         /// Indicates whether the error output stream has been redirected from the standard error stream.
         /// </summary>
         bool IsErrorRedirected { get; }
-        
+
         /// <summary>
         /// Indicates whether input has been redirected from the standard input stream.
         /// </summary>
@@ -104,7 +104,7 @@ namespace chocolatey.infrastructure.adapters
 
         System.ConsoleColor BackgroundColor { get; set; }
         System.ConsoleColor ForegroundColor { get; set; }
-        
+
         int BufferWidth { get; set; }
         int BufferHeight { get; set; }
         void SetBufferSize(int width, int height);
@@ -122,7 +122,7 @@ namespace chocolatey.infrastructure.adapters
         int WindowLeft { get; set; }
         int WindowTop { get; set; }
         void SetWindowPosition(int width, int height);
-    
+
     }
 
     // ReSharper restore InconsistentNaming

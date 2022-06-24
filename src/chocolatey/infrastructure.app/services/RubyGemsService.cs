@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,14 +91,14 @@ namespace chocolatey.infrastructure.app.services
                     UseValueOnly = true,
                     Required = true
                 });
-            
+
             args.Add("Force", new ExternalCommandArgument
                 {
                     ArgumentOption = "-f ",
                     QuoteValue = false,
                     Required = false
                 });
-            
+
             args.Add("Version", new ExternalCommandArgument
                 {
                     ArgumentOption = "--version ",
@@ -160,7 +160,7 @@ namespace chocolatey.infrastructure.app.services
         {
             var packageResults = new List<PackageResult>();
             var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
-            
+
             Environment.ExitCode = _commandExecutor.execute(
                 EXE_PATH,
                 args,
@@ -213,7 +213,7 @@ namespace chocolatey.infrastructure.app.services
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
                             this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
-                          
+
                             if (InstallingRegex.IsMatch(logMessage))
                             {
                                 var packageName = get_value_from_output(logMessage, PackageNameFetchingRegex, PACKAGE_NAME_GROUP);
@@ -221,7 +221,7 @@ namespace chocolatey.infrastructure.app.services
                                 this.Log().Info(ChocolateyLoggers.Important, "{0}".format_with(packageName));
                                 return;
                             }
-                           
+
                             //if (string.IsNullOrWhiteSpace(packageName)) return;
 
                             if (InstalledRegex.IsMatch(logMessage))
