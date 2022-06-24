@@ -388,7 +388,7 @@ param(
   [string]$filePath = $downloadFilePath
   if ($useOriginalLocation) {
     $filePath = $url
-    if (Get-ProcessorBits 64) {
+    if (Get-OSArchitectureWidth 64) {
       $forceX86 = $env:chocolateyForceX86
       if ($forceX86) {
         Write-Debug "User specified '-x86' so forcing 32-bit"

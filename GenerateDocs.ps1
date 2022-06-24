@@ -96,7 +96,7 @@ These are the functions from above as one list.
 function Get-Aliases($commandName){
 
   $aliasOutput = ''
-  Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | %{ $aliasOutput += "``$($_.Name)``$lineFeed"}
+  Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | ForEach-Object { $aliasOutput += "``$($_.Name)``$lineFeed"}
 
   if ($aliasOutput -eq $null -or $aliasOutput -eq '') {
     $aliasOutput = 'None'
@@ -111,7 +111,7 @@ function Convert-Example($objItem) {
 
 ~~~powershell
 $($objItem.Code.Replace("`n",$lineFeed))
-$($objItem.remarks | ? { $_.Text -ne ''} | % { Write-Output $_.Text.Replace("`n", $lineFeed) })
+$($objItem.remarks | Where-Object { $_.Text } | ForEach-Object { $_.Text.Replace("`n", $lineFeed) })
 ~~~
 "@
 }
@@ -139,7 +139,7 @@ function Convert-Syntax($objItem, $hasCmdletBinding) {
   $cmd = $objItem.Name
 
   if ($objItem.parameter -ne $null) {
-    $objItem.parameter | % {
+    $objItem.parameter | ForEach-Object {
       $cmd += ' `' + $lineFeed
       $cmd += "  "
       if ($_.required -eq $false) { $cmd += '['}
@@ -165,7 +165,7 @@ function Convert-Parameter($objItem, $commandName) {
   }
   $parmText += $lineFeed
   if ($objItem.description -ne $null) {
-    $parmText += (($objItem.description | % { Replace-CommonItems $_.Text }) -join "$lineFeed") + $lineFeed + $lineFeed
+    $parmText += (($objItem.description | ForEach-Object { Replace-CommonItems $_.Text }) -join "$lineFeed") + $lineFeed + $lineFeed
   }
   if ($objItem.parameterValueGroup -ne $null) {
     $parmText += "$($lineFeed)Valid options: " + ($objItem.parameterValueGroup.parameterValue -join ", ") + $lineFeed + $lineFeed
@@ -304,7 +304,10 @@ function Generate-TopLevelCommandReference {
   $commandOutput += @("$lineFeed~~~$lineFeed")
   $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco -h``. $lineFeed")
 
-  $commandOutput | %{ Convert-CommandText($_) } | %{ Convert-CommandReferenceSpecific($_) } | Out-File $fileName -Encoding UTF8 -Force
+  $commandOutput | 
+      ForEach-Object { Convert-CommandText($_) } |
+      ForEach-Object { Convert-CommandReferenceSpecific($_) } |
+      Out-File $fileName -Encoding UTF8 -Force
 }
 
 function Move-GeneratedFiles {
@@ -373,7 +376,9 @@ function Generate-CommandReference($commandName, $order) {
   $commandOutput += $(& $chocoExe $commandName.ToLower() -h -r)
   $commandOutput += @("$lineFeed~~~$lineFeed$lineFeed[Command Reference](xref:choco-commands)")
   $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco $($commandName.ToLower()) -h``. $lineFeed")
-  $commandOutput | %{ Convert-CommandText $_ $commandName.ToLower() } | Out-File $fileName -Encoding UTF8 -Force
+  $commandOutput | 
+      ForEach-Object { Convert-CommandText $_ $commandName.ToLower() } | 
+      Out-File $fileName -Encoding UTF8 -Force
 }
 
 try
@@ -428,14 +433,14 @@ RedirectFrom:
 $(Replace-CommonItems $_.Synopsis)
 
 ## Syntax
-$( ($_.syntax.syntaxItem | % { Convert-Syntax $_ $hasCmdletBinding }) -join "$lineFeed$lineFeed")
+$( ($_.syntax.syntaxItem | ForEach-Object { Convert-Syntax $_ $hasCmdletBinding }) -join "$lineFeed$lineFeed")
 $( if ($_.description -ne $null) { $lineFeed + "## Description" + $lineFeed + $lineFeed + $(Replace-CommonItems $_.description.Text) })
 $( if ($_.alertSet -ne $null) { $lineFeed + "## Notes" + $lineFeed + $lineFeed +  $(Replace-CommonItems $_.alertSet.alert.Text) })
 
 ## Aliases
 
 $(Get-Aliases $_.Name)
-$( if ($_.Examples -ne $null) { Write-Output "$lineFeed## Examples$lineFeed$lineFeed"; ($_.Examples.Example | % { Convert-Example $_ }) -join "$lineFeed$lineFeed"; Write-Output "$lineFeed" })
+$( if ($_.Examples -ne $null) { Write-Output "$lineFeed## Examples$lineFeed$lineFeed"; ($_.Examples.Example | ForEach-Object { Convert-Example $_ }) -join "$lineFeed$lineFeed"; Write-Output "$lineFeed" })
 ## Inputs
 
 $( if ($_.InputTypes -ne $null -and $_.InputTypes.Length -gt 0 -and -not $_.InputTypes.Contains('inputType')) { $lineFeed + " * $($_.InputTypes)" + $lineFeed} else { 'None'})
@@ -445,9 +450,9 @@ $( if ($_.InputTypes -ne $null -and $_.InputTypes.Length -gt 0 -and -not $_.Inpu
 $( if ($_.ReturnValues -ne $null -and $_.ReturnValues.Length -gt 0 -and -not $_.ReturnValues.StartsWith('returnValue')) { "$lineFeed * $($_.ReturnValues)$lineFeed"} else { 'None'})
 
 ## Parameters
-$( if ($_.parameters.parameter.count -gt 0) { $_.parameters.parameter | % { Convert-Parameter $_ $commandName }}) $( if ($hasCmdletBinding) { "$lineFeed### &lt;CommonParameters&gt;$lineFeed$($lineFeed)This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see ``about_CommonParameters`` http://go.microsoft.com/fwlink/p/?LinkID=113216 ." } )
+$( if ($_.parameters.parameter.count -gt 0) { $_.parameters.parameter | ForEach-Object { Convert-Parameter $_ $commandName }}) $( if ($hasCmdletBinding) { "$lineFeed### &lt;CommonParameters&gt;$lineFeed$($lineFeed)This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see ``about_CommonParameters`` http://go.microsoft.com/fwlink/p/?LinkID=113216 ." } )
 
-$( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$lineFeed"; $_.relatedLinks.navigationLink | ? { $_.linkText -ne $null} | % { Write-Output "* [$($_.LinkText)](xref:$($_.LinkText.ToLower()))$lineFeed" }})
+$( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$lineFeed"; $_.relatedLinks.navigationLink | Where-Object { $_.linkText -ne $null} | ForEach-Object { Write-Output "* [$($_.LinkText)](xref:$($_.LinkText.ToLower()))$lineFeed" }})
 
 [Function Reference](xref:powershell-reference)
 

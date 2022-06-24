@@ -61,7 +61,7 @@ param(
 		$shell=new-object -com "Shell.Application"
 		$folder=$shell.Namespace($path)
 		$item = $folder.Parsename((split-path $targetFilePath -leaf))
-		$itemVerb = $item.Verbs() | ? {$_.Name.Replace("&","") -eq $verb}
+		$itemVerb = $item.Verbs() | Where-Object {$_.Name.Replace("&","") -eq $verb}
 		if($itemVerb -eq $null){
 			Write-Host "TaskBar verb not found for $item. It may have already been pinned"
 		} else {

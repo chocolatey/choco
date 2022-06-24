@@ -157,11 +157,14 @@ param(
         if ([System.IntPtr]::Size -eq 4)
         {
             <# 32bits system case #>
-            $versions=(get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName -match "^[0-9\.]+$") } | ? {$_.property -contains "InstallDir"} | sort {[int]($_.PSChildName)} -descending)
+            $versions = Get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue |
+              Where-Object { ($_.PSChildName -match "^[0-9\.]+$") } |
+              Where-Object { $_.property -contains "InstallDir" } |
+              Sort-Object { [int]($_.PSChildName) } -descending
         }
         else
         {
-            $versions=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName -match "^[0-9\.]+$") } | ? {$_.property -contains "InstallDir"} | sort {[int]($_.PSChildName)} -descending)
+            $versions=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName -match "^[0-9\.]+$") } | Where-Object {$_.property -contains "InstallDir"} | Sort-Object {[int]($_.PSChildName)} -descending)
         }
         if($versions -and $versions.Length){
             $version = $versions[0]
@@ -173,11 +176,11 @@ param(
         if ([System.IntPtr]::Size -eq 4)
         {
             <# 32bits system case #>
-            $versions=(get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName.EndsWith("$vsVersion.0")) } | ? {$_.property -contains "InstallDir"})
+            $versions=(get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName.EndsWith("$vsVersion.0")) } | Where-Object {$_.property -contains "InstallDir"})
         }
         else
         {
-            $version=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName.EndsWith("$vsVersion.0")) } | ? {$_.property -contains "InstallDir"})
+            $version=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName.EndsWith("$vsVersion.0")) } | Where-Object {$_.property -contains "InstallDir"})
         }
     }
 
