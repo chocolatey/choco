@@ -2,12 +2,14 @@
 Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 
 Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
+    # Because we're not modifying the install in any way, there is no need to Initialize-ChocolateyTestInstall
     BeforeDiscovery {
         $ExportNotPresent = $true
         if (Test-ChocolateyVersionEqualOrHigherThan -Version "0.10.16-beta") {
             $ExportNotPresent = $false
         }
     }
+
     Context "Tab Completion" {
         It "Should Exist" {
             Test-Path Function:\TabExpansion | Should -BeTrue

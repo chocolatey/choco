@@ -11,7 +11,7 @@ Describe "Python Source" -Tag Chocolatey, UpgradeCommand, PythonSource -Skip:(-n
 
     AfterAll {
         $null = Invoke-Choco uninstall python3 --remove-dependencies
-        Remove-ChocolateyInstallSnapshot
+        Remove-ChocolateyTestInstall
     }
 
     Context "upgrade <Argument>" -Foreach @(
