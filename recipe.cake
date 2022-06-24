@@ -326,8 +326,7 @@ BuildParameters.SetParameters(context: Context,
                             shouldPublishAwsLambdas: false,
                             chocolateyNupkgGlobbingPattern: "/**/chocolatey[!-no7zip]*.nupkg");
 
-ToolSettings.SetToolSettings(context: Context,
-                            buildMSBuildToolVersion: MSBuildToolVersion.NET40);
+ToolSettings.SetToolSettings(context: Context);
 
 BuildParameters.PrintParameters(Context);
 
