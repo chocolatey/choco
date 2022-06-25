@@ -34,7 +34,7 @@ to reverse the installation done in the install script.
 With auto uninstaller turned off, a chocolateyUninstall.ps1 is required
 to perform uninstall from "Programs and Features". In the absence of
 chocolateyUninstall.ps1, choco uninstall only removes the package from
-Chocolatey but does not remove the sofware from your system without
+Chocolatey but does not remove the software from your system without
 auto uninstaller.
 
 .NOTES

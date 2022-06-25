@@ -230,7 +230,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_throw_when_source_is_not_set()
             {
                 configuration.Sources = "";
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -239,11 +239,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
                 error.Message.ShouldContain("Source is required.");
@@ -254,7 +254,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 configuration.Sources = "https://somewhere/out/there";
                 configuration.PushCommand.Key = "";
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -263,11 +263,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
                 error.Message.ShouldContain("ApiKey was not found");
@@ -303,7 +303,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.Sources = "http://somewhere/out/there";
                 configuration.PushCommand.Key = "bob";
                 configuration.Force = false;
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -312,11 +312,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
                 error.Message.ShouldContain("WARNING! The specified source '{0}' is not secure".format_with(configuration.Sources));

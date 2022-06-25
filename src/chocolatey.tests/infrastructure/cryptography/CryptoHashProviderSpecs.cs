@@ -26,9 +26,9 @@ namespace chocolatey.tests.infrastructure.cryptography
     using Moq;
     using Should;
 
-    public class CrytpoHashProviderSpecs
+    public class CryptoHashProviderSpecs
     {
-        public abstract class CrytpoHashProviderSpecsBase : TinySpec
+        public abstract class CryptoHashProviderSpecsBase : TinySpec
         {
             protected CryptoHashProvider Provider;
             protected Mock<IFileSystem> FileSystem = new Mock<IFileSystem>();
@@ -39,7 +39,7 @@ namespace chocolatey.tests.infrastructure.cryptography
             }
         }
 
-        public class when_HashProvider_provides_a_hash : CrytpoHashProviderSpecsBase
+        public class when_HashProvider_provides_a_hash : CryptoHashProviderSpecsBase
         {
             private string result;
             private readonly string filePath = "c:\\path\\does\\not\\matter.txt";
@@ -66,7 +66,7 @@ namespace chocolatey.tests.infrastructure.cryptography
             }
         }
 
-        public class when_HashProvider_attempts_to_provide_a_hash_for_a_file_over_2GB : CrytpoHashProviderSpecsBase
+        public class when_HashProvider_attempts_to_provide_a_hash_for_a_file_over_2GB : CryptoHashProviderSpecsBase
         {
             private string result;
             private readonly string filePath = "c:\\path\\does\\not\\matter.txt";

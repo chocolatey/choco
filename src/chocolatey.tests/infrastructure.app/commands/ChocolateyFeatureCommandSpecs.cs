@@ -126,7 +126,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 reset();
                 unparsedArgs.Add("wtf");
                 unparsedArgs.Add("bbq");
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -135,11 +135,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
                 error.Message.ShouldContain("A single features command must be listed");
@@ -209,7 +209,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 configuration.FeatureCommand.Command = FeatureCommandType.unknown;
                 configuration.FeatureCommand.Name = "";
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -218,11 +218,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
                 error.Message.ShouldEqual("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.FeatureCommand.Command.to_string()));

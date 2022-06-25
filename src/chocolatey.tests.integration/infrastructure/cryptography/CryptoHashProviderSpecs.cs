@@ -23,9 +23,9 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
     using chocolatey.infrastructure.filesystem;
     using Should;
 
-    public class CrytpoHashProviderSpecs
+    public class CryptoHashProviderSpecs
     {
-        public abstract class CrytpoHashProviderSpecsBase : TinySpec
+        public abstract class CryptoHashProviderSpecsBase : TinySpec
         {
             protected CryptoHashProvider Provider;
             protected DotNetFileSystem FileSystem;
@@ -39,7 +39,7 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
             }
         }
 
-        public class when_HashProvider_provides_a_hash : CrytpoHashProviderSpecsBase
+        public class when_HashProvider_provides_a_hash : CryptoHashProviderSpecsBase
         {
             private string result;
             private string filePath;

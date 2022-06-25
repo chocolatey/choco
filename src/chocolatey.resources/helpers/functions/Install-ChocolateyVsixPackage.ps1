@@ -58,7 +58,7 @@ In 0.10.4+, `Url` is an alias for VsixUrl.
 The major version number of Visual Studio where the
 package should be installed. This is optional. If not
 specified, the most recent Visual Studio installation
-will be targetted.
+will be targeted.
 
 NOTE: For Visual Studio 2015, the VsVersion is 14. It can be determined
 by looking at the folders under Program Files / Program Files (x86).

@@ -137,7 +137,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_call_service_oudated_run()
+            public void should_call_service_outdated_run()
             {
                 packageService.Verify(c => c.outdated_run(configuration), Times.Once);
             }

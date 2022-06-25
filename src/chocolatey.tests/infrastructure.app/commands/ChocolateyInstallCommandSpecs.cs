@@ -270,7 +270,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_throw_when_packagenames_is_not_set()
             {
                 configuration.PackageNames = "";
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -279,11 +279,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
             }

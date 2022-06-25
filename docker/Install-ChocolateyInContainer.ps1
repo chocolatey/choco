@@ -26,8 +26,8 @@ param (
   if ($env:TEMP -eq $null) {
     $env:TEMP = Join-Path $env:SystemDrive 'temp'
   }
-  $chocTempDir = Join-Path $env:TEMP "chocolatey"
-  $tempDir = Join-Path $chocTempDir "chocInstall"
+  $chocoTempDir = Join-Path $env:TEMP "chocolatey"
+  $tempDir = Join-Path $chocoTempDir "chocoInstall"
   if (![System.IO.Directory]::Exists($tempDir)) {[System.IO.Directory]::CreateDirectory($tempDir)}
   $file = Join-Path $tempDir "chocolatey.zip"
   Copy-Item $chocolateyPackageFilePath $file -Force
@@ -72,13 +72,13 @@ param (
   # Call chocolatey install
   Write-Output "Installing chocolatey on this machine"
   $toolsFolder = Join-Path $tempDir "tools"
-  $chocInstallPS1 = Join-Path $toolsFolder "chocolateyInstall.ps1"
+  $chocoInstallPS1 = Join-Path $toolsFolder "chocolateyInstall.ps1"
 
-  & $chocInstallPS1
+  & $chocoInstallPS1
 
   Write-Output 'Ensuring chocolatey commands are on the path'
-  $chocInstallVariableName = "ChocolateyInstall"
-  $chocoPath = [Environment]::GetEnvironmentVariable($chocInstallVariableName)
+  $chocoInstallVariableName = "ChocolateyInstall"
+  $chocoPath = [Environment]::GetEnvironmentVariable($chocoInstallVariableName)
   if ($chocoPath -eq $null -or $chocoPath -eq '') {
     $chocoPath = 'C:\ProgramData\Chocolatey'
   }

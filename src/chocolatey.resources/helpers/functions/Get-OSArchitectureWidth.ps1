@@ -44,7 +44,7 @@ None
 
 .PARAMETER Compare
 This optional parameter causes the function to return $true or $false,
-depending on wether or not the bit width matches.
+depending on whether or not the bit width matches.
 #>
 param(
   $compare
