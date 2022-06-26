@@ -173,7 +173,7 @@ sudo apt-get install mono-devel -y
  * Consider adding the following to your `~/.profile` (or other relevant dot source file):
 
 ```sh
-# mono
+# Mono
 # http://www.michaelruck.de/2010/03/solving-pkg-config-and-mono-35-profile.html
 # https://cloudgen.wordpress.com/2013/03/06/configure-nant-to-run-under-mono-3-06-beta-for-mac-osx/
 export PKG_CONFIG_PATH=/opt/local/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig:$PKG_CONFIG_PATH

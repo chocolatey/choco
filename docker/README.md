@@ -1,7 +1,7 @@
 Building Docker Image
 =====================
 
-This directory contains the necessary files for building a Docker Images. There is a Windows based image which runs choco on .Net and a Linux based image that builds and runs choco with mono.
+This directory contains the necessary files for building a Docker Images. There is a Windows based image which runs choco on .NET and a Linux based image that builds and runs choco with Mono.
 
 To build the Windows image yourself, follow these steps:
 
