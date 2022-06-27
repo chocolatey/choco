@@ -22,14 +22,18 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Linq;
     using IFileSystem = filesystem.IFileSystem;
     using chocolatey.infrastructure.platforms;
+    using NuGet.Common;
+    using NuGet.Configuration;
+    using NuGet.Packaging;
 
     // ReSharper disable InconsistentNaming
 
     public sealed class NugetPack
     {
-        public static IPackage BuildPackage(PackageBuilder builder, IFileSystem fileSystem, string outputPath = null)
+        public static bool BuildPackage(PackageBuilder builder, IFileSystem fileSystem, string outputPath)
         {
             ExcludeFiles(builder.Files);
+
             // Track if the package file was already present on disk
             bool isExistingPackage = fileSystem.file_exists(outputPath);
             try
@@ -53,7 +57,7 @@ namespace chocolatey.infrastructure.app.nuget
                 throw;
             }
 
-            return new OptimizedZipPackage(outputPath);
+            return true;
         }
 
         private static void ExcludeFiles(ICollection<IPackageFile> packageFiles)
@@ -63,7 +67,7 @@ namespace chocolatey.infrastructure.app.nuget
             // manifest file.
             var filter = Platform.get_platform() == PlatformType.Windows ? @"**\*" : "**/*";
             var excludes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var wildCards = excludes.Concat(new[] { filter + Constants.ManifestExtension, filter + Constants.PackageExtension });
+            var wildCards = excludes.Concat(new[] { filter + PackagingConstants.ManifestExtension, filter + NuGetConstants.PackageExtension });
 
             PathResolver.FilterPackageFiles(packageFiles, ResolvePath, wildCards);
         }

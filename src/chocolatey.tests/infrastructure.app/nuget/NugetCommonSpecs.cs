@@ -17,10 +17,15 @@
 namespace chocolatey.tests.infrastructure.app.nuget
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.nuget;
     using Moq;
+    using NuGet.Common;
+    using NuGet.Packaging;
+    using NuGet.Protocol;
+    using NuGet.Protocol.Core.Types;
     using Should;
 
     public class NugetCommonSpecs
@@ -31,7 +36,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             private readonly Mock<ILogger> nugetLogger = new Mock<ILogger>();
             private readonly Mock<IPackageDownloader> packageDownloader = new Mock<IPackageDownloader>();
             private ChocolateyConfiguration configuration;
-            private IPackageRepository packageRepository;
+            private IEnumerable<SourceRepository> packageRepositories;
 
             public override void Context()
             {
@@ -42,7 +47,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
             public override void Because()
             {
-                because = () => packageRepository = NugetCommon.GetRemoteRepository(configuration, nugetLogger.Object, packageDownloader.Object);
+                because = () => packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger.Object);
             }
 
             [Fact]
@@ -53,7 +58,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                ((AggregateRepository)packageRepository).Repositories.Count().ShouldEqual(0);
+                packageRepositories.Count().ShouldEqual(0);
             }
         }
     }

@@ -87,7 +87,7 @@ Anything encrypted as CurrentUser can only be decrypted by your current user.");
         {
             // SHA256 is case sensitive; given that our key is case insensitive, we upper case it
             var pathBytes = Encoding.UTF8.GetBytes(caseInsensitiveKey.ToUpperInvariant());
-            var hashProvider = new NuGet.CryptoHashProvider("SHA256");
+            var hashProvider = new NuGet.Common.CryptoHashProvider("SHA256");
 
             return Convert.ToBase64String(hashProvider.CalculateHash(pathBytes)).ToUpperInvariant();
         }

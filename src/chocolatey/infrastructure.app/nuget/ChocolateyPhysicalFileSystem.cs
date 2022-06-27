@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.nuget
 
     // ReSharper disable InconsistentNaming
 
+    /*
     public class ChocolateyPhysicalFileSystem : PhysicalFileSystem
     {
         public ChocolateyPhysicalFileSystem(string root)
@@ -32,6 +33,6 @@ namespace chocolatey.infrastructure.app.nuget
             this.AddFiles(files, rootDir, preserveFilePath: true);
         }
     }
-
+    */
     // ReSharper restore InconsistentNaming
 }

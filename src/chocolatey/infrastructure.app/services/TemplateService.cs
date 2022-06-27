@@ -28,6 +28,10 @@ namespace chocolatey.infrastructure.app.services
     using templates;
     using tokens;
     using nuget;
+    using NuGet.Common;
+    using NuGet.PackageManagement;
+    using NuGet.Protocol.Core.Types;
+    using NuGet.Versioning;
     using IFileSystem = filesystem.IFileSystem;
 
     public class TemplateService : ITemplateService
@@ -48,10 +52,11 @@ namespace chocolatey.infrastructure.app.services
         private readonly string _builtInTemplateName = "built-in";
         private readonly string _templateParameterCacheFilename = ".parameters";
 
-        public TemplateService(IFileSystem fileSystem, IXmlService xmlService)
+        public TemplateService(IFileSystem fileSystem, IXmlService xmlService, ILogger logger)
         {
             _fileSystem = fileSystem;
             _xmlService = xmlService;
+            _nugetLogger = logger;
         }
 
         public void generate_noop(ChocolateyConfiguration configuration)
@@ -219,12 +224,6 @@ namespace chocolatey.infrastructure.app.services
 
         public void list(ChocolateyConfiguration configuration)
         {
-            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
-                new PackageDownloader(),
-                installSuccessAction: null,
-                uninstallSuccessAction: null,
-                addUninstallHandler: false);
-
             var templateDirList = _fileSystem.get_directories(ApplicationParameters.TemplatesLocation).ToList();
             var isBuiltInTemplateOverriden = templateDirList.Contains(_fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, _builtInTemplateOverrideName));
             var isBuiltInOrDefaultTemplateDefault = string.IsNullOrWhiteSpace(configuration.DefaultTemplateName) || !templateDirList.Contains(_fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.DefaultTemplateName));
@@ -236,7 +235,7 @@ namespace chocolatey.infrastructure.app.services
                     foreach (var templateDir in templateDirList)
                     {
                         configuration.TemplateCommand.Name = _fileSystem.get_file_name(templateDir);
-                        list_custom_template_info(configuration, packageManager);
+                        list_custom_template_info(configuration);
                     }
 
                     this.Log().Info(configuration.RegularOutput ? "{0} Custom templates found at {1}{2}".format_with(templateDirList.Count(), ApplicationParameters.TemplatesLocation, Environment.NewLine) : string.Empty);
@@ -252,7 +251,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 if (templateDirList.Contains(_fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.TemplateCommand.Name)))
                 {
-                    list_custom_template_info(configuration, packageManager);
+                    list_custom_template_info(configuration);
                     if (configuration.TemplateCommand.Name == _builtInTemplateName || configuration.TemplateCommand.Name == _builtInTemplateOverrideName)
                     {
                         list_built_in_template_info(configuration, isBuiltInTemplateOverriden, isBuiltInOrDefaultTemplateDefault);
@@ -273,12 +272,20 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
-        protected void list_custom_template_info(ChocolateyConfiguration configuration, IPackageManager packageManager)
+        protected void list_custom_template_info(ChocolateyConfiguration configuration)
         {
-            var pkg = packageManager.LocalRepository.FindPackage("{0}.template".format_with(configuration.TemplateCommand.Name));
+            var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, _nugetLogger);
+            var sourceCacheContext = new ChocolateySourceCacheContext(configuration);
+            var pkg = NugetList.find_package(
+                    "{0}.template".format_with(configuration.TemplateCommand.Name),
+                    configuration,
+                    _nugetLogger,
+                    sourceCacheContext,
+                    NugetCommon.GetRepositoryResource<PackageMetadataResource>(packageRepositories));
+
             var templateInstalledViaPackage = (pkg != null);
 
-            var pkgVersion = templateInstalledViaPackage ? pkg.Version.to_string() : "0.0.0";
+            var pkgVersion = templateInstalledViaPackage ? pkg.Identity.Version.to_string() : "0.0.0";
             var pkgTitle = templateInstalledViaPackage ? pkg.Title : "{0} (Unmanaged)".format_with(configuration.TemplateCommand.Name);
             var pkgSummary = templateInstalledViaPackage ?
                 (pkg.Summary != null && !string.IsNullOrWhiteSpace(pkg.Summary.to_string()) ? "{0}".format_with(pkg.Summary.escape_curly_braces().to_string()) : string.Empty) : string.Empty;

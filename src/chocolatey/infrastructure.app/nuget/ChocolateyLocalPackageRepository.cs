@@ -22,9 +22,14 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Linq;
     using System.Runtime.Versioning;
     using System.Threading;
+    using filesystem;
+    using NuGet.Common;
+    using NuGet.Packaging;
+    using NuGet.ProjectManagement;
+    using NuGet.Versioning;
 
     // ReSharper disable InconsistentNaming
-
+    /*
     public class ChocolateyLocalPackageRepository : LocalPackageRepository
     {
         public ChocolateyLocalPackageRepository(string physicalPath)
@@ -71,7 +76,7 @@ namespace chocolatey.infrastructure.app.nuget
             }
         }
 
-        private string GetManifestFilePath(string packageId, SemanticVersion version)
+        private string GetManifestFilePath(string packageId, NuGetVersion version)
         {
             string packageDirectory = PathResolver.GetPackageDirectory(packageId, version);
             string path2 = packageDirectory + Constants.ManifestExtension;
@@ -80,4 +85,5 @@ namespace chocolatey.infrastructure.app.nuget
     }
 
     // ReSharper restore InconsistentNaming
+    */
 }

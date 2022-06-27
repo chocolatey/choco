@@ -24,6 +24,8 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using Moq;
+    using NuGet.Common;
+    using NuGet.Packaging;
     using Should;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
@@ -36,7 +38,7 @@ namespace chocolatey.tests.infrastructure.app.services
             protected Mock<IFileSystem> fileSystem = new Mock<IFileSystem>();
             protected Mock<ILogger> nugetLogger = new Mock<ILogger>();
             protected Mock<IFilesService> filesService = new Mock<IFilesService>();
-            protected Mock<IPackage> package = new Mock<IPackage>();
+            protected Mock<IPackageMetadata> package = new Mock<IPackageMetadata>();
             protected Mock<IPackageDownloader> packageDownloader = new Mock<IPackageDownloader>();
 
             public override void Context()
@@ -47,7 +49,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 filesService.ResetCalls();
                 package.ResetCalls();
 
-                service = new NugetService(fileSystem.Object, nugetLogger.Object, packageInfoService.Object, filesService.Object, packageDownloader.Object);
+                service = new NugetService(fileSystem.Object, nugetLogger.Object, packageInfoService.Object, filesService.Object);
             }
         }
 
@@ -305,7 +307,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 because();
 
-                var infos = MockLogger.MessagesFor(LogLevel.Info);
+                var infos = MockLogger.MessagesFor(tests.LogLevel.Info);
                 infos.Count.ShouldEqual(1);
                 infos[0].ShouldEqual("Chocolatey would have searched for a nuspec file in \"c:\\projects\\chocolatey\" and attempted to compile it.");
             }
@@ -319,7 +321,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 because();
 
-                var infos = MockLogger.MessagesFor(LogLevel.Info);
+                var infos = MockLogger.MessagesFor(tests.LogLevel.Info);
                 infos.Count.ShouldEqual(1);
                 infos[0].ShouldEqual("Chocolatey would have searched for a nuspec file in \"c:\\packages\" and attempted to compile it.");
             }

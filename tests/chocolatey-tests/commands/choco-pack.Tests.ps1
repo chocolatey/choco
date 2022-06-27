@@ -18,10 +18,10 @@ $invalidFailures = @(
     $emptyFailures | ForEach-Object {
         @{id = $_; message = "Invalid URI: The format of the URI could not be determined." }
     }
-    @{id = "version"; message = "'INVALID' is not a valid version string." }
+    @{id = "version"; message = "An error occured while trying to parse the value 'INVALID' of property 'version' in the manifest file." }
     @{id = "no-content"; message = "Cannot create a package that has no dependencies nor content." }
     @{id = "id"; message = "The package ID 'invalid id' contains invalid characters. Examples of valid package IDs include 'MyPackage' and 'MyPackage.Sample'." }
-    @{id = "requirelicenseacceptance"; message = "Enabling license acceptance requires a license url." }
+    @{id = "requirelicenseacceptance"; message = "Enabling license acceptance requires a license or a licenseUrl to be specified. The licenseUrl will be deprecated, consider using the license metadata." }
 )
 
 Describe "choco pack" -Tag Chocolatey, PackCommand {
@@ -164,7 +164,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "Displays serialize error" {
-            $Output.Lines | Should -Contain "The 'http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd:requireLicenseAcceptance' element is invalid - The value '' is invalid according to its datatype 'http://www.w3.org/2001/XMLSchema:boolean' - The string '' is not a valid Boolean value."
+            $Output.Lines | Should -Contain "The 'http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd:requireLicenseAcceptance' element is invalid - The value '' is invalid according to its datatype 'http://www.w3.org/2001/XMLSchema:boolean' - The string '' is not a valid Boolean value. This validation error occurred in a 'requireLicenseAcceptance' element."
         }
 
         It "Does not create the nuget package" {

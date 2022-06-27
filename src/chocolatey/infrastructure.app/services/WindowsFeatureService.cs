@@ -155,7 +155,7 @@ namespace chocolatey.infrastructure.app.services
             get { return SourceTypes.WINDOWS_FEATURES; }
         }
 
-        public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
+        public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
         {
             if (Platform.get_platform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
 
@@ -250,14 +250,14 @@ namespace chocolatey.infrastructure.app.services
             return args;
         }
 
-        public void install_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
             set_executable_path_if_not_set();
             var args = build_args(config, _installArguments);
             this.Log().Info("Would have run '{0} {1}'".format_with(_exePath.escape_curly_braces(), args.escape_curly_braces()));
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
             set_executable_path_if_not_set();
             var args = build_args(config, _installArguments);
@@ -321,27 +321,27 @@ namespace chocolatey.infrastructure.app.services
             return packageResults;
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
             set_executable_path_if_not_set();
             this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement upgrade".format_with(APP_NAME));
             return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction = null)
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null)
         {
             set_executable_path_if_not_set();
             throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
         }
 
-        public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
+        public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
             set_executable_path_if_not_set();
             var args = build_args(config, _uninstallArguments);
             this.Log().Info("Would have run '{0} {1}'".format_with(_exePath.escape_curly_braces(), args.escape_curly_braces()));
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUninstallAction = null)
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
         {
             set_executable_path_if_not_set();
             var args = build_args(config, _uninstallArguments);

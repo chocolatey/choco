@@ -23,6 +23,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.results;
+    using NuGet.Configuration;
     using NUnit.Framework;
     using Should;
 
@@ -39,8 +40,8 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Configuration = Scenario.list();
                 Scenario.reset(Configuration);
-                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "installpackage*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + NuGetConstants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "installpackage*" + NuGetConstants.PackageExtension);
                 Scenario.install_package(Configuration, "installpackage", "1.0.0");
                 Scenario.install_package(Configuration, "upgradepackage", "1.0.0");
 
@@ -437,7 +438,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Configuration = Scenario.list();
                 Scenario.reset(Configuration);
-                Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + NuGetConstants.PackageExtension);
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
 
                 Configuration.ListCommand.Exact = true;
@@ -496,7 +497,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Configuration = Scenario.list();
                 Scenario.reset(Configuration);
-                Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + NuGetConstants.PackageExtension);
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
 
                 Configuration.ListCommand.Exact = true;
@@ -551,7 +552,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Configuration = Scenario.list();
                 Scenario.reset(Configuration);
-                Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + NuGetConstants.PackageExtension);
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
 
                 Configuration.ListCommand.Exact = true;
@@ -580,15 +581,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_find_only_packages_with_exact_id()
             {
-                Results[0].Package.Id.ShouldEqual("exactpackage");
-                Results[1].Package.Id.ShouldEqual("exactpackage");
+                Results[0].PackageMetadata.Id.ShouldEqual("exactpackage");
+                Results[1].PackageMetadata.Id.ShouldEqual("exactpackage");
             }
 
             [Fact]
             public void should_find_all_non_prerelease_versions_in_descending_order()
             {
-                Results[0].Package.Version.ToNormalizedString().ShouldEqual("1.0.0");
-                Results[1].Package.Version.ToNormalizedString().ShouldEqual("0.9.0");
+                Results[0].PackageMetadata.Version.ToNormalizedString().ShouldEqual("1.0.0");
+                Results[1].PackageMetadata.Version.ToNormalizedString().ShouldEqual("0.9.0");
             }
         }
 
@@ -598,7 +599,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Configuration = Scenario.list();
                 Scenario.reset(Configuration);
-                Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + NuGetConstants.PackageExtension);
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
 
                 Configuration.ListCommand.Exact = true;
@@ -628,17 +629,17 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_find_only_packages_with_exact_id()
             {
-                Results[0].Package.Id.ShouldEqual("exactpackage");
-                Results[1].Package.Id.ShouldEqual("exactpackage");
-                Results[2].Package.Id.ShouldEqual("exactpackage");
+                Results[0].PackageMetadata.Id.ShouldEqual("exactpackage");
+                Results[1].PackageMetadata.Id.ShouldEqual("exactpackage");
+                Results[2].PackageMetadata.Id.ShouldEqual("exactpackage");
             }
 
             [Fact]
             public void should_find_all_versions_in_descending_order()
             {
-                Results[0].Package.Version.ToNormalizedString().ShouldEqual("1.0.0");
-                Results[1].Package.Version.ToNormalizedString().ShouldEqual("1.0.0-beta1");
-                Results[2].Package.Version.ToNormalizedString().ShouldEqual("0.9.0");
+                Results[0].PackageMetadata.Version.ToNormalizedString().ShouldEqual("1.0.0");
+                Results[1].PackageMetadata.Version.ToNormalizedString().ShouldEqual("1.0.0-beta1");
+                Results[2].PackageMetadata.Version.ToNormalizedString().ShouldEqual("0.9.0");
             }
         }
     }

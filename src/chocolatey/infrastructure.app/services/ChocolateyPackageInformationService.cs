@@ -23,6 +23,9 @@ namespace chocolatey.infrastructure.app.services
     using configuration;
     using domain;
     using infrastructure.configuration;
+    using NuGet.Packaging;
+    using NuGet.Versioning;
+    using results;
     using tolerance;
     using IFileSystem = filesystem.IFileSystem;
 
@@ -62,7 +65,7 @@ namespace chocolatey.infrastructure.app.services
             _config = config;
         }
 
-        public ChocolateyPackageInformation get_package_information(IPackage package)
+        public ChocolateyPackageInformation get_package_information(IPackageMetadata package)
         {
             var packageInformation = new ChocolateyPackageInformation(package);
             if (package == null)
@@ -165,7 +168,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0.", pa
                 FaultTolerance.try_catch_with_logging_exception(
                 () =>
                     {
-                        packageInformation.VersionOverride = new SemanticVersion(_fileSystem.read_file(versionOverrideFile).trim_safe());
+                        packageInformation.VersionOverride = new NuGetVersion(_fileSystem.read_file(versionOverrideFile).trim_safe());
                     },
                     "Unable to read version override file",
                     throwError: false,
@@ -264,7 +267,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0.", pa
             }
         }
 
-        public void remove_package_information(IPackage package)
+        public void remove_package_information(IPackageMetadata package)
         {
             var pkgStorePath = _fileSystem.combine_paths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".format_with(package.Id, package.Version.to_string()));
             if (_config.RegularOutput) this.Log().Info("Removing Package Information for {0}".format_with(pkgStorePath));
