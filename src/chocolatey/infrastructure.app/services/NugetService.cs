@@ -1007,9 +1007,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             // there may be overrides from the user running upgrade
             if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Username)) config.SourceCommand.Username = originalConfig.SourceCommand.Username;
-            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Password)) config.SourceCommand.Username = originalConfig.SourceCommand.Password;
-            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Certificate)) config.SourceCommand.Username = originalConfig.SourceCommand.Certificate;
-            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword)) config.SourceCommand.Username = originalConfig.SourceCommand.CertificatePassword;
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Password)) config.SourceCommand.Password = originalConfig.SourceCommand.Password;
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Certificate)) config.SourceCommand.Certificate = originalConfig.SourceCommand.Certificate;
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword)) config.SourceCommand.CertificatePassword = originalConfig.SourceCommand.CertificatePassword;
 
             return originalConfig;
         }
