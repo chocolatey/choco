@@ -59,7 +59,7 @@ namespace chocolatey.infrastructure.platforms
                     return PlatformType.Mac;
 
                 case PlatformID.Unix:
-                    // Well, there are chances MacOSX is reported as Unix instead of MacOSX.
+                    // Well, there are chances macOS is reported as Unix instead of macOS (MacOSX).
                     // Instead of platform check, we'll do a feature checks (Mac specific root folders)
                     if (file_system.directory_exists("/Applications")
                         & file_system.directory_exists("/System")
@@ -85,7 +85,7 @@ namespace chocolatey.infrastructure.platforms
                 case PlatformType.Linux:
                     return "Linux";
                 case PlatformType.Mac:
-                    return "OS X";
+                    return "macOS";
                 case PlatformType.Windows:
                     return get_windows_name(get_version());
                 default:

@@ -2,7 +2,7 @@
 set -eo pipefail
 
 ##########################################################################
-# This is the Cake bootstrapper script for Linux and OS X.
+# This is the Cake bootstrapper script for Linux and macOS.
 # This file was downloaded from https://github.com/cake-build/resources
 # Feel free to change this file to fit your needs.
 ##########################################################################
@@ -23,7 +23,7 @@ export CAKE_PATHS_TOOLS=$TOOLS_DIR
 export CAKE_PATHS_ADDINS=$ADDINS_DIR
 export CAKE_PATHS_MODULES=$MODULES_DIR
 
-# Define md5sum or md5 depending on Linux/OSX
+# Define md5sum or md5 depending on Linux / macOS
 MD5_EXE=
 if [[ "$(uname -s)" == "Darwin" ]]; then
     MD5_EXE="md5 -r"

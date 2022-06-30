@@ -650,7 +650,7 @@ namespace chocolatey.infrastructure.filesystem
         {
             if (string.IsNullOrWhiteSpace(directoryPath) || string.IsNullOrWhiteSpace(newDirectoryPath)) throw new ApplicationException("You must provide a directory to move from or to.");
 
-            //Linux/MacOS do not have a SystemDrive environment variable, instead, everything is under "/"
+            // Linux / macOS do not have a SystemDrive environment variable, instead, everything is under "/"
             var systemDrive = Platform.get_platform() == PlatformType.Windows ? Environment.GetEnvironmentVariable("SystemDrive") : "/";
             if (combine_paths(directoryPath, "").is_equal_to(combine_paths(systemDrive, ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
 
@@ -745,7 +745,7 @@ namespace chocolatey.infrastructure.filesystem
         {
             if (string.IsNullOrWhiteSpace(directoryPath)) throw new ApplicationException("You must provide a directory to delete.");
 
-            //Linux / MacOS do not have a SystemDrive environment variable, instead, everything is under "/"
+            // Linux / macOS do not have a SystemDrive environment variable, instead, everything is under "/"
             var systemDrive = Platform.get_platform() == PlatformType.Windows ? Environment.GetEnvironmentVariable("SystemDrive") : "/";
             if (combine_paths(directoryPath, "").is_equal_to(combine_paths(systemDrive, ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
 
