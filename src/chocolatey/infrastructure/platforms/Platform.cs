@@ -126,7 +126,15 @@ namespace chocolatey.infrastructure.platforms
             switch (majorMinor)
             {
                 case "10.0":
-                    name = isServer ? "Windows Server 2016" : "Windows 10";
+                    if (isServer)
+                    {
+                        name = (version.Build < 20348) ? (version.Build < 17763) ?
+                            "Windows Server 2016" : "Windows Server 2019" : "Windows Server 2022";
+                    }
+                    else
+                    {
+                        name = (version.Build < 22000) ? "Windows 10" : "Windows 11";
+                    }
                     break;
                 case "6.4":
                     name = isServer ? "Windows Server 2016" : "Windows 10";
