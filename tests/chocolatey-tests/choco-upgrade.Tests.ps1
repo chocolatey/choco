@@ -1,4 +1,4 @@
-﻿Import-Module helpers/common-helpers
+Import-Module helpers/common-helpers
 
 Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
     BeforeAll {
@@ -50,7 +50,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It "Outputs a message showing that upgrading was successful" {
-            $Output.String | SHould -Match "Chocolatey upgraded 3/3 packages\."
+            $Output.String | Should -Match "Chocolatey upgraded 3/3 packages\."
         }
     }
 
@@ -99,7 +99,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It "Outputs a message showing that upgrading was successful" {
-            $Output.String | SHould -Match "Chocolatey upgraded 2/2 packages\."
+            $Output.String | Should -Match "Chocolatey upgraded 2/2 packages\."
         }
     }
 
@@ -149,7 +149,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It "Outputs a message showing that upgrading was successful" {
-            $Output.String | SHould -Match "Chocolatey upgraded 2/2 packages\."
+            $Output.String | Should -Match "Chocolatey upgraded 2/2 packages\."
         }
     }
 }
