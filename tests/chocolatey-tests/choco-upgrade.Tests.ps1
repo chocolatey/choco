@@ -1,4 +1,4 @@
-Import-Module helpers/common-helpers
+﻿Import-Module helpers/common-helpers
 
 Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
     BeforeAll {
@@ -11,7 +11,8 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         Remove-ChocolateyTestInstall
     }
 
-    Context "Can upgrade packages with dependencies containing side by side installations and outdated dependency" {
+    # This was fixed in https://github.com/chocolatey/choco/pull/2726. Need skip it if we're on an older version.
+    Context "Can upgrade packages with dependencies containing side by side installations and outdated dependency" -Skip:(-Not (Test-ChocolateyVersionEqualOrHigherThan "1.2.0-alpha")) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -54,7 +55,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
     }
 
-    Context "Can upgrade packages with dependencies containing side by side installations and up to date dependency" {
+    Context "Can upgrade packages with dependencies containing side by side installations and up to date dependency" -Skip:(-Not (Test-ChocolateyVersionEqualOrHigherThan "1.2.0-alpha")) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -104,7 +105,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
     }
 
 
-    Context "Can upgrade packages with dependencies containing outdated side by side installations and up to date dependency" {
+    Context "Can upgrade packages with dependencies containing outdated side by side installations and up to date dependency" -Skip:(-Not (Test-ChocolateyVersionEqualOrHigherThan "1.2.0-alpha")) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
