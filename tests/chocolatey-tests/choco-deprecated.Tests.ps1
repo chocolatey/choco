@@ -1,6 +1,15 @@
 ﻿Import-Module helpers/common-helpers
 
 Describe "choco deprecated shims" -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0")) -Tag Chocolatey, DeprecatedShims {
+    BeforeAll {
+        Initialize-ChocolateyTestInstall
+        New-ChocolateyInstallSnapshot
+    }
+
+    AfterAll {
+        Remove-ChocolateyTestInstall
+    }
+
     BeforeDiscovery {
         $DeprecatedShims = @(
             @{ Command = 'help'; Deprecation = 'none' }
@@ -60,6 +69,7 @@ Describe "Deprecated Chocolatey Helper Commands" -Skip:(-not (Test-ChocolateyVer
 
     AfterAll {
         Remove-Item "./$PackageName" -Recurse -Force -ErrorAction Ignore
+        Remove-ChocolateyTestInstall
     }
     It 'should not mention Get-BinRoot in any of the generated files' {
         $TemplateOutput | Should -BeNullOrEmpty -Because 'Get-BinRoot has been deprecated and removed from the template'

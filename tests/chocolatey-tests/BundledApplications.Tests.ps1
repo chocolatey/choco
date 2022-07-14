@@ -6,6 +6,7 @@ Describe 'Ensuring correct version of <Name> is installed' -Tag BundledApplicati
 ) -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0")) {
     Context '<Name> is correctly installed' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan $ChocolateyVersion)) {
         BeforeAll {
+            # Because we're not modifying the install in any way, there is no need to Initialize-ChocolateyTestInstall
             $ToolPath = "$env:ChocolateyInstall/tools/$Name.exe"
             # TODO: Encapsulate in an environment variable once kitchen-pester has new version - https://github.com/chocolatey/choco/issues/2692
             $Thumbprint = '83AC7D88C66CB8680BCE802E0F0F5C179722764B'

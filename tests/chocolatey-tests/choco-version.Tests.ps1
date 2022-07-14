@@ -1,7 +1,16 @@
 ﻿Import-Module helpers/common-helpers
 
 Describe "choco version" -Tag Chocolatey, VersionCommand -Skip:(Test-ChocolateyVersionEqualOrHigherThan "1.0.0") {
-    Context "Something" {
+    BeforeAll {
+        Initialize-ChocolateyTestInstall
+        New-ChocolateyInstallSnapshot
+    }
+
+    AfterAll {
+        Remove-ChocolateyTestInstall
+    }
+
+    Context "Version" {
         BeforeAll {
             $Output = Invoke-Choco version
         }

@@ -40,7 +40,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     AfterAll {
-        Remove-ChocolateyInstallSnapshot
+        Remove-ChocolateyTestInstall
     }
 
     Context 'Chocolatey' {

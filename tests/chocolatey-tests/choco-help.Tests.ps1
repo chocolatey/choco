@@ -28,6 +28,12 @@ Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolate
 
     BeforeAll {
         $helpArgument = $_
+        Initialize-ChocolateyTestInstall
+        New-ChocolateyInstallSnapshot
+    }
+
+    AfterAll {
+        Remove-ChocolateyTestInstall
     }
 
     Context "Top Level Help" {

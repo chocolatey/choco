@@ -8,7 +8,7 @@ Describe "choco outdated" -Tag Chocolatey, OutdatedCommand {
     }
 
     AfterAll {
-        Remove-ChocolateyInstallSnapshot
+        Remove-ChocolateyTestInstall
     }
 
     Context "outdated ignore-pinned uses correct enhanced exit codes" -Foreach @(

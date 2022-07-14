@@ -9,7 +9,7 @@ Describe "Ensuring removed things are removed" -Tag Removed, Chocolatey {
     }
 
     AfterAll {
-        Remove-ChocolateyInstallSnapshot
+        Remove-ChocolateyTestInstall
     }
 
     Context 'Helper function (<FunctionName>)' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0')) -Foreach @(
