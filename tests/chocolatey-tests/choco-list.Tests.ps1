@@ -126,11 +126,11 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand {
         }
 
         It "Contains packages and versions with a space between them" {
-            $Output.Lines | Should -Contain "upgradepackage 1.0.0"
+            ($Output.Lines -like "upgradepackage *").Count | Should -BeLessOrEqual 4
         }
 
         It "Should not contain pipe-delimited packages and versions" {
-            $Output.Lines | Should -Not -Contain "upgradepackage|1.0.0"
+            ($Output.Lines -like "upgradepackage|*").Count | Should -Be 0
         }
 
         It "Should contain a summary" {
