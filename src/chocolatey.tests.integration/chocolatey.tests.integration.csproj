@@ -240,6 +240,18 @@
     <None Include="context\exactpackage\exactpackage\1.0.0\exactpackage.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\portablepackage\1.0.0\portablepackage.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\portablepackage\1.0.0\tools\Casemismatch.exe.ignore">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\portablepackage\1.0.0\tools\graphical.exe.gui">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\portablepackage\1.0.0\tools\not.installed.exe.ignore">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\installpackage\1.0.0\installpackage.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -346,6 +358,168 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="context\nonterminatingerror\1.0\tools\chocolateyInstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\dontrun.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-beforemodify-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-beforemodify-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-beforemodify-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-install-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-install-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-install-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-uninstall-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-uninstall-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-uninstall-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-upgrade-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-upgrade-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\post-upgrade-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-beforemodify-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-beforemodify-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-beforemodify-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-install-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-install-doesnotexist.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-install-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-install-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-uninstall-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-uninstall-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-uninstall-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-upgrade-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-upgrade-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\hook\pre-upgrade-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\1.0.0\scriptpackage.hook.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\dontrun.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-beforemodify-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-beforemodify-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-beforemodify-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-install-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-install-doesnotexist.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-install-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-install-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-uninstall-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-uninstall-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-uninstall-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-upgrade-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-upgrade-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\post-upgrade-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-beforemodify-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-beforemodify-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-beforemodify-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-install-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-install-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-install-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-uninstall-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-uninstall-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-uninstall-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-upgrade-all.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-upgrade-installpackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\hook\pre-upgrade-upgradepackage.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\scriptpackage.hook\2.0.0\scriptpackage.hook.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="context\testing.packages.config">
@@ -500,6 +674,18 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="context\upgradepackage\1.1.1-beta\tools\graphical.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\portablepackage\1.0.0\tools\casemismatch.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\portablepackage\1.0.0\tools\console.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\portablepackage\1.0.0\tools\graphical.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\portablepackage\1.0.0\tools\not.installed.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="infrastructure\filesystem\CopyMe.txt">

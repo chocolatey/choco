@@ -18,6 +18,7 @@ namespace chocolatey.tests.integration.scenarios
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Threading;
@@ -3171,6 +3172,357 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
                 upgradePackageResult.Count.ShouldEqual(0, "upgradepackage should not be in the results list");
+            }
+        }
+
+        public class when_upgrading_an_existing_hook_package : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Scenario.add_packages_to_source_location(Configuration, "scriptpackage.hook" + ".1.0.0" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "scriptpackage.hook", "1.0.0");
+                Configuration.PackageNames = Configuration.Input = "scriptpackage.hook";
+                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + ".2.0.0" + Constants.PackageExtension);
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_upgrade_where_install_location_reports()
+            {
+                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_upgrade_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("2.0.0.0");
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_with_old_and_new_versions()
+            {
+                bool upgradeMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("You have scriptpackage.hook v1.0.0 installed. Version 2.0.0 is available based on your source")) upgradeMessage = true;
+                }
+
+                upgradeMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_match_the_upgrade_version_of_two_dot_zero_dot_zero()
+            {
+                _packageResult.Version.ShouldEqual("2.0.0");
+            }
+
+            [Fact]
+            public void should_have_a_hooks_folder_for_the_package()
+            {
+                var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty));
+
+                Directory.Exists(hooksDirectory).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_hook_scripts_to_folder()
+            {
+                var hookScripts = new List<string> { "pre-install-all.ps1", "post-install-all.ps1", "pre-upgrade-all.ps1", "post-upgrade-all.ps1", "pre-uninstall-all.ps1", "post-uninstall-all.ps1" };
+                foreach (string scriptName in hookScripts)
+                {
+                    var hookScriptPath = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), scriptName);
+                    File.ReadAllText(hookScriptPath).ShouldContain("Write-Output");
+                }
+            }
+
+            [Fact]
+            public void should_remove_files_not_in_upgrade_version()
+            {
+                var hookScriptPath = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), "pre-install-doesnotexist.ps1");
+                File.Exists(hookScriptPath).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_install_new_files_in_upgrade_version()
+            {
+                var hookScriptPath = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), "post-install-doesnotexist.ps1");
+                File.Exists(hookScriptPath).ShouldBeTrue();
+            }
+        }
+
+        public class when_upgrading_an_existing_package_happy_path_with_hooks : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Scenario.add_packages_to_source_location(Configuration, "scriptpackage.hook" + "*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "scriptpackage.hook", "1.0.0");
+                Configuration.PackageNames = Configuration.Input = "upgradepackage";
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_upgrade_where_install_location_reports()
+            {
+                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_upgrade_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_newer_version_in_directory()
+            {
+                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+
+                File.ReadAllText(shimFile).ShouldEqual("1.1.0");
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.1.0.0");
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_with_old_and_new_versions()
+            {
+                bool upgradeMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source")) upgradeMessage = true;
+                }
+
+                upgradeMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_match_the_upgrade_version_of_one_dot_one_dot_zero()
+            {
+                _packageResult.Version.ShouldEqual("1.1.0");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_before_chocolateyInstall()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null()
+                    .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
+                    .Any(p => p.EndsWith("upgradepackage 1.1.0 Installed"))
+                    .ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyUninstall_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.0 Before Modification", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyInstall_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.0 Installed", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_pre_all_hook_script()
+            {
+                MockLogger.contains_message("pre-install-all.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_post_all_hook_script()
+            {
+                MockLogger.contains_message("post-install-all.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_pre_upgradepackage_hook_script()
+            {
+                MockLogger.contains_message("pre-install-upgradepackage.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_post_upgradepackage_hook_script()
+            {
+                MockLogger.contains_message("post-install-upgradepackage.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_have_executed_uninstall_hook_script()
+            {
+                MockLogger.contains_message("post-uninstall-all.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_have_executed_installpackage_hook_script()
+            {
+                MockLogger.contains_message("pre-install-installpackage.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_beforemodify_hook_script_for_previous_version()
+            {
+                MockLogger.contains_message("pre-beforemodify-all.ps1 hook ran for upgradepackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_have_executed_beforemodify_hook_script_for_upgrade_version()
+            {
+                MockLogger.contains_message("pre-beforemodify-all.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeFalse();
             }
         }
     }

@@ -169,6 +169,18 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 optionSet.Contains("n").ShouldBeTrue();
             }
+
+            [Fact]
+            public void should_add_skip_hooks_to_the_option_set()
+            {
+                optionSet.Contains("skip-hooks").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_short_version_of_skip_hooks_to_the_option_set()
+            {
+                optionSet.Contains("skiphooks").ShouldBeTrue();
+            }
         }
 
         public class when_handling_additional_argument_parsing : ChocolateyUninstallCommandSpecsBase
