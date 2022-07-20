@@ -19,24 +19,25 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net;
+    using NuGet;
     using adapters;
-    using chocolatey.infrastructure.app.utility;
     using commandline;
     using configuration;
     using domain;
     using guards;
     using logging;
     using nuget;
-    using NuGet;
     using platforms;
     using results;
     using tolerance;
     using DateTime = adapters.DateTime;
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
+    using chocolatey.infrastructure.app.utility;
 
     //todo: #2575 - this monolith is too large. Refactor once test coverage is up.
 
@@ -617,13 +618,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 uninstallSuccessAction: null,
                 addUninstallHandler: false);
 
-            var localRepository = packageManager.LocalRepository as ChocolateyLocalPackageRepository;
-
-            if (localRepository != null)
-            {
-                localRepository.IgnoreVersionedDirectories = !config.AllowMultipleVersions;
-            }
-
             var configIgnoreDependencies = config.IgnoreDependencies;
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
@@ -933,7 +927,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                SemanticVersion version = null;
+                SemanticVersion version =  null;
                 var latestPackage = NugetList.find_package(packageName, null, config, packageManager.SourceRepository);
 
                 if (latestPackage == null)
@@ -1118,7 +1112,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 // script could be incorrectly left in place during an upgrade operation.  To guard against this,
                 // remove any Chocolatey Packaging scripts, which will then be restored by the new package, if
                 // they are still required
-                var filesToDelete = new List<string> { "chocolateyinstall", "chocolateyuninstall", "chocolateybeforemodify" };
+                var filesToDelete = new List<string> {"chocolateyinstall", "chocolateyuninstall", "chocolateybeforemodify"};
                 var packagingScripts = _fileSystem.get_files(directoryPath, "*.ps1", SearchOption.AllDirectories)
                     .Where(p => filesToDelete.Contains(_fileSystem.get_file_name_without_extension(p).to_lower()));
 
