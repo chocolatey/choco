@@ -48,7 +48,7 @@ jobs:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Test with NUnit on .Net Framework
-      run: .\build.bat  --verbosity=diagnostic --target=test --testExecutionType=all
+      run: .\build.bat  --verbosity=diagnostic --target=test --testExecutionType=all --shouldRunOpenCover=false
     - name: Upload Windows build results
       uses: actions/upload-artifact@v2
       # Always upload build results
