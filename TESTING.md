@@ -14,11 +14,13 @@ The NUnit tests get run automatically when you run `./build.bat` or `./build.sh`
 
 ### NUnit Integration Tests
 
-If you need to run the integration tests, you can do so using: `./build.bat --target=test-nunit --exclusive --testExecutionType=integration`, or `./build.sh --target=test-nunit --exclusive --testExecutionType=integration`.
+If you need to run the integration tests, you can do so using: `./build.bat --target=test-nunit --exclusive --testExecutionType=integration --shouldRunOpenCover=false`, or `./build.sh --target=test-nunit --exclusive --testExecutionType=integration --shouldRunOpenCover=false`.
 
 ### All NUnit Integration Tests
 
-If you need to run all the tests, you can do so using: `./build.bat --target=test-nunit --exclusive --testExecutionType=all`, or `./build.sh --target=test-nunit --exclusive --testExecutionType=all`.
+If you need to run all the tests, you can do so using: `./build.bat --target=test-nunit --exclusive --testExecutionType=all --shouldRunOpenCover=false`, or `./build.sh --target=test-nunit --exclusive --testExecutionType=all --shouldRunOpenCover=false`.
+
+The `shouldRunOpenCover` argument is required when running the integration tests because some of the integration tests rely on the standard output and error output, which is not available when run via OpenCover. This switch changes the NUnit tests to run on NUnit directly, instead of on NUnit via OpenCover.
 
 ### Skipping NUnit Tests
 
