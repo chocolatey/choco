@@ -66,8 +66,8 @@ namespace chocolatey.infrastructure.extractors
         /// <param name="overwriteExisting">
         ///   if set to <c>true</c> [overwrite existing].
         /// </param>
-        /// <param name="throwError">Throw an error if there are issues</param>
-        public static void extract_binary_file_from_assembly(IFileSystem fileSystem, IAssembly assembly, string manifestLocation, string filePath, bool overwriteExisting = false, bool throwError = true)
+        /// <param name="throwEror">Throw an error if there are issues</param>
+        public static void extract_binary_file_from_assembly(IFileSystem fileSystem, IAssembly assembly, string manifestLocation, string filePath, bool overwriteExisting = false, bool throwEror = true)
         {
             if (overwriteExisting || !fileSystem.file_exists(filePath))
             {
@@ -78,10 +78,10 @@ namespace chocolatey.infrastructure.extractors
                         fileSystem.write_file(filePath, () => assembly.get_manifest_stream(manifestLocation));
                     },
                    errorMessage:"Unable to extract binary",
-                   throwError: throwError, 
+                   throwError: throwEror,
                    logWarningInsteadOfError: false,
-                   logDebugInsteadOfError: !throwError,
-                   isSilent: !throwError);
+                   logDebugInsteadOfError: !throwEror,
+                   isSilent: !throwEror);
             }
         }
 
