@@ -13,7 +13,7 @@ $global:VerbosePreference = "SilentlyContinue"
 if ($env:ChocolateyEnvironmentVerbose -eq 'true') { $global:VerbosePreference = "Continue"; $verbosity = $true }
 
 Write-Debug '---------------------------Script Execution---------------------------'
-Write-Debug "Running 'ChocolateyScriptRunner' for $($env:packageName) v$($env:packageVersion) with packageScript `'$packageScript`', packageFolder:`'$($env:packageFolder)`', installArguments: `'$installArguments`', packageParameters: `'$packageParameters`',"
+Write-Debug "Running 'ChocolateyScriptRunner' for $($env:packageName) v$($env:packageVersion) with packageScript '$packageScript', packageFolder:'$($env:packageFolder)', installArguments: '$installArguments', packageParameters: '$packageParameters',"
 
 ## Set the culture to invariant
 $currentThread = [System.Threading.Thread]::CurrentThread;
