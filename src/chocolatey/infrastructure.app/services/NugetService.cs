@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,9 +72,9 @@ namespace chocolatey.infrastructure.app.services
             _packageDownloader = packageDownloader;
         }
 
-        public SourceType SourceType
+        public string SourceType
         {
-            get { return SourceType.normal; }
+            get { return SourceTypes.NORMAL; }
         }
 
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)

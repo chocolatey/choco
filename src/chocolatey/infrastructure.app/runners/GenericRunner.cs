@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.runners
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using chocolatey.infrastructure.app.services;
     using events;
     using filesystem;
     using infrastructure.events;
@@ -70,7 +71,7 @@ namespace chocolatey.infrastructure.app.runners
                     warn_when_admin_needs_elevation(config);
                 }
 
-                set_source_type(config);
+                set_source_type(config, container);
                 // guaranteed that all settings are set.
                 EnvironmentSettings.set_environment_variables(config);
 
@@ -112,13 +113,20 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             return command;
         }
 
-        private void set_source_type(ChocolateyConfiguration config)
+        private void set_source_type(ChocolateyConfiguration config, Container container)
         {
-            var sourceType = SourceType.normal;
-            Enum.TryParse(config.Sources, true, out sourceType);
+            var sourceRunner = container.GetAllInstances<ISourceRunner>()
+                .FirstOrDefault(s => s.SourceType.is_equal_to(config.Sources) || s.SourceType.is_equal_to(config.Sources + "s"));
+
+            var sourceType = SourceTypes.NORMAL;
+            if (sourceRunner != null)
+            {
+                sourceType = sourceRunner.SourceType;
+            }
+
             config.SourceType = sourceType;
 
-            this.Log().Debug(() => "The source '{0}' evaluated to a '{1}' source type".format_with(config.Sources, sourceType.to_string()));
+            this.Log().Debug(() => "The source '{0}' evaluated to a '{1}' source type".format_with(config.Sources, sourceType));
         }
 
         public void fail_when_license_is_missing_or_invalid_if_requested(ChocolateyConfiguration config)

@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +35,7 @@ namespace chocolatey.infrastructure.app.configuration
             RegularOutput = true;
             PromptForConfirmation = true;
             DisableCompatibilityChecks = false;
-            SourceType = SourceType.normal;
+            SourceType = SourceTypes.NORMAL;
             Information = new InformationCommandConfiguration();
             Features = new FeaturesConfiguration();
             NewCommand = new NewCommandConfiguration();
@@ -154,7 +154,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         ///   One or more source locations set by configuration or by command line. Separated by semi-colon
         /// </summary>
         public string Sources { get; set; }
-        public SourceType SourceType { get; set; }
+        public string SourceType { get; set; }
 
         // top level commands
 

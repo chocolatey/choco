@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -135,26 +135,26 @@ Did you know Pro / Business automatically syncs with Programs and
 
         private void perform_source_runner_action(ChocolateyConfiguration config, Action<ISourceRunner> action)
         {
-            var runner = _sourceRunners.FirstOrDefault(r => r.SourceType == config.SourceType);
+            var runner = get_source_runner(config.SourceType);
             if (runner != null && action != null)
             {
                 action.Invoke(runner);
             }
             else
             {
-                this.Log().Warn("No runner was found that implements source type '{0}' or action was missing".format_with(config.SourceType.to_string()));
+                this.Log().Warn("No runner was found that implements source type '{0}' or action was missing".format_with(config.SourceType));
             }
         }
 
         private T perform_source_runner_function<T>(ChocolateyConfiguration config, Func<ISourceRunner, T> function)
         {
-            var runner = _sourceRunners.FirstOrDefault(r => r.SourceType == config.SourceType);
+            var runner = get_source_runner(config.SourceType);
             if (runner != null && function != null)
             {
                 return function.Invoke(runner);
             }
 
-            this.Log().Warn("No runner was found that implements source type '{0}' or function was missing.".format_with(config.SourceType.to_string()));
+            this.Log().Warn("No runner was found that implements source type '{0}' or function was missing.".format_with(config.SourceType));
             return default(T);
         }
 
@@ -180,7 +180,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
             foreach (var package in perform_source_runner_function(config, r => r.list_run(config)))
             {
-                if (config.SourceType == SourceType.normal)
+                if (config.SourceType.is_equal_to(SourceTypes.NORMAL))
                 {
                     if (!config.ListCommand.IncludeRegistryPrograms)
                     {
@@ -239,7 +239,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public void pack_noop(ChocolateyConfiguration config)
         {
-            if (config.SourceType != SourceType.normal)
+            if (!config.SourceType.is_equal_to(SourceTypes.NORMAL))
             {
                 this.Log().Warn(ChocolateyLoggers.Important, "This source doesn't provide a facility for packaging.");
                 return;
@@ -251,7 +251,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public virtual void pack_run(ChocolateyConfiguration config)
         {
-            if (config.SourceType != SourceType.normal)
+            if (!config.SourceType.is_equal_to(SourceTypes.NORMAL))
             {
                 this.Log().Warn(ChocolateyLoggers.Important, "This source doesn't provide a facility for packaging.");
                 return;
@@ -263,7 +263,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public void push_noop(ChocolateyConfiguration config)
         {
-            if (config.SourceType != SourceType.normal)
+            if (!config.SourceType.is_equal_to(SourceTypes.NORMAL))
             {
                 this.Log().Warn(ChocolateyLoggers.Important, "This source doesn't provide a facility for pushing.");
                 return;
@@ -275,7 +275,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public virtual void push_run(ChocolateyConfiguration config)
         {
-            if (config.SourceType != SourceType.normal)
+            if (!config.SourceType.is_equal_to(SourceTypes.NORMAL))
             {
                 this.Log().Warn(ChocolateyLoggers.Important, "This source doesn't provide a facility for pushing.");
                 return;
@@ -291,7 +291,7 @@ Did you know Pro / Business automatically syncs with Programs and
             foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, new ConcurrentDictionary<string, PackageResult>()).or_empty_list_if_null())
             {
                 Action<PackageResult> action = null;
-                if (packageConfig.SourceType == SourceType.normal)
+                if (packageConfig.SourceType.is_equal_to(SourceTypes.NORMAL))
                 {
                     action = (pkg) => _powershellService.install_noop(pkg);
                 }
@@ -595,7 +595,7 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
                 foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, packageInstalls).or_empty_list_if_null())
                 {
                     Action<PackageResult> action = null;
-                    if (packageConfig.SourceType == SourceType.normal)
+                    if (packageConfig.SourceType.is_equal_to(SourceTypes.NORMAL))
                     {
                         action = (packageResult) => handle_package_result(packageResult, packageConfig, CommandNameType.install);
                     }
@@ -631,7 +631,7 @@ Would have determined packages that are out of date based on what is
 
         public virtual void outdated_run(ChocolateyConfiguration config)
         {
-            if (config.SourceType != SourceType.normal)
+            if (!config.SourceType.is_equal_to(SourceTypes.NORMAL))
             {
                 this.Log().Warn(ChocolateyLoggers.Important, "This source doesn't provide a facility for outdated.");
                 return;
@@ -736,8 +736,12 @@ Would have determined packages that are out of date based on what is
                     if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
                     if (pkgSettings.ApplyInstallArgumentsToDependencies) packageConfig.ApplyInstallArgumentsToDependencies = true;
                     if (pkgSettings.ApplyPackageParametersToDependencies) packageConfig.ApplyPackageParametersToDependencies = true;
-                    SourceType sourceType;
-                    if (Enum.TryParse(pkgSettings.Source, true, out sourceType)) packageConfig.SourceType = sourceType;
+                    
+                    if (!string.IsNullOrWhiteSpace(pkgSettings.Source) && has_source_type(pkgSettings.Source))
+                    {
+                        packageConfig.SourceType = pkgSettings.Source;
+                    }
+
                     if (pkgSettings.PinPackage) packageConfig.PinPackage = true;
                     if (pkgSettings.Force) packageConfig.Force = true;
                     packageConfig.CommandExecutionTimeoutSeconds = pkgSettings.ExecutionTimeout == -1 ? packageConfig.CommandExecutionTimeoutSeconds : pkgSettings.ExecutionTimeout;
@@ -792,7 +796,7 @@ Would have determined packages that are out of date based on what is
         public void upgrade_noop(ChocolateyConfiguration config)
         {
             Action<PackageResult> action = null;
-            if (config.SourceType == SourceType.normal)
+            if (config.SourceType.is_equal_to(SourceTypes.NORMAL))
             {
                 action = (pkg) => _powershellService.install_noop(pkg);
             }
@@ -831,7 +835,7 @@ Would have determined packages that are out of date based on what is
             try
             {
                 Action<PackageResult> action = null;
-                if (config.SourceType == SourceType.normal)
+                if (config.SourceType.is_equal_to(SourceTypes.NORMAL))
                 {
                     action = (packageResult) => handle_package_result(packageResult, config, CommandNameType.upgrade);
                 }
@@ -875,7 +879,7 @@ Would have determined packages that are out of date based on what is
         public void uninstall_noop(ChocolateyConfiguration config)
         {
             Action<PackageResult> action = null;
-            if (config.SourceType == SourceType.normal)
+            if (config.SourceType.is_equal_to(SourceTypes.NORMAL))
             {
                 action = (pkg) =>
                 {
@@ -903,7 +907,7 @@ Would have determined packages that are out of date based on what is
             try
             {
                 Action<PackageResult> action = null;
-                if (config.SourceType == SourceType.normal)
+                if (config.SourceType.is_equal_to(SourceTypes.NORMAL))
                 {
                     action = (packageResult) => handle_package_uninstall(packageResult, config);
                 }
@@ -1295,6 +1299,11 @@ ATTENTION: You must take manual action to remove {1} from
             }
         }
 
+        private bool has_source_type(string source)
+        {
+            return _sourceRunners.Any(s => s.SourceType == source || s.SourceType == source + "s");
+        }
+
         private void move_bad_package_to_failure_location(PackageResult packageResult)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageFailuresLocation);
@@ -1491,6 +1500,13 @@ ATTENTION: You must take manual action to remove {1} from
                     }
                 }
             }
+        }
+
+        private ISourceRunner get_source_runner(string sourceType)
+        {
+            // We add the trailing s to the check in case of windows feature which can be specified both with and without
+            // the s.
+            return _sourceRunners.FirstOrDefault(s => s.SourceType == sourceType || s.SourceType == sourceType + "s");
         }
     }
 }
