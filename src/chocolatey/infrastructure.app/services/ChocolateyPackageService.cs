@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -322,7 +322,7 @@ Did you know Pro / Business automatically syncs with Programs and
                         // doesn't like to grab the max value.
                         var messageCount = _proBusinessMessages.Count;
                         var chosenMessage = new Random().Next(0, messageCount);
-                        if (chosenMessage >= messageCount) chosenMessage = messageCount -1;
+                        if (chosenMessage >= messageCount) chosenMessage = messageCount - 1;
                         message = _proBusinessMessages[chosenMessage];
                     }
 
@@ -438,9 +438,9 @@ Did you know Pro / Business automatically syncs with Programs and
 
             remove_pending(packageResult, config);
 
-            if(_rebootExitCodes.Contains(packageResult.ExitCode))
+            if (_rebootExitCodes.Contains(packageResult.ExitCode))
             {
-                if(config.Features.ExitOnRebootDetected)
+                if (config.Features.ExitOnRebootDetected)
                 {
                     Environment.ExitCode = ApplicationParameters.ExitCodes.ErrorInstallSuspend;
                     this.Log().Warn(ChocolateyLoggers.Important, @"Chocolatey has detected a pending reboot after installing/upgrading
@@ -471,7 +471,7 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
             var installerDetected = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType);
             if (!string.IsNullOrWhiteSpace(installLocation))
             {
-                 this.Log().Info(ChocolateyLoggers.Important, "  Software installed to '{0}'".format_with(installLocation.escape_curly_braces()));
+                this.Log().Info(ChocolateyLoggers.Important, "  Software installed to '{0}'".format_with(installLocation.escape_curly_braces()));
             }
             else if (!string.IsNullOrWhiteSpace(installerDetected))
             {
@@ -688,7 +688,7 @@ Would have determined packages that are out of date based on what is
 
                 foreach (var packageConfig in get_packages_from_config(packageConfigFile, config, packageInstalls).or_empty_list_if_null())
                 {
-                   yield return packageConfig;
+                    yield return packageConfig;
                 }
             }
 
@@ -973,7 +973,7 @@ If a package is failing because it is a dependency of another package
                     actionName,
                     successes.Count(),
                     packageResults.Count,
-                    (failures > 0) ? failures + " packages failed.": string.Empty,
+                    (failures > 0) ? failures + " packages failed." : string.Empty,
                     _fileSystem.combine_paths(ApplicationParameters.LoggingLocation, ApplicationParameters.LoggingFile)
                     ));
 
@@ -981,7 +981,7 @@ If a package is failing because it is a dependency of another package
             if (packageResults.Count >= 5 && successes.Count() != 0)
             {
                 this.Log().Info("");
-                this.Log().Warn("{0}{1}:".format_with(actionName.Substring(0,1).ToUpper(), actionName.Substring(1)));
+                this.Log().Warn("{0}{1}:".format_with(actionName.Substring(0, 1).ToUpper(), actionName.Substring(1)));
                 foreach (var packageResult in successes.or_empty_list_if_null())
                 {
                     this.Log().Info(" - {0} v{1}".format_with(packageResult.Value.Name, packageResult.Value.Version));
@@ -1072,9 +1072,9 @@ The recent package changes indicate a reboot is necessary.
                 handle_unsuccessful_operation(config, packageResult, movePackageToFailureLocation: false, attemptRollback: false);
             }
 
-            if(_rebootExitCodes.Contains(packageResult.ExitCode))
+            if (_rebootExitCodes.Contains(packageResult.ExitCode))
             {
-                if(config.Features.ExitOnRebootDetected)
+                if (config.Features.ExitOnRebootDetected)
                 {
                     Environment.ExitCode = ApplicationParameters.ExitCodes.ErrorInstallSuspend;
                     this.Log().Warn(ChocolateyLoggers.Important, @"Chocolatey has detected a pending reboot after uninstalling
@@ -1201,7 +1201,6 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
                 "Attempted to remove '{0}' but had an error".format_with(packageExtensionsDirectory),
                 throwError: false,
                 logWarningInsteadOfError: true);
-
         }
 
         private void handle_template_packages(ChocolateyConfiguration config, PackageResult packageResult)

@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -328,7 +328,6 @@ namespace chocolatey.infrastructure.app.services
             if (config.RegularOutput) this.Log().Info(() => "Attempting to push {0} to {1}".format_with(_fileSystem.get_file_name(nupkgFilePath), config.Sources));
 
             NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath));
-
 
             if (config.RegularOutput && (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) || config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)))
             {
@@ -927,7 +926,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                SemanticVersion version =  null;
+                SemanticVersion version = null;
                 var latestPackage = NugetList.find_package(packageName, null, config, packageManager.SourceRepository);
 
                 if (latestPackage == null)
@@ -1112,7 +1111,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 // script could be incorrectly left in place during an upgrade operation.  To guard against this,
                 // remove any Chocolatey Packaging scripts, which will then be restored by the new package, if
                 // they are still required
-                var filesToDelete = new List<string> {"chocolateyinstall", "chocolateyuninstall", "chocolateybeforemodify"};
+                var filesToDelete = new List<string> { "chocolateyinstall", "chocolateyuninstall", "chocolateybeforemodify" };
                 var packagingScripts = _fileSystem.get_files(directoryPath, "*.ps1", SearchOption.AllDirectories)
                     .Where(p => filesToDelete.Contains(_fileSystem.get_file_name_without_extension(p).to_lower()));
 
@@ -1226,7 +1225,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     var nugetCachedFile = _fileSystem.combine_paths(localAppData, "NuGet", "Cache", "{0}.{1}.nupkg".format_with(installedPackage.Id, installedPackage.Version.to_string()));
                     if (_fileSystem.file_exists(nugetCachedFile))
                     {
-
                         _fileSystem.delete_file(nugetCachedFile);
                     }
                 },

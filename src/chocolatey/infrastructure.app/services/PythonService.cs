@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -97,13 +97,13 @@ namespace chocolatey.infrastructure.app.services
 
             args.Add("_command_", new ExternalCommandArgument { ArgumentOption = "install", Required = true });
             args.Add("_package_name_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "",
-                    ArgumentValue = PACKAGE_NAME_TOKEN,
-                    QuoteValue = false,
-                    UseValueOnly = true,
-                    Required = true
-                });
+            {
+                ArgumentOption = "",
+                ArgumentValue = PACKAGE_NAME_TOKEN,
+                QuoteValue = false,
+                UseValueOnly = true,
+                Required = true
+            });
         }
 
         /// <summary>
@@ -116,13 +116,13 @@ namespace chocolatey.infrastructure.app.services
             args.Add("_command_", new ExternalCommandArgument { ArgumentOption = "install", Required = true });
             args.Add("_upgrade_", new ExternalCommandArgument { ArgumentOption = "--upgrade", Required = true });
             args.Add("_package_name_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "",
-                    ArgumentValue = PACKAGE_NAME_TOKEN,
-                    QuoteValue = false,
-                    UseValueOnly = true,
-                    Required = true
-                });
+            {
+                ArgumentOption = "",
+                ArgumentValue = PACKAGE_NAME_TOKEN,
+                QuoteValue = false,
+                UseValueOnly = true,
+                Required = true
+            });
         }
 
         /// <summary>
@@ -135,13 +135,13 @@ namespace chocolatey.infrastructure.app.services
             args.Add("_command_", new ExternalCommandArgument { ArgumentOption = "uninstall", Required = true });
             args.Add("_confirm_", new ExternalCommandArgument { ArgumentOption = "-y", Required = true });
             args.Add("_package_name_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "",
-                    ArgumentValue = PACKAGE_NAME_TOKEN,
-                    QuoteValue = false,
-                    UseValueOnly = true,
-                    Required = true
-                });
+            {
+                ArgumentOption = "",
+                ArgumentValue = PACKAGE_NAME_TOKEN,
+                QuoteValue = false,
+                UseValueOnly = true,
+                Required = true
+            });
         }
 
         private void set_common_args(IDictionary<string, ExternalCommandArgument> args)
@@ -163,8 +163,6 @@ namespace chocolatey.infrastructure.app.services
                 UseValueOnly = true,
                 Required = true
             });
-
-
         }
 
         public string SourceType

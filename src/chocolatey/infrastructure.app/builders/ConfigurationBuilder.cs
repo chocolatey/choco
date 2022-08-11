@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,14 +23,12 @@ namespace chocolatey.infrastructure.app.builders
     using System.Reflection;
     using System.Text;
     using adapters;
-    using attributes;
     using chocolatey.infrastructure.app.commands;
     using configuration;
     using cryptography;
     using extractors;
     using filesystem;
     using information;
-    using infrastructure.commands;
     using infrastructure.services;
     using licensing;
     using logging;
@@ -114,7 +112,7 @@ namespace chocolatey.infrastructure.app.builders
                 () => xmlService.serialize(configFileSettings, globalConfigPath, isSilent: shouldLogSilently),
                 "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
                 logDebugInsteadOfError: true,
-                isSilent:shouldLogSilently);
+                isSilent: shouldLogSilently);
         }
 
         private static void add_or_remove_licensed_source(ChocolateyLicense license, ConfigFileSettings configFileSettings)
@@ -200,30 +198,32 @@ namespace chocolatey.infrastructure.app.builders
             foreach (var source in defaultSourcesInOrder)
             {
                 config.MachineSources.Add(new MachineSourceConfiguration
-                    {
-                        Key = source.Value,
-                        Name = source.Id,
-                        Username = source.UserName,
-                        EncryptedPassword = source.Password,
-                        Certificate = source.Certificate,
-                        EncryptedCertificatePassword = source.CertificatePassword,
-                        Priority = source.Priority,
-                        BypassProxy = source.BypassProxy,
-                        AllowSelfService = source.AllowSelfService,
-                        VisibleToAdminsOnly = source.VisibleToAdminsOnly
-                    });
+                {
+                    Key = source.Value,
+                    Name = source.Id,
+                    Username = source.UserName,
+                    EncryptedPassword = source.Password,
+                    Certificate = source.Certificate,
+                    EncryptedCertificatePassword = source.CertificatePassword,
+                    Priority = source.Priority,
+                    BypassProxy = source.BypassProxy,
+                    AllowSelfService = source.AllowSelfService,
+                    VisibleToAdminsOnly = source.VisibleToAdminsOnly
+                });
             }
         }
 
         private static void set_config_items(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
             config.CacheLocation = Environment.ExpandEnvironmentVariables(set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder. Replaces `$env:TEMP` value for choco.exe process. It is highly recommended this be set to make Chocolatey more deterministic in cleanup."));
-            if (string.IsNullOrWhiteSpace(config.CacheLocation)) {
+            if (string.IsNullOrWhiteSpace(config.CacheLocation))
+            {
                 config.CacheLocation = fileSystem.get_temp_path(); // System.Environment.GetEnvironmentVariable("TEMP");
                 // TEMP gets set in EnvironmentSettings, so it may already have
                 // chocolatey in the path when it installs the next package from
                 // the API.
-                if(!String.Equals(fileSystem.get_directory_info_for(config.CacheLocation).Name, "chocolatey", StringComparison.OrdinalIgnoreCase)) {
+                if (!string.Equals(fileSystem.get_directory_info_for(config.CacheLocation).Name, "chocolatey", StringComparison.OrdinalIgnoreCase))
+                {
                     config.CacheLocation = fileSystem.combine_paths(fileSystem.get_temp_path(), "chocolatey");
                 }
             }
@@ -432,7 +432,7 @@ namespace chocolatey.infrastructure.app.builders
                              option => config.Proxy.BypassOnLocal = option != null)
                          .Add("log-file=",
                              "Log File to output to in addition to regular loggers. Available in 0.10.8+.",
-                             option => config.AdditionalLogFileLocation= option.remove_surrounding_quotes())
+                             option => config.AdditionalLogFileLocation = option.remove_surrounding_quotes())
                         .Add("skipcompatibilitychecks|skip-compatibility-checks",
                             "SkipCompatibilityChecks - Prevent warnings being shown before and after command execution when a runtime compatibility problem is found between the version of Chocolatey and the Chocolatey Licensed Extension. Available in 1.1.0+",
                             option => config.DisableCompatibilityChecks = option != null)

@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -85,39 +85,39 @@ namespace chocolatey.infrastructure.app.services
             //    UseValueOnly = true,
             //    Required = true
             //});
-            args.Add("_quiet_", new ExternalCommandArgument {ArgumentOption = "--quiet-mode", Required = true});
-            args.Add("_no_desktop_", new ExternalCommandArgument {ArgumentOption = "--no-desktop", Required = true});
-            args.Add("_no_startmenu_", new ExternalCommandArgument {ArgumentOption = "--no-startmenu", Required = true});
+            args.Add("_quiet_", new ExternalCommandArgument { ArgumentOption = "--quiet-mode", Required = true });
+            args.Add("_no_desktop_", new ExternalCommandArgument { ArgumentOption = "--no-desktop", Required = true });
+            args.Add("_no_startmenu_", new ExternalCommandArgument { ArgumentOption = "--no-startmenu", Required = true });
             args.Add("_root_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--root ",
-                    ArgumentValue = INSTALL_ROOT_TOKEN,
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--root ",
+                ArgumentValue = INSTALL_ROOT_TOKEN,
+                QuoteValue = false,
+                Required = true
+            });
             args.Add("_local_pkgs_dir_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--local-package-dir ",
-                    ArgumentValue = "{0}\\packages".format_with(INSTALL_ROOT_TOKEN),
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--local-package-dir ",
+                ArgumentValue = "{0}\\packages".format_with(INSTALL_ROOT_TOKEN),
+                QuoteValue = false,
+                Required = true
+            });
 
             args.Add("_site_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--site ",
-                    ArgumentValue = "http://mirrors.kernel.org/sourceware/cygwin/",
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--site ",
+                ArgumentValue = "http://mirrors.kernel.org/sourceware/cygwin/",
+                QuoteValue = false,
+                Required = true
+            });
 
             args.Add("_package_name_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--packages ",
-                    ArgumentValue = PACKAGE_NAME_TOKEN,
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--packages ",
+                ArgumentValue = PACKAGE_NAME_TOKEN,
+                QuoteValue = false,
+                Required = true
+            });
         }
 
         public string SourceType
@@ -130,18 +130,18 @@ namespace chocolatey.infrastructure.app.services
             if (Platform.get_platform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
 
             var runnerConfig = new ChocolateyConfiguration
-                {
-                    Sources = ApplicationParameters.PackagesLocation,
-                    Debug = config.Debug,
-                    Force = config.Force,
-                    Verbose = config.Verbose,
-                    CommandExecutionTimeoutSeconds = config.CommandExecutionTimeoutSeconds,
-                    CacheLocation = config.CacheLocation,
-                    RegularOutput = config.RegularOutput,
-                    PromptForConfirmation = false,
-                    AcceptLicense = true,
-                    QuietOutput = true,
-                };
+            {
+                Sources = ApplicationParameters.PackagesLocation,
+                Debug = config.Debug,
+                Force = config.Force,
+                Verbose = config.Verbose,
+                CommandExecutionTimeoutSeconds = config.CommandExecutionTimeoutSeconds,
+                CacheLocation = config.CacheLocation,
+                RegularOutput = config.RegularOutput,
+                PromptForConfirmation = false,
+                AcceptLicense = true,
+                QuietOutput = true,
+            };
             runnerConfig.ListCommand.LocalOnly = true;
 
             var localPackages = _nugetService.list_run(runnerConfig);
@@ -180,7 +180,7 @@ namespace chocolatey.infrastructure.app.services
                 var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
                 if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
 
-                _rootDirectory = _fileSystem.combine_paths(binRoot,"cygwin");
+                _rootDirectory = _fileSystem.combine_paths(binRoot, "cygwin");
             }
         }
 
