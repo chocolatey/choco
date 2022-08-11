@@ -737,6 +737,8 @@ Would have determined packages that are out of date based on what is
                     if (pkgSettings.ApplyPackageParametersToDependencies) packageConfig.ApplyPackageParametersToDependencies = true;
                     SourceType sourceType;
                     if (Enum.TryParse(pkgSettings.Source, true, out sourceType)) packageConfig.SourceType = sourceType;
+                    if (pkgSettings.Force) packageConfig.Force = true;
+                    packageConfig.CommandExecutionTimeoutSeconds = pkgSettings.CommandExecutionTimeoutSeconds == -1 ? packageConfig.CommandExecutionTimeoutSeconds : pkgSettings.CommandExecutionTimeoutSeconds;
 
                     this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(packageConfig.PackageNames));
                     packageConfigs.Add(packageConfig);

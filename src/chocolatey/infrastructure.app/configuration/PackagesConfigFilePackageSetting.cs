@@ -58,5 +58,12 @@ namespace chocolatey.infrastructure.app.configuration
 
         [XmlAttribute(AttributeName = "disabled")]
         public bool Disabled { get; set; }
+
+        [System.ComponentModel.DefaultValue(-1)]
+        [XmlAttribute(AttributeName = "commandExecutionTimeoutSeconds")]
+        public int CommandExecutionTimeoutSeconds { get; set; }
+
+        [XmlAttribute(AttributeName = "force")]
+        public bool Force { get; set; }
     }
 }
