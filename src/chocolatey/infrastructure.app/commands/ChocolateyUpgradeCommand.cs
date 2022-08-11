@@ -152,23 +152,23 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.UsePackageExitCodes = false;
                          }
                      })
-                 .Add("usepackagecodes|usepackageexitcodes|use-package-codes|use-package-exit-codes",
+                .Add("usepackagecodes|usepackageexitcodes|use-package-codes|use-package-exit-codes",
                      "UsePackageExitCodes - Package scripts can provide exit codes. Use those for choco's exit code when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
                      option => configuration.Features.UsePackageExitCodes = option != null
                      )
-                 .Add("except=",
+                .Add("except=",
                      "Except - a comma-separated list of package names that should not be upgraded when upgrading 'all'. Overrides the configuration setting '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.ConfigSettings.UpgradeAllExceptions, configuration.UpgradeCommand.PackageNamesToSkip.to_string()),
                      option => configuration.UpgradeCommand.PackageNamesToSkip = option.remove_surrounding_quotes()
                      )
-                 .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
+                .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
                      "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
                      )
-                 .Add("skip-if-not-installed|only-upgrade-installed|skip-when-not-installed",
+                .Add("skip-if-not-installed|only-upgrade-installed|skip-when-not-installed",
                      "Skip Packages Not Installed - if a package is not installed, do not install it during the upgrade process. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with(ApplicationParameters.Features.SkipPackageUpgradesWhenNotInstalled, configuration.Features.SkipPackageUpgradesWhenNotInstalled.to_string()),
                      option => configuration.Features.SkipPackageUpgradesWhenNotInstalled = option != null
                      )
-                 .Add("install-if-not-installed",
+                .Add("install-if-not-installed",
                      "Install Missing Packages When Not Installed - if a package is not installed, install it as part of running upgrade (typically default behavior). Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with(ApplicationParameters.Features.SkipPackageUpgradesWhenNotInstalled, configuration.Features.SkipPackageUpgradesWhenNotInstalled.to_string()),
                      option =>
                      {
@@ -177,28 +177,28 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.SkipPackageUpgradesWhenNotInstalled = false;
                          }
                      })
-                 .Add("exclude-pre|exclude-prerelease|exclude-prereleases",
+                .Add("exclude-pre|exclude-prerelease|exclude-prereleases",
                      "Exclude Prerelease - Should prerelease be ignored for upgrades? Will be ignored if you pass `--pre`. Available in 0.10.4+.",
                      option => configuration.UpgradeCommand.ExcludePrerelease = option != null
                      )
-                 .Add("userememberedargs|userememberedarguments|userememberedoptions|use-remembered-args|use-remembered-arguments|use-remembered-options",
+                .Add("userememberedargs|userememberedarguments|userememberedoptions|use-remembered-args|use-remembered-arguments|use-remembered-options",
                      "Use Remembered Options for Upgrade - use the arguments and options used during install for upgrade. Does not override arguments being passed at runtime. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configuration.Features.UseRememberedArgumentsForUpgrades.to_string()),
                      option =>
                      {
                          if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = true;
                      })
-                 .Add("ignorerememberedargs|ignorerememberedarguments|ignorerememberedoptions|ignore-remembered-args|ignore-remembered-arguments|ignore-remembered-options",
+                .Add("ignorerememberedargs|ignorerememberedarguments|ignorerememberedoptions|ignore-remembered-args|ignore-remembered-arguments|ignore-remembered-options",
                      "Ignore Remembered Options for Upgrade - ignore the arguments and options used during install for upgrade. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configuration.Features.UseRememberedArgumentsForUpgrades.to_string()),
                      option =>
                      {
                          if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = false;
                      })
-                 .Add("exitwhenrebootdetected|exit-when-reboot-detected",
+                .Add("exitwhenrebootdetected|exit-when-reboot-detected",
                      "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}. Overrides the default feature '{3}' set to '{4}'. Available in 0.10.12+.".format_with
                          (ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend, ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
                      option => configuration.Features.ExitOnRebootDetected = option != null
                      )
-                 .Add("ignoredetectedreboot|ignore-detected-reboot",
+                .Add("ignoredetectedreboot|ignore-detected-reboot",
                      "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with
                          (ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
                      option =>
@@ -208,7 +208,7 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.ExitOnRebootDetected = false;
                          }
                      })
-                 .Add("disable-repository-optimizations|disable-package-repository-optimizations",
+                .Add("disable-repository-optimizations|disable-package-repository-optimizations",
                      "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.14+.".format_with
                          (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.to_string()),
                      option =>
@@ -218,6 +218,10 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.UsePackageRepositoryOptimizations = false;
                          }
                      })
+                .Add("pin|pinpackage|pin-package",
+                    "Pin Package - Add a pin to the package after upgrade. Available in 1.2.0+",
+                    option => configuration.PinPackage = option != null
+                    )
                 ;
         }
 

@@ -408,6 +408,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 handle_extension_packages(config, packageResult);
                 handle_template_packages(config, packageResult);
                 pkgInfo.Arguments = capture_arguments(config, packageResult);
+                pkgInfo.IsPinned = config.PinPackage;
             }
 
             var toolsLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyToolsLocation);
@@ -737,8 +738,9 @@ Would have determined packages that are out of date based on what is
                     if (pkgSettings.ApplyPackageParametersToDependencies) packageConfig.ApplyPackageParametersToDependencies = true;
                     SourceType sourceType;
                     if (Enum.TryParse(pkgSettings.Source, true, out sourceType)) packageConfig.SourceType = sourceType;
+                    if (pkgSettings.PinPackage) packageConfig.PinPackage = true;
                     if (pkgSettings.Force) packageConfig.Force = true;
-                    packageConfig.CommandExecutionTimeoutSeconds = pkgSettings.ExecutionTimeout == -1 ? packageConfig.ExecutionTimeout : pkgSettings.CommandExecutionTimeoutSeconds;
+                    packageConfig.CommandExecutionTimeoutSeconds = pkgSettings.ExecutionTimeout == -1 ? packageConfig.CommandExecutionTimeoutSeconds : pkgSettings.ExecutionTimeout;
                     if (pkgSettings.Prerelease) packageConfig.Prerelease = true;
                     if (pkgSettings.OverrideArguments) packageConfig.OverrideArguments = true;
                     if (pkgSettings.NotSilent) packageConfig.NotSilent = true;

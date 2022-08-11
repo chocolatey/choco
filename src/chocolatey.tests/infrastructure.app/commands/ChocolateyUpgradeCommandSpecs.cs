@@ -217,6 +217,24 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 optionSet.Contains("p").ShouldBeTrue();
             }
+
+            [Fact]
+            public void should_add_pin_to_the_option_set()
+            {
+                optionSet.Contains("pinpackage").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_long_version_of_pin_to_the_option_set()
+            {
+                optionSet.Contains("pin-package").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_short_version_of_pin_to_the_option_set()
+            {
+                optionSet.Contains("pin").ShouldBeTrue();
+            }
         }
 
         public class when_handling_additional_argument_parsing : ChocolateyUpgradeCommandSpecsBase

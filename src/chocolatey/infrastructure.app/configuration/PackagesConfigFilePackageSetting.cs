@@ -59,6 +59,9 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "disabled")]
         public bool Disabled { get; set; }
 
+        [XmlAttribute(AttributeName = "pinPackage")]
+        public bool PinPackage { get; set; }
+        
         [System.ComponentModel.DefaultValue(-1)]
         [XmlAttribute(AttributeName = "executionTimeout")]
         public int ExecutionTimeout { get; set; }
