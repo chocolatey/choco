@@ -59,7 +59,7 @@ namespace chocolatey.infrastructure.app.registration
             registrator.register_instance<filesystem.IFileSystem>(() => fileSystem);
             registrator.register_instance(() => Config.get_configuration_settings());
             mainRegistrator.register_dependencies(registrator, configuration);
-            //registrator.register_assembly_commands(Assembly.GetExecutingAssembly());
+            registrator.register_assembly_commands(Assembly.GetExecutingAssembly());
             registrator.CanReplaceRegister = false;
 
             var assemblies = fileSystem.get_extension_assemblies();
@@ -151,11 +151,11 @@ choco feature enable --name=""disableCompatibilityChecks""",
                         hasRegisteredDependencies = !clonedRegistrator.RegistrationFailed;
                     }
 
-                    //if (hasRegisteredDependencies)
-                    //{
-                    //    clonedRegistrator.register_assembly_commands(assembly);
-                    //    hasRegisteredDependencies = !clonedRegistrator.RegistrationFailed;
-                    //}
+                    if (hasRegisteredDependencies)
+                    {
+                        clonedRegistrator.register_assembly_commands(assembly);
+                        hasRegisteredDependencies = !clonedRegistrator.RegistrationFailed;
+                    }
 
                     if (hasRegisteredDependencies && !clonedRegistrator.RegistrationFailed)
                     {
