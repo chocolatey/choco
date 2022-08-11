@@ -16,9 +16,12 @@
 
 namespace chocolatey.infrastructure.tasks
 {
+    using chocolatey.infrastructure.app.attributes;
+
     /// <summary>
     ///   Interface for all runners.
     /// </summary>
+    [MultiService]
     public interface ITask
     {
         /// <summary>

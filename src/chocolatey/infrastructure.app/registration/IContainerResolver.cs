@@ -6,7 +6,7 @@
 //
 // You may obtain a copy of the License at
 //
-// 	http://www.apache.org/licenses/LICENSE-2.0
+//  http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,23 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.validations
+namespace chocolatey.infrastructure.app.registration
 {
     using System.Collections.Generic;
-    using app.configuration;
-    using chocolatey.infrastructure.app.attributes;
 
-    /// <summary>
-    ///   Interface for all validations
-    /// </summary>
-    [MultiService]
-    public interface IValidation
+    public interface IContainerResolver
     {
-        /// <summary>
-        ///   Performs the required validation logic
-        /// </summary>
-        /// <param name="config">The current Chocolatey Configuration</param>
-        /// <returns>The validation results</returns>
-        ICollection<ValidationResult> validate(ChocolateyConfiguration config);
+        TService resolve<TService>()
+            where TService : class;
+
+        IEnumerable<TService> resolve_all<TService>()
+            where TService : class;
     }
 }
