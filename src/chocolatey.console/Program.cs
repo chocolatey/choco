@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,20 +21,25 @@ namespace chocolatey.console
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using chocolatey.infrastructure.information;
     using infrastructure.app;
     using infrastructure.app.builders;
     using infrastructure.app.configuration;
     using infrastructure.app.runners;
     using infrastructure.commandline;
-    using infrastructure.configuration;
     using infrastructure.extractors;
     using infrastructure.licensing;
     using infrastructure.logging;
     using infrastructure.registration;
     using infrastructure.tolerance;
+    using SimpleInjector;
+
 #if !NoResources
+
     using resources;
+
 #endif
+
     using Assembly = infrastructure.adapters.Assembly;
     using Console = System.Console;
     using Environment = System.Environment;
@@ -196,6 +201,7 @@ namespace chocolatey.console
         }
 
         private static ResolveEventHandler _handler = null;
+
         private static void add_assembly_resolver()
         {
             _handler = (sender, args) =>
@@ -208,8 +214,40 @@ namespace chocolatey.console
                 var chocolateyPublicKey = ApplicationParameters.UnofficialChocolateyPublicKey;
 #endif
 
+                if (requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey))
+                {
+                    // Check if it is already loaded
+                    var resolvedAssembly = AssemblyResolution.resolve_existing_assembly(requestedAssembly.Name, chocolateyPublicKey);
+
+                    if (resolvedAssembly != null)
+                    {
+                        return resolvedAssembly.UnderlyingType;
+                    }
+
+                    if (Directory.Exists(ApplicationParameters.ExtensionsLocation))
+                    {
+                        foreach (var extensionDll in Directory.EnumerateFiles(ApplicationParameters.ExtensionsLocation, requestedAssembly.Name + ".dll", SearchOption.AllDirectories))
+                        {
+                            try
+                            {
+                                resolvedAssembly = AssemblyResolution.load_assembly(requestedAssembly.Name, extensionDll, chocolateyPublicKey);
+
+                                if (resolvedAssembly != null)
+                                {
+                                    return resolvedAssembly.UnderlyingType;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                // This catch statement is empty on purpose, we do
+                                // not want to do anything if it fails to load.
+                            }
+                        }
+                    }
+                }
+
                 // There are things that are ILMerged into Chocolatey. Anything with
-                // the right public key except licensed should use the choco/chocolatey assembly
+                // the right public key except extensions should use the choco/chocolatey assembly
                 if (requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey)
                     && !requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName)
                     && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
