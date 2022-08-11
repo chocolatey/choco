@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,6 +58,15 @@ namespace chocolatey.infrastructure.app.builders
         private static IEnvironment Environment
         {
             get { return _environmentInitializer.Value; }
+        }
+
+        public static bool is_compatibility_checks_disabled(IFileSystem filesystem, IXmlService xmlService)
+        {
+            var config = get_config_file_settings(filesystem, xmlService);
+
+            var feature = config.Features.FirstOrDefault(f => f.Name.is_equal_to("disableCompatibilityChecks"));
+
+            return feature != null && feature.Enabled;
         }
 
         /// <summary>

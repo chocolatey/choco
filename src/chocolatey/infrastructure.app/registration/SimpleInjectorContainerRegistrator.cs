@@ -80,31 +80,6 @@ namespace chocolatey.infrastructure.app.registration
             return cloned;
         }
 
-        public void register_assembly_commands(IAssembly assembly)
-        {
-            try
-            {
-                var types = assembly.get_loadable_types()
-                    .Where(t => t.IsClass && !t.IsAbstract && typeof(ICommand).IsAssignableFrom(t) && t.GetCustomAttribute<CommandForAttribute>() != null);
-
-                foreach (var t in types)
-                {
-                    if (RegistrationFailed)
-                    {
-                        break;
-                    }
-
-                    register_command(t);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.Log().Warn("Unable to register commands for '{0}'. Continuing without registering commands!", assembly.GetName().Name);
-                this.Log().Warn(ex.Message);
-                RegistrationFailed = true;
-            }
-        }
-
         public void register_command(Type commandType)
         {
             ensure_not_built();
@@ -350,7 +325,7 @@ namespace chocolatey.infrastructure.app.registration
             // If we have gotten here, that means all commands have a registered
             // command for this type, but it can not be found. As such we need to
             // throw an error so it can be looked at.
-            throw new ApplicationException("The command '{0}' have been globally registered, but can not be found!".format_with(commandName));
+            throw new ApplicationException("The command '{0}' has been globally registered, but can not be found!".format_with(commandName));
         }
 
         private void register_instance(Type serviceType, Func<IContainerResolver, object> instanceAction)

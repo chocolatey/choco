@@ -70,10 +70,16 @@ namespace chocolatey.console
 
                 "LogFileOnly".Log().Info(() => "".PadRight(60, '='));
 
-                config = Config.get_configuration_settings();
+                config = container.GetInstance<ChocolateyConfiguration>();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
                 var warnings = new List<string>();
+
+                if (license.AssemblyLoaded && !is_licensed_assembly_loaded(container))
+                {
+                    license.AssemblyLoaded = false;
+                    license.IsCompatible = false;
+                }
 
                 ConfigurationBuilder.set_up_configuration(
                      args,
@@ -83,7 +89,7 @@ namespace chocolatey.console
                      warning => { warnings.Add(warning); }
                      );
 
-                if (license.is_licensed_version() && !license.IsCompatible && !config.DisableCompatibilityChecks)
+                if (license.AssemblyLoaded && license.is_licensed_version() && !license.IsCompatible && !config.DisableCompatibilityChecks)
                 {
                     write_warning_for_incompatible_versions();
                 }
@@ -176,7 +182,7 @@ namespace chocolatey.console
             }
             finally
             {
-                if (license != null && license.is_licensed_version() && !license.IsCompatible && config != null && !config.DisableCompatibilityChecks)
+                if (license != null && license.AssemblyLoaded && license.is_licensed_version() && !license.IsCompatible && config != null && !config.DisableCompatibilityChecks)
                 {
                     write_warning_for_incompatible_versions();
                 }
@@ -189,6 +195,25 @@ namespace chocolatey.console
                 Bootstrap.shutdown();
                 Environment.Exit(Environment.ExitCode);
             }
+        }
+
+        private static bool is_licensed_assembly_loaded(Container container)
+        {
+            var allExtensions = container.GetAllInstances<ExtensionInformation>();
+
+            foreach (var extension in allExtensions)
+            {
+                if (extension.Name.is_equal_to("chocolatey.licensed"))
+                {
+                    return extension.Status == ExtensionStatus.Enabled || extension.Status == ExtensionStatus.Loaded;
+                }
+            }
+
+            // We will be going by an assumption that it has been loaded in this case.
+            // This is mostly to prevent that the licensed extension won't be disabled
+            // if it has been loaded using old method.
+
+            return true;
         }
 
         private static void warn_on_nuspec_or_nupkg_usage(string[] args, ChocolateyConfiguration config)
