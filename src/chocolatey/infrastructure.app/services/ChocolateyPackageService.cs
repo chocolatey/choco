@@ -739,6 +739,45 @@ Would have determined packages that are out of date based on what is
                     if (Enum.TryParse(pkgSettings.Source, true, out sourceType)) packageConfig.SourceType = sourceType;
                     if (pkgSettings.Force) packageConfig.Force = true;
                     packageConfig.CommandExecutionTimeoutSeconds = pkgSettings.CommandExecutionTimeoutSeconds == -1 ? packageConfig.CommandExecutionTimeoutSeconds : pkgSettings.CommandExecutionTimeoutSeconds;
+                    if (pkgSettings.Prerelease) packageConfig.Prerelease = true;
+                    if (pkgSettings.OverrideArguments) packageConfig.OverrideArguments = true;
+                    if (pkgSettings.NotSilent) packageConfig.NotSilent = true;
+                    if (pkgSettings.AllowDowngrade) packageConfig.AllowDowngrade = true;
+                    if (pkgSettings.ForceDependencies) packageConfig.ForceDependencies = true;
+                    if (pkgSettings.SkipAutomationScripts) packageConfig.SkipPackageInstallProvider = true;
+                    packageConfig.SourceCommand.Username = string.IsNullOrWhiteSpace(pkgSettings.User) ? packageConfig.SourceCommand.Username : pkgSettings.User;
+                    packageConfig.SourceCommand.Password = string.IsNullOrWhiteSpace(pkgSettings.Password) ? packageConfig.SourceCommand.Password : pkgSettings.Password;
+                    packageConfig.SourceCommand.Certificate = string.IsNullOrWhiteSpace(pkgSettings.Cert) ? packageConfig.SourceCommand.Certificate : pkgSettings.Cert;
+                    packageConfig.SourceCommand.CertificatePassword = string.IsNullOrWhiteSpace(pkgSettings.CertPassword) ? packageConfig.SourceCommand.CertificatePassword : pkgSettings.CertPassword;
+                    if (pkgSettings.IgnoreChecksums) packageConfig.Features.ChecksumFiles = false;
+                    if (pkgSettings.AllowEmptyChecksums) packageConfig.Features.AllowEmptyChecksums = true;
+                    if (pkgSettings.AllowEmptyChecksumsSecure) packageConfig.Features.AllowEmptyChecksumsSecure = true;
+                    if (pkgSettings.RequireChecksums)
+                    {
+                        packageConfig.Features.AllowEmptyChecksums = false;
+                        packageConfig.Features.AllowEmptyChecksumsSecure = false;
+                    }
+                    packageConfig.DownloadChecksum = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksum) ? packageConfig.DownloadChecksum : pkgSettings.DownloadChecksum;
+                    packageConfig.DownloadChecksum64 = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksum64) ? packageConfig.DownloadChecksum64 : pkgSettings.DownloadChecksum64;
+                    packageConfig.DownloadChecksum = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksumType) ? packageConfig.DownloadChecksumType : pkgSettings.DownloadChecksumType;
+                    packageConfig.DownloadChecksumType64 = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksumType64) ? packageConfig.DownloadChecksumType : pkgSettings.DownloadChecksumType64;
+                    if (pkgSettings.IgnorePackageExitCodes) packageConfig.Features.UsePackageExitCodes = false;
+                    if (pkgSettings.UsePackageExitCodes) packageConfig.Features.UsePackageExitCodes = true;
+                    if (pkgSettings.StopOnFirstFailure) packageConfig.Features.StopOnFirstPackageFailure = true;
+                    if (pkgSettings.ExitWhenRebootDetected) packageConfig.Features.ExitOnRebootDetected = true;
+                    if (pkgSettings.IgnoreDetectedReboot) packageConfig.Features.ExitOnRebootDetected = false;
+                    if (pkgSettings.DisableRepositoryOptimizations) packageConfig.Features.UsePackageRepositoryOptimizations = false;
+                    if (pkgSettings.AcceptLicense) packageConfig.AcceptLicense = true;
+                    if (pkgSettings.Confirm)
+                    {
+                        packageConfig.PromptForConfirmation = false;
+                        packageConfig.AcceptLicense = true;
+                    }
+                    if (pkgSettings.LimitOutput) packageConfig.RegularOutput = false;
+                    packageConfig.CacheLocation = string.IsNullOrWhiteSpace(pkgSettings.CacheLocation) ? packageConfig.CacheLocation : pkgSettings.CacheLocation;
+                    if (pkgSettings.FailOnStderr) packageConfig.Features.FailOnStandardError = true;
+                    if (pkgSettings.UseSystemPowershell) packageConfig.Features.UsePowerShellHost = false;
+                    if (pkgSettings.NoProgress) packageConfig.Features.ShowDownloadProgress = false;
 
                     this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(packageConfig.PackageNames));
                     packageConfigs.Add(packageConfig);
