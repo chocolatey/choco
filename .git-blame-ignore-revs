@@ -1,0 +1,480 @@
+#(maint) Remove trailing whitespace 
+2456459bfd2094f4b32cb9267ad7eb7d2cb3eec0
+
+#(maint) Add trailing newline to files 
+4b6656b10102acee4b7c958adc066571d9f04dd4
+
+#(maint) Add BOM  
+a374d52a9f5cd3d48687ea25e0b7c059dfeb7d3f
+
+#(maint) Fix line endings 
+8face0175ac571d47ee405254dc0962d0ef1783c
+
+#(#2261) Updates License Headers Copyright to 2021 
+3ac4e4e924de7302a6851096ffba091b2b1175f6
+
+#(maint) Add 2018 to copyright year 
+0a86d5e5e78747f0ae00b5eb04916c19a0e7ba86
+
+#(GH-1209) Add Chocolatey Software to copyright 
+8dc774eb615a760581b49913402bc3956d354205
+
+#(maint) Corrected whitespace 
+44558390a70614440bc9c113e5c7da4576cfeaa4
+
+#(maint) Corrected whitespace 
+57f966ff5b51cf43a56e9aa56f844384326ae0a1
+
+#(maint) Corrected whitespace 
+fd81fcd6c48688c67e8f8e3a9cd2dd08126870b3
+
+#(maint) Corrected whitespace 
+6cc246eb3d71d8f01e4a6f5e608fc836348ad19e
+
+#(maint) Corrected whitespace 
+f8b0c6abe5cae1ba8025e0556d8d7dc9d105e4cb
+
+#(maint) Whitespace changes 
+7c9e4405477449890cc12ad757df503ffc006e61
+
+#(maint) Whitespace changes 
+00025cbc6df2640cb967d3539fdec1b259f77d45
+
+#(maint) Whitespace changes 
+d7b2544b7fb627b9b4d2bead9c117e97ca85facd
+
+#(maint) Whitespace changes 
+22284f0f31358eee8100b91a19a4ec6d101f17bf
+
+#(maint) Whitespace changes 
+dc49f717c6c2f2ade3df292850c648028cd69f61
+
+#(maint) Remove unnecessary whitespace 
+a7b1d03f37ede4e771e8ca45fd73717303a1a76b
+
+#(maint) Remove unnecessary whitespace 
+de61b1d1a19a7edd8e9b38921b3b29e54d55ac15
+
+#(maint) Remove unnecessary whitespace 
+53694495ec6f0ff266c4a22b7329be1d770adc03
+
+#(maint) Remove unnecessary whitespace 
+50a21c48e50c444a436b1be4dd5688c19fab9eac
+
+#(maint) Correct whitespace 
+9d4dd65a1fcfacf07fe4ccd9c63f69b4a3506f7c
+
+#(maint) Remove unnecessary whitespace 
+2a99e3873b1535060a2de8418c52854976552002
+
+#(maint) Remove unnecessary whitespace 
+32461370879f26c1595083aeed8b49c73f6aaeb5
+
+#(maint) Remove unnecessary whitespace 
+eb30cef11038767da4ac456c2372d66d09080c81
+
+#(maint) Remove unnecessary whitespace 
+0d419905ce06cee00ade0f0ebf4ce1eb33b38240
+
+#(maint) Remove whitespace 
+aab0406f70a46212bbb5d023e53a41c786a95ede
+
+#(maint) whitespace 
+6b4d50bf294f0cdb05ece1664a1e33d3095f9d5e
+
+#(maint) Correct whitespace 
+ba3c10b544d919ab39e21c558fed64008f835c34
+
+#(maint) Corrected whitespace 
+44558390a70614440bc9c113e5c7da4576cfeaa4
+
+#(maint) Correct whitespace 
+b2f54e3e66b919284c168509fce4e6e56f799218
+
+#(maint) Correct whitespace 
+d91bf41319d4ca2ee48263eb46eca37ea09f210f
+
+#(maint) whitespace 
+968a84a9ebbe08c9b728799bed337ed561ddb4bf
+
+#(maint) Remove unnecessary whitespace 
+1a20a2e2e90d07e058887c397ec9a88e3c87279e
+
+#(maint) Formatting + whitespace fix 
+99fd2c2c9d714972bda8cfcf0748d4b27d3584e2
+
+#(maint) Remove unnecessary whitespace 
+cf2862201e62edbfbfdf06c454b18ddd1e81e045
+
+#(maint) Remove whitespace and fix formatting 
+d7b2d08232977971e55aa4ed851345880dc07517
+
+#(maint) Whitespace 
+0efabf0b8309e9301e742441c20a12bbe3e5074c
+
+#(maint) Whitespace and formatting fix 
+ed46ca7fae1b8afd720bd6dc612cfdefb2a04edf
+
+#(maint) Remove unnecessary whitespace 
+742dacca1f32dea0723b16660faeef6dbdcf39a4
+
+#(maint) Fix whitespace and formatting 
+0c4025b48aa62be48fd221918b785ac4ed73e07f
+
+#(maint) Formatting 
+f701feabf7f1deccaba335f486f3ca3a4056cccf
+
+#(maint) Formatting 
+9315a9ec54f0f24770f3184d8cbc1b4493607470
+
+#(maint) Formatting + whitespace fix 
+99fd2c2c9d714972bda8cfcf0748d4b27d3584e2
+
+#(maint) formatting 
+38edf1efd9d73e7a5f0502e898e917dd8ecaf242
+
+#(maint) Formatting and whitespace changes 
+2bf2bcd88d9c9b33f2dd092884863365b3fcc55a
+
+#(maint) Formatting and whitespace changes 
+1007d8c760d75a63df23521bae612c9f6183c822
+
+#(maint) formatting 
+179f0f32b4a5f646e5ada6401935627e91be6a98
+
+#(maint) formatting 
+0d840334bb4cad0432089e11096769b6353e5c8e
+
+#(maint) formatting 
+3837ffdc36812fdbb030e938032517c3a5cd8ffc
+
+#(maint) formatting 
+0fe09728612a1ef29317aecf9d9cfa041817d3d8
+
+#(maint) formatting 
+e0c753fc4da00c5863ff5d6b25b332d29f83f11f
+
+#(maint) formatting / order 
+1675a19d8b1c8ad6e3efb11a4202ff4dffe8557c
+
+#(maint) formatting 
+c8c28093ac68cff6aa59728ac1d1065996b96a13
+
+#(maint) formatting 
+bca094debb96735e793468a6fcc0d59acf6734cd
+
+#(maint) formatting 
+d32982a22703e13b2e4708373b755c02211852d7
+
+#(maint) formatting 
+fd63e4a8807bb352bd8b7c31f5aa43ed35278171
+
+#(maint) formatting 
+865d7477f24e5dc81add0c1d3a587bd1374c4a76
+
+#(maint) formatting 
+f5798180e7fd26fb9c3da343d2bdba6ed2798af0
+
+#(maint) formatting 
+f9e586d12fcca2f2e42e43abd329fb4eb97626bc
+
+#(maint) formatting 
+5dcd104ccb9d38fe5e4977ab0c1382cc8703fc77
+
+#(maint) formatting 
+68de28f738dbc2a6537a9c304a199ca5809bc18a
+
+#(maint) formatting/wording 
+75e8063ee322db789dae05ee65af97a22c86c21d
+
+#(maint) formatting 
+8bd20a0f6aeb577b48af6c4638de5896021532bb
+
+#(maint) formatting 
+3a0ee21a669656f56d661bec487085c422990f70
+
+#(maint) formatting 
+1bcd6dc600542f42237779f2213d484a39d66f93
+
+#(maint) formatting 
+939afa30b87728762f5409a6073f9b68bf50d5f0
+
+#(maint) formatting 
+d25ef6dcd5f18852160912f47b460af56611eb62
+
+#(maint) formatting 
+3da47609824464780f0707868a28c521dc9efdba
+
+#(maint) formatting 
+260c872954782cc987ee9cbfa3f55ce7e809e500
+
+#(maint) formatting 
+48e668dc1e8ddc75d6135fb6721b00f7326af9bc
+
+#(maint) formatting 
+581db0177e43d6e2b9dd1852a6cef9f25df878dc
+
+#(maint) formatting 
+c51f9d301fb52cf6fd93a51cac1a55a84d36c1d7
+
+#(maint) formatting 
+d12c94c799cd7c1904c14546f81e001fae44161f
+
+#(maint) formatting 
+728deda7ba4a4a46be371aa8da352a1bc597bb90
+
+#(maint) formatting 
+70a6120723a0ffe8505ee238fbf1024f5bca3505
+
+#(maint) formatting 
+1a9aa99f2c34c2ef4c9eed4a37ad213f75a92965
+
+#(maint) formatting 
+e63773b5ab1aea63f8b514e30df9921847cbf55c
+
+#(maint) formatting 
+12230d4acafe72da79f3e0761e292440a5783bb6
+
+#(maint) formatting 
+77be5d8192dc57c9523daf59f70da85cfdda876c
+
+#(maint) formatting 
+43b139c332bc664700963a0fd6d28e0349c10b47
+
+#(maint) formatting methods / parameters in calls 
+0666e26fcfe1b95b7685cdcd0ff4bd9e9e51cda3
+
+#(maint) formatting 
+186f9c739ff4654363ce675cfcd71ac7722a24a4
+
+#(maint) formatting 
+74af77d178d0750c55262fd09d2ba1fcb5842b84
+
+#(maint) formatting 
+ff97904b5c398349b738e16e643fc996c33c73f2
+
+#(maint) formatting 
+f4ae1c9845cddbc83d75f09706b9c0b5e00d32f6
+
+#(maint) formatting 
+0513e70ef2104f8f345e514f86b3202884a849ae
+
+#(maint) formatting 
+be903e4e5585f551aebde1e09f93b46612283b25
+
+#(maint) formatting 
+e2fa59116b8e42ef44f611b9b14362d51db6c5ba
+
+#(maint) formatting / add message consistency 
+2854c5ae8e6aa3fbe6f5b5fe51a59190c886cc72
+
+#(maint) formatting 
+c3ae26769cd7a023cea0e3c0561752bedd05e5da
+
+#(maint) formatting 
+d51e259d38312c28ea6e5954ebf7ca4311820699
+
+#(maint) formatting 
+7709753f8804df22d615398f4cc3d975734af34f
+
+#(maint) formatting 
+31db2695841501784d0a05530d16ec6a7397dc4a
+
+#(maint) formatting 
+e5726d7340a07e0c9127f3518ad95f7d506a5392
+
+#(maint) formatting 
+a7d92f53263acf6205965b65bfafa4282563a8cf
+
+#(maint) formatting 
+c819d7bf07b8e576a22b92ecb448b1497b8ab094
+
+#(maint) formatting 
+727879cab1a647af92b701146c26f263b11a78ae
+
+#(maint) formatting 
+252f7c5152cd6c8c254a67d036cd6ea350ba747a
+
+#(maint) formatting 
+40095903aebcbe5304c9bc82196cd68f437c547c
+
+#(maint) formatting 
+4643bab03d187a381e3a7c2f6d206dda215afae6
+
+#(maint) formatting 
+b74dbec14fbf5d11f6575542976ce85030c75558
+
+#(maint) formatting 
+4f3454295d332f4b41ad84224d0e5b5dc6e20eb8
+
+#(maint) formatting 
+5f6439a974db86a729ea449d6d72b295a4ced72d
+
+#(maint) formatting 
+69f3466674907be27b2929173ac09bee0b8a10ca
+
+#(maint) formatting 
+09765f6626458f5fb491f43bc24f0755531d9c88
+
+#(maint) formatting 
+8906ea82aa689e0557e03bb6348f3aa4688d37a7
+
+#(maint) formatting 
+da4cb2a646c35c0c976085f6d8362c43af696fd8
+
+#(maint) formatting 
+b09644e00c925d6c17ad01a578fb726d07ccb4a4
+
+#(maint) formatting 
+7ae1939f734615357247c6a518c52a76a9869077
+
+#(maint) formatting 
+5601e2db63aefa02411b7c40aadd789942e81e7a
+
+#(maint) formatting 
+c8d9630c8698f9738b423198d9119d1aac8b2aed
+
+#(maint) formatting 
+763ac498364ecd6b9ac6240d70c57ccccca62849
+
+#(maint) formatting 
+b7c619f10e42a8dd57b6f42c59b735d74e1890c3
+
+#(maint) formatting 
+9c1bfe1d30e958e4113289bafbd8b1954ad8c3f8
+
+#(maint) formatting 
+1dffc0a958a5d85fb0b1ec2506052a88190c01a7
+
+#(maint) formatting 
+c8bec4424243adf6d4201fb8f6e940e468d00b0b
+
+#(maint) formatting 
+998bc44116cb3054ac5717fcd4547bcb03db55d6
+
+#(maint) formatting 
+346c050025dc4c51800cc8cd4985d81710c40ebb
+
+#(maint) formatting 
+cd98ee0053aae1c29485bd5f269fcdff7aaa370c
+
+#(maint) formatting 
+e5ea5a6ca3f58062a2ba9e04a2b616ee036b6cc1
+
+#(maint) formatting/comment 
+231ac31dfab285e740b50ab583feaf376d3ccd9c
+
+#(maint) formatting 
+580a66467783c436fcdd3cdb74a4ee8e94b73fb1
+
+#(maint) formatting 
+855b4abc3e348f669091704c3951d7f5c7970956
+
+#(maint) formatting 
+5765e5e80d1dcd31d55c671e145037d919509015
+
+#(maint) formatting 
+9945cd0bafd3983bc10903d0ec9b01d48210afdd
+
+#(maint) formatting 
+e6ad7e7f90fa28417602ec22349add8750aa50ac
+
+#(maint) formatting 
+87c8c5b1676131b3bf2823142921cb1c828e83b0
+
+#(maint) formatting 
+2b68dae5efb93699dbbc65e6761fd1d5f7a362a2
+
+#(maint) formatting 
+e4f145e4bcc16d2d0e3360a4e4b253175483fe7b
+
+#(maint) formatting 
+016c6914335198e78305db0691ae9b800d14e13c
+
+#(maint) formatting 
+309f33ecc8d454d12d3398cdccba77a3658ba106
+
+#(maint) formatting 
+35c98096055d3c034848ffa54fbbc0d284d0e037
+
+#(maint) formatting 
+e199c22c2b304215835b27778dbbcc63a14b529a
+
+#(maint) formatting 
+abdea1856bcb370d3b1ffe782922d793ba9ecb3e
+
+#(maint) formatting 
+f10c55d3fc860b66f7892930b493eda2953e0419
+
+#(maint) formatting 
+3ff7adb0ecb1b85da9340693f11d9699ae2d50c3
+
+#(maint) formatting 
+4f39b7439e045ed2b65fe72741b753afb3b4d33d
+
+#(maint) formatting 
+f1df436680acac307d489a8402390891d8c32573
+
+#(maint) formatting 
+ddf8d2f3692a9f1de472965aa1f5f619acb23c50
+
+#(maint) formatting 
+cee189ccdd0e0a4169044a1d847d0fb8226d4c67
+
+#(maint) formatting/spacing 
+32dc4420f35a55375da9d253e2ee591b4d72a674
+
+#(maint) formatting 
+67fbbcf5b4f2828e7c3910730e042b90181e0415
+
+#(maint) formatting 
+13451a7a841f353365953454f91503b0af79392d
+
+#(maint) formatting 
+26447f974f5853866d73e46f71af378a7834bdac
+
+#(maint) formatting 
+a808f2f2e07cbbbcac021de7e4c74d90c63d523c
+
+#(maint) formatting 
+a2a6eb98e7add1c9646e9f86a4614ee22a78f950
+
+#(maint) formatting 
+a2d026d4ef173d68132c2e51c8abbea408eb9f3e
+
+#(maint) formatting 
+fea75e87f0ef7d64eb823f4a091f958594c4fe4e
+
+#(maint) formatting 
+e3d3a9fc2c3bf3d54273bd51991fd44eca9bae24
+
+#(maint) formatting 
+e387053ab1502088e92ad4a72f65f6da88f4cae4
+
+#(maint) formatting 
+ebc811ae6e10693e07b8bab406bcf7f76711209a
+
+#(maint) formatting 
+18b33736da35bde7419e8a2b2a631aafd0a3ba36
+
+#(maint) formatting 
+785f1e970ca2d43de6d5e5181dddc8c9c233fdc6
+
+#(maint) formatting 
+97458f8877f07c6cea87d2702b98ccb9f36cb712
+
+#(maint) formatting 
+5e29a252b52ef4c5c5324844d7796845b00db2d8
+
+#(maint) formatting 
+b19c8c24b08d3b4a8d2b2b88d46edead71d0e31a
+
+#(maint) formatting 
+e9515c247972ecf22ece68e080ae96ef0e8ebd6c
+
+#(maint) formatting of xml comments 
+5e7bdb4143e89605ce887543b4ba74f6af488e3c
+
+#(maint) formatting 
+f6393c625416250e87294bb4f20b94495a1ed923
+
