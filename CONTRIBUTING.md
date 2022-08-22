@@ -117,6 +117,7 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
       * `git config merge.ff false`
       * `git config merge.log true`
       * `git config fetch.prune true`
+      * `git config blame.ignoreRevsFile .git-blame-ignore-revs --local`
     1. From there you create a branch named specific to the feature.
     1. In the branch you do work specific to the feature.
     1. For committing the code, please see [Prepare Commits](#prepare-commits).
