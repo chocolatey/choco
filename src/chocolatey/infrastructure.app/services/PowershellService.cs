@@ -165,7 +165,7 @@ namespace chocolatey.infrastructure.app.services
 
         private string prepare_powershell_arguments(string argument)
         {
-            return argument.to_string().Replace("\"", "\\\"");
+            return argument.to_string().Replace("\"", "\\\"").Replace("'", "\\'");
         }
 
         public bool run_action(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command)
