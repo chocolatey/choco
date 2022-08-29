@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = 'Stop';
+﻿$ErrorActionPreference = 'Stop'
 
 $LicensedCommandsRegistered = Get-Command "Invoke-ValidateChocolateyLicense" -EA SilentlyContinue
 if (!$LicensedCommandsRegistered) {
