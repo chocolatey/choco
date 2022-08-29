@@ -24,9 +24,6 @@ This is a low-level function that is used by Chocolatey to get the
 headers for a request/response to better help when getting and
 validating internet resources.
 
-.NOTES
-Not recommended for use in package scripts.
-
 .INPUTS
 None
 
