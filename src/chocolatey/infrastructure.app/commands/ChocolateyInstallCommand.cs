@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.app.commands
                      "AllowDowngrade - Should an attempt at downgrading be allowed? Defaults to false.",
                      option => configuration.AllowDowngrade = option != null)
                 .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
-                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false.",
+                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false. (DEPRECATED)",
                      option => configuration.AllowMultipleVersions = option != null)
                 .Add("i|ignoredependencies|ignore-dependencies",
                      "IgnoreDependencies - Ignore dependencies when installing package(s). Defaults to false.",
@@ -254,6 +254,10 @@ NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
 Starting in v2.0.0 the shortcut `cinst` will be removed and can not be used
 to install packages anymore. We recommend you make sure that you always
 use the full command going forward (`choco install`).
+
+Side by side installations has been deprecated and will be removed in v2.0.0.
+Instead of using side by side installations, distinct packages should be created
+if similar functionality is needed going forward.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");

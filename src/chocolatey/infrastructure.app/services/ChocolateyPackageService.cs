@@ -573,6 +573,11 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
 
         public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
         {
+            if (config.AllowMultipleVersions)
+            {
+                this.Log().Warn(ChocolateyLoggers.Important, "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0.");
+            }
+
             this.Log().Info(is_packages_config_file(config.PackageNames) ? @"Installing from config file:" : @"Installing the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
 
@@ -812,6 +817,11 @@ Would have determined packages that are out of date based on what is
 
         public virtual ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config)
         {
+            if (config.AllowMultipleVersions)
+            {
+                this.Log().Warn(ChocolateyLoggers.Important, "Upgrading the same package with multiple versions is deprecated and will be removed in v2.0.0.");
+            }
+
             this.Log().Info(@"Upgrading the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
 

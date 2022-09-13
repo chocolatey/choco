@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.nuget
 {
+    using System;
     using System.IO;
     using NuGet;
 
@@ -24,8 +25,16 @@ namespace chocolatey.infrastructure.app.nuget
     public sealed class ChocolateyPackagePathResolver : DefaultPackagePathResolver
     {
         private readonly IFileSystem _nugetFileSystem;
+
+        [Obsolete("Side by Side installations are deprecated, and is pending removal in v2.0.0")]
         public bool UseSideBySidePaths { get; set; }
 
+        public ChocolateyPackagePathResolver(IFileSystem nugetFileSystem)
+            : this(nugetFileSystem, useSideBySidePaths: false)
+        {
+        }
+
+        [Obsolete("Initializing using side by side installation enabled is deprecated. Use overload without useSideBySidePaths instead.")]
         public ChocolateyPackagePathResolver(IFileSystem nugetFileSystem, bool useSideBySidePaths)
             : base(nugetFileSystem, useSideBySidePaths)
         {
@@ -47,6 +56,7 @@ namespace chocolatey.infrastructure.app.nuget
             return GetPackageDirectory(packageId, version, UseSideBySidePaths);
         }
 
+        [Obsolete("Side by Side installations are deprecated, and is pending removal in v2.0.0")]
         public string GetPackageDirectory(string packageId, SemanticVersion version, bool useVersionInPath)
         {
             string directory = packageId;

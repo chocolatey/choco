@@ -17,6 +17,7 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Text;
     using configuration;
@@ -41,6 +42,10 @@ namespace chocolatey.infrastructure.app.services
         private const string ARGS_FILE = ".arguments";
         private const string EXTRA_FILE = ".extra";
         private const string VERSION_OVERRIDE_FILE = ".version";
+
+        // We need to store the package identifiers we have warned about
+        // to prevent duplicated outputs.
+        private HashSet<string> _deprecationWarning = new HashSet<string>();
 
         public ChocolateyPackageInformationService(IFileSystem fileSystem, IRegistryService registryService, IFilesService filesService)
         {
@@ -140,6 +145,19 @@ A corrupt .registry file exists at {0}.
             if (_fileSystem.file_exists(argsFile)) packageInformation.Arguments = _fileSystem.read_file(argsFile);
             var extraInfoFile = _fileSystem.combine_paths(pkgStorePath, EXTRA_FILE);
             if (_fileSystem.file_exists(extraInfoFile)) packageInformation.ExtraInformation = _fileSystem.read_file(extraInfoFile);
+
+            if (packageInformation.IsSideBySide && !_deprecationWarning.Contains(package.Id))
+            {
+                var logger = _config.RegularOutput ?
+                    logging.ChocolateyLoggers.Important :
+                    logging.ChocolateyLoggers.LogFileOnly;
+
+                this.Log().Warn(logger, @"
+{0} has been installed as a side by side installation.
+Side by side installations are deprecated and is pending removal in v2.0.0.", package.Id);
+
+                _deprecationWarning.Add(package.Id);
+            }
 
             var versionOverrideFile = _fileSystem.combine_paths(pkgStorePath, VERSION_OVERRIDE_FILE);
             if (_fileSystem.file_exists(versionOverrideFile))
