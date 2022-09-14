@@ -169,6 +169,11 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         It "Shows version <_> of local package" -ForEach @("2.0.0"; "1.1.0") {
             $Output.Lines | Should -Contain "isdependency $_"
         }
+
+        It "Outputs a warning message that installed side by side package is deprecated" {
+            $Output.Lines | Should -Contain "isdependency has been installed as a side by side installation."
+            $Output.Lines | Should -Contain "Side by side installations are deprecated and is pending removal in v2.0.0."
+        }
     }
 
     Context "Searching packages with Verbose" {

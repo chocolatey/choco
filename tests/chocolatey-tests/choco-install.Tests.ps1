@@ -565,6 +565,10 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $XML.package.metadata.version | Should -Be "1.0.0"
         }
 
+        It "Outputs a warning message about side by side installs are deprecated" {
+            $Output.Lines | Should -Contain "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0." -Because $Output.String
+        }
+
         It "Outputs a message indicating that it installed the package successfully" {
             $Output.Lines | Should -Contain "Chocolatey installed 1/1 packages."
         }
@@ -599,6 +603,10 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $XML.package.metadata.version | Should -Be "1.0.0"
         }
 
+        It "Outputs a warning message about side by side installs are deprecated" {
+            $Output.Lines | Should -Contain "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0." -Because $Output.String
+        }
+
         It "Outputs a message indicating that it installed the package successfully" {
             $Output.Lines | Should -Contain "Chocolatey installed 1/1 packages."
         }
@@ -627,6 +635,15 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec" | Should -Exist
             [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec"
             $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+
+        It "Does not output a warning message about side by side installs are deprecated" {
+            $Output.Lines | Should -Not -Contain "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0." -Because $Output.String
+        }
+
+        It "Does not output a warning message that installed side by side package is deprecated" {
+            $Output.Lines | Should -Not -Contain "installpackage has been installed as a side by side installation." -Because $Output.String
+            $Output.Lines | Should -Not -Contain "Side by side installations are deprecated and is pending removal in v2.0.0." -Because $Output.String
         }
 
         It "Outputs a message indicating that it installed the package successfully" {
