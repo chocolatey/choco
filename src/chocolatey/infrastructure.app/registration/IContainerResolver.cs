@@ -6,7 +6,7 @@
 //
 // You may obtain a copy of the License at
 //
-// 	http://www.apache.org/licenses/LICENSE-2.0
+//  http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,24 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.app.domain
+namespace chocolatey.infrastructure.app.registration
 {
-    using System;
+    using System.Collections.Generic;
 
-    /// <summary>
-    ///   Special source modifiers that use alternate sources for packages
-    /// </summary>
-    [Obsolete("This source type is no longer used, and only provided for backwards compatibility, instead use SourceTypes class instead.")]
-    public enum SourceType
+    public interface IContainerResolver
     {
-        //this is what it should be when it's not set
-        normal,
+        TService resolve<TService>()
+            where TService : class;
 
-        webpi,
-        ruby,
-        python,
-        windowsfeature,
-        windowsfeatures,
-        cygwin,
+        IEnumerable<TService> resolve_all<TService>()
+            where TService : class;
     }
 }

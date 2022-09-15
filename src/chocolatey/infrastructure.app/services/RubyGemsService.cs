@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +45,6 @@ namespace chocolatey.infrastructure.app.services
         public static readonly Regex PackageNameInstalledRegex = new Regex(@"Successfully installed (?<{0}>.*)\-".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
         public static readonly Regex PackageNameErrorRegex = new Regex(@"'(?<{0}>[^']*)'".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
 
-
         private readonly IDictionary<string, ExternalCommandArgument> _listArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
         private readonly IDictionary<string, ExternalCommandArgument> _installArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -72,7 +71,7 @@ namespace chocolatey.infrastructure.app.services
         {
             args.Add("_cmd_c_", new ExternalCommandArgument { ArgumentOption = "/c", Required = true });
             args.Add("_gem_", new ExternalCommandArgument { ArgumentOption = "gem", Required = true });
-            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "list", Required = true});
+            args.Add("_action_", new ExternalCommandArgument { ArgumentOption = "list", Required = true });
         }
 
         /// <summary>
@@ -80,36 +79,36 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         private void set_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-            args.Add("_cmd_c_", new ExternalCommandArgument {ArgumentOption = "/c", Required = true});
-            args.Add("_gem_", new ExternalCommandArgument {ArgumentOption = "gem", Required = true});
-            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "install", Required = true});
+            args.Add("_cmd_c_", new ExternalCommandArgument { ArgumentOption = "/c", Required = true });
+            args.Add("_gem_", new ExternalCommandArgument { ArgumentOption = "gem", Required = true });
+            args.Add("_action_", new ExternalCommandArgument { ArgumentOption = "install", Required = true });
             args.Add("_package_name_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "package name ",
-                    ArgumentValue = PACKAGE_NAME_TOKEN,
-                    QuoteValue = false,
-                    UseValueOnly = true,
-                    Required = true
-                });
+            {
+                ArgumentOption = "package name ",
+                ArgumentValue = PACKAGE_NAME_TOKEN,
+                QuoteValue = false,
+                UseValueOnly = true,
+                Required = true
+            });
 
             args.Add("Force", new ExternalCommandArgument
-                {
-                    ArgumentOption = "-f ",
-                    QuoteValue = false,
-                    Required = false
-                });
+            {
+                ArgumentOption = "-f ",
+                QuoteValue = false,
+                Required = false
+            });
 
             args.Add("Version", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--version ",
-                    QuoteValue = false,
-                    Required = false
-                });
+            {
+                ArgumentOption = "--version ",
+                QuoteValue = false,
+                Required = false
+            });
         }
 
-        public SourceType SourceType
+        public string SourceType
         {
-            get { return SourceType.ruby; }
+            get { return SourceTypes.RUBY; }
         }
 
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
@@ -117,19 +116,19 @@ namespace chocolatey.infrastructure.app.services
             if (Platform.get_platform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
 
             var runnerConfig = new ChocolateyConfiguration
-                {
-                    PackageNames = RUBY_PORTABLE_PACKAGE,
-                    Sources = ApplicationParameters.PackagesLocation,
-                    Debug = config.Debug,
-                    Force = config.Force,
-                    Verbose = config.Verbose,
-                    CommandExecutionTimeoutSeconds = config.CommandExecutionTimeoutSeconds,
-                    CacheLocation = config.CacheLocation,
-                    RegularOutput = config.RegularOutput,
-                    PromptForConfirmation = false,
-                    AcceptLicense = true,
-                    QuietOutput = true,
-                };
+            {
+                PackageNames = RUBY_PORTABLE_PACKAGE,
+                Sources = ApplicationParameters.PackagesLocation,
+                Debug = config.Debug,
+                Force = config.Force,
+                Verbose = config.Verbose,
+                CommandExecutionTimeoutSeconds = config.CommandExecutionTimeoutSeconds,
+                CacheLocation = config.CacheLocation,
+                RegularOutput = config.RegularOutput,
+                PromptForConfirmation = false,
+                AcceptLicense = true,
+                QuietOutput = true,
+            };
             runnerConfig.ListCommand.LocalOnly = true;
 
             var localPackages = _nugetService.list_run(runnerConfig);

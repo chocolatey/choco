@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +35,7 @@ namespace chocolatey.infrastructure.app.configuration
             RegularOutput = true;
             PromptForConfirmation = true;
             DisableCompatibilityChecks = false;
-            SourceType = SourceType.normal;
+            SourceType = SourceTypes.NORMAL;
             Information = new InformationCommandConfiguration();
             Features = new FeaturesConfiguration();
             NewCommand = new NewCommandConfiguration();
@@ -69,7 +69,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
  output to a gist for review.");
             output_tostring(properties, GetType().GetProperties(), this, "");
             return properties.ToString();
-
         }
 
         private void output_tostring(StringBuilder propertyValues, IEnumerable<PropertyInfo> properties, object obj, string prepend)
@@ -145,6 +144,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         // configuration set variables
         public string CacheLocation { get; set; }
+
         public bool ContainsLegacyPackageInstalls { get; set; }
         public int CommandExecutionTimeoutSeconds { get; set; }
         public int WebRequestTimeoutSeconds { get; set; }
@@ -154,7 +154,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         ///   One or more source locations set by configuration or by command line. Separated by semi-colon
         /// </summary>
         public string Sources { get; set; }
-        public SourceType SourceType { get; set; }
+
+        public string SourceType { get; set; }
 
         // top level commands
 
@@ -164,6 +165,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool Force { get; set; }
         public bool Noop { get; set; }
         public bool HelpRequested { get; set; }
+
         /// <summary>
         ///   Gets or sets a value indicating whether parsing was successful (everything parsed) or not.
         /// </summary>
@@ -177,6 +179,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </summary>
         /// <value><c>true</c> for regular output; <c>false</c> for limited output.</value>
         public bool RegularOutput { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether console logging should be supressed.
         /// This is for use by API calls which surface results in alternate forms.
@@ -184,6 +187,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <value><c>true</c> for no output; <c>false</c> for regular or limited output.</value>
         /// <remarks>This has only been implemented for NuGet List</remarks>
         public bool QuietOutput { get; set; }
+
         public bool PromptForConfirmation { get; set; }
 
         /// <summary>
@@ -206,6 +210,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         // command level options
         public string Version { get; set; }
+
         public bool AllVersions { get; set; }
         public bool SkipPackageInstallProvider { get; set; }
         public string OutputDirectory { get; set; }
@@ -243,7 +248,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public InformationCommandConfiguration Information { get;  set; }
+        public InformationCommandConfiguration Information { get; set; }
 
         /// <summary>
         ///   Configuration related to features and whether they are enabled.
@@ -251,7 +256,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public FeaturesConfiguration Features { get;  set; }
+        public FeaturesConfiguration Features { get; set; }
 
         /// <summary>
         ///   Configuration related specifically to List command
@@ -259,7 +264,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public ListCommandConfiguration ListCommand { get;  set; }
+        public ListCommandConfiguration ListCommand { get; set; }
 
         /// <summary>
         ///   Configuration related specifically to Upgrade command
@@ -267,7 +272,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public UpgradeCommandConfiguration UpgradeCommand { get;  set; }
+        public UpgradeCommandConfiguration UpgradeCommand { get; set; }
 
         /// <summary>
         ///   Configuration related specifically to New command
@@ -275,7 +280,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public NewCommandConfiguration NewCommand { get;  set; }
+        public NewCommandConfiguration NewCommand { get; set; }
 
         /// <summary>
         ///   Configuration related specifically to Source command
@@ -283,7 +288,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public SourcesCommandConfiguration SourceCommand { get;  set; }
+        public SourcesCommandConfiguration SourceCommand { get; set; }
 
         /// <summary>
         ///   Default Machine Sources Configuration
@@ -315,7 +320,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public ApiKeyCommandConfiguration ApiKeyCommand { get;  set; }
+        public ApiKeyCommandConfiguration ApiKeyCommand { get; set; }
 
         /// <summary>
         ///   Configuration related specifically to the Pack command.
@@ -331,7 +336,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public PushCommandConfiguration PushCommand { get;  set; }
+        public PushCommandConfiguration PushCommand { get; set; }
 
         /// <summary>
         /// Configuration related specifically to Pin command
@@ -365,7 +370,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// <remarks>
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
-        public TemplateCommandConfiguration TemplateCommand { get;  set; }
+        public TemplateCommandConfiguration TemplateCommand { get; set; }
     }
 
     [Serializable]
@@ -373,6 +378,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         // application set variables
         public PlatformType PlatformType { get; set; }
+
         public Version PlatformVersion { get; set; }
         public string PlatformName { get; set; }
         public string ChocolateyVersion { get; set; }
@@ -435,6 +441,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         // list
         public bool LocalOnly { get; set; }
+
         public bool IdOnly { get; set; }
         public bool IncludeRegistryPrograms { get; set; }
         public int? Page { get; set; }

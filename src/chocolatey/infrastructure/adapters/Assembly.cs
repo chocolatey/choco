@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -88,9 +88,19 @@ namespace chocolatey.infrastructure.adapters
             return _assembly.GetType(name,throwOnError, ignoreCase);
         }
 
+        public Type[] GetTypes()
+        {
+            return _assembly.GetTypes();
+        }
+
         public static IAssembly Load(byte[] rawAssembly)
         {
             return new Assembly(System.Reflection.Assembly.Load(rawAssembly));
+        }
+
+        public static IAssembly Load(byte[] rawAssembly, byte[] rawSymbols)
+        {
+            return new Assembly(System.Reflection.Assembly.Load(rawAssembly, rawSymbols));
         }
 
         public static IAssembly LoadFile(string path)

@@ -14,23 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.validations
+namespace chocolatey.infrastructure.app.registration
 {
+    using System;
     using System.Collections.Generic;
-    using app.configuration;
-    using chocolatey.infrastructure.app.attributes;
+    using System.Linq;
+    using System.Text;
 
     /// <summary>
-    ///   Interface for all validations
+    /// Placeholder for the future to prevent the need to do a breaking release of
+    /// Chocolatey Licensed Extension.
     /// </summary>
-    [MultiService]
-    public interface IValidation
+    public interface IExtensionConfiguration
     {
         /// <summary>
-        ///   Performs the required validation logic
+        /// Creates the initial configuration for this extension.
+        /// This will be automatically populated with the correct values
+        /// from the configuration file by Chocolatey CLI.
         /// </summary>
-        /// <param name="config">The current Chocolatey Configuration</param>
-        /// <returns>The validation results</returns>
-        ICollection<ValidationResult> validate(ChocolateyConfiguration config);
+        /// <returns>The initial configuration for the settings.</returns>
+        /// <remarks>This is not used, and is only a placeholder for the future.</remarks>
+        object create_initial_extension_configuration();
     }
 }
