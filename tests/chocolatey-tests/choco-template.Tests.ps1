@@ -35,6 +35,10 @@ Describe "choco <_>" -ForEach @(
             $Output.Lines | Should -Contain 'msi 1.0.2'
             $Output.Lines | Should -Contain 'zip 1.0.0'
         }
+
+        It "Displays how many custom templates are available" {
+            $Output.Lines | Should -Contain "2 Custom templates found at $env:ChocolateyInstall\templates"
+        }
     }
 
     Context "Running with list subcommand" {
@@ -53,6 +57,10 @@ Describe "choco <_>" -ForEach @(
         It "Displays the templates expected" {
             $Output.Lines | Should -Contain 'msi 1.0.2'
             $Output.Lines | Should -Contain 'zip 1.0.0'
+        }
+
+        It "Displays how many custom templates are available" {
+            $Output.Lines | Should -Contain "2 Custom templates found at $env:ChocolateyInstall\templates"
         }
     }
 
@@ -103,6 +111,22 @@ Describe "choco <_>" -ForEach @(
             $Output.Lines | Should -Contain "$env:ChocolateyInstall\templates\msi\tools\LICENSE.txt"
             $Output.Lines | Should -Contain "$env:ChocolateyInstall\templates\msi\tools\VERIFICATION.txt"
         }
+
+        It "Displays section of parameters" {
+            $Output.Lines | Should -Contain 'List of Parameters:'
+        }
+
+        It "Displays parameter name <_>" -Foreach @('PackageNameLower'; 'PackageVersion'; 'MaintainerRepo'; 'MaintainerName'; 'PackageName'; 'AutomaticPackageNotesNuspec'; 'AutomaticPackageNotesInstaller'; 'Url'; 'Url64'; 'Checksum'; 'Checksum64'; 'SilentArgs') {
+            $Output.Lines | Should -Contain $_
+        }
+
+        It "Created parameters file for msi" {
+            "$env:ChocolateyInstall\templates\msi\.parameters" | Should -Exist
+        }
+
+        It "Does not create parameters file for zip" {
+            "$env:ChocolateyInstall\templates\zip\.parameters" | Should -Not -Exist
+        }
     }
 
     Context "Running with no subcommand specified with --name parameter" {
@@ -142,6 +166,10 @@ Describe "choco <_>" -ForEach @(
             $Output.Lines | Should -Contain '* zip 1.0.0'
             $Output.Lines | Should -Contain 'Built-in template is not default, it can be specified if the --built-in parameter is used'
         }
+
+        It "Displays how many custom templates are available" {
+            $Output.Lines | Should -Contain "2 Custom templates found at $env:ChocolateyInstall\templates"
+        }
     }
 
     Context "Running without subcommand specified after an invalid default template name is specified" {
@@ -162,6 +190,110 @@ Describe "choco <_>" -ForEach @(
         It "Displays the templates marking the default as expected" {
             $Output.Lines | Should -Contain 'zip 1.0.0'
             $Output.Lines | Should -Contain 'Built-in template is default.'
+        }
+
+        It "Displays how many custom templates are available" {
+            $Output.Lines | Should -Contain "2 Custom templates found at $env:ChocolateyInstall\templates"
+        }
+    }
+
+    Context 'Running <_> with verbose argument' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Invoke-Choco install msi.template zip.template
+
+            $Output = Invoke-Choco $_ --verbose
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Displays <Name> template information" -ForEach @(
+            @{
+                Name  = 'msi'
+                Lines = @(
+                    'Template name: msi'
+                    'Version: 1.0.2'
+                    'Default template: False'
+                    'Summary: MSI Chocolatey template'
+                    '### Chocolatey MSI template'
+                    'This adds a template for MSI packages.'
+                    'List of files:'
+                )
+            }
+            @{
+                Name  = 'zip'
+                Lines = @(
+                    'Template name: zip'
+                    'Version: 1.0.0'
+                    'Default template: False'
+                    'Summary: Zip Chocolatey template'
+                    '### Chocolatey Zip template'
+                    'This adds a template for archive (zipped) packages.'
+                    'List of files:'
+                )
+            }
+        ) {
+            $Lines | ForEach-Object {
+                $Output.Lines | Should -Contain $_ -Because $Output.String
+            }
+        }
+
+        It "Displays <Name> template information for files" -Foreach @(
+            @{
+                Name = 'msi'
+                Files = @(
+                    'msi\msi.nuspec'
+                    'msi\ReadMe.md'
+                    'msi\tools\chocolateybeforemodify.ps1'
+                    'msi\tools\chocolateyinstall.ps1'
+                    'msi\tools\chocolateyuninstall.ps1'
+                    'msi\tools\LICENSE.txt'
+                    'msi\tools\VERIFICATION.txt'
+                )
+            }
+            @{
+                Name = 'zip'
+                Files = @(
+                    'zip\zip.nuspec'
+                    'zip\ReadMe.md'
+                    'zip\tools\chocolateybeforemodify.ps1'
+                    'zip\tools\chocolateyinstall.ps1'
+                    'zip\tools\LICENSE.txt'
+                    'zip\tools\VERIFICATION.txt'
+                )
+            }
+        ) {
+            $Files | ForEach-Object {
+                $Output.Lines | Should -Contain "$env:ChocolateyInstall\templates\$_" -Because $Output.String
+            }
+        }
+
+        It "Displays how many custom templates are available" {
+            $Output.Lines | Should -Contain "2 Custom templates found at $env:ChocolateyInstall\templates"
+        }
+
+        It "Displays section of parameters" {
+            $items = $Output.Lines | Where-Object { $_ -eq 'List of Parameters:' }
+            $items | Should -HaveCount 2 -Because $Output.String
+        }
+
+        It "Displays parameter name <_>" -Foreach @('PackageNameLower'; 'PackageVersion'; 'MaintainerRepo'; 'MaintainerName'; 'PackageName'; 'AutomaticPackageNotesNuspec'; 'AutomaticPackageNotesInstaller'; 'Url'; 'Url64'; 'Checksum'; 'Checksum64') {
+            $parameter = $_
+            $items = $Output.Lines | Where-Object { $_ -eq $parameter }
+            $items | Should -HaveCount 2 -Because $Output.String
+        }
+
+        It "Displays parameter name <_>" -Foreach @('SilentArgs') {
+            $parameter = $_
+            $items = $Output.Lines | Where-Object { $_ -eq $parameter }
+            $items | Should -HaveCount 1 -Because $Output.String
+        }
+
+        It "Created parameters file for <_>" -Foreach @('msi', 'zip') {
+            "$env:ChocolateyInstall\templates\$_\.parameters" | Should -Exist
         }
     }
 }
