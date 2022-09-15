@@ -288,7 +288,7 @@ param(
   $ErrorActionPreference = 'Stop'
   try {
     # get current acl
-    $acl = (Get-Item $folder).GetAccessControl('Access,Owner')
+    $acl = Get-Acl $folder
 
     Write-Debug "Removing existing permissions."
     $acl.Access | ForEach-Object { $acl.RemoveAccessRuleAll($_) }
@@ -334,17 +334,17 @@ param(
     $acl.SetAccessRuleProtection($true, $false)
 
     # enact the changes against the actual
-    (Get-Item $folder).SetAccessControl($acl)
+    Set-Acl -Path $folder -AclObject $acl
 
     # set an explicit append permission on the logs folder
     Write-Debug "Allow users to append to log files."
     $logsFolder = "$folder\logs"
     Create-DirectoryIfNotExists $logsFolder
-    $logsAcl = (Get-Item $logsFolder).GetAccessControl('Access')
+    $logsAcl = Get-Acl $logsFolder
     $usersAppendAccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule($builtinUsers, $rightsWrite, [Security.AccessControl.InheritanceFlags]::ObjectInherit, [Security.AccessControl.PropagationFlags]::InheritOnly, "Allow")
     $logsAcl.SetAccessRule($usersAppendAccessRule)
     $logsAcl.SetAccessRuleProtection($false, $true)
-    (Get-Item $logsFolder).SetAccessControl($logsAcl)
+    Set-Acl -Path $logsFolder -AclObject $logsAcl
   } catch {
     Write-ChocolateyWarning "Not able to set permissions for $folder."
   }
