@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -621,12 +621,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-            var originalConfig = config.deep_copy();
+            config.start_backup();
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                // reset config each time through
-                config = originalConfig.deep_copy();
+                // We need to ensure we are using a clean configuration file
+                // before we start reading it.
+                config.reset_config();
 
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
@@ -877,6 +878,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
                 }
             }
+
+            // Reset the configuration again once we are completely done with the processing of
+            // configurations, and make sure that we are removing any backup that was created
+            // as part of this run.
+            config.reset_config(removeBackup: true);
 
             return packageInstalls;
         }
