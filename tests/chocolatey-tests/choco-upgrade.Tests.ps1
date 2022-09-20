@@ -119,4 +119,92 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
             $Output.Lines | Should -Contain "Chocolatey upgraded 1/1 packages." -Because $Output.String
         }
     }
+
+    Context "Upgrading packages while remembering arguments with only one package using arguments" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Enable-ChocolateyFeature useRememberedArgumentsForUpgrades
+            $null = Invoke-Choco install curl --package-parameters="'/CurlOnlyParam'" --version="7.77.0" --ia="'/CurlIAParam'" --x86 -y
+            $null = Invoke-Choco install wget --version=1.21.1 -y
+
+            $Output = Invoke-Choco upgrade all -y --debug
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Outputs running curl script with correct arguments' {
+            $line = $Output.Lines | Where-Object { $_ -match "packageScript.*curl\\tools" } | Select-Object -Last 1
+
+            $line | Should -Not -BeNullOrEmpty
+            $line | Should -MatchExactly "\/CurlIAParam"
+            $line | Should -MatchExactly "\/CurlOnlyParam"
+            $line | Should -Match "-forceX86"
+        }
+
+        It 'Outputs running wget script with correct arguments' {
+            $line = $Output.Lines | Where-Object { $_ -match "packageScript.*wget\\tools" }
+
+            $line | Should -Not -BeNullOrEmpty
+            $line | Should -Match "installArguments:? ''"
+            $line | Should -Match "packageParameters:? ''"
+            $line | Should -Not -Match "-forceX86"
+        }
+    }
+
+    # We exclude this test when running CCM, as it will install and remove
+    # the firefox package which is used through other tests that will be affected.
+    Context "Upgrading packages while remembering arguments with multiple packages using arguments" -Tag CCMExcluded {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Enable-ChocolateyFeature useRememberedArgumentsForUpgrades
+            $null = Invoke-Choco install curl --package-parameters="'/CurlOnlyParam'" --version="7.77.0" --ia="'/CurlIAParam'" --forcex86 -y
+            $null = Invoke-Choco install wget --version=1.21.1 -y --forcex86
+            $null = Invoke-Choco install firefox --version=99.0.1 --package-parameters="'/l=eu'" -y --ia="'/RemoveDistributionDir=true'"
+
+            $Output = Invoke-Choco upgrade all -y --debug
+        }
+
+        AfterAll {
+            $null = Invoke-Choco uninstall firefox -y
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Outputs running curl script with correct arguments' {
+            $line = $Output.Lines | Where-Object { $_ -match "packageScript.*curl\\tools" } | Select-Object -Last 1
+
+            $line | Should -Not -BeNullOrEmpty
+            $line | Should -Match "installArguments:? '/CurlIAParam'"
+            $line | Should -Match "packageParameters:? '/CurlOnlyParam'"
+            $line | Should -Match "-forceX86"
+        }
+
+        It 'Outputs running wget script with correct arguments' {
+            $line = $Output.Lines | Where-Object { $_ -match "packageScript.*wget\\tools" } | Select-Object -Last 1
+
+            $line | Should -Not -BeNullOrEmpty
+            $line | Should -Match "installArguments:? ''"
+            $line | Should -Match "packageParameters:? ''"
+            $line | Should -Match "-forceX86"
+        }
+
+        It 'Outputs firefox using eu as language locale' {
+            $Output.Lines | Should -Contain "Using locale 'eu'..."
+        }
+
+        It 'Outputs running firefox script with correct arguments' {
+            $line = $Output.Lines | Where-Object { $_ -match "packageScript.*firefox\\tools" }
+
+            $line | Should -Not -BeNullOrEmpty
+            $line | Should -Match "installArguments:? '\/RemoveDistributionDir=true'"
+            $line | Should -Match "packageParameters:? '\/l=eu'"
+            $line | Should -Not -Match "-forceX86"
+        }
+    }
 }
