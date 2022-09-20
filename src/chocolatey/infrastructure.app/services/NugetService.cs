@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,25 +19,24 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net;
-    using NuGet;
     using adapters;
+    using chocolatey.infrastructure.app.utility;
     using commandline;
     using configuration;
     using domain;
     using guards;
     using logging;
     using nuget;
+    using NuGet;
     using platforms;
     using results;
     using tolerance;
     using DateTime = adapters.DateTime;
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
-    using chocolatey.infrastructure.app.utility;
 
     //todo: #2575 - this monolith is too large. Refactor once test coverage is up.
 

@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,6 @@ namespace chocolatey.infrastructure.app.services
     using System.IO;
     using System.Linq;
     using System.Text;
-    using builders;
     using commandline;
     using configuration;
     using domain;
@@ -31,8 +30,8 @@ namespace chocolatey.infrastructure.app.services
     using infrastructure.events;
     using infrastructure.services;
     using logging;
-    using NuGet;
     using nuget;
+    using NuGet;
     using platforms;
     using results;
     using tolerance;
@@ -91,6 +90,7 @@ Did you know Chocolatey goes to eleven? And it turns great developers /
  organization's struggles with software management and save the day!
  https://chocolatey.org/compare"
 };
+
         private const string PRO_BUSINESS_LIST_MESSAGE = @"
 Did you know Pro / Business automatically syncs with Programs and
  Features? Learn more about Package Synchronizer at
@@ -742,7 +742,7 @@ Would have determined packages that are out of date based on what is
                     if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
                     if (pkgSettings.ApplyInstallArgumentsToDependencies) packageConfig.ApplyInstallArgumentsToDependencies = true;
                     if (pkgSettings.ApplyPackageParametersToDependencies) packageConfig.ApplyPackageParametersToDependencies = true;
-                    
+
                     if (!string.IsNullOrWhiteSpace(pkgSettings.Source) && has_source_type(pkgSettings.Source))
                     {
                         packageConfig.SourceType = pkgSettings.Source;
