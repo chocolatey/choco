@@ -214,6 +214,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool AllVersions { get; set; }
         public bool SkipPackageInstallProvider { get; set; }
         public string OutputDirectory { get; set; }
+        public bool SkipHookScripts { get; set; }
 
         // install/update
         /// <summary>

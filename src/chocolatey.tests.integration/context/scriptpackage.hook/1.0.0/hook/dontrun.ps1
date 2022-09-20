@@ -1,0 +1,1 @@
+Throw "This script should not be run"

@@ -88,6 +88,8 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
         public static readonly string ExtensionsLocation = _fileSystem.combine_paths(InstallLocation, "extensions");
         public static readonly string TemplatesLocation = _fileSystem.combine_paths(InstallLocation, "templates");
+        public static readonly string HooksLocation = _fileSystem.combine_paths(InstallLocation, "hooks");
+        public static readonly string HookPackageIdExtension = ".hook";
         public static readonly string ChocolateyCommunityFeedPushSourceOld = "https://chocolatey.org/";
         public static readonly string ChocolateyCommunityFeedPushSource = "https://push.chocolatey.org/";
         public static readonly string ChocolateyCommunityGalleryUrl = "https://community.chocolatey.org/";

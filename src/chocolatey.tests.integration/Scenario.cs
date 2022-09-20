@@ -49,6 +49,7 @@ namespace chocolatey.tests.integration
             string badPackagesPath = get_package_install_path() + "-bad";
             string backupPackagesPath = get_package_install_path() + "-bkp";
             string shimsPath = ApplicationParameters.ShimsLocation;
+            string hooksPath = ApplicationParameters.HooksLocation;
 
             _fileSystem.delete_directory_if_exists(config.CacheLocation, recursive: true, overrideAttributes: true);
             _fileSystem.delete_directory_if_exists(config.Sources, recursive: true, overrideAttributes: true);
@@ -58,6 +59,7 @@ namespace chocolatey.tests.integration
             _fileSystem.delete_directory_if_exists(backupPackagesPath, recursive: true, overrideAttributes: true);
             _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(get_top_level(), ".chocolatey"), recursive: true, overrideAttributes: true);
             _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(get_top_level(), "extensions"), recursive: true, overrideAttributes: true);
+            _fileSystem.delete_directory_if_exists(hooksPath, recursive: true, overrideAttributes: true);
 
             _fileSystem.create_directory(config.CacheLocation);
             _fileSystem.create_directory(config.Sources);
@@ -93,6 +95,7 @@ namespace chocolatey.tests.integration
 
             installConfig.PackageNames = packageId;
             installConfig.Version = version;
+            installConfig.CommandName = CommandNameType.install.to_string();
             _service.install_run(installConfig);
 
             NUnitSetup.MockLogger.Messages.Clear();

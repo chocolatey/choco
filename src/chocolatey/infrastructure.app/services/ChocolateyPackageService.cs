@@ -407,6 +407,7 @@ Did you know Pro / Business automatically syncs with Programs and
             {
                 handle_extension_packages(config, packageResult);
                 handle_template_packages(config, packageResult);
+                handle_hook_packages(config, packageResult);
                 pkgInfo.Arguments = capture_arguments(config, packageResult);
                 pkgInfo.IsPinned = config.PinPackage;
             }
@@ -1109,6 +1110,7 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
             remove_rollback_if_exists(packageResult);
             handle_extension_packages(config, packageResult);
             handle_template_packages(config, packageResult);
+            handle_hook_packages(config, packageResult);
 
             if (config.Force)
             {
@@ -1516,6 +1518,51 @@ ATTENTION: You must take manual action to remove {1} from
             // We add the trailing s to the check in case of windows feature which can be specified both with and without
             // the s.
             return _sourceRunners.FirstOrDefault(s => s.SourceType == sourceType || s.SourceType == sourceType + "s");
+        }
+
+        private void handle_hook_packages(ChocolateyConfiguration config, PackageResult packageResult)
+        {
+            if (packageResult == null) return;
+            if (!packageResult.Name.to_lower().EndsWith(ApplicationParameters.HookPackageIdExtension)) return;
+
+            _fileSystem.create_directory_if_not_exists(ApplicationParameters.HooksLocation);
+            var hookFolderName = packageResult.Name.to_lower().Replace(ApplicationParameters.HookPackageIdExtension, string.Empty);
+            var installHookPath = _fileSystem.combine_paths(ApplicationParameters.HooksLocation, hookFolderName);
+
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                {
+                    _fileSystem.delete_directory_if_exists(installHookPath, recursive: true);
+                },
+                "Attempted to remove '{0}' but had an error".format_with(installHookPath));
+
+            if (!config.CommandName.is_equal_to(CommandNameType.uninstall.to_string()))
+            {
+                if (packageResult.InstallLocation == null) return;
+
+                _fileSystem.create_directory_if_not_exists(installHookPath);
+                var hookPath = _fileSystem.combine_paths(packageResult.InstallLocation, "hook");
+                var hookFolderToCopy = _fileSystem.directory_exists(hookPath) ? hookPath : packageResult.InstallLocation;
+
+                FaultTolerance.try_catch_with_logging_exception(
+                    () =>
+                    {
+                        _fileSystem.copy_directory(hookFolderToCopy, installHookPath, overwriteExisting: true);
+                    },
+                    "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".format_with(Environment.NewLine, hookFolderToCopy, installHookPath));
+
+                string logMessage = " Installed/updated {0} hook.".format_with(hookFolderName);
+                this.Log().Warn(logMessage);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, installHookPath, EnvironmentVariableTarget.Process);
+            }
+            else
+            {
+                string logMessage = " Uninstalled {0} hook.".format_with(hookFolderName);
+                this.Log().Warn(logMessage);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
+            }
         }
     }
 }
