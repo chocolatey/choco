@@ -142,4 +142,21 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
             $Output.Lines | Should -Contain "${Title}: $Value"
         }
     }
+
+    Context "Listing package information about local side by side installed package" {
+        BeforeAll {
+            $null = Invoke-Choco install 'isdependency' --confirm --sxs
+
+            $Output = Invoke-Choco info 'isdependency' --local-only
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Outputs a warning message that installed side by side package is deprecated" {
+            $Output.Lines | Should -Contain "isdependency has been installed as a side by side installation." -Because $Output.String
+            $Output.Lines | Should -Contain "Side by side installations are deprecated and is pending removal in v2.0.0." -Because $Output.String
+        }
+    }
 }

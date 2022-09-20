@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
+    using System;
     using NuGet;
 
     public sealed class ChocolateyPackageInformation
@@ -31,6 +32,8 @@ namespace chocolatey.infrastructure.app.domain
         public string Arguments { get; set; }
         public SemanticVersion VersionOverride { get; set; }
         public bool HasSilentUninstall { get; set; }
+
+        [Obsolete("Side by side installations are deprecated, with removal pending in v2.0.0")]
         public bool IsSideBySide { get; set; }
         public bool IsPinned { get; set; }
         public string ExtraInformation { get; set; }

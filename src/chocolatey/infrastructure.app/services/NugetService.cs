@@ -950,6 +950,15 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
                 this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version, isPinned.to_string().to_lower()));
+
+                if (pkgInfo.IsSideBySide)
+                {
+                    var deprecationMessage = @"
+{0} v{1} has been installed as a side by side installation.
+Side by side installations are deprecated and is pending removal in v2.0.0".format_with(installedPackage.Id, installedPackage.Version);
+
+                    packageResult.Messages.Add(new ResultMessage(ResultType.Warn, deprecationMessage));
+                }
             }
 
             return outdatedPackages;
@@ -1264,6 +1273,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             packageManager.PackageUninstalling += (s, e) =>
                 {
                     var pkg = e.Package;
+
+                    // TODO: Removal special handling for SxS packages once we hit v2.0.0
 
                     // this section fires twice sometimes, like for older packages in a sxs install...
                     var packageResult = packageUninstalls.GetOrAdd(pkg.Id.to_lower() + "." + pkg.Version.to_string(), new PackageResult(pkg, e.InstallPath));

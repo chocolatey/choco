@@ -233,6 +233,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ApplyPackageParametersToDependencies { get; set; }
         public bool ApplyInstallArgumentsToDependencies { get; set; }
         public bool IgnoreDependencies { get; set; }
+
+        [Obsolete("Side by Side installation is deprecated, and is pending removal in v2.0.0")]
         public bool AllowMultipleVersions { get; set; }
         public bool AllowDowngrade { get; set; }
         public bool ForceDependencies { get; set; }

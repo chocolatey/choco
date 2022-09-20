@@ -1409,6 +1409,22 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_contain_a_warning_message_that_installing_package_with_multiple_versions_being_deprecated()
+            {
+                const string expected = "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0.";
+
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains(expected))
+                    {
+                        return;
+                    }
+                }
+
+                Assert.Fail("No warning message about side by side deprecation outputted");
+            }
+
+            [Fact]
             public void should_have_a_successful_package_result()
             {
                 packageResult.Success.ShouldBeTrue();
