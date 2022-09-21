@@ -93,7 +93,7 @@ try {
             Verbosity = 'Minimal'
         }
         Filter     = @{
-            ExcludeTag = 'Background', 'Licensed', 'CCM', 'WIP', 'NonAdmin'
+            ExcludeTag = 'Background', 'Licensed', 'CCM', 'WIP', 'NonAdmin', 'Internal'
         }
     }
 
