@@ -1282,7 +1282,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     # Issue: https://github.com/chocolatey/chocolatey-licensed-issues/issues/284
-    Context "Installing a Package with Embedded Zip Archive and specifying destination <Name>" -Foreach @(
+    Context "Installing a Package with Embedded Zip Archive and specifying destination <Name>" -ForEach @(
         @{ Name = 'Root of UNC share' ; Path = '\\localhost\c$\' }
         @{ Name = 'UNC share path' ; Path = '\\localhost\c$\temp\' }
         @{ Name = 'Root of drive with trailing slash' ; Path = 'C:\' }
