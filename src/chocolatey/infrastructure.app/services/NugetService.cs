@@ -19,25 +19,24 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net;
-    using NuGet;
     using adapters;
+    using chocolatey.infrastructure.app.utility;
     using commandline;
     using configuration;
     using domain;
     using guards;
     using logging;
     using nuget;
+    using NuGet;
     using platforms;
     using results;
     using tolerance;
     using DateTime = adapters.DateTime;
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
-    using chocolatey.infrastructure.app.utility;
 
     //todo: #2575 - this monolith is too large. Refactor once test coverage is up.
 
@@ -436,13 +435,13 @@ folder.");
                 uninstallSuccessAction: null,
                 addUninstallHandler: true);
 
-            var originalConfig = config.deep_copy();
+            config.start_backup();
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
-                // reset config each time through
-                config = originalConfig.deep_copy();
-
+                // We need to ensure we are using a clean configuration file
+                // before we start reading it.
+                config.reset_config();
                 //todo: #2577 get smarter about realizing multiple versions have been installed before and allowing that
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
@@ -555,6 +554,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 }
             }
 
+            // Reset the configuration again once we are completely done with the processing of
+            // configurations, and make sure that we are removing any backup that was created
+            // as part of this run.
+            config.reset_config(removeBackup: true);
+
             return packageInstalls;
         }
 
@@ -621,12 +625,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-            var originalConfig = config.deep_copy();
+            config.start_backup();
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                // reset config each time through
-                config = originalConfig.deep_copy();
+                // We need to ensure we are using a clean configuration file
+                // before we start reading it.
+                config.reset_config();
 
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
@@ -878,6 +883,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 }
             }
 
+            // Reset the configuration again once we are completely done with the processing of
+            // configurations, and make sure that we are removing any backup that was created
+            // as part of this run.
+            config.reset_config(removeBackup: true);
+
             return packageInstalls;
         }
 
@@ -897,12 +907,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             var packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
 
-            var originalConfig = config.deep_copy();
+            config.start_backup();
 
             foreach (var packageName in packageNames)
             {
-                // reset config each time through
-                config = originalConfig.deep_copy();
+                // We need to ensure we are using a clean configuration file
+                // before we start reading it.
+                config.reset_config();
 
                 var installedPackage = packageManager.LocalRepository.FindPackage(packageName);
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
@@ -960,6 +971,11 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                     packageResult.Messages.Add(new ResultMessage(ResultType.Warn, deprecationMessage));
                 }
             }
+
+            // Reset the configuration again once we are completely done with the processing of
+            // configurations, and make sure that we are removing any backup that was created
+            // as part of this run.
+            config.reset_config(removeBackup: true);
 
             return outdatedPackages;
         }
@@ -1374,12 +1390,13 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                     config.ForceDependencies = false;
                 });
 
-            var originalConfig = config.deep_copy();
+            config.start_backup();
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                // reset config each time through
-                config = originalConfig.deep_copy();
+                // We need to ensure we are using a clean configuration file
+                // before we start reading it.
+                config.reset_config();
 
                 IList<IPackage> installedPackageVersions = new List<IPackage>();
                 if (string.IsNullOrWhiteSpace(config.Version))
@@ -1506,6 +1523,11 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                     }
                 }
             }
+
+            // Reset the configuration again once we are completely done with the processing of
+            // configurations, and make sure that we are removing any backup that was created
+            // as part of this run.
+            config.reset_config(removeBackup: true);
 
             return packageUninstalls;
         }
