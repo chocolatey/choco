@@ -120,7 +120,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
     }
 
-    Context "Upgrading packages while remembering arguments with only one package using arguments" {
+    Context "Upgrading packages while remembering arguments with only one package using arguments" -Tag Internal {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -156,7 +156,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
 
     # We exclude this test when running CCM, as it will install and remove
     # the firefox package which is used through other tests that will be affected.
-    Context "Upgrading packages while remembering arguments with multiple packages using arguments" -Tag CCMExcluded {
+    Context "Upgrading packages while remembering arguments with multiple packages using arguments" -Tag CCMExcluded, Internal, VMOnly {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -195,7 +195,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It 'Outputs firefox using eu as language locale' {
-            $Output.Lines | Should -Contain "Using locale 'eu'..."
+            $Output.Lines | Should -Contain "Using locale 'eu'..." -Because $Output.String
         }
 
         It 'Outputs running firefox script with correct arguments' {
