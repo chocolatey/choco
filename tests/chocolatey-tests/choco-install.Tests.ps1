@@ -1392,4 +1392,36 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $result2.Lines | Should -Contain "Circular dependency detected 'circulardependency2 0.0.1 => circulardependency1 0.0.1 => circulardependency2 0.0.1'."
         }
     }
+
+    Context "Installing package that extracts local zip archive while disabling logging" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install zip-log-disable-test --verbose --debug -y
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Does not output extracted file path '<_>'" -ForEach @('tools\'; 'tools\chocolateybeforemodify.ps1'; 'tools\chocolateyinstall.ps1'; 'tools\chocolateyuninstall.ps1'; 'zip-log-disable-test.nuspec') {
+            $Output.String | Should -Not -Match "- $([regex]::Escape($_))"
+        }
+    }
+
+    Context "Installing package that extracts external zip archive while disabling logging" -Tag Internal {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install zip-log-disable-test-external --verbose --debug -y
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Does not output extracted file path '<_>'" -ForEach @('tools\'; 'tools\chocolateybeforemodify.ps1'; 'tools\chocolateyinstall.ps1'; 'tools\chocolateyuninstall.ps1'; 'zip-log-disable-test.nuspec') {
+            $Output.String | Should -Not -Match "- $([regex]::Escape($_))"
+        }
+    }
 }
