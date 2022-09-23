@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Xml.Serialization;
 using chocolatey.infrastructure.app.attributes;
 using chocolatey.infrastructure.commandline;
 using chocolatey.infrastructure.app.configuration;
@@ -136,34 +137,39 @@ If you find other exit codes that we have not yet documented, please
 
         public void Run(ChocolateyConfiguration configuration)
         {
-            var packageResults = _nugetService.GetInstalledPackages(configuration);
-            var settings = new XmlWriterSettings { Indent = true, Encoding = new UTF8Encoding(false) };
+            var installedPackages = _nugetService.GetInstalledPackages(configuration);
+            var xmlWriterSettings = new XmlWriterSettings { Indent = true, Encoding = new UTF8Encoding(false) };
 
             FaultTolerance.TryCatchWithLoggingException(
                 () =>
                 {
+                    var packagesConfig = new PackagesConfigFileSettings();
+                    packagesConfig.Packages = new HashSet<PackagesConfigFilePackageSetting>();
+
                     using (var stringWriter = new StringWriter())
                     {
-                        using (var xw = XmlWriter.Create(stringWriter, settings))
+                        using (var xw = XmlWriter.Create(stringWriter, xmlWriterSettings))
                         {
-                            xw.WriteProcessingInstruction("xml", "version=\"1.0\" encoding=\"utf-8\"");
-                            xw.WriteStartElement("packages");
-
-                            foreach (var packageResult in packageResults)
+                            foreach (var packageResult in installedPackages)
                             {
-                                xw.WriteStartElement("package");
-                                xw.WriteAttributeString("id", packageResult.PackageMetadata.Id);
+                                var packageElement = new PackagesConfigFilePackageSetting
+                                {
+                                    Id = packageResult.PackageMetadata.Id
+                                };
 
                                 if (configuration.ExportCommand.IncludeVersionNumbers)
                                 {
-                                    xw.WriteAttributeString("version", packageResult.PackageMetadata.Version.ToString());
+                                    packageElement.Version = packageResult.PackageMetadata.Version.ToString();
                                 }
 
-                                xw.WriteEndElement();
+                                packagesConfig.Packages.Add(packageElement);
                             }
 
-                            xw.WriteEndElement();
-                            xw.Flush();
+                            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                            ns.Add("", "");
+
+                            var packagesConfigSerializer = new XmlSerializer(typeof(PackagesConfigFileSettings));
+                            packagesConfigSerializer.Serialize(xw, packagesConfig, ns);
                         }
 
                         var fullOutputFilePath = _fileSystem.GetFullPath(configuration.ExportCommand.OutputFilePath);
