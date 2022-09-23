@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -591,6 +591,12 @@ namespace chocolatey.infrastructure.app.services
             {
                 AppDomain.CurrentDomain.AssemblyResolve -= _handler;
             }
+        }
+
+        [Obsolete("This version of running the powershell host do not support running additional hooks. Use the appropriate overload instead")]
+        public PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowershellScript, Action<Pipeline> additionalActionsBeforeScript)
+        {
+            return run_host(config, chocoPowershellScript, additionalActionsBeforeScript, Enumerable.Empty<string>(), Enumerable.Empty<string>());
         }
 
         public PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList)
