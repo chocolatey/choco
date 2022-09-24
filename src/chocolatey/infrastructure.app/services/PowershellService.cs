@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,10 +23,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Management.Automation;
     using System.Management.Automation.Runspaces;
     using System.Reflection;
-    using System.Security.Cryptography;
-    using System.Text;
     using adapters;
-    using builders;
     using commandline;
     using configuration;
     using cryptography;
@@ -38,8 +35,6 @@ namespace chocolatey.infrastructure.app.services
     using powershell;
     using results;
     using utility;
-    using Assembly = adapters.Assembly;
-    using Console = System.Console;
     using CryptoHashProvider = cryptography.CryptoHashProvider;
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
@@ -112,12 +107,15 @@ namespace chocolatey.infrastructure.app.services
                 case CommandNameType.install:
                     filenameBase += "install-";
                     break;
+
                 case CommandNameType.uninstall:
                     filenameBase += "uninstall-";
                     break;
+
                 case CommandNameType.upgrade:
                     filenameBase += "beforemodify-";
                     break;
+
                 default:
                     throw new ApplicationException("Could not find CommandNameType '{0}' to get hook scripts".format_with(command));
             }
@@ -353,7 +351,6 @@ namespace chocolatey.infrastructure.app.services
  `choco -h` for details.");
                     }
 
-
                     if (result.ExitCode != 0)
                     {
                         Environment.ExitCode = result.ExitCode;
@@ -534,7 +531,7 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
 
-            SecurityProtocol.set_protocol(configuration, provideWarning:false);
+            SecurityProtocol.set_protocol(configuration, provideWarning: false);
         }
 
         private ResolveEventHandler _handler = null;
@@ -591,6 +588,12 @@ namespace chocolatey.infrastructure.app.services
             {
                 AppDomain.CurrentDomain.AssemblyResolve -= _handler;
             }
+        }
+
+        [Obsolete("This version of running the powershell host do not support running additional hooks. Use the appropriate overload instead")]
+        public PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowershellScript, Action<Pipeline> additionalActionsBeforeScript)
+        {
+            return run_host(config, chocoPowershellScript, additionalActionsBeforeScript, Enumerable.Empty<string>(), Enumerable.Empty<string>());
         }
 
         public PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList)
@@ -732,11 +735,11 @@ try {
                                 if (host.ExitCode == 0) host.SetShouldExit(1);
                                 host.HostException = pipeline.PipelineStateInfo.Reason;
                                 break;
+
                             case PipelineState.Completed:
                                 if (host.ExitCode == -1) host.SetShouldExit(0);
                                 break;
                         }
-
                     }
                 }
             }
