@@ -771,7 +771,7 @@ Would have determined packages that are out of date based on what is
                     }
                     packageConfig.DownloadChecksum = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksum) ? packageConfig.DownloadChecksum : pkgSettings.DownloadChecksum;
                     packageConfig.DownloadChecksum64 = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksum64) ? packageConfig.DownloadChecksum64 : pkgSettings.DownloadChecksum64;
-                    packageConfig.DownloadChecksum = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksumType) ? packageConfig.DownloadChecksumType : pkgSettings.DownloadChecksumType;
+                    packageConfig.DownloadChecksumType = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksumType) ? packageConfig.DownloadChecksumType : pkgSettings.DownloadChecksumType;
                     packageConfig.DownloadChecksumType64 = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksumType64) ? packageConfig.DownloadChecksumType : pkgSettings.DownloadChecksumType64;
                     if (pkgSettings.IgnorePackageExitCodes) packageConfig.Features.UsePackageExitCodes = false;
                     if (pkgSettings.UsePackageExitCodes) packageConfig.Features.UsePackageExitCodes = true;
@@ -793,6 +793,7 @@ Would have determined packages that are out of date based on what is
 
                     this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(packageConfig.PackageNames));
                     packageConfigs.Add(packageConfig);
+                    this.Log().Debug(() => "Package Configuration: {0}".format_with(packageConfig.ToString()));
                 }
             }
 
