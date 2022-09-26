@@ -3,7 +3,6 @@
 Describe "choco outdated" -Tag Chocolatey, OutdatedCommand {
     BeforeAll {
         Initialize-ChocolateyTestInstall
-        New-ChocolateyInstallSnapshot
         # Pin all of the Chocolatey packages
         @(
             'chocolatey'
@@ -16,6 +15,7 @@ Describe "choco outdated" -Tag Chocolatey, OutdatedCommand {
             $null = Invoke-Choco pin add -n $_
         }
         Invoke-Choco install upgradepackage --version 1.0.0 --confirm
+        New-ChocolateyInstallSnapshot
     }
 
     AfterAll {
