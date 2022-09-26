@@ -120,6 +120,33 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
     }
 
+    Context "Upgrade package with (<Command>) specified" -ForEach @(
+        @{ Command = '--pin' ; Contains = $true }
+        @{ Command = '' ; Contains = $false }
+    ) {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Package = 'upgradepackage'
+            $null = Invoke-Choco install $Package --version 1.0.0 --confirm
+            $null = Invoke-Choco upgrade $Package $Command --confirm
+            $Output = Invoke-Choco pin list
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Output should include pinned package" {
+            if ($Contains) {
+                $Output.String | Should -Match "$Package|1.1.0"
+            }
+            else {
+                $Output.String | Should -Not -Match "$Package|1.1.0"
+            }
+        }
+    }
+
     Context "Upgrading packages while remembering arguments with only one package using arguments" -Tag Internal {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot

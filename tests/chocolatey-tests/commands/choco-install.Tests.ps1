@@ -1282,7 +1282,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     # Issue: https://github.com/chocolatey/chocolatey-licensed-issues/issues/284
-    Context "Installing a Package with Embedded Zip Archive and specifying destination <Name>" -Foreach @(
+    Context "Installing a Package with Embedded Zip Archive and specifying destination <Name>" -ForEach @(
         @{ Name = 'Root of UNC share' ; Path = '\\localhost\c$\' }
         @{ Name = 'UNC share path' ; Path = '\\localhost\c$\temp\' }
         @{ Name = 'Root of drive with trailing slash' ; Path = 'C:\' }
@@ -1390,6 +1390,37 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         It "should identify a circular dependency" {
             $result1.Lines | Should -Contain "Circular dependency detected 'circulardependency1 0.0.1 => circulardependency2 0.0.1 => circulardependency1 0.0.1'."
             $result2.Lines | Should -Contain "Circular dependency detected 'circulardependency2 0.0.1 => circulardependency1 0.0.1 => circulardependency2 0.0.1'."
+        }
+    }
+
+    Context "Install '<Package>' package with (<Command>) specified" -ForEach @(
+        @{ Command = '--pin' ; Package = 'installpackage' ; Contains = $true }
+        @{ Command = '' ; Package = 'installpackage' ; Contains = $false }
+        @{ Command = '' ; Package = 'packages.config' ; Contains = $true }
+    ) {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            if ($Package -eq 'packages.config') {
+                @"
+<?xml version="1.0" encoding="utf-8"?>
+<packages>
+    <package id="installpackage" pinPackage="true" />
+</packages>
+"@ | Set-Content $PWD/packages.config
+            }
+
+            $null = Invoke-Choco install $Package $Command --confirm
+            $Output = Invoke-Choco pin list
+        }
+
+        It "Output should include pinned package" {
+            if ($Contains) {
+                $Output.String | Should -Match "installpackage|1.0.0"
+            }
+            else {
+                $Output.String | Should -Not -Match "installpackage|1.0.0"
+            }
         }
     }
 

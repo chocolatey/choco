@@ -145,6 +145,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
 
     Context "Listing package information about local side by side installed package" {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
             $null = Invoke-Choco install 'isdependency' --confirm --sxs
 
             $Output = Invoke-Choco info 'isdependency' --local-only

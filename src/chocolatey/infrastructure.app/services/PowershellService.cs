@@ -91,6 +91,9 @@ namespace chocolatey.infrastructure.app.services
             // If skipping hook scripts, return an empty list
             if (configuration.SkipHookScripts) return hookScriptPaths;
 
+            // If hooks directory doesn't exist, return an empty list to prevent directory not exist warnings
+            if (!_fileSystem.directory_exists(ApplicationParameters.HooksLocation)) return hookScriptPaths;
+
             string filenameBase;
 
             if (isPreHook)
