@@ -205,19 +205,41 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
                 @"
 <?xml version="1.0" encoding="utf-8"?>
 <packages>
-    <package id="installpackage" prerelease="true" overrideArguments="true"
-        notSilent="true" allowDowngrade="true" forceDependencies="true"
-        skipAutomationScripts="true" user="string" password="string" cert="string"
-        certPassword="string" ignoreChecksums="true" allowEmptyChecksums="true"
-        allowEmptyChecksumsSecure="true" requireChecksums="true"
-        downloadChecksum="string" downloadChecksum64="string"
-        downloadChecksumType="sha512" downloadChecksumType64="sha512"
-        ignorePackageExitCodes="true" usePackageExitCodes="true"
-        stopOnFirstFailure="true" exitWhenRebootDetected="true"
-        ignoreDetectedReboot="true" disableRepositoryOptimizations="true"
-        acceptLicense="true" confirm="true" limitOutput="true" cacheLocation="Z:\"
-        failOnStderr="true" useSystemPowershell="true" noProgress="true"
-        force="true" executionTimeout="1000"
+    <package
+        id="installpackage"
+        prerelease="true"
+        overrideArguments="true"
+        notSilent="true"
+        allowDowngrade="true"
+        forceDependencies="true"
+        skipAutomationScripts="true"
+        user="user"
+        password="string"
+        cert="cert"
+        certPassword="string"
+        ignoreChecksums="true"
+        allowEmptyChecksums="true"
+        allowEmptyChecksumsSecure="true"
+        requireChecksums="true"
+        downloadChecksum="downloadChecksum"
+        downloadChecksum64="downloadChecksum64"
+        downloadChecksumType="downloadChecksumType"
+        downloadChecksumType64="downloadChecksumType64"
+        ignorePackageExitCodes="true"
+        usePackageExitCodes="true"
+        stopOnFirstFailure="true"
+        exitWhenRebootDetected="true"
+        ignoreDetectedReboot="true"
+        disableRepositoryOptimizations="true"
+        acceptLicense="true"
+        confirm="true"
+        limitOutput="true"
+        cacheLocation="Z:\"
+        failOnStderr="true"
+        useSystemPowershell="true"
+        noProgress="true"
+        force="true"
+        executionTimeout="1000"
     />
 </packages>
 "@ | Out-File $env:CHOCOLATEY_TEST_PACKAGES_PATH\alloptions.packages.config -Encoding utf8
@@ -246,11 +268,11 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
                 # SkipAutomationScripts sets configuration option SkipPackageInstallProvider
                 @{ Option = "SkipPackageInstallProvider" ; ExpectedValue = "True" }
                 # User is expanded to Username
-                @{ Option = "Username" ; ExpectedValue = "string" }
+                @{ Option = "Username" ; ExpectedValue = "user" }
                 # Password should *not* be output in the logging
                 # @{ Option = "Password" ; ExpectedValue = "string" }
                 # Cert is expanded to Certificate
-                @{ Option = "Certificate" ; ExpectedValue = "string" }
+                @{ Option = "Certificate" ; ExpectedValue = "cert" }
                 # CertPassword should *not* be output in the logging
                 # @{ Option = "CertPassword" ; ExpectedValue = "string" }
                 # IgnoreChecksums sets ChecksumFiles to False
@@ -259,10 +281,10 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
                 # @{ Option = "RequireChecksums" ; ExpectedValue = "True" }
                 @{ Option = "AllowEmptyChecksums" ; ExpectedValue = "False" }
                 @{ Option = "AllowEmptyChecksumsSecure" ; ExpectedValue = "False" }
-                @{ Option = "DownloadChecksum" ; ExpectedValue = "string" }
-                @{ Option = "DownloadChecksum64" ; ExpectedValue = "string" }
-                @{ Option = "DownloadChecksumType" ; ExpectedValue = "sha512" }
-                @{ Option = "DownloadChecksumType64" ; ExpectedValue = "sha512" }
+                @{ Option = "DownloadChecksum" ; ExpectedValue = "downloadChecksum" }
+                @{ Option = "DownloadChecksum64" ; ExpectedValue = "downloadChecksum64" }
+                @{ Option = "DownloadChecksumType" ; ExpectedValue = "downloadChecksumType" }
+                @{ Option = "DownloadChecksumType64" ; ExpectedValue = "downloadChecksumType64" }
                 # UsePackageExitCodes and IgnorePackageExitCodes set the same setting, but are opposite of each other.
                 # UsePackageExitCodes is evaluated last, so takes precidence.
                 # @{ Option = "IgnorePackageExitCodes" ; ExpectedValue = "True" }
