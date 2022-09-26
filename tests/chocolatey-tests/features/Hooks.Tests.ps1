@@ -1,19 +1,19 @@
 Import-Module helpers/common-helpers
 
-Describe "hooks tests" -Tag Chocolatey, Hooks {
+Describe "choco hooks tests" -Tag Chocolatey, HooksFeature {
     BeforeDiscovery {
         $Flags = @(
-            @{ Flag = '' ; RunsHooks = $true ; Command = 'install' }
-            @{ Flag = '--skip-powershell' ; RunsHooks = $false ; Command = 'install' }
-            @{ Flag = '--skip-hooks' ; RunsHooks = $false ; Command = 'install' }
+            @{ Flag = '' ; RunsHooks = $true ; Command = 'install' ; ExitCode = 0 }
+            @{ Flag = '--skip-powershell' ; RunsHooks = $false ; Command = 'install' ; ExitCode = 0 }
+            @{ Flag = '--skip-hooks' ; RunsHooks = $false ; Command = 'install' ; ExitCode = 0 }
 
-            @{ Flag = '' ; RunsHooks = $true ; Command = 'uninstall' }
-            @{ Flag = '--skip-powershell' ; RunsHooks = $false ; Command = 'uninstall' }
-            @{ Flag = '--skip-hooks' ; RunsHooks = $false ; Command = 'uninstall' }
+            @{ Flag = '' ; RunsHooks = $true ; Command = 'uninstall' ; ExitCode = 0 }
+            @{ Flag = '--skip-powershell' ; RunsHooks = $false ; Command = 'uninstall' ; ExitCode = 0 }
+            @{ Flag = '--skip-hooks' ; RunsHooks = $false ; Command = 'uninstall' ; ExitCode = 0 }
 
-            @{ Flag = '' ; RunsHooks = $true ; Command = 'upgrade' }
-            @{ Flag = '--skip-powershell' ; RunsHooks = $false ; Command = 'upgrade' }
-            @{ Flag = '--skip-hooks' ; RunsHooks = $false ; Command = 'upgrade' }
+            @{ Flag = '' ; RunsHooks = $true ; Command = 'upgrade' ; ExitCode = -1 }
+            @{ Flag = '--skip-powershell' ; RunsHooks = $false ; Command = 'upgrade' ; ExitCode = 0 }
+            @{ Flag = '--skip-hooks' ; RunsHooks = $false ; Command = 'upgrade' ; ExitCode = -1 }
 
         )
     }
@@ -47,8 +47,8 @@ Describe "hooks tests" -Tag Chocolatey, Hooks {
         }
 
         # Uninstall/Upgrade exit -1: https://github.com/chocolatey/choco/issues/2822
-        It "Exits with Success (0,-1)" {
-            $Output.ExitCode | Should -BeIn @(0, -1) -Because $Output.String
+        It "Exits with expected value (<ExitCode>)" {
+            $Output.ExitCode | Should -Be $ExitCode -Because $Output.String
         }
 
         It "Should execute hooks (<RunsHooks>)" {
