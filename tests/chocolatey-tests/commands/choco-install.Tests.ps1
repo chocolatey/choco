@@ -199,6 +199,123 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         It "Outputs a message indicating that missingpackage was not installed" {
             $Output.Lines | Should -Contain "missingpackage not installed. The package was not found with the source(s) listed."
         }
+
+        Context "packages.config containing all options" {
+            BeforeAll {
+                @"
+<?xml version="1.0" encoding="utf-8"?>
+<packages>
+    <package
+        id="installpackage"
+        prerelease="true"
+        overrideArguments="true"
+        notSilent="true"
+        allowDowngrade="true"
+        forceDependencies="true"
+        skipAutomationScripts="true"
+        user="user"
+        password="string"
+        cert="cert"
+        certPassword="string"
+        ignoreChecksums="true"
+        allowEmptyChecksums="true"
+        allowEmptyChecksumsSecure="true"
+        requireChecksums="true"
+        downloadChecksum="downloadChecksum"
+        downloadChecksum64="downloadChecksum64"
+        downloadChecksumType="downloadChecksumType"
+        downloadChecksumType64="downloadChecksumType64"
+        ignorePackageExitCodes="true"
+        usePackageExitCodes="true"
+        stopOnFirstFailure="true"
+        exitWhenRebootDetected="true"
+        ignoreDetectedReboot="true"
+        disableRepositoryOptimizations="true"
+        acceptLicense="true"
+        confirm="true"
+        limitOutput="true"
+        cacheLocation="Z:\"
+        failOnStderr="true"
+        useSystemPowershell="true"
+        noProgress="true"
+        force="true"
+        executionTimeout="1000"
+    />
+</packages>
+"@ | Out-File $env:CHOCOLATEY_TEST_PACKAGES_PATH\alloptions.packages.config -Encoding utf8
+
+                $Output = Invoke-Choco install $env:CHOCOLATEY_TEST_PACKAGES_PATH\alloptions.packages.config --confirm --verbose --debug
+
+                # This is based on two observations: The addition explicitly outputs that it's the Package Configuration.
+                # The configuration output is also about 80 lines.
+                $StartofPackageConfiguration = [array]::IndexOf($Output.Lines, "Package Configuration: CommandName='install'|")
+                $PackageConfigurationOutput = $Output.Lines[$StartofPackageConfiguration..($StartofPackageConfiguration+80)] -join [Environment]::NewLine
+            }
+
+            # We are explicitly passing in a bad username and password here.
+            # Therefore it cannot find the package to install and fails the install.
+            # That doesn't matter because we just need to test that the configuration is set properly.
+            It "Should exit Failure (1)" {
+                $Output.ExitCode | Should -Be 1 -Because $Output.String
+            }
+
+            It "Should contain the expected configuration option (<Option>) set correctly (<ExpectedValue>)" -ForEach @(
+                @{ Option = "Prerelease" ; ExpectedValue = "True" }
+                @{ Option = "OverrideArguments" ; ExpectedValue = "True" }
+                @{ Option = "NotSilent" ; ExpectedValue = "True" }
+                @{ Option = "AllowDowngrade" ; ExpectedValue = "True" }
+                @{ Option = "ForceDependencies" ; ExpectedValue = "True" }
+                # SkipAutomationScripts sets configuration option SkipPackageInstallProvider
+                @{ Option = "SkipPackageInstallProvider" ; ExpectedValue = "True" }
+                # User is expanded to Username
+                @{ Option = "Username" ; ExpectedValue = "user" }
+                # Password should *not* be output in the logging
+                # @{ Option = "Password" ; ExpectedValue = "string" }
+                # Cert is expanded to Certificate
+                @{ Option = "Certificate" ; ExpectedValue = "cert" }
+                # CertPassword should *not* be output in the logging
+                # @{ Option = "CertPassword" ; ExpectedValue = "string" }
+                # IgnoreChecksums sets ChecksumFiles to False
+                @{ Option = "ChecksumFiles" ; ExpectedValue = "False" }
+                # RequireChecksums is evaluated after allowing empty. It sets both allow options to False
+                # @{ Option = "RequireChecksums" ; ExpectedValue = "True" }
+                @{ Option = "AllowEmptyChecksums" ; ExpectedValue = "False" }
+                @{ Option = "AllowEmptyChecksumsSecure" ; ExpectedValue = "False" }
+                @{ Option = "DownloadChecksum" ; ExpectedValue = "downloadChecksum" }
+                @{ Option = "DownloadChecksum64" ; ExpectedValue = "downloadChecksum64" }
+                @{ Option = "DownloadChecksumType" ; ExpectedValue = "downloadChecksumType" }
+                @{ Option = "DownloadChecksumType64" ; ExpectedValue = "downloadChecksumType64" }
+                # UsePackageExitCodes and IgnorePackageExitCodes set the same setting, but are opposite of each other.
+                # UsePackageExitCodes is evaluated last, so takes precidence.
+                # @{ Option = "IgnorePackageExitCodes" ; ExpectedValue = "True" }
+                @{ Option = "UsePackageExitCodes" ; ExpectedValue = "True" }
+                # StopOnFirstFailure is expanded to StopOnFirstPackageFailure
+                @{ Option = "StopOnFirstPackageFailure" ; ExpectedValue = "True" }
+                # ExitWhenRebootDetected and IgnoreDetectedReboot both set ExitOnRebootDetected.
+                # IgnoreDetectedReboot is evaluated last, so takes precidence.
+                # @{ Option = "ExitWhenRebootDetected" ; ExpectedValue = "True" }
+                # @{ Option = "IgnoreDetectedReboot" ; ExpectedValue = "True" }
+                @{ Option = "ExitOnRebootDetected" ; ExpectedValue = "False" }
+                # DisableRepositoryOptimizations sets UsePackageRepositoryOptimizations to false
+                @{ Option = "UsePackageRepositoryOptimizations" ; ExpectedValue = "False" }
+                @{ Option = "AcceptLicense" ; ExpectedValue = "True" }
+                # Confirm is negated into PromptForConfirmation
+                @{ Option = "PromptForConfirmation" ; ExpectedValue = "False" }
+                # LimitOutput is negated into Regular Output
+                @{ Option = "RegularOutput" ; ExpectedValue = "False" }
+                @{ Option = "CacheLocation" ; ExpectedValue = "Z:\\" }
+                @{ Option = "FailOnStandardError" ; ExpectedValue = "True" }
+                # UseSystemPowerShell sets UsePowerShellHost to False
+                @{ Option = "UsePowerShellHost" ; ExpectedValue = "False" }
+                # NoProgress sets ShowDownloadProgress to False
+                @{ Option = "ShowDownloadProgress" ; ExpectedValue = "False" }
+                @{ Option = "Force" ; ExpectedValue = "True" }
+                # ExecutionTimeout is expanded to CommandExecutionTimeoutSeconds
+                @{ Option = "CommandExecutionTimeoutSeconds" ; ExpectedValue = "1000" }
+            ) {
+                $PackageConfigurationOutput | Should -Match "$Option='$ExpectedValue'"
+            }
+        }
     }
 
     Context "Installing a Package that is already installed" {
