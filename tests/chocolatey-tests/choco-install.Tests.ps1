@@ -1393,6 +1393,37 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
+    Context "Install '<Package>' package with (<Command>) specified" -ForEach @(
+        @{ Command = '--pin' ; Package = 'installpackage' ; Contains = $true }
+        @{ Command = '' ; Package = 'installpackage' ; Contains = $false }
+        @{ Command = '' ; Package = 'packages.config' ; Contains = $true }
+    ) {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            if ($Package -eq 'packages.config') {
+                @"
+<?xml version="1.0" encoding="utf-8"?>
+<packages>
+    <package id="installpackage" pinPackage="true" />
+</packages>
+"@ | Set-Content $PWD/packages.config
+            }
+
+            $null = Invoke-Choco install $Package $Command --confirm
+            $Output = Invoke-Choco pin list
+        }
+
+        It "Output should include pinned package" {
+            if ($Contains) {
+                $Output.String | Should -Match "installpackage|1.0.0"
+            }
+            else {
+                $Output.String | Should -Not -Match "installpackage|1.0.0"
+            }
+        }
+    }
+
     Context "Installing package that extracts local zip archive while disabling logging" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
