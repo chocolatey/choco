@@ -3,8 +3,19 @@
 Describe "choco outdated" -Tag Chocolatey, OutdatedCommand {
     BeforeAll {
         Initialize-ChocolateyTestInstall
-        New-ChocolateyInstallSnapshot
+        # Pin all of the Chocolatey packages
+        @(
+            'chocolatey'
+            'chocolatey.extension'
+            'chocolatey-agent'
+            'chocolatey-management-database'
+            'chocolatey-management-service'
+            'chocolatey-management-web'
+        ) | ForEach-Object {
+            $null = Invoke-Choco pin add -n $_
+        }
         Invoke-Choco install upgradepackage --version 1.0.0 --confirm
+        New-ChocolateyInstallSnapshot
     }
 
     AfterAll {
