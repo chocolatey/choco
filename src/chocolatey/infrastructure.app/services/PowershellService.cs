@@ -194,14 +194,14 @@ namespace chocolatey.infrastructure.app.services
 
         private string get_script_arguments(string script, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList, ChocolateyConfiguration config)
         {
-            return "-packageScript '{0}' -installArguments '{1}' -packageParameters '{2}'{3}{4}{5}{6}".format_with(
+            return "-packageScript '{0}' -installArguments '{1}' -packageParameters '{2}'{3}{4} -preRunHookScripts {5} -postRunHookScripts {6}".format_with(
                 script,
                 prepare_powershell_arguments(config.InstallArguments),
                 prepare_powershell_arguments(config.PackageParameters),
                 config.ForceX86 ? " -forceX86" : string.Empty,
                 config.OverrideArguments ? " -overrideArgs" : string.Empty,
-                hookPreScriptPathList.Any() ? " -preRunHookScripts {0}".format_with(string.Join(",", hookPreScriptPathList)) : string.Empty,
-                hookPostScriptPathList.Any() ? " -postRunHookScripts {0}".format_with(string.Join(",", hookPostScriptPathList)) : string.Empty
+                hookPreScriptPathList.Any() ? "{0}".format_with(string.Join(",", hookPreScriptPathList)) : "$null",
+                hookPostScriptPathList.Any() ? "{0}".format_with(string.Join(",", hookPostScriptPathList)) : "$null"
              );
         }
 
