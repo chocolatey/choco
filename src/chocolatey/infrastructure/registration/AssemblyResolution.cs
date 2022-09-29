@@ -37,6 +37,18 @@ namespace chocolatey.infrastructure.registration
         /// <param name="assemblySimpleName">Simple Name of the assembly, such as "chocolatey"</param>
         /// <param name="publicKeyToken">The public key token.</param>
         /// <param name="assemblyFileLocation">The assembly file location. Typically the path to the DLL on disk.</param>
+        /// <returns>An assembly</returns>
+        /// <exception cref="Exception">Unable to enter synchronized code to determine assembly loading</exception>
+        public static IAssembly resolve_or_load_assembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation) {
+            return resolve_or_load_assembly(assemblySimpleName, publicKeyToken, assemblyFileLocation, false);
+        }
+
+        /// <summary>
+        /// Resolves or loads an assembly. If an assembly is already loaded, no need to reload it.
+        /// </summary>
+        /// <param name="assemblySimpleName">Simple Name of the assembly, such as "chocolatey"</param>
+        /// <param name="publicKeyToken">The public key token.</param>
+        /// <param name="assemblyFileLocation">The assembly file location. Typically the path to the DLL on disk.</param>
         /// <param name="ignoreExisting">Whether any existing library that has previously been loaded should be ignored or not.</param>
         /// <returns>An assembly</returns>
         /// <exception cref="Exception">Unable to enter synchronized code to determine assembly loading</exception>
