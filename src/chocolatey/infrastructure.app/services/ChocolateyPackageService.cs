@@ -793,7 +793,7 @@ Would have determined packages that are out of date based on what is
 
                     this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(packageConfig.PackageNames));
                     packageConfigs.Add(packageConfig);
-                    this.Log().Debug(() => "Package Configuration: {0}".format_with(packageConfig.ToString()));
+                    this.Log().Debug(() => "Package Configuration Start:{0}{1}{0}Package Configuration End".format_with(System.Environment.NewLine, packageConfig.ToString()));
                 }
             }
 
