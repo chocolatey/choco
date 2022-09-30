@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\chocolatey.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -81,8 +82,8 @@
     <Reference Include="Rhino.Licensing">
       <HintPath>..\..\lib\Rhino.Licensing.1.4.1\lib\net40\Rhino.Licensing.dll</HintPath>
     </Reference>
-    <Reference Include="SimpleInjector">
-      <HintPath>..\packages\SimpleInjector.2.5.0\lib\net40-client\SimpleInjector.dll</HintPath>
+    <Reference Include="SimpleInjector, Version=2.8.3.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.2.8.3\lib\net40-client\SimpleInjector.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -113,13 +114,23 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="infrastructure.app\attributes\MultiServiceAttribute.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyTemplateCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpdateCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyVersionCommand.cs" />
+    <Compile Include="infrastructure.app\domain\SourceTypes.cs" />
     <Compile Include="infrastructure.app\domain\TemplateCommandType.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyExportCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInfoCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyHelpCommand.cs" />
+    <Compile Include="infrastructure.app\registration\ChocolateyRegistrationModule.cs" />
+    <Compile Include="infrastructure.app\registration\IContainerRegistrator.cs" />
+    <Compile Include="infrastructure.app\registration\IContainerResolver.cs" />
+    <Compile Include="infrastructure.app\registration\IExtensionConfiguration.cs" />
+    <Compile Include="infrastructure.app\registration\IExtensionEnvironment.cs" />
+    <Compile Include="infrastructure.app\registration\IExtensionModule.cs" />
+    <Compile Include="infrastructure.app\registration\SimpleInjectorContainerRegistrator.cs" />
+    <Compile Include="infrastructure.app\registration\SimpleInjectorContainerResolver.cs" />
     <Compile Include="infrastructure\cryptography\DefaultEncryptionUtility.cs" />
     <Compile Include="infrastructure\adapters\IEncryptionUtility.cs" />
     <Compile Include="infrastructure.app\validations\GlobalConfigurationValidation.cs" />
@@ -149,6 +160,8 @@
     <Compile Include="infrastructure.app\utility\PackageUtility.cs" />
     <Compile Include="infrastructure.app\validations\SystemStateValidation.cs" />
     <Compile Include="infrastructure\filesystem\FileSystem.cs" />
+    <Compile Include="FileSystemExtensions.cs" />
+    <Compile Include="infrastructure\information\ExtensionInformation.cs" />
     <Compile Include="infrastructure\logging\AggregateLog.cs" />
     <Compile Include="infrastructure\logging\LogLevelType.cs" />
     <Compile Include="infrastructure\logging\LogMessage.cs" />

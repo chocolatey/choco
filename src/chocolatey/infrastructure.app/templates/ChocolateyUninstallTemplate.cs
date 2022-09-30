@@ -31,7 +31,7 @@ namespace chocolatey.infrastructure.app.templates
 ## If this is an MSI, ensure 'softwareName' is appropriate, then clean up comments and you are done.
 ## If this is an exe, change fileType, silentArgs, and validExitCodes
 
-$ErrorActionPreference = 'Stop'; # stop on all errors
+$ErrorActionPreference = 'Stop' # stop on all errors
 $packageArgs = @{
   packageName   = $env:ChocolateyPackageName
   softwareName  = '[[PackageName]]*'  #part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique

@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +16,17 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
+    using System;
+
     /// <summary>
     ///   Special source modifiers that use alternate sources for packages
     /// </summary>
+    [Obsolete("This source type is no longer used, and only provided for backwards compatibility, instead use SourceTypes class instead.")]
     public enum SourceType
     {
         //this is what it should be when it's not set
         normal,
+
         webpi,
         ruby,
         python,

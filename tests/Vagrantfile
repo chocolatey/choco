@@ -60,6 +60,7 @@ Vagrant.configure("2") do |config|
 
     Write-Host "Build complete. Executing tests."
     # $env:TEST_KITCHEN = 1
+    $env:VM_RUNNING = 1
     ./Invoke-Tests.ps1
   SHELL
 end

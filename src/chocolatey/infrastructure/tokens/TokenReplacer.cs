@@ -61,5 +61,16 @@ namespace chocolatey.infrastructure.tokens
 
             return propertyDictionary;
         }
+
+        public static IEnumerable<string> get_tokens(string textWithTokens, string tokenPrefix = "[[", string tokenSuffix = "]]")
+        {
+            var regexMatches = Regex.Matches(textWithTokens, "{0}(?<key>\\w+){1}"
+                .format_with(Regex.Escape(tokenPrefix), Regex.Escape(tokenSuffix))
+            );
+            foreach (Match regexMatch in regexMatches)
+            {
+                yield return regexMatch.Groups["key"].to_string();
+            }
+        }
     }
 }

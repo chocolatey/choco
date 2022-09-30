@@ -93,7 +93,17 @@ try {
             Verbosity = 'Minimal'
         }
         Filter     = @{
-            ExcludeTag = 'Background', 'Licensed', 'CCM', 'WIP', 'NonAdmin'
+            ExcludeTag = @(
+                'Background'
+                'Licensed'
+                'CCM'
+                'WIP'
+                'NonAdmin'
+                'Internal'
+                if (-not $env:VM_RUNNING -and -not $env:TEST_KITCHEN) {
+                    'VMOnly'
+                }
+            )
         }
     }
 

@@ -26,7 +26,7 @@ namespace chocolatey.infrastructure.app.templates
 # 1. See the _TODO.md that is generated top level and read through that
 # 2. Follow the documentation below to learn how to create a package for the package type you are creating.
 # 3. In Chocolatey scripts, ALWAYS use absolute paths - $toolsDir gets you to the package's tools directory.
-$ErrorActionPreference = 'Stop'; # stop on all errors[[AutomaticPackageNotesInstaller]]
+$ErrorActionPreference = 'Stop' # stop on all errors[[AutomaticPackageNotesInstaller]]
 $toolsDir   = ""$(Split-Path -parent $MyInvocation.MyCommand.Definition)""
 # Internal packages (organizations) or software that has redistribution rights (community repo)
 # - Use `Install-ChocolateyInstallPackage` instead of `Install-ChocolateyPackage`
