@@ -67,8 +67,9 @@ param(
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $paths = Parse-EnvPathList (Get-EnvironmentVariable -Name 'PATH' -Scope $pathType -PreserveVariables)
-  if ((IndexOf-EnvPath $paths $pathToUninstall) -eq -1) {
-    Write-Host "PATH environment variable does not have $pathToUninstall in it. Adding..."
+  $removeIndex = (IndexOf-EnvPath $paths $pathToUninstall)
+  if ($removeIndex -ge 0) {
+    Write-Host "Found $pathToUninstall in PATH environment variable. Removing..."
 
     if ($pathType -eq [EnvironmentVariableTarget]::Machine -and -not (Test-ProcessAdminRights)) {
       $psArgs = "Uninstall-ChocolateyPath -pathToUninstall `'$pathToUninstall`' -pathType `'$pathType`'"
@@ -82,7 +83,8 @@ param(
 
   # Make change immediately available
   $paths = Parse-EnvPathList $env:PATH
-  if ((IndexOf-EnvPath $paths $pathToUninstall) -eq -1) {
+  $removeIndex = (IndexOf-EnvPath $paths $pathToUninstall)
+  if ($removeIndex -ge 0) {
     $paths = [System.Collections.ArrayList] $paths
     $paths.RemoveAt($removeIndex)
     $env:Path = Format-EnvPathList $paths
