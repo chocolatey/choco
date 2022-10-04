@@ -53,6 +53,7 @@ namespace chocolatey.infrastructure.app.configuration
             PackCommand = new PackCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
             PinCommand = new PinCommandConfiguration();
+            LicenseCommand = new LicenseCommandConfiguration();
             OutdatedCommand = new OutdatedCommandConfiguration();
             Proxy = new ProxyConfiguration();
             ExportCommand = new ExportCommandConfiguration();
@@ -472,6 +473,14 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public PinCommandConfiguration PinCommand { get; set; }
 
         /// <summary>
+        /// Configuration related specifically to License command
+        /// </summary>
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public LicenseCommandConfiguration LicenseCommand { get; set; }
+
+        /// <summary>
         /// Configuration related specifically to Outdated command
         /// </summary>
         /// <remarks>
@@ -683,6 +692,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         public string Name { get; set; }
         public PinCommandType Command { get; set; }
+    }
+
+    [Serializable]
+    public sealed class LicenseCommandConfiguration
+    {
+        public LicenseCommandType Command { get; set; }
     }
 
     [Serializable]
