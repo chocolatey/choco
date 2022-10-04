@@ -1,4 +1,4 @@
-ARG tagversion="ltsc2016"
+ARG tagversion="ltsc2019"
 FROM mcr.microsoft.com/windows/servercore:${tagversion}
 
 LABEL org.opencontainers.image.url="https://chocolatey.org/"
