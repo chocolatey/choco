@@ -666,7 +666,7 @@ namespace chocolatey.tests.infrastructure.commandline
             public override void Context()
             {
                 base.Context();
-                Choices.Add("all - yes to all");
+                Choices.Add("all scripts");
             }
 
             public override void Because()
@@ -683,17 +683,9 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void Should_return_all_when_full_all_answer_is_given()
             {
-                Console.Setup(c => c.ReadLine()).Returns("all - yes to all");
+                Console.Setup(c => c.ReadLine()).Returns("all scripts");
                 var result = _prompt();
-                result.Should().Be("all - yes to all");
-            }
-
-            [Fact]
-            public void Should_return_all_when_only_all_is_given()
-            {
-                Console.Setup(c => c.ReadLine()).Returns("all");
-                var result = _prompt();
-                result.Should().Be("all - yes to all");
+                result.Should().Be("all scripts");
             }
         }
     }

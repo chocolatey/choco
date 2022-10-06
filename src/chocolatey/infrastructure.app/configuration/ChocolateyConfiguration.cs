@@ -125,7 +125,7 @@ namespace chocolatey.infrastructure.app.configuration
                     if (property.Name == "PromptForConfirmation")
                     {
                         // We do not overwrite this value between backups as it is intended to be a global setting;
-                        // if a user has selected a "[A] yes to all" prompt interactively, this option is
+                        // if a user has selected a "[A]ll scripts" prompt interactively, this option is
                         // set and should be retained for the duration of the operations.
                         continue;
                     }

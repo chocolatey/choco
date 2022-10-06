@@ -1704,8 +1704,8 @@ To install a local, or remote file, you may use:
             }
         }
 
-        It "Ran both installation scripts after selecting [A] Yes to all at the first prompt" {
-            $promptLine = "Do you want to run the script?([Y]es/[A]ll - yes to all/[N]o/[P]rint):"
+        It "Ran both installation scripts after selecting [A]ll scripts at the first prompt" {
+            $promptLine = "Do you want to run the script?([Y]es/[A]ll scripts/[N]o/[P]rint):"
             $prompts = $Output.Lines | Where-Object { $_ -eq $promptLine }
 
             $prompts.Count | Should -Be 1
