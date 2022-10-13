@@ -45,7 +45,10 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("n=|name=",
                     "The name of the template to get information about.",
-                    option => configuration.TemplateCommand.Name = option.UnquoteSafe().ToLower());
+                    option => configuration.TemplateCommand.Name = option.UnquoteSafe().ToLower()),
+	        .Add(StringResources.Options.DISPLAY_HEADERS,
+		    StringResources.OptionDescriptions.DISPLAY_HEADERS,
+		    option => configuration.DisplayHeaders = true);
             // todo: #2570 Allow for templates from an external path? Requires #1477
         }
 

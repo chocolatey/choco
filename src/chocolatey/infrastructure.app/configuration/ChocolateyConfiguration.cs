@@ -58,6 +58,7 @@ namespace chocolatey.infrastructure.app.configuration
             ExportCommand = new ExportCommandConfiguration();
             TemplateCommand = new TemplateCommandConfiguration();
             CacheCommand = new CacheCommandConfiguration();
+	    DisplayHeaders = false;
 #if DEBUG
             AllowUnofficialBuild = true;
 #endif
@@ -358,6 +359,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string DownloadChecksumType { get; set; }
         public string DownloadChecksumType64 { get; set; }
         public bool PinPackage { get; set; }
+	public bool DisplayHeaders { get; set; }
 
         /// <summary>
         ///   Configuration values provided by choco.

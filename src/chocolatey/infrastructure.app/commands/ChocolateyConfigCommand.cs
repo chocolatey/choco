@@ -51,6 +51,10 @@ namespace chocolatey.infrastructure.app.commands
                     "value=",
                     "Value - the value of the config setting. Required with some actions. Defaults to empty.",
                     option => configuration.ConfigCommand.ConfigValue = option.UnquoteSafe())
+		.Add(
+		    StringResources.Options.DISPLAY_HEADERS,
+		    StringResources.OptionDescriptions.DISPLAY_HEADERS,
+		    option => configuration.DisplayHeaders = true)
                 ;
         }
 

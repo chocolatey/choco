@@ -75,6 +75,9 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("adminonly|admin-only",
                      "Visible to Administrators Only - Should this source be visible to non-administrators? Requires business edition (v1.12.2+). Defaults to false.",
                      option => configuration.SourceCommand.VisibleToAdminsOnly = option != null)
+	         .Add(StringResources.Options.DISPLAY_HEADERS,
+		     StringResources.OptionDescriptions.DISPLAY_HEADERS,
+		     option => configuration.DisplayHeaders = true)
                 ;
         }
 

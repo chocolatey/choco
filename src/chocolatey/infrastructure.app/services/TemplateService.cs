@@ -227,6 +227,11 @@ namespace chocolatey.infrastructure.app.services
 
             if (string.IsNullOrWhiteSpace(configuration.TemplateCommand.Name))
             {
+		if (!configuration.RegularOutput && configuration.DisplayHeaders)
+		{
+		    this.Log().Info("TemplateName|Version");
+		}
+
                 if (templateDirList.Any())
                 {
                     foreach (var templateDir in templateDirList)
@@ -235,11 +240,11 @@ namespace chocolatey.infrastructure.app.services
                         ListCustomTemplateInformation(configuration);
                     }
 
-                    this.Log().Info(configuration.RegularOutput ? "{0} Custom templates found at {1}{2}".FormatWith(templateDirList.Count(), ApplicationParameters.TemplatesLocation, Environment.NewLine) : string.Empty);
+                    this.Log().Info(configuration.RegularOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, "{0} Custom templates found at {1}{2}".FormatWith(templateDirList.Count(), ApplicationParameters.TemplatesLocation, Environment.NewLine));
                 }
                 else
                 {
-                    this.Log().Info(configuration.RegularOutput ? "No custom templates installed in {0}{1}".FormatWith(ApplicationParameters.TemplatesLocation, Environment.NewLine) : string.Empty);
+                    this.Log().Info(configuration.RegularOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, "No custom templates installed in {0}{1}".FormatWith(ApplicationParameters.TemplatesLocation, Environment.NewLine));
                 }
 
                 ListBuiltinTemplateInformation(configuration, isBuiltInTemplateOverridden, isBuiltInOrDefaultTemplateDefault);

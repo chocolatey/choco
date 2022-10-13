@@ -47,6 +47,9 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("n=|name=",
                      "Name - the name of the source. Required with actions other than list. Defaults to empty.",
                      option => configuration.FeatureCommand.Name = option.UnquoteSafe())
+		.Add(StringResources.Options.DISPLAY_HEADERS,
+		     StringResources.OptionDescriptions.DISPLAY_HEADERS,
+		     option => configuration.DisplayHeaders = true)
                 ;
         }
 

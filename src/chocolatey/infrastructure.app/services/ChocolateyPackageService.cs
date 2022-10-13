@@ -255,7 +255,18 @@ Did you know Pro / Business automatically syncs with Programs and
                 yield break;
             }
 
-            if (config.RegularOutput) this.Log().Debug(() => "Searching for package information");
+            if (config.RegularOutput)
+	    {
+		// This doesn't make sense as a Debug message to me... Debug messages don't really show up when you're running normally...
+	        this.Log().Debug(() => "Searching for package information");
+	    }
+	    else
+	    {
+		if (config.DisplayHeaders)
+		{
+		    this.Log().Info("PackageID|Version");
+		}
+	    }
 
             var packages = new List<PackageResult>();
 
@@ -758,9 +769,19 @@ Would have determined packages that are out of date based on what is
                 return;
             }
 
-            if (config.RegularOutput) this.Log().Info(ChocolateyLoggers.Important, @"Outdated Packages
+            if (config.RegularOutput)
+	    {
+	        this.Log().Info(ChocolateyLoggers.Important, @"Outdated Packages
  Output is package name | current version | available version | pinned?
 ");
+	    }
+	    else
+	    {
+	        if (config.DisplayHeaders)
+		{
+		    this.Log().Info("PackageName|CurrentVersion|AvailableVersion|Pinned");
+		}
+	    }
 
             config.PackageNames = ApplicationParameters.AllPackages;
             config.UpgradeCommand.NotifyOnlyAvailableUpgrades = true;
