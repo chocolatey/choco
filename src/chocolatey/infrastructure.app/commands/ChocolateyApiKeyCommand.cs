@@ -197,6 +197,10 @@ If you find other exit codes that we have not yet documented, please
                     _configSettingsService.SetApiKey(configuration);
                     break;
                 default:
+                    // This is required, since we only want to show the header if there are any ApiKeys
+                    // to be shown, which will be when we are printing the first ApiKey
+                    var hasHeaderRowBeenOutput = false;
+
                     _configSettingsService.GetApiKey(configuration, (key) =>
                     {
                         var authenticatedString = string.IsNullOrWhiteSpace(key.Key) ? string.Empty : "(Authenticated)";
@@ -207,7 +211,13 @@ If you find other exit codes that we have not yet documented, please
                         }
                         else
                         {
-                            this.Log().Info(() => "{0}|{1}".FormatWith(key.Source, authenticatedString));
+                            if (configuration.IncludeHeaders && !hasHeaderRowBeenOutput)
+                            {
+                                OutputHelpers.LimitedOutput("Source", "ApiKey");
+                                hasHeaderRowBeenOutput = true;
+                            }
+
+                            OutputHelpers.LimitedOutput(key.Source, authenticatedString);
                         }
                     });
                     break;

@@ -256,11 +256,8 @@ Did you know Pro / Business automatically syncs with Programs and
                 yield break;
             }
 
-            if (config.RegularOutput)
-            {
-                this.Log().Debug(() => "Searching for package information");
-            }
-
+            this.Log().Debug(() => "Searching for package information");
+ 
             var packages = new List<PackageResult>();
 
             IEnumerable<PackageResult> results;
@@ -844,7 +841,7 @@ Would have determined packages that are out of date based on what is
             if (config.RegularOutput)
             {
                 this.Log().Info(ChocolateyLoggers.Important, @"Outdated Packages
- Output is package name | current version | available version | pinned?
+ Output is Id | Version | Available Version | Pinned
 ");
             }
 

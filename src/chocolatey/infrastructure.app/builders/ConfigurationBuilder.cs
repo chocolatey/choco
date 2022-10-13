@@ -341,7 +341,8 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.UsePackageRepositoryOptimizations = SetFeatureFlag(ApplicationParameters.Features.UsePackageRepositoryOptimizations, configFileSettings, defaultEnabled: true, description: "Use Package Repository Optimizations - Turn on optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should generally be left enabled, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in earlier versions of Chocolatey.");
             config.Features.UsePackageHashValidation = SetFeatureFlag(ApplicationParameters.Features.UsePackageHashValidation, configFileSettings, defaultEnabled: false, description: "Use Package Hash Validation - Check the hash of the downloaded package file against the source provided hash. Only supports sources that provide SHA512 hashes. Disabled by default. Available in 2.3.0+");
             config.PromptForConfirmation = !SetFeatureFlag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
-            config.DisableCompatibilityChecks = SetFeatureFlag(ApplicationParameters.Features.DisableCompatibilityChecks, configFileSettings, defaultEnabled: false, description: "Disable Compatibility Checks - Disable showing a warning when there is an incompatibility between Chocolatey CLI and Chocolatey Licensed Extension.");
+            config.DisableCompatibilityChecks = SetFeatureFlag(ApplicationParameters.Features.DisableCompatibilityChecks, configFileSettings, defaultEnabled: false, description: "Disable Compatibility Checks - Disable showing a warning when there is an incompatibility between Chocolatey CLI and Chocolatey Licensed Extension. Available in 1.1.0+");
+            config.IncludeHeaders = SetFeatureFlag(ApplicationParameters.Features.AlwaysIncludeHeaders, configFileSettings, defaultEnabled: false, description: StringResources.OptionDescriptions.IncludeHeaders);
         }
 
         private static bool SetFeatureFlag(string featureName, ConfigFileSettings configFileSettings, bool defaultEnabled, string description)
@@ -411,6 +412,9 @@ namespace chocolatey.infrastructure.app.builders
                         .Add("r|limitoutput|limit-output",
                              "LimitOutput - Limit the output to essential information",
                              option => config.RegularOutput = option == null)
+                        .Add(StringResources.Options.IncludeHeaders,
+                            StringResources.OptionDescriptions.IncludeHeaders,
+                            option => config.IncludeHeaders = true)
                         .Add("timeout=|execution-timeout=",
                              "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds. Supply '0' to disable the timeout.".FormatWith(config.CommandExecutionTimeoutSeconds.ToStringSafe()),
                             option =>
@@ -453,7 +457,7 @@ namespace chocolatey.infrastructure.app.builders
                         .Add("proxy-bypass-on-local",
                              "Proxy Bypass On Local - Bypass proxy for local connections. Requires explicit proxy (`--proxy` or config setting). Overrides the default proxy bypass on local setting of '{0}'.".FormatWith(config.Proxy.BypassOnLocal),
                              option => config.Proxy.BypassOnLocal = option != null)
-                         .Add("log-file=",
+                        .Add("log-file=",
                              "Log File to output to in addition to regular loggers.",
                              option => config.AdditionalLogFileLocation = option.UnquoteSafe())
                         .Add("skipcompatibilitychecks|skip-compatibility-checks",
