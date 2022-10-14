@@ -37,12 +37,12 @@ $script:someCommands = @('-?','search','list','info','install','outdated','upgra
 
 # ensure these all have a space to start, or they will cause issues
 $allcommands = " --debug --verbose --trace --noop --help --accept-license --confirm --limit-output --no-progress --log-file='' --execution-timeout='' --cache-location='' --proxy='' --proxy-user='' --proxy-password='' --proxy-bypass-list='' --proxy-bypass-on-local --force --no-color --skip-compatibility-checks"
-$proListOptions = " --audit"
-$proInstallUpgradeOptions = " --install-directory='' --package-parameters-sensitive='' --max-download-rate='' --install-arguments-sensitive='' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum='' --deflate-package-size --no-deflate-package-size --deflate-nupkg-only"
-$proUpgradeOptions = " --exclude-chocolatey-packages-during-upgrade-all --include-chocolatey-packages-during-upgrade-all"
+$proListOptions = " --audit --use-self-service"
+$proInstallUpgradeOptions = " --install-directory='' --package-parameters-sensitive='' --max-download-rate='' --install-arguments-sensitive='' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum='' --deflate-package-size --no-deflate-package-size --deflate-nupkg-only --use-self-service"
+$proUpgradeOptions = " --exclude-chocolatey-packages-during-upgrade-all --include-chocolatey-packages-during-upgrade-all --use-self-service"
 $proNewOptions = " --file='' --build-package --file64='' --from-programs-and-features --use-original-location --keep-remote --url='' --url64='' --checksum='' --checksum64='' --checksumtype='' --pause-on-error --remove-architecture-from-name --include-architecture-in-name"
-$proUninstallOptions = " --from-programs-and-features"
-$proPinOptions = " --note=''"
+$proUninstallOptions = " --from-programs-and-features --use-self-service"
+$proPinOptions = " --note='' --use-self-service"
 
 $commandOptions = @{
   list = "--lo --id-only --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --local-only --prerelease --include-programs --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations" + $proListOptions + $allcommands
@@ -60,7 +60,7 @@ $commandOptions = @{
   config = "--name='' --value='' -?" + $allcommands
   feature = "--name='' -?" + $allcommands
   apikey = "--source='' --api-key='' --remove -?" + $allcommands
-  download = "--internalize --internalize-all-urls --ignore-dependencies --installed-packages --ignore-unfound-packages --resources-location='' --download-location='' --outputdirectory='' --source='' --version='' --prerelease --user='' --password='' --cert='' --certpassword='' --append-use-original-location --recompile --disable-package-repository-optimizations -?" + $allcommands
+  download = "--internalize --internalize-all-urls --ignore-dependencies --installed-packages --ignore-unfound-packages --resources-location='' --download-location='' --outputdirectory='' --source='' --version='' --prerelease --user='' --password='' --cert='' --certpassword='' --append-use-original-location --recompile --disable-package-repository-optimizations -? --use-self-service" + $allcommands
   sync = "--output-directory='' --id='' --package-id='' -?" + $allcommands
   optimize = "--deflate-nupkg-only --id='' -?" + $allcommands
   export = "--include-version-numbers --output-file-path='' -?" + $allcommands
