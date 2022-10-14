@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.licensing
 {
     using System;
     using System.IO;
+    using System.Linq;
     using app;
     using logging;
     using Rhino.Licensing;
@@ -36,6 +37,8 @@ namespace chocolatey.infrastructure.licensing
             };
 
             var regularLogOutput = determine_if_regular_output_for_logging();
+            var normalLogger = regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly;
+            var importantLogger = regularLogOutput ? ChocolateyLoggers.Important : ChocolateyLoggers.LogFileOnly;
 
             string licenseFile = ApplicationParameters.LicenseFileLocation;
             var userLicenseFile = ApplicationParameters.UserLicenseFileLocation;
@@ -53,9 +56,9 @@ namespace chocolatey.infrastructure.licensing
                 {
                     if (Directory.GetFiles(licenseDirectory).Length != 0)
                     {
-                        "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, @"Files found in directory '{0}' but not a
+                        "chocolatey".Log().Error(normalLogger, @"Files found in directory '{0}' but not a
  valid license file. License should be named '{1}'.".format_with(licenseDirectory, licenseFileName));
-                        "chocolatey".Log().Warn(ChocolateyLoggers.Important,@" Rename license file to '{0}' to allow commercial features.".format_with(licenseFileName));
+                        "chocolatey".Log().Warn(importantLogger,@" Rename license file to '{0}' to allow commercial features.".format_with(licenseFileName));
                     }
                 }
 
@@ -63,9 +66,9 @@ namespace chocolatey.infrastructure.licensing
                 // - user put the license file in the top level location and/or forgot to rename it
                 if (File.Exists(Path.Combine(ApplicationParameters.InstallLocation, licenseFileName)) || File.Exists(Path.Combine(ApplicationParameters.InstallLocation, licenseFileName + ".txt")))
                 {
-                    "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, @"Chocolatey license found in the wrong location. File must be located at
+                    "chocolatey".Log().Error(normalLogger, @"Chocolatey license found in the wrong location. File must be located at
  '{0}'.".format_with(ApplicationParameters.LicenseFileLocation));
-                    "chocolatey".Log().Warn(regularLogOutput ? ChocolateyLoggers.Important : ChocolateyLoggers.LogFileOnly, @" Move license file to '{0}' to allow commercial features.".format_with(ApplicationParameters.LicenseFileLocation));
+                    "chocolatey".Log().Warn(importantLogger, @" Move license file to '{0}' to allow commercial features.".format_with(ApplicationParameters.LicenseFileLocation));
                 }
             }
 
@@ -91,7 +94,7 @@ namespace chocolatey.infrastructure.licensing
                 {
                     chocolateyLicense.IsValid = false;
                     chocolateyLicense.InvalidReason = e.Message;
-                    "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, "A license was not found for a licensed version of Chocolatey:{0} {1}{0} {2}".format_with(Environment.NewLine, e.Message,
+                    "chocolatey".Log().Error(normalLogger, "A license was not found for a licensed version of Chocolatey:{0} {1}{0} {2}".format_with(Environment.NewLine, e.Message,
                         "A license was also not found in the user profile: '{0}'.".format_with(ApplicationParameters.UserLicenseFileLocation)));
                 }
                 catch (Exception e)
@@ -99,7 +102,7 @@ namespace chocolatey.infrastructure.licensing
                     //license may be invalid
                     chocolateyLicense.IsValid = false;
                     chocolateyLicense.InvalidReason = e.Message;
-                    "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, "A license was found for a licensed version of Chocolatey, but is invalid:{0} {1}".format_with(Environment.NewLine, e.Message));
+                    "chocolatey".Log().Error(normalLogger, "A license was found for a licensed version of Chocolatey, but is invalid:{0} {1}".format_with(Environment.NewLine, e.Message));
                 }
 
                 var chocolateyLicenseType = ChocolateyLicenseType.Unknown;
@@ -137,11 +140,23 @@ namespace chocolatey.infrastructure.licensing
 
         private static bool determine_if_regular_output_for_logging()
         {
+            var limitOutputArguments = new string[]
+            {
+                "--limit-output",
+                "--limitoutput",
+                "-r"
+            };
             var args = Environment.GetCommandLineArgs();
+
             if (args == null || args.Length < 2) return true;
 
             var firstArg = args[1].to_string();
             if (firstArg.is_equal_to("-v") || firstArg.is_equal_to("--version")) return false;
+
+            if (args.Count(argument => limitOutputArguments.Contains(argument)) > 0)
+            {
+                return false;
+            }
 
             return true;
         }
