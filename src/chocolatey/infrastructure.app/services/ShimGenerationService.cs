@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -87,13 +87,13 @@ namespace chocolatey.infrastructure.app.services
                 return;
             }
 
-            //gather all .exes in the folder 
+            //gather all .exes in the folder
             var exeFiles = _fileSystem.get_files(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
             foreach (string file in exeFiles.or_empty_list_if_null())
             {
                 if (_fileSystem.file_exists(file + ".ignore")) continue;
                 bool isGui = _fileSystem.file_exists(file + ".gui");
-                //todo: v2 be able to determine gui automatically
+                //todo: #2586 v2 be able to determine gui automatically
 
                 var args = ExternalCommandArgsBuilder.build_arguments(configuration, _shimGenArguments);
                 var shimLocation = _fileSystem.combine_paths(ApplicationParameters.ShimsLocation, _fileSystem.get_file_name(file));
@@ -132,7 +132,7 @@ namespace chocolatey.infrastructure.app.services
 
         public void uninstall(ChocolateyConfiguration configuration, PackageResult packageResult)
         {
-            //gather all .exes in the folder 
+            //gather all .exes in the folder
             var exeFiles = _fileSystem.get_files(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
             foreach (string file in exeFiles.or_empty_list_if_null())
             {

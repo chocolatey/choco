@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -87,8 +87,8 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Info Command");
             this.Log().Info(@"
-Chocolatey will perform a search for a package local or remote and provide 
- detailed information about that package. This is a synonym for 
+Chocolatey will perform a search for a package local or remote and provide
+ detailed information about that package. This is a synonym for
  `choco search <pkgname> --exact --detailed`.
 
 NOTE: New as of 0.9.10.0.
@@ -106,7 +106,7 @@ NOTE: New as of 0.9.10.0.
     choco info googlechrome
     choco info powershell
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
@@ -123,12 +123,12 @@ Enhanced:
  - -1 or 1: an error has occurred
  - 2: no results (enhanced)
 
-NOTE: Starting in v0.10.12, if you have the feature '{0}' 
- turned on, then choco will provide enhanced exit codes that allow 
+NOTE: Starting in v0.10.12, if you have the feature '{0}'
+ turned on, then choco will provide enhanced exit codes that allow
  better integration and scripting.
 
-If you find other exit codes that we have not yet documented, please 
- file a ticket so we can document it at 
+If you find other exit codes that we have not yet documented, please
+ file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
 ".format_with(ApplicationParameters.Features.UseEnhancedExitCodes));

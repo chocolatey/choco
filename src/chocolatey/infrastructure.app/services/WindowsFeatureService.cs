@@ -1,13 +1,13 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,6 +27,7 @@ namespace chocolatey.infrastructure.app.services
     using infrastructure.commands;
     using logging;
     using results;
+    using platforms;
 
     /// <summary>
     ///   Alternative Source for Enabling Windows Features
@@ -91,8 +92,8 @@ namespace chocolatey.infrastructure.app.services
         private void set_list_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
             set_common_args(args);
-            args.Add("_features_", new ExternalCommandArgument {ArgumentOption = FEATURES_VALUE, Required = true});
-            args.Add("_format_", new ExternalCommandArgument {ArgumentOption = FORMAT_VALUE, Required = true});
+            args.Add("_features_", new ExternalCommandArgument { ArgumentOption = FEATURES_VALUE, Required = true });
+            args.Add("_format_", new ExternalCommandArgument { ArgumentOption = FORMAT_VALUE, Required = true });
         }
 
         /// <summary>
@@ -102,16 +103,16 @@ namespace chocolatey.infrastructure.app.services
         {
             set_common_args(args);
 
-            args.Add("_feature_", new ExternalCommandArgument {ArgumentOption = "/Enable-Feature", Required = true});
+            args.Add("_feature_", new ExternalCommandArgument { ArgumentOption = "/Enable-Feature", Required = true });
             args.Add("_package_name_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "/FeatureName:",
-                    ArgumentValue = PACKAGE_NAME_TOKEN,
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "/FeatureName:",
+                ArgumentValue = PACKAGE_NAME_TOKEN,
+                QuoteValue = false,
+                Required = true
+            });
             // /All should be the final argument.
-            args.Add("_all_", new ExternalCommandArgument {ArgumentOption = ALL_TOKEN, Required = true});
+            args.Add("_all_", new ExternalCommandArgument { ArgumentOption = ALL_TOKEN, Required = true });
         }
 
         /// <summary>
@@ -124,38 +125,40 @@ namespace chocolatey.infrastructure.app.services
             // uninstall feature completely in 8/2012+ - /Remove
             // would need /source to bring it back
 
-            args.Add("_feature_", new ExternalCommandArgument {ArgumentOption = "/Disable-Feature", Required = true});
+            args.Add("_feature_", new ExternalCommandArgument { ArgumentOption = "/Disable-Feature", Required = true });
             args.Add("_package_name_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "/FeatureName:",
-                    ArgumentValue = PACKAGE_NAME_TOKEN,
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "/FeatureName:",
+                ArgumentValue = PACKAGE_NAME_TOKEN,
+                QuoteValue = false,
+                Required = true
+            });
         }
 
         private void set_common_args(IDictionary<string, ExternalCommandArgument> args)
         {
-            args.Add("_online_", new ExternalCommandArgument {ArgumentOption = "/Online", Required = true});
-            args.Add("_english_", new ExternalCommandArgument {ArgumentOption = "/English", Required = true});
+            args.Add("_online_", new ExternalCommandArgument { ArgumentOption = "/Online", Required = true });
+            args.Add("_english_", new ExternalCommandArgument { ArgumentOption = "/English", Required = true });
             args.Add("_loglevel_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "/LogLevel=",
-                    ArgumentValue = LOG_LEVEL_TOKEN,
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "/LogLevel=",
+                ArgumentValue = LOG_LEVEL_TOKEN,
+                QuoteValue = false,
+                Required = true
+            });
 
-            args.Add("_no_restart_", new ExternalCommandArgument {ArgumentOption = "/NoRestart", Required = true});
+            args.Add("_no_restart_", new ExternalCommandArgument { ArgumentOption = "/NoRestart", Required = true });
         }
 
-        public SourceType SourceType
+        public string SourceType
         {
-            get { return SourceType.windowsfeatures; }
+            get { return SourceTypes.WINDOWS_FEATURES; }
         }
 
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
         {
+            if (Platform.get_platform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+
             set_executable_path_if_not_set();
         }
 
@@ -266,7 +269,7 @@ namespace chocolatey.infrastructure.app.services
                 var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageName, null, null));
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageName);
 
-                //todo: detect windows feature is already enabled
+                //todo: #2574 detect windows feature is already enabled
                 /*
                       $checkStatement=@"
                     `$dismInfo=(cmd /c `"$dism /Online /Get-FeatureInfo /FeatureName:$packageName`")
@@ -350,7 +353,7 @@ namespace chocolatey.infrastructure.app.services
                 var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageName, null, null));
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageName);
 
-                //todo: detect windows feature is already disabled
+                //todo: #2574 detect windows feature is already disabled
                 /*
                       $checkStatement=@"
                     `$dismInfo=(cmd /c `"$dism /Online /Get-FeatureInfo /FeatureName:$packageName`")

@@ -1,13 +1,13 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,7 @@ namespace chocolatey.infrastructure.app.services
     using infrastructure.commands;
     using logging;
     using results;
+    using platforms;
 
     public sealed class RubyGemsService : ISourceRunner
     {
@@ -43,7 +44,6 @@ namespace chocolatey.infrastructure.app.services
         public static readonly Regex PackageNameFetchingRegex = new Regex(@"Fetching: (?<{0}>.*)\-".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
         public static readonly Regex PackageNameInstalledRegex = new Regex(@"Successfully installed (?<{0}>.*)\-".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
         public static readonly Regex PackageNameErrorRegex = new Regex(@"'(?<{0}>[^']*)'".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
-
 
         private readonly IDictionary<string, ExternalCommandArgument> _listArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
         private readonly IDictionary<string, ExternalCommandArgument> _installArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
@@ -71,7 +71,7 @@ namespace chocolatey.infrastructure.app.services
         {
             args.Add("_cmd_c_", new ExternalCommandArgument { ArgumentOption = "/c", Required = true });
             args.Add("_gem_", new ExternalCommandArgument { ArgumentOption = "gem", Required = true });
-            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "list", Required = true});
+            args.Add("_action_", new ExternalCommandArgument { ArgumentOption = "list", Required = true });
         }
 
         /// <summary>
@@ -79,54 +79,56 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         private void set_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-            args.Add("_cmd_c_", new ExternalCommandArgument {ArgumentOption = "/c", Required = true});
-            args.Add("_gem_", new ExternalCommandArgument {ArgumentOption = "gem", Required = true});
-            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "install", Required = true});
+            args.Add("_cmd_c_", new ExternalCommandArgument { ArgumentOption = "/c", Required = true });
+            args.Add("_gem_", new ExternalCommandArgument { ArgumentOption = "gem", Required = true });
+            args.Add("_action_", new ExternalCommandArgument { ArgumentOption = "install", Required = true });
             args.Add("_package_name_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "package name ",
-                    ArgumentValue = PACKAGE_NAME_TOKEN,
-                    QuoteValue = false,
-                    UseValueOnly = true,
-                    Required = true
-                });
-            
+            {
+                ArgumentOption = "package name ",
+                ArgumentValue = PACKAGE_NAME_TOKEN,
+                QuoteValue = false,
+                UseValueOnly = true,
+                Required = true
+            });
+
             args.Add("Force", new ExternalCommandArgument
-                {
-                    ArgumentOption = "-f ",
-                    QuoteValue = false,
-                    Required = false
-                });
-            
+            {
+                ArgumentOption = "-f ",
+                QuoteValue = false,
+                Required = false
+            });
+
             args.Add("Version", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--version ",
-                    QuoteValue = false,
-                    Required = false
-                });
+            {
+                ArgumentOption = "--version ",
+                QuoteValue = false,
+                Required = false
+            });
         }
 
-        public SourceType SourceType
+        public string SourceType
         {
-            get { return SourceType.ruby; }
+            get { return SourceTypes.RUBY; }
         }
 
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
         {
+            if (Platform.get_platform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+
             var runnerConfig = new ChocolateyConfiguration
-                {
-                    PackageNames = RUBY_PORTABLE_PACKAGE,
-                    Sources = ApplicationParameters.PackagesLocation,
-                    Debug = config.Debug,
-                    Force = config.Force,
-                    Verbose = config.Verbose,
-                    CommandExecutionTimeoutSeconds = config.CommandExecutionTimeoutSeconds,
-                    CacheLocation = config.CacheLocation,
-                    RegularOutput = config.RegularOutput,
-                    PromptForConfirmation = false,
-                    AcceptLicense = true,
-                    QuietOutput = true,
-                };
+            {
+                PackageNames = RUBY_PORTABLE_PACKAGE,
+                Sources = ApplicationParameters.PackagesLocation,
+                Debug = config.Debug,
+                Force = config.Force,
+                Verbose = config.Verbose,
+                CommandExecutionTimeoutSeconds = config.CommandExecutionTimeoutSeconds,
+                CacheLocation = config.CacheLocation,
+                RegularOutput = config.RegularOutput,
+                PromptForConfirmation = false,
+                AcceptLicense = true,
+                QuietOutput = true,
+            };
             runnerConfig.ListCommand.LocalOnly = true;
 
             var localPackages = _nugetService.list_run(runnerConfig);
@@ -157,7 +159,7 @@ namespace chocolatey.infrastructure.app.services
         {
             var packageResults = new List<PackageResult>();
             var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
-            
+
             Environment.ExitCode = _commandExecutor.execute(
                 EXE_PATH,
                 args,
@@ -210,7 +212,7 @@ namespace chocolatey.infrastructure.app.services
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
                             this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
-                          
+
                             if (InstallingRegex.IsMatch(logMessage))
                             {
                                 var packageName = get_value_from_output(logMessage, PackageNameFetchingRegex, PACKAGE_NAME_GROUP);
@@ -218,7 +220,7 @@ namespace chocolatey.infrastructure.app.services
                                 this.Log().Info(ChocolateyLoggers.Important, "{0}".format_with(packageName));
                                 return;
                             }
-                           
+
                             //if (string.IsNullOrWhiteSpace(packageName)) return;
 
                             if (InstalledRegex.IsMatch(logMessage))

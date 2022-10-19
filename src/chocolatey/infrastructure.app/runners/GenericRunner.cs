@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.runners
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using chocolatey.infrastructure.app.services;
     using events;
     using filesystem;
     using infrastructure.events;
@@ -49,7 +50,7 @@ namespace chocolatey.infrastructure.app.runners
 
             if (command == null)
             {
-                //todo add a search among other location/extensions for the command
+                //todo: #2581 add a search among other location/extensions for the command
                 if (!string.IsNullOrWhiteSpace(config.CommandName))
                 {
                     throw new Exception(@"Could not find a command registered that meets '{0}'.
@@ -70,12 +71,11 @@ namespace chocolatey.infrastructure.app.runners
                     warn_when_admin_needs_elevation(config);
                 }
 
-                set_source_type(config);
+                set_source_type(config, container);
                 // guaranteed that all settings are set.
                 EnvironmentSettings.set_environment_variables(config);
 
                 this.Log().Debug(() => "Configuration: {0}".format_with(config.ToString()));
-
 
                 if (isConsole && (config.HelpRequested || config.UnsuccessfulParsing))
                 {
@@ -83,7 +83,7 @@ namespace chocolatey.infrastructure.app.runners
                     Console.WriteLine("Press enter to continue...");
                     Console.ReadKey();
 #endif
-                    Environment.Exit(config.UnsuccessfulParsing? 1 : 0);
+                    Environment.Exit(config.UnsuccessfulParsing ? 1 : 0);
                 }
 
                 var token = Assembly.GetExecutingAssembly().get_public_key_token();
@@ -104,7 +104,6 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
  now be in a bad state. Only official builds are to be trusted.
 "
                         );
-
                     }
                 }
             }
@@ -112,13 +111,20 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             return command;
         }
 
-        private void set_source_type(ChocolateyConfiguration config)
+        private void set_source_type(ChocolateyConfiguration config, Container container)
         {
-            var sourceType = SourceType.normal;
-            Enum.TryParse(config.Sources, true, out sourceType);
+            var sourceRunner = container.GetAllInstances<ISourceRunner>()
+                .FirstOrDefault(s => s.SourceType.is_equal_to(config.Sources) || s.SourceType.is_equal_to(config.Sources + "s"));
+
+            var sourceType = SourceTypes.NORMAL;
+            if (sourceRunner != null)
+            {
+                sourceType = sourceRunner.SourceType;
+            }
+
             config.SourceType = sourceType;
 
-            this.Log().Debug(() => "The source '{0}' evaluated to a '{1}' source type".format_with(config.Sources, sourceType.to_string()));
+            this.Log().Debug(() => "The source '{0}' evaluated to a '{1}' source type".format_with(config.Sources, sourceType));
         }
 
         public void fail_when_license_is_missing_or_invalid_if_requested(ChocolateyConfiguration config)
@@ -140,7 +146,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             }
 
             fail_when_license_is_missing_or_invalid_if_requested(config);
-            SecurityProtocol.set_protocol(config, provideWarning:true);
+            SecurityProtocol.set_protocol(config, provideWarning: true);
             EventManager.publish(new PreRunMessage(config));
 
             try
@@ -201,7 +207,8 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                 var nugetX = fileSystem.combine_paths(fileSystem.get_temp_path(), "x", "nuget");
                 fileSystem.delete_directory_if_exists(nugetX, recursive: true, overrideAttributes: true, isSilent: true);
 
-                if (config != null && !string.IsNullOrWhiteSpace(config.CacheLocation)) {
+                if (config != null && !string.IsNullOrWhiteSpace(config.CacheLocation))
+                {
                     scratch = fileSystem.combine_paths(config.CacheLocation, "NuGetScratch");
                     fileSystem.delete_directory_if_exists(scratch, recursive: true, overrideAttributes: true, isSilent: true);
                     nugetX = fileSystem.combine_paths(config.CacheLocation, "x", "nuget");
@@ -324,7 +331,5 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                 }
             }
         }
-
     }
 }
-

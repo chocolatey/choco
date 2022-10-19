@@ -1,0 +1,18 @@
+ARG tagversion="ltsc2016"
+FROM mcr.microsoft.com/windows/servercore:${tagversion}
+
+LABEL org.opencontainers.image.url="https://chocolatey.org/"
+LABEL org.opencontainers.image.documentation="https://docs.chocolatey.org/"
+LABEL org.opencontainers.image.source="https://github.com/chocolatey/choco"
+LABEL org.opencontainers.image.vendor="Chocolatey Software, Inc"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.title="Chocolatey"
+LABEL org.opencontainers.image.description="Chocolatey Client running on .NET"
+LABEL org.opencontainers.image.authors="https://chocolatey.org/support"
+LABEL org.opencontainers.image.base.name="mcr.microsoft.com/windows/servercore:${tagversion}"
+
+COPY ./code_drop/Packages/Chocolatey C:/choco-nupkg
+COPY ./docker/Install-ChocolateyInContainer.ps1 C:/choco-nupkg/Install-ChocolateyInContainer.ps1
+COPY ./src/chocolatey.resources/tools/ C:/choco-nupkg/tools/
+
+RUN PowerShell.exe "C:\choco-nupkg\Install-ChocolateyInContainer.ps1"

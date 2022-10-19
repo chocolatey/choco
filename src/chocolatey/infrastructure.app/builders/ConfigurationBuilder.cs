@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,14 +23,12 @@ namespace chocolatey.infrastructure.app.builders
     using System.Reflection;
     using System.Text;
     using adapters;
-    using attributes;
     using chocolatey.infrastructure.app.commands;
     using configuration;
     using cryptography;
     using extractors;
     using filesystem;
     using information;
-    using infrastructure.commands;
     using infrastructure.services;
     using licensing;
     using logging;
@@ -58,6 +56,15 @@ namespace chocolatey.infrastructure.app.builders
         private static IEnvironment Environment
         {
             get { return _environmentInitializer.Value; }
+        }
+
+        public static bool is_compatibility_checks_disabled(IFileSystem filesystem, IXmlService xmlService)
+        {
+            var config = get_config_file_settings(filesystem, xmlService);
+
+            var feature = config.Features.FirstOrDefault(f => f.Name.is_equal_to("disableCompatibilityChecks"));
+
+            return feature != null && feature.Enabled;
         }
 
         /// <summary>
@@ -105,7 +112,7 @@ namespace chocolatey.infrastructure.app.builders
                 () => xmlService.serialize(configFileSettings, globalConfigPath, isSilent: shouldLogSilently),
                 "Error updating '{0}'. Please ensure you have permissions to do so".format_with(globalConfigPath),
                 logDebugInsteadOfError: true,
-                isSilent:shouldLogSilently);
+                isSilent: shouldLogSilently);
         }
 
         private static void add_or_remove_licensed_source(ChocolateyLicense license, ConfigFileSettings configFileSettings)
@@ -191,30 +198,32 @@ namespace chocolatey.infrastructure.app.builders
             foreach (var source in defaultSourcesInOrder)
             {
                 config.MachineSources.Add(new MachineSourceConfiguration
-                    {
-                        Key = source.Value,
-                        Name = source.Id,
-                        Username = source.UserName,
-                        EncryptedPassword = source.Password,
-                        Certificate = source.Certificate,
-                        EncryptedCertificatePassword = source.CertificatePassword,
-                        Priority = source.Priority,
-                        BypassProxy = source.BypassProxy,
-                        AllowSelfService = source.AllowSelfService,
-                        VisibleToAdminsOnly = source.VisibleToAdminsOnly
-                    });
+                {
+                    Key = source.Value,
+                    Name = source.Id,
+                    Username = source.UserName,
+                    EncryptedPassword = source.Password,
+                    Certificate = source.Certificate,
+                    EncryptedCertificatePassword = source.CertificatePassword,
+                    Priority = source.Priority,
+                    BypassProxy = source.BypassProxy,
+                    AllowSelfService = source.AllowSelfService,
+                    VisibleToAdminsOnly = source.VisibleToAdminsOnly
+                });
             }
         }
 
         private static void set_config_items(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
             config.CacheLocation = Environment.ExpandEnvironmentVariables(set_config_item(ApplicationParameters.ConfigSettings.CacheLocation, configFileSettings, string.IsNullOrWhiteSpace(configFileSettings.CacheLocation) ? string.Empty : configFileSettings.CacheLocation, "Cache location if not TEMP folder. Replaces `$env:TEMP` value for choco.exe process. It is highly recommended this be set to make Chocolatey more deterministic in cleanup."));
-            if (string.IsNullOrWhiteSpace(config.CacheLocation)) {
+            if (string.IsNullOrWhiteSpace(config.CacheLocation))
+            {
                 config.CacheLocation = fileSystem.get_temp_path(); // System.Environment.GetEnvironmentVariable("TEMP");
                 // TEMP gets set in EnvironmentSettings, so it may already have
                 // chocolatey in the path when it installs the next package from
                 // the API.
-                if(!String.Equals(fileSystem.get_directory_info_for(config.CacheLocation).Name, "chocolatey", StringComparison.OrdinalIgnoreCase)) {
+                if (!string.Equals(fileSystem.get_directory_info_for(config.CacheLocation).Name, "chocolatey", StringComparison.OrdinalIgnoreCase))
+                {
                     config.CacheLocation = fileSystem.combine_paths(fileSystem.get_temp_path(), "chocolatey");
                 }
             }
@@ -254,6 +263,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Proxy.BypassList = set_config_item(ApplicationParameters.ConfigSettings.ProxyBypassList, configFileSettings, string.Empty, "Optional proxy bypass list. Comma separated. Available in 0.10.4+.");
             config.Proxy.BypassOnLocal = set_config_item(ApplicationParameters.ConfigSettings.ProxyBypassOnLocal, configFileSettings, "true", "Bypass proxy for local connections. Available in 0.10.4+.").is_equal_to(bool.TrueString);
             config.UpgradeCommand.PackageNamesToSkip = set_config_item(ApplicationParameters.ConfigSettings.UpgradeAllExceptions, configFileSettings, string.Empty, "A comma-separated list of package names that should not be upgraded when running `choco upgrade all'. Defaults to empty. Available in 0.10.14+.");
+            config.DefaultTemplateName = set_config_item(ApplicationParameters.ConfigSettings.DefaultTemplateName, configFileSettings, string.Empty, "Default template name used when running 'choco new' command. Available in 0.12.0+.");
         }
 
         private static string set_config_item(string configName, ConfigFileSettings configFileSettings, string defaultValue, string description, bool forceSettingValue = false)
@@ -307,8 +317,8 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.LogWithoutColor = set_feature_flag(ApplicationParameters.Features.LogWithoutColor, configFileSettings, defaultEnabled: false, description: "Log without color - Do not show colorization in logging output. Available in 0.10.9+.");
             config.Features.LogValidationResultsOnWarnings = set_feature_flag(ApplicationParameters.Features.LogValidationResultsOnWarnings, configFileSettings, defaultEnabled: true, description: "Log validation results on warnings - Should the validation results be logged if there are warnings? Available in 0.10.12+.");
             config.Features.UsePackageRepositoryOptimizations = set_feature_flag(ApplicationParameters.Features.UsePackageRepositoryOptimizations, configFileSettings, defaultEnabled: true, description: "Use Package Repository Optimizations - Turn on optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should generally be left enabled, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Available in 0.10.14+.");
-            config.Features.ScriptsCheckLastExitCode = set_feature_flag(ApplicationParameters.Features.ScriptsCheckLastExitCode, configFileSettings, defaultEnabled: false, description: "Scripts Check $LastExitCode (external commands) - Leave this off unless you absolutely need it while you fix your package scripts  to use `throw 'error message'` or `Set-PowerShellExitCode #` instead of `exit #`. This behavior started in 0.9.10 and produced hard to find bugs. If the last external process exits successfully but with an exit code of not zero, this could cause hard to detect package failures. Available in 0.10.3+. Will be removed in 0.11.0.");
             config.PromptForConfirmation = !set_feature_flag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
+            config.DisableCompatibilityChecks = set_feature_flag(ApplicationParameters.Features.DisableCompatibilityChecks, configFileSettings, defaultEnabled: false, description: "Disable Compatibility Checks - Should a warning we shown, before and after command execution, when a runtime compatibility check determines that there is an incompatibility between Chocolatey and Chocolatey Licensed Extension. Available in 1.1.0+");
         }
 
         private static bool set_feature_flag(string featureName, ConfigFileSettings configFileSettings, bool defaultEnabled, string description)
@@ -422,7 +432,10 @@ namespace chocolatey.infrastructure.app.builders
                              option => config.Proxy.BypassOnLocal = option != null)
                          .Add("log-file=",
                              "Log File to output to in addition to regular loggers. Available in 0.10.8+.",
-                             option => config.AdditionalLogFileLocation= option.remove_surrounding_quotes())
+                             option => config.AdditionalLogFileLocation = option.remove_surrounding_quotes())
+                        .Add("skipcompatibilitychecks|skip-compatibility-checks",
+                            "SkipCompatibilityChecks - Prevent warnings being shown before and after command execution when a runtime compatibility problem is found between the version of Chocolatey and the Chocolatey Licensed Extension. Available in 1.1.0+",
+                            option => config.DisableCompatibilityChecks = option != null)
                         ;
                 },
                 (unparsedArgs) =>

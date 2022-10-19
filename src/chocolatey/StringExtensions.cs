@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -96,19 +96,19 @@ namespace chocolatey
             var secureString = new SecureString();
 
             if (string.IsNullOrWhiteSpace(input)) return secureString;
-            
+
             foreach (char character in input)
             {
                 secureString.AppendChar(character);
             }
-            
+
             return secureString;
         }
 
         public static string from_secure_string(this SecureString input)
         {
             if (input == null) return string.Empty;
-            
+
             IntPtr unmanagedString = IntPtr.Zero;
             try
             {

@@ -1,0 +1,66 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "StefanScherer/windows_2019"
+  config.vm.boot_timeout = 600
+
+  # windows
+  config.vm.guest = :windows
+  config.windows.halt_timeout = 60
+  config.windows.set_work_network = true
+
+  # winrm
+  config.vm.communicator = 'winrm'
+  config.winrm.username = 'vagrant'
+  config.winrm.password = 'vagrant'
+  # https://github.com/hashicorp/vagrant/issues/6430
+  config.winrm.retry_limit = 30
+  config.winrm.retry_delay = 10
+
+  config.vm.network :forwarded_port, guest: 5985, host: 14985, id: 'winrm', auto_correct: true
+  config.vm.network :forwarded_port, guest: 3389, host: 14389, id: 'rdp', auto_correct: true
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = true
+    vb.memory = 4096
+    vb.cpus = 2
+    vb.linked_clone = true
+    vb.customize ['modifyvm', :id, '--vram', '128']
+  end
+  config.vm.provider "hyperv" do |h|
+    h.memory = 4096
+    h.cpus = 2
+    h.linked_clone = true
+    h.enable_checkpoints = false
+  end
+
+  config.vm.synced_folder '../', '/chocoRoot'
+
+  config.vm.provision "shell", inline: <<-SHELL
+    cscript c:/windows/system32/slmgr.vbs /rearm | Out-Null
+    Set-ExecutionPolicy Bypass -Scope Process -Force
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+    Write-Host "We are going to install some prerequisites now. This could take some time"
+    $null = choco install dotnet3.5 git pester visualstudio2019community visualstudio2019-workload-manageddesktop -y
+    Import-Module $env:ChocolateyInstall/helpers/chocolateyProfile.psm1
+    Update-SessionEnvironment
+    Write-Host "Done installing software, now copying files"
+    $null = robocopy c:/chocoRoot c:/code/choco /mir
+    Push-Location c:/code/choco
+    Write-Host "Files have been copied, beginning build process. You may see some red warning text regarding VsVersionToYearString, this can be safely ignored"
+    $CakeOutput = ./build.bat
+    if ($LastExitCode -ne 0) {
+      Set-Content c:/chocoRoot/buildOutput.txt -Value $CakeOutput
+      Write-Host "The build has failed. Please see the buildOutput.txt file at the root of the repository for details"
+      exit $LastExitCode
+    }
+
+    Write-Host "Build complete. Executing tests."
+    # $env:TEST_KITCHEN = 1
+    $env:VM_RUNNING = 1
+    ./Invoke-Tests.ps1
+  SHELL
+end

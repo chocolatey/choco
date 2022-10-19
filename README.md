@@ -3,7 +3,11 @@ You can just call me choco.
 
 ![Chocolatey Logo](https://rawcdn.githack.com/chocolatey/choco/14a627932c78c8baaba6bef5f749ebfa1957d28d/docs/logo/chocolateyicon.gif "Chocolatey")
 
-[![](https://img.shields.io/chocolatey/dt/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey) [![](https://img.shields.io/chocolatey/v/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey) [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/chocolatey/choco?label=docker&logo=docker&sort=semver)](https://hub.docker.com/r/chocolatey/choco) [![Project Stats](https://www.openhub.net/p/chocolatey/widgets/project_thin_badge.gif)](https://www.openhub.net/p/chocolatey)
+[![](https://img.shields.io/chocolatey/dt/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey) 
+[![](https://img.shields.io/chocolatey/v/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey) 
+[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/chocolatey/choco?label=docker&logo=docker&sort=semver)](https://hub.docker.com/r/chocolatey/choco) 
+[![Project Stats](https://www.openhub.net/p/chocolatey/widgets/project_thin_badge.gif)](https://www.openhub.net/p/chocolatey)
+[![Coverage Status](https://coveralls.io/repos/github/chocolatey/choco/badge.svg?branch=develop)](https://coveralls.io/github/chocolatey/choco?branch=develop)
 
 <!-- TOC -->
 
@@ -29,16 +33,15 @@ You can just call me choco.
 <!-- /TOC -->
 
 ## Build Status
-TeamCity  | AppVeyor | Travis | GitHub Action
-------------- | ------------- | ------------- | -------------
-[![TeamCity Build Status](https://img.shields.io/teamcity/codebetter/bt429.svg)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt429) | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/jfxywa3xuwowt20w/branch/master?svg=true)](https://ci.appveyor.com/project/ferventcoder/choco/branch/master) | [![Travis Build Status](https://travis-ci.org/chocolatey/choco.svg?branch=master)](https://travis-ci.org/chocolatey/choco) | [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/master?logo=github)]((https://github.com/chocolatey/choco/actions/workflows/build.yml))
+
+| GitHub Action                                                                                                                                                                                                  |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/develop?logo=github)](https://github.com/chocolatey/choco/actions/workflows/build.yml)  |
 
 ## Chat Room
-Come join in the conversation about Chocolatey in our Gitter Chat Room.
+Come join in the conversation about Chocolatey in our Community Chat Room.
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chocolatey/choco?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Or, you can find us in IRC at #chocolatey on freenode. IRC is not as often checked by committers, so it is recommended you stick to Gitter if you need more timely assistance.
+[![Discord](https://img.shields.io/discord/778552361454141460?logo=Discord)](https://ch0.co/community)
 
 Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
@@ -61,7 +64,7 @@ If you are using a [commercial edition of Chocolatey](https://chocolatey.org/com
 
 ## Information
  * [Chocolatey Website and Community Package Repository](https://community.chocolatey.org)
- * [Mailing List](http://groups.google.com/group/chocolatey) / [Release Announcements Only Mailing List](https://groups.google.com/group/chocolatey-announce) / [Build Status Mailing List](http://groups.google.com/group/chocolatey-build-status)
+ * [Mailing List](https://groups.google.com/group/chocolatey) / [Release Announcements Only Mailing List](https://groups.google.com/group/chocolatey-announce) / [Build Status Mailing List](http://groups.google.com/group/chocolatey-build-status)
  * [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [GitHub](https://github.com/chocolatey)
  * [Blog](https://blog.chocolatey.org/) / [Newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&id=73b018498d)
  * [Documentation](https://docs.chocolatey.org/en-us/) / [Support](https://chocolatey.org/support)
@@ -98,8 +101,8 @@ Prerequisites:
 
  * The issue has to do with choco itself and is not a package or website issue.
  * Please check to see if your issue already exists with a quick search of the issues. Start with one relevant term and then add if you get too many results.
- * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md) guidelines.
- * You are not submitting a question - questions are better served as [emails](https://groups.google.com/group/chocolatey) or [gitter chat questions](https://gitter.im/chocolatey/choco).
+ * You are not submitting an "Enhancement". Enhancements should observe [CONTRIBUTING](https://github.com/chocolatey/choco/blob/develop/CONTRIBUTING.md) guidelines.
+ * You are not submitting a question - questions are better served as [emails](https://groups.google.com/group/chocolatey) or [Community Chat questions](https://ch0.co/community-support).
  * Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
 Submitting a ticket:
@@ -113,10 +116,10 @@ Submitting a ticket:
  * Include screenshots and/or animated gifs whenever possible, they help show us exactly what the problem is.
 
 ## Contributing
-If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [CONTRIBUTING](https://github.com/chocolatey/choco/blob/master/CONTRIBUTING.md).
+If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [CONTRIBUTING](https://github.com/chocolatey/choco/blob/develop/CONTRIBUTING.md).
 
 ## Committers
-Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey/choco/blob/master/COMMITTERS.md).
+Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey/choco/blob/develop/COMMITTERS.md).
 
 ### Compiling / Building Source
 There is a `build.bat`/`build.sh` file that creates a necessary generated file named `SolutionVersion.cs`. It must be run at least once before Visual Studio will build.
@@ -139,7 +142,7 @@ Running the build on Windows should produce an artifact that is tested and ready
 ##### Prerequisites:
 
  * Install and configure Mono. Mono 5.20 or newer should work, see the Dockerfile for the currently recommended version.
-  * [Debian based](http://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives)
+  * [Debian based](https://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives)
 
 ```sh
 # install prerequisites
@@ -170,9 +173,9 @@ sudo apt-get install mono-devel -y
  * Consider adding the following to your `~/.profile` (or other relevant dot source file):
 
 ```sh
-# mono
+# Mono
 # http://www.michaelruck.de/2010/03/solving-pkg-config-and-mono-35-profile.html
-# http://cloudgen.wordpress.com/2013/03/06/configure-nant-to-run-under-mono-3-06-beta-for-mac-osx/
+# https://cloudgen.wordpress.com/2013/03/06/configure-nant-to-run-under-mono-3-06-beta-for-mac-osx/
 export PKG_CONFIG_PATH=/opt/local/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig:$PKG_CONFIG_PATH
 ```
 
@@ -188,6 +191,13 @@ chmod +x zip.sh
  * Run `./build.sh`.
 
 Running the build on Mono produces an artifact similar to Windows but may have more rough edges. You may get a failure or two in the build script that can be safely ignored.
+
+### Installing on Other Platforms:
+
+ 1. Get a copy of the source code and build.
+ 1. Copy (or link) the contents of `./code_drop/temp/_PublishedApps/choco` to your preferred install directory. On Linux, the preferred directory is `/opt/chocolatey`
+ 1. Export the `ChocolateyInstall` environment variable, pointing to the install directory the build output was copied too.
+ 1. Copy `./docker/choco_wrapper` to a directory on the `$PATH`, rename to `choco`, and if the install directory is something else than `/opt/chocolatey`, then edit it to point to the correct path.
 
 ## Credits
 Chocolatey is brought to you by quite a few people and frameworks. See [CREDITS](https://github.com/chocolatey/choco/blob/master/docs/legal/CREDITS.md) (just LEGAL/Credits.md in the zip folder).

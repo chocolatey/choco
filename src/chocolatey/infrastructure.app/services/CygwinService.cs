@@ -1,13 +1,13 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,6 +28,7 @@ namespace chocolatey.infrastructure.app.services
     using infrastructure.commands;
     using logging;
     using results;
+    using platforms;
 
     /// <summary>
     ///   Alternative Source for Cygwin
@@ -84,61 +85,63 @@ namespace chocolatey.infrastructure.app.services
             //    UseValueOnly = true,
             //    Required = true
             //});
-            args.Add("_quiet_", new ExternalCommandArgument {ArgumentOption = "--quiet-mode", Required = true});
-            args.Add("_no_desktop_", new ExternalCommandArgument {ArgumentOption = "--no-desktop", Required = true});
-            args.Add("_no_startmenu_", new ExternalCommandArgument {ArgumentOption = "--no-startmenu", Required = true});
+            args.Add("_quiet_", new ExternalCommandArgument { ArgumentOption = "--quiet-mode", Required = true });
+            args.Add("_no_desktop_", new ExternalCommandArgument { ArgumentOption = "--no-desktop", Required = true });
+            args.Add("_no_startmenu_", new ExternalCommandArgument { ArgumentOption = "--no-startmenu", Required = true });
             args.Add("_root_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--root ",
-                    ArgumentValue = INSTALL_ROOT_TOKEN,
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--root ",
+                ArgumentValue = INSTALL_ROOT_TOKEN,
+                QuoteValue = false,
+                Required = true
+            });
             args.Add("_local_pkgs_dir_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--local-package-dir ",
-                    ArgumentValue = "{0}\\packages".format_with(INSTALL_ROOT_TOKEN),
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--local-package-dir ",
+                ArgumentValue = "{0}\\packages".format_with(INSTALL_ROOT_TOKEN),
+                QuoteValue = false,
+                Required = true
+            });
 
             args.Add("_site_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--site ",
-                    ArgumentValue = "http://mirrors.kernel.org/sourceware/cygwin/",
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--site ",
+                ArgumentValue = "http://mirrors.kernel.org/sourceware/cygwin/",
+                QuoteValue = false,
+                Required = true
+            });
 
             args.Add("_package_name_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--packages ",
-                    ArgumentValue = PACKAGE_NAME_TOKEN,
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--packages ",
+                ArgumentValue = PACKAGE_NAME_TOKEN,
+                QuoteValue = false,
+                Required = true
+            });
         }
 
-        public SourceType SourceType
+        public string SourceType
         {
-            get { return SourceType.cygwin; }
+            get { return SourceTypes.CYGWIN; }
         }
 
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
         {
+            if (Platform.get_platform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+
             var runnerConfig = new ChocolateyConfiguration
-                {
-                    Sources = ApplicationParameters.PackagesLocation,
-                    Debug = config.Debug,
-                    Force = config.Force,
-                    Verbose = config.Verbose,
-                    CommandExecutionTimeoutSeconds = config.CommandExecutionTimeoutSeconds,
-                    CacheLocation = config.CacheLocation,
-                    RegularOutput = config.RegularOutput,
-                    PromptForConfirmation = false,
-                    AcceptLicense = true,
-                    QuietOutput = true,
-                };
+            {
+                Sources = ApplicationParameters.PackagesLocation,
+                Debug = config.Debug,
+                Force = config.Force,
+                Verbose = config.Verbose,
+                CommandExecutionTimeoutSeconds = config.CommandExecutionTimeoutSeconds,
+                CacheLocation = config.CacheLocation,
+                RegularOutput = config.RegularOutput,
+                PromptForConfirmation = false,
+                AcceptLicense = true,
+                QuietOutput = true,
+            };
             runnerConfig.ListCommand.LocalOnly = true;
 
             var localPackages = _nugetService.list_run(runnerConfig);
@@ -177,7 +180,7 @@ namespace chocolatey.infrastructure.app.services
                 var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
                 if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
 
-                _rootDirectory = _fileSystem.combine_paths(binRoot,"cygwin");
+                _rootDirectory = _fileSystem.combine_paths(binRoot, "cygwin");
             }
         }
 

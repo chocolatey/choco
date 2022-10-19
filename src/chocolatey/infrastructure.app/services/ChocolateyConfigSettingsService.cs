@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using configuration;
     using infrastructure.services;
     using logging;
@@ -26,9 +27,15 @@ namespace chocolatey.infrastructure.app.services
 
     public class ChocolateyConfigSettingsService : IChocolateyConfigSettingsService
     {
+        private readonly HashSet<string> _knownFeatures = new HashSet<string>();
         private readonly Lazy<ConfigFileSettings> _configFileSettings;
         private readonly IXmlService _xmlService;
         private const string NO_CHANGE_MESSAGE = "Nothing to change. Config already set.";
+
+        public ChocolateyConfigSettingsService()
+        {
+            add_known_features_from_static_class(typeof(ApplicationParameters.Features));
+        }
 
         private ConfigFileSettings configFileSettings
         {
@@ -36,6 +43,7 @@ namespace chocolatey.infrastructure.app.services
         }
 
         public ChocolateyConfigSettingsService(IXmlService xmlService)
+            : this()
         {
             _xmlService = xmlService;
             _configFileSettings = new Lazy<ConfigFileSettings>(() => _xmlService.deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation));
@@ -58,7 +66,8 @@ namespace chocolatey.infrastructure.app.services
             {
                 if (skip_source(source, configuration)) continue;
 
-                if (!configuration.QuietOutput) {
+                if (!configuration.QuietOutput)
+                {
                     if (configuration.RegularOutput)
                     {
                         this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}|Bypass Proxy - {5}|Self-Service - {6}|Admin Only - {7}.".format_with(
@@ -87,7 +96,8 @@ namespace chocolatey.infrastructure.app.services
                         ));
                     }
                 }
-                list.Add(new ChocolateySource {
+                list.Add(new ChocolateySource
+                {
                     Id = source.Id,
                     Value = source.Value,
                     Disabled = source.Disabled,
@@ -134,9 +144,9 @@ namespace chocolatey.infrastructure.app.services
                     configuration.SourceCommand.Password.is_equal_to(currentPassword) &&
                     configuration.SourceCommand.CertificatePassword.is_equal_to(currentCertificatePassword) &&
                     configuration.SourceCommand.Certificate.is_equal_to(source.Certificate) &&
-                    configuration.SourceCommand.BypassProxy == source.BypassProxy && 
+                    configuration.SourceCommand.BypassProxy == source.BypassProxy &&
                     configuration.SourceCommand.AllowSelfService == source.AllowSelfService &&
-                    configuration.SourceCommand.VisibleToAdminsOnly == source.VisibleToAdminsOnly 
+                    configuration.SourceCommand.VisibleToAdminsOnly == source.VisibleToAdminsOnly
                     )
                 {
                     if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
@@ -228,6 +238,8 @@ namespace chocolatey.infrastructure.app.services
                 throw new ApplicationException("Feature '{0}' not found".format_with(configuration.FeatureCommand.Name));
             }
 
+            validate_supported_feature(feature);
+
             if (feature.Enabled || !feature.SetExplicitly)
             {
                 if (!feature.Enabled && !feature.SetExplicitly)
@@ -253,6 +265,8 @@ namespace chocolatey.infrastructure.app.services
             {
                 throw new ApplicationException("Feature '{0}' not found".format_with(configuration.FeatureCommand.Name));
             }
+
+            validate_supported_feature(feature);
 
             if (!feature.Enabled || !feature.SetExplicitly)
             {
@@ -284,7 +298,7 @@ namespace chocolatey.infrastructure.app.services
 
                     if (keyAction != null)
                     {
-                        keyAction.Invoke(new ConfigFileApiKeySetting {Key = apiKeyValue, Source = apiKey.Source});
+                        keyAction.Invoke(new ConfigFileApiKeySetting { Key = apiKeyValue, Source = apiKey.Source });
                     }
                 }
             }
@@ -295,7 +309,7 @@ namespace chocolatey.infrastructure.app.services
                     var keyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();
                     if (keyAction != null)
                     {
-                        keyAction.Invoke(new ConfigFileApiKeySetting {Key = keyValue, Source = apiKey.Source});
+                        keyAction.Invoke(new ConfigFileApiKeySetting { Key = keyValue, Source = apiKey.Source });
                     }
                 }
             }
@@ -309,10 +323,10 @@ namespace chocolatey.infrastructure.app.services
             if (apiKey == null)
             {
                 configFileSettings.ApiKeys.Add(new ConfigFileApiKeySetting
-                    {
-                        Source = configuration.Sources,
-                        Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key),
-                    });
+                {
+                    Source = configuration.Sources,
+                    Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key),
+                });
 
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
@@ -443,6 +457,43 @@ namespace chocolatey.infrastructure.app.services
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
                 this.Log().Warn(() => "Unset {0}".format_with(config.Key));
+            }
+        }
+
+        protected void add_known_features_from_static_class(Type classType)
+        {
+            var fieldInfos = classType.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.GetField);
+
+            foreach (var fi in fieldInfos)
+            {
+                try
+                {
+                    var value = (string)fi.GetValue(null);
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        add_known_feature(value);
+                    }
+                }
+                catch
+                {
+                    typeof(ChocolateyConfigSettingsService).Log().Debug("Unable to get value for known feature name for variable '{0}'!".format_with(fi.Name));
+                }
+            }
+        }
+
+        protected void add_known_feature(string name)
+        {
+            if (!_knownFeatures.Contains(name.to_lower()))
+            {
+                _knownFeatures.Add(name.to_lower());
+            }
+        }
+
+        protected void validate_supported_feature(ConfigFileFeatureSetting feature)
+        {
+            if (!_knownFeatures.Contains(feature.Name.to_lower()))
+            {
+                throw new ApplicationException("Feature '{0}' is not supported.".format_with(feature.Name));
             }
         }
     }

@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,6 @@ namespace chocolatey.tests.integration.scenarios
     using System.Collections.Concurrent;
     using System.IO;
     using System.Linq;
-    using bdddoc.core;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
@@ -59,7 +58,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_noop_uninstalling_a_package : ScenariosBase
         {
             public override void Context()
@@ -94,19 +92,22 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_contain_a_message_that_it_would_have_run_a_powershell_script()
             {
                 MockLogger.contains_message("chocolateyuninstall.ps1").ShouldBeTrue();
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_contain_a_message_that_it_would_have_run_powershell_modification_script()
             {
                 MockLogger.contains_message("chocolateyBeforeModify.ps1").ShouldBeTrue();
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_noop_uninstalling_a_package_that_does_not_exist : ScenariosBase
         {
             public override void Context()
@@ -134,7 +135,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_happy_path : ScenariosBase
         {
             private PackageResult packageResult;
@@ -162,6 +162,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_console_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
@@ -170,6 +172,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_graphical_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
@@ -222,19 +226,22 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyBeforeModify_script()
             {
                 MockLogger.contains_message("installpackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_have_executed_chocolateyUninstall_script()
             {
                 MockLogger.contains_message("installpackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_force_uninstalling_a_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -320,13 +327,12 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_packages_with_packages_config : ScenariosBase
         {
             public override void Context()
             {
                 base.Context();
-                var packagesConfig = "{0}\\context\\testing.packages.config".format_with(Scenario.get_top_level());
+                var packagesConfig = "{0}{1}context{1}testing.packages.config".format_with(Scenario.get_top_level(), Path.DirectorySeparatorChar);
                 Configuration.PackageNames = Configuration.Input = packagesConfig;
             }
 
@@ -342,7 +348,8 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_with_readonly_files : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -408,7 +415,8 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -481,7 +489,8 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_with_an_exclusively_locked_file : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -562,7 +571,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_added_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -608,6 +616,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_console_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
@@ -616,6 +626,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_graphical_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
@@ -660,7 +672,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_with_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -668,7 +679,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
                 File.WriteAllText(fileChanged, "hellow");
             }
 
@@ -681,7 +692,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_keep_the_changed_file()
             {
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
                 File.Exists(fileChanged).ShouldBeTrue();
             }
@@ -706,6 +717,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_console_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
@@ -714,6 +727,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_graphical_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
@@ -758,7 +773,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_force_uninstalling_a_package_with_added_and_changed_files : ScenariosBase
         {
             private PackageResult packageResult;
@@ -766,7 +780,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
                 File.WriteAllText(fileChanged, "hellow");
                 var fileAdded = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "dude.txt");
                 File.WriteAllText(fileAdded, "hellow");
@@ -798,7 +812,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_not_keep_the_changed_file()
             {
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
                 File.Exists(fileChanged).ShouldBeFalse();
             }
@@ -812,6 +826,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_console_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
@@ -820,6 +836,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void should_delete_a_shim_for_graphical_in_the_bin_directory()
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
@@ -864,7 +882,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
         public class when_uninstalling_a_package_that_does_not_exist : ScenariosBase
         {
             private PackageResult packageResult;
@@ -939,7 +956,8 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyUninstallCommand))]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_uninstalling_a_package_that_errors : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1047,5 +1065,256 @@ namespace chocolatey.tests.integration.scenarios
                 errorFound.ShouldBeTrue();
             }
         }
+
+
+        public class when_uninstalling_a_hook_package : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "scriptpackage.hook";
+                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + ".1.0.0" + Constants.PackageExtension);
+                Service.install_run(Configuration);
+            }
+
+            public override void Because()
+            {
+                Results = Service.uninstall_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_remove_the_package_from_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_uninstalled_successfully()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("1/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_remove_hooks_folder_for_the_package()
+            {
+                var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty));
+
+                Directory.Exists(hooksDirectory).ShouldBeFalse();
+            }
+        }
+
+        public class when_uninstalling_a_package_happy_path_with_hooks : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Scenario.add_packages_to_source_location(Configuration, "scriptpackage.hook" + "*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "scriptpackage.hook", "1.0.0");
+            }
+
+            public override void Because()
+            {
+                Results = Service.uninstall_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_remove_the_package_from_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_delete_a_shim_for_console_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_delete_a_shim_for_graphical_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_delete_any_files_created_during_the_install()
+            {
+                var generatedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "simplefile.txt");
+
+                File.Exists(generatedFile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_uninstalled_successfully()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("1/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_script()
+            {
+                MockLogger.contains_message("installpackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyUninstall_script()
+            {
+                MockLogger.contains_message("installpackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_pre_all_hook_script()
+            {
+                MockLogger.contains_message("pre-uninstall-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_post_all_hook_script()
+            {
+                MockLogger.contains_message("post-uninstall-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_pre_installpackage_hook_script()
+            {
+                MockLogger.contains_message("pre-uninstall-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_post_installpackage_hook_script()
+            {
+                MockLogger.contains_message("post-uninstall-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_have_executed_upgradepackage_hook_script()
+            {
+                MockLogger.contains_message("pre-uninstall-upgradepackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_pre_beforemodify_hook_script()
+            {
+                MockLogger.contains_message("pre-beforemodify-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_post_beforemodify_hook_script()
+            {
+                MockLogger.contains_message("post-beforemodify-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+        }
+
     }
 }

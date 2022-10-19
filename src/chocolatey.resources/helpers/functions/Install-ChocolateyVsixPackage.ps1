@@ -58,7 +58,7 @@ In 0.10.4+, `Url` is an alias for VsixUrl.
 The major version number of Visual Studio where the
 package should be installed. This is optional. If not
 specified, the most recent Visual Studio installation
-will be targetted.
+will be targeted.
 
 NOTE: For Visual Studio 2015, the VsVersion is 14. It can be determined
 by looking at the folders under Program Files / Program Files (x86).
@@ -157,11 +157,14 @@ param(
         if ([System.IntPtr]::Size -eq 4)
         {
             <# 32bits system case #>
-            $versions=(get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName -match "^[0-9\.]+$") } | ? {$_.property -contains "InstallDir"} | sort {[int]($_.PSChildName)} -descending)
+            $versions = Get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue |
+              Where-Object { ($_.PSChildName -match "^[0-9\.]+$") } |
+              Where-Object { $_.property -contains "InstallDir" } |
+              Sort-Object { [int]($_.PSChildName) } -descending
         }
         else
         {
-            $versions=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName -match "^[0-9\.]+$") } | ? {$_.property -contains "InstallDir"} | sort {[int]($_.PSChildName)} -descending)
+            $versions=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName -match "^[0-9\.]+$") } | Where-Object {$_.property -contains "InstallDir"} | Sort-Object {[int]($_.PSChildName)} -descending)
         }
         if($versions -and $versions.Length){
             $version = $versions[0]
@@ -173,11 +176,11 @@ param(
         if ([System.IntPtr]::Size -eq 4)
         {
             <# 32bits system case #>
-            $versions=(get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName.EndsWith("$vsVersion.0")) } | ? {$_.property -contains "InstallDir"})
+            $versions=(get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName.EndsWith("$vsVersion.0")) } | Where-Object {$_.property -contains "InstallDir"})
         }
         else
         {
-            $version=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | ? { ($_.PSChildName.EndsWith("$vsVersion.0")) } | ? {$_.property -contains "InstallDir"})
+            $version=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName.EndsWith("$vsVersion.0")) } | Where-Object {$_.property -contains "InstallDir"})
         }
     }
 

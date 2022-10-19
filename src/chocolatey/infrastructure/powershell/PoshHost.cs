@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,7 +41,7 @@ namespace chocolatey.infrastructure.powershell
 
         // others
         // http://stackoverflow.com/questions/16329448/hosting-powershell-powershell-vs-runspace-vs-runspacepool-vs-pipeline
-        // 
+        //
 
         public int ExitCode { get; set; }
         public Exception HostException { get; set; }
@@ -56,7 +56,7 @@ namespace chocolatey.infrastructure.powershell
         }
 
         /// <summary>
-        /// Grabs the current version of PowerShell from the registry 
+        /// Grabs the current version of PowerShell from the registry
         /// </summary>
         /// <returns></returns>
         /// <remarks>We can cheat because we require at least v2, which takes us down to just the check for v3</remarks>
@@ -70,7 +70,7 @@ namespace chocolatey.infrastructure.powershell
             {
                 version = new Version(majorMinor.Value);
             }
-          
+
             return version;
         }
 

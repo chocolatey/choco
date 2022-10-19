@@ -67,13 +67,13 @@ namespace chocolatey.infrastructure.app.commands
                      "Apply Package Parameters To Dependencies  - Should package parameters be applied to dependent packages? Defaults to false.",
                      option => configuration.ApplyPackageParametersToDependencies = option != null)
                 .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
-                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false.",
+                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false. (DEPRECATED)",
                      option => configuration.AllowMultipleVersions = option != null)
                 .Add("x|forcedependencies|force-dependencies|removedependencies|remove-dependencies",
                      "RemoveDependencies - Uninstall dependencies when uninstalling package(s). Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
                 .Add("n|skippowershell|skip-powershell|skipscripts|skip-scripts|skip-automation-scripts",
-                     "Skip Powershell - Do not run chocolateyUninstall.ps1. Defaults to false.",
+                     "Skip PowerShell - Do not run chocolateyUninstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 .Add("ignorepackagecodes|ignorepackageexitcodes|ignore-package-codes|ignore-package-exit-codes",
                      "IgnorePackageExitCodes - Exit with a 0 for success and 1 for non-success, no matter what package scripts provide for exit codes. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
@@ -133,6 +133,10 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.ExitOnRebootDetected = false;
                          }
                      })
+                .Add("skiphooks|skip-hooks",
+                    "Skip hooks - Do not run hook scripts. Available in 1.2.0+",
+                    option => configuration.SkipHookScripts = option != null
+                    )
                 ;
         }
 
@@ -154,8 +158,7 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Uninstall Command");
             this.Log().Info(@"
-Uninstalls a package or a list of packages. Some may prefer to use
- `cuninst` as a shortcut for `choco uninstall`.
+Uninstalls a package or a list of packages.
 
 NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
  with options and switches. Add `-y` for previous behavior with no
@@ -204,10 +207,21 @@ NOTE: Synchronizer and AutoUninstaller enhancements in licensed
  to determine how to automatically uninstall software.
 ");
 
+            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
+            "chocolatey".Log().Warn(@"
+Starting in v2.0.0 the shortcut `cuninst` will be removed and can not be used
+to uninstall packages anymore. We recommend you make sure that you always
+use the full command going forward (`choco uninstall`).
+
+Side by side installations has been deprecated and support for uninstalling such packages will be removed in v2.0.0.
+Instead of using side by side installations, distinct packages should be created
+if similar functionality is needed going forward.
+");
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco uninstall <pkg|all> [pkg2 pkgN] [options/switches]
-    cuninst <pkg|all> [pkg2 pkgN] [options/switches]
+    cuninst <pkg|all> [pkg2 pkgN] [options/switches] (DEPRECATED, will be removed in v2.0.0)
 
 NOTE: `all` is a special package keyword that will allow you to
  uninstall all packages.
@@ -227,7 +241,7 @@ choco uninstall: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/
     choco uninstall ruby --version 1.8.7.37402
     choco uninstall nodejs.install --all-versions
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");

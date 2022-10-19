@@ -1,13 +1,13 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +16,13 @@
 
 namespace chocolatey
 {
+    using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using chocolatey.infrastructure.app.registration;
+    using chocolatey.infrastructure.logging;
     using infrastructure.adapters;
 
     /// <summary>
@@ -85,6 +89,54 @@ namespace chocolatey
             if (publicKeyToken == null || publicKeyToken.Length == 0) return string.Empty;
 
             return publicKeyToken.Select(x => x.ToString("x2")).Aggregate((x, y) => x + y);
+        }
+
+        public static IEnumerable<Type> get_loadable_types(this IAssembly assembly)
+        {
+            // Code originates from the following stack overflow answer: https://stackoverflow.com/a/11915414
+            if (assembly == null)
+            {
+                throw new ArgumentNullException("assembly");
+            }
+
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                return e.Types.Where(t => t != null);
+            }
+        }
+
+        public static IEnumerable<IExtensionModule> get_extension_modules(this IAssembly assembly)
+        {
+            var result = new List<IExtensionModule>();
+
+            "chocolatey".Log().Debug("Gathering exported extension registration modules!");
+
+            var registrationTypes = assembly
+                .get_loadable_types()
+                .Where(t => t.IsClass && !t.IsAbstract && !t.IsGenericType && typeof(IExtensionModule).IsAssignableFrom(t));
+
+            foreach (var extensionType in registrationTypes)
+            {
+                try
+                {
+                    var module = (IExtensionModule)Activator.CreateInstance(extensionType);
+                    result.Add(module);
+                }
+                catch (Exception ex)
+                {
+                    "chocolatey".Log().Error("Unable to activate extension module '{0}' in assembly '{1}'.\n Message:{2}",
+                        extensionType.Name,
+                        assembly.GetName().Name,
+                        ex.Message);
+                    "chocolatey".Log().Error(ChocolateyLoggers.LogFileOnly, ex.StackTrace);
+                }
+            }
+
+            return result;
         }
     }
 }

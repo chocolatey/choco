@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -217,6 +217,36 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 optionSet.Contains("p").ShouldBeTrue();
             }
+
+            [Fact]
+            public void should_add_pin_to_the_option_set()
+            {
+                optionSet.Contains("pinpackage").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_long_version_of_pin_to_the_option_set()
+            {
+                optionSet.Contains("pin-package").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_short_version_of_pin_to_the_option_set()
+            {
+                optionSet.Contains("pin").ShouldBeTrue();
+            }
+            
+            [Fact]
+            public void should_add_skip_hooks_to_the_option_set()
+            {
+                optionSet.Contains("skip-hooks").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_add_short_version_of_skip_hooks_to_the_option_set()
+            {
+                optionSet.Contains("skiphooks").ShouldBeTrue();
+            }
         }
 
         public class when_handling_additional_argument_parsing : ChocolateyUpgradeCommandSpecsBase
@@ -252,7 +282,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_throw_when_packagenames_is_not_set()
             {
                 configuration.PackageNames = "";
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -261,11 +291,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
             }

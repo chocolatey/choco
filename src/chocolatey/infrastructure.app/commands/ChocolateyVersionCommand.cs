@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,114 +16,67 @@
 
 namespace chocolatey.infrastructure.app.commands
 {
+    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using attributes;
     using commandline;
     using configuration;
-    using logging;
     using services;
 
-    [CommandFor("version", "[DEPRECATED] will be removed in v1 - use `choco outdated` or `cup <pkg|all> -whatif` instead")]
+    /// <summary>
+    /// This class is provided to allow backwards compatibility for users of older Chocolatey Licensed Extension versions,
+    /// for example, those using a perpetual license.  In the release of Chocolatey CLI v1.0.0 and Chocolatey Licensed
+    /// Extension v4.0.0, these classes were removed, as it was thought that anyone using v1.0.0 would upgrade to v4.0.0
+    /// as well, however, this is not always possible.
+    ///
+    /// Therefore, this skeleton class, with no actual implementations, have been re-added to allow usage of v1.0.1 of
+    /// Chocolatey, along with say v3.2.0, or v2.2.1, of Chocolatey Licensed Extension.  It is expected at some point that
+    /// this class can/will be removed, perhaps in v2.0.0, but for now, they will remain in place.
+    /// </summary>
     public class ChocolateyVersionCommand : ChocolateyUpgradeCommand
     {
-        private readonly IChocolateyPackageService _packageService;
-
-        //todo: v1 Deprecation - remove version
-
-        public ChocolateyVersionCommand(IChocolateyPackageService packageService)
-            : base(packageService)
+        public ChocolateyVersionCommand(IChocolateyPackageService packageService) : base(packageService)
         {
-            _packageService = packageService;
         }
 
-        public override void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
-            optionSet
-                .Add("s=|source=",
-                     "Source - The source to find the package(s) to install. Special sources include: ruby, webpi, cygwin, windowsfeatures, and python. Defaults to default feeds.",
-                     option => configuration.Sources = option.remove_surrounding_quotes())
-                 .Add("lo|localonly",
-                     "LocalOnly - Only search against local machine items.",
-                     option => configuration.ListCommand.LocalOnly = option != null)
-                .Add("pre|prerelease",
-                     "Prerelease - Include Prereleases? Defaults to false.",
-                     option => configuration.Prerelease = option != null)
-                ;
+            throw_exception();
         }
 
-        public override void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
-            base.handle_additional_argument_parsing(unparsedArguments, configuration);
-
-            configuration.Noop = true;
-
-            if (configuration.ListCommand.LocalOnly)
-            {
-                configuration.Noop = false;
-                configuration.Sources = ApplicationParameters.PackagesLocation;
-                configuration.Prerelease = true;
-            }
-
-            if (string.IsNullOrWhiteSpace(configuration.PackageNames))
-            {
-                configuration.PackageNames = "chocolatey";
-            }
+            throw_exception();
         }
 
-        public override void handle_validation(ChocolateyConfiguration configuration)
+        public void handle_validation(ChocolateyConfiguration configuration)
         {
-            if (configuration.ListCommand.LocalOnly)
-            {
-                this.Log().Warn(ChocolateyLoggers.Important, @"
-DEPRECATION NOTICE - `choco version -lo` is deprecated. version command
- will be removed in version 1.0.0. Please use `choco list -lo` instead.");
-
-            }
-            else
-            {
-                this.Log().Warn(ChocolateyLoggers.Important, @"
-DEPRECATION NOTICE - choco version command is deprecated and will be 
- removed in version 1.0.0. Please use `choco outdated` 
- instead.");
-
-            }
-
-            base.handle_validation(configuration);
+            throw_exception();
         }
 
-        public override void help_message(ChocolateyConfiguration configuration)
+        public void help_message(ChocolateyConfiguration configuration)
         {
-            this.Log().Info(ChocolateyLoggers.Important, "[DEPRECATED] Version Command");
-            this.Log().Info(@"
-NOTE: Version has been deprecated and will be removed in version 1.0.0. 
-
- If you are attempting to get local installed items, use 
- `choco list -lo`. 
-
- If you want to know what has available upgrades, use 
- `choco upgrade <pkg|all> -whatif` or `choco outdated`.
-"); 
-            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
+            throw_exception();
         }
 
-        public override void noop(ChocolateyConfiguration configuration)
+        public void noop(ChocolateyConfiguration configuration)
         {
-            _packageService.upgrade_noop(configuration);
+            throw_exception();
         }
 
-        public override void run(ChocolateyConfiguration configuration)
+        public void run(ChocolateyConfiguration config)
         {
-            if (configuration.ListCommand.LocalOnly)
-            {
-                // note: you must leave the .ToList() here or else the method may not be evaluated!
-                _packageService.list_run(configuration).ToList();
-            }
-            else
-            {
-                _packageService.upgrade_run(configuration);
-            }
-            
+            throw_exception();
+        }
+
+        public bool may_require_admin_access()
+        {
+            return false;
+        }
+
+        private void throw_exception()
+        {
+            throw new Exception(@"Could not find a command registered that meets 'version'.
+ Try choco -? for command reference/help.");
         }
     }
 }

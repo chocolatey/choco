@@ -37,4 +37,18 @@ src/_dotCover.chocolatey/
 src/_dotTrace.chocolatey/
 src/chocolatey.sln.GhostDoc.xml
 
+chocolatey.official.snk
+
 docs/generated
+
+# Testing related
+.vagrant
+buildOutput.txt
+
+# Build related
+tools/**
+!tools/packages.config
+!tools/Addins/packages.config
+!tools/Modules/packages.config
+BuildArtifacts/
+code_drop/

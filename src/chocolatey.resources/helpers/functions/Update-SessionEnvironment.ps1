@@ -18,7 +18,7 @@ function Update-SessionEnvironment {
 <#
 .SYNOPSIS
 Updates the environment variables of the current powershell session with
-any environment variable changes that may have occured during a
+any environment variable changes that may have occurred during a
 Chocolatey package install.
 
 .DESCRIPTION
@@ -67,7 +67,7 @@ None
 
   #ordering is important here, $user should override $machine...
   $ScopeList = 'Process', 'Machine'
-  if ($userName -notin 'SYSTEM', "${env:COMPUTERNAME}`$") {
+  if ('SYSTEM', "${env:COMPUTERNAME}`$" -notcontains $userName) {
     # but only if not running as the SYSTEM/machine in which case user can be ignored.
     $ScopeList += 'User'
   }

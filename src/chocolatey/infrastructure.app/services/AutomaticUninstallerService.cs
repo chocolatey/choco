@@ -122,7 +122,7 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
 
-            //todo: if there is a local package, look to use it in the future
+            //todo: #2562 if there is a local package, look to use it in the future
             if (string.IsNullOrWhiteSpace(key.UninstallString))
             {
                 this.Log().Info(" Skipping auto uninstaller - '{0}' does not have an uninstall string.".format_with(!string.IsNullOrEmpty(key.DisplayName.to_string()) ? key.DisplayName.to_string().escape_curly_braces() : "The application"));
@@ -131,7 +131,7 @@ namespace chocolatey.infrastructure.app.services
 
             this.Log().Debug(() => " Preparing uninstall key '{0}' for '{1}'".format_with(key.UninstallString.to_string().escape_curly_braces(), key.DisplayName.to_string().escape_curly_braces()));
 
-            if ((!string.IsNullOrWhiteSpace(key.InstallLocation) && !_fileSystem.directory_exists(key.InstallLocation)) || !_registryService.installer_value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation))
+            if ((!string.IsNullOrWhiteSpace(key.InstallLocation) && !_fileSystem.directory_exists(key.InstallLocation.to_string().remove_surrounding_quotes())) || !_registryService.installer_value_exists(key.KeyPath, ApplicationParameters.RegistryValueInstallLocation))
             {
                 this.Log().Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".format_with(!string.IsNullOrEmpty(key.DisplayName.to_string()) ? key.DisplayName.to_string().escape_curly_braces() : "The application"));
                 this.Log().Debug(() => " Searched for install path '{0}' - found? {1}".format_with(key.InstallLocation.to_string().escape_curly_braces(), _fileSystem.directory_exists(key.InstallLocation)));
@@ -187,7 +187,7 @@ namespace chocolatey.infrastructure.app.services
 
             if (!key.HasQuietUninstall)
             {
-                //todo: ultimately we should merge keys
+                //todo: #2563 ultimately we should merge keys
                 uninstallArgs += " " + installer.build_uninstall_command_arguments();
             }
 
@@ -217,8 +217,8 @@ namespace chocolatey.infrastructure.app.services
                 if (!config.Information.IsLicensedVersion)
                 {
                     this.Log().Warn(@"
-  Did you know licensed versions of Chocolatey are 95% effective with 
-   Automatic Uninstaller due to licensed enhancements and Package 
+  Did you know licensed versions of Chocolatey are 95% effective with
+   Automatic Uninstaller due to licensed enhancements and Package
    Synchronizer?
 ");
                 }

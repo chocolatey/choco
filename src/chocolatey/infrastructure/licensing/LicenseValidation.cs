@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,8 @@ namespace chocolatey.infrastructure.licensing
         {
             var chocolateyLicense = new ChocolateyLicense
             {
-                LicenseType = ChocolateyLicenseType.Unknown
+                LicenseType = ChocolateyLicenseType.Unknown,
+                IsCompatible = true
             };
 
             var regularLogOutput = determine_if_regular_output_for_logging();
@@ -52,7 +53,7 @@ namespace chocolatey.infrastructure.licensing
                 {
                     if (Directory.GetFiles(licenseDirectory).Length != 0)
                     {
-                        "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, @"Files found in directory '{0}' but not a 
+                        "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, @"Files found in directory '{0}' but not a
  valid license file. License should be named '{1}'.".format_with(licenseDirectory, licenseFileName));
                         "chocolatey".Log().Warn(ChocolateyLoggers.Important,@" Rename license file to '{0}' to allow commercial features.".format_with(licenseFileName));
                     }
@@ -62,12 +63,12 @@ namespace chocolatey.infrastructure.licensing
                 // - user put the license file in the top level location and/or forgot to rename it
                 if (File.Exists(Path.Combine(ApplicationParameters.InstallLocation, licenseFileName)) || File.Exists(Path.Combine(ApplicationParameters.InstallLocation, licenseFileName + ".txt")))
                 {
-                    "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, @"Chocolatey license found in the wrong location. File must be located at 
+                    "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, @"Chocolatey license found in the wrong location. File must be located at
  '{0}'.".format_with(ApplicationParameters.LicenseFileLocation));
                     "chocolatey".Log().Warn(regularLogOutput ? ChocolateyLoggers.Important : ChocolateyLoggers.LogFileOnly, @" Move license file to '{0}' to allow commercial features.".format_with(ApplicationParameters.LicenseFileLocation));
                 }
             }
-            
+
             // no IFileSystem at this point
             if (File.Exists(licenseFile))
             {
@@ -124,9 +125,6 @@ namespace chocolatey.infrastructure.licensing
                 chocolateyLicense.ExpirationDate = license.ExpirationDate;
                 chocolateyLicense.Name = license.Name;
                 chocolateyLicense.Id = license.UserId.to_string();
-
-                //todo: if it is expired, provide a warning.
-                // one month after it should stop working
             }
             else
             {

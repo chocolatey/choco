@@ -168,7 +168,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 reset();
                 unparsedArgs.Add("wtf");
                 unparsedArgs.Add("bbq");
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -177,11 +177,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
                 error.Message.ShouldContain("A single sources command must be listed");
@@ -297,7 +297,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 configuration.SourceCommand.Command = SourceCommandType.add;
 
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -306,11 +306,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
                 var commandName = configuration.SourceCommand.Command.to_string();

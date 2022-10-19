@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             // http://www.indigorose.com/forums/threads/23686-How-to-Set-the-Default-Application-Directory
             // http://www.indigorose.com/webhelp/suf70/Program_Reference/Screen_Types/Select_Install_Folder/Properties.htm
             // http://www.indigorose.com/webhelp/suf70/Program_Reference/Variables/Session_Variables.htm#AppFolder
-            // todo: basically we need an environment variable for AppFolder
+            // todo: #2582 basically we need an environment variable for AppFolder
             CustomInstallLocation = "";
             Language = "";
             //OtherInstallOptions = "\"/T:{0}\"".format_with(InstallTokens.TEMP_LOCATION);

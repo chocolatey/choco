@@ -1,13 +1,13 @@
-// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public MsiInstaller()
         {
-            //todo: fully qualify msiexec
+            //todo: #2573 fully qualify msiexec
             InstallExecutable = "msiexec.exe";
             SilentInstall = "/i \"{0}\" /qn".format_with(InstallTokens.INSTALLER_LOCATION); // /quiet
             // http://msdn.microsoft.com/en-us/library/aa371101.aspx
@@ -53,7 +53,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             // https://msdn.microsoft.com/en-us/library/aa376931.aspx
             // https://support.microsoft.com/en-us/kb/290158
             ValidInstallExitCodes = new List<long> { 0, 1641, 3010 };
-            // we allow unknown 1605/1614 b/c it may have already been uninstalled 
+            // we allow unknown 1605/1614 b/c it may have already been uninstalled
             // and that's okay
             ValidUninstallExitCodes = new List<long> { 0, 1605, 1614, 1641, 3010 };
         }

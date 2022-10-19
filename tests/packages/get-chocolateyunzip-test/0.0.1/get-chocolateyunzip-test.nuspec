@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>get-chocolateyunzip-test</id>
+    <version>0.0.1</version>
+    <title>get-chocolateyunzip-test (Install)</title>
+    <authors>Test</authors>
+    <owners>Test</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Package to test Get-ChocolateyUnzip</description>
+    <summary>Package to test Get-ChocolateyUnzip</summary>
+    <tags>get-chocolateyunzip issue test</tags>
+  </metadata>
+</package>

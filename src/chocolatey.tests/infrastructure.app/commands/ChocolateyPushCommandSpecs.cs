@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -107,9 +107,9 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_add_short_version_of_timeout_to_the_option_set()
+            public void should_not_add_short_version_of_timeout_to_the_option_set()
             {
-                optionSet.Contains("t").ShouldBeTrue();
+                optionSet.Contains("t").ShouldBeFalse();
             }
         }
 
@@ -148,6 +148,25 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
 
                 configuration.Sources.ShouldEqual(ApplicationParameters.ChocolateyCommunityFeedPushSource);
+            }
+
+            [Fact]
+            public void should_not_check_for_fallback_community_url()
+            {
+                reset();
+                configuration.Sources = "";
+                configSettingsService.Setup(c => c.get_api_key(
+                    It.Is<ChocolateyConfiguration>(config => config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)),
+                    null))
+                    .Returns(apiKey);
+                because();
+
+                configuration.Sources.ShouldEqual(ApplicationParameters.ChocolateyCommunityFeedPushSource);
+                configSettingsService.Verify(c => c.get_api_key(
+                    It.Is<ChocolateyConfiguration>(config => config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)),
+                    null),
+                    Times.Never);
+                configuration.PushCommand.Key.ShouldNotEqual(apiKey);
             }
 
             [Fact]
@@ -211,7 +230,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_throw_when_source_is_not_set()
             {
                 configuration.Sources = "";
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -220,11 +239,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
                 error.Message.ShouldContain("Source is required.");
@@ -235,7 +254,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 configuration.Sources = "https://somewhere/out/there";
                 configuration.PushCommand.Key = "";
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -244,11 +263,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
                 error.Message.ShouldContain("ApiKey was not found");
@@ -284,7 +303,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.Sources = "http://somewhere/out/there";
                 configuration.PushCommand.Key = "bob";
                 configuration.Force = false;
-                var errorred = false;
+                var errored = false;
                 Exception error = null;
 
                 try
@@ -293,11 +312,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
                 catch (Exception ex)
                 {
-                    errorred = true;
+                    errored = true;
                     error = ex;
                 }
 
-                errorred.ShouldBeTrue();
+                errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
                 error.Message.ShouldContain("WARNING! The specified source '{0}' is not secure".format_with(configuration.Sources));

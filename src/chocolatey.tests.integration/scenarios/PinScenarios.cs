@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,6 @@ namespace chocolatey.tests.integration.scenarios
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using bdddoc.core;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
@@ -63,7 +62,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPinCommand))]
         public class when_listing_pins_with_no_pins : ScenariosBase
         {
             public override void Context()
@@ -93,7 +91,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPinCommand))]
         public class when_listing_pins_with_an_existing_pin : ScenariosBase
         {
             public override void Context()
@@ -126,7 +123,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPinCommand))]
         public class when_listing_pins_with_existing_pins : ScenariosBase
         {
             public override void Context()
@@ -162,7 +158,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPinCommand))]
         public class when_setting_a_pin_for_an_installed_package : ScenariosBase
         {
             public override void Context()
@@ -185,7 +180,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPinCommand))]
         public class when_setting_a_pin_for_an_already_pinned_package : ScenariosBase
         {
             public override void Context()
@@ -209,7 +203,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPinCommand))]
         public class when_setting_a_pin_for_a_non_installed_package : ScenariosBase
         {
             public override void Context()
@@ -232,7 +225,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPinCommand))]
         public class when_removing_a_pin_for_a_pinned_package : ScenariosBase
         {
             public override void Context()
@@ -258,7 +250,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPinCommand))]
         public class when_removing_a_pin_for_an_unpinned_package : ScenariosBase
         {
             public override void Context()
@@ -281,7 +272,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyPinCommand))]
         public class when_removing_a_pin_for_a_non_installed_package : ScenariosBase
         {
             public override void Context()

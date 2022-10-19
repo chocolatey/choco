@@ -134,7 +134,7 @@ param(
 
     $keyPaths = $keys | Select-Object -ExpandProperty PSPath
     try {
-      [array]$foundKey = Get-ItemProperty -LiteralPath $keyPaths -ErrorAction Stop | ? { $_.DisplayName -like $softwareName }
+      [array]$foundKey = Get-ItemProperty -LiteralPath $keyPaths -ErrorAction Stop | Where-Object { $_.DisplayName -like $softwareName }
       $success = $true
     } catch {
       Write-Debug "Found bad key."
@@ -146,7 +146,7 @@ param(
         }
       }
       Write-Verbose "Skipping bad key: $badKey"
-      [array]$keys = $keys | ? { $badKey -NotContains $_.PsPath }
+      [array]$keys = $keys | Where-Object { $badKey -NotContains $_.PsPath }
     }
 
     if ($success) { break; }

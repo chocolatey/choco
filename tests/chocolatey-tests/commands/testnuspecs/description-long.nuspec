@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>description-long</id>
+    <version>1.0.0</version>
+    <authors>Author</authors>
+    <description>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nunc eget lorem dolor sed viverra ipsum nunc aliquet. Integer vitae justo eget magna fermentum iaculis. Non curabitur gravida arcu ac tortor dignissim convallis. Rhoncus dolor purus non enim praesent. Curabitur vitae nunc sed velit dignissim. Sapien pellentesque habitant morbi tristique senectus et netus. Purus gravida quis blandit turpis cursus. Ut tortor pretium viverra suspendisse potenti nullam. Amet est placerat in egestas erat. Senectus et netus et malesuada fames. Amet consectetur adipiscing elit pellentesque habitant morbi. Elementum nisi quis eleifend quam adipiscing. Arcu ac tortor dignissim convallis aenean et tortor at.
+
+Feugiat pretium nibh ipsum consequat nisl vel pretium lectus. Erat imperdiet sed euismod nisi porta. Suspendisse ultrices gravida dictum fusce ut placerat orci nulla. Et ligula ullamcorper malesuada proin libero. Orci dapibus ultrices in iaculis nunc sed augue. Odio eu feugiat pretium nibh ipsum consequat nisl vel pretium. Non blandit massa enim nec dui nunc mattis enim. Etiam sit amet nisl purus in mollis nunc. Commodo sed egestas egestas fringilla. Cras adipiscing enim eu turpis. Ornare arcu dui vivamus arcu felis. Pharetra vel turpis nunc eget lorem dolor.
+
+Tortor dignissim convallis aenean et. Lobortis elementum nibh tellus molestie. Lectus proin nibh nisl condimentum id. Massa id neque aliquam vestibulum morbi blandit cursus risus. Quam elementum pulvinar etiam non. Nullam non nisi est sit amet. Fringilla urna porttitor rhoncus dolor purus. Elementum sagittis vitae et leo. Est placerat in egestas erat imperdiet sed. Consequat ac felis donec et odio pellentesque diam volutpat commodo. Velit ut tortor pretium viverra suspendisse potenti nullam ac tortor. Id leo in vitae turpis massa sed elementum tempus. Consequat nisl vel pretium lectus. Enim sit amet venenatis urna cursus eget.
+
+Facilisis mauris sit amet massa vitae. Dictum at tempor commodo ullamcorper a lacus vestibulum sed. Ut aliquam purus sit amet luctus venenatis. Eleifend donec pretium vulputate sapien. Vulputate dignissim suspendisse in est. Ornare arcu dui vivamus arcu felis. In ornare quam viverra orci sagittis. Nunc lobortis mattis aliquam faucibus purus in massa tempor nec. Aliquam id diam maecenas ultricies mi. Varius vel pharetra vel turpis nunc eget lorem. Ultrices vitae auctor eu augue ut lectus. Egestas congue quisque egestas diam in.
+
+Enim praesent elementum facilisis leo vel fringilla est. Tortor condimentum lacinia quis vel eros donec ac. Sit amet consectetur adipiscing elit pellentesque habitant morbi. Eget lorem dolor sed viverra. Purus in mollis nunc sed id semper. Enim praesent elementum facilisis leo vel fringilla est ullamcorper eget. Nec ultrices dui sapien eget mi proin sed. Commodo viverra maecenas accumsan lacus vel. Libero nunc consequat interdum varius sit. Sociis natoque penatibus et magnis dis parturient montes. Enim ut sem viverra aliquet eget sit amet tellus. Diam vel quam elementum pulvinar etiam non quam. Massa enim nec dui nunc mattis enim ut tellus. Donec adipiscing tristique risus nec feugiat. In vitae turpis massa sed. Risus nec feugiat in fermentum posuere urna nec tincidunt.
+
+Nulla facilisi nullam vehicula ipsum a arcu cursus vitae. Netus et malesuada fames ac turpis. Dolor magna eget est lorem ipsum dolor sit amet. Vitae justo eget magna fermentum iaculis eu non diam phasellus. Nunc mi ipsum faucibus vitae aliquet nec ullamcorper sit. Aenean et tortor at risus viverra adipiscing at in tellus. Quam elementum pulvinar etiam non quam lacus suspendisse. Tortor id aliquet lectus proin nibh nisl condimentum id venenatis. Commodo odio aenean sed adipiscing diam donec adipiscing tristique. Massa eget egestas purus viverra. Gravida quis blandit turpis cursus in hac. Sit amet consectetur adipiscing elit pellentesque. Aliquam ut porttitor leo a diam sollicitudin tempor.
+
+Leo vel orci porta non pulvinar neque laoreet suspendisse. Sagittis eu volutpat odio facilisis mauris. Sollicitudin ac orci phasellus egestas tellus rutrum tellus. Tellus integer feugiat scelerisque varius morbi. Tincidunt praesent semper feugiat nibh. Enim nec dui nunc mattis enim ut. Sit amet nisl purus in mollis. Eget duis at tellus at urna condimentum mattis pellentesque. Amet mattis vulputate enim nulla aliquet porttitor lacus luctus. Porttitor lacus luctus accumsan tortor posuere ac. Tristique senectus et netus et malesuada fames. Auctor urna nunc id cursus metus aliquam eleifend. Amet porttitor eget dolor morbi non arcu risus quis. Eu non diam phasellus vestibulum lorem sed risus ultricies tristique. Facilisis gravida neque convallis a cras semper auctor neque. Praesent semper feugiat nibh sed pulvinar proin gravida hendrerit. Sit amet massa vitae tortor.
+</description>
+    <dependencies>
+      <dependency id="basic" />
+    </dependencies>
+  </metadata>
+  <files />
+</package>

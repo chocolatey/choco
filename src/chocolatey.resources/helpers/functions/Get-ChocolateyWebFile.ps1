@@ -17,7 +17,7 @@
 function Get-ChocolateyWebFile {
 <#
 .SYNOPSIS
-Downloads a file from the internets.
+Downloads a file from the internet.
 
 .DESCRIPTION
 This will download a file from a url, tracking with a progress bar.
@@ -229,7 +229,7 @@ param(
   $checksum32 = $checksum
   $checksumType32 = $checksumType
   $bitWidth = 32
-  if (Get-ProcessorBits 64) {
+  if (Get-OSArchitectureWidth 64) {
     $bitWidth = 64
   }
   Write-Debug "CPU is $bitWidth bit"
@@ -306,7 +306,7 @@ param(
       $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
     } catch {
       if ($PSVersionTable.PSVersion -lt (New-Object 'Version' 3,0)) {
-        Write-Debug "Converting Security Protocol to SSL3 only for Powershell v2"
+        Write-Debug "Converting Security Protocol to SSL3 only for PowerShell v2"
         # this should last for the entire duration
         $originalProtocol = [System.Net.ServicePointManager]::SecurityProtocol
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Ssl3

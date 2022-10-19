@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,25 +42,25 @@ namespace chocolatey.infrastructure.information
 
                     if (!isAdmin)
                     {
-                        // Processes subject to UAC actually have the Administrators group 
-                        // stripped out from the process, and will return false for any 
+                        // Processes subject to UAC actually have the Administrators group
+                        // stripped out from the process, and will return false for any
                         // check about being an administrator, including a check against
-                        // the native `CheckTokenMembership` or `UserIsAdmin`. Instead we 
+                        // the native `CheckTokenMembership` or `UserIsAdmin`. Instead we
                         // need to perform a not 100% answer on whether they are an admin
                         // based on if we have a split token.
                         // Crediting http://www.davidmoore.info/blog/2011/06/20/how-to-check-if-the-current-user-is-an-administrator-even-if-uac-is-on/
                         // and http://blogs.msdn.com/b/cjacks/archive/2006/10/09/how-to-determine-if-a-user-is-a-member-of-the-administrators-group-with-uac-enabled-on-windows-vista.aspx
-                        // NOTE: from the latter (the original) - 
-                        //    Note that this technique detects if the token is split or not. 
-                        //    In the vast majority of situations, this will determine whether 
-                        //    the user is running as an administrator. However, there are 
+                        // NOTE: from the latter (the original) -
+                        //    Note that this technique detects if the token is split or not.
+                        //    In the vast majority of situations, this will determine whether
+                        //    the user is running as an administrator. However, there are
                         //    other user types with advanced permissions which may generate a
-                        //    split token during an interactive login (for example, the 
-                        //    Network Configuration Operators group). If you are using one of 
-                        //    these advanced permission groups, this technique will determine 
-                        //    the elevation type, and not the presence (or absence) of the 
+                        //    split token during an interactive login (for example, the
+                        //    Network Configuration Operators group). If you are using one of
+                        //    these advanced permission groups, this technique will determine
+                        //    the elevation type, and not the presence (or absence) of the
                         //    administrator credentials.
-                        "chocolatey".Log().Debug(@"User may be subject to UAC, checking for a split token (not 100% 
+                        "chocolatey".Log().Debug(@"User may be subject to UAC, checking for a split token (not 100%
  effective).");
 
                         int tokenInfLength = Marshal.SizeOf(typeof(int));
@@ -120,7 +120,7 @@ namespace chocolatey.infrastructure.information
         {
             return Environment.GetEnvironmentVariable("SESSIONNAME").to_string().contains("rdp-");
         }
-        
+
         public static bool user_is_remote()
         {
             return user_is_terminal_services() || Environment.GetEnvironmentVariable("SESSIONNAME").to_string() == string.Empty;
@@ -160,7 +160,7 @@ namespace chocolatey.infrastructure.information
             _In_      PSID SidToCheck,
             _Out_     PBOOL IsMember
          );
-         
+
          */
 
         [DllImport("advapi32.dll", SetLastError = true)]
@@ -175,8 +175,8 @@ namespace chocolatey.infrastructure.information
             _In_       DWORD TokenInformationLength,
             _Out_      PDWORD ReturnLength
           );
-          
-          
+
+
         */
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern bool GetTokenInformation(IntPtr tokenHandle, TokenInformationType tokenInformationClass, IntPtr tokenInformation, int tokenInformationLength, out int returnLength);

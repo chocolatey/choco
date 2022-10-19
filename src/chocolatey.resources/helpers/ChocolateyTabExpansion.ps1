@@ -29,40 +29,45 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
     if ($currentArguments -ne $null -and $currentArguments.Trim() -ne '') { $currentOptions = $currentArguments.Trim() -split ' ' }
 
     $commands.$command.Replace("  "," ") -split ' ' |
-      where { $_ -notmatch "^(?:$($currentOptions -join '|' -replace "=", "\="))(?:\S*)\s?$" } |
-      where { $_ -like "$filter*" }
+      Where-Object { $_ -notmatch "^(?:$($currentOptions -join '|' -replace "=", "\="))(?:\S*)\s?$" } |
+      Where-Object { $_ -like "$filter*" }
 }
 
-$script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','optimize','pack','push','sync','-h','--help','pin','source','config','feature','apikey','export','help','--version')
+$script:someCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','download','optimize','pack','push','sync','-h','--help','pin','source','config','feature','apikey','export','help','template','--version')
 
 # ensure these all have a space to start, or they will cause issues
-$allcommands = " --debug --verbose --trace --noop --help --accept-license --confirm --limit-output --no-progress --log-file='' --execution-timeout='' --cache-location='' --proxy='' --proxy-user='' --proxy-password='' --proxy-bypass-list='' --proxy-bypass-on-local --force --no-color"
-$proListOptions = " --audit"
-$proInstallUpgradeOptions = " --install-directory='' --package-parameters-sensitive='' --max-download-rate='' --install-arguments-sensitive='' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum='' --deflate-package-size --no-deflate-package-size --deflate-nupkg-only"
+$allcommands = " --debug --verbose --trace --noop --help --accept-license --confirm --limit-output --no-progress --log-file='' --execution-timeout='' --cache-location='' --proxy='' --proxy-user='' --proxy-password='' --proxy-bypass-list='' --proxy-bypass-on-local --force --no-color --skip-compatibility-checks"
+$proListOptions = " --audit --use-self-service"
+$proInfoOptions = " --use-self-service"
+$proInstallUpgradeOptions = " --install-directory='' --package-parameters-sensitive='' --max-download-rate='' --install-arguments-sensitive='' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum='' --deflate-package-size --no-deflate-package-size --deflate-nupkg-only --use-self-service"
+$proUpgradeOptions = " --exclude-chocolatey-packages-during-upgrade-all --include-chocolatey-packages-during-upgrade-all --use-self-service"
 $proNewOptions = " --file='' --build-package --file64='' --from-programs-and-features --use-original-location --keep-remote --url='' --url64='' --checksum='' --checksum64='' --checksumtype='' --pause-on-error --remove-architecture-from-name --include-architecture-in-name"
-$proUninstallOptions = " --from-programs-and-features"
-$proPinOptions = " --note=''"
+$proUninstallOptions = " --from-programs-and-features --use-self-service"
+$proPinOptions = " --note='' --use-self-service"
+$proOutdatedOptions = " --use-self-service"
+$proPushOptions = " --use-self-service"
 
 $commandOptions = @{
   list = "--lo --id-only --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --local-only --prerelease --include-programs --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations" + $proListOptions + $allcommands
-  search = "--pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --local-only --prerelease --include-programs --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations" + $allcommands
-  info = "--pre --lo --source='' --user='' --password='' --local-only --prerelease --disable-package-repository-optimizations" + $allcommands
-  install = "-y -whatif -? --pre --version= --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user='' --password='' --prerelease --forcex86 --not-silent --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --allow-downgrade --force-dependencies --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --allow-multiple-versions --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --stop-on-first-package-failure --disable-package-repository-optimizations" + $proInstallUpgradeOptions + $allcommands
+  search = "--pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --local-only --prerelease --include-programs --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations" + $proListOptions + $allcommands
+  info = "--pre --lo --source='' --user='' --password='' --local-only --prerelease --disable-package-repository-optimizations" + $proInfoOptions + $allcommands
+  install = "-y -whatif -? --pre --version= --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user='' --password='' --prerelease --forcex86 --not-silent --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --allow-downgrade --force-dependencies --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --allow-multiple-versions --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --stop-on-first-package-failure --disable-package-repository-optimizations --pin" + $proInstallUpgradeOptions + $allcommands
   pin = "--name='' --version='' -?" + $proPinOptions + $allcommands
-  outdated = "-? --source='' --user='' --password='' --ignore-pinned --ignore-unfound --pre --prerelease --disable-package-repository-optimizations" + $allcommands
-  upgrade = "-y -whatif -? --pre --version='' --except='' --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user='' --password='' --prerelease --forcex86 --not-silent --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --allow-downgrade --allow-multiple-versions --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --fail-on-unfound --fail-on-not-installed --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --exclude-prerelease --stop-on-first-package-failure --use-remembered-options --ignore-remembered-options --skip-when-not-installed --install-if-not-installed --disable-package-repository-optimizations" + $proInstallUpgradeOptions + $allcommands
+  outdated = "-? --source='' --user='' --password='' --ignore-pinned --ignore-unfound --pre --prerelease --disable-package-repository-optimizations" + $proOutdatedOptions + $allcommands
+  upgrade = "-y -whatif -? --pre --version='' --except='' --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --source='webpi' --user='' --password='' --prerelease --forcex86 --not-silent --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --allow-downgrade --allow-multiple-versions --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --fail-on-unfound --fail-on-not-installed --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --exclude-prerelease --stop-on-first-package-failure --use-remembered-options --ignore-remembered-options --skip-when-not-installed --install-if-not-installed --disable-package-repository-optimizations --pin" + $proInstallUpgradeOptions + $proUpgradeOptions + $allcommands
   uninstall = "-y -whatif -? --force-dependencies --remove-dependencies --all-versions --source='windowsfeatures' --source='webpi' --version= --uninstall-arguments='' --override-arguments --not-silent --params='' --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --use-autouninstaller --skip-autouninstaller --fail-on-autouninstaller --ignore-autouninstaller-failure --stop-on-first-package-failure" + $proUninstallOptions + $allcommands
   new = "--template-name='' --output-directory='' --automaticpackage --version='' --maintainer='' packageversion='' maintainername='' maintainerrepo='' installertype='' url='' url64='' silentargs='' --use-built-in-template -?" + $proNewOptions + $allcommands
   pack = "--version='' --output-directory='' -?" + $allcommands
-  push = "--source='' --api-key='' --timeout='' -?" + $allcommands
+  push = "--source='' --api-key='' --timeout='' -?" + $proPushOptions + $allcommands
   source = "--name='' --source='' --user='' --password='' --priority= --bypass-proxy --allow-self-service -?" + $allcommands
   config = "--name='' --value='' -?" + $allcommands
   feature = "--name='' -?" + $allcommands
   apikey = "--source='' --api-key='' --remove -?" + $allcommands
-  download = "--internalize --internalize-all-urls --ignore-dependencies --installed-packages --ignore-unfound-packages --resources-location='' --download-location='' --outputdirectory='' --source='' --version='' --prerelease --user='' --password='' --cert='' --certpassword='' --append-use-original-location --recompile --disable-package-repository-optimizations -?" + $allcommands
-  sync = "--output-directory='' --id='' --package-id='' -?" + $allcommands
-  optimize = "--deflate-nupkg-only --id='' -?" + $allcommands
+  download = "--internalize --internalize-all-urls --ignore-dependencies --installed-packages --ignore-unfound-packages --resources-location='' --download-location='' --outputdirectory='' --source='' --version='' --prerelease --user='' --password='' --cert='' --certpassword='' --append-use-original-location --recompile --disable-package-repository-optimizations -? --use-self-service" + $allcommands
+  sync = "--output-directory='' --id='' --package-id='' -? --use-self-service" + $allcommands
+  optimize = "--deflate-nupkg-only --id='' -? --use-self-service" + $allcommands
   export = "--include-version-numbers --output-file-path='' -?" + $allcommands
+  template = "--name=''" + $allcommands
 }
 
 try {
@@ -78,9 +83,9 @@ function script:chocoCommands($filter) {
         $cmdList += $someCommands -like "$filter*"
     } else {
         $cmdList += (& $script:choco -h) |
-            where { $_ -match '^  \S.*' } |
-            foreach { $_.Split(' ', [StringSplitOptions]::RemoveEmptyEntries) } |
-            where { $_ -like "$filter*" }
+            Where-Object { $_ -match '^  \S.*' } |
+            ForEach-Object { $_.Split(' ', [StringSplitOptions]::RemoveEmptyEntries) } |
+            Where-Object { $_ -like "$filter*" }
     }
 
     $cmdList #| sort
@@ -88,21 +93,25 @@ function script:chocoCommands($filter) {
 
 function script:chocoLocalPackages($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
-    @(& $script:choco list $filter -lo -r --id-starts-with) | %{ $_.Split('|')[0] }
+    @(& $script:choco list $filter -lo -r --id-starts-with) | ForEach-Object { $_.Split('|')[0] }
 }
 
 function script:chocoLocalPackagesUpgrade($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
-    @('all|') + @(& $script:choco list $filter -lo -r --id-starts-with) | where { $_ -like "$filter*" } | %{ $_.Split('|')[0] }
+    @('all|') + @(& $script:choco list $filter -lo -r --id-starts-with) | 
+      Where-Object { $_ -like "$filter*" } | 
+      ForEach-Object { $_.Split('|')[0] }
 }
 
 function script:chocoRemotePackages($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) { return; } #file search
-    @('packages.config|') + @(& $script:choco search $filter --page='0' --page-size='30' -r --id-starts-with --order-by-popularity) | where { $_ -like "$filter*" } | %{ $_.Split('|')[0] }
+    @('packages.config|') + @(& $script:choco search $filter --page='0' --page-size='30' -r --id-starts-with --order-by-popularity) | 
+      Where-Object { $_ -like "$filter*" } | 
+      ForEach-Object { $_.Split('|')[0] }
 }
 
 function Get-AliasPattern($exe) {
-  $aliases = @($exe) + @(Get-Alias | where { $_.Definition -eq $exe } | select -Exp Name)
+  $aliases = @($exe) + @(Get-Alias | Where-Object { $_.Definition -eq $exe } | Select-Object -Exp Name)
 
   "($($aliases -join '|'))"
 }
@@ -127,41 +136,46 @@ function ChocolateyTabExpansion($lastBlock) {
 
     # Handles list/search first tab
     "^(list|search)\s+(?<subcommand>[^-\s]*)$" {
-      @('<filter>','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('<filter>','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles new first tab
     "^(new)\s+(?<subcommand>[^-\s]*)$" {
-      @('<name>','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('<name>','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles pack first tab
     "^(pack)\s+(?<subcommand>[^-\s]*)$" {
-      @('<PathtoNuspec>','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('<PathtoNuspec>','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles push first tab
     "^(push)\s+(?<subcommand>[^-\s]*)$" {
-      @('<PathtoNupkg>','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('<PathtoNupkg>','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles source first tab
     "^(source)\s+(?<subcommand>[^-\s]*)$" {
-      @('list','add','remove','disable','enable','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('list','add','remove','disable','enable','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles pin first tab
     "^(pin)\s+(?<subcommand>[^-\s]*)$" {
-      @('list','add','remove','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('list','add','remove','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles feature first tab
     "^(feature)\s+(?<subcommand>[^-\s]*)$" {
-      @('list','disable','enable','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('list','disable','enable','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
     # Handles config first tab
     "^(config)\s+(?<subcommand>[^-\s]*)$" {
-      @('list','get','set','unset','-?') | where { $_ -like "$($matches['subcommand'])*" }
+      @('list','get','set','unset','-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+    }
+
+    # Handles template first tab
+    "^(template)\s+(?<subcommand>[^-\s]*)$" {
+        @('list', 'info', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
     }
 
     # Handles more options after others

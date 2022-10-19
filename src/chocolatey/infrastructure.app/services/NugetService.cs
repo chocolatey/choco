@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,27 +19,26 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net;
-    using NuGet;
     using adapters;
+    using chocolatey.infrastructure.app.utility;
     using commandline;
     using configuration;
     using domain;
     using guards;
     using logging;
     using nuget;
+    using NuGet;
     using platforms;
     using results;
     using tolerance;
     using DateTime = adapters.DateTime;
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
-    using chocolatey.infrastructure.app.utility;
 
-    //todo - this monolith is too large. Refactor once test coverage is up.
+    //todo: #2575 - this monolith is too large. Refactor once test coverage is up.
 
     public class NugetService : INugetService
     {
@@ -72,9 +71,9 @@ namespace chocolatey.infrastructure.app.services
             _packageDownloader = packageDownloader;
         }
 
-        public SourceType SourceType
+        public string SourceType
         {
-            get { return SourceType.normal; }
+            get { return SourceTypes.NORMAL; }
         }
 
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
@@ -307,7 +306,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 throw new ApplicationException("Unable to create nupkg. See the log for error details.");
             }
-            //todo: v1 analyze package
+            //todo: #602 analyze package
             //if (package != null)
             //{
             //    AnalyzePackage(package);
@@ -329,26 +328,34 @@ namespace chocolatey.infrastructure.app.services
 
             NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath));
 
-
             if (config.RegularOutput && (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) || config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)))
             {
                 this.Log().Warn(ChocolateyLoggers.Important, () => @"
 
-Your package may be subject to moderation. A moderator will review the
-package prior to acceptance. You should have received an email. If you
-don't hear back from moderators within 1-3 business days, please reply
-to the email and ask for status or use contact site admins on the
-package page to contact moderators.
+Your package will go through automated checks and may be subject to
+human moderation. You should receive email(s) with the automated
+testing results. If you don't receive them within 1-3 business days,
+please use the 'Contact Site Admins' on the package page to contact the
+moderators. If your package is subject to human moderation there is no
+guarantee on the length of time that this can take to complete. This
+depends on the availability of moderators, number of packages in the
+queue at this time, as well as many other factors.
+
+You can check where your package is in the moderation queue here:
+https://ch0.co/moderation
+
+For more information about the moderation process, see the docs:
+https://docs.chocolatey.org/en-us/community-repository/moderation/
 
 Please ensure your registered email address is correct and emails from
-noreply at chocolatey dot org are not being sent to your spam/junk
+moderation at chocolatey dot org are not being sent to your spam/junk
 folder.");
             }
         }
 
         public void install_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
-            //todo: noop should see if packages are already installed and adjust message, amiright?!
+            //todo: #2576 noop should see if packages are already installed and adjust message, amiright?!
 
             this.Log().Info("{0} would have used NuGet to install packages (if they are not already installed):{1}{2}".format_with(
                 ApplicationParameters.Name,
@@ -373,7 +380,7 @@ folder.");
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
-            //todo: handle all
+            //todo: #23 handle all
 
             SemanticVersion version = !string.IsNullOrWhiteSpace(config.Version) ? new SemanticVersion(config.Version) : null;
             if (config.Force) config.AllowDowngrade = true;
@@ -428,15 +435,21 @@ folder.");
                 uninstallSuccessAction: null,
                 addUninstallHandler: true);
 
-            var originalConfig = config.deep_copy();
+            config.start_backup();
 
             foreach (string packageName in packageNames.or_empty_list_if_null())
             {
-                // reset config each time through
-                config = originalConfig.deep_copy();
-
-                //todo: get smarter about realizing multiple versions have been installed before and allowing that
+                // We need to ensure we are using a clean configuration file
+                // before we start reading it.
+                config.reset_config();
+                //todo: #2577 get smarter about realizing multiple versions have been installed before and allowing that
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
+
+                if (Platform.get_platform() != PlatformType.Windows && !packageName.EndsWith(".template"))
+                {
+                    string logMessage = "{0} is not a supported package on non-Windows systems.{1}Only template packages are currently supported.".format_with(packageName, Environment.NewLine);
+                    this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                }
 
                 if (installedPackage != null && (version == null || version == installedPackage.Version) && !config.Force)
                 {
@@ -541,6 +554,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 }
             }
 
+            // Reset the configuration again once we are completely done with the processing of
+            // configurations, and make sure that we are removing any backup that was created
+            // as part of this run.
+            config.reset_config(removeBackup: true);
+
             return packageInstalls;
         }
 
@@ -607,12 +625,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             config.IgnoreDependencies = configIgnoreDependencies;
 
-            var originalConfig = config.deep_copy();
+            config.start_backup();
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                // reset config each time through
-                config = originalConfig.deep_copy();
+                // We need to ensure we are using a clean configuration file
+                // before we start reading it.
+                config.reset_config();
 
                 IPackage installedPackage = packageManager.LocalRepository.FindPackage(packageName);
 
@@ -722,7 +741,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (pkgInfo != null && pkgInfo.IsSideBySide)
                 {
-                    //todo: get smarter about realizing multiple versions have been installed before and allowing that
+                    //todo: #103 get smarter about realizing multiple versions have been installed before and allowing that
                 }
 
                 var packageResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
@@ -864,6 +883,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 }
             }
 
+            // Reset the configuration again once we are completely done with the processing of
+            // configurations, and make sure that we are removing any backup that was created
+            // as part of this run.
+            config.reset_config(removeBackup: true);
+
             return packageInstalls;
         }
 
@@ -883,12 +907,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
             var packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null().ToList();
 
-            var originalConfig = config.deep_copy();
+            config.start_backup();
 
             foreach (var packageName in packageNames)
             {
-                // reset config each time through
-                config = originalConfig.deep_copy();
+                // We need to ensure we are using a clean configuration file
+                // before we start reading it.
+                config.reset_config();
 
                 var installedPackage = packageManager.LocalRepository.FindPackage(packageName);
                 var pkgInfo = _packageInfoService.get_package_information(installedPackage);
@@ -912,7 +937,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                SemanticVersion version =  null;
+                SemanticVersion version = null;
                 var latestPackage = NugetList.find_package(packageName, null, config, packageManager.SourceRepository);
 
                 if (latestPackage == null)
@@ -936,7 +961,21 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
                 this.Log().Info("{0}|{1}|{2}|{3}".format_with(installedPackage.Id, installedPackage.Version, latestPackage.Version, isPinned.to_string().to_lower()));
+
+                if (pkgInfo.IsSideBySide)
+                {
+                    var deprecationMessage = @"
+{0} v{1} has been installed as a side by side installation.
+Side by side installations are deprecated and is pending removal in v2.0.0".format_with(installedPackage.Id, installedPackage.Version);
+
+                    packageResult.Messages.Add(new ResultMessage(ResultType.Warn, deprecationMessage));
+                }
             }
+
+            // Reset the configuration again once we are completely done with the processing of
+            // configurations, and make sure that we are removing any backup that was created
+            // as part of this run.
+            config.reset_config(removeBackup: true);
 
             return outdatedPackages;
         }
@@ -986,9 +1025,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             // there may be overrides from the user running upgrade
             if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Username)) config.SourceCommand.Username = originalConfig.SourceCommand.Username;
-            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Password)) config.SourceCommand.Username = originalConfig.SourceCommand.Password;
-            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Certificate)) config.SourceCommand.Username = originalConfig.SourceCommand.Certificate;
-            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword)) config.SourceCommand.Username = originalConfig.SourceCommand.CertificatePassword;
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Password)) config.SourceCommand.Password = originalConfig.SourceCommand.Password;
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Certificate)) config.SourceCommand.Certificate = originalConfig.SourceCommand.Certificate;
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword)) config.SourceCommand.CertificatePassword = originalConfig.SourceCommand.CertificatePassword;
 
             return originalConfig;
         }
@@ -1097,7 +1136,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 // script could be incorrectly left in place during an upgrade operation.  To guard against this,
                 // remove any Chocolatey Packaging scripts, which will then be restored by the new package, if
                 // they are still required
-                var filesToDelete = new List<string> {"chocolateyinstall", "chocolateyuninstall", "chocolateybeforemodify"};
+                var filesToDelete = new List<string> { "chocolateyinstall", "chocolateyuninstall", "chocolateybeforemodify" };
                 var packagingScripts = _fileSystem.get_files(directoryPath, "*.ps1", SearchOption.AllDirectories)
                     .Where(p => filesToDelete.Contains(_fileSystem.get_file_name_without_extension(p).to_lower()));
 
@@ -1211,7 +1250,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     var nugetCachedFile = _fileSystem.combine_paths(localAppData, "NuGet", "Cache", "{0}.{1}.nupkg".format_with(installedPackage.Id, installedPackage.Version.to_string()));
                     if (_fileSystem.file_exists(nugetCachedFile))
                     {
-
                         _fileSystem.delete_file(nugetCachedFile);
                     }
                 },
@@ -1252,6 +1290,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 {
                     var pkg = e.Package;
 
+                    // TODO: Removal special handling for SxS packages once we hit v2.0.0
+
                     // this section fires twice sometimes, like for older packages in a sxs install...
                     var packageResult = packageUninstalls.GetOrAdd(pkg.Id.to_lower() + "." + pkg.Version.to_string(), new PackageResult(pkg, e.InstallPath));
                     packageResult.InstallLocation = e.InstallPath;
@@ -1284,7 +1324,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
                     else
                     {
-                        //todo:allow cleaning of pkgstore files
+                        //todo: #2578 allow cleaning of pkgstore files
                     }
                 };
 
@@ -1350,12 +1390,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     config.ForceDependencies = false;
                 });
 
-            var originalConfig = config.deep_copy();
+            config.start_backup();
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
             {
-                // reset config each time through
-                config = originalConfig.deep_copy();
+                // We need to ensure we are using a clean configuration file
+                // before we start reading it.
+                config.reset_config();
 
                 IList<IPackage> installedPackageVersions = new List<IPackage>();
                 if (string.IsNullOrWhiteSpace(config.Version))
@@ -1483,6 +1524,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 }
             }
 
+            // Reset the configuration again once we are completely done with the processing of
+            // configurations, and make sure that we are removing any backup that was created
+            // as part of this run.
+            config.reset_config(removeBackup: true);
+
             return packageUninstalls;
         }
 
@@ -1546,7 +1592,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         public IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config)
         {
-            //todo : move to deep copy for get all installed
+            //todo: #2579 move to deep copy for get all installed
             //var listConfig = config.deep_copy();
             //listConfig.ListCommand.LocalOnly = true;
             //listConfig.Noop = false;

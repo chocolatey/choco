@@ -1,3 +1,4 @@
+﻿#Requires -PSEdition Desktop
 # Copyright © 2017 Chocolatey Software, Inc
 # Copyright © 2011 - 2017 RealDimensions Software, LLC
 #
@@ -22,9 +23,9 @@ $thisDirectory = (Split-Path -parent $MyInvocation.MyCommand.Definition);
 $psModuleName = 'chocolateyInstaller'
 $psModuleLocation = [System.IO.Path]::GetFullPath("$thisDirectory\src\chocolatey.resources\helpers\chocolateyInstaller.psm1")
 $docsFolder = [System.IO.Path]::GetFullPath("$thisDirectory\docs\generated")
-$chocoExe = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\chocolatey\console\choco.exe")
+$chocoExe = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\temp\_PublishedApps\choco_merged\choco.exe")
 $lineFeed = "`r`n"
-$sourceLocation = 'https://github.com/chocolatey/choco/blob/stable/'
+$sourceLocation = 'https://github.com/chocolatey/choco/blob/master/'
 $sourceCommands = $sourceLocation + 'src/chocolatey/infrastructure.app/commands'
 $sourceFunctions = $sourceLocation + 'src/chocolatey.resources/helpers/functions'
 $global:powerShellReferenceTOC = @'
@@ -57,13 +58,6 @@ These functions call other functions and many times may be the only thing you ne
 * [Install-ChocolateyPowershellCommand](xref:install-chocolateypowershellcommand)
 * [Install-ChocolateyVsixPackage](xref:install-chocolateyvsixpackage)
 
-## Error / Success Functions
-
-* [Write-ChocolateySuccess](xref:write-chocolateysuccess) - **DEPRECATED**
-* [Write-ChocolateyFailure](xref:write-chocolateyfailure) - **DEPRECATED**
-
-You really don't need a try catch with Chocolatey PowerShell files anymore.
-
 ## More Functions
 
 ### Administrative Access Functions
@@ -86,13 +80,11 @@ These are the functions from above as one list.
 
 * [Install-ChocolateyZipPackage](xref:install-chocolateyzippackage)
 * [Install-ChocolateyPowershellCommand](xref:install-chocolateypowershellcommand)
-* [Write-ChocolateySuccess](xref:write-chocolateysuccess)
-* [Write-ChocolateyFailure](xref:write-chocolateyfailure)
+* [Get-ChocolateyPath](xref:get-chocolateypath)
 * [Get-ChocolateyWebFile](xref:get-chocolateywebfile)
 * [Get-ChocolateyUnzip](xref:get-chocolateyunzip)
 * [Install-ChocolateyPath](xref:install-chocolateypath) - when specifying user path
 * [Install-ChocolateyEnvironmentVariable](xref:install-chocolateyenvironmentvariable) - when specifying user path
-* [Install-ChocolateyDesktopLink](xref:install-chocolateydesktoplink) - **DEPRECATED** - see [Install-ChocolateyShortcut](xref:install-chocolateyshortcut)
 * [Install-ChocolateyPinnedTaskBarItem](xref:install-chocolateypinnedtaskbaritem)
 * [Install-ChocolateyShortcut](xref:install-chocolateyshortcut) - v0.9.9+
 * [Update-SessionEnvironment](xref:update-sessionenvironment)
@@ -105,7 +97,7 @@ These are the functions from above as one list.
 function Get-Aliases($commandName){
 
   $aliasOutput = ''
-  Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | %{ $aliasOutput += "``$($_.Name)``$lineFeed"}
+  Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | ForEach-Object { $aliasOutput += "``$($_.Name)``$lineFeed"}
 
   if ($aliasOutput -eq $null -or $aliasOutput -eq '') {
     $aliasOutput = 'None'
@@ -120,7 +112,7 @@ function Convert-Example($objItem) {
 
 ~~~powershell
 $($objItem.Code.Replace("`n",$lineFeed))
-$($objItem.remarks | ? { $_.Text -ne ''} | % { Write-Output $_.Text.Replace("`n", $lineFeed) })
+$($objItem.remarks | Where-Object { $_.Text } | ForEach-Object { $_.Text.Replace("`n", $lineFeed) })
 ~~~
 "@
 }
@@ -148,7 +140,7 @@ function Convert-Syntax($objItem, $hasCmdletBinding) {
   $cmd = $objItem.Name
 
   if ($objItem.parameter -ne $null) {
-    $objItem.parameter | % {
+    $objItem.parameter | ForEach-Object {
       $cmd += ' `' + $lineFeed
       $cmd += "  "
       if ($_.required -eq $false) { $cmd += '['}
@@ -165,19 +157,19 @@ function Convert-Syntax($objItem, $hasCmdletBinding) {
 }
 
 function Convert-Parameter($objItem, $commandName) {
-  $parmText = $lineFeed + "###  -$($objItem.name.substring(0,1).ToUpper() + $objItem.name.substring(1))"
+  $paramText = $lineFeed + "###  -$($objItem.name.substring(0,1).ToUpper() + $objItem.name.substring(1))"
   if ( ($objItem.parameterValue -ne $null) -and ($objItem.parameterValue -ne 'SwitchParameter') ) {
-    $parmText += ' '
-    if ([string]($objItem.required) -eq 'false') { $parmText += "["}
-    $parmText += "&lt;$($objItem.parameterValue)&gt;"
-    if ([string]($objItem.required) -eq 'false') { $parmText += "]"}
+    $paramText += ' '
+    if ([string]($objItem.required) -eq 'false') { $paramText += "["}
+    $paramText += "&lt;$($objItem.parameterValue)&gt;"
+    if ([string]($objItem.required) -eq 'false') { $paramText += "]"}
   }
-  $parmText += $lineFeed
+  $paramText += $lineFeed
   if ($objItem.description -ne $null) {
-    $parmText += (($objItem.description | % { Replace-CommonItems $_.Text }) -join "$lineFeed") + $lineFeed + $lineFeed
+    $parmText += (($objItem.description | ForEach-Object { Replace-CommonItems $_.Text }) -join "$lineFeed") + $lineFeed + $lineFeed
   }
   if ($objItem.parameterValueGroup -ne $null) {
-    $parmText += "$($lineFeed)Valid options: " + ($objItem.parameterValueGroup.parameterValue -join ", ") + $lineFeed + $lineFeed
+    $paramText += "$($lineFeed)Valid options: " + ($objItem.parameterValueGroup.parameterValue -join ", ") + $lineFeed + $lineFeed
   }
 
   $aliases = [string]((Get-Command -Name $commandName).parameters."$($objItem.Name)".Aliases -join ', ')
@@ -188,7 +180,7 @@ function Convert-Parameter($objItem, $commandName) {
 
   $padding = ($aliases.Length, $required.Length, $position.Length, $defValue.Length, $acceptPipeline.Length | Measure-Object -Maximum).Maximum
 
-    $parmText += @"
+    $paramText += @"
 Property               | Value
 ---------------------- | $([string]('-' * $padding))
 Aliases                | $($aliases)
@@ -199,7 +191,7 @@ Accept Pipeline Input? | $($acceptPipeline)
 
 "@
 
-  Write-Output $parmText
+  Write-Output $paramText
 }
 
 function Convert-CommandText {
@@ -216,13 +208,13 @@ param(
     return
   }
   $commandText = $commandText -creplace '^(.+)(\s+Command\s*)$', "# `$1`$2 (choco $commandName)"
-  $commandText = $commandText -creplace '^(Usage|Troubleshooting|Examples|Exit Codes|Connecting to Chocolatey.org|See It In Action|Alternative Sources|Resources|Packages.config|Scripting \/ Integration - Best Practices \/ Style Guide)', '## $1'
+  $commandText = $commandText -creplace '^(DEPRECATION NOTICE|Usage|Troubleshooting|Examples|Exit Codes|Connecting to Chocolatey.org|See It In Action|Alternative Sources|Resources|Packages.config|Scripting \/ Integration - Best Practices \/ Style Guide)', '## $1'
   $commandText = $commandText -replace '^(Commands|How To Pass Options)', '## $1'
   $commandText = $commandText -replace '^(WebPI|Windows Features|Ruby|Cygwin|Python)\s*$', '### $1'
   $commandText = $commandText -replace 'NOTE\:', '> :memo: **NOTE**'
   $commandText = $commandText -replace '\*> :memo: \*\*NOTE\*\*\*', '> :memo: **NOTE**'
   $commandText = $commandText -replace 'the command reference', '[how to pass arguments](xref:choco-commands#how-to-pass-options-switches)'
-  $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://comminty.chocolatey.org/packages)'
+  $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://community.chocolatey.org/packages)'
   #$commandText = $commandText -replace '\`(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[[`$1`|Commands$1]]'
   $commandText = $commandText -replace '\`([choco\s]*)(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[`$1$2`](xref:choco-command-$2)'
   $commandText = $commandText -replace '^(.+):\s(.+.gif)$', '![$1]($2)'
@@ -313,7 +305,10 @@ function Generate-TopLevelCommandReference {
   $commandOutput += @("$lineFeed~~~$lineFeed")
   $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco -h``. $lineFeed")
 
-  $commandOutput | %{ Convert-CommandText($_) } | %{ Convert-CommandReferenceSpecific($_) } | Out-File $fileName -Encoding UTF8 -Force
+  $commandOutput | 
+      ForEach-Object { Convert-CommandText($_) } |
+      ForEach-Object { Convert-CommandReferenceSpecific($_) } |
+      Out-File $fileName -Encoding UTF8 -Force
 }
 
 function Move-GeneratedFiles {
@@ -323,6 +318,9 @@ function Move-GeneratedFiles {
   Move-Item -Path "$docsFolder\choco\commands\new.md" -Destination "$docsFolder\create\commands\new.md"
   Move-Item -Path "$docsFolder\choco\commands\pack.md" -Destination "$docsFolder\create\commands\pack.md"
   Move-Item -Path "$docsFolder\choco\commands\push.md" -Destination "$docsFolder\create\commands\push.md"
+  Move-Item -Path "$docsFolder\choco\commands\template.md" -Destination "$docsFolder\create\commands\template.md"
+  Move-Item -Path "$docsFolder\choco\commands\templates.md" -Destination "$docsFolder\create\commands\templates.md"
+  Move-Item -Path "$docsFolder\choco\commands\convert.md" -Destination "$docsFolder\create\commands\convert.md"
 }
 
 function Generate-CommandReference($commandName, $order) {
@@ -352,12 +350,36 @@ function Generate-CommandReference($commandName, $order) {
     $commandOutput += @("ShowInSidebar: false")
   }
 
+  if($commandName -eq 'Templates') {
+    $commandOutput += @("ShowInNavbar: false")
+    $commandOutput += @("ShowInSidebar: false")
+  }
+
   $commandOutput += @("---$lineFeed")
   $commandOutput += @("<!-- This file is automatically generated based on output from $($sourceCommands)/Chocolatey$($commandName)Command.cs using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). If the file is not found, it is not part of the open source edition of Chocolatey or the name of the file is different. --> $lineFeed")
+
+  $commandOutput += @(@"
+> :memo: **WARNING** SHIM DEPRECATION
+>
+> With the release of Chocolatey CLI v1.0.0 we have deprecated the following shims/shortcuts:
+>
+> - `chocolatey` (Alias for `choco`)
+> - `cinst` (Shortcut for `choco install`)
+> - `cpush` (Shortcut for `choco push`)
+> - `cuninst` (Shortcut for `cuninst`)
+> - `cup` (Shortcut for `choco upgrade`)
+>
+> We recommend that any scripts calling these shims be updated to use the full command, as
+> these shims will be removed in Chocolatey CLI v2.0.0.
+
+"@)
+
   $commandOutput += $(& $chocoExe $commandName.ToLower() -h -r)
   $commandOutput += @("$lineFeed~~~$lineFeed$lineFeed[Command Reference](xref:choco-commands)")
   $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco $($commandName.ToLower()) -h``. $lineFeed")
-  $commandOutput | %{ Convert-CommandText $_ $commandName.ToLower() } | Out-File $fileName -Encoding UTF8 -Force
+  $commandOutput | 
+      ForEach-Object { Convert-CommandText $_ $commandName.ToLower() } | 
+      Out-File $fileName -Encoding UTF8 -Force
 }
 
 try
@@ -412,14 +434,14 @@ RedirectFrom:
 $(Replace-CommonItems $_.Synopsis)
 
 ## Syntax
-$( ($_.syntax.syntaxItem | % { Convert-Syntax $_ $hasCmdletBinding }) -join "$lineFeed$lineFeed")
+$( ($_.syntax.syntaxItem | ForEach-Object { Convert-Syntax $_ $hasCmdletBinding }) -join "$lineFeed$lineFeed")
 $( if ($_.description -ne $null) { $lineFeed + "## Description" + $lineFeed + $lineFeed + $(Replace-CommonItems $_.description.Text) })
 $( if ($_.alertSet -ne $null) { $lineFeed + "## Notes" + $lineFeed + $lineFeed +  $(Replace-CommonItems $_.alertSet.alert.Text) })
 
 ## Aliases
 
 $(Get-Aliases $_.Name)
-$( if ($_.Examples -ne $null) { Write-Output "$lineFeed## Examples$lineFeed$lineFeed"; ($_.Examples.Example | % { Convert-Example $_ }) -join "$lineFeed$lineFeed"; Write-Output "$lineFeed" })
+$( if ($_.Examples -ne $null) { Write-Output "$lineFeed## Examples$lineFeed$lineFeed"; ($_.Examples.Example | ForEach-Object { Convert-Example $_ }) -join "$lineFeed$lineFeed"; Write-Output "$lineFeed" })
 ## Inputs
 
 $( if ($_.InputTypes -ne $null -and $_.InputTypes.Length -gt 0 -and -not $_.InputTypes.Contains('inputType')) { $lineFeed + " * $($_.InputTypes)" + $lineFeed} else { 'None'})
@@ -429,9 +451,9 @@ $( if ($_.InputTypes -ne $null -and $_.InputTypes.Length -gt 0 -and -not $_.Inpu
 $( if ($_.ReturnValues -ne $null -and $_.ReturnValues.Length -gt 0 -and -not $_.ReturnValues.StartsWith('returnValue')) { "$lineFeed * $($_.ReturnValues)$lineFeed"} else { 'None'})
 
 ## Parameters
-$( if ($_.parameters.parameter.count -gt 0) { $_.parameters.parameter | % { Convert-Parameter $_ $commandName }}) $( if ($hasCmdletBinding) { "$lineFeed### &lt;CommonParameters&gt;$lineFeed$($lineFeed)This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see ``about_CommonParameters`` http://go.microsoft.com/fwlink/p/?LinkID=113216 ." } )
+$( if ($_.parameters.parameter.count -gt 0) { $_.parameters.parameter | ForEach-Object { Convert-Parameter $_ $commandName }}) $( if ($hasCmdletBinding) { "$lineFeed### &lt;CommonParameters&gt;$lineFeed$($lineFeed)This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see ``about_CommonParameters`` http://go.microsoft.com/fwlink/p/?LinkID=113216 ." } )
 
-$( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$lineFeed"; $_.relatedLinks.navigationLink | ? { $_.linkText -ne $null} | % { Write-Output "* [$($_.LinkText)](xref:$($_.LinkText.ToLower()))$lineFeed" }})
+$( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$lineFeed"; $_.relatedLinks.navigationLink | Where-Object { $_.linkText -ne $null} | ForEach-Object { Write-Output "* [$($_.LinkText)](xref:$($_.LinkText.ToLower()))$lineFeed" }})
 
 [Function Reference](xref:powershell-reference)
 
@@ -468,7 +490,6 @@ Chocolatey makes a number of environment variables available (You can access any
  * ChocolateyPackageName - The name of the package, equivalent to the `<id />` field in the nuspec (0.9.9+)
  * ChocolateyPackageTitle - The title of the package, equivalent to the `<title />` field in the nuspec (0.10.1+)
  * ChocolateyPackageVersion - The version of the package, equivalent to the `<version />` field in the nuspec (0.9.9+)
- * ChocolateyPackageFolder - The top level location of the package folder - the folder where Chocolatey has downloaded and extracted the NuGet package, typically `C:\ProgramData\chocolatey\lib\packageName`.
 
 #### Advanced Environment Variables
 
@@ -477,11 +498,11 @@ The following are more advanced settings:
  * ChocolateyPackageParameters - Parameters to use with packaging, not the same as install arguments (which are passed directly to the native installer). Based on `--package-parameters`. (0.9.8.22+)
  * CHOCOLATEY_VERSION - The version of Choco you normally see. Use if you are 'lighting' things up based on choco version. (0.9.9+) - Otherwise take a dependency on the specific version you need.
  * ChocolateyForceX86 = If available and set to 'true', then user has requested 32bit version. (0.9.9+) - Automatically handled in built in Choco functions.
- * OS_PLATFORM - Like Windows, OSX, Linux. (0.9.9+)
+ * OS_PLATFORM - Like Windows, macOS, Linux. (0.9.9+)
  * OS_VERSION - The version of OS, like 6.1 something something for Windows. (0.9.9+)
  * OS_NAME - The reported name of the OS. (0.9.9+)
  * IS_PROCESSELEVATED = Is the process elevated? (0.9.9+)
- * ChocolateyToolsLocation - formerly 'ChocolateyBinRoot' ('ChocolateyBinRoot' will be removed with Chocolatey v2.0.0), this is where tools being installed outside of Chocolatey packaging will go. (0.9.10+)
+ * ChocolateyPackageInstallLocation - Install location of the software that the package installs. Displayed at the end of the package install. (0.9.10+)
 
 #### Set By Options and Configuration
 
@@ -498,7 +519,7 @@ Some environment variables are set based on options that are passed, configurati
 #### Business Edition Variables
 
  * ChocolateyInstallArgumentsSensitive - Encrypted arguments passed from command line `--install-arguments-sensitive` that are not logged anywhere. (0.10.1+ and licensed editions 1.6.0+)
- * ChocolateyPackageParametersSensitive - Package parameters passed from command line `--package-parameters-senstivite` that are not logged anywhere.  (0.10.1+ and licensed editions 1.6.0+)
+ * ChocolateyPackageParametersSensitive - Package parameters passed from command line `--package-parameters-sensitive` that are not logged anywhere.  (0.10.1+ and licensed editions 1.6.0+)
  * ChocolateyLicensedVersion - What version is the licensed edition on?
  * ChocolateyLicenseType - What edition / type of the licensed edition is installed?
 
@@ -512,12 +533,11 @@ The following are experimental or use not recommended:
 
 #### Not Useful Or Anti-Pattern If Used
 
- * ChocolateyInstallOverride = Not for use in package automation scripts. Based on `--override-arguments` being passed. (0.9.9+)
- * ChocolateyInstallArguments = The installer arguments meant for the native installer. You should use chocolateyPackageParameters instead. Based on `--install-arguments` being passed. (0.9.9+)
+ * ChocolateyInstallOverride - Not for use in package automation scripts. Based on `--override-arguments` being passed. (0.9.9+)
+ * ChocolateyInstallArguments - The installer arguments meant for the native installer. You should use chocolateyPackageParameters instead. Based on `--install-arguments` being passed. (0.9.9+)
  * ChocolateyIgnoreChecksums - Was `--ignore-checksums` passed or the feature `checksumFiles` turned off? (0.9.9.9+)
  * ChocolateyAllowEmptyChecksums - Was `--allow-empty-checksums` passed or the feature `allowEmptyChecksums` turned on? (0.10.0+)
  * ChocolateyAllowEmptyChecksumsSecure - Was `--allow-empty-checksums-secure` passed or the feature `allowEmptyChecksumsSecure` turned on? (0.10.0+)
- * ChocolateyCheckLastExitCode - Should Chocolatey check LASTEXITCODE? Is the feature `scriptsCheckLastExitCode` turned on? (0.10.3+)
  * ChocolateyChecksum32 - Was `--download-checksum` passed? (0.10.0+)
  * ChocolateyChecksumType32 - Was `--download-checksum-type` passed? (0.10.0+)
  * ChocolateyChecksum64 - Was `--download-checksum-x64` passed? (0.10.0)+
@@ -531,37 +551,45 @@ The following are experimental or use not recommended:
  * http_proxy - Set by original `http_proxy` passthrough, or same as `ChocolateyProxyLocation` if explicitly set. (0.10.4+)
  * https_proxy - Set by original `https_proxy` passthrough, or same as `ChocolateyProxyLocation` if explicitly set. (0.10.4+)
  * no_proxy- Set by original `no_proxy` passthrough, or same as `ChocolateyProxyBypassList` if explicitly set. (0.10.4+)
+ * ChocolateyPackageFolder - Not for use in package automation scripts. Recommend using `$toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"` as per template generated by `choco new`
+ * ChocolateyToolsLocation - Not for use in package automation scripts. Recommend using Get-ToolsLocation instead
 '@
 
   $global:powerShellReferenceTOC | Out-File $fileName -Encoding UTF8 -Force
 
   Write-Host "Generating command reference markdown files"
-  Generate-CommandReference 'List' '60'
-  Generate-CommandReference 'Search' '100'
-  Generate-CommandReference 'Info' '40'
-  Generate-CommandReference 'Install' '50'
-  Generate-CommandReference 'Pin' '90'
-  Generate-CommandReference 'Outdated' '80'
-  Generate-CommandReference 'Upgrade' '200'
-  Generate-CommandReference 'Uninstall' '170'
   Generate-CommandReference 'Config' '10'
-  Generate-CommandReference 'Source' '120'
-  Generate-CommandReference 'Sources' '130'
-  Generate-CommandReference 'Feature' '30'
-  Generate-CommandReference 'Features' '35'
+  Generate-CommandReference 'Download' '20'
+  Generate-CommandReference 'Export' '30'
+  Generate-CommandReference 'Find' '35'
+  Generate-CommandReference 'Feature' '40'
+  Generate-CommandReference 'Features' '45'
+  Generate-CommandReference 'Help' '50'
+  Generate-CommandReference 'Info' '60'
+  Generate-CommandReference 'Install' '70'
+  Generate-CommandReference 'List' '80'
+  Generate-CommandReference 'Optimize' '90'
+  Generate-CommandReference 'Outdated' '100'
+  Generate-CommandReference 'Pin' '110'
+  Generate-CommandReference 'Search' '120'
+  Generate-CommandReference 'SetApiKey' '130'
+  Generate-CommandReference 'Source' '140'
+  Generate-CommandReference 'Sources' '150'
+  Generate-CommandReference 'Support' '160'
+  Generate-CommandReference 'Sync' '170'
+  Generate-CommandReference 'Synchronize' '180'
+  Generate-CommandReference 'Uninstall' '190'
+  Generate-CommandReference 'UnpackSelf' '200'
+  Generate-CommandReference 'Upgrade' '220'
+
   Generate-CommandReference 'New' '10'
   Generate-CommandReference 'Pack' '20'
   Generate-CommandReference 'ApiKey' '30'
-  Generate-CommandReference 'SetApiKey' '110'
   Generate-CommandReference 'Push' '40'
-  Generate-CommandReference 'UnpackSelf' '180'
-  Generate-CommandReference 'Update' '190'
-  Generate-CommandReference 'Version' '210'
-  Generate-CommandReference 'Download' '20'
-  Generate-CommandReference 'Support' '140'
-  Generate-CommandReference 'Sync' '150'
-  Generate-CommandReference 'Synchronize' '160'
-  Generate-CommandReference 'Optimize' '70'
+  Generate-CommandReference 'Template' '50'
+  Generate-CommandReference 'Templates' '55'
+  Generate-CommandReference 'Convert' '60'
+
   Generate-TopLevelCommandReference
   Move-GeneratedFiles
 

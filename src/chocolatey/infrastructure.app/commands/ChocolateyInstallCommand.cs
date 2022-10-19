@@ -23,7 +23,6 @@ namespace chocolatey.infrastructure.app.commands
     using commandline;
     using configuration;
     using infrastructure.commands;
-    using infrastructure.configuration;
     using logging;
     using services;
 
@@ -74,7 +73,7 @@ namespace chocolatey.infrastructure.app.commands
                      "AllowDowngrade - Should an attempt at downgrading be allowed? Defaults to false.",
                      option => configuration.AllowDowngrade = option != null)
                 .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
-                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false.",
+                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false. (DEPRECATED)",
                      option => configuration.AllowMultipleVersions = option != null)
                 .Add("i|ignoredependencies|ignore-dependencies",
                      "IgnoreDependencies - Ignore dependencies when installing package(s). Defaults to false.",
@@ -83,7 +82,7 @@ namespace chocolatey.infrastructure.app.commands
                      "ForceDependencies - Force dependencies to be reinstalled when force installing package(s). Must be used in conjunction with --force. Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
                 .Add("n|skippowershell|skip-powershell|skipscripts|skip-scripts|skip-automation-scripts",
-                     "Skip Powershell - Do not run chocolateyInstall.ps1. Defaults to false.",
+                     "Skip PowerShell - Do not run chocolateyInstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
@@ -109,7 +108,7 @@ namespace chocolatey.infrastructure.app.commands
                       {
                           if (option != null) configuration.Features.AllowEmptyChecksums = true;
                       })
-                 .Add("allowemptychecksumsecure|allowemptychecksumssecure|allow-empty-checksums-secure",
+                .Add("allowemptychecksumsecure|allowemptychecksumssecure|allow-empty-checksums-secure",
                       "Allow Empty Checksums Secure - Allow packages to have empty checksums for downloaded resources from secure locations (HTTPS). Overrides the default feature '{0}' set to '{1}'. Available in 0.10.0+.".format_with(ApplicationParameters.Features.AllowEmptyChecksumsSecure, configuration.Features.AllowEmptyChecksumsSecure.to_string()),
                       option =>
                       {
@@ -147,20 +146,20 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.UsePackageExitCodes = false;
                          }
                      })
-                 .Add("usepackagecodes|usepackageexitcodes|use-package-codes|use-package-exit-codes",
+                .Add("usepackagecodes|usepackageexitcodes|use-package-codes|use-package-exit-codes",
                      "UsePackageExitCodes - Package scripts can provide exit codes. Use those for choco's exit code when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010.  Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
                      option => configuration.Features.UsePackageExitCodes = option != null
                      )
-                 .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
+                .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
                      "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
                      )
-                 .Add("exitwhenrebootdetected|exit-when-reboot-detected",
+                .Add("exitwhenrebootdetected|exit-when-reboot-detected",
                      "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}. Overrides the default feature '{3}' set to '{4}'. Available in 0.10.12+.".format_with
                      (ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend, ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
                      option => configuration.Features.ExitOnRebootDetected = option != null
                      )
-                 .Add("ignoredetectedreboot|ignore-detected-reboot",
+                .Add("ignoredetectedreboot|ignore-detected-reboot",
                      "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.12+.".format_with
                      (ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
                      option =>
@@ -180,9 +179,17 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.UsePackageRepositoryOptimizations = false;
                          }
                      })
+                .Add("pin|pinpackage|pin-package",
+                    "Pin Package - Add a pin to the package after install. Available in 1.2.0+",
+                    option => configuration.PinPackage = option != null
+                    )
+                .Add("skiphooks|skip-hooks",
+                    "Skip hooks - Do not run hook scripts. Available in 1.2.0+",
+                    option => configuration.SkipHookScripts = option != null
+                    )
                 ;
 
-            //todo: package name can be a url / installertype
+            //todo: #770 package name can be a url / installertype
         }
 
         public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
@@ -238,8 +245,7 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Install Command");
             this.Log().Info(@"
 Installs a package or a list of packages (sometimes specified as a
- packages.config). Some may prefer to use `cinst` as a shortcut for
- `choco install`.
+ packages.config).
 
 NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
  with options and switches. Add `-y` for previous behavior with no
@@ -247,17 +253,28 @@ NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
  dash (`-`). For more details, see the command reference (`choco -?`).
 ");
 
+            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
+            "chocolatey".Log().Warn(@"
+Starting in v2.0.0 the shortcut `cinst` will be removed and can not be used
+to install packages anymore. We recommend you make sure that you always
+use the full command going forward (`choco install`).
+
+Side by side installations has been deprecated and will be removed in v2.0.0.
+Instead of using side by side installations, distinct packages should be created
+if similar functionality is needed going forward.
+");
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco install <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>]
-    cinst <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>]
+    cinst <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>] (DEPRECATED, will be removed in v2.0.0)
 
 NOTE: `all` is a special package keyword that will allow you to install
  all packages from a custom feed. Will not work with Chocolatey default
  feed. THIS IS NOT YET REIMPLEMENTED.
 
 NOTE: Any package name ending with .config is considered a
- 'packages.config' file. Please see https://bit.ly/packages_config
+ 'packages.config' file. Please see https://ch0.co/packages_config
 
 NOTE: Chocolatey Pro / Business builds on top of a great open source
  experience with quite a few features that enhance the your use of the
@@ -365,7 +382,7 @@ NOTE: The filename is only required to end in .config, the name is not required 
       <package id=""alloptions"" version=""0.1.1""
                source=""https://somewhere/api/v2/"" installArguments=""""
                packageParameters="""" forceX86=""false"" allowMultipleVersions=""false""
-               ignoreDependencies=""false""
+               ignoreDependencies=""false"" executionTimeout=""1000"" force=""false""
                />
     </packages>
 

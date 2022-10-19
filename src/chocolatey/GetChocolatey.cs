@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,9 +32,13 @@ namespace chocolatey
     using infrastructure.registration;
     using infrastructure.synchronization;
     using log4net;
+
 #if !NoResources
+
     using resources;
+
 #endif
+
     using Assembly = infrastructure.adapters.Assembly;
     using IFileSystem = infrastructure.filesystem.IFileSystem;
     using ILog = infrastructure.logging.ILog;
@@ -66,19 +70,53 @@ namespace chocolatey
         }
 
         private static ResolveEventHandler _handler = null;
+
         private static void add_assembly_resolver()
         {
             _handler = (sender, args) =>
             {
                 var requestedAssembly = new AssemblyName(args.Name);
 
-                // There are things that are ILMerged into Chocolatey. Anything with
-                // the right public key except licensed should use the choco/chocolatey assembly
 #if FORCE_CHOCOLATEY_OFFICIAL_KEY
                 var chocolateyPublicKey = ApplicationParameters.OfficialChocolateyPublicKey;
 #else
                 var chocolateyPublicKey = ApplicationParameters.UnofficialChocolateyPublicKey;
 #endif
+
+                if (requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey))
+                {
+                    // Check if it is already loaded
+                    var resolvedAssembly = AssemblyResolution.resolve_existing_assembly(requestedAssembly.Name, chocolateyPublicKey);
+
+                    if (resolvedAssembly != null)
+                    {
+                        return resolvedAssembly.UnderlyingType;
+                    }
+
+                    if (Directory.Exists(ApplicationParameters.ExtensionsLocation))
+                    {
+                        foreach (var extensionDll in Directory.EnumerateFiles(ApplicationParameters.ExtensionsLocation, requestedAssembly.Name + ".dll", SearchOption.AllDirectories))
+                        {
+                            try
+                            {
+                                resolvedAssembly = AssemblyResolution.load_assembly(requestedAssembly.Name, extensionDll, chocolateyPublicKey);
+
+                                if (resolvedAssembly != null)
+                                {
+                                    return resolvedAssembly.UnderlyingType;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                // This catch statement is empty on purpose, we do
+                                // not want to do anything if it fails to load.
+                            }
+                        }
+                    }
+                }
+
+                // There are things that are ILMerged into Chocolatey. Anything with
+                // the right public key except extensions should use the choco/chocolatey assembly
                 if (requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey)
                     && !requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName)
                     && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
@@ -277,7 +315,7 @@ namespace chocolatey
         /// Registers a container component. Does not require a dependency on Simple Injector.
         /// Will override existing component if registered.
         /// </summary>
-        /// <typeparam name="Service">The type of the ervice.</typeparam>
+        /// <typeparam name="Service">The type of the service.</typeparam>
         /// <param name="implementationCreator">The implementation creator.</param>
         /// <returns>This <see cref="GetChocolatey"/> instance</returns>
         /// <remarks>
@@ -433,7 +471,7 @@ namespace chocolatey
         public ChocolateyConfiguration GetConfiguration()
         {
             ensure_environment();
-            
+
             // ensure_original_configuration() already calls create_configuration()
             // so no need to repeat, just grab the result
             var configuration = ensure_original_configuration(

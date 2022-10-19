@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>hasoutofrangedependency</id>
+        <version>2.0.3</version>
+        <title>Has out of range Dependency (Above available)</title>
+        <authors>__REPLACE_AUTHORS_OF_SOFTWARE__</authors>
+        <owners>__REPLACE_YOUR_NAME__</owners>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>__REPLACE__</description>
+        <summary>Package to test for out of range dependencies. This version uses a dependency that require a higher version.</summary>
+        <releaseNotes />
+        <copyright />
+        <tags>hasoutofrangedependency admin</tags>
+        <dependencies>
+            <dependency id="hasdependency" version="2.2.0" />
+        </dependencies>
+    </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

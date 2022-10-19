@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -74,7 +74,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
                 FileSystem.get_executable_path("cmd.exe").ShouldEqual(
                     Platform.get_platform() == PlatformType.Windows
                         ? "c:\\windows\\system32\\cmd.exe"
-                        : "cmd",
+                        : "cmd.exe",
                     StringComparer.OrdinalIgnoreCase
                 );
             }
@@ -139,6 +139,8 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void GetFiles_should_return_files_that_meet_the_pattern_regardless_of_case()
             {
                 string filePath = FileSystem.combine_paths(ContextPath, "chocolateyInstall.ps1");
@@ -189,6 +191,8 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
         }
 
         [Category("Integration")]
+        [WindowsOnly]
+        [Platform(Exclude = "Mono")]
         public class when_setting_file_attributes_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Context()

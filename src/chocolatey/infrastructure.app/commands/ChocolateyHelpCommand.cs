@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -6,7 +6,7 @@
 //
 // You may obtain a copy of the License at
 //
-// 	http://www.apache.org/licenses/LICENSE-2.0
+//  http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.commands
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
@@ -83,16 +84,22 @@ namespace chocolatey.infrastructure.app.commands
 
             IEnumerable<ICommand> commands = container.GetAllInstances<ICommand>();
 
-            foreach (var command in commands.or_empty_list_if_null())
+            foreach (var command in commands.or_empty_list_if_null().SelectMany(c =>
             {
-                var attributes = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>();
-                foreach (var attribute in attributes.or_empty_list_if_null())
-                {
-                    commandsLog.AppendFormat(" * {0} - {1}\n", attribute.CommandName, attribute.Description);
-                }
+                return c.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>();
+            }).OrderBy(c => c.CommandName))
+            {
+                commandsLog.AppendFormat(" * {0} - {1}\n", command.CommandName, command.Description);
             }
 
             "chocolatey".Log().Info(@"This is a listing of all of the different things you can pass to choco.
+");
+
+            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
+            "chocolatey".Log().Warn(@"
+The shims `chocolatey`, `cinst`, `clist`, `cpush`, `cuninst` and `cup` are deprecated.
+We recommend updating all scripts to use their full command equivalent as these will be
+removed in v2.0.0 of Chocolatey.
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
 
@@ -160,7 +167,8 @@ Following this guide will ensure your experience is not frustrating
 based on choco not receiving things you think you are passing to it.
 
  * For consistency, always use `choco`, not `choco.exe`. Never use
-   shortcut commands like `cinst` or `cup`.
+   shortcut commands like `cinst` or `cup` (The shortcuts `cinst`
+   and `cup` will be removed in v2.0.0).
  * Always have the command as the first argument to `choco`. e.g.
    `choco install`, where `install` is the command.
  * If there is a subcommand, ensure that is the second argument. e.g.

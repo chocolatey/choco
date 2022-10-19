@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>chocolatey-dummy-package</id>
+    <version>1.0.0</version>
+    <title>chocolatey-dummy-package</title>
+    <authors>Chocolatey Software</authors>
+    <projectUrl>https://github.com/chocolatey</projectUrl>
+    <iconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</iconUrl>
+    <tags>chocolatey-dummy-package</tags>
+    <summary>This is a purposely empty dummy package for testing choco push functionality</summary>
+    <description>This is a purposely empty dummy package for testing choco push functionality</description>
+    <dependencies>
+      <dependency id="chocolatey" />
+    </dependencies>
+  </metadata>
+</package>

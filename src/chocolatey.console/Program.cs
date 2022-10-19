@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,20 +21,25 @@ namespace chocolatey.console
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using chocolatey.infrastructure.information;
     using infrastructure.app;
     using infrastructure.app.builders;
     using infrastructure.app.configuration;
     using infrastructure.app.runners;
     using infrastructure.commandline;
-    using infrastructure.configuration;
     using infrastructure.extractors;
     using infrastructure.licensing;
     using infrastructure.logging;
     using infrastructure.registration;
     using infrastructure.tolerance;
+    using SimpleInjector;
+
 #if !NoResources
+
     using resources;
+
 #endif
+
     using Assembly = infrastructure.adapters.Assembly;
     using Console = System.Console;
     using Environment = System.Environment;
@@ -46,6 +51,9 @@ namespace chocolatey.console
         private static void Main(string[] args)
         // ReSharper restore InconsistentNaming
         {
+            ChocolateyConfiguration config = null;
+            ChocolateyLicense license = null;
+
             try
             {
                 add_assembly_resolver();
@@ -57,15 +65,21 @@ namespace chocolatey.console
                 Log4NetAppenderConfiguration.configure(loggingLocation, excludeLoggerNames: ChocolateyLoggers.Trace.to_string());
                 Bootstrap.initialize();
                 Bootstrap.startup();
-                var license = License.validate_license();
+                license = License.validate_license();
                 var container = SimpleInjectorContainer.Container;
 
                 "LogFileOnly".Log().Info(() => "".PadRight(60, '='));
 
-                var config = Config.get_configuration_settings();
+                config = container.GetInstance<ChocolateyConfiguration>();
                 var fileSystem = container.GetInstance<IFileSystem>();
 
                 var warnings = new List<string>();
+
+                if (license.AssemblyLoaded && !is_licensed_assembly_loaded(container))
+                {
+                    license.AssemblyLoaded = false;
+                    license.IsCompatible = false;
+                }
 
                 ConfigurationBuilder.set_up_configuration(
                      args,
@@ -75,6 +89,11 @@ namespace chocolatey.console
                      warning => { warnings.Add(warning); }
                      );
 
+                if (license.AssemblyLoaded && license.is_licensed_version() && !license.IsCompatible && !config.DisableCompatibilityChecks)
+                {
+                    write_warning_for_incompatible_versions();
+                }
+
                 if (config.Features.LogWithoutColor)
                 {
                     ApplicationParameters.Log4NetConfigurationResource = @"chocolatey.infrastructure.logging.log4net.nocolor.config.xml";
@@ -83,7 +102,7 @@ namespace chocolatey.console
 
                 if (!string.IsNullOrWhiteSpace(config.AdditionalLogFileLocation))
                 {
-                  Log4NetAppenderConfiguration.configure_additional_log_file(fileSystem.get_full_path(config.AdditionalLogFileLocation));
+                    Log4NetAppenderConfiguration.configure_additional_log_file(fileSystem.get_full_path(config.AdditionalLogFileLocation));
                 }
 
                 report_version_and_exit_if_requested(args, config);
@@ -129,7 +148,7 @@ namespace chocolatey.console
 
                 remove_old_chocolatey_exe(fileSystem);
 
-                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(Program)), ApplicationParameters.InstallLocation, new List<string>(), "chocolatey.console", throwError:false);
+                AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(Program)), ApplicationParameters.InstallLocation, new List<string>(), "chocolatey.console", throwError: false);
                 //refactor - thank goodness this is temporary, cuz manifest resource streams are dumb
                 IList<string> folders = new List<string>
                     {
@@ -163,6 +182,11 @@ namespace chocolatey.console
             }
             finally
             {
+                if (license != null && license.AssemblyLoaded && license.is_licensed_version() && !license.IsCompatible && config != null && !config.DisableCompatibilityChecks)
+                {
+                    write_warning_for_incompatible_versions();
+                }
+
                 "chocolatey".Log().Debug(() => "Exiting with {0}".format_with(Environment.ExitCode));
 #if DEBUG
                 "chocolatey".Log().Info(() => "Exiting with {0}".format_with(Environment.ExitCode));
@@ -171,6 +195,25 @@ namespace chocolatey.console
                 Bootstrap.shutdown();
                 Environment.Exit(Environment.ExitCode);
             }
+        }
+
+        private static bool is_licensed_assembly_loaded(Container container)
+        {
+            var allExtensions = container.GetAllInstances<ExtensionInformation>();
+
+            foreach (var extension in allExtensions)
+            {
+                if (extension.Name.is_equal_to("chocolatey.licensed"))
+                {
+                    return extension.Status == ExtensionStatus.Enabled || extension.Status == ExtensionStatus.Loaded;
+                }
+            }
+
+            // We will be going by an assumption that it has been loaded in this case.
+            // This is mostly to prevent that the licensed extension won't be disabled
+            // if it has been loaded using old method.
+
+            return true;
         }
 
         private static void warn_on_nuspec_or_nupkg_usage(string[] args, ChocolateyConfiguration config)
@@ -183,6 +226,7 @@ namespace chocolatey.console
         }
 
         private static ResolveEventHandler _handler = null;
+
         private static void add_assembly_resolver()
         {
             _handler = (sender, args) =>
@@ -195,8 +239,40 @@ namespace chocolatey.console
                 var chocolateyPublicKey = ApplicationParameters.UnofficialChocolateyPublicKey;
 #endif
 
+                if (requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey))
+                {
+                    // Check if it is already loaded
+                    var resolvedAssembly = AssemblyResolution.resolve_existing_assembly(requestedAssembly.Name, chocolateyPublicKey);
+
+                    if (resolvedAssembly != null)
+                    {
+                        return resolvedAssembly.UnderlyingType;
+                    }
+
+                    if (Directory.Exists(ApplicationParameters.ExtensionsLocation))
+                    {
+                        foreach (var extensionDll in Directory.EnumerateFiles(ApplicationParameters.ExtensionsLocation, requestedAssembly.Name + ".dll", SearchOption.AllDirectories))
+                        {
+                            try
+                            {
+                                resolvedAssembly = AssemblyResolution.load_assembly(requestedAssembly.Name, extensionDll, chocolateyPublicKey);
+
+                                if (resolvedAssembly != null)
+                                {
+                                    return resolvedAssembly.UnderlyingType;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                // This catch statement is empty on purpose, we do
+                                // not want to do anything if it fails to load.
+                            }
+                        }
+                    }
+                }
+
                 // There are things that are ILMerged into Chocolatey. Anything with
-                // the right public key except licensed should use the choco/chocolatey assembly
+                // the right public key except extensions should use the choco/chocolatey assembly
                 if (requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey)
                     && !requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName)
                     && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
@@ -268,6 +344,31 @@ namespace chocolatey.console
             Console.WriteLine("Press enter to continue...");
             Console.ReadKey();
 #endif
+        }
+
+        private static void write_warning_for_incompatible_versions()
+        {
+            "chocolatey".Log().Warn(
+                ChocolateyLoggers.Important,
+                @"WARNING!
+
+You are running a version of Chocolatey that may not be compatible with
+the currently installed version of the chocolatey.extension package.
+Running Chocolatey with the current version of the chocolatey.extension
+package is an unsupported configuration.
+
+See https://ch0.co/compatibility for more information.
+
+If you are in the process of modifying the chocolatey.extension package,
+you can ignore this warning.
+
+Additionally, you can ignore these warnings by either setting the
+DisableCompatibilityChecks feature:
+
+choco feature enable --name=""'disableCompatibilityChecks'""
+
+Or by passing the --skip-compatibility-checks option when executing a
+command.");
         }
     }
 }

@@ -1,0 +1,1 @@
+This is used to test that https://github.com/chocolatey/choco/issues/2241 is implemented

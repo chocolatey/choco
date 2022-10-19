@@ -1,13 +1,13 @@
-// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,6 +49,7 @@ namespace chocolatey.tests.integration
             string badPackagesPath = get_package_install_path() + "-bad";
             string backupPackagesPath = get_package_install_path() + "-bkp";
             string shimsPath = ApplicationParameters.ShimsLocation;
+            string hooksPath = ApplicationParameters.HooksLocation;
 
             _fileSystem.delete_directory_if_exists(config.CacheLocation, recursive: true, overrideAttributes: true);
             _fileSystem.delete_directory_if_exists(config.Sources, recursive: true, overrideAttributes: true);
@@ -58,6 +59,7 @@ namespace chocolatey.tests.integration
             _fileSystem.delete_directory_if_exists(backupPackagesPath, recursive: true, overrideAttributes: true);
             _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(get_top_level(), ".chocolatey"), recursive: true, overrideAttributes: true);
             _fileSystem.delete_directory_if_exists(_fileSystem.combine_paths(get_top_level(), "extensions"), recursive: true, overrideAttributes: true);
+            _fileSystem.delete_directory_if_exists(hooksPath, recursive: true, overrideAttributes: true);
 
             _fileSystem.create_directory(config.CacheLocation);
             _fileSystem.create_directory(config.Sources);
@@ -93,6 +95,7 @@ namespace chocolatey.tests.integration
 
             installConfig.PackageNames = packageId;
             installConfig.Version = version;
+            installConfig.CommandName = CommandNameType.install.to_string();
             _service.install_run(installConfig);
 
             NUnitSetup.MockLogger.Messages.Clear();
@@ -121,7 +124,7 @@ namespace chocolatey.tests.integration
             // prior commands, so ensure that all items go back to the default values here
             var config = NUnitSetup.Container.GetInstance<ChocolateyConfiguration>();
 
-            config.Information.PlatformType = PlatformType.Windows;
+            config.Information.PlatformType = Platform.get_platform();
             config.Information.IsInteractive = false;
             config.Information.ChocolateyVersion = "1.2.3";
             config.Information.PlatformVersion = new Version(6, 1, 0, 0);
