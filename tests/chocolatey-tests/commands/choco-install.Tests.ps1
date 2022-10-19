@@ -1574,4 +1574,24 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $Output.String | Should -Not -Match "- $([regex]::Escape($_))"
         }
     }
+
+    Context "Installing package that makes use of new Get Chocolatey Path helper" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            Enable-ChocolateySource -Name 'local'
+
+            $Output = Invoke-Choco install test-chocolateypath -y
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Outputs message <_>" -ForEach @(
+            'Package Path in Install Script: <installPath>\lib\test-chocolateypath'
+            'Install Path in Install Script: <installPath>'
+        ) {
+            $Output.Lines | Should -Contain "$($_ -replace '<installPath>',$env:ChocolateyInstall)" -Because $Output.String
+        }
+    }
 }
