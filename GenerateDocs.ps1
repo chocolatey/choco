@@ -23,7 +23,7 @@ $thisDirectory = (Split-Path -parent $MyInvocation.MyCommand.Definition);
 $psModuleName = 'chocolateyInstaller'
 $psModuleLocation = [System.IO.Path]::GetFullPath("$thisDirectory\src\chocolatey.resources\helpers\chocolateyInstaller.psm1")
 $docsFolder = [System.IO.Path]::GetFullPath("$thisDirectory\docs\generated")
-$chocoExe = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\chocolatey\console\choco.exe")
+$chocoExe = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\temp\_PublishedApps\choco_merged\choco.exe")
 $lineFeed = "`r`n"
 $sourceLocation = 'https://github.com/chocolatey/choco/blob/master/'
 $sourceCommands = $sourceLocation + 'src/chocolatey/infrastructure.app/commands'
@@ -80,6 +80,7 @@ These are the functions from above as one list.
 
 * [Install-ChocolateyZipPackage](xref:install-chocolateyzippackage)
 * [Install-ChocolateyPowershellCommand](xref:install-chocolateypowershellcommand)
+* [Get-ChocolateyPath](xref:get-chocolateypath)
 * [Get-ChocolateyWebFile](xref:get-chocolateywebfile)
 * [Get-ChocolateyUnzip](xref:get-chocolateyunzip)
 * [Install-ChocolateyPath](xref:install-chocolateypath) - when specifying user path

@@ -247,9 +247,11 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
                 $Output = Invoke-Choco install $env:CHOCOLATEY_TEST_PACKAGES_PATH\alloptions.packages.config --confirm --verbose --debug
 
                 # This is based on two observations: The addition explicitly outputs that it's the Package Configuration.
-                # The configuration output is also about 80 lines.
-                $StartofPackageConfiguration = [array]::IndexOf($Output.Lines, "Package Configuration: CommandName='install'|")
-                $PackageConfigurationOutput = $Output.Lines[$StartofPackageConfiguration..($StartofPackageConfiguration+80)] -join [Environment]::NewLine
+                # The configuration output is about 80 lines.
+                $StartOfPackageConfiguration = [array]::IndexOf($Output.Lines, "Package Configuration Start:")
+                $EndOfPackageConfiguration = [array]::IndexOf($Output.Lines, "Package Configuration End")
+
+                $PackageConfigurationOutput = $Output.Lines[$StartofPackageConfiguration..$EndOfPackageConfiguration] -join [Environment]::NewLine
             }
 
             # We are explicitly passing in a bad username and password here.
@@ -1570,6 +1572,26 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
 
         It "Does not output extracted file path '<_>'" -ForEach @('tools\'; 'tools\chocolateybeforemodify.ps1'; 'tools\chocolateyinstall.ps1'; 'tools\chocolateyuninstall.ps1'; 'zip-log-disable-test.nuspec') {
             $Output.String | Should -Not -Match "- $([regex]::Escape($_))"
+        }
+    }
+
+    Context "Installing package that makes use of new Get Chocolatey Path helper" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            Enable-ChocolateySource -Name 'local'
+
+            $Output = Invoke-Choco install test-chocolateypath -y
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Outputs message <_>" -ForEach @(
+            'Package Path in Install Script: <installPath>\lib\test-chocolateypath'
+            'Install Path in Install Script: <installPath>'
+        ) {
+            $Output.Lines | Should -Contain "$($_ -replace '<installPath>',$env:ChocolateyInstall)" -Because $Output.String
         }
     }
 }

@@ -77,7 +77,7 @@
     </Reference>
     <Reference Include="NuGet.Core, Version=2.11.0.0, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Chocolatey-NuGet.Core.2.11.0.20211014\lib\net4\NuGet.Core.dll</HintPath>
+      <HintPath>..\..\lib\Chocolatey-NuGet.Core.2.11.0.20220901\lib\net4\NuGet.Core.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Licensing">
       <HintPath>..\..\lib\Rhino.Licensing.1.4.1\lib\net40\Rhino.Licensing.dll</HintPath>
