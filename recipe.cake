@@ -133,6 +133,7 @@ Task("Prepare-Chocolatey-Packages")
 });
 
 Task("Prepare-NuGet-Packages")
+    .WithCriteria(() => BuildParameters.ShouldRunNuGet, "Skipping because execution of NuGet has been disabled")
     .IsDependeeOf("Create-NuGet-Packages")
     .IsDependeeOf("Sign-PowerShellScripts")
     .IsDependeeOf("Sign-Assemblies")
@@ -169,7 +170,8 @@ BuildParameters.SetParameters(context: Context,
                             getScriptsToSign: getScriptsToSign,
                             getFilesToSign: getFilesToSign,
                             getILMergeConfigs: getILMergeConfigs,
-                            preferDotNetGlobalToolUsage: !IsRunningOnWindows());
+                            preferDotNetGlobalToolUsage: !IsRunningOnWindows(),
+                            shouldRunNuGet: IsRunningOnWindows());
 
 ToolSettings.SetToolSettings(context: Context,
                             buildMSBuildToolVersion: MSBuildToolVersion.NET40);
