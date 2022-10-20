@@ -7,8 +7,9 @@ To verify the binaries:
 * Switch to the tag of the released version. For instance: 
     `git checkout 0.10.11`
 * Run `build.bat` (`.\build.bat` in PowerShell)
-* Once that is successfully completed, head into code_drop\chocolatey\console 
-    folder where you will find choco.exe.
+* Once that is successfully completed, head into the
+    code_drop\temp\_PublishedApps\choco_merged folder where you will find
+    choco.exe.
 * Verify the checksum you find there with the checksum shown on the package 
     page of the community repository.
 

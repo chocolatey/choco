@@ -9,7 +9,7 @@ param(
     [string]
     $TestPath = "$env:TEMP/chocolateyTests",
 
-    # Path of the nupkg to be tested. Defaults to `code_drop/nuget/chocolatey.<version>.nupkg`
+    # Path of the nupkg to be tested. Defaults to `code_drop/Packages/Chocolatey/chocolatey.<version>.nupkg`
     [ValidateScript({
             $count = (Get-Item $_).Count
             if ($count -ne 1) {
