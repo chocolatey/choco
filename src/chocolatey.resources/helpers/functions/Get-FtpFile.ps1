@@ -16,7 +16,7 @@
 function Get-FtpFile {
 <#
 .SYNOPSIS
-Downloads a file from a File Transfter Protocol (FTP) location.
+Downloads a file from a File Transfer Protocol (FTP) location.
 
 .DESCRIPTION
 This will download a file from an FTP location, saving the file to the

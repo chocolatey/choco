@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,7 +55,7 @@ namespace chocolatey.infrastructure.logging
         private const string IMPORTANT_LOGGING_COLORED_APPENDER = "ImportantLoggingColoredConsoleAppender";
 
         /// <summary>
-        ///   Pulls xml configuration from embedded location and applies it. 
+        ///   Pulls xml configuration from embedded location and applies it.
         ///   Then it configures a file appender to the specified output directory if one is provided.
         /// </summary>
         /// <param name="outputDirectory">The output directory.</param>
@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.logging
         public static void configure(string outputDirectory = null, params string[] excludeLoggerNames)
         {
             GlobalContext.Properties["pid"] = System.Diagnostics.Process.GetCurrentProcess().Id;
-            
+
             var xmlConfigFile = Path.Combine(ApplicationParameters.InstallLocation, "log4net.config.xml");
             if (File.Exists(xmlConfigFile))
             {
@@ -87,7 +87,7 @@ namespace chocolatey.infrastructure.logging
             }
 
             configure_info_logging_colors();
-            
+
             if (!string.IsNullOrWhiteSpace(outputDirectory))
             {
                 set_file_appender(outputDirectory, excludeLoggerNames);

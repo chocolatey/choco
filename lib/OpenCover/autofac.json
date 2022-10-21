@@ -1,5 +1,0 @@
-﻿{
-  "modules": [{
-      "type": "OpenCover.Extensions.RegisterStrategiesModule, OpenCover.Extensions"
-    }] 
-}

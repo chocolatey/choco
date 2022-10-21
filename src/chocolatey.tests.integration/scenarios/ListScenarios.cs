@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,6 @@ namespace chocolatey.tests.integration.scenarios
 {
     using System.Collections.Generic;
     using System.Linq;
-    using bdddoc.core;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
@@ -49,7 +48,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_searching_packages_with_no_filter_happy_path : ScenariosBase
         {
             public override void Because()
@@ -94,7 +92,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_searching_for_a_particular_package : ScenariosBase
         {
             public override void Context()
@@ -137,7 +134,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_searching_all_available_packages : ScenariosBase
         {
             public override void Context()
@@ -187,7 +183,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_searching_packages_with_verbose : ScenariosBase
         {
             public override void Context()
@@ -248,7 +243,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_listing_local_packages : ScenariosBase
         {
             public override void Context()
@@ -292,7 +286,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_listing_local_packages_with_id_only : ScenariosBase
         {
             public override void Context()
@@ -322,7 +315,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_listing_local_packages_limiting_output : ScenariosBase
         {
             public override void Context()
@@ -375,7 +367,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_listing_local_packages_limiting_output_with_id_only : ScenariosBase
         {
             public override void Context()
@@ -413,7 +404,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_listing_packages_with_no_sources_enabled : ScenariosBase
         {
             public override void Context()
@@ -441,7 +431,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_searching_for_an_exact_package : ScenariosBase
         {
             public override void Context()
@@ -501,7 +490,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_searching_for_an_exact_package_with_zero_results : ScenariosBase
         {
             public override void Context()
@@ -557,7 +545,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_searching_for_all_packages_with_exact_id : ScenariosBase
         {
             public override void Context()
@@ -605,7 +592,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyListCommand))]
         public class when_searching_for_all_packages_including_prerelease_with_exact_id : ScenariosBase
         {
             public override void Context()

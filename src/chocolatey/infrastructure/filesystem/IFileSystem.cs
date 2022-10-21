@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -159,7 +159,7 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="file">File to check - FileInfo or some representation of FileInfo</param>
         /// <returns>True if the file has the ReadOnly attribute marked, otherwise false</returns>
         bool is_readonly_file(dynamic file);
-        
+
         /// <summary>
         ///   Determines if a file is a hidden file
         /// </summary>
@@ -248,7 +248,7 @@ namespace chocolatey.infrastructure.filesystem
         FileStream open_file_readonly(string filePath);
 
         /// <summary>
-        ///   Opens a file exlusively
+        ///   Opens a file exclusively
         /// </summary>
         /// <param name="filePath">Path to the file name</param>
         /// <returns>A file stream object for use after accessing the file</returns>
@@ -273,7 +273,7 @@ namespace chocolatey.infrastructure.filesystem
         ///   Writes a stream to a specified file path.
         /// </summary>
         /// <param name="filePath">The file path.</param>
-        /// <param name="getStream">A defferred function of getting the stream</param>
+        /// <param name="getStream">A deferred function of getting the stream</param>
         void write_file(string filePath, Func<Stream> getStream);
 
         #endregion
@@ -386,7 +386,7 @@ namespace chocolatey.infrastructure.filesystem
         /// </summary>
         /// <param name="directoryPath">The directory path.</param>
         /// <param name="recursive">Would you like to delete the directories inside of this directory? Almost always true.</param>
-        void delete_directory_if_exists(string directoryPath, bool recursive);      
+        void delete_directory_if_exists(string directoryPath, bool recursive);
 
         /// <summary>
         /// Deletes a directory if it exists

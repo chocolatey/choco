@@ -1,13 +1,13 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,9 +40,10 @@ namespace chocolatey.infrastructure.app.services
         public static readonly Regex InstallingRegex = new Regex(@"Started installing:", RegexOptions.Compiled);
         public static readonly Regex InstalledRegex = new Regex(@"Install completed \(Success\):", RegexOptions.Compiled);
         public static readonly Regex AlreadyInstalledRegex = new Regex(@"No products to be installed \(either not available or already installed\)", RegexOptions.Compiled);
+
         //public static readonly Regex NotInstalled = new Regex(@"not installed", RegexOptions.Compiled);
         public static readonly Regex PackageNameRegex = new Regex(@"'(?<{0}>[^']*)'".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
-      
+
         private readonly IDictionary<string, ExternalCommandArgument> _listArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
         private readonly IDictionary<string, ExternalCommandArgument> _installArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -67,8 +68,8 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         private void set_list_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "/List", Required = true});
-            args.Add("_list_option_", new ExternalCommandArgument {ArgumentOption = "/ListOption:All", Required = true});
+            args.Add("_action_", new ExternalCommandArgument { ArgumentOption = "/List", Required = true });
+            args.Add("_list_option_", new ExternalCommandArgument { ArgumentOption = "/ListOption:All", Required = true });
         }
 
         /// <summary>
@@ -76,21 +77,21 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         private void set_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-            args.Add("_action_", new ExternalCommandArgument {ArgumentOption = "/Install", Required = true});
-            args.Add("_accept_eula_", new ExternalCommandArgument {ArgumentOption = "/AcceptEula", Required = true});
-            args.Add("_suppress_reboot_", new ExternalCommandArgument {ArgumentOption = "/SuppressReboot", Required = true});
+            args.Add("_action_", new ExternalCommandArgument { ArgumentOption = "/Install", Required = true });
+            args.Add("_accept_eula_", new ExternalCommandArgument { ArgumentOption = "/AcceptEula", Required = true });
+            args.Add("_suppress_reboot_", new ExternalCommandArgument { ArgumentOption = "/SuppressReboot", Required = true });
             args.Add("_package_name_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "/Products:",
-                    ArgumentValue = PACKAGE_NAME_TOKEN,
-                    QuoteValue = false,
-                    Required = true
-                });
+            {
+                ArgumentOption = "/Products:",
+                ArgumentValue = PACKAGE_NAME_TOKEN,
+                QuoteValue = false,
+                Required = true
+            });
         }
 
-        public SourceType SourceType
+        public string SourceType
         {
-            get { return SourceType.webpi; }
+            get { return SourceTypes.WEBPI; }
         }
 
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction)
@@ -98,19 +99,19 @@ namespace chocolatey.infrastructure.app.services
             if (Platform.get_platform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
 
             var runnerConfig = new ChocolateyConfiguration
-                {
-                    PackageNames = WEB_PI_PACKAGE,
-                    Sources = ApplicationParameters.PackagesLocation,
-                    Debug = config.Debug,
-                    Force = config.Force,
-                    Verbose = config.Verbose,
-                    CommandExecutionTimeoutSeconds = config.CommandExecutionTimeoutSeconds,
-                    CacheLocation = config.CacheLocation,
-                    RegularOutput = config.RegularOutput,
-                    PromptForConfirmation = false,
-                    AcceptLicense = true,
-                    QuietOutput = true,
-                };
+            {
+                PackageNames = WEB_PI_PACKAGE,
+                Sources = ApplicationParameters.PackagesLocation,
+                Debug = config.Debug,
+                Force = config.Force,
+                Verbose = config.Verbose,
+                CommandExecutionTimeoutSeconds = config.CommandExecutionTimeoutSeconds,
+                CacheLocation = config.CacheLocation,
+                RegularOutput = config.RegularOutput,
+                PromptForConfirmation = false,
+                AcceptLicense = true,
+                QuietOutput = true,
+            };
             runnerConfig.ListCommand.LocalOnly = true;
 
             var localPackages = _nugetService.list_run(runnerConfig);
@@ -228,7 +229,7 @@ namespace chocolatey.infrastructure.app.services
                                 this.Log().Info(ChocolateyLoggers.Important, "{0}".format_with(packageName));
                                 return;
                             }
-                           
+
                             if (InstalledRegex.IsMatch(logMessage))
                             {
                                 this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
@@ -240,7 +241,7 @@ namespace chocolatey.infrastructure.app.services
                             this.Log().Error(() => "[{0}] {1}".format_with(APP_NAME, e.Data.escape_curly_braces()));
                         },
                     updateProcessPath: false,
-                    allowUseWindow:true
+                    allowUseWindow: true
                     );
 
                 if (exitCode != 0)

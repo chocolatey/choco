@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -151,7 +151,7 @@ namespace chocolatey.infrastructure.filesystem
             // Always add empty, for when the executable name is enough.
             extensions.Add(string.Empty);
 
-            // Gets the path to an executable based on looking in current 
+            // Gets the path to an executable based on looking in current
             // working directory, next to the running process, then among the
             // derivatives of Path and Pathext variables, applied in order.
             var searchPaths = new List<string>();
@@ -168,7 +168,7 @@ namespace chocolatey.infrastructure.filesystem
                 }
             }
 
-            // If not found, return the same as passed in - it may work, 
+            // If not found, return the same as passed in - it may work,
             // but possibly not.
             return executableName;
         }
@@ -432,7 +432,7 @@ namespace chocolatey.infrastructure.filesystem
                         // copy source file to destination
                         this.Log().Trace("Copying '{0}' to '{1}'.".format_with(sourceFilePath, destinationFilePath));
                         copy_file(sourceFilePath, destinationFilePath, overwriteExisting: true);
-                        
+
                         // delete source file
                         try
                         {
@@ -649,8 +649,8 @@ namespace chocolatey.infrastructure.filesystem
         public void move_directory(string directoryPath, string newDirectoryPath)
         {
             if (string.IsNullOrWhiteSpace(directoryPath) || string.IsNullOrWhiteSpace(newDirectoryPath)) throw new ApplicationException("You must provide a directory to move from or to.");
-            
-            //Linux/MacOS do not have a SystemDrive environment variable, instead, everything is under "/"
+
+            // Linux / macOS do not have a SystemDrive environment variable, instead, everything is under "/"
             var systemDrive = Platform.get_platform() == PlatformType.Windows ? Environment.GetEnvironmentVariable("SystemDrive") : "/";
             if (combine_paths(directoryPath, "").is_equal_to(combine_paths(systemDrive, ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
 
@@ -745,7 +745,7 @@ namespace chocolatey.infrastructure.filesystem
         {
             if (string.IsNullOrWhiteSpace(directoryPath)) throw new ApplicationException("You must provide a directory to delete.");
 
-            //Linux / MacOS do not have a SystemDrive environment variable, instead, everything is under "/"
+            // Linux / macOS do not have a SystemDrive environment variable, instead, everything is under "/"
             var systemDrive = Platform.get_platform() == PlatformType.Windows ? Environment.GetEnvironmentVariable("SystemDrive") : "/";
             if (combine_paths(directoryPath, "").is_equal_to(combine_paths(systemDrive, ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
 

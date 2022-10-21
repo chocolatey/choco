@@ -23,7 +23,7 @@ $thisDirectory = (Split-Path -parent $MyInvocation.MyCommand.Definition);
 $psModuleName = 'chocolateyInstaller'
 $psModuleLocation = [System.IO.Path]::GetFullPath("$thisDirectory\src\chocolatey.resources\helpers\chocolateyInstaller.psm1")
 $docsFolder = [System.IO.Path]::GetFullPath("$thisDirectory\docs\generated")
-$chocoExe = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\chocolatey\console\choco.exe")
+$chocoExe = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\temp\_PublishedApps\choco_merged\choco.exe")
 $lineFeed = "`r`n"
 $sourceLocation = 'https://github.com/chocolatey/choco/blob/master/'
 $sourceCommands = $sourceLocation + 'src/chocolatey/infrastructure.app/commands'
@@ -80,6 +80,7 @@ These are the functions from above as one list.
 
 * [Install-ChocolateyZipPackage](xref:install-chocolateyzippackage)
 * [Install-ChocolateyPowershellCommand](xref:install-chocolateypowershellcommand)
+* [Get-ChocolateyPath](xref:get-chocolateypath)
 * [Get-ChocolateyWebFile](xref:get-chocolateywebfile)
 * [Get-ChocolateyUnzip](xref:get-chocolateyunzip)
 * [Install-ChocolateyPath](xref:install-chocolateypath) - when specifying user path
@@ -96,7 +97,7 @@ These are the functions from above as one list.
 function Get-Aliases($commandName){
 
   $aliasOutput = ''
-  Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | %{ $aliasOutput += "``$($_.Name)``$lineFeed"}
+  Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | ForEach-Object { $aliasOutput += "``$($_.Name)``$lineFeed"}
 
   if ($aliasOutput -eq $null -or $aliasOutput -eq '') {
     $aliasOutput = 'None'
@@ -111,7 +112,7 @@ function Convert-Example($objItem) {
 
 ~~~powershell
 $($objItem.Code.Replace("`n",$lineFeed))
-$($objItem.remarks | ? { $_.Text -ne ''} | % { Write-Output $_.Text.Replace("`n", $lineFeed) })
+$($objItem.remarks | Where-Object { $_.Text } | ForEach-Object { $_.Text.Replace("`n", $lineFeed) })
 ~~~
 "@
 }
@@ -139,7 +140,7 @@ function Convert-Syntax($objItem, $hasCmdletBinding) {
   $cmd = $objItem.Name
 
   if ($objItem.parameter -ne $null) {
-    $objItem.parameter | % {
+    $objItem.parameter | ForEach-Object {
       $cmd += ' `' + $lineFeed
       $cmd += "  "
       if ($_.required -eq $false) { $cmd += '['}
@@ -156,19 +157,19 @@ function Convert-Syntax($objItem, $hasCmdletBinding) {
 }
 
 function Convert-Parameter($objItem, $commandName) {
-  $parmText = $lineFeed + "###  -$($objItem.name.substring(0,1).ToUpper() + $objItem.name.substring(1))"
+  $paramText = $lineFeed + "###  -$($objItem.name.substring(0,1).ToUpper() + $objItem.name.substring(1))"
   if ( ($objItem.parameterValue -ne $null) -and ($objItem.parameterValue -ne 'SwitchParameter') ) {
-    $parmText += ' '
-    if ([string]($objItem.required) -eq 'false') { $parmText += "["}
-    $parmText += "&lt;$($objItem.parameterValue)&gt;"
-    if ([string]($objItem.required) -eq 'false') { $parmText += "]"}
+    $paramText += ' '
+    if ([string]($objItem.required) -eq 'false') { $paramText += "["}
+    $paramText += "&lt;$($objItem.parameterValue)&gt;"
+    if ([string]($objItem.required) -eq 'false') { $paramText += "]"}
   }
-  $parmText += $lineFeed
+  $paramText += $lineFeed
   if ($objItem.description -ne $null) {
-    $parmText += (($objItem.description | % { Replace-CommonItems $_.Text }) -join "$lineFeed") + $lineFeed + $lineFeed
+    $parmText += (($objItem.description | ForEach-Object { Replace-CommonItems $_.Text }) -join "$lineFeed") + $lineFeed + $lineFeed
   }
   if ($objItem.parameterValueGroup -ne $null) {
-    $parmText += "$($lineFeed)Valid options: " + ($objItem.parameterValueGroup.parameterValue -join ", ") + $lineFeed + $lineFeed
+    $paramText += "$($lineFeed)Valid options: " + ($objItem.parameterValueGroup.parameterValue -join ", ") + $lineFeed + $lineFeed
   }
 
   $aliases = [string]((Get-Command -Name $commandName).parameters."$($objItem.Name)".Aliases -join ', ')
@@ -179,7 +180,7 @@ function Convert-Parameter($objItem, $commandName) {
 
   $padding = ($aliases.Length, $required.Length, $position.Length, $defValue.Length, $acceptPipeline.Length | Measure-Object -Maximum).Maximum
 
-    $parmText += @"
+    $paramText += @"
 Property               | Value
 ---------------------- | $([string]('-' * $padding))
 Aliases                | $($aliases)
@@ -190,7 +191,7 @@ Accept Pipeline Input? | $($acceptPipeline)
 
 "@
 
-  Write-Output $parmText
+  Write-Output $paramText
 }
 
 function Convert-CommandText {
@@ -304,7 +305,10 @@ function Generate-TopLevelCommandReference {
   $commandOutput += @("$lineFeed~~~$lineFeed")
   $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco -h``. $lineFeed")
 
-  $commandOutput | %{ Convert-CommandText($_) } | %{ Convert-CommandReferenceSpecific($_) } | Out-File $fileName -Encoding UTF8 -Force
+  $commandOutput | 
+      ForEach-Object { Convert-CommandText($_) } |
+      ForEach-Object { Convert-CommandReferenceSpecific($_) } |
+      Out-File $fileName -Encoding UTF8 -Force
 }
 
 function Move-GeneratedFiles {
@@ -373,7 +377,9 @@ function Generate-CommandReference($commandName, $order) {
   $commandOutput += $(& $chocoExe $commandName.ToLower() -h -r)
   $commandOutput += @("$lineFeed~~~$lineFeed$lineFeed[Command Reference](xref:choco-commands)")
   $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco $($commandName.ToLower()) -h``. $lineFeed")
-  $commandOutput | %{ Convert-CommandText $_ $commandName.ToLower() } | Out-File $fileName -Encoding UTF8 -Force
+  $commandOutput | 
+      ForEach-Object { Convert-CommandText $_ $commandName.ToLower() } | 
+      Out-File $fileName -Encoding UTF8 -Force
 }
 
 try
@@ -428,14 +434,14 @@ RedirectFrom:
 $(Replace-CommonItems $_.Synopsis)
 
 ## Syntax
-$( ($_.syntax.syntaxItem | % { Convert-Syntax $_ $hasCmdletBinding }) -join "$lineFeed$lineFeed")
+$( ($_.syntax.syntaxItem | ForEach-Object { Convert-Syntax $_ $hasCmdletBinding }) -join "$lineFeed$lineFeed")
 $( if ($_.description -ne $null) { $lineFeed + "## Description" + $lineFeed + $lineFeed + $(Replace-CommonItems $_.description.Text) })
 $( if ($_.alertSet -ne $null) { $lineFeed + "## Notes" + $lineFeed + $lineFeed +  $(Replace-CommonItems $_.alertSet.alert.Text) })
 
 ## Aliases
 
 $(Get-Aliases $_.Name)
-$( if ($_.Examples -ne $null) { Write-Output "$lineFeed## Examples$lineFeed$lineFeed"; ($_.Examples.Example | % { Convert-Example $_ }) -join "$lineFeed$lineFeed"; Write-Output "$lineFeed" })
+$( if ($_.Examples -ne $null) { Write-Output "$lineFeed## Examples$lineFeed$lineFeed"; ($_.Examples.Example | ForEach-Object { Convert-Example $_ }) -join "$lineFeed$lineFeed"; Write-Output "$lineFeed" })
 ## Inputs
 
 $( if ($_.InputTypes -ne $null -and $_.InputTypes.Length -gt 0 -and -not $_.InputTypes.Contains('inputType')) { $lineFeed + " * $($_.InputTypes)" + $lineFeed} else { 'None'})
@@ -445,9 +451,9 @@ $( if ($_.InputTypes -ne $null -and $_.InputTypes.Length -gt 0 -and -not $_.Inpu
 $( if ($_.ReturnValues -ne $null -and $_.ReturnValues.Length -gt 0 -and -not $_.ReturnValues.StartsWith('returnValue')) { "$lineFeed * $($_.ReturnValues)$lineFeed"} else { 'None'})
 
 ## Parameters
-$( if ($_.parameters.parameter.count -gt 0) { $_.parameters.parameter | % { Convert-Parameter $_ $commandName }}) $( if ($hasCmdletBinding) { "$lineFeed### &lt;CommonParameters&gt;$lineFeed$($lineFeed)This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see ``about_CommonParameters`` http://go.microsoft.com/fwlink/p/?LinkID=113216 ." } )
+$( if ($_.parameters.parameter.count -gt 0) { $_.parameters.parameter | ForEach-Object { Convert-Parameter $_ $commandName }}) $( if ($hasCmdletBinding) { "$lineFeed### &lt;CommonParameters&gt;$lineFeed$($lineFeed)This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see ``about_CommonParameters`` http://go.microsoft.com/fwlink/p/?LinkID=113216 ." } )
 
-$( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$lineFeed"; $_.relatedLinks.navigationLink | ? { $_.linkText -ne $null} | % { Write-Output "* [$($_.LinkText)](xref:$($_.LinkText.ToLower()))$lineFeed" }})
+$( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$lineFeed"; $_.relatedLinks.navigationLink | Where-Object { $_.linkText -ne $null} | ForEach-Object { Write-Output "* [$($_.LinkText)](xref:$($_.LinkText.ToLower()))$lineFeed" }})
 
 [Function Reference](xref:powershell-reference)
 
@@ -484,7 +490,6 @@ Chocolatey makes a number of environment variables available (You can access any
  * ChocolateyPackageName - The name of the package, equivalent to the `<id />` field in the nuspec (0.9.9+)
  * ChocolateyPackageTitle - The title of the package, equivalent to the `<title />` field in the nuspec (0.10.1+)
  * ChocolateyPackageVersion - The version of the package, equivalent to the `<version />` field in the nuspec (0.9.9+)
- * ChocolateyPackageFolder - The top level location of the package folder - the folder where Chocolatey has downloaded and extracted the NuGet package, typically `C:\ProgramData\chocolatey\lib\packageName`.
 
 #### Advanced Environment Variables
 
@@ -493,11 +498,11 @@ The following are more advanced settings:
  * ChocolateyPackageParameters - Parameters to use with packaging, not the same as install arguments (which are passed directly to the native installer). Based on `--package-parameters`. (0.9.8.22+)
  * CHOCOLATEY_VERSION - The version of Choco you normally see. Use if you are 'lighting' things up based on choco version. (0.9.9+) - Otherwise take a dependency on the specific version you need.
  * ChocolateyForceX86 = If available and set to 'true', then user has requested 32bit version. (0.9.9+) - Automatically handled in built in Choco functions.
- * OS_PLATFORM - Like Windows, OSX, Linux. (0.9.9+)
+ * OS_PLATFORM - Like Windows, macOS, Linux. (0.9.9+)
  * OS_VERSION - The version of OS, like 6.1 something something for Windows. (0.9.9+)
  * OS_NAME - The reported name of the OS. (0.9.9+)
  * IS_PROCESSELEVATED = Is the process elevated? (0.9.9+)
- * ChocolateyToolsLocation - formerly 'ChocolateyBinRoot' ('ChocolateyBinRoot' will be removed with Chocolatey v2.0.0), this is where tools being installed outside of Chocolatey packaging will go. (0.9.10+)
+ * ChocolateyPackageInstallLocation - Install location of the software that the package installs. Displayed at the end of the package install. (0.9.10+)
 
 #### Set By Options and Configuration
 
@@ -514,7 +519,7 @@ Some environment variables are set based on options that are passed, configurati
 #### Business Edition Variables
 
  * ChocolateyInstallArgumentsSensitive - Encrypted arguments passed from command line `--install-arguments-sensitive` that are not logged anywhere. (0.10.1+ and licensed editions 1.6.0+)
- * ChocolateyPackageParametersSensitive - Package parameters passed from command line `--package-parameters-senstivite` that are not logged anywhere.  (0.10.1+ and licensed editions 1.6.0+)
+ * ChocolateyPackageParametersSensitive - Package parameters passed from command line `--package-parameters-sensitive` that are not logged anywhere.  (0.10.1+ and licensed editions 1.6.0+)
  * ChocolateyLicensedVersion - What version is the licensed edition on?
  * ChocolateyLicenseType - What edition / type of the licensed edition is installed?
 
@@ -528,8 +533,8 @@ The following are experimental or use not recommended:
 
 #### Not Useful Or Anti-Pattern If Used
 
- * ChocolateyInstallOverride = Not for use in package automation scripts. Based on `--override-arguments` being passed. (0.9.9+)
- * ChocolateyInstallArguments = The installer arguments meant for the native installer. You should use chocolateyPackageParameters instead. Based on `--install-arguments` being passed. (0.9.9+)
+ * ChocolateyInstallOverride - Not for use in package automation scripts. Based on `--override-arguments` being passed. (0.9.9+)
+ * ChocolateyInstallArguments - The installer arguments meant for the native installer. You should use chocolateyPackageParameters instead. Based on `--install-arguments` being passed. (0.9.9+)
  * ChocolateyIgnoreChecksums - Was `--ignore-checksums` passed or the feature `checksumFiles` turned off? (0.9.9.9+)
  * ChocolateyAllowEmptyChecksums - Was `--allow-empty-checksums` passed or the feature `allowEmptyChecksums` turned on? (0.10.0+)
  * ChocolateyAllowEmptyChecksumsSecure - Was `--allow-empty-checksums-secure` passed or the feature `allowEmptyChecksumsSecure` turned on? (0.10.0+)
@@ -546,6 +551,8 @@ The following are experimental or use not recommended:
  * http_proxy - Set by original `http_proxy` passthrough, or same as `ChocolateyProxyLocation` if explicitly set. (0.10.4+)
  * https_proxy - Set by original `https_proxy` passthrough, or same as `ChocolateyProxyLocation` if explicitly set. (0.10.4+)
  * no_proxy- Set by original `no_proxy` passthrough, or same as `ChocolateyProxyBypassList` if explicitly set. (0.10.4+)
+ * ChocolateyPackageFolder - Not for use in package automation scripts. Recommend using `$toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"` as per template generated by `choco new`
+ * ChocolateyToolsLocation - Not for use in package automation scripts. Recommend using Get-ToolsLocation instead
 '@
 
   $global:powerShellReferenceTOC | Out-File $fileName -Encoding UTF8 -Force

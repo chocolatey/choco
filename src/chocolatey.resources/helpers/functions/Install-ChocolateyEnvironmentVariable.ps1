@@ -48,7 +48,7 @@ The name or key of the environment variable
 A string value assigned to the above name.
 
 .PARAMETER VariableType
-Specifies whether this variable is to be accesible at either the
+Specifies whether this variable is to be accessible at either the
 individual user level or at the Machine level.
 
 .PARAMETER IgnoredArguments
@@ -64,7 +64,7 @@ Install-ChocolateyEnvironmentVariable "JAVA_HOME" "d:\oracle\jdk\bin"
 >
 # Creates a User environment variable "_NT_SYMBOL_PATH" pointing to
 # "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols".
-# The command will be elevated to admin priviledges.
+# The command will be elevated to admin privileges.
 Install-ChocolateyEnvironmentVariable `
   -VariableName "_NT_SYMBOL_PATH" `
   -VariableValue "symsrv*symsrv.dll*f:\localsymbols*http://msdl.microsoft.com/download/symbols" `

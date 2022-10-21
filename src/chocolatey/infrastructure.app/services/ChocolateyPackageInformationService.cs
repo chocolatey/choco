@@ -17,6 +17,7 @@
 namespace chocolatey.infrastructure.app.services
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Text;
     using configuration;
@@ -41,6 +42,10 @@ namespace chocolatey.infrastructure.app.services
         private const string ARGS_FILE = ".arguments";
         private const string EXTRA_FILE = ".extra";
         private const string VERSION_OVERRIDE_FILE = ".version";
+
+        // We need to store the package identifiers we have warned about
+        // to prevent duplicated outputs.
+        private HashSet<string> _deprecationWarning = new HashSet<string>();
 
         public ChocolateyPackageInformationService(IFileSystem fileSystem, IRegistryService registryService, IFilesService filesService)
         {
@@ -76,12 +81,12 @@ namespace chocolatey.infrastructure.app.services
             var deserializationErrorMessage = @"
 A corrupt .registry file exists at {0}.
  Open this file in a text editor, and remove/escape any characters that
- are regarded as illegal within XML strings not surrounded by CData. 
+ are regarded as illegal within XML strings not surrounded by CData.
  These are typically the characters &, `<`, and `>`. Again, this
  is an XML document, so you will see many < and > characters, so just
- focus exclusively in the string values not surrounded by CData. Once 
+ focus exclusively in the string values not surrounded by CData. Once
  these have been corrected, rename the .registry.bad file to .registry.
- Once saved, try running the same Chocolatey command that was just 
+ Once saved, try running the same Chocolatey command that was just
  executed, so verify problem is fixed.
  NOTE: It will not be possible to rename the file in Windows Explorer.
  Instead, you can use the following PowerShell command:
@@ -102,9 +107,9 @@ A corrupt .registry file exists at {0}.
             catch (Exception e)
             {
                 if (_config.RegularOutput) this.Log().Warn(@"A .registry file at '{0}'
- has errored attempting to read it. This file will be renamed to 
+ has errored attempting to read it. This file will be renamed to
  '{1}' The error:
- {2} 
+ {2}
  ".format_with(_fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_FILE), _fileSystem.combine_paths(pkgStorePath, REGISTRY_SNAPSHOT_BAD_FILE), e.ToString()));
 
                 FaultTolerance.try_catch_with_logging_exception(
@@ -140,6 +145,19 @@ A corrupt .registry file exists at {0}.
             if (_fileSystem.file_exists(argsFile)) packageInformation.Arguments = _fileSystem.read_file(argsFile);
             var extraInfoFile = _fileSystem.combine_paths(pkgStorePath, EXTRA_FILE);
             if (_fileSystem.file_exists(extraInfoFile)) packageInformation.ExtraInformation = _fileSystem.read_file(extraInfoFile);
+
+            if (packageInformation.IsSideBySide && !_deprecationWarning.Contains(package.Id))
+            {
+                var logger = _config.RegularOutput ?
+                    logging.ChocolateyLoggers.Important :
+                    logging.ChocolateyLoggers.LogFileOnly;
+
+                this.Log().Warn(logger, @"
+{0} has been installed as a side by side installation.
+Side by side installations are deprecated and is pending removal in v2.0.0.", package.Id);
+
+                _deprecationWarning.Add(package.Id);
+            }
 
             var versionOverrideFile = _fileSystem.combine_paths(pkgStorePath, VERSION_OVERRIDE_FILE);
             if (_fileSystem.file_exists(versionOverrideFile))

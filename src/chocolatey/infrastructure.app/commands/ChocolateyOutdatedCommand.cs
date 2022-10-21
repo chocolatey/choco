@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -111,15 +111,15 @@ NOTE: Available with 0.9.9.6+.
     choco outdated -s https://somewhere/out/there
     choco outdated -s ""'https://somewhere/protected'"" -u user -p pass
 
-If you use `--source=https://somewhere/out/there`, it is 
- going to look for outdated packages only based on that source, so 
+If you use `--source=https://somewhere/out/there`, it is
+ going to look for outdated packages only based on that source, so
  you may want to add `--ignore-unfound` to your options.
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");
-           
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
             "chocolatey".Log().Info(@"
 Exit codes that normally result from running this command.
@@ -133,16 +133,16 @@ Enhanced:
  - -1 or 1: an error has occurred
  - 2: outdated packages have been found
 
-NOTE: Starting in v0.10.12, if you have the feature '{0}' 
- turned on, then choco will provide enhanced exit codes that allow 
+NOTE: Starting in v0.10.12, if you have the feature '{0}'
+ turned on, then choco will provide enhanced exit codes that allow
  better integration and scripting.
 
-If you find other exit codes that we have not yet documented, please 
- file a ticket so we can document it at 
+If you find other exit codes that we have not yet documented, please
+ file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
 ".format_with(ApplicationParameters.Features.UseEnhancedExitCodes));
-           
+
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"
 choco outdated: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_outdated.gif

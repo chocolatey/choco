@@ -150,7 +150,7 @@ param(
   foreach ($paramString in $paramStrings) {
     if (!$paramString -or $paramString -eq '') { continue }
 
-    Select-String '(?:^|\s+)\/(?<ItemKey>[^\:\=\s)]+)(?:(?:\:|=){1}(?:\''|\"){0,1}(?<ItemValue>.*?)(?:\''|\"){0,1}(?:(?=\s+\/)|$))?' -Input $paramString -AllMatches | % { $_.Matches } | % {
+    Select-String '(?:^|\s+)\/(?<ItemKey>[^\:\=\s)]+)(?:(?:\:|=){1}(?:\''|\"){0,1}(?<ItemValue>.*?)(?:\''|\"){0,1}(?:(?=\s+\/)|$))?' -Input $paramString -AllMatches | ForEach-Object { $_.Matches } | ForEach-Object {
       if (!$_) { continue } #Posh v2 issue?
       $paramItemName = ($_.Groups["ItemKey"].Value).Trim()
       $paramItemValue = ($_.Groups["ItemValue"].Value).Trim()

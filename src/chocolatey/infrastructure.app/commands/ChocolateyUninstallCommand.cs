@@ -67,7 +67,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Apply Package Parameters To Dependencies  - Should package parameters be applied to dependent packages? Defaults to false.",
                      option => configuration.ApplyPackageParametersToDependencies = option != null)
                 .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
-                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false.",
+                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false. (DEPRECATED)",
                      option => configuration.AllowMultipleVersions = option != null)
                 .Add("x|forcedependencies|force-dependencies|removedependencies|remove-dependencies",
                      "RemoveDependencies - Uninstall dependencies when uninstalling package(s). Defaults to false.",
@@ -133,6 +133,10 @@ namespace chocolatey.infrastructure.app.commands
                              configuration.Features.ExitOnRebootDetected = false;
                          }
                      })
+                .Add("skiphooks|skip-hooks",
+                    "Skip hooks - Do not run hook scripts. Available in 1.2.0+",
+                    option => configuration.SkipHookScripts = option != null
+                    )
                 ;
         }
 
@@ -208,6 +212,10 @@ NOTE: Synchronizer and AutoUninstaller enhancements in licensed
 Starting in v2.0.0 the shortcut `cuninst` will be removed and can not be used
 to uninstall packages anymore. We recommend you make sure that you always
 use the full command going forward (`choco uninstall`).
+
+Side by side installations has been deprecated and support for uninstalling such packages will be removed in v2.0.0.
+Instead of using side by side installations, distinct packages should be created
+if similar functionality is needed going forward.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
@@ -233,7 +241,7 @@ choco uninstall: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/
     choco uninstall ruby --version 1.8.7.37402
     choco uninstall nodejs.install --all-versions
 
-NOTE: See scripting in the command reference (`choco -?`) for how to 
+NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
 ");

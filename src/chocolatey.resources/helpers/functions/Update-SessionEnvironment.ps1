@@ -18,7 +18,7 @@ function Update-SessionEnvironment {
 <#
 .SYNOPSIS
 Updates the environment variables of the current powershell session with
-any environment variable changes that may have occured during a
+any environment variable changes that may have occurred during a
 Chocolatey package install.
 
 .DESCRIPTION

@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,6 @@ namespace chocolatey.tests.integration.scenarios
     using System.IO;
     using System.Linq;
     using System.Xml.XPath;
-    using bdddoc.core;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
@@ -55,7 +54,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_noop_installing_a_package : ScenariosBase
         {
             public override void Context()
@@ -104,7 +102,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_noop_installing_a_package_that_does_not_exist : ScenariosBase
         {
             public override void Context()
@@ -152,7 +149,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_happy_path : ScenariosBase
         {
             private PackageResult packageResult;
@@ -227,6 +223,14 @@ namespace chocolatey.tests.integration.scenarios
                 var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
 
                 Directory.Exists(extensionsDirectory).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_an_hooks_folder_for_the_package()
+            {
+                var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames);
+
+                Directory.Exists(hooksDirectory).ShouldBeFalse();
             }
 
             [Fact]
@@ -334,7 +338,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_packages_with_packages_config : ScenariosBase
         {
             public override void Context()
@@ -478,7 +481,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_an_already_installed_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -551,7 +553,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -653,7 +654,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
         public class when_force_installing_an_already_installed_package_that_errors : ScenariosBase
@@ -734,7 +734,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
         public class when_force_installing_an_already_installed_package_with_a_read_and_delete_share_locked_file : ScenariosBase
@@ -836,7 +835,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
         public class when_force_installing_an_already_installed_package_with_with_an_exclusively_locked_file : ScenariosBase
@@ -923,7 +921,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_exists_but_a_version_that_does_not_exist : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1015,7 +1012,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_does_not_exist : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1101,7 +1097,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
         public class when_installing_a_package_that_errors : ScenariosBase
@@ -1197,7 +1192,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_has_nonterminating_errors : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1282,7 +1276,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
         public class when_installing_a_package_that_has_nonterminating_errors_with_fail_on_stderr : ScenariosBase
@@ -1381,7 +1374,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_side_by_side_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1425,6 +1417,22 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void should_contain_a_warning_message_that_installing_package_with_multiple_versions_being_deprecated()
+            {
+                const string expected = "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0.";
+
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains(expected))
+                    {
+                        return;
+                    }
+                }
+
+                Assert.Fail("No warning message about side by side deprecation outputted");
+            }
+
+            [Fact]
             public void should_have_a_successful_package_result()
             {
                 packageResult.Success.ShouldBeTrue();
@@ -1455,7 +1463,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_switching_a_normal_package_to_a_side_by_side_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1531,7 +1538,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_switching_a_side_by_side_package_to_a_normal_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1608,7 +1614,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_with_dependencies_happy : ScenariosBase
         {
             public override void Context()
@@ -1707,7 +1712,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package_with_dependencies : ScenariosBase
         {
             public override void Context()
@@ -1818,7 +1822,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package_forcing_dependencies : ScenariosBase
         {
             public override void Context()
@@ -1929,7 +1932,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package_ignoring_dependencies : ScenariosBase
         {
             public override void Context()
@@ -2040,7 +2042,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_an_already_installed_package_forcing_and_ignoring_dependencies : ScenariosBase
         {
             public override void Context()
@@ -2142,7 +2143,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_with_dependencies_and_dependency_cannot_be_found : ScenariosBase
         {
             public override void Context()
@@ -2251,7 +2251,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_ignoring_dependencies_that_cannot_be_found : ScenariosBase
         {
             private PackageResult packageResult;
@@ -2337,7 +2336,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_depends_on_a_newer_version_of_an_installed_dependency : ScenariosBase
         {
             public override void Context()
@@ -2437,7 +2435,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_depends_on_an_unavailable_newer_version_of_an_installed_dependency : ScenariosBase
         {
             public override void Context()
@@ -2503,7 +2500,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_that_depends_on_an_unavailable_newer_version_of_an_installed_dependency_ignoring_dependencies : ScenariosBase
         {
             public override void Context()
@@ -2587,7 +2583,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_force_installing_a_package_that_depends_on_an_unavailable_newer_version_of_an_installed_dependency_forcing_dependencies : ScenariosBase
         {
             public override void Context()
@@ -2701,7 +2696,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_with_dependencies_on_a_newer_version_of_a_package_than_an_existing_package_has_with_that_dependency : ScenariosBase
         {
             public override void Context()
@@ -2786,7 +2780,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_with_dependencies_on_a_newer_version_of_a_package_than_are_allowed_by_an_existing_package_with_that_dependency : ScenariosBase
         {
             public override void Context()
@@ -2907,7 +2900,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_with_dependencies_on_an_older_version_of_a_package_than_is_already_installed : ScenariosBase
         {
             public override void Context()
@@ -3015,7 +3007,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_with_a_dependent_package_that_also_depends_on_a_less_constrained_but_still_valid_dependency_of_the_same_package : ScenariosBase
         {
             public override void Context()
@@ -3129,7 +3120,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_from_a_nupkg_file : ScenariosBase
         {
             private PackageResult packageResult;
@@ -3210,6 +3200,14 @@ namespace chocolatey.tests.integration.scenarios
                 var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", "installpackage");
 
                 Directory.Exists(extensionsDirectory).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_an_hooks_folder_for_the_package()
+            {
+                var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", "installpackage");
+
+                Directory.Exists(hooksDirectory).ShouldBeFalse();
             }
 
             [Fact]
@@ -3309,7 +3307,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_with_config_transforms : ScenariosBase
         {
             private PackageResult packageResult;
@@ -3396,7 +3393,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Concern(typeof(ChocolateyInstallCommand))]
         public class when_installing_a_package_with_no_sources_enabled : ScenariosBase
         {
             public override void Context()
@@ -3420,6 +3416,601 @@ namespace chocolatey.tests.integration.scenarios
             public void should_not_install_any_packages()
             {
                 Results.Count().ShouldEqual(0);
+            }
+        }
+
+        public class when_installing_a_hook_package : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "scriptpackage.hook";
+                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + ".1.0.0" + Constants.PackageExtension);
+            }
+
+            private PackageResult _packageResult;
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_install_the_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_the_expected_version_of_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            public void should_not_create_an_extensions_folder_for_the_package()
+            {
+                var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
+
+                Directory.Exists(extensionsDirectory).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_create_a_hooks_folder_for_the_package()
+            {
+                var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty));
+
+                Directory.Exists(hooksDirectory).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_hook_scripts_to_folder()
+            {
+                var hookScripts = new List<string> { "pre-install-all.ps1", "post-install-all.ps1", "pre-upgrade-all.ps1", "post-upgrade-all.ps1", "pre-uninstall-all.ps1", "post-uninstall-all.ps1" };
+                foreach (string scriptName in hookScripts)
+                {
+                    var hookScriptPath = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), scriptName);
+                    File.ReadAllText(hookScriptPath).ShouldContain("Write-Output");
+                }
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_installed_successfully()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("1/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_have_a_version_of_one_dot_zero_dot_zero()
+            {
+                _packageResult.Version.ShouldEqual("1.0.0");
+            }
+
+        }
+
+        public class when_installing_a_package_happy_path_with_hook_scripts : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Scenario.add_packages_to_source_location(Configuration, "scriptpackage.hook" + "*" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "scriptpackage.hook", "1.0.0");
+                Configuration.PackageNames = Configuration.Input = "installpackage";
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_install_where_install_location_reports()
+            {
+                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_the_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_the_expected_version_of_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_create_a_shim_for_console_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_create_a_shim_for_graphical_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_ignored_executable_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "not.installed.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_mismatched_case_ignored_executable_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "casemismatch.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_an_extensions_folder_for_the_package()
+            {
+                var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
+
+                Directory.Exists(extensionsDirectory).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_an_hooks_folder_for_the_package()
+            {
+                var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames);
+
+                Directory.Exists(hooksDirectory).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_a_console_shim_that_is_set_for_non_gui_access()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                );
+
+                var messageFound = false;
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains("is gui? False")) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("GUI false message not found");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_a_graphical_shim_that_is_set_for_gui_access()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                );
+
+                var messageFound = false;
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains("is gui? True")) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("GUI true message not found");
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_installed_successfully()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("1/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_have_a_version_of_one_dot_zero_dot_zero()
+            {
+                _packageResult.Version.ShouldEqual("1.0.0");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyInstall_script()
+            {
+                MockLogger.contains_message("installpackage v1.0.0 has been installed", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_pre_all_hook_script()
+            {
+                MockLogger.contains_message("pre-install-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_post_all_hook_script()
+            {
+                MockLogger.contains_message("post-install-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_pre_installpackage_hook_script()
+            {
+                MockLogger.contains_message("pre-install-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_post_installpackage_hook_script()
+            {
+                MockLogger.contains_message("post-install-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_have_executed_uninstall_hook_script()
+            {
+                MockLogger.contains_message("post-uninstall-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_have_executed_upgradepackage_hook_script()
+            {
+                MockLogger.contains_message("pre-install-upgradepackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_have_executed_beforemodify_hook_script()
+            {
+                MockLogger.contains_message("pre-beforemodify-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+            }
+        }
+
+        public class when_installing_a_portable_package_happy_path_with_hook_scripts : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Scenario.add_packages_to_source_location(Configuration, "scriptpackage.hook" + ".1.0.0" + Constants.PackageExtension);
+                Scenario.install_package(Configuration, "scriptpackage.hook", "1.0.0");
+                Configuration.PackageNames = Configuration.Input = "portablepackage";
+                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_install_where_install_location_reports()
+            {
+                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_the_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                Directory.Exists(packageDir).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_install_the_expected_version_of_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("1.0.0.0");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_create_a_shim_for_console_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_create_a_shim_for_graphical_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+
+                File.Exists(shimfile).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_ignored_executable_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "not.installed.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_mismatched_case_ignored_executable_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "casemismatch.exe");
+
+                File.Exists(shimfile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_an_extensions_folder_for_the_package()
+            {
+                var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
+
+                Directory.Exists(extensionsDirectory).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_create_an_hooks_folder_for_the_package()
+            {
+                var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames);
+
+                Directory.Exists(hooksDirectory).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_a_console_shim_that_is_set_for_non_gui_access()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                );
+
+                var messageFound = false;
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains("is gui? False")) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("GUI false message not found");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_a_graphical_shim_that_is_set_for_gui_access()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                );
+
+                var messageFound = false;
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains("is gui? True")) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("GUI true message not found");
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_installed_successfully()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("1/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_have_a_version_of_one_dot_zero_dot_zero()
+            {
+                _packageResult.Version.ShouldEqual("1.0.0");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_have_executed_chocolateyInstall_script()
+            {
+                MockLogger.contains_message("portablepackage v1.0.0 has been installed", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_pre_all_hook_script()
+            {
+                MockLogger.contains_message("pre-install-all.ps1 hook ran for portablepackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_post_all_hook_script()
+            {
+                MockLogger.contains_message("post-install-all.ps1 hook ran for portablepackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_have_executed_uninstall_hook_script()
+            {
+                MockLogger.contains_message("post-uninstall-all.ps1 hook ran for portablepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_have_executed_upgradepackage_hook_script()
+            {
+                MockLogger.contains_message("pre-install-upgradepackage.ps1 hook ran for portablepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_have_executed_beforemodify_hook_script()
+            {
+                MockLogger.contains_message("pre-beforemodify-all.ps1 hook ran for portablepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
             }
         }
     }

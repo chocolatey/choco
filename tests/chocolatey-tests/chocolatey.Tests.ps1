@@ -40,7 +40,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     AfterAll {
-        Remove-ChocolateyInstallSnapshot
+        Remove-ChocolateyTestInstall
     }
 
     Context 'Chocolatey' {
@@ -139,13 +139,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
 
         # This is FossOnly for now as there are some undetermined errors here that do not seem to present inside of Chocolatey. https://gitlab.com/chocolatey/build-automation/chocolatey-test-kitchen/-/issues/39
         It "Should be able to run the script in AllSigned mode" -Skip:($_ -notin $PowerShellFiles) -Tag FossOnly {
-            # The chocolateyScriptRunner expects some passed in values and results in two errors if they're not there. This accounts for that.
-            $expectedErrors = if ($FileUnderTest.Name -eq 'chocolateyScriptRunner.ps1') {
-                2
-            }
-            else {
-                0
-            }
+            $expectedErrors = 0
             $command = "Import-Module $FileUnderTest -ErrorAction SilentlyContinue; exit `$error.count"
             & powershell.exe -noprofile -ExecutionPolicy AllSigned -command $command 2>$null
             $LastExitCode | Should -BeExactly $expectedErrors

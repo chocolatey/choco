@@ -1,13 +1,13 @@
-﻿// Copyright © 2017 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,7 +41,7 @@ namespace chocolatey.infrastructure.adapters
         {
             get { return _assembly.Location; }
         }
-        
+
         public string CodeBase
         {
             get { return _assembly.CodeBase; }
@@ -76,23 +76,33 @@ namespace chocolatey.infrastructure.adapters
         public Type GetType(String name)
         {
             return _assembly.GetType(name);
-        }   
-        
+        }
+
         public Type GetType(String name, bool throwOnError)
         {
             return _assembly.GetType(name,throwOnError);
-        }    
-        
+        }
+
         public Type GetType(String name, bool throwOnError, bool ignoreCase)
         {
             return _assembly.GetType(name,throwOnError, ignoreCase);
         }
 
+        public Type[] GetTypes()
+        {
+            return _assembly.GetTypes();
+        }
+
         public static IAssembly Load(byte[] rawAssembly)
         {
             return new Assembly(System.Reflection.Assembly.Load(rawAssembly));
-        } 
-        
+        }
+
+        public static IAssembly Load(byte[] rawAssembly, byte[] rawSymbols)
+        {
+            return new Assembly(System.Reflection.Assembly.Load(rawAssembly, rawSymbols));
+        }
+
         public static IAssembly LoadFile(string path)
         {
            return new Assembly(System.Reflection.Assembly.LoadFile(path));
@@ -113,8 +123,8 @@ namespace chocolatey.infrastructure.adapters
         public static IAssembly GetCallingAssembly()
         {
             return new Assembly(System.Reflection.Assembly.GetCallingAssembly());
-        } 
-        
+        }
+
         public static IAssembly GetEntryAssembly()
         {
             return new Assembly(System.Reflection.Assembly.GetEntryAssembly());

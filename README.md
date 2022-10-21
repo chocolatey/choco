@@ -173,7 +173,7 @@ sudo apt-get install mono-devel -y
  * Consider adding the following to your `~/.profile` (or other relevant dot source file):
 
 ```sh
-# mono
+# Mono
 # http://www.michaelruck.de/2010/03/solving-pkg-config-and-mono-35-profile.html
 # https://cloudgen.wordpress.com/2013/03/06/configure-nant-to-run-under-mono-3-06-beta-for-mac-osx/
 export PKG_CONFIG_PATH=/opt/local/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig:$PKG_CONFIG_PATH
@@ -195,7 +195,7 @@ Running the build on Mono produces an artifact similar to Windows but may have m
 ### Installing on Other Platforms:
 
  1. Get a copy of the source code and build.
- 1. Copy (or link) the contents of `./code_drop/chocolatey/console` to your preferred install directory. On Linux, the preferred directory is `/opt/chocolatey`
+ 1. Copy (or link) the contents of `./code_drop/temp/_PublishedApps/choco` to your preferred install directory. On Linux, the preferred directory is `/opt/chocolatey`
  1. Export the `ChocolateyInstall` environment variable, pointing to the install directory the build output was copied too.
  1. Copy `./docker/choco_wrapper` to a directory on the `$PATH`, rename to `choco`, and if the install directory is something else than `/opt/chocolatey`, then edit it to point to the correct path.
 

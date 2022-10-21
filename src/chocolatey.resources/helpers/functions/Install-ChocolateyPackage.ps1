@@ -224,7 +224,7 @@ Allows splatting with arguments that do not apply. Do not use directly.
 Specifies the commands to run after download has completed but before install steps have begun.
 Available in 0.11.0+.
 
-Use this for starting an auxilary process such as AutoHotkey, so that any timeouts are not 
+Use this for starting an auxiliary process such as AutoHotkey, so that any timeouts are not 
 affected by the time to download.
 
 .EXAMPLE
@@ -305,7 +305,7 @@ Install-ChocolateyPackage 'StExBar' 'msi' '/quiet' `
 .EXAMPLE
 >
 Install-ChocolateyPackage 'mono' 'exe' '/SILENT' `
- 'http://somehwere/something.exe' -ValidExitCodes @(0,21)
+ 'http://somewhere/something.exe' -ValidExitCodes @(0,21)
 
 .EXAMPLE
 >
@@ -371,8 +371,8 @@ param(
 
   Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  $chocTempDir = $env:TEMP
-  $tempDir = Join-Path $chocTempDir "$($env:chocolateyPackageName)"
+  $chocoTempDir = $env:TEMP
+  $tempDir = Join-Path $chocoTempDir "$($env:chocolateyPackageName)"
   if ($env:chocolateyPackageVersion -ne $null) { $tempDir = Join-Path $tempDir "$($env:chocolateyPackageVersion)"; }
   $tempDir = $tempDir -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
@@ -388,7 +388,7 @@ param(
   [string]$filePath = $downloadFilePath
   if ($useOriginalLocation) {
     $filePath = $url
-    if (Get-ProcessorBits 64) {
+    if (Get-OSArchitectureWidth 64) {
       $forceX86 = $env:chocolateyForceX86
       if ($forceX86) {
         Write-Debug "User specified '-x86' so forcing 32-bit"

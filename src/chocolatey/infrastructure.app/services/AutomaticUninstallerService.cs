@@ -217,8 +217,8 @@ namespace chocolatey.infrastructure.app.services
                 if (!config.Information.IsLicensedVersion)
                 {
                     this.Log().Warn(@"
-  Did you know licensed versions of Chocolatey are 95% effective with 
-   Automatic Uninstaller due to licensed enhancements and Package 
+  Did you know licensed versions of Chocolatey are 95% effective with
+   Automatic Uninstaller due to licensed enhancements and Package
    Synchronizer?
 ");
                 }

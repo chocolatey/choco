@@ -1,13 +1,13 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -81,8 +81,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 Configuration.PackageNames = @"C:\test\packages.config";
                 Configuration.Sources = @"C:\test";
 
-                NormalRunner.Setup(r => r.SourceType).Returns(SourceType.normal);
-                FeaturesRunner.Setup(r => r.SourceType).Returns(SourceType.windowsfeatures);
+                NormalRunner.Setup(r => r.SourceType).Returns(SourceTypes.NORMAL);
+                FeaturesRunner.Setup(r => r.SourceType).Returns(SourceTypes.WINDOWS_FEATURES);
 
                 var package = new Mock<IPackage>();
                 var expectedResult = new ConcurrentDictionary<string, PackageResult>();
@@ -92,7 +92,7 @@ namespace chocolatey.tests.infrastructure.app.services
                     .Returns(expectedResult);
                 NormalRunner.Setup(r => r.install_run(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<PackageResult>>()))
                     .Returns(new ConcurrentDictionary<string, PackageResult>());
-                SourceRunners.AddRange(new []{ NormalRunner.Object, FeaturesRunner.Object });
+                SourceRunners.AddRange(new[] { NormalRunner.Object, FeaturesRunner.Object });
 
                 FileSystem.Setup(f => f.get_full_path(Configuration.PackageNames)).Returns(Configuration.PackageNames);
                 FileSystem.Setup(f => f.file_exists(Configuration.PackageNames)).Returns(true);

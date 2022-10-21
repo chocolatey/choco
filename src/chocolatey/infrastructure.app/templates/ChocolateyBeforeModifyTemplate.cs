@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.templates
 #  need to uninstall an MSI prior to upgrade, put the functionality in this
 #  file without calling the uninstall script. Make it idempotent in the
 #  uninstall script so that it doesn't fail when it is already uninstalled.
-# NOTE: For upgrades - like the uninstall script, this script always runs from 
+# NOTE: For upgrades - like the uninstall script, this script always runs from
 #  the currently installed version, not from the new upgraded package version.
 
 ";

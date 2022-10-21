@@ -117,6 +117,7 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
       * `git config merge.ff false`
       * `git config merge.log true`
       * `git config fetch.prune true`
+      * `git config blame.ignoreRevsFile .git-blame-ignore-revs --local`
     1. From there you create a branch named specific to the feature.
     1. In the branch you do work specific to the feature.
     1. For committing the code, please see [Prepare Commits](#prepare-commits).
@@ -204,8 +205,8 @@ As far as testing goes, unit tests are extremely quick feedback and great for lo
 **NOTE:** When you are doing this, we almost always recommend you take the output of the build to another machine to do the testing, like the [Chocolatey Test Environment](https://github.com/chocolatey/chocolatey-test-environment).
 
  * Run `build.bat`.
- * There is a detailed log of the output in both `build_output` and `code_drop\build_artifacts`. The `build_artifacts` folders contain a lot of detail with each individual tool's output and reporting (helpful when wanting to see a visual of what tests failed).
- * There are two folders created - `build_output` and `code_drop`. You are looking for `code_drop\chocolatey\console` or `code_drop\nuget`. The `choco.exe` file contains everything it needs, but it does unpack the manifest on first use, so you could run into [#1292](https://github.com/chocolatey/choco/issues/1292).
+ * There is a detailed log of the output in `code_drop`.
+ * You are looking for `code_drop\temp\_PublishedApps\choco_merged` or `code_drop\Packages\Chocolatey`. The `choco.exe` file contains everything it needs, but it does unpack the manifest on first use, so you could run into [#1292](https://github.com/chocolatey/choco/issues/1292).
  * You will need to pass `--allow-unofficial-build` for it to work when built with release mode.
  * You can also try `build.debug.bat` - note that it is newer and it may have an issue or two. It doesn't require `--allow-unofficial-build` as the binaries are built for debugging.
  * Use `.\choco.exe` to point to the local file. By default in PowerShell.exe, if you have Chocolatey installed, when you call `choco`, that is using the installed `choco` and not the one in the folder you are currently in. You must be explicit. This catches nearly everyone.

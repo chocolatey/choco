@@ -213,8 +213,9 @@ Install-ChocolateyPinnedTaskBarItem
 
     If ($pinToTaskbar) {
       $scfilename = $Path.FullName
-      $pinverb = (new-object -com "shell.application").namespace($(split-path -parent $Path.FullName)).Parsename($(split-path -leaf $Path.FullName)).verbs() | ?{$_.Name -eq 'Pin to Tas&kbar'}
-      If ($pinverb) {$pinverb.doit()}
+      $pinverb = (new-object -com "shell.application").namespace($(split-path -parent $Path.FullName)).Parsename($(split-path -leaf $Path.FullName)).verbs() | 
+        Where-Object{$_.Name -eq 'Pin to Tas&kbar'}
+      If ($pinverb) { $pinverb.doit() }
     }
 	}
 	catch {

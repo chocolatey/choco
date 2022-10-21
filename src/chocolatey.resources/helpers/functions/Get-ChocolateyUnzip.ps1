@@ -75,6 +75,14 @@ folder and its contents will be extracted to the destination.
 OPTIONAL - This will facilitate logging unzip activity for subsequent
 uninstalls
 
+.PARAMETER DisableLogging
+OPTIONAL - This disables logging of the extracted items. It speeds up
+extraction of archives with many files. 
+
+Usage of this parameter will prevent Uninstall-ChocolateyZipPackage
+from working, extracted files will have to be cleaned up with
+Remove-Item or a similar command instead.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -93,6 +101,7 @@ param(
   [parameter(Mandatory=$false, Position=2)][string] $specificFolder,
   [parameter(Mandatory=$false, Position=3)][string] $packageName,
   [alias("file64")][parameter(Mandatory=$false)][string] $fileFullPath64,
+  [parameter(Mandatory=$false)][switch] $disableLogging,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
@@ -100,7 +109,7 @@ param(
 
    $bitnessMessage = ''
     $zipfileFullPath=$fileFullPath
-  if ((Get-ProcessorBits 32) -or $env:ChocolateyForceX86 -eq 'true') {
+  if ((Get-OSArchitectureWidth 32) -or $env:ChocolateyForceX86 -eq 'true') {
     if (!$fileFullPath) { throw "32-bit archive is not supported for $packageName"; }
     if ($fileFullPath64) { $bitnessMessage = '32-bit '; }
   } elseif ($fileFullPath64) {
@@ -156,7 +165,12 @@ param(
   }
   $workingDirectory = $workingDirectory.ProviderPath
 
-  $params = "x -aoa -bd -bb1 -o`"$destinationNoRedirection`" -y `"$fileFullPathNoRedirection`""
+  $loggingParam = '-bb1'
+  if ($disableLogging) {
+      $loggingParam = '-bb0'
+  }
+
+  $params = "x -aoa -bd $loggingParam -o`"$destinationNoRedirection`" -y `"$fileFullPathNoRedirection`""
   if ($specificfolder) {
     $params += " `"$specificfolder`""
   }
@@ -219,7 +233,7 @@ param(
   Set-PowerShellExitCode $exitCode
   Write-Debug "Command ['$7zip' $params] exited with `'$exitCode`'."
 
-  if ($zipExtractLogFullPath) {
+  if ($zipExtractLogFullPath -and -not $disableLogging) {
     Set-Content $zipExtractLogFullPath $global:zipFileList.ToString() -Encoding UTF8 -Force
   }
 

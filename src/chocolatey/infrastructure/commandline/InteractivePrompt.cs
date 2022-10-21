@@ -1,13 +1,13 @@
 ﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,7 +68,7 @@ namespace chocolatey.infrastructure.commandline
                     .meets(
                         c => !c.Any(String.IsNullOrWhiteSpace),
                         (name, value) => { throw new ApplicationException("Some choices are empty. Please ensure you provide no empty choices."); });
-                
+
                 Ensure
                  .that(() => choices)
                  .meets(
@@ -85,7 +85,7 @@ namespace chocolatey.infrastructure.commandline
             {
                 Console.Write(prompt + "(");
 
-            } 
+            }
 
             "chocolatey".Log().Info(shortPrompt ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, prompt);
 
@@ -99,17 +99,17 @@ namespace chocolatey.infrastructure.commandline
                 {
                     var choicePrompt = choice.is_equal_to(defaultChoice) ?
                             shortPrompt ?
-                                "[[{0}]{1}]".format_with(choice.Substring(0, 1).ToUpperInvariant(), choice.Substring(1, choice.Length - 1)) : 
+                                "[[{0}]{1}]".format_with(choice.Substring(0, 1).ToUpperInvariant(), choice.Substring(1, choice.Length - 1)) :
                                 "[{0}]".format_with(choice.ToUpperInvariant())
-                        : 
-                            shortPrompt ? 
+                        :
+                            shortPrompt ?
                                 "[{0}]{1}".format_with(choice.Substring(0,1).ToUpperInvariant(), choice.Substring(1, choice.Length - 1)) :
                                 choice;
 
                     if (counter != 1) Console.Write("/");
                     Console.Write(choicePrompt);
                 }
-                
+
                 counter++;
             }
 
@@ -132,8 +132,8 @@ namespace chocolatey.infrastructure.commandline
                 foreach (var pair in choiceDictionary)
                 {
                     var value = pair.Value.to_string();
-                    if (value.is_equal_to(selection) || 
-                        (allowShortAnswer && value.Substring(0, 1).is_equal_to(selection)) || 
+                    if (value.is_equal_to(selection) ||
+                        (allowShortAnswer && value.Substring(0, 1).is_equal_to(selection)) ||
                         (value.contains("-") && value.Substring(0, value.IndexOf("-")).trim_safe().is_equal_to(selection))
                         )
                     {

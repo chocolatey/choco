@@ -151,6 +151,14 @@ Will be used for Url64bit if Url64bit is empty. Available in 0.10.7+.
 This parameter provides compatibility, but should not be used directly
 and not with the community package repository until January 2018.
 
+.PARAMETER DisableLogging
+OPTIONAL - This disables logging of the extracted items. It speeds up
+extraction of archives with many files. 
+
+Usage of this parameter will prevent Uninstall-ChocolateyZipPackage
+from working, extracted files will have to be cleaned up with
+Remove-Item or a similar command instead.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -191,6 +199,7 @@ param(
   [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
   [alias("fileFullPath")][parameter(Mandatory=$false)][string] $file = '',
   [alias("fileFullPath64")][parameter(Mandatory=$false)][string] $file64 = '',
+  [parameter(Mandatory=$false)][switch] $disableLogging,
   [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
 )
 
@@ -198,8 +207,8 @@ param(
 
   $fileType = 'zip'
 
-  $chocTempDir = $env:TEMP
-  $tempDir = Join-Path $chocTempDir "$($env:chocolateyPackageName)"
+  $chocoTempDir = $env:TEMP
+  $tempDir = Join-Path $chocoTempDir "$($env:chocolateyPackageName)"
   if ($env:chocolateyPackageVersion -ne $null) { $tempDir = Join-Path $tempDir "$($env:chocolateyPackageVersion)"; }
   $tempDir = $tempDir -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
   if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
@@ -213,5 +222,5 @@ param(
   }
 
   $filePath = Get-ChocolateyWebFile $packageName $downloadFilePath $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
-  Get-ChocolateyUnzip "$filePath" $unzipLocation $specificFolder $packageName
+  Get-ChocolateyUnzip "$filePath" $unzipLocation $specificFolder $packageName -disableLogging:$disableLogging
 }

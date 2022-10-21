@@ -74,7 +74,7 @@ The following are more advanced settings:
     - Otherwise take a dependency on the specific version you need. 
  * chocolateyForceX86 = If available and set to 'true', then user has requested 32bit version. (0.9.9+)
     - Automatically handled in built in Choco functions. 
- * OS_PLATFORM = Like Windows, OSX, Linux. (0.9.9+)
+ * OS_PLATFORM = Like Windows, macOS, Linux. (0.9.9+)
  * OS_VERSION = The version of OS, like 6.1 something something for Windows. (0.9.9+)
  * OS_NAME = The reported name of the OS. (0.9.9+)
  * IS_PROCESSELEVATED = Is the process elevated? (0.9.9+)

@@ -9,7 +9,7 @@ param(
     [string]
     $TestPath = "$env:TEMP/chocolateyTests",
 
-    # Path of the nupkg to be tested. Defaults to `code_drop/nuget/chocolatey.<version>.nupkg`
+    # Path of the nupkg to be tested. Defaults to `code_drop/Packages/Chocolatey/chocolatey.<version>.nupkg`
     [ValidateScript({
             $count = (Get-Item $_).Count
             if ($count -ne 1) {
@@ -28,7 +28,7 @@ $packageRegex = 'chocolatey\.\d.*\.nupkg'
 
 # Use TstPkg as TestPackage has ValidateScript that can't be circumvented
 if (-not $TestPackage) {
-    $TstPkg = Get-ChildItem $PSScriptRoot/code_drop/nuget -Filter *.nupkg | Where-Object Name -Match $packageRegex
+    $TstPkg = Get-ChildItem $PSScriptRoot/code_drop/Packages/Chocolatey -Filter *.nupkg | Where-Object Name -Match $packageRegex
 }
 else {
     $TstPkg = Get-ChildItem $TestPackage
@@ -93,7 +93,17 @@ try {
             Verbosity = 'Minimal'
         }
         Filter     = @{
-            ExcludeTag = 'Background', 'Licensed', 'CCM', 'WIP', 'NonAdmin'
+            ExcludeTag = @(
+                'Background'
+                'Licensed'
+                'CCM'
+                'WIP'
+                'NonAdmin'
+                'Internal'
+                if (-not $env:VM_RUNNING -and -not $env:TEST_KITCHEN) {
+                    'VMOnly'
+                }
+            )
         }
     }
 

@@ -4,7 +4,7 @@ on:
   schedule:
     # Run at 10:47pm, at a random  minute to reduce load on GH Actions
     - cron:  '47 22 * * *'
-  
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -14,12 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Build with Mono
+      with:
+        fetch-depth: 0
+    - name: Cache Tools
+      uses: actions/cache@v2.1.6
+      with:
+        path: tools
+        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+    - name: Test with NUnit on Mono
       run: |
         chmod +x build.sh
-        $GITHUB_WORKSPACE//build.sh -v
-    - name: Test with Nunit on Mono
-      run: $GITHUB_WORKSPACE//test.sh integration
+        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=test --testExecutionType=all
     - name: Upload Ubuntu build results
       uses: actions/upload-artifact@v2
       # Always upload build results
@@ -27,18 +32,23 @@ jobs:
       with:
         name: ubuntu-build-results
         path: |
-          build_output/build_artifacts/tests/index.html
-          build_output/_BuildInfo.xml
-          build_output/build.log    
+          code_drop/TestResults/issues-report.html
+          code_drop/TestResults/NUnit/TestResult.xml
+          code_drop/MsBuild.log
   # Build and test on Windows
   windows-build:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
-    - name: Build with .Net Framework
-      run: .\build.bat -v
-    - name: Test with Nunit on .Net Framework
-      run: .\test.bat integration
+      with:
+        fetch-depth: 0
+    - name: Cache Tools
+      uses: actions/cache@v2.1.6
+      with:
+        path: tools
+        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+    - name: Test with NUnit on .Net Framework
+      run: .\build.bat  --verbosity=diagnostic --target=test --testExecutionType=all --shouldRunOpenCover=false
     - name: Upload Windows build results
       uses: actions/upload-artifact@v2
       # Always upload build results
@@ -46,56 +56,34 @@ jobs:
       with:
         name: windows-build-results
         path: |
-          build_output\build_artifacts\tests\index.html
-          build_output\build_artifacts\codecoverage\Html\index.htm
-          build_output\_BuildInfo.xml
-          build_output\build.log
-          code_drop\build_artifacts\ilmerge\ilmerge.log
-          code_drop\build_artifacts\ilmerge\ilmergedll.log
-    - name: Upload Windows build .nupkg
-      uses: actions/upload-artifact@v2
-      with:
-        name: windows-build-nupkg
-        path: code_drop\nuget\*.nupkg
+          code_drop\TestResults\issues-report.html
+          code_drop\TestResults\NUnit\TestResult.xml
+          code_drop\TestCoverage\lcov.info
+          code_drop\TestCoverage\OpenCover.xml
+          code_drop\MsBuild.log
   # Build and test using mono on MacOS
   macos-build:
     runs-on: macos-latest
     steps:
-     - uses: actions/checkout@v2
-     - name: Build with Mono
-       run: |
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Cache Tools
+      uses: actions/cache@v2.1.6
+      with:
+        path: tools
+        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+    - name: Test with NUnit on Mono
+      run: |
           chmod +x build.sh
-          $GITHUB_WORKSPACE//build.sh -v
-     - name: Test with Nunit on Mono
-       run: $GITHUB_WORKSPACE//test.sh integration
-     - name: Upload MacOS build results
-       uses: actions/upload-artifact@v2
-       # Always upload build results
-       if: ${{ always() }}
-       with:
-         name: macos-build-results
-         path: |
-           build_output/build_artifacts/tests/index.html
-           build_output/_BuildInfo.xml
-           build_output/build.log
-  # Build using Mono in Docker on Ubuntu
-  docker-build:
-    runs-on: ubuntu-latest
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      -
-        name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: docker/Dockerfile.linux
-          push: false
-          tags: chocolatey/choco:latest
+          $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=test --testExecutionType=all
+    - name: Upload MacOS build results
+      uses: actions/upload-artifact@v2
+      # Always upload build results
+      if: ${{ always() }}
+      with:
+        name: macos-build-results
+        path: |
+          code_drop/TestResults/issues-report.html
+          code_drop/TestResults/NUnit/TestResult.xml
+          code_drop/MsBuild.log

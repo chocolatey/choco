@@ -1,13 +1,13 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// 
+//
 // You may obtain a copy of the License at
-// 
+//
 // 	http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,12 +51,12 @@ namespace chocolatey.infrastructure.adapters
 
         /// <summary>
         /// Gets the location of the assembly as specified originally, for example, in an <see cref="T:System.Reflection.AssemblyName"/> object.
-        /// 
+        ///
         /// </summary>
-        /// 
+        ///
         /// <returns>
         /// The location of the assembly as specified originally.
-        /// 
+        ///
         /// </returns>
         /// <PermissionSet><IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/></PermissionSet>
         string CodeBase { get; }
@@ -85,6 +85,8 @@ namespace chocolatey.infrastructure.adapters
         Type GetType(String name, bool throwOnError);
 
         Type GetType(String name, bool throwOnError, bool ignoreCase);
+
+        Type[] GetTypes();
 
         /// <summary>
         ///   Loads the specified manifest resource from this assembly.

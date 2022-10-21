@@ -116,7 +116,7 @@ NOTE: For chocolatey.org, you must update the source to be secure.".format_with(
 Chocolatey will attempt to push a compiled nupkg to a package feed.
 
 NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
- with options and switches. In most cases you can still pass options and 
+ with options and switches. In most cases you can still pass options and
  switches with one dash (`-`). For more details, see
  the command reference (`choco -?`).
 
