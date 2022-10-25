@@ -448,8 +448,11 @@ namespace chocolatey.infrastructure.app.builders
                 {
                     if (!string.IsNullOrWhiteSpace(config.CommandName))
                     {
-                        // save help for next menu
+                        // The setOptions lambda above is called twice, once to set the command name, and then to execute the command with all options.
+                        // To ensure correct option of the help options, we need to reset them to false in the first execution, to then have them parsed correctly in the second
+                        // iteration.
                         config.HelpRequested = false;
+                        config.ShowOnlineHelp = false;
                         config.UnsuccessfulParsing = false;
                     }
                 },

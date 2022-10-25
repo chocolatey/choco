@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text.RegularExpressions;
     using adapters;
@@ -75,8 +76,11 @@ namespace chocolatey.infrastructure.app.configuration
             {
                 _optionSet
                     .Add("?|help|h",
-                         "Prints out the help menu.",
-                         option => configuration.HelpRequested = option != null);
+                        "Prints out the help menu.",
+                        option => configuration.HelpRequested = option != null)
+                    .Add("online",
+                        "Online - Open help for specified command in default browser application. This option only works when used in combintation with the -?/--help/-h option.",
+                        option => configuration.ShowOnlineHelp = option != null);
             }
 
             if (setOptions != null)
@@ -120,10 +124,38 @@ namespace chocolatey.infrastructure.app.configuration
 
             if (configuration.HelpRequested)
             {
+                if (configuration.ShowOnlineHelp)
+                {
+                    if (string.IsNullOrWhiteSpace(configuration.CommandName))
+                    {
+                        "chocolatey".Log().Warn("Unable to open command help as no command name has been provided.");
+                        return;
+                    }
+
+                    var targetAddress = "https://ch0.co/c/{0}".FormatWith(configuration.CommandName.ToLowerSafe());
+
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new ProcessStartInfo(targetAddress) { UseShellExecute = true });
+                    }
+                    catch (Exception)
+                    {
+                        "chocolatey".Log().Warn("There was an error while attempting to open the following URL: {0} in the default browser.".FormatWith(targetAddress));
+                    }
+
+                    return;
+                }
+
                 ShowHelp(_optionSet, helpMessage);
             }
             else
             {
+                // Only show this warning once
+                if (configuration.ShowOnlineHelp)
+                {
+                    "chocolatey".Log().Warn("The --online option has been used, without the corresponding -?/--help/-h option.  Command execution will be completed without invoking help.");
+                }
+
                 if (validateConfiguration != null)
                 {
                     validateConfiguration();

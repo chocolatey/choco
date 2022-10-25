@@ -263,6 +263,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         // top level commands
 
+        public bool ShowOnlineHelp { get; set; }
         public bool Debug { get; set; }
         public bool Verbose { get; set; }
         public bool Trace { get; set; }
