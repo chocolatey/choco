@@ -67,33 +67,32 @@ We would like to credit other super sweet tools/frameworks that aid in the devel
 
 ## Third Party Licenses - Runtime
 
-Chocolatey CLI open source uses a number of 3rd party components. Their details are below (order is alphabetical).
+Chocolatey CLI (choco) uses a number of 3rd-party components.
+Their details are below.
 
-<!-- TOC -->
+- [7-Zip @ 21.07](#7-zip--2107)
+- [AlphaFS @ 2.1.3](#alphafs--213)
+- [Checksum @ 0.2.0](#checksum--020)
+- [log4net @ 2.0.12](#log4net--2012)
+- [Microsoft.Web.Xdt @ 2.1.1](#microsoftwebxdt--211)
+- [NuGet.Core @ 2.11.0.20220901 (modified)](#nugetcore--211020220901-modified)
+- [Rhino.Licensing @ 1.4.1 (modified)](#rhinolicensing--141-modified)
+- [Rx (Reactive Extensions) @ 2.1.30214.0](#rx-reactive-extensions--21302140)
+- [Shim Generator (shimgen) @ 1.0.0](#shim-generator-shimgen--100)
+- [SimpleInjector @ 2.8.3](#simpleinjector--282)
 
-- [7-Zip](#7-zip)
-- [AlphaFS](#alphafs)
-- [Checksum](#checksum)
-- [log4net](#log4net)
-- [Microsoft.Web.Xdt](#microsoftwebxdt)
-- [NuGet.Core (modified)](#nugetcore-modified)
-- [Rhino.Licensing (modified)](#rhinolicensing-modified)
-- [Rx (Reactive Extensions)](#rx-reactive-extensions)
-- [Shim Generator (shimgen)](#shim-generator-shimgen)
-- [SimpleInjector](#simpleinjector)
+### 7-Zip @ 21.07
 
-<!-- /TOC -->
+Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives.
+[License terms](http://www.7-zip.org/license.txt):
 
-### 7-Zip
-Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives. [License terms](http://www.7-zip.org/license.txt):
-
-~~~
+```txt
   7-Zip
   ~~~~~
   License for use and distribution
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  7-Zip Copyright (C) 1999-2021 Igor Pavlov.
+  7-Zip Copyright (C) 1999-2022 Igor Pavlov.
 
   The licenses for files are:
 
@@ -178,12 +177,14 @@ Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives. [Lice
 
   --
   Igor Pavlov
-~~~
+```
 
-### AlphaFS
-Chocolatey uses [AlphaFS](https://github.com/alphaleonis/AlphaFS) for long file paths. [License terms](https://github.com/alphaleonis/AlphaFS/blob/7e597b58a5109ee820766a176ffa489c1411b6aa/LICENSE.md):
+### AlphaFS @ 2.1.3
 
-~~~
+Chocolatey uses [AlphaFS](https://github.com/alphaleonis/AlphaFS) for long file paths.
+[License terms](https://github.com/alphaleonis/AlphaFS/blob/7e597b58a5109ee820766a176ffa489c1411b6aa/LICENSE.md):
+
+```txt
   The MIT License (MIT)
   =====================
 
@@ -203,12 +204,14 @@ Chocolatey uses [AlphaFS](https://github.com/alphaleonis/AlphaFS) for long file 
   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-~~~
+```
 
-### Checksum
-Chocolatey uses [Checksum](https://github.com/ferventcoder/checksum) to determine checksums. [License terms](https://github.com/ferventcoder/checksum/blob/e6f5645610c7bc15084b48f69d4cdb056106f956/LICENSE):
+### Checksum @ 0.2.0
 
-~~~
+Chocolatey uses [Checksum](https://github.com/chocolatey/checksum) to determine checksums.
+[License terms](https://github.com/chocolatey/checksum/blob/e6f5645610c7bc15084b48f69d4cdb056106f956/LICENSE):
+
+```txt
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -386,12 +389,14 @@ Chocolatey uses [Checksum](https://github.com/ferventcoder/checksum) to determin
 
       END OF TERMS AND CONDITIONS
 
-~~~
+```
 
-### log4net
-Chocolatey uses [log4net](http://logging.apache.org/log4net/) for logging. [License terms](http://logging.apache.org/log4net/license.html):
+### log4net @ 2.0.12
 
-~~~
+Chocolatey uses [log4net](http://logging.apache.org/log4net/) for logging.
+[License terms](http://logging.apache.org/log4net/license.html):
+
+```txt
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -568,12 +573,15 @@ Chocolatey uses [log4net](http://logging.apache.org/log4net/) for logging. [Lice
       of your accepting any such warranty or additional liability.
 
       END OF TERMS AND CONDITIONS
-~~~
+```
 
-### Microsoft.Web.Xdt
-Chocolatey uses [Microsoft.Web.Xdt](https://www.nuget.org/packages/Microsoft.Web.xdt) to perform Xml Document Transformation. It is also a requirement of NuGet.Core. [License terms](https://www.microsoft.com/web/webpi/eula/microsoft_web_xmltransform.htm):
+### Microsoft.Web.Xdt @ 2.1.1
 
-~~~
+Chocolatey uses [Microsoft.Web.Xdt](https://www.nuget.org/packages/Microsoft.Web.xdt) to perform Xml Document Transformation.
+It is also a requirement of NuGet.Core.
+[License terms](https://www.microsoft.com/web/webpi/eula/microsoft_web_xmltransform.htm):
+
+```txt
   MICROSOFT SOFTWARE LICENSE TERMS
 
   MICROSOFT.WEB.XDT
@@ -675,12 +683,14 @@ Chocolatey uses [Microsoft.Web.Xdt](https://www.nuget.org/packages/Microsoft.Web
   ·         claims for breach of contract, breach of warranty, guarantee or condition, strict liability, negligence, or other tort to the extent permitted by applicable law.
 
   It also applies even if Microsoft knew or should have known about the possibility of the damages. The above limitation or exclusion may not apply to you because your country may not allow the exclusion or limitation of incidental, consequential or other damages.
-~~~
+```
 
-### NuGet.Core (modified)
-Chocolatey uses [NuGet.Core](https://github.com/NuGet/NuGet2) [(modified)](https://github.com/chocolatey/nuget-chocolatey) to work with packaging. [License terms](https://github.com/NuGet/NuGet2/blob/c3d1027a51b31fd0c41e9abbe90810cf1c924c9f/COPYRIGHT.txt):
+### NuGet.Core @ 2.11.0.20220901 (modified)
 
-~~~
+Chocolatey uses [NuGet.Core](https://github.com/NuGet/NuGet2) [(modified)](https://github.com/chocolatey/nuget-chocolatey) to work with packaging.
+[License terms](https://github.com/NuGet/NuGet2/blob/c3d1027a51b31fd0c41e9abbe90810cf1c924c9f/COPYRIGHT.txt):
+
+```txt
   Copyright 2010-2014 Outercurve Foundation
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -694,13 +704,15 @@ Chocolatey uses [NuGet.Core](https://github.com/NuGet/NuGet2) [(modified)](https
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-~~~
+```
 
-### Rhino.Licensing (modified)
-Chocolatey uses [Rhino.Licensing](https://github.com/ayende/rhino-licensing) [(modified)](https://github.com/ferventcoder/rhino-licensing) to work with licensing. [License terms](https://github.com/ayende/rhino-licensing/blob/1fc90c984b0c3012465a73afae0a53492c969eb5/license.txt):
+### Rhino.Licensing @ 1.4.1 (modified)
 
-~~~
-  Copyright (c) 2005 - 2009 Ayende Rahien (ayende@ayende.com)
+Chocolatey uses [Rhino.Licensing](https://github.com/ayende/rhino-licensing) [(modified)](https://github.com/chocolatey/rhino-licensing) to work with licensing.
+[License terms](https://github.com/ayende/rhino-licensing/blob/1fc90c984b0c3012465a73afae0a53492c969eb5/license.txt):
+
+```txt
+  Copyright (c) 2005 - 2009 Ayende Rahien (ayende @ ayende.com)
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without modification,
@@ -725,12 +737,14 @@ Chocolatey uses [Rhino.Licensing](https://github.com/ayende/rhino-licensing) [(m
   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-~~~
+```
 
-### Rx (Reactive Extensions)
-Chocolatey uses [Rx](http://reactivex.io/) for schedules and internal messaging. [License terms](https://github.com/Reactive-Extensions/Rx.NET/blob/5003248b99f8bf4afc2d4f7570b5789cedda9155/LICENSE):
+### Rx (Reactive Extensions) @ 2.1.30214.0
 
-~~~
+Chocolatey uses [Rx](http://reactivex.io/) for schedules and internal messaging.
+[License terms](https://github.com/Reactive-Extensions/Rx.NET/blob/5003248b99f8bf4afc2d4f7570b5789cedda9155/LICENSE):
+
+```txt
   Copyright (c) .NET Foundation and Contributors
   All Rights Reserved
 
@@ -745,81 +759,70 @@ Chocolatey uses [Rx](http://reactivex.io/) for schedules and internal messaging.
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
   implied. See the License for the specific language governing permissions
   and limitations under the License.
-~~~
+```
 
-### Shim Generator (shimgen)
-Chocolatey uses [shimgen](https://github.com/chocolatey/shimgen) to generate shim executables that call the original binaries. [License terms](https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/tools/shimgen.license.txt):
+### Shim Generator (shimgen) @ 1.0.0
 
-~~~
-Shim Generator - shimgen.exe
-Copyright (C) 2017 - Present Chocolatey Software, Inc ("CHOCOLATEY")
-Copyright (C) 2013 - 2017 RealDimensions Software, LLC ("RDS")
-===================================================================
-Grant of License
-===================================================================
-ATTENTION: Shim Generator ("shimgen.exe") is a closed source application with
-a proprietary license and its use is strictly limited to the terms of this 
-license agreement.
+Chocolatey uses [shimgen](https://github.com/chocolatey/shimgen) to generate shim executables that call the original binaries.
+[License terms](https://github.com/chocolatey/choco/blob/782a1cd228df548661e6c4eb5bb49b347025f85a/src/chocolatey.resources/tools/shimgen.license.txt):
 
-RealDimensions Software, LLC ("RDS") grants Chocolatey Software, Inc a revocable, 
-non-exclusive license to distribute and use shimgen.exe with the official 
-Chocolatey client (https://chocolatey.org). This license file must be stored in 
-Chocolatey source next to shimgen.exe and distributed with every copy of 
-shimgen.exe. The distribution or use of shimgen.exe outside of these terms 
-without the express written permission of RDS is strictly prohibited.
+```txt
+  Shim Generator - shimgen.exe
+  Copyright (C) 2013 - 2017 RealDimensions Software, LLC ("RDS")
+  ===================================================================
+  Grant of License
+  ===================================================================
+  You may use Shim Generator ("shimgen.exe") only with the official Chocolatey
+  client. The use of shimgen.exe for any other reason is strictly prohibited.
 
-While the source for shimgen.exe is closed source, the shims have reference 
-source at https://github.com/chocolatey/shimgen/tree/master/shim.
+  If you would like to use this software for any other reason, you must obtain a
+  personal or commercial license to do so. To do that you must contact RDS at
+  ferventcoder.com.
 
-===================================================================
-End-User License Agreement
-===================================================================
-EULA - Shim Generator
+  This software is not free to distribute apart from the Chocolatey client. If you
+  would like to distribute this software outside of use through Chocolatey, you
+  must receive written permission from the software owner.
 
-IMPORTANT- READ CAREFULLY: This RealDimensions Software, LLC ("RDS") End-User License
-Agreement ("EULA") is a legal agreement between you ("END USER") and RDS for all 
-RDS products, controls, source code, demos, intermediate files, media, printed 
-materials, and "online" or electronic documentation (collectively "SOFTWARE 
-PRODUCT(S)") contained with this distribution.
+  ===================================================================
+  End-User License Agreement
+  ===================================================================
+  EULA - Shim Generator
 
-RDS grants to you as an individual or entity, a personal, non-exclusive license 
-to install and use the SOFTWARE PRODUCT(S) for the sole purpose of use with the 
-official Chocolatey client. By installing, copying, or otherwise using the 
-SOFTWARE PRODUCT(S), END USER agrees to be bound by the terms of this EULA. If 
-END USER does not agree to any part of the terms of this EULA, DO NOT INSTALL, 
-USE, OR EVALUATE, ANY PART, FILE OR PORTION OF THE SOFTWARE PRODUCT(S).
+  IMPORTANT- READ CAREFULLY: This RealDimensions Software ("RDS") End-User License
+  Agreement ("EULA") is a legal agreement between you ("END USER") and RDS for all
+  RDS products, controls, source code, demos, intermediate files, media, printed
+  materials, and "online" or electronic documentation ("SOFTWARE PRODUCT(S)")
+  contained with this distribution.
 
-In no event shall RDS be liable to END USER for damages, including any direct, 
-indirect, special, incidental, or consequential damages of any character arising
-as a result of the use or inability to use the SOFTWARE PRODUCT(S) (including 
-but not limited to damages for loss of goodwill, work stoppage, computer failure
-or malfunction, or any and all other commercial damages or losses).
+  RDS grants to END USER as an individual, a personal, nonexclusive license to
+  install and use the SOFTWARE PRODUCT(S) for the sole purpose of use with the
+  official Chocolatey client. By installing, copying, or otherwise using the
+  SOFTWARE PRODUCT(S), END USER agrees to be bound by the terms of this EULA. If
+  END USER does not agree to any part of the terms of this EULA, DO NOT INSTALL,
+  USE, OR EVALUATE, ANY PART, FILE OR PORTION OF THE SOFTWARE PRODUCT(S).
 
-The liability of RDS to END USER for any reason and upon any cause of action 
-related to the performance of the work under this agreement whether in tort or 
-in contract or otherwise shall be limited to the amount paid by the END USER to 
-RDS pursuant to this agreement or as determined by written agreement signed 
-by both RDS and END USER.
+  ALL SOFTWARE PRODUCT(S) are licensed not sold. If END USER is an individual,
+  END USER must acquire an individual license for the SOFTWARE PRODUCT(S) from RDS
+  or its authorized resellers. If END USER is an entity, END USER must acquire an
+  individual license for each machine running the SOFTWARE PRODUCT(S) within your
+  organization from RDS or its authorized resellers. Both Virtual and Physical
+  Machines running the SOFTWARE PRODUCT(S) must be counted in the SOFTWARE
+  PRODUCT(S) licenses quantity of the organization.
 
-ALL SOFTWARE PRODUCT(S) are licensed not sold. If you are an individual, you 
-must acquire an individual license for the SOFTWARE PRODUCT(S) from RDS or its 
-authorized resellers. If you are an entity, you must acquire an individual license 
-for each machine running the SOFTWARE PRODUCT(S) within your organization from RDS 
-or its authorized resellers. Both virtual and physical machines running the SOFTWARE 
-PRODUCT(S) must be counted in the SOFTWARE PRODUCT(S) licenses quantity of the 
-organization.
+  ===================================================================
+  Commercial / Personal Licensing
+  ===================================================================
+  Shim Generator (shimgen.exe) is also offered under personal and commercial
+  licenses. You can learn more about this option by contacting RDS at
+  http://ferventcoder.com
+```
 
-===================================================================
-Commercial / Personal Licensing
-===================================================================
-Shim Generator ("shimgen.exe") is also offered under personal and commercial 
-licenses. You can learn more by contacting Chocolatey at https://chocolatey.org/contact.
-~~~
+### SimpleInjector @ 2.8.3
 
-### SimpleInjector
-Chocolatey uses [SimpleInjector](https://simpleinjector.org/) for IoC containers. [License Terms](https://github.com/simpleinjector/SimpleInjector/blob/0687195a7691363d4b4918e36b5e4d708e88253c/licence.txt):
+Chocolatey uses [SimpleInjector](https://simpleinjector.org/) for IoC containers.
+[License Terms](https://github.com/simpleinjector/SimpleInjector/blob/0687195a7691363d4b4918e36b5e4d708e88253c/licence.txt):
 
-~~~
+```txt
   Copyright (c) 2013 - 2017 Simple Injector Contributors
 
   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -836,4 +839,4 @@ Chocolatey uses [SimpleInjector](https://simpleinjector.org/) for IoC containers
   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
   DEALINGS IN THE SOFTWARE.
-~~~
+```
