@@ -280,6 +280,7 @@ Task("Create-ChocolateyNo7zip-Package")
 });
 
 Task("Prepare-NuGet-Packages")
+    .WithCriteria(() => BuildParameters.ShouldRunNuGet, "Skipping because execution of NuGet has been disabled")
     .IsDependeeOf("Create-NuGet-Packages")
     .IsDependeeOf("Sign-PowerShellScripts")
     .IsDependeeOf("Sign-Assemblies")
