@@ -316,7 +316,9 @@ BuildParameters.SetParameters(context: Context,
                             getScriptsToSign: getScriptsToSign,
                             getFilesToSign: getFilesToSign,
                             getILMergeConfigs: getILMergeConfigs,
-                            preferDotNetGlobalToolUsage: !IsRunningOnWindows());
+                            preferDotNetGlobalToolUsage: !IsRunningOnWindows(),
+                            shouldRunNuGet: IsRunningOnWindows(),
+                            shouldPublishAwsLambdas: false);
 
 ToolSettings.SetToolSettings(context: Context,
                             buildMSBuildToolVersion: MSBuildToolVersion.NET40);
