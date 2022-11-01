@@ -6,16 +6,16 @@
   - [Contributors](#contributors)
 - [Third Party Licenses - Development](#third-party-licenses---development)
 - [Third Party Licenses - Runtime](#third-party-licenses---runtime)
-  - [7-Zip](#7-zip)
-  - [AlphaFS](#alphafs)
-  - [Checksum](#checksum)
-  - [log4net](#log4net)
-  - [Microsoft.Web.Xdt](#microsoftwebxdt)
-  - [NuGet.Core (modified)](#nugetcore-modified)
-  - [Rhino.Licensing (modified)](#rhinolicensing-modified)
-  - [Rx (Reactive Extensions)](#rx-reactive-extensions)
-  - [Shim Generator (shimgen)](#shim-generator-shimgen)
-  - [SimpleInjector](#simpleinjector)
+  - [7-Zip @ 21.07](#7-zip--2107)
+  - [AlphaFS @ 2.1.3](#alphafs--213)
+  - [Checksum @ 0.2.0](#checksum--020)
+  - [log4net @ 2.0.12](#log4net--2012)
+  - [Microsoft.Web.Xdt @ 2.1.1](#microsoftwebxdt--211)
+  - [NuGet.Core @ 2.11.0.20220901 (modified)](#nugetcore--211020220901-modified)
+  - [Rhino.Licensing @ 1.4.1 (modified)](#rhinolicensing--141-modified)
+  - [Rx (Reactive Extensions) @ 2.1.30214.0](#rx-reactive-extensions--21302140)
+  - [Shim Generator (shimgen) @ 1.0.0](#shim-generator-shimgen--100)
+  - [SimpleInjector @ 2.8.3](#simpleinjector--283)
 
 <!-- /TOC -->
 
@@ -79,7 +79,7 @@ Their details are below.
 - [Rhino.Licensing @ 1.4.1 (modified)](#rhinolicensing--141-modified)
 - [Rx (Reactive Extensions) @ 2.1.30214.0](#rx-reactive-extensions--21302140)
 - [Shim Generator (shimgen) @ 1.0.0](#shim-generator-shimgen--100)
-- [SimpleInjector @ 2.8.3](#simpleinjector--282)
+- [SimpleInjector @ 2.8.3](#simpleinjector--283)
 
 ### 7-Zip @ 21.07
 
