@@ -131,12 +131,12 @@ jobs:
             "github_base_ref=${{ github.base_ref }}"
             "github_head_ref=${{ github.head_ref }}"
             "github_run_number=${{ github.run_number }}"
-  upload-code-coverage-results:
-    needs: [ubuntu-build, windows-build, macos-build]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        parallel-finished: true
+  #upload-code-coverage-results:
+  #  needs: [ubuntu-build, windows-build, macos-build]
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #  - name: Coveralls Finished
+  #    uses: coverallsapp/github-action@master
+  #    with:
+  #      github-token: ${{ secrets.GITHUB_TOKEN }}
+  #      parallel-finished: true
