@@ -66,13 +66,13 @@ jobs:
           code_drop\Packages\NuGet\*.nupkg
           code_drop\Packages\Chocolatey\*.nupkg
           code_drop\MsBuild.log
-    - uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: |
-          code_drop\TestCoverage\lcov.info
-        flag-name: run-${{ matrix.os }}
-        parallel: true
+  #  - uses: coverallsapp/github-action@master
+  #    with:
+  #      github-token: ${{ secrets.GITHUB_TOKEN }}
+  #      path-to-lcov: |
+  #        code_drop\TestCoverage\lcov.info
+  #      flag-name: run-${{ matrix.os }}
+  #      parallel: true
   # Build using mono on MacOS
   macos-build:
     runs-on: macos-latest
