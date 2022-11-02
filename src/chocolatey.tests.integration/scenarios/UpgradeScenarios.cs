@@ -1216,10 +1216,11 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            [ExpectedException(typeof(ApplicationException))]
             public void should_throw_an_error_that_it_is_not_allowed()
             {
-                Results = Service.upgrade_run(Configuration);
+                Action m = () => Service.upgrade_run(Configuration);
+
+                m.ShouldThrow<ApplicationException>();
             }
         }
 
@@ -1343,6 +1344,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.AfterObservations();
                 fileStream.Close();
+                fileStream.Dispose();
             }
 
             public override void Because()
@@ -1379,7 +1381,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1452,6 +1454,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.AfterObservations();
                 fileStream.Close();
+                fileStream.Dispose();
             }
 
             public override void Because()

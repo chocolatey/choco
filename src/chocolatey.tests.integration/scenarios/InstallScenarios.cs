@@ -754,6 +754,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.AfterObservations();
                 fileStream.Close();
+                fileStream.Dispose();
             }
 
             public override void Because()
@@ -765,7 +766,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(packageResult.InstallLocation);
             }
 
             [Fact]
@@ -773,7 +774,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -790,7 +791,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -856,6 +857,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.AfterObservations();
                 fileStream.Close();
+                fileStream.Dispose();
             }
 
             public override void Because()
