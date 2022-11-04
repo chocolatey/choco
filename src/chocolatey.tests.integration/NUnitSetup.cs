@@ -75,14 +75,14 @@ namespace chocolatey.tests.integration
             var field = typeof(ApplicationParameters).GetField("InstallLocation");
             field.SetValue(null, applicationLocation);
 
-            field = typeof(ApplicationParameters).GetField("LicenseFileLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "license", "chocolatey.license.xml"));
-
             field = typeof(ApplicationParameters).GetField("LoggingLocation");
             field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "logs"));
 
             field = typeof(ApplicationParameters).GetField("GlobalConfigFileLocation");
             field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "config", "chocolatey.config"));
+
+            field = typeof(ApplicationParameters).GetField("LicenseFileLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "license", "chocolatey.license.xml"));
 
             field = typeof(ApplicationParameters).GetField("PackagesLocation");
             field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "lib"));
@@ -98,6 +98,15 @@ namespace chocolatey.tests.integration
 
             field = typeof(ApplicationParameters).GetField("ChocolateyPackageInfoStoreLocation");
             field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, ".chocolatey"));
+
+            field = typeof(ApplicationParameters).GetField("ExtensionsLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.HooksLocation, "extensions"));
+
+            field = typeof(ApplicationParameters).GetField("TemplatesLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.HooksLocation, "templates"));
+
+            field = typeof(ApplicationParameters).GetField("HooksLocation");
+            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "hooks"));
 
             field = typeof(ApplicationParameters).GetField("LockTransactionalInstallFiles");
             field.SetValue(null, false);
