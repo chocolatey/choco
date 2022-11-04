@@ -1,4 +1,4 @@
-#load nuget:?package=Chocolatey.Cake.Recipe&version=0.18.0
+#load nuget:?package=Chocolatey.Cake.Recipe&version=0.19.0
 
 ///////////////////////////////////////////////////////////////////////////////
 // TOOLS
@@ -277,6 +277,10 @@ Task("Create-ChocolateyNo7zip-Package")
         nuspecDirectory + "chocolatey." + BuildParameters.Version.PackageVersion + ".nupkg",
         BuildParameters.Paths.Directories.ChocolateyPackages + "/chocolatey-no7zip." + BuildParameters.Version.PackageVersion + ".nupkg"
     );
+
+    // Due to the fact that we have chosen to ignore the no7zip package via the chocolateyNupkgGlobbingPattern, it will
+    // no longer be automatically uploaded via Chocolatey.Cake.Recipe, so we need to handle that work here.
+    BuildParameters.BuildProvider.UploadArtifact(BuildParameters.Paths.Directories.ChocolateyPackages + "/chocolatey-no7zip." + BuildParameters.Version.PackageVersion + ".nupkg");
 });
 
 Task("Prepare-NuGet-Packages")
@@ -319,7 +323,8 @@ BuildParameters.SetParameters(context: Context,
                             getILMergeConfigs: getILMergeConfigs,
                             preferDotNetGlobalToolUsage: !IsRunningOnWindows(),
                             shouldRunNuGet: IsRunningOnWindows(),
-                            shouldPublishAwsLambdas: false);
+                            shouldPublishAwsLambdas: false,
+                            chocolateyNupkgGlobbingPattern: "/**/chocolatey[!-no7zip]*.nupkg");
 
 ToolSettings.SetToolSettings(context: Context,
                             buildMSBuildToolVersion: MSBuildToolVersion.NET40);
