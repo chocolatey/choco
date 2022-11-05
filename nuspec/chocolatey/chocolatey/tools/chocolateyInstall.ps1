@@ -19,7 +19,8 @@ if ($null -ne $licensedAssembly) {
     $borderWidth = 70
     try {
         $borderWidth = [System.Console]::BufferWidth - 10
-    } catch {
+    }
+    catch {
         # Do nothing. This means we're in a non-interactive environment without a console attached.
     }
 
@@ -62,14 +63,14 @@ $messageBorder
 
 $modules = Get-ChildItem $toolsPath -Filter *.psm1
 $modules | ForEach-Object {
-	  $psm1File = $_.FullName
-	  $moduleName = [System.IO.Path]::GetFileNameWithoutExtension($psm1File)
+    $psm1File = $_.FullName
+    $moduleName = [System.IO.Path]::GetFileNameWithoutExtension($psm1File)
 
-	  if (Get-Module $moduleName) {
+    if (Get-Module $moduleName) {
         Remove-Module $moduleName -ErrorAction SilentlyContinue
     }
 
-	  Import-Module -Name $psm1File
+    Import-Module -Name $psm1File
 }
 
 Initialize-Chocolatey

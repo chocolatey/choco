@@ -15,7 +15,12 @@
     $license = Get-ChocolateyLicense
     # Just so we don't return the actual license for tests
     # we only specify as true if there is a license.
-    $isLicensed = if ($license) { $true } else { $false }
+    $isLicensed = if ($license) {
+        $true
+    }
+    else {
+        $false
+    }
     $is30Licensed = $isLicensed -and (Test-PackageIsEqualOrHigher 'chocolatey.extension' '3.0.0-alpha')
     $is22Licensed = $isLicensed -and ($is30Licensed -or (Test-PackageIsEqualOrHigher 'chocolatey.extension' '2.2.0-beta'))
 

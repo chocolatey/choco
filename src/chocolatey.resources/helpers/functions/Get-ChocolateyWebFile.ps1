@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Get-ChocolateyWebFile {
-<#
+    <#
 .SYNOPSIS
 Downloads a file from the internet.
 
@@ -187,203 +187,241 @@ Get-WebFileName
 .LINK
 Get-FtpFile
 #>
-param(
-  [parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [parameter(Mandatory=$true, Position=1)][string] $fileFullPath,
-  [parameter(Mandatory=$false, Position=2)][string] $url = '',
-  [parameter(Mandatory=$false, Position=3)]
-  [alias("url64")][string] $url64bit = '',
-  [parameter(Mandatory=$false)][string] $checksum = '',
-  [parameter(Mandatory=$false)][string] $checksumType = '',
-  [parameter(Mandatory=$false)][string] $checksum64 = '',
-  [parameter(Mandatory=$false)][string] $checksumType64 = $checksumType,
-  [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
-  [parameter(Mandatory=$false)][switch] $getOriginalFileName,
-  [parameter(Mandatory=$false)][switch] $forceDownload,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param(
+        [parameter(Mandatory = $true, Position = 0)][string] $packageName,
+        [parameter(Mandatory = $true, Position = 1)][string] $fileFullPath,
+        [parameter(Mandatory = $false, Position = 2)][string] $url = '',
+        [parameter(Mandatory = $false, Position = 3)]
+        [alias("url64")][string] $url64bit = '',
+        [parameter(Mandatory = $false)][string] $checksum = '',
+        [parameter(Mandatory = $false)][string] $checksumType = '',
+        [parameter(Mandatory = $false)][string] $checksum64 = '',
+        [parameter(Mandatory = $false)][string] $checksumType64 = $checksumType,
+        [parameter(Mandatory = $false)][hashtable] $options = @{Headers = @{} },
+        [parameter(Mandatory = $false)][switch] $getOriginalFileName,
+        [parameter(Mandatory = $false)][switch] $forceDownload,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  # url overrides
-  $urlOverride = $env:ChocolateyUrlOverride
-  $url64bitOverride = $env:ChocolateyUrl64bitOverride
-  if ($urlOverride -ne $null -and $urlOverride -ne '') { $url = $urlOverride }
-  if ($url64bitOverride -ne $null -and $url64bitOverride -ne '') { $url64bit = $url64bitOverride }
-
-  if ($url -ne $null) { $url = $url.Replace("//","/").Replace(":/","://") }
-  if ($url64bit -ne $null) { $url64bit = $url64bit.Replace("//","/").Replace(":/","://") }
-
-  $url32bit = $url
-
-  # allow user provided values for checksumming
-  $checksum32Override = $env:chocolateyChecksum32
-  $checksumType32Override = $env:chocolateyChecksumType32
-  $checksum64Override = $env:chocolateyChecksum64
-  $checksumType64Override = $env:chocolateyChecksumType64
-  if ($checksum32Override -ne $null -and $checksum32Override -ne '') { $checksum = $checksum32Override }
-  if ($checksumType32Override -ne $null -and $checksumType32Override -ne '') { $checksumType = $checksumType32Override }
-  if ($checksum64Override -ne $null -and $checksum64Override -ne '') { $checksum64 = $checksum64Override }
-  if ($checksumType64Override -ne $null -and $checksumType64Override -ne '') { $checksumType64 = $checksumType64Override }
-
-  $checksum32 = $checksum
-  $checksumType32 = $checksumType
-  $bitWidth = 32
-  if (Get-OSArchitectureWidth 64) {
-    $bitWidth = 64
-  }
-  Write-Debug "CPU is $bitWidth bit"
-
-  $bitPackage = ''
-  if ($url32bit -ne $url64bit -and $url64bit -ne $null -and $url64bit -ne '') { $bitPackage = '32 bit' }
-
-  if ($bitWidth -eq 64 -and $url64bit -ne $null -and $url64bit -ne '') {
-    Write-Debug "Setting url to '$url64bit' and bitPackage to $bitWidth"
-    $bitPackage = '64 bit'
-    $url = $url64bit
-    # only set if urls are different
-    if ($url32bit -ne $url64bit) {
-      $checksum = $checksum64
-      if ($checkSumType64 -ne '') {
-        $checksumType = $checksumType64
-      }
+    # url overrides
+    $urlOverride = $env:ChocolateyUrlOverride
+    $url64bitOverride = $env:ChocolateyUrl64bitOverride
+    if ($urlOverride -ne $null -and $urlOverride -ne '') {
+        $url = $urlOverride
     }
-  }
-
-  $forceX86 = $env:chocolateyForceX86;
-  if ($forceX86) {
-    Write-Debug "User specified -x86 so forcing 32 bit"
-    if ($url32bit -ne $url64bit) { $bitPackage = '32 bit' }
-    $url = $url32bit
-    $checksum =  $checksum32
-    $checksumType = $checksumType32
-  }
-
-  # If we're on 32 bit or attempting to force 32 bit and there is no
-  # 32 bit url, we need to throw an error.
-  if ($url -eq $null -or $url -eq '') {
-    throw "This package does not support $bitPackage architecture."
-  }
-
-  # determine if the url can be SSL/TLS
-  if ($url.StartsWith('http:')) {
-    try {
-      $httpsUrl = $url.Replace("http://", "https://")
-      Get-WebHeaders -Url $httpsUrl -ErrorAction "Stop" | Out-Null
-      $url = $httpsUrl
-      Write-Warning "Url has SSL/TLS available, switching to HTTPS for download"
-    } catch {
-      Write-Debug "Url does not have HTTPS available"
+    if ($url64bitOverride -ne $null -and $url64bitOverride -ne '') {
+        $url64bit = $url64bitOverride
     }
-  }
 
-  if ($getOriginalFileName) {
-    try {
-      $fileFullPath = $fileFullPath -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
-      $fileDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
-      $originalFileName = [System.IO.Path]::GetFileName($fileFullPath)
-      $fileFullPath = Get-WebFileName -Url $url -DefaultName $originalFileName
-      $fileFullPath = Join-Path $fileDirectory $fileFullPath
-      $fileFullPath = [System.IO.Path]::GetFullPath($fileFullPath)
-    } catch {
-      Write-Host "Attempt to use original download file name failed for '$url'."
+    if ($url -ne $null) {
+        $url = $url.Replace("//", "/").Replace(":/", "://")
     }
-  }
-
-  try {
-    $fileDirectory = $([System.IO.Path]::GetDirectoryName($fileFullPath))
-    if (!(Test-Path($fileDirectory))) {
-      [System.IO.Directory]::CreateDirectory($fileDirectory) | Out-Null
+    if ($url64bit -ne $null) {
+        $url64bit = $url64bit.Replace("//", "/").Replace(":/", "://")
     }
-  } catch {
-    Write-Host "Attempt to create directory failed for '$fileFullPath'."
-  }
 
-  $urlIsRemote = $true
-  $headers = @{}
-  if ($url.StartsWith('http')) {
-    try {
-      $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
-    } catch {
-      if ($PSVersionTable.PSVersion -lt (New-Object 'Version' 3,0)) {
-        Write-Debug "Converting Security Protocol to SSL3 only for PowerShell v2"
-        # this should last for the entire duration
-        $originalProtocol = [System.Net.ServicePointManager]::SecurityProtocol
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Ssl3
-        try {
-          $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
-        } catch {
-          Write-Host "Attempt to get headers for $url failed.`n  $($_.Exception.Message)"
-          [System.Net.ServicePointManager]::SecurityProtocol = $originalProtocol
+    $url32bit = $url
+
+    # allow user provided values for checksumming
+    $checksum32Override = $env:chocolateyChecksum32
+    $checksumType32Override = $env:chocolateyChecksumType32
+    $checksum64Override = $env:chocolateyChecksum64
+    $checksumType64Override = $env:chocolateyChecksumType64
+    if ($checksum32Override -ne $null -and $checksum32Override -ne '') {
+        $checksum = $checksum32Override
+    }
+    if ($checksumType32Override -ne $null -and $checksumType32Override -ne '') {
+        $checksumType = $checksumType32Override
+    }
+    if ($checksum64Override -ne $null -and $checksum64Override -ne '') {
+        $checksum64 = $checksum64Override
+    }
+    if ($checksumType64Override -ne $null -and $checksumType64Override -ne '') {
+        $checksumType64 = $checksumType64Override
+    }
+
+    $checksum32 = $checksum
+    $checksumType32 = $checksumType
+    $bitWidth = 32
+    if (Get-OSArchitectureWidth 64) {
+        $bitWidth = 64
+    }
+    Write-Debug "CPU is $bitWidth bit"
+
+    $bitPackage = ''
+    if ($url32bit -ne $url64bit -and $url64bit -ne $null -and $url64bit -ne '') {
+        $bitPackage = '32 bit'
+    }
+
+    if ($bitWidth -eq 64 -and $url64bit -ne $null -and $url64bit -ne '') {
+        Write-Debug "Setting url to '$url64bit' and bitPackage to $bitWidth"
+        $bitPackage = '64 bit'
+        $url = $url64bit
+        # only set if urls are different
+        if ($url32bit -ne $url64bit) {
+            $checksum = $checksum64
+            if ($checkSumType64 -ne '') {
+                $checksumType = $checksumType64
+            }
         }
-      } else {
-        Write-Host "Attempt to get headers for $url failed.`n  $($_.Exception.Message)"
-      }
     }
 
-    $needsDownload = $true
-    $fiCached = New-Object System.IO.FileInfo($fileFullPath)
-    if ($fiCached.Exists -and -not ($forceDownload)) {
-      if ($checksum -ne $null -and $checksum -ne '') {
-          try {
-            Write-Host "File appears to be downloaded already. Verifying with package checksum to determine if it needs to be redownloaded."
-            Get-ChecksumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType -originalUrl $url -ErrorAction "Stop"
-            $needsDownload = $false
-          } catch {
-            Write-Debug "Existing file failed checksum. Will be redownloaded from url."
-          }
-      }
-      elseif ($headers.Count -ne 0 -and $headers.ContainsKey("Content-Length")) {
-        # if the file already exists there is no reason to download it again.
-        if ($fiCached.Length -eq $headers["Content-Length"]) { $needsDownload = $false }
-      }
+    $forceX86 = $env:chocolateyForceX86;
+    if ($forceX86) {
+        Write-Debug "User specified -x86 so forcing 32 bit"
+        if ($url32bit -ne $url64bit) {
+            $bitPackage = '32 bit'
+        }
+        $url = $url32bit
+        $checksum = $checksum32
+        $checksumType = $checksumType32
     }
 
-    if ($needsDownload) {
-      Write-Host "Downloading $packageName $bitPackage
+    # If we're on 32 bit or attempting to force 32 bit and there is no
+    # 32 bit url, we need to throw an error.
+    if ($url -eq $null -or $url -eq '') {
+        throw "This package does not support $bitPackage architecture."
+    }
+
+    # determine if the url can be SSL/TLS
+    if ($url.StartsWith('http:')) {
+        try {
+            $httpsUrl = $url.Replace("http://", "https://")
+            Get-WebHeaders -Url $httpsUrl -ErrorAction "Stop" | Out-Null
+            $url = $httpsUrl
+            Write-Warning "Url has SSL/TLS available, switching to HTTPS for download"
+        }
+        catch {
+            Write-Debug "Url does not have HTTPS available"
+        }
+    }
+
+    if ($getOriginalFileName) {
+        try {
+            $fileFullPath = $fileFullPath -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+            $fileDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
+            $originalFileName = [System.IO.Path]::GetFileName($fileFullPath)
+            $fileFullPath = Get-WebFileName -Url $url -DefaultName $originalFileName
+            $fileFullPath = Join-Path $fileDirectory $fileFullPath
+            $fileFullPath = [System.IO.Path]::GetFullPath($fileFullPath)
+        }
+        catch {
+            Write-Host "Attempt to use original download file name failed for '$url'."
+        }
+    }
+
+    try {
+        $fileDirectory = $([System.IO.Path]::GetDirectoryName($fileFullPath))
+        if (!(Test-Path($fileDirectory))) {
+            [System.IO.Directory]::CreateDirectory($fileDirectory) | Out-Null
+        }
+    }
+    catch {
+        Write-Host "Attempt to create directory failed for '$fileFullPath'."
+    }
+
+    $urlIsRemote = $true
+    $headers = @{}
+    if ($url.StartsWith('http')) {
+        try {
+            $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
+        }
+        catch {
+            if ($PSVersionTable.PSVersion -lt (New-Object 'Version' 3, 0)) {
+                Write-Debug "Converting Security Protocol to SSL3 only for PowerShell v2"
+                # this should last for the entire duration
+                $originalProtocol = [System.Net.ServicePointManager]::SecurityProtocol
+                [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Ssl3
+                try {
+                    $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
+                }
+                catch {
+                    Write-Host "Attempt to get headers for $url failed.`n  $($_.Exception.Message)"
+                    [System.Net.ServicePointManager]::SecurityProtocol = $originalProtocol
+                }
+            }
+            else {
+                Write-Host "Attempt to get headers for $url failed.`n  $($_.Exception.Message)"
+            }
+        }
+
+        $needsDownload = $true
+        $fiCached = New-Object System.IO.FileInfo($fileFullPath)
+        if ($fiCached.Exists -and -not ($forceDownload)) {
+            if ($checksum -ne $null -and $checksum -ne '') {
+                try {
+                    Write-Host "File appears to be downloaded already. Verifying with package checksum to determine if it needs to be redownloaded."
+                    Get-ChecksumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType -originalUrl $url -ErrorAction "Stop"
+                    $needsDownload = $false
+                }
+                catch {
+                    Write-Debug "Existing file failed checksum. Will be redownloaded from url."
+                }
+            }
+            elseif ($headers.Count -ne 0 -and $headers.ContainsKey("Content-Length")) {
+                # if the file already exists there is no reason to download it again.
+                if ($fiCached.Length -eq $headers["Content-Length"]) {
+                    $needsDownload = $false
+                }
+            }
+        }
+
+        if ($needsDownload) {
+            Write-Host "Downloading $packageName $bitPackage
   from `'$url`'"
-      Get-WebFile -Url $url -FileName $fileFullPath -Options $options
-    } else {
-      Write-Debug "$($packageName)'s requested file has already been downloaded. Using cached copy at
+            Get-WebFile -Url $url -FileName $fileFullPath -Options $options
+        }
+        else {
+            Write-Debug "$($packageName)'s requested file has already been downloaded. Using cached copy at
  '$fileFullPath'."
+        }
     }
-  } elseif ($url.StartsWith('ftp')) {
-    Write-Host "Ftp-ing $packageName
+    elseif ($url.StartsWith('ftp')) {
+        Write-Host "Ftp-ing $packageName
   from '$url'"
-    Get-FtpFile -Url $url -FileName $fileFullPath
-  } else {
-    if ($url.StartsWith('file:')) { $url = ([uri] $url).LocalPath }
-    Write-Host "Copying $packageName
-  from `'$url`'"
-    Copy-Item $url -Destination $fileFullPath -Force
-    $urlIsRemote = $false
-  }
-
-  Start-Sleep 2 #give it a sec or two to finish up copying
-
-  $fi = New-Object System.IO.FileInfo($fileFullPath)
-  # validate file exists
-  if (!($fi.Exists)) { throw "Chocolatey expected a file to be downloaded to `'$fileFullPath`' but nothing exists at that location." }
-
-  Get-VirusCheckValid -Location $url -File $fileFullPath
-
-  if ($headers.Count -ne 0 -and ($checksum -eq $null -or $checksum -eq '')) {
-    # validate length is what we expected
-    Write-Debug "Checking that '$fileFullPath' is the size we expect it to be."
-    if ($headers.ContainsKey("Content-Length") -and ($fi.Length -ne $headers["Content-Length"]))  { throw "Chocolatey expected a file at '$fileFullPath' to be of length '$($headers["Content-Length"])' but the length was '$($fi.Length)'." }
-
-    if ($headers.ContainsKey("X-Checksum-Sha1")) {
-      $remoteChecksum = $headers["X-Checksum-Sha1"]
-      Write-Debug "Verifying remote checksum of '$remoteChecksum' for '$fileFullPath'."
-      Get-ChecksumValid -File $fileFullPath -Checksum $remoteChecksum -ChecksumType 'sha1' -OriginalUrl $url
+        Get-FtpFile -Url $url -FileName $fileFullPath
     }
-  }
+    else {
+        if ($url.StartsWith('file:')) {
+            $url = ([uri] $url).LocalPath
+        }
+        Write-Host "Copying $packageName
+  from `'$url`'"
+        Copy-Item $url -Destination $fileFullPath -Force
+        $urlIsRemote = $false
+    }
 
-  #skip requirement for embedded files if checksum is not provided
-  if ($urlIsRemote -or ($checksum -ne $null -and $checksum -ne '')) {
-    Write-Debug "Verifying package provided checksum of '$checksum' for '$fileFullPath'."
-    Get-ChecksumValid -File $fileFullPath -Checksum $checksum -ChecksumType $checksumType -OriginalUrl $url
-  }
+    Start-Sleep 2 #give it a sec or two to finish up copying
 
-  return $fileFullPath
+    $fi = New-Object System.IO.FileInfo($fileFullPath)
+    # validate file exists
+    if (!($fi.Exists)) {
+        throw "Chocolatey expected a file to be downloaded to `'$fileFullPath`' but nothing exists at that location."
+    }
+
+    Get-VirusCheckValid -Location $url -File $fileFullPath
+
+    if ($headers.Count -ne 0 -and ($checksum -eq $null -or $checksum -eq '')) {
+        # validate length is what we expected
+        Write-Debug "Checking that '$fileFullPath' is the size we expect it to be."
+        if ($headers.ContainsKey("Content-Length") -and ($fi.Length -ne $headers["Content-Length"])) {
+            throw "Chocolatey expected a file at '$fileFullPath' to be of length '$($headers["Content-Length"])' but the length was '$($fi.Length)'."
+        }
+
+        if ($headers.ContainsKey("X-Checksum-Sha1")) {
+            $remoteChecksum = $headers["X-Checksum-Sha1"]
+            Write-Debug "Verifying remote checksum of '$remoteChecksum' for '$fileFullPath'."
+            Get-ChecksumValid -File $fileFullPath -Checksum $remoteChecksum -ChecksumType 'sha1' -OriginalUrl $url
+        }
+    }
+
+    #skip requirement for embedded files if checksum is not provided
+    if ($urlIsRemote -or ($checksum -ne $null -and $checksum -ne '')) {
+        Write-Debug "Verifying package provided checksum of '$checksum' for '$fileFullPath'."
+        Get-ChecksumValid -File $fileFullPath -Checksum $checksum -ChecksumType $checksumType -OriginalUrl $url
+    }
+
+    return $fileFullPath
 }

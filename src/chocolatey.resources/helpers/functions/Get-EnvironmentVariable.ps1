@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Get-EnvironmentVariable {
-<#
+    <#
 .SYNOPSIS
 Gets an Environment Variable.
 
@@ -55,53 +55,56 @@ Get-EnvironmentVariableNames
 .LINK
 Set-EnvironmentVariable
 #>
-[CmdletBinding()]
-[OutputType([string])]
-param(
-  [Parameter(Mandatory=$true)][string] $Name,
-  [Parameter(Mandatory=$true)][System.EnvironmentVariableTarget] $Scope,
-  [Parameter(Mandatory=$false)][switch] $PreserveVariables = $false,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][string] $Name,
+        [Parameter(Mandatory = $true)][System.EnvironmentVariableTarget] $Scope,
+        [Parameter(Mandatory = $false)][switch] $PreserveVariables = $false,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  # Do not log function call, it may expose variable names
-  ## Called from chocolateysetup.psm1 - wrap any Write-Host in try/catch
+    # Do not log function call, it may expose variable names
+    ## Called from chocolateysetup.psm1 - wrap any Write-Host in try/catch
 
-  [string] $MACHINE_ENVIRONMENT_REGISTRY_KEY_NAME = "SYSTEM\CurrentControlSet\Control\Session Manager\Environment\";
-  [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey($MACHINE_ENVIRONMENT_REGISTRY_KEY_NAME)
-  if ($Scope -eq [System.EnvironmentVariableTarget]::User) {
-    [string] $USER_ENVIRONMENT_REGISTRY_KEY_NAME = "Environment";
-    [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($USER_ENVIRONMENT_REGISTRY_KEY_NAME)
-  } elseif ($Scope -eq [System.EnvironmentVariableTarget]::Process) {
-    return [Environment]::GetEnvironmentVariable($Name, $Scope)
-  }
-
-  [Microsoft.Win32.RegistryValueOptions] $registryValueOptions = [Microsoft.Win32.RegistryValueOptions]::None
-
-  if ($PreserveVariables) {
-    Write-Verbose "Choosing not to expand environment names"
-    $registryValueOptions = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
-  }
-
-  [string] $environmentVariableValue = [string]::Empty
-
-  try {
-    #Write-Verbose "Getting environment variable $Name"
-    if ($win32RegistryKey -ne $null) {
-      # Some versions of Windows do not have HKCU:\Environment
-      $environmentVariableValue = $win32RegistryKey.GetValue($Name, [string]::Empty, $registryValueOptions)
+    [string] $MACHINE_ENVIRONMENT_REGISTRY_KEY_NAME = "SYSTEM\CurrentControlSet\Control\Session Manager\Environment\";
+    [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey($MACHINE_ENVIRONMENT_REGISTRY_KEY_NAME)
+    if ($Scope -eq [System.EnvironmentVariableTarget]::User) {
+        [string] $USER_ENVIRONMENT_REGISTRY_KEY_NAME = "Environment";
+        [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($USER_ENVIRONMENT_REGISTRY_KEY_NAME)
     }
-  } catch {
-    Write-Debug "Unable to retrieve the $Name environment variable. Details: $_"
-  } finally {
-    if ($win32RegistryKey -ne $null) {
-      $win32RegistryKey.Close()
+    elseif ($Scope -eq [System.EnvironmentVariableTarget]::Process) {
+        return [Environment]::GetEnvironmentVariable($Name, $Scope)
     }
-  }
 
-  if ($environmentVariableValue -eq $null -or $environmentVariableValue -eq '') {
-    $environmentVariableValue = [Environment]::GetEnvironmentVariable($Name, $Scope)
-  }
+    [Microsoft.Win32.RegistryValueOptions] $registryValueOptions = [Microsoft.Win32.RegistryValueOptions]::None
 
-  return $environmentVariableValue
+    if ($PreserveVariables) {
+        Write-Verbose "Choosing not to expand environment names"
+        $registryValueOptions = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
+    }
+
+    [string] $environmentVariableValue = [string]::Empty
+
+    try {
+        #Write-Verbose "Getting environment variable $Name"
+        if ($win32RegistryKey -ne $null) {
+            # Some versions of Windows do not have HKCU:\Environment
+            $environmentVariableValue = $win32RegistryKey.GetValue($Name, [string]::Empty, $registryValueOptions)
+        }
+    }
+    catch {
+        Write-Debug "Unable to retrieve the $Name environment variable. Details: $_"
+    }
+    finally {
+        if ($win32RegistryKey -ne $null) {
+            $win32RegistryKey.Close()
+        }
+    }
+
+    if ($environmentVariableValue -eq $null -or $environmentVariableValue -eq '') {
+        $environmentVariableValue = [Environment]::GetEnvironmentVariable($Name, $Scope)
+    }
+
+    return $environmentVariableValue
 }

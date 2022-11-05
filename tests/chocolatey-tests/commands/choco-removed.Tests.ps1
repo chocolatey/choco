@@ -12,7 +12,7 @@ Describe "Ensuring removed things are removed" -Tag Removed, Chocolatey {
         Remove-ChocolateyTestInstall
     }
 
-    Context 'Helper function (<FunctionName>)' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0')) -Foreach @(
+    Context 'Helper function (<FunctionName>)' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0')) -ForEach @(
         @{ FunctionName = 'Write-FileUpdateLog' }
         @{ FunctionName = 'Write-ChocolateySuccess' }
         @{ FunctionName = 'Write-ChocolateyFailure' }
@@ -75,7 +75,7 @@ exit $command.Count
         }
     }
 
-    Context 'Ensure <Command> removed from Chocolatey' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0')) -Foreach @(
+    Context 'Ensure <Command> removed from Chocolatey' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0')) -ForEach @(
         @{ Command = 'update' }
         @{ Command = 'version' }
     ) {

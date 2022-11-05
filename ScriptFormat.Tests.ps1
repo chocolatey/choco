@@ -45,21 +45,31 @@ Describe "Verifying integrity of module files" {
             )
 
             if ($PSVersionTable.PSVersion.Major -lt 6) {
-                [byte[]]$byte = get-content -Encoding byte -ReadCount 4 -TotalCount 4 -Path $Path
+                [byte[]]$byte = Get-Content -Encoding byte -ReadCount 4 -TotalCount 4 -Path $Path
             }
             else {
                 [byte[]]$byte = Get-Content -AsByteStream -ReadCount 4 -TotalCount 4 -Path $Path
             }
 
-            if ($byte[0] -eq 0xef -and $byte[1] -eq 0xbb -and $byte[2] -eq 0xbf) { 'UTF8 BOM' }
-            elseif ($byte[0] -eq 0xfe -and $byte[1] -eq 0xff) { 'Unicode' }
-            elseif ($byte[0] -eq 0 -and $byte[1] -eq 0 -and $byte[2] -eq 0xfe -and $byte[3] -eq 0xff) { 'UTF32' }
-            elseif ($byte[0] -eq 0x2b -and $byte[1] -eq 0x2f -and $byte[2] -eq 0x76) { 'UTF7' }
-            else { 'Unknown' }
+            if ($byte[0] -eq 0xef -and $byte[1] -eq 0xbb -and $byte[2] -eq 0xbf) {
+                'UTF8 BOM'
+            }
+            elseif ($byte[0] -eq 0xfe -and $byte[1] -eq 0xff) {
+                'Unicode'
+            }
+            elseif ($byte[0] -eq 0 -and $byte[1] -eq 0 -and $byte[2] -eq 0xfe -and $byte[3] -eq 0xff) {
+                'UTF32'
+            }
+            elseif ($byte[0] -eq 0x2b -and $byte[1] -eq 0x2f -and $byte[2] -eq 0x76) {
+                'UTF7'
+            }
+            else {
+                'Unknown'
+            }
         }
     }
 
-    Context "Validating PowerShell file <_.FullName>" -Foreach $FilesBeingTested {
+    Context "Validating PowerShell file <_.FullName>" -ForEach $FilesBeingTested {
         BeforeAll {
             $FileUnderTest = $_
         }

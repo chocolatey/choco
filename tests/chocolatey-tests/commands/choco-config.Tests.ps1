@@ -146,7 +146,12 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
         It "Displays Available Sources <Name> - <Source>" -ForEach @(
             @{
                 Name   = "chocolatey"
-                Source = if (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta") { "https://community.chocolatey.org/api/v2/" } else { "https://chocolatey.org/api/v2/" }
+                Source = if (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta") {
+                    "https://community.chocolatey.org/api/v2/"
+                }
+                else {
+                    "https://chocolatey.org/api/v2/"
+                }
             }
         ) {
             $Output.String | Should -MatchExactly "$Name( \[Disabled\])? - $([Regex]::Escape($Source))\s*\|"

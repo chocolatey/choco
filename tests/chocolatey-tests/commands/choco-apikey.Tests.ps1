@@ -171,7 +171,6 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         It "Removed apikey do not exist in file" -Skip {
             $config = $apiKeys.Where{ $_.source -eq "https://remove.test.com/api" }
             $config | Should -BeNullOrEmpty
-
         }
     }
 

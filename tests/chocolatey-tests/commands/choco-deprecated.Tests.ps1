@@ -22,7 +22,7 @@ Describe "choco deprecated shims" -Skip:(-not (Test-ChocolateyVersionEqualOrHigh
         )
     }
 
-    Context 'help for command <Command> mentions that <Deprecation> is deprecated' -Foreach $DeprecatedShims {
+    Context 'help for command <Command> mentions that <Deprecation> is deprecated' -ForEach $DeprecatedShims {
         BeforeAll {
             # -? needs to be wrapped in quotes or PowerShell consumes it on us.
             $Output = Invoke-Choco $Command "-?"

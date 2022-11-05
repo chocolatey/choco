@@ -1,7 +1,7 @@
-function Get-TempDirectory {
-  <#
+﻿function Get-TempDirectory {
+    <#
       .SYNOPSIS
           Returns the temporary directory.
   #>
-  [System.IO.Path]::GetTempPath()
+    [System.IO.Path]::GetTempPath()
 }

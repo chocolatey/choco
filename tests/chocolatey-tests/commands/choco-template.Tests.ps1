@@ -5,7 +5,6 @@ Describe "choco <_>" -ForEach @(
     "templates"
 ) -Tag Chocolatey, TemplateCommand {
     BeforeDiscovery {
-
     }
 
     BeforeAll {
@@ -116,7 +115,7 @@ Describe "choco <_>" -ForEach @(
             $Output.Lines | Should -Contain 'List of Parameters:'
         }
 
-        It "Displays parameter name <_>" -Foreach @('PackageNameLower'; 'PackageVersion'; 'MaintainerRepo'; 'MaintainerName'; 'PackageName'; 'AutomaticPackageNotesNuspec'; 'AutomaticPackageNotesInstaller'; 'Url'; 'Url64'; 'Checksum'; 'Checksum64'; 'SilentArgs') {
+        It "Displays parameter name <_>" -ForEach @('PackageNameLower'; 'PackageVersion'; 'MaintainerRepo'; 'MaintainerName'; 'PackageName'; 'AutomaticPackageNotesNuspec'; 'AutomaticPackageNotesInstaller'; 'Url'; 'Url64'; 'Checksum'; 'Checksum64'; 'SilentArgs') {
             $Output.Lines | Should -Contain $_
         }
 
@@ -241,9 +240,9 @@ Describe "choco <_>" -ForEach @(
             }
         }
 
-        It "Displays <Name> template information for files" -Foreach @(
+        It "Displays <Name> template information for files" -ForEach @(
             @{
-                Name = 'msi'
+                Name  = 'msi'
                 Files = @(
                     'msi\msi.nuspec'
                     'msi\ReadMe.md'
@@ -255,7 +254,7 @@ Describe "choco <_>" -ForEach @(
                 )
             }
             @{
-                Name = 'zip'
+                Name  = 'zip'
                 Files = @(
                     'zip\zip.nuspec'
                     'zip\ReadMe.md'
@@ -280,19 +279,19 @@ Describe "choco <_>" -ForEach @(
             $items | Should -HaveCount 2 -Because $Output.String
         }
 
-        It "Displays parameter name <_>" -Foreach @('PackageNameLower'; 'PackageVersion'; 'MaintainerRepo'; 'MaintainerName'; 'PackageName'; 'AutomaticPackageNotesNuspec'; 'AutomaticPackageNotesInstaller'; 'Url'; 'Url64'; 'Checksum'; 'Checksum64') {
+        It "Displays parameter name <_>" -ForEach @('PackageNameLower'; 'PackageVersion'; 'MaintainerRepo'; 'MaintainerName'; 'PackageName'; 'AutomaticPackageNotesNuspec'; 'AutomaticPackageNotesInstaller'; 'Url'; 'Url64'; 'Checksum'; 'Checksum64') {
             $parameter = $_
             $items = $Output.Lines | Where-Object { $_ -eq $parameter }
             $items | Should -HaveCount 2 -Because $Output.String
         }
 
-        It "Displays parameter name <_>" -Foreach @('SilentArgs') {
+        It "Displays parameter name <_>" -ForEach @('SilentArgs') {
             $parameter = $_
             $items = $Output.Lines | Where-Object { $_ -eq $parameter }
             $items | Should -HaveCount 1 -Because $Output.String
         }
 
-        It "Created parameters file for <_>" -Foreach @('msi', 'zip') {
+        It "Created parameters file for <_>" -ForEach @('msi', 'zip') {
             "$env:ChocolateyInstall\templates\$_\.parameters" | Should -Exist
         }
     }

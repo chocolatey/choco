@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Set-EnvironmentVariable {
-<#
+    <#
 .SYNOPSIS
 **NOTE:** Administrative Access Required when `-Scope 'Machine'.`
 
@@ -55,73 +55,74 @@ Install-ChocolateyPath
 .LINK
 Get-EnvironmentVariable
 #>
-param (
-  [parameter(Mandatory=$true, Position=0)][string] $Name,
-  [parameter(Mandatory=$false, Position=1)][string] $Value,
-  [parameter(Mandatory=$false, Position=2)]
-  [System.EnvironmentVariableTarget] $Scope,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param (
+        [parameter(Mandatory = $true, Position = 0)][string] $Name,
+        [parameter(Mandatory = $false, Position = 1)][string] $Value,
+        [parameter(Mandatory = $false, Position = 2)]
+        [System.EnvironmentVariableTarget] $Scope,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  if ($Scope -eq [System.EnvironmentVariableTarget]::Process -or $Value -eq $null -or $Value -eq '') {
-    return [Environment]::SetEnvironmentVariable($Name, $Value, $Scope)
-  }
-
-  [string]$keyHive = 'HKEY_LOCAL_MACHINE'
-  [string]$registryKey = "SYSTEM\CurrentControlSet\Control\Session Manager\Environment\"
-  [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey($registryKey)
-  if ($Scope -eq [System.EnvironmentVariableTarget]::User) {
-    $keyHive = 'HKEY_CURRENT_USER'
-    $registryKey = "Environment"
-    [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($registryKey)
-  }
-
-  [Microsoft.Win32.RegistryValueKind]$registryType = [Microsoft.Win32.RegistryValueKind]::String
-  try {
-    if ($win32RegistryKey.GetValueNames() -contains $Name)
-    {
-      $registryType = $win32RegistryKey.GetValueKind($Name)
+    if ($Scope -eq [System.EnvironmentVariableTarget]::Process -or $Value -eq $null -or $Value -eq '') {
+        return [Environment]::SetEnvironmentVariable($Name, $Value, $Scope)
     }
-  } catch {
-    # the value doesn't yet exist
-    # move along, nothing to see here
-  }
-  Write-Debug "Registry type for $Name is/will be $registryType"
 
-  if ($Name -eq 'PATH') {
-    $registryType = [Microsoft.Win32.RegistryValueKind]::ExpandString
-  }
+    [string]$keyHive = 'HKEY_LOCAL_MACHINE'
+    [string]$registryKey = "SYSTEM\CurrentControlSet\Control\Session Manager\Environment\"
+    [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey($registryKey)
+    if ($Scope -eq [System.EnvironmentVariableTarget]::User) {
+        $keyHive = 'HKEY_CURRENT_USER'
+        $registryKey = "Environment"
+        [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($registryKey)
+    }
 
-  [Microsoft.Win32.Registry]::SetValue($keyHive + "\" + $registryKey, $Name, $Value, $registryType)
+    [Microsoft.Win32.RegistryValueKind]$registryType = [Microsoft.Win32.RegistryValueKind]::String
+    try {
+        if ($win32RegistryKey.GetValueNames() -contains $Name) {
+            $registryType = $win32RegistryKey.GetValueKind($Name)
+        }
+    }
+    catch {
+        # the value doesn't yet exist
+        # move along, nothing to see here
+    }
+    Write-Debug "Registry type for $Name is/will be $registryType"
 
-  try {
-    # make everything refresh
-    # because sometimes explorer.exe just doesn't get the message that things were updated.
-    if (-not ("win32.nativemethods" -as [type])) {
-        # import sendmessagetimeout from win32
-        add-type -Namespace Win32 -Name NativeMethods -MemberDefinition @"
+    if ($Name -eq 'PATH') {
+        $registryType = [Microsoft.Win32.RegistryValueKind]::ExpandString
+    }
+
+    [Microsoft.Win32.Registry]::SetValue($keyHive + "\" + $registryKey, $Name, $Value, $registryType)
+
+    try {
+        # make everything refresh
+        # because sometimes explorer.exe just doesn't get the message that things were updated.
+        if (-not ("win32.nativemethods" -as [type])) {
+            # import sendmessagetimeout from win32
+            Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @"
 [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
 public static extern IntPtr SendMessageTimeout(
     IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
     uint fuFlags, uint uTimeout, out UIntPtr lpdwResult);
 "@
+        }
+
+        $HWND_BROADCAST = [intptr]0xffff;
+        $WM_SETTINGCHANGE = 0x1a;
+        $result = [uintptr]::zero
+
+        # notify all windows of environment block change
+        [win32.nativemethods]::SendMessageTimeout($HWND_BROADCAST, $WM_SETTINGCHANGE, [uintptr]::Zero, "Environment", 2, 5000, [ref]$result) | Out-Null
+
+        # Set a user environment variable making the system refresh
+        $setx = "$($env:SystemRoot)\System32\setx.exe"
+        & "$setx" ChocolateyLastPathUpdate `"$((Get-Date).ToFileTime())`" | Out-Null
+    }
+    catch {
+        Write-Warning "Failure attempting to let Explorer know about updated environment settings.`n  $($_.Exception.Message)"
     }
 
-    $HWND_BROADCAST = [intptr]0xffff;
-    $WM_SETTINGCHANGE = 0x1a;
-    $result = [uintptr]::zero
-
-    # notify all windows of environment block change
-    [win32.nativemethods]::SendMessageTimeout($HWND_BROADCAST, $WM_SETTINGCHANGE,  [uintptr]::Zero, "Environment", 2, 5000, [ref]$result) | Out-Null
-
-    # Set a user environment variable making the system refresh
-    $setx = "$($env:SystemRoot)\System32\setx.exe"
-    & "$setx" ChocolateyLastPathUpdate `"$((Get-Date).ToFileTime())`" | Out-Null
-  } catch {
-    Write-Warning "Failure attempting to let Explorer know about updated environment settings.`n  $($_.Exception.Message)"
-  }
-
-  Update-SessionEnvironment
+    Update-SessionEnvironment
 }
