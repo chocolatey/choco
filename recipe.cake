@@ -16,7 +16,7 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
 {
     var mergeConfigs = new List<ILMergeConfig>();
 
-    var targetPlatform = "v4,C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.0";
+    var targetPlatform = "v4,C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.8";
     var assembliesToILMerge = GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/*.{exe|dll}")
                             - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/choco.exe")
                             - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/System.Management.Automation.dll");
@@ -326,8 +326,7 @@ BuildParameters.SetParameters(context: Context,
                             shouldPublishAwsLambdas: false,
                             chocolateyNupkgGlobbingPattern: "/**/chocolatey[!-no7zip]*.nupkg");
 
-ToolSettings.SetToolSettings(context: Context,
-                            buildMSBuildToolVersion: MSBuildToolVersion.NET40);
+ToolSettings.SetToolSettings(context: Context);
 
 BuildParameters.PrintParameters(Context);
 
