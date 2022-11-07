@@ -88,7 +88,7 @@ Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICEN
  * If you are having issue with a package, please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process).
  * If you are looking for packages to be added to the community feed (aka https://community.chocolatey.org/packages), please see [Package Requests](https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process#package-request-package-missing).
 
- 1. Start with [Troubleshooting](https://github.com/chocolatey/choco/wiki/Troubleshooting) and the [FAQ](https://github.com/chocolatey/choco/wiki/ChocolateyFAQs) to see if your question or issue already has an answer.
+ 1. Start with [Troubleshooting](https://docs.chocolatey.org/en-us/troubleshooting) and the [FAQ](https://docs.chocolatey.org/en-us/faqs) to see if your question or issue already has an answer.
  1. If not found or resolved, please follow one of the following avenues:
     * If you are a licensed customer, please see [support](https://chocolatey.org/support). You can also log an issue to [Licensed Issues](https://github.com/chocolatey/chocolatey-licensed-issues) and we will submit issues to all other places on your behalf. Another avenue is to use email support to have us submit tickets and other avenues on your behalf (allowing you to maintain privacy).
     * If it is an enhancement request or issue with the website (the community package repository aka [https://community.chocolatey.org](https://community.chocolatey.org)), please submit the issue to the [Chocolatey.org repo](https://github.com/chocolatey/home).
