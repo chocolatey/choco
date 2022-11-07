@@ -85,7 +85,10 @@ namespace chocolatey.infrastructure.app.registration
             try
             {
                 var types = assembly.get_loadable_types()
-                    .Where(t => t.IsClass && !t.IsAbstract && typeof(ICommand).IsAssignableFrom(t) && t.GetCustomAttribute<CommandForAttribute>() != null);
+                    .Where(t => t.IsClass &&
+                                !t.IsAbstract &&
+                                typeof(ICommand).IsAssignableFrom(t) &&
+                                t.GetCustomAttributes<CommandForAttribute>().Any()).ToList();
 
                 foreach (var t in types)
                 {
@@ -114,7 +117,7 @@ namespace chocolatey.infrastructure.app.registration
                 return;
             }
 
-            var commandForAttribute = commandType.GetCustomAttribute<CommandForAttribute>();
+            var commandForAttribute = commandType.GetCustomAttributes<CommandForAttribute>().FirstOrDefault();
 
             if (commandForAttribute == null)
             {
