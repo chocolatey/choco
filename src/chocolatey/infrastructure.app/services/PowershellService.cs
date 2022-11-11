@@ -463,6 +463,7 @@ namespace chocolatey.infrastructure.app.services
 
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageName, package.Identity.Id);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.PackageName, package.Identity.Id);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageId, package.Identity.Id);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageTitle, package.Title);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.PackageTitle, package.Title);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageVersion, package.Identity.Version.ToNormalizedStringChecked());
