@@ -15,11 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.resources", "cho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.tests.integration", "chocolatey.tests.integration\chocolatey.tests.integration.csproj", "{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7A36F8E0-B170-4A51-A788-F1246513808A}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{FB6236DD-17EF-4C36-943C-47792FBC3306}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chocolatey", "chocolatey", "{DAB29F30-149D-4005-A8D2-4FA56CF2784D}"
