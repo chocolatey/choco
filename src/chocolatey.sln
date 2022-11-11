@@ -15,23 +15,24 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.resources", "cho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.tests.integration", "chocolatey.tests.integration\chocolatey.tests.integration.csproj", "{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{FB6236DD-17EF-4C36-943C-47792FBC3306}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuspec", "nuspec", "{FB6236DD-17EF-4C36-943C-47792FBC3306}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chocolatey", "chocolatey", "{DAB29F30-149D-4005-A8D2-4FA56CF2784D}"
 	ProjectSection(SolutionItems) = preProject
-		..\nuget\chocolatey\chocolatey.nuspec = ..\nuget\chocolatey\chocolatey.nuspec
+		..\nuspec\chocolatey\chocolatey\chocolatey.nuspec = ..\nuspec\chocolatey\chocolatey\chocolatey.nuspec
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E5C987F8-6B95-4835-BBDD-A25C9D370BB9}"
 	ProjectSection(SolutionItems) = preProject
-		..\nuget\chocolatey\tools\chocolateyInstall.ps1 = ..\nuget\chocolatey\tools\chocolateyInstall.ps1
-		..\nuget\chocolatey\tools\chocolateysetup.psm1 = ..\nuget\chocolatey\tools\chocolateysetup.psm1
-		..\nuget\chocolatey\tools\init.ps1 = ..\nuget\chocolatey\tools\init.ps1
+		..\nuspec\chocolatey\chocolatey\tools\chocolateyInstall.ps1 = ..\nuspec\chocolatey\chocolatey\tools\chocolateyInstall.ps1
+		..\nuspec\chocolatey\chocolatey\tools\chocolateysetup.psm1 = ..\nuspec\chocolatey\chocolatey\tools\chocolateysetup.psm1
+		..\nuspec\chocolatey\chocolatey\tools\init.ps1 = ..\nuspec\chocolatey\chocolatey\tools\init.ps1
+		..\nuspec\chocolatey\chocolatey\tools\VERIFICATION.txt = ..\nuspec\chocolatey\chocolatey\tools\VERIFICATION.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chocolatey.lib", "chocolatey.lib", "{DD9689F3-1D2D-41AE-A672-063EE70C0C9A}"
 	ProjectSection(SolutionItems) = preProject
-		..\nuget\chocolatey.lib\chocolatey.lib.nuspec = ..\nuget\chocolatey.lib\chocolatey.lib.nuspec
+		..\nuspec\nuget\chocolatey.lib\chocolatey.lib.nuspec = ..\nuspec\nuget\chocolatey.lib\chocolatey.lib.nuspec
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "toplevel", "toplevel", "{18FEFF9F-7352-4230-8B4E-E8D8BE976095}"
@@ -40,6 +41,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "toplevel", "toplevel", "{18
 		..\CONTRIBUTING.md = ..\CONTRIBUTING.md
 		..\README.md = ..\README.md
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{9AF88603-3E34-4B68-9B69-B0F1967A86BC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chocolatey", "chocolatey", "{4795798A-2F92-467A-88FC-772E66BF8E57}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -195,9 +200,11 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{5C4C60F0-47B1-498E-ABF7-D315E1A94BC9} = {7656D054-387D-409C-A9FB-62A44599AA77}
 		{12ECAD4F-D463-4D72-A792-A4FCCFE9C456} = {7656D054-387D-409C-A9FB-62A44599AA77}
-		{DAB29F30-149D-4005-A8D2-4FA56CF2784D} = {FB6236DD-17EF-4C36-943C-47792FBC3306}
+		{DAB29F30-149D-4005-A8D2-4FA56CF2784D} = {4795798A-2F92-467A-88FC-772E66BF8E57}
 		{E5C987F8-6B95-4835-BBDD-A25C9D370BB9} = {DAB29F30-149D-4005-A8D2-4FA56CF2784D}
-		{DD9689F3-1D2D-41AE-A672-063EE70C0C9A} = {FB6236DD-17EF-4C36-943C-47792FBC3306}
+		{DD9689F3-1D2D-41AE-A672-063EE70C0C9A} = {9AF88603-3E34-4B68-9B69-B0F1967A86BC}
+		{9AF88603-3E34-4B68-9B69-B0F1967A86BC} = {FB6236DD-17EF-4C36-943C-47792FBC3306}
+		{4795798A-2F92-467A-88FC-772E66BF8E57} = {FB6236DD-17EF-4C36-943C-47792FBC3306}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {998CAC46-A2B8-447C-B4CC-3B11DC35ED46}
