@@ -38,8 +38,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "toplevel", "toplevel", "{18FEFF9F-7352-4230-8B4E-E8D8BE976095}"
 	ProjectSection(SolutionItems) = preProject
 		..\CHANGELOG.md = ..\CHANGELOG.md
+		..\CHANGELOG_LICENSED.md = ..\CHANGELOG_LICENSED.md
+		..\COMMITTERS.md = ..\COMMITTERS.md
 		..\CONTRIBUTING.md = ..\CONTRIBUTING.md
 		..\README.md = ..\README.md
+		..\TESTING.md = ..\TESTING.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{9AF88603-3E34-4B68-9B69-B0F1967A86BC}"
