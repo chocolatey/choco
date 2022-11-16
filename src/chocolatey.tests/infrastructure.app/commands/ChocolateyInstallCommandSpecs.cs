@@ -30,6 +30,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyInstallCommandSpecs
     {
+        [ConcernFor("install")]
         public abstract class ChocolateyInstallCommandSpecsBase : TinySpec
         {
             protected ChocolateyInstallCommand command;

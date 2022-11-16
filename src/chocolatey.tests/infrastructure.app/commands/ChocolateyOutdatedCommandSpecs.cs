@@ -28,6 +28,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyOutdatedCommandSpecs
     {
+        [ConcernFor("outdated")]
         public abstract class ChocolateyOutdatedCommandSpecsBase : TinySpec
         {
             protected ChocolateyOutdatedCommand command;

@@ -30,6 +30,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyPushCommandSpecs
     {
+        [ConcernFor("push")]
         public abstract class ChocolateyPushCommandSpecsBase : TinySpec
         {
             protected ChocolateyPushCommand command;

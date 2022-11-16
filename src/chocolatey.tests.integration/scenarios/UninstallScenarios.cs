@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,7 @@ namespace chocolatey.tests.integration.scenarios
 
     public class UninstallScenarios
     {
+        [ConcernFor("uninstall")]
         public abstract class ScenariosBase : TinySpec
         {
             protected ConcurrentDictionary<string, PackageResult> Results;

@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+[assembly: chocolatey.tests.Integration]
+
 namespace chocolatey.tests.integration
 {
     using System;

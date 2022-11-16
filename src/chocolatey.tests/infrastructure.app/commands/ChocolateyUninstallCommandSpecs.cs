@@ -30,6 +30,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyUninstallCommandSpecs
     {
+        [ConcernFor("uninstall")]
         public abstract class ChocolateyUninstallCommandSpecsBase : TinySpec
         {
             protected ChocolateyUninstallCommand command;

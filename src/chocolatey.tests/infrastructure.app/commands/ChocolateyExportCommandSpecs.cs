@@ -30,6 +30,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyExportCommandSpecs
     {
+        [ConcernFor("export")]
         public abstract class ChocolateyExportCommandSpecsBase : TinySpec
         {
             protected ChocolateyExportCommand command;

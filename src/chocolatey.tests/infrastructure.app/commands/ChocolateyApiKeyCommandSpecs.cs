@@ -29,6 +29,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyApiKeyCommandSpecs
     {
+        [ConcernFor("apikey")]
         public abstract class ChocolateyApiKeyCommandSpecsBase : TinySpec
         {
             protected ChocolateyApiKeyCommand command;

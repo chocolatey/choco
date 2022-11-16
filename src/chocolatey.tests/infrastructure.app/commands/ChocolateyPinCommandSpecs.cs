@@ -33,6 +33,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyPinCommandSpecs
     {
+        [ConcernFor("pin")]
         public abstract class ChocolateyPinCommandSpecsBase : TinySpec
         {
             protected ChocolateyPinCommand command;
