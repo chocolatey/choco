@@ -46,6 +46,7 @@ namespace chocolatey.tests.integration.infrastructure.app.services
             }
         }
 
+        [SetCulture("en"), SetUICulture("en")]
         public class when_FilesService_encounters_locked_files : FilesServiceSpecsBase
         {
             private PackageFiles _result;
