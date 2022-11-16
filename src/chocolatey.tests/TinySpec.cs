@@ -120,13 +120,11 @@ namespace chocolatey.tests
     }
 
 
-    public class ConcernForAttribute : Attribute
+    public class ConcernForAttribute : CategoryAttribute
     {
-        public string Name { get; set; }
-
         public ConcernForAttribute(string name)
+            : base("ConcernFor - {0}".format_with(name))
         {
-            Name = name;
         }
     }
 
