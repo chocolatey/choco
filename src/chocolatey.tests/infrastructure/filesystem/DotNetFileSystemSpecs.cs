@@ -120,10 +120,11 @@ namespace chocolatey.tests.infrastructure.filesystem
             }
 
             [Fact]
-            [ExpectedException(typeof(ApplicationException), MatchType = MessageMatch.StartsWith, ExpectedMessage = "Cannot combine a path with")]
             public void Combine_should_error_if_any_path_but_the_primary_contains_colon()
             {
-                FileSystem.combine_paths("C:\\temp", "C:");
+                Assert.That(() => FileSystem.combine_paths("C:\\temp", "C:"),
+                    Throws.TypeOf<ApplicationException>()
+                          .And.Message.StartsWith("Cannot combine a path with"));
             }
         }
 

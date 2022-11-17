@@ -33,6 +33,7 @@ namespace chocolatey.tests.integration.scenarios
 
     public class InstallScenarios
     {
+        [ConcernFor("install")]
         public abstract class ScenariosBase : TinySpec
         {
             protected ConcurrentDictionary<string, PackageResult> Results;
@@ -72,7 +73,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -121,7 +122,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -162,7 +163,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(packageResult.InstallLocation);
             }
 
             [Fact]
@@ -170,7 +171,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -188,7 +189,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
 
-                File.Exists(shimfile).ShouldBeTrue();
+                FileAssert.Exists(shimfile);
             }
 
             [Fact]
@@ -198,7 +199,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
 
-                File.Exists(shimfile).ShouldBeTrue();
+                FileAssert.Exists(shimfile);
             }
 
             [Fact]
@@ -206,7 +207,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "not.installed.exe");
 
-                File.Exists(shimfile).ShouldBeFalse();
+                FileAssert.DoesNotExist(shimfile);
             }
 
             [Fact]
@@ -214,7 +215,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "casemismatch.exe");
 
-                File.Exists(shimfile).ShouldBeFalse();
+                FileAssert.DoesNotExist(shimfile);
             }
 
             [Fact]
@@ -222,7 +223,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
 
-                Directory.Exists(extensionsDirectory).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(extensionsDirectory);
             }
 
             [Fact]
@@ -230,7 +231,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames);
 
-                Directory.Exists(hooksDirectory).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(hooksDirectory);
             }
 
             [Fact]
@@ -363,7 +364,7 @@ namespace chocolatey.tests.integration.scenarios
                 {
                     if (packageResult.Value.Name.is_equal_to("missingpackage")) continue;
 
-                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
             }
 
@@ -380,7 +381,7 @@ namespace chocolatey.tests.integration.scenarios
                 foreach (var package in packagesExpected)
                 {
                     var packageDir = Path.Combine(Scenario.get_top_level(), "lib", package);
-                    Directory.Exists(packageDir).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageDir);
                 }
             }
 
@@ -389,7 +390,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -502,7 +503,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -577,7 +578,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(packageResult.InstallLocation);
             }
 
             [Fact]
@@ -585,7 +586,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -608,7 +609,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -700,7 +701,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -754,6 +755,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.AfterObservations();
                 fileStream.Close();
+                fileStream.Dispose();
             }
 
             public override void Because()
@@ -765,7 +767,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(packageResult.InstallLocation);
             }
 
             [Fact]
@@ -773,7 +775,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -790,7 +792,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -856,6 +858,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.AfterObservations();
                 fileStream.Close();
+                fileStream.Dispose();
             }
 
             public override void Because()
@@ -869,7 +872,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -886,7 +889,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -943,7 +946,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1034,7 +1037,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1121,7 +1124,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1129,7 +1132,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1215,7 +1218,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(packageResult.InstallLocation);
             }
 
             [Fact]
@@ -1223,7 +1226,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.Input);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1303,7 +1306,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1311,7 +1314,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1394,7 +1397,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(packageResult.InstallLocation);
             }
 
             [Fact]
@@ -1402,7 +1405,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames) + ".1.0.0";
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1485,7 +1488,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(packageResult.InstallLocation);
             }
 
             [Fact]
@@ -1493,7 +1496,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames) + ".1.0.0";
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1561,7 +1564,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(packageResult.InstallLocation);
             }
 
             [Fact]
@@ -1569,7 +1572,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1636,7 +1639,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
             }
 
@@ -1645,7 +1648,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1653,7 +1656,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1738,7 +1741,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
             }
 
@@ -1747,7 +1750,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1763,7 +1766,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1849,7 +1852,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
             }
 
@@ -1858,7 +1861,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1874,7 +1877,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1959,7 +1962,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
             }
 
@@ -1968,7 +1971,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1984,7 +1987,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2070,7 +2073,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
             }
 
@@ -2079,7 +2082,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2094,14 +2097,14 @@ namespace chocolatey.tests.integration.scenarios
             public void should_remove_the_floating_dependency()
             {
                 var dependency = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
-                Directory.Exists(dependency).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(dependency);
             }
 
             [Fact]
             public void should_remove_the_exact_dependency()
             {
                 var dependency = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency");
-                Directory.Exists(dependency).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(dependency);
             }
 
             [Fact]
@@ -2163,7 +2166,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -2171,7 +2174,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -2273,7 +2276,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(packageResult.InstallLocation);
             }
 
             [Fact]
@@ -2281,7 +2284,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2297,7 +2300,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -2360,7 +2363,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
             }
 
@@ -2369,7 +2372,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2385,7 +2388,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2458,7 +2461,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -2524,7 +2527,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
             }
 
@@ -2533,7 +2536,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2608,7 +2611,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -2721,7 +2724,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
             }
 
@@ -2730,7 +2733,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2806,7 +2809,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
             }
 
@@ -2816,7 +2819,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -2932,7 +2935,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -3037,7 +3040,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    Directory.Exists(packageResult.Value.InstallLocation).ShouldBeTrue();
+                    DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
             }
 
@@ -3047,7 +3050,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -3056,7 +3059,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "childdependencywithlooserversiondependency");
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -3140,7 +3143,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(packageResult.InstallLocation);
             }
 
             [Fact]
@@ -3148,7 +3151,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "installpackage");
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -3166,7 +3169,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
 
-                File.Exists(shimfile).ShouldBeTrue();
+                FileAssert.Exists(shimfile);
             }
 
             [Fact]
@@ -3176,7 +3179,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
 
-                File.Exists(shimfile).ShouldBeTrue();
+                FileAssert.Exists(shimfile);
             }
 
             [Fact]
@@ -3184,7 +3187,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "not.installed.exe");
 
-                File.Exists(shimfile).ShouldBeFalse();
+                FileAssert.DoesNotExist(shimfile);
             }
 
             [Fact]
@@ -3192,7 +3195,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "casemismatch.exe");
 
-                File.Exists(shimfile).ShouldBeFalse();
+                FileAssert.DoesNotExist(shimfile);
             }
 
             [Fact]
@@ -3200,7 +3203,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", "installpackage");
 
-                Directory.Exists(extensionsDirectory).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(extensionsDirectory);
             }
 
             [Fact]
@@ -3208,7 +3211,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", "installpackage");
 
-                Directory.Exists(hooksDirectory).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(hooksDirectory);
             }
 
             [Fact]
@@ -3442,7 +3445,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -3458,7 +3461,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
 
-                Directory.Exists(extensionsDirectory).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(extensionsDirectory);
             }
 
             [Fact]
@@ -3466,7 +3469,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty));
 
-                Directory.Exists(hooksDirectory).ShouldBeTrue();
+                DirectoryAssert.Exists(hooksDirectory);
             }
 
             [Fact]
@@ -3545,7 +3548,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
             }
 
             [Fact]
@@ -3553,7 +3556,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -3571,7 +3574,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
 
-                File.Exists(shimfile).ShouldBeTrue();
+                FileAssert.Exists(shimfile);
             }
 
             [Fact]
@@ -3581,7 +3584,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
 
-                File.Exists(shimfile).ShouldBeTrue();
+                FileAssert.Exists(shimfile);
             }
 
             [Fact]
@@ -3589,7 +3592,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "not.installed.exe");
 
-                File.Exists(shimfile).ShouldBeFalse();
+                FileAssert.DoesNotExist(shimfile);
             }
 
             [Fact]
@@ -3597,7 +3600,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "casemismatch.exe");
 
-                File.Exists(shimfile).ShouldBeFalse();
+                FileAssert.DoesNotExist(shimfile);
             }
 
             [Fact]
@@ -3605,7 +3608,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
 
-                Directory.Exists(extensionsDirectory).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(extensionsDirectory);
             }
 
             [Fact]
@@ -3613,7 +3616,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames);
 
-                Directory.Exists(hooksDirectory).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(hooksDirectory);
             }
 
             [Fact]
@@ -3799,7 +3802,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
             }
 
             [Fact]
@@ -3807,7 +3810,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -3825,7 +3828,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
 
-                File.Exists(shimfile).ShouldBeTrue();
+                FileAssert.Exists(shimfile);
             }
 
             [Fact]
@@ -3835,7 +3838,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
 
-                File.Exists(shimfile).ShouldBeTrue();
+                FileAssert.Exists(shimfile);
             }
 
             [Fact]
@@ -3843,7 +3846,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "not.installed.exe");
 
-                File.Exists(shimfile).ShouldBeFalse();
+                FileAssert.DoesNotExist(shimfile);
             }
 
             [Fact]
@@ -3851,7 +3854,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "casemismatch.exe");
 
-                File.Exists(shimfile).ShouldBeFalse();
+                FileAssert.DoesNotExist(shimfile);
             }
 
             [Fact]
@@ -3859,7 +3862,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
 
-                Directory.Exists(extensionsDirectory).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(extensionsDirectory);
             }
 
             [Fact]
@@ -3867,7 +3870,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames);
 
-                Directory.Exists(hooksDirectory).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(hooksDirectory);
             }
 
             [Fact]

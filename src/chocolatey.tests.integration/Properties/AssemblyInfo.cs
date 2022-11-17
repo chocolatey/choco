@@ -53,3 +53,7 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+
+// Because we use a static variable for collecting log message
+// we can not run tests in parallel.
+[assembly: NUnit.Framework.NonParallelizable]

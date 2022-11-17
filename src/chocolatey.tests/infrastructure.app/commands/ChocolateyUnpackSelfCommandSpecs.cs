@@ -29,6 +29,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyUnpackSelfCommandSpecs
     {
+        [ConcernFor("unpackself")]
         public abstract class ChocolateyUnpackSelfCommandSpecsBase : TinySpec
         {
             protected ChocolateyUnpackSelfCommand command;

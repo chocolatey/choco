@@ -4,10 +4,6 @@
 // TOOLS
 ///////////////////////////////////////////////////////////////////////////////
 
-// This is needed in order to allow NUnit v2 tested to be executed by the NUnit
-// v3 Test Runner
-#tool nuget:?package=NUnit.Extension.NUnitV2Driver&version=3.9.0
-
 ///////////////////////////////////////////////////////////////////////////////
 // SCRIPT
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,7 +61,7 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
                                 - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/choco.exe")
                                 - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/System.Management.Automation.dll")
                                 - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/chocolatey.tests*.dll")
-                                - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/{Moq|nunit.framework|Should}.dll");
+                                - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/{Moq|nunit|Should|testcentric}*.dll");
 
         Information("The following assemblies have been selected to be ILMerged for choco.exe No7zip Version...");
         foreach (var assemblyToILMerge in no7zAssembliesToILMerge)

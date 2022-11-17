@@ -30,6 +30,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateySourceCommandSpecs
     {
+        [ConcernFor("source")]
         public abstract class ChocolateySourceCommandSpecsBase : TinySpec
         {
             protected ChocolateySourceCommand command;

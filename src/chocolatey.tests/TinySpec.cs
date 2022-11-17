@@ -22,6 +22,7 @@ namespace chocolatey.tests
     using NUnit.Framework;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.logging;
+    using System.IO;
 
     // ReSharper disable InconsistentNaming
 
@@ -32,7 +33,7 @@ namespace chocolatey.tests
 
         private static readonly string InstallLocationVariable = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName);
 
-        [SetUp]
+        [OneTimeSetUp]
         public virtual void BeforeEverything()
         {
             Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, string.Empty);
@@ -40,13 +41,14 @@ namespace chocolatey.tests
             Log.InitializeWith(MockLogger);
             // do not log trace messages
             ILogExtensions.LogTraceMessages = false;
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
         }
 
         public virtual void before_everything()
         {
         }
 
-        [TearDown]
+        [OneTimeTearDown]
         public void AfterEverything()
         {
             Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, InstallLocationVariable);
@@ -61,7 +63,7 @@ namespace chocolatey.tests
             get { return NUnitSetup.MockLogger; }
         }
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
             if (MockLogger != null) MockLogger.reset();
@@ -94,7 +96,7 @@ namespace chocolatey.tests
         {
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
             AfterObservations();
@@ -118,13 +120,11 @@ namespace chocolatey.tests
     }
 
 
-    public class ConcernForAttribute : Attribute
+    public class ConcernForAttribute : CategoryAttribute
     {
-        public string Name { get; set; }
-
         public ConcernForAttribute(string name)
+            : base("ConcernFor - {0}".format_with(name))
         {
-            Name = name;
         }
     }
 
@@ -165,15 +165,6 @@ namespace chocolatey.tests
             : base("Integration")
         {
         }
-    }
-
-    public class ExpectedExceptionAttribute : NUnit.Framework.ExpectedExceptionAttribute
-    {
-        public ExpectedExceptionAttribute(Type exceptionType) : base(exceptionType)
-        {}
-
-        public ExpectedExceptionAttribute(string exceptionName) : base(exceptionName)
-        {}
     }
 
     // ReSharper restore InconsistentNaming

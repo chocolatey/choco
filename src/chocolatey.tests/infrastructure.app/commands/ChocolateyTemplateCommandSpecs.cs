@@ -31,6 +31,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyTemplateCommandSpecs
     {
+        [ConcernFor("template")]
         public abstract class ChocolateyTemplateCommandSpecsBase : TinySpec
         {
             protected ChocolateyTemplateCommand command;

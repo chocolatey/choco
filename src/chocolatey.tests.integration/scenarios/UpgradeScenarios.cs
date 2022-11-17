@@ -34,6 +34,7 @@ namespace chocolatey.tests.integration.scenarios
 
     public class UpgradeScenarios
     {
+        [ConcernFor("upgrade")]
         public abstract class ScenariosBase : TinySpec
         {
             protected ConcurrentDictionary<string, PackageResult> Results;
@@ -108,7 +109,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
         }
 
@@ -155,7 +156,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
         }
 
@@ -211,7 +212,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_upgrade_where_install_location_reports()
             {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
             }
 
             [Fact]
@@ -219,7 +220,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -227,7 +228,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -385,7 +386,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -393,7 +394,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -448,7 +449,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_upgrade_where_install_location_reports()
             {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
             }
 
             [Fact]
@@ -456,7 +457,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -464,7 +465,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -599,7 +600,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_upgrade_where_install_location_reports()
             {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
             }
 
             [Fact]
@@ -607,7 +608,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -615,7 +616,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -777,7 +778,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -785,7 +786,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -870,7 +871,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -878,7 +879,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -933,7 +934,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_upgrade_where_install_location_reports()
             {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
             }
 
             [Fact]
@@ -941,7 +942,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -957,7 +958,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1068,7 +1069,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1076,7 +1077,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1158,7 +1159,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1166,7 +1167,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1216,10 +1217,11 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            [ExpectedException(typeof(ApplicationException))]
             public void should_throw_an_error_that_it_is_not_allowed()
             {
-                Results = Service.upgrade_run(Configuration);
+                Action m = () => Service.upgrade_run(Configuration);
+
+                m.ShouldThrow<ApplicationException>();
             }
         }
 
@@ -1246,7 +1248,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_upgrade_where_install_location_reports()
             {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
             }
 
             [Fact]
@@ -1254,7 +1256,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1270,7 +1272,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1343,6 +1345,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.AfterObservations();
                 fileStream.Close();
+                fileStream.Dispose();
             }
 
             public override void Because()
@@ -1354,7 +1357,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_upgrade_where_install_location_reports()
             {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
             }
 
             [Fact]
@@ -1362,7 +1365,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1379,7 +1382,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1452,6 +1455,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.AfterObservations();
                 fileStream.Close();
+                fileStream.Dispose();
             }
 
             public override void Because()
@@ -1465,7 +1469,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1473,7 +1477,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1557,7 +1561,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var fileAdded = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "dude.txt");
 
-                File.Exists(fileAdded).ShouldBeTrue();
+                FileAssert.Exists(fileAdded);
             }
 
             [Fact]
@@ -1712,7 +1716,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1808,7 +1812,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_install_where_install_location_reports()
             {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
             }
 
             [Fact]
@@ -1816,7 +1820,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1824,7 +1828,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1883,7 +1887,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -1970,7 +1974,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -1986,7 +1990,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2002,7 +2006,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -2479,14 +2483,14 @@ namespace chocolatey.tests.integration.scenarios
             public void should_remove_the_legacy_folder_version_of_the_package()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency.1.0.0");
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
             public void should_replace_the_legacy_folder_version_of_the_package_with_a_lib_package_folder_that_has_no_version()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2501,14 +2505,14 @@ namespace chocolatey.tests.integration.scenarios
             public void should_not_add_a_versionless_parent_package_folder_to_the_lib_dir()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency");
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
             public void should_leave_the_parent_package_as_legacy_folder()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency.1.0.0");
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2523,14 +2527,14 @@ namespace chocolatey.tests.integration.scenarios
             public void should_leave_the_exact_version_package_as_legacy_folder()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency.1.0.0");
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
             public void should_not_add_a_versionless_exact_version_package_folder_to_the_lib_dir()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency");
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -2693,14 +2697,14 @@ namespace chocolatey.tests.integration.scenarios
             public void should_remove_the_legacy_folder_version_of_the_package()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency.1.0.0");
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
             public void should_replace_the_legacy_folder_version_of_the_package_with_a_lib_package_folder_that_has_no_version()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isdependency");
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2715,7 +2719,7 @@ namespace chocolatey.tests.integration.scenarios
             public void should_replace_the_legacy_folder_version_of_the_parent_package_with_a_lib_package_folder_that_has_no_version()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency");
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2723,7 +2727,7 @@ namespace chocolatey.tests.integration.scenarios
             public void should_remove_the_legacy_folder_version_of_the_parent_package()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency.1.0.0");
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -2738,7 +2742,7 @@ namespace chocolatey.tests.integration.scenarios
             public void should_replace_the_legacy_folder_version_of_the_exact_version_package_with_a_lib_package_folder_that_has_no_version()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency");
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -2746,7 +2750,7 @@ namespace chocolatey.tests.integration.scenarios
             public void should_remove_the_legacy_folder_version_of_the_exact_version_package()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency.1.0.0");
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -3198,7 +3202,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_upgrade_where_install_location_reports()
             {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
             }
 
             [Fact]
@@ -3206,7 +3210,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -3214,7 +3218,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -3284,7 +3288,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty));
 
-                Directory.Exists(hooksDirectory).ShouldBeTrue();
+                DirectoryAssert.Exists(hooksDirectory);
             }
 
             [Fact]
@@ -3302,14 +3306,14 @@ namespace chocolatey.tests.integration.scenarios
             public void should_remove_files_not_in_upgrade_version()
             {
                 var hookScriptPath = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), "pre-install-doesnotexist.ps1");
-                File.Exists(hookScriptPath).ShouldBeFalse();
+                FileAssert.DoesNotExist(hookScriptPath);
             }
 
             [Fact]
             public void should_install_new_files_in_upgrade_version()
             {
                 var hookScriptPath = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), "post-install-doesnotexist.ps1");
-                File.Exists(hookScriptPath).ShouldBeTrue();
+                FileAssert.Exists(hookScriptPath);
             }
         }
 
@@ -3334,7 +3338,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_upgrade_where_install_location_reports()
             {
-                Directory.Exists(_packageResult.InstallLocation).ShouldBeTrue();
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
             }
 
             [Fact]
@@ -3342,7 +3346,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
@@ -3350,7 +3354,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]

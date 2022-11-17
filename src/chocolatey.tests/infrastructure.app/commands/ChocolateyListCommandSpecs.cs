@@ -29,6 +29,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyListCommandSpecs
     {
+        [ConcernFor("list")]
         public abstract class ChocolateyListCommandSpecsBase : TinySpec
         {
             protected ChocolateyListCommand command;

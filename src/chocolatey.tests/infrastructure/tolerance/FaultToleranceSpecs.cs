@@ -42,25 +42,27 @@ namespace chocolatey.tests.infrastructure.tolerance
             }
 
             [Fact]
-            [ExpectedException(typeof(ApplicationException))]
             public void should_not_allow_the_number_of_retries_to_be_zero()
             {
                 reset();
 
-                FaultTolerance.retry(
+                Action m = () => FaultTolerance.retry(
                     0,
                     () =>
                     {
                     });
+
+                m.ShouldThrow<ApplicationException>();
             }
 
             [Fact]
-            [ExpectedException(typeof(Exception))]
             public void should_throw_an_error_if_retries_are_reached()
             {
                 reset();
 
-                FaultTolerance.retry(2, () => { throw new Exception("YIKES"); }, waitDurationMilliseconds: 0);
+                Action m = () => FaultTolerance.retry(2, () => { throw new Exception("YIKES"); }, waitDurationMilliseconds: 0);
+
+                m.ShouldThrow<Exception>();
             }
 
             [Fact]
@@ -166,30 +168,32 @@ namespace chocolatey.tests.infrastructure.tolerance
             }
 
             [Fact]
-            [ExpectedException(typeof(Exception))]
             public void should_throw_an_error_if_throwError_set_to_true()
             {
                 reset();
 
-                FaultTolerance.try_catch_with_logging_exception(
+                Action m = () => FaultTolerance.try_catch_with_logging_exception(
                     () => { throw new Exception("This is the message"); },
                     "You have an error",
                     throwError: true
                 );
+
+                m.ShouldThrow<Exception>();
             }
 
             [Fact]
-            [ExpectedException(typeof(Exception))]
             public void should_still_throw_an_error_when_warn_is_set_if_throwError_set_to_true()
             {
                 reset();
 
-                FaultTolerance.try_catch_with_logging_exception(
+                Action m = () => FaultTolerance.try_catch_with_logging_exception(
                     () => { throw new Exception("This is the message"); },
                     "You have an error",
                     logWarningInsteadOfError: true,
                     throwError: true
                 );
+
+                m.ShouldThrow<Exception>();
             }
         }
     }

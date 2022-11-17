@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,6 +46,7 @@ namespace chocolatey.tests.integration.infrastructure.app.services
             }
         }
 
+        [SetCulture("en"), SetUICulture("en")]
         public class when_FilesService_encounters_locked_files : FilesServiceSpecsBase
         {
             private PackageFiles _result;
@@ -69,6 +70,7 @@ namespace chocolatey.tests.integration.infrastructure.app.services
             {
                 base.AfterObservations();
                 _fileStream.Close();
+                _fileStream.Dispose();
             }
 
             public override void Because()
@@ -93,13 +95,7 @@ namespace chocolatey.tests.integration.infrastructure.app.services
             [Platform(Exclude = "Mono")]
             public void should_log_a_warning_about_locked_files()
             {
-                bool lockedFiles = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
-                {
-                    if (message.Contains("The process cannot access the file")) lockedFiles = true;
-                }
-
-                lockedFiles.ShouldBeTrue();
+                MockLogger.Verify(l => l.Warn(It.Is<string>(s => s.Contains("The process cannot access the file"))), Times.Once);
             }
 
             [Fact]

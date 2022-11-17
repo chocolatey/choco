@@ -30,6 +30,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyFeatureCommandSpecs
     {
+        [ConcernFor("feature")]
         public abstract class ChocolateyFeatureCommandSpecsBase : TinySpec
         {
             protected ChocolateyFeatureCommand command;

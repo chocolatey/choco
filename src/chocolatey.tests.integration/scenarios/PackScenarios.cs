@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,10 +21,14 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
+
+    using NUnit.Framework;
+
     using Should;
 
     public class PackScenarios
     {
+        [ConcernFor("pack")]
         public abstract class ScenariosBase : TinySpec
         {
             protected ChocolateyConfiguration Configuration;
@@ -67,7 +71,7 @@ namespace chocolatey.tests.integration.scenarios
                 infos[0].ShouldEqual("Attempting to build package from 'myPackage.nuspec'.");
                 infos[1].ShouldEqual(string.Concat("Successfully created package '", package_path, "'"));
 
-                File.Exists(package_path).ShouldBeTrue();
+                FileAssert.Exists(package_path);
             }
 
             [Fact]
@@ -102,7 +106,7 @@ namespace chocolatey.tests.integration.scenarios
                 infos[0].ShouldEqual("Attempting to build package from 'myPackage.nuspec'.");
                 infos[1].ShouldEqual(string.Concat("Successfully created package '", package_path, "'"));
 
-                File.Exists(package_path).ShouldBeTrue();
+                FileAssert.Exists(package_path);
             }
 
             [Fact]
@@ -146,7 +150,7 @@ namespace chocolatey.tests.integration.scenarios
                 infos[0].ShouldEqual("Attempting to build package from 'myPackage.nuspec'.");
                 infos[1].ShouldEqual(string.Concat("Successfully created package '", package_path, "'"));
 
-                File.Exists(package_path).ShouldBeTrue();
+                FileAssert.Exists(package_path);
             }
 
             [Fact]
@@ -154,8 +158,8 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var messages = MockLogger.MessagesFor(LogLevel.Debug);
                 messages.Count.ShouldEqual(2);
-                messages.Contains("Setting property 'commitId': 1234abcd");
-                messages.Contains("Setting property 'version': 0.1.0");
+                messages.ShouldContain("Setting property 'commitId': 1234abcd");
+                messages.ShouldContain("Setting property 'version': 0.1.0");
             }
         }
 

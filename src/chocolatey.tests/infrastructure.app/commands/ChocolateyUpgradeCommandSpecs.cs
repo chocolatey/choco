@@ -30,6 +30,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyUpgradeCommandSpecs
     {
+        [ConcernFor("upgrade")]
         public abstract class ChocolateyUpgradeCommandSpecsBase : TinySpec
         {
             protected ChocolateyUpgradeCommand command;
