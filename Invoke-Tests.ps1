@@ -29,11 +29,13 @@ $packageRegex = 'chocolatey\.\d.*\.nupkg'
 # Check if there are any tests that exceed Test Kitchen maximum lengths
 $TestsLocation = Join-Path $PSScriptRoot tests
 $MaxFileNameLength = 110
-$LongFiles = Get-ChildItem $TestsLocation -Recurse | Where-Object { ($_.FullName.Length - $TestsLocation.Length) -gt $MaxFileNameLength } | ForEach-Object { [pscustomobject]@{ FullName = $_.FullName ; ReductionNeeded = $_.FullName.Length - $TestsLocation.Length - $MaxFileNameLength } }
+$LongFiles = Get-ChildItem $TestsLocation -Recurse |
+    Where-Object { ($_.FullName.Length - $TestsLocation.Length) -gt $MaxFileNameLength } |
+    Select-Object -Property @{Name = 'RelativePath' ; Expression = { $_.FullName.Replace($TestsLocation, [string]::Empty)}}, @{ Name = 'ReductionNeeded' ; Expression = { $_.FullName.Length - $TestsLocation.Length - $MaxFileNameLength } }
 
 if ($LongFiles) {
-    Write-Host "File paths too long for Test Kitchen use. Please shorten lengths:"
-    $LongFiles | ForEach-Object { Write-Host "$($_.ReductionNeeded), $($_.FullName)" }
+    Write-Host "Tests' file paths may be too long for Test Kitchen use. Please shorten file names or paths:"
+    $LongFiles | Format-List | Out-String | Out-Host
     throw "Unable to complete tests due to long file paths"
 }
 
