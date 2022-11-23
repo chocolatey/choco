@@ -31,6 +31,9 @@ namespace chocolatey.tests.infrastructure.app.commands
     using NuGet.Common;
     using NuGet.Packaging;
     using NuGet.Versioning;
+
+    using NUnit.Framework;
+
     using Should;
 
     public class ChocolateyPinCommandSpecs
@@ -425,7 +428,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 nugetService.Verify(n => n.list_run(It.IsAny<ChocolateyConfiguration>()), Times.Once);
             }
 
-            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object.")]
+            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object."), Category("Pending")]
             [Fact]
             public void should_set_pin_when_command_is_add()
             {
@@ -443,7 +446,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 packageInfoService.Verify(s => s.save_package_information(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
             }
 
-            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object.")]
+            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object."), Category("Pending")]
             [Fact]
             public void should_remove_pin_when_command_is_remove()
             {

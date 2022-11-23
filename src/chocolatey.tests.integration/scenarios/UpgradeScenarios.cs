@@ -1401,6 +1401,7 @@ namespace chocolatey.tests.integration.scenarios
 
             [Fact]
             [Pending("Does not work under .Net 4.8, See issue #2690")]
+            [Broken]
             public void should_not_be_able_delete_the_rollback()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);

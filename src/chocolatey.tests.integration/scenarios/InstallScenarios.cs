@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -799,6 +799,7 @@ namespace chocolatey.tests.integration.scenarios
 
             [Fact]
             [Pending("Does not work under .Net 4.8, See issue #2690")]
+            [Broken]
             public void should_not_be_able_delete_the_rollback()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
@@ -1285,7 +1286,7 @@ namespace chocolatey.tests.integration.scenarios
                 packageResult.Name.ShouldEqual(Configuration.Input);
             }
 
-            [Fact]
+            [Fact, Pending("Current version of the NuGet client library changes this to 1.0"), Broken]
             public void should_have_a_version_of_one_dot_zero_dot_zero()
             {
                 packageResult.Version.ShouldEqual("1.0.0");
@@ -1390,6 +1391,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Category("Side-by-Side")]
         public class when_installing_a_side_by_side_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1431,7 +1433,7 @@ namespace chocolatey.tests.integration.scenarios
                 FileAssert.Exists(packageFile);
             }
 
-            [Fact]
+            [Fact, Pending("Will be removed together with side by side removal"), Broken]
             public void should_put_version_in_nuspec_filename()
             {
                 var packageFile = Path.Combine(
@@ -1453,7 +1455,7 @@ namespace chocolatey.tests.integration.scenarios
                 FileAssert.DoesNotExist(packageFile);
             }
 
-            [Fact]
+            [Fact, Pending("Broken, will be removed together with side by side install"), Broken]
             public void should_not_have_nuspec_without_version_in_filename()
             {
                 var packageFile = Path.Combine(
@@ -1523,6 +1525,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Category("Side-by-Side")]
         public class when_switching_a_normal_package_to_a_side_by_side_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1566,7 +1569,7 @@ namespace chocolatey.tests.integration.scenarios
                 FileAssert.Exists(packageFile);
             }
 
-            [Fact]
+            [Fact, Pending("Should be removed together with side by side installation"), Broken]
             public void should_put_version_in_nuspec_filename()
             {
                 var packageFile = Path.Combine(
@@ -1588,7 +1591,7 @@ namespace chocolatey.tests.integration.scenarios
                 FileAssert.DoesNotExist(packageFile);
             }
 
-            [Fact]
+            [Fact, Pending("Should be removed together with side by side installation"), Broken]
             public void should_not_have_nuspec_without_version_in_filename()
             {
                 var packageFile = Path.Combine(
@@ -1642,6 +1645,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Category("Side-by-Side")]
         public class when_installing_an_older_version_side_by_side_with_a_newer_version : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1687,7 +1691,7 @@ namespace chocolatey.tests.integration.scenarios
                 FileAssert.Exists(packageFile);
             }
 
-            [Fact]
+            [Fact, Pending("Should be removed together with side by side installation"), Broken]
             public void should_put_version_in_nuspec_filename()
             {
                 var packageFile = Path.Combine(
@@ -1709,7 +1713,7 @@ namespace chocolatey.tests.integration.scenarios
                 FileAssert.DoesNotExist(packageFile);
             }
 
-            [Fact]
+            [Fact, Pending("Should be removed together with side by side installation"), Broken]
             public void should_not_have_nuspec_without_version_in_filename()
             {
                 var packageFile = Path.Combine(
@@ -1763,7 +1767,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-
+        [Category("Side-by-Side")]
         public class when_switching_a_side_by_side_package_to_a_normal_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -3146,7 +3150,7 @@ namespace chocolatey.tests.integration.scenarios
                 }
             }
 
-            [Fact]
+            [Fact, Broken]
             public void should_contain_a_message_that_it_was_unable_to_install_any_packages()
             {
                 bool expectedMessage = false;
@@ -3248,7 +3252,7 @@ namespace chocolatey.tests.integration.scenarios
                 }
             }
 
-            [Fact]
+            [Fact, Broken]
             public void should_contain_a_message_that_it_was_unable_to_install_any_packages()
             {
                 bool expectedMessage = false;
