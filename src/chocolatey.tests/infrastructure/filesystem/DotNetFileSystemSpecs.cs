@@ -24,7 +24,7 @@ namespace chocolatey.tests.infrastructure.filesystem
     using chocolatey.infrastructure.platforms;
     using Moq;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class DotNetFileSystemSpecs
     {
@@ -47,37 +47,37 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void GetFullPath_should_return_the_full_path_to_an_item()
             {
-                FileSystem.GetFullPath("test.txt").ShouldEqual(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test.txt"));
+                FileSystem.GetFullPath("test.txt").Should().Be(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test.txt"));
             }
 
             [Fact]
             public void GetFileNameWithoutExtension_should_return_a_file_name_without_an_extension()
             {
-                FileSystem.GetFilenameWithoutExtension("test.txt").ShouldEqual("test");
+                FileSystem.GetFilenameWithoutExtension("test.txt").Should().Be("test");
             }
 
             [Fact]
             public void GetFileNameWithoutExtension_should_return_a_file_name_without_an_extension_even_with_a_full_path()
             {
-                FileSystem.GetFilenameWithoutExtension("C:\\temp\\test.txt").ShouldEqual("test");
+                FileSystem.GetFilenameWithoutExtension("C:\\temp\\test.txt").Should().Be("test");
             }
 
             [Fact]
             public void GetExtension_should_return_the_extension_of_the_filename()
             {
-                FileSystem.GetFileExtension("test.txt").ShouldEqual(".txt");
+                FileSystem.GetFileExtension("test.txt").Should().Be(".txt");
             }
 
             [Fact]
             public void GetExtension_should_return_the_extension_of_the_filename_even_with_a_full_path()
             {
-                FileSystem.GetFileExtension("C:\\temp\\test.txt").ShouldEqual(".txt");
+                FileSystem.GetFileExtension("C:\\temp\\test.txt").Should().Be(".txt");
             }
 
             [Fact]
             public void GetDirectoryName_should_return_the_directory_of_the_path_to_the_file()
             {
-                FileSystem.GetDirectoryName("C:\\temp\\test.txt").ShouldEqual(
+                FileSystem.GetDirectoryName("C:\\temp\\test.txt").Should().Be(
                     Platform.GetPlatform() == PlatformType.Windows
                         ? "C:\\temp"
                         : "C:/temp");
@@ -86,7 +86,7 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void Combine_should_combine_the_file_paths_of_all_the_included_items_together()
             {
-                FileSystem.CombinePaths("C:\\temp", "yo", "filename.txt").ShouldEqual(
+                FileSystem.CombinePaths("C:\\temp", "yo", "filename.txt").Should().Be(
                     Platform.GetPlatform() == PlatformType.Windows
                         ? "C:\\temp\\yo\\filename.txt"
                         : "C:/temp/yo/filename.txt");
@@ -95,7 +95,7 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void Combine_should_combine_when_paths_have_backslashes_in_subpaths()
             {
-                FileSystem.CombinePaths("C:\\temp", "yo\\timmy", "filename.txt").ShouldEqual(
+                FileSystem.CombinePaths("C:\\temp", "yo\\timmy", "filename.txt").Should().Be(
                     Platform.GetPlatform() == PlatformType.Windows
                         ? "C:\\temp\\yo\\timmy\\filename.txt"
                         : "C:/temp/yo/timmy/filename.txt");
@@ -104,7 +104,7 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void Combine_should_combine_when_paths_start_with_backslashes_in_subpaths()
             {
-                FileSystem.CombinePaths("C:\\temp", "\\yo", "filename.txt").ShouldEqual(
+                FileSystem.CombinePaths("C:\\temp", "\\yo", "filename.txt").Should().Be(
                     Platform.GetPlatform() == PlatformType.Windows
                         ? "C:\\temp\\yo\\filename.txt"
                         : "C:/temp/yo/filename.txt");
@@ -113,7 +113,7 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void Combine_should_combine_when_paths_start_with_forwardslashes_in_subpaths()
             {
-                FileSystem.CombinePaths("C:\\temp", "/yo", "filename.txt").ShouldEqual(
+                FileSystem.CombinePaths("C:\\temp", "/yo", "filename.txt").Should().Be(
                     Platform.GetPlatform() == PlatformType.Windows
                         ? "C:\\temp\\yo\\filename.txt"
                         : "C:/temp/yo/filename.txt");
@@ -155,41 +155,38 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void GetExecutablePath_should_find_existing_executable()
             {
-                FileSystem.GetExecutablePath("cmd").ToLowerSafe().ShouldEqual(
+                FileSystem.GetExecutablePath("cmd").ToLowerSafe().Should().BeEquivalentTo(
                     Platform.GetPlatform() == PlatformType.Windows
                         ? "c:\\windows\\system32\\cmd.exe"
-                        : "cmd",
-                    StringComparer.OrdinalIgnoreCase
-                );
+                        : "cmd");
             }
 
             [Fact]
             public void GetExecutablePath_should_find_existing_executable_with_extension()
             {
-                FileSystem.GetExecutablePath("cmd.exe").ToLowerSafe().ShouldEqual(
+                FileSystem.GetExecutablePath("cmd.exe").ToLowerSafe().Should().BeEquivalentTo(
                     Platform.GetPlatform() == PlatformType.Windows
                         ? "c:\\windows\\system32\\cmd.exe"
-                        : "cmd.exe",
-                    StringComparer.OrdinalIgnoreCase
+                        : "cmd.exe"
                 );
             }
 
             [Fact]
             public void GetExecutablePath_should_return_same_value_when_executable_is_not_found()
             {
-                FileSystem.GetExecutablePath("daslakjsfdasdfwea").ShouldEqual("daslakjsfdasdfwea");
+                FileSystem.GetExecutablePath("daslakjsfdasdfwea").Should().Be("daslakjsfdasdfwea");
             }
 
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_null()
             {
-                FileSystem.GetExecutablePath(null).ShouldEqual(string.Empty);
+                FileSystem.GetExecutablePath(null).Should().Be(string.Empty);
             }
 
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_empty_string()
             {
-                FileSystem.GetExecutablePath(string.Empty).ShouldEqual(string.Empty);
+                FileSystem.GetExecutablePath(string.Empty).Should().Be(string.Empty);
             }
         }
 
@@ -217,33 +214,33 @@ namespace chocolatey.tests.infrastructure.filesystem
             {
                 if (Platform.GetPlatform() == PlatformType.Windows)
                 {
-                    FileSystem.GetExecutablePath("ls").ShouldEqual("ls");
+                    FileSystem.GetExecutablePath("ls").Should().Be("ls");
                 }
                 else
                 {
                     new string[]
                     {
                         "/bin/ls", "/usr/bin/ls"
-                    }.ShouldContain(FileSystem.GetExecutablePath("ls"));
+                    }.Should().Contain(FileSystem.GetExecutablePath("ls"));
                 }
             }
 
             [Fact]
             public void GetExecutablePath_should_return_same_value_when_executable_is_not_found()
             {
-                FileSystem.GetExecutablePath("daslakjsfdasdfwea").ShouldEqual("daslakjsfdasdfwea");
+                FileSystem.GetExecutablePath("daslakjsfdasdfwea").Should().Be("daslakjsfdasdfwea");
             }
 
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_null()
             {
-                FileSystem.GetExecutablePath(null).ShouldEqual(string.Empty);
+                FileSystem.GetExecutablePath(null).Should().Be(string.Empty);
             }
 
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_empty_string()
             {
-                FileSystem.GetExecutablePath(string.Empty).ShouldEqual(string.Empty);
+                FileSystem.GetExecutablePath(string.Empty).Should().Be(string.Empty);
             }
         }
     }

@@ -24,7 +24,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
     using System;
 
     public class ChocolateyPackCommandSpecs
@@ -54,7 +54,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_implement_pack()
             {
-                results.ShouldContain("pack");
+                results.Should().Contain("pack");
             }
         }
 
@@ -76,13 +76,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_add_version_to_the_option_set()
             {
-                optionSet.Contains("version").ShouldBeTrue();
+                optionSet.Contains("version").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_outputdirectory_to_the_option_set()
             {
-                optionSet.Contains("outputdirectory").ShouldBeTrue();
+                optionSet.Contains("outputdirectory").Should().BeTrue();
             }
         }
 
@@ -110,27 +110,27 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_allow_a_path_to_the_nuspec_to_be_passed_in()
             {
-                configuration.Input.ShouldEqual(nuspecPath);
+                configuration.Input.Should().Be(nuspecPath);
             }
 
             [Fact]
             public void Should_property_foo_equal_1()
             {
-                configuration.PackCommand.Properties["foo"].ShouldEqual("1");
+                configuration.PackCommand.Properties["foo"].Should().Be("1");
             }
 
             [Fact]
             public void Should_property_bar_equal_baz()
             {
-                configuration.PackCommand.Properties["bar"].ShouldEqual("baz");
+                configuration.PackCommand.Properties["bar"].Should().Be("baz");
             }
 
             [Fact]
             public void Should_log_warning_on_duplicate_foo()
             {
                 var warnings = MockLogger.MessagesFor(LogLevel.Warn);
-                warnings.Count.ShouldEqual(1);
-                warnings[0].ShouldEqual("A value for 'foo' has already been added with the value '1'. Ignoring foo='2'.", StringComparer.OrdinalIgnoreCase);
+                warnings.Count.Should().Be(1);
+                warnings[0].Should().BeEquivalentTo("A value for 'foo' has already been added with the value '1'. Ignoring foo='2'.");
             }
         }
 
@@ -181,13 +181,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_version_equal_to_42()
             {
-                configuration.Version.ShouldEqual("0.42.0");
+                configuration.Version.Should().Be("0.42.0");
             }
 
             [Fact]
             public void Should_outputdirectory_equal_packages()
             {
-                configuration.OutputDirectory.ShouldEqual("c:\\packages");
+                configuration.OutputDirectory.Should().Be("c:\\packages");
             }
         }
     }

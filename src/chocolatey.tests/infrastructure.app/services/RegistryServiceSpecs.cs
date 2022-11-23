@@ -22,7 +22,7 @@ namespace chocolatey.tests.infrastructure.app.services
     using Microsoft.Win32;
     using Moq;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
     using Registry = chocolatey.infrastructure.app.domain.Registry;
 
     public class RegistryServiceSpecs
@@ -66,7 +66,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_not_be_null()
             {
-                _result.ShouldNotBeNull();
+                _result.Should().NotBeNull();
             }
         }
 
@@ -91,25 +91,25 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_return_a_non_null_value()
             {
-                _result.ShouldNotBeNull();
+                _result.Should().NotBeNull();
             }
 
             [Fact]
             public void Should_return_a_value_of_type_RegistryKey()
             {
-                _result.ShouldBeType<RegistryKey>();
+                _result.Should().BeOfType<RegistryKey>();
             }
 
             [Fact]
             public void Should_contain_keys()
             {
-                _result.GetSubKeyNames().ShouldNotBeEmpty();
+                _result.GetSubKeyNames().Should().NotBeEmpty();
             }
 
             [Fact]
             public void Should_contain_values()
             {
-                Service.GetKey(_hive, "Environment").GetValueNames().ShouldNotBeEmpty();
+                Service.GetKey(_hive, "Environment").GetValueNames().Should().NotBeEmpty();
             }
         }
 
@@ -140,7 +140,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_return_null_key()
             {
-                _result.ShouldBeNull();
+                _result.Should().BeNull();
             }
         }
 

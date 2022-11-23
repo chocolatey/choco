@@ -24,7 +24,7 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.rules;
     using chocolatey.infrastructure.services;
-    using Should;
+    using FluentAssertions;
 
     public class RulesServiceSpecs : TinySpec
     {
@@ -62,12 +62,12 @@ namespace chocolatey.tests.infrastructure.app.services
         [Fact]
         public void GetsRulesFromService()
         {
-            _detectedRules.Count().ShouldEqual(4);
+            _detectedRules.Count().Should().Be(4);
             IEnumerable<string> ruleIds = _detectedRules.Select(t => t.Id);
-            ruleIds.ShouldContain(UnsupportedElementUsed);
-            ruleIds.ShouldContain(EmptyRequiredElement);
-            ruleIds.ShouldContain(InvalidTypeElement);
-            ruleIds.ShouldContain(MissingElementOnRequiringLicenseAcceptance);
+            ruleIds.Should().Contain(UnsupportedElementUsed);
+            ruleIds.Should().Contain(EmptyRequiredElement);
+            ruleIds.Should().Contain(InvalidTypeElement);
+            ruleIds.Should().Contain(MissingElementOnRequiringLicenseAcceptance);
         }
     }
 }

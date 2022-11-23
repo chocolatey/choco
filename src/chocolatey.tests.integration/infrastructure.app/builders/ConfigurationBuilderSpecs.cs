@@ -33,7 +33,7 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
     using chocolatey.infrastructure.registration;
     using Microsoft.Win32;
     using scenarios;
-    using Should;
+    using FluentAssertions;
 
     public class ConfigurationBuilderSpecs
     {
@@ -140,31 +140,31 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
                 if (!SystemSet && !ArgumentSet && !ConfigSet &&
                     !EnvironmentVariableSet)
                 {
-                    Configuration.Proxy.Location.ShouldEqual(string.Empty);
+                    Configuration.Proxy.Location.Should().Be(string.Empty);
                     return;
                 }
 
                 if (ArgumentSet)
                 {
-                    Configuration.Proxy.Location.ShouldEqual(CommandArgumentProxyValue);
+                    Configuration.Proxy.Location.Should().Be(CommandArgumentProxyValue);
                     return;
                 }
 
                 if (ConfigSet)
                 {
-                    Configuration.Proxy.Location.ShouldEqual(ConfigurationFileProxyValue);
+                    Configuration.Proxy.Location.Should().Be(ConfigurationFileProxyValue);
                     return;
                 }
 
                 if (EnvironmentVariableSet)
                 {
-                    Configuration.Proxy.Location.ShouldEqual(EnvironmentVariableProxyValue);
+                    Configuration.Proxy.Location.Should().Be(EnvironmentVariableProxyValue);
                     return;
                 }
 
                 if (SystemSet)
                 {
-                    Configuration.Proxy.Location.ShouldEqual(SystemLevelProxyValue);
+                    Configuration.Proxy.Location.Should().Be(SystemLevelProxyValue);
                     return;
                 }
             }
@@ -211,25 +211,25 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
                 if (!ArgumentSet && !ConfigSet &&
                     !EnvironmentVariableSet)
                 {
-                    Configuration.Proxy.BypassList.ShouldEqual(string.Empty);
+                    Configuration.Proxy.BypassList.Should().Be(string.Empty);
                     return;
                 }
 
                 if (ArgumentSet)
                 {
-                    Configuration.Proxy.BypassList.ShouldEqual(CommandArgumentProxyValue);
+                    Configuration.Proxy.BypassList.Should().Be(CommandArgumentProxyValue);
                     return;
                 }
 
                 if (ConfigSet)
                 {
-                    Configuration.Proxy.BypassList.ShouldEqual(ConfigurationFileProxyValue);
+                    Configuration.Proxy.BypassList.Should().Be(ConfigurationFileProxyValue);
                     return;
                 }
 
                 if (EnvironmentVariableSet)
                 {
-                    Configuration.Proxy.BypassList.ShouldEqual(EnvironmentVariableProxyValue);
+                    Configuration.Proxy.BypassList.Should().Be(EnvironmentVariableProxyValue);
                     return;
                 }
             }

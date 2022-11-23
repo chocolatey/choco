@@ -21,7 +21,7 @@ namespace chocolatey.tests.infrastructure.commandline
     using chocolatey.infrastructure.adapters;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class InteractivePromptSpecs
     {
@@ -73,7 +73,7 @@ namespace chocolatey.tests.infrastructure.commandline
                     errored = true;
                 }
 
-                errored.ShouldBeTrue();
+                errored.Should().BeTrue();
                 console.Verify(c => c.ReadLine(), Times.Never);
             }
 
@@ -94,8 +94,8 @@ namespace chocolatey.tests.infrastructure.commandline
                     errorMessage = ex.Message;
                 }
 
-                errored.ShouldBeTrue();
-                errorMessage.ShouldContain("No choices passed in.");
+                errored.Should().BeTrue();
+                errorMessage.Should().Contain("No choices passed in.");
                 console.Verify(c => c.ReadLine(), Times.Never);
             }
 
@@ -118,7 +118,7 @@ namespace chocolatey.tests.infrastructure.commandline
                     errored = true;
                 }
 
-                errored.ShouldBeTrue();
+                errored.Should().BeTrue();
                 console.Verify(c => c.ReadLine(), Times.Never);
             }
 
@@ -144,9 +144,9 @@ namespace chocolatey.tests.infrastructure.commandline
                     errorMessage = ex.Message;
                 }
 
-                result.ShouldNotEqual("maybe");
-                errored.ShouldBeTrue();
-                errorMessage.ShouldEqual("Default choice value must be one of the given choices.");
+                result.Should().NotBe("maybe");
+                errored.Should().BeTrue();
+                errorMessage.Should().Be("Default choice value must be one of the given choices.");
                 console.Verify(c => c.ReadLine(), Times.Never);
             }
         }
@@ -171,7 +171,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 var result = prompt();
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
 
             [Fact]
@@ -179,7 +179,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("1");
                 var result = prompt();
-                result.ShouldEqual(choices[0]);
+                result.Should().Be(choices[0]);
             }
 
             [Fact]
@@ -187,7 +187,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("yes");
                 var result = prompt();
-                result.ShouldEqual(choices[0]);
+                result.Should().Be(choices[0]);
             }
 
             [Fact]
@@ -195,7 +195,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("2");
                 var result = prompt();
-                result.ShouldEqual(choices[1]);
+                result.Should().Be(choices[1]);
             }
 
             [Fact]
@@ -203,7 +203,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("3");
                 var result = prompt();
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
 
             [Fact]
@@ -211,7 +211,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("4");
                 var result = prompt();
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
 
             [Fact]
@@ -219,7 +219,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("0");
                 var result = prompt();
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
 
             [Fact]
@@ -227,7 +227,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("-1");
                 var result = prompt();
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
 
             [Fact]
@@ -235,7 +235,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("abc");
                 var result = prompt();
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
         }
 
@@ -268,7 +268,7 @@ namespace chocolatey.tests.infrastructure.commandline
                 {
                     errored = true;
                 }
-                errored.ShouldBeTrue();
+                errored.Should().BeTrue();
                 console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
 
@@ -277,7 +277,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("1");
                 var result = prompt();
-                result.ShouldEqual(choices[0]);
+                result.Should().Be(choices[0]);
             }
 
             [Fact]
@@ -285,7 +285,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("2");
                 var result = prompt();
-                result.ShouldEqual(choices[1]);
+                result.Should().Be(choices[1]);
             }
 
             [Fact]
@@ -302,7 +302,7 @@ namespace chocolatey.tests.infrastructure.commandline
                 {
                     errored = true;
                 }
-                errored.ShouldBeTrue();
+                errored.Should().BeTrue();
                 console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
         }
@@ -327,7 +327,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 var result = prompt();
-                result.ShouldEqual(choices[1]);
+                result.Should().Be(choices[1]);
             }
 
             [Fact]
@@ -335,7 +335,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("1");
                 var result = prompt();
-                result.ShouldEqual(choices[0]);
+                result.Should().Be(choices[0]);
             }
 
             [Fact]
@@ -343,7 +343,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("2");
                 var result = prompt();
-                result.ShouldEqual(choices[1]);
+                result.Should().Be(choices[1]);
             }
 
             [Fact]
@@ -351,7 +351,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("3");
                 var result = prompt();
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
 
             [Fact]
@@ -359,7 +359,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("4");
                 var result = prompt();
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
 
             [Fact]
@@ -367,7 +367,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("0");
                 var result = prompt();
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
 
             [Fact]
@@ -375,7 +375,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("-1");
                 var result = prompt();
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
 
             [Fact]
@@ -383,7 +383,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("abc");
                 var result = prompt();
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
         }
 
@@ -407,7 +407,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 var result = prompt();
-                result.ShouldEqual(choices[0]);
+                result.Should().Be(choices[0]);
             }
 
             [Fact]
@@ -415,7 +415,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("1");
                 var result = prompt();
-                result.ShouldEqual(choices[0]);
+                result.Should().Be(choices[0]);
             }
 
             [Fact]
@@ -423,7 +423,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("2");
                 var result = prompt();
-                result.ShouldEqual(choices[1]);
+                result.Should().Be(choices[1]);
             }
 
             [Fact]
@@ -440,7 +440,7 @@ namespace chocolatey.tests.infrastructure.commandline
                 {
                     errored = true;
                 }
-                errored.ShouldBeTrue();
+                errored.Should().BeTrue();
                 console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
         }
@@ -470,7 +470,7 @@ namespace chocolatey.tests.infrastructure.commandline
                     errored = true;
                 }
 
-                errored.ShouldBeTrue();
+                errored.Should().BeTrue();
                 console.Verify(c => c.ReadLine(), Times.Never);
             }
 
@@ -491,8 +491,8 @@ namespace chocolatey.tests.infrastructure.commandline
                     errorMessage = ex.Message;
                 }
 
-                errored.ShouldBeTrue();
-                errorMessage.ShouldContain("No choices passed in.");
+                errored.Should().BeTrue();
+                errorMessage.Should().Contain("No choices passed in.");
                 console.Verify(c => c.ReadLine(), Times.Never);
             }
 
@@ -517,8 +517,8 @@ namespace chocolatey.tests.infrastructure.commandline
                     errorMessage = ex.Message;
                 }
 
-                errored.ShouldBeTrue();
-                errorMessage.ShouldContain("Value for prompt cannot be null.");
+                errored.Should().BeTrue();
+                errorMessage.Should().Contain("Value for prompt cannot be null.");
                 console.Verify(c => c.ReadLine(), Times.Never);
             }
 
@@ -543,8 +543,8 @@ namespace chocolatey.tests.infrastructure.commandline
                     errorMessage = ex.Message;
                 }
 
-                errored.ShouldBeTrue();
-                errorMessage.ShouldContain("Some choices are empty.");
+                errored.Should().BeTrue();
+                errorMessage.Should().Contain("Some choices are empty.");
                 console.Verify(c => c.ReadLine(), Times.Never);
             }
 
@@ -569,8 +569,8 @@ namespace chocolatey.tests.infrastructure.commandline
                     errorMessage = ex.Message;
                 }
 
-                errored.ShouldBeTrue();
-                errorMessage.ShouldContain("Multiple choices have the same first letter.");
+                errored.Should().BeTrue();
+                errorMessage.Should().Contain("Multiple choices have the same first letter.");
                 console.Verify(c => c.ReadLine(), Times.Never);
             }
         }
@@ -604,7 +604,7 @@ namespace chocolatey.tests.infrastructure.commandline
                 {
                     errored = true;
                 }
-                errored.ShouldBeTrue();
+                errored.Should().BeTrue();
                 console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
 
@@ -613,7 +613,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("yes");
                 var result = prompt();
-                result.ShouldEqual("yes");
+                result.Should().Be("yes");
             }
 
             [Fact]
@@ -621,7 +621,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("y");
                 var result = prompt();
-                result.ShouldEqual("yes");
+                result.Should().Be("yes");
             }
 
             [Fact]
@@ -629,7 +629,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("no");
                 var result = prompt();
-                result.ShouldEqual("no");
+                result.Should().Be("no");
             }
 
             [Fact]
@@ -637,7 +637,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("n");
                 var result = prompt();
-                result.ShouldEqual("no");
+                result.Should().Be("no");
             }
 
             [Fact]
@@ -654,7 +654,7 @@ namespace chocolatey.tests.infrastructure.commandline
                 {
                     errored = true;
                 }
-                errored.ShouldBeTrue();
+                errored.Should().BeTrue();
                 console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
         }
@@ -685,7 +685,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("all - yes to all");
                 var result = prompt();
-                result.ShouldEqual("all - yes to all");
+                result.Should().Be("all - yes to all");
             }
 
             [Fact]
@@ -693,7 +693,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("all");
                 var result = prompt();
-                result.ShouldEqual("all - yes to all");
+                result.Should().Be("all - yes to all");
             }
         }
     }

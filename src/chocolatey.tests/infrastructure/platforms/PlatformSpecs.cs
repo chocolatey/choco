@@ -21,7 +21,7 @@ namespace chocolatey.tests.infrastructure.platforms
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.platforms;
     using Moq;
-    using Should;
+    using FluentAssertions;
     using Environment = System.Environment;
 
     public class PlatformSpecs
@@ -50,7 +50,7 @@ namespace chocolatey.tests.infrastructure.platforms
             [Fact]
             public void Should_not_be_Unknown()
             {
-                result.ShouldNotEqual(PlatformType.Unknown);
+                result.Should().NotBe(PlatformType.Unknown);
             }
         }
 
@@ -72,7 +72,7 @@ namespace chocolatey.tests.infrastructure.platforms
             [Fact]
             public void Should_return_Windows()
             {
-                result.ShouldEqual(PlatformType.Windows);
+                result.Should().Be(PlatformType.Windows);
             }
         }
 
@@ -94,7 +94,7 @@ namespace chocolatey.tests.infrastructure.platforms
             [Fact]
             public void Should_return_Mac()
             {
-                result.ShouldEqual(PlatformType.Mac);
+                result.Should().Be(PlatformType.Mac);
             }
         }
 
@@ -117,7 +117,7 @@ namespace chocolatey.tests.infrastructure.platforms
             [Fact]
             public void Should_return_Linux()
             {
-                result.ShouldEqual(PlatformType.Linux);
+                result.Should().Be(PlatformType.Linux);
             }
         }
 
@@ -140,7 +140,7 @@ namespace chocolatey.tests.infrastructure.platforms
             [Fact]
             public void Should_return_Mac()
             {
-                result.ShouldEqual(PlatformType.Mac);
+                result.Should().Be(PlatformType.Mac);
             }
         }
     }

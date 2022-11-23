@@ -24,7 +24,7 @@ namespace chocolatey.tests.infrastructure.cryptography
     using chocolatey.infrastructure.cryptography;
     using chocolatey.infrastructure.filesystem;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class CryptoHashProviderSpecs
     {
@@ -62,7 +62,7 @@ namespace chocolatey.tests.infrastructure.cryptography
             {
                 var expected = BitConverter.ToString(SHA256.Create().ComputeHash(byteArray)).Replace("-", string.Empty);
 
-                result.ShouldEqual(expected);
+                result.Should().Be(expected);
             }
         }
 
@@ -91,7 +91,7 @@ namespace chocolatey.tests.infrastructure.cryptography
             [Fact]
             public void Should_log_a_warning()
             {
-                MockLogger.MessagesFor(LogLevel.Warn).Count.ShouldEqual(1);
+                MockLogger.MessagesFor(LogLevel.Warn).Count.Should().Be(1);
             }
 
             [Fact]
@@ -103,7 +103,7 @@ namespace chocolatey.tests.infrastructure.cryptography
             [Fact]
             public void Should_provide_an_unchanging_hash_for_a_file_too_big_to_hash()
             {
-                result.ShouldEqual(ApplicationParameters.HashProviderFileTooBig);
+                result.Should().Be(ApplicationParameters.HashProviderFileTooBig);
             }
         }
     }

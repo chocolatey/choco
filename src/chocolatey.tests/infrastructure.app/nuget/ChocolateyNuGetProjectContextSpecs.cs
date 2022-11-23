@@ -21,7 +21,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
     using NuGet.Common;
     using NuGet.ProjectManagement;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class ChocolateyNuGetProjectContextSpecs
     {
@@ -139,7 +139,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 var result = Service.ResolveFileConflict(message);
 
-                result.ShouldEqual(FileConflictAction.OverwriteAll);
+                result.Should().Be(FileConflictAction.OverwriteAll);
 
                 Logger.Verify(l => l.LogWarning("File conflict, overwriting all: Some kind of message"), Times.Once);
 

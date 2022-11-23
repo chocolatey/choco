@@ -22,7 +22,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.platforms;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class DotNetFileSystemSpecs
     {
@@ -59,41 +59,39 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void GetExecutablePath_should_find_existing_executable()
             {
-                FileSystem.GetExecutablePath("cmd").ShouldEqual(
+                FileSystem.GetExecutablePath("cmd").Should().BeEquivalentTo(
                     Platform.GetPlatform() == PlatformType.Windows
                         ? "C:\\Windows\\system32\\cmd.exe"
-                        : "cmd",
-                    StringComparer.OrdinalIgnoreCase
-                );
+                        : "cmd"
+                    );
             }
 
             [Fact]
             public void GetExecutablePath_should_find_existing_executable_with_extension()
             {
-                FileSystem.GetExecutablePath("cmd.exe").ShouldEqual(
+                FileSystem.GetExecutablePath("cmd.exe").Should().BeEquivalentTo(
                     Platform.GetPlatform() == PlatformType.Windows
                         ? "c:\\windows\\system32\\cmd.exe"
-                        : "cmd.exe",
-                    StringComparer.OrdinalIgnoreCase
+                        : "cmd.exe"
                 );
             }
 
             [Fact]
             public void GetExecutablePath_should_return_same_value_when_executable_is_not_found()
             {
-                FileSystem.GetExecutablePath("daslakjsfdasdfwea").ShouldEqual("daslakjsfdasdfwea");
+                FileSystem.GetExecutablePath("daslakjsfdasdfwea").Should().Be("daslakjsfdasdfwea");
             }
 
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_null()
             {
-                FileSystem.GetExecutablePath(null).ShouldEqual(string.Empty);
+                FileSystem.GetExecutablePath(null).Should().Be(string.Empty);
             }
 
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_empty_string()
             {
-                FileSystem.GetExecutablePath(string.Empty).ShouldEqual(string.Empty);
+                FileSystem.GetExecutablePath(string.Empty).Should().Be(string.Empty);
             }
         }
 
@@ -120,7 +118,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void GetFiles_should_return_string_array_of_files()
             {
-                FileSystem.GetFiles(ContextPath, "*lipsum*", SearchOption.AllDirectories).ShouldEqual(FileArray);
+                FileSystem.GetFiles(ContextPath, "*lipsum*", SearchOption.AllDirectories).Should().BeEquivalentTo(FileArray);
             }
 
             [Fact]
@@ -132,8 +130,8 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
                 var actual = FileSystem.GetFiles(ContextPath, "chocolateyInstall.ps1", SearchOption.AllDirectories).ToList();
                 FileSystem.DeleteFile(filePath);
 
-                actual.ShouldNotBeEmpty();
-                actual.Count().ShouldEqual(1);
+                actual.Should().NotBeEmpty();
+                actual.Count().Should().Be(1);
             }
 
             [Fact]
@@ -147,44 +145,44 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
                 var actual = FileSystem.GetFiles(ContextPath, "chocolateyinstall.ps1", SearchOption.AllDirectories).ToList();
                 FileSystem.DeleteFile(filePath);
 
-                actual.ShouldNotBeEmpty();
-                actual.Count().ShouldEqual(1);
+                actual.Should().NotBeEmpty();
+                actual.Count().Should().Be(1);
             }
 
             [Fact]
             public void FileExists_should_return_true_if_file_exists()
             {
-                FileSystem.FileExists(TheTestFile).ShouldBeTrue();
+                FileSystem.FileExists(TheTestFile).Should().BeTrue();
             }
 
             [Fact]
             public void FileExists_should_return_false_if_file_does_not_exists()
             {
-                FileSystem.FileExists(Path.Combine(ContextPath, "IDontExist.txt")).ShouldBeFalse();
+                FileSystem.FileExists(Path.Combine(ContextPath, "IDontExist.txt")).Should().BeFalse();
             }
 
             [Fact]
             public void DirectoryExists_should_return_true_if_directory_exists()
             {
-                FileSystem.DirectoryExists(ContextPath).ShouldBeTrue();
+                FileSystem.DirectoryExists(ContextPath).Should().BeTrue();
             }
 
             [Fact]
             public void DirectoryExists_should_return_false_if_directory_does_not_exist()
             {
-                FileSystem.DirectoryExists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IDontExist")).ShouldBeFalse();
+                FileSystem.DirectoryExists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IDontExist")).Should().BeFalse();
             }
 
             [Fact]
             public void GetFileSize_should_return_correct_file_size()
             {
-                FileSystem.GetFileSize(TheTestFile).ShouldEqual(5377);
+                FileSystem.GetFileSize(TheTestFile).Should().Be(5377);
             }
 
             [Fact]
             public void GetDirectories_should_return_a_string_array_with_directories()
             {
-                FileSystem.GetDirectories(ContextPath).ShouldEqual(DirectoryArray);
+                FileSystem.GetDirectories(ContextPath).Should().BeEquivalentTo(DirectoryArray);
             }
         }
 
@@ -207,7 +205,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void Visible_file_should_now_be_hidden()
             {
-                ((FileAttributes)FileSystem.GetFileInfoFor(SourceFile).Attributes & FileAttributes.Hidden).ShouldEqual(FileAttributes.Hidden);
+                ((FileAttributes)FileSystem.GetFileInfoFor(SourceFile).Attributes & FileAttributes.Hidden).Should().Be(FileAttributes.Hidden);
             }
 
             public override void AfterObservations()
@@ -234,7 +232,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void Readonly_file_should_no_longer_be_readonly()
             {
-                ((FileAttributes)FileSystem.GetFileInfoFor(SourceFile).Attributes & FileAttributes.ReadOnly).ShouldNotEqual(FileAttributes.ReadOnly);
+                ((FileAttributes)FileSystem.GetFileInfoFor(SourceFile).Attributes & FileAttributes.ReadOnly).Should().NotBe(FileAttributes.ReadOnly);
             }
         }
 
@@ -258,13 +256,13 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void Move_me_text_file_should_not_exist_in_the_source_path()
             {
-                FileSystem.FileExists(SourceFile).ShouldBeFalse();
+                FileSystem.FileExists(SourceFile).Should().BeFalse();
             }
 
             [Fact]
             public void Move_me_text_file_should_exist_in_destination_path()
             {
-                FileSystem.FileExists(DestFile).ShouldBeTrue();
+                FileSystem.FileExists(DestFile).Should().BeTrue();
             }
         }
 
@@ -291,13 +289,13 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void Copy_me_text_file_should_exist_in_context_path()
             {
-                FileSystem.FileExists(SourceFile).ShouldBeTrue();
+                FileSystem.FileExists(SourceFile).Should().BeTrue();
             }
 
             [Fact]
             public void Move_me_text_file_should_exist_in_destination_path()
             {
-                FileSystem.FileExists(DestFile).ShouldBeTrue();
+                FileSystem.FileExists(DestFile).Should().BeTrue();
             }
         }
 
@@ -319,7 +317,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void Delete_me_text_file_should_not_exist()
             {
-                FileSystem.FileExists(DeleteFile).ShouldBeFalse();
+                FileSystem.FileExists(DeleteFile).Should().BeFalse();
             }
         }
 
@@ -338,7 +336,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void Test_directory_should_exist()
             {
-                FileSystem.DirectoryExists(TestDirectory).ShouldBeTrue();
+                FileSystem.DirectoryExists(TestDirectory).Should().BeTrue();
             }
         }
 
@@ -353,7 +351,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void Should_have_correct_modified_date()
             {
-                FileSystem.GetFileModifiedDate(TheTestFile).ToShortDateString().ShouldEqual(DateTime.Now.AddDays(-1).ToShortDateString());
+                FileSystem.GetFileModifiedDate(TheTestFile).ToShortDateString().Should().Be(DateTime.Now.AddDays(-1).ToShortDateString());
             }
         }
     }

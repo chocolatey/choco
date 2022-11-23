@@ -26,7 +26,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class ChocolateyConfigCommandSpecs
     {
@@ -55,7 +55,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_implement_config()
             {
-                _results.ShouldContain("config");
+                _results.Should().Contain("config");
             }
         }
 
@@ -77,13 +77,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_add_name_to_the_option_set()
             {
-                _optionSet.Contains("name").ShouldBeTrue();
+                _optionSet.Contains("name").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_value_to_the_option_set()
             {
-                _optionSet.Contains("value").ShouldBeTrue();
+                _optionSet.Contains("value").Should().BeTrue();
             }
         }
 

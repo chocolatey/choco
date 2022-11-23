@@ -28,7 +28,7 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.results;
     using chocolatey.infrastructure.services;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class FilesServiceSpecs
     {
@@ -138,13 +138,13 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_return_a_warning_if_the_install_directory_matches_choco_install_location()
             {
-                packageResult.Warning.ShouldBeTrue();
+                packageResult.Warning.Should().BeTrue();
             }
 
             [Fact]
             public void Should_return_null()
             {
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
         }
 
@@ -174,13 +174,13 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_return_a_warning_if_the_install_directory_matches_choco_install_location()
             {
-                packageResult.Warning.ShouldBeTrue();
+                packageResult.Warning.Should().BeTrue();
             }
 
             [Fact]
             public void Should_return_null()
             {
-                result.ShouldBeNull();
+                result.Should().BeNull();
             }
         }
 
@@ -210,13 +210,13 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_return_a_non_null_object()
             {
-                result.ShouldNotBeNull();
+                result.Should().NotBeNull();
             }
 
             [Fact]
             public void Should_return_empty_package_files()
             {
-                result.Files.ShouldBeEmpty();
+                result.Files.Should().BeEmpty();
             }
         }
 
@@ -249,19 +249,19 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_return_a_PackageFiles_object()
             {
-                result.ShouldNotBeNull();
+                result.Should().NotBeNull();
             }
 
             [Fact]
             public void Should_contain_package_files()
             {
-                result.Files.ShouldNotBeEmpty();
+                result.Files.Should().NotBeEmpty();
             }
 
             [Fact]
             public void Should_contain_the_correct_number_of_package_files()
             {
-                result.Files.Count.ShouldEqual(files.Count);
+                result.Files.Count.Should().Be(files.Count);
             }
 
             [Fact]

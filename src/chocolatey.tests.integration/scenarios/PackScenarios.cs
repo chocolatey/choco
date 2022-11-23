@@ -28,7 +28,7 @@ namespace chocolatey.tests.integration.scenarios
 
     using NUnit.Framework;
 
-    using Should;
+    using FluentAssertions;
 
     public class PackScenarios
     {
@@ -71,7 +71,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", string.Empty);
 
-                ServiceAct.ShouldThrow<XmlException>();
+                ServiceAct.Should().Throw<XmlException>();
             }
 
             [TestCase("")]
@@ -96,7 +96,7 @@ namespace chocolatey.tests.integration.scenarios
   </metadata>
 </package>".FormatWith(version));
 
-                ServiceAct.ShouldThrow<InvalidDataException>();
+                ServiceAct.Should().Throw<InvalidDataException>();
             }
         }
 
@@ -154,9 +154,9 @@ namespace chocolatey.tests.integration.scenarios
             public void Generated_package_should_be_in_current_directory()
             {
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.ShouldEqual(2);
-                infos[0].ShouldEqual("Attempting to build package from 'myPackage.nuspec'.");
-                infos[1].ShouldEqual(string.Concat("Successfully created package '", PackagePath, "'"));
+                infos.Count.Should().Be(2);
+                infos[0].Should().Be("Attempting to build package from 'myPackage.nuspec'.");
+                infos[1].Should().Be(string.Concat("Successfully created package '", PackagePath, "'"));
 
                 FileAssert.Exists(PackagePath);
             }
@@ -168,7 +168,7 @@ namespace chocolatey.tests.integration.scenarios
                 {
                     var version = packageReader.NuspecReader.GetVersion();
 
-                    version.ToFullString().ShouldEqual(ExpectedNuspecVersion);
+                    version.ToFullString().Should().Be(ExpectedNuspecVersion);
                 }
             }
 
@@ -177,11 +177,11 @@ namespace chocolatey.tests.integration.scenarios
             {
                 if (string.IsNullOrEmpty(ExpectedSubDirectory))
                 {
-                    Configuration.Sources.ShouldEqual(Scenario.get_top_level());
+                    Configuration.Sources.Should().Be(Scenario.get_top_level());
                 }
                 else
                 {
-                    Configuration.Sources.ShouldEqual(ExpectedSubDirectory);
+                    Configuration.Sources.Should().Be(ExpectedSubDirectory);
                 }
             }
 
@@ -426,9 +426,9 @@ namespace chocolatey.tests.integration.scenarios
             public void Property_settings_should_be_logged_as_debug_messages()
             {
                 var messages = MockLogger.MessagesFor(LogLevel.Debug);
-                messages.Count.ShouldEqual(2);
-                messages.ShouldContain("Setting property 'commitId': 1234abcd");
-                messages.ShouldContain("Setting property 'version': 0.1.0");
+                messages.Count.Should().Be(2);
+                messages.Should().ContainEquivalentOf("Setting property 'commitId': 1234abcd");
+                messages.Should().ContainEquivalentOf("Setting property 'version': 0.1.0");
             }
         }
 
@@ -439,7 +439,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithAllUnsupportedElements);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -447,7 +447,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithServiceableElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -455,7 +455,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithLicenseElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -463,7 +463,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithRepositoryElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -471,7 +471,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithPackageTypesElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -479,7 +479,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithFrameWorkReferencesElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -487,7 +487,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithReadmeElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -495,7 +495,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithIconElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
         }
 

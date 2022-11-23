@@ -21,7 +21,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.results;
     using NuGet.Configuration;
-    using Should;
+    using FluentAssertions;
 
     public class ListScenarios
     {
@@ -62,28 +62,28 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_packages_and_versions_with_a_space_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0").ShouldBeTrue(userMessage: "Warnings: " + string.Join("\n", MockLogger.Messages["Info"]));
+                MockLogger.ContainsMessage("upgradepackage 1.0.0").Should().BeTrue("Warnings: " + string.Join("\n", MockLogger.Messages["Info"]));
             }
 
             [Fact]
             public void Should_not_contain_packages_and_versions_with_a_pipe_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage|1.0.0").ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage|1.0.0").Should().BeFalse();
             }
 
             [Fact]
             public void Should_contain_a_summary()
             {
-                MockLogger.ContainsMessage("packages installed").ShouldBeTrue();
+                MockLogger.ContainsMessage("packages installed").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeTrue();
+                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeTrue();
+                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeTrue();
+                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeTrue();
             }
         }
 
@@ -104,13 +104,13 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_package_name()
             {
-                MockLogger.ContainsMessage("upgradepackage").ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage").Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_contain_any_version_number()
             {
-                MockLogger.ContainsMessage(".0").ShouldBeFalse();
+                MockLogger.ContainsMessage(".0").Should().BeFalse();
             }
         }
 
@@ -132,35 +132,35 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_packages_and_versions_with_a_pipe_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage|1.0.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage|1.0.0").Should().BeTrue();
             }
 
             [Fact]
             public void Should_only_have_messages_related_to_package_information()
             {
                 var count = MockLogger.MessagesFor(LogLevel.Info).OrEmpty().Count();
-                count.ShouldEqual(2);
+                count.Should().Be(2);
             }
 
             [Fact]
             public void Should_not_contain_packages_and_versions_with_a_space_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0").ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage 1.0.0").Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_contain_a_summary()
             {
-                MockLogger.ContainsMessage("packages installed").ShouldBeFalse();
+                MockLogger.ContainsMessage("packages installed").Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).ShouldBeFalse();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).ShouldBeFalse();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).ShouldBeFalse();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).ShouldBeFalse();
+                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeFalse();
+                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeFalse();
+                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeFalse();
+                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeFalse();
             }
         }
 
@@ -183,19 +183,19 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_packages_id()
             {
-                MockLogger.ContainsMessage("upgradepackage").ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage").Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_contain_any_version_number()
             {
-                MockLogger.ContainsMessage(".0").ShouldBeFalse();
+                MockLogger.ContainsMessage(".0").Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_contain_pipe()
             {
-                MockLogger.ContainsMessage("|").ShouldBeFalse();
+                MockLogger.ContainsMessage("|").Should().BeFalse();
             }
         }
 
@@ -217,34 +217,34 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_packages_and_versions_with_a_space_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage 1.0.0").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_uppercase_id_package()
             {
-                MockLogger.ContainsMessage("UpperCase 1.1.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("UpperCase 1.1.0").Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_contain_packages_and_versions_with_a_pipe_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage|1.0.0").ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage|1.0.0").Should().BeFalse();
             }
 
             [Fact]
             public void Should_contain_a_summary()
             {
-                MockLogger.ContainsMessage("packages installed").ShouldBeTrue();
+                MockLogger.ContainsMessage("packages installed").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeTrue();
+                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeTrue();
+                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeTrue();
+                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeTrue();
             }
         }
     }

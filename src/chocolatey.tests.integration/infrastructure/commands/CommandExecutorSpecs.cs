@@ -21,7 +21,7 @@ namespace chocolatey.tests.integration.infrastructure.commands
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class CommandExecutorSpecs
     {
@@ -64,19 +64,19 @@ namespace chocolatey.tests.integration.infrastructure.commands
             [Fact]
             public void Should_not_return_an_exit_code_of_zero()
             {
-                result.ShouldNotEqual(0);
+                result.Should().NotBe(0);
             }
 
             [Fact]
             public void Should_contain_error_output()
             {
-                errorOutput.ShouldNotBeNull();
+                errorOutput.Should().NotBeNull();
             }
 
             [Fact]
             public void Should_message_the_error()
             {
-                errorOutput.ShouldEqual("'bob123123' is not recognized as an internal or external command,operable program or batch file.");
+                errorOutput.Should().Be("'bob123123' is not recognized as an internal or external command,operable program or batch file.");
             }
         }
 
@@ -102,7 +102,7 @@ namespace chocolatey.tests.integration.infrastructure.commands
             [Fact]
             public void Should_have_an_error_message()
             {
-                result.ShouldNotBeNull();
+                result.Should().NotBeNull();
             }
         }
     }

@@ -28,7 +28,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.results;
     using NuGet.Configuration;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
     public class UninstallScenarios
@@ -89,7 +89,7 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("Would have uninstalled installpackage v1.0.0")) expectedMessage = true;
                 }
 
-                expectedMessage.ShouldBeTrue();
+                expectedMessage.Should().BeTrue();
             }
 
             [Fact]
@@ -97,7 +97,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_contain_a_message_that_it_would_have_run_a_powershell_script()
             {
-                MockLogger.ContainsMessage("chocolateyuninstall.ps1").ShouldBeTrue();
+                MockLogger.ContainsMessage("chocolateyuninstall.ps1").Should().BeTrue();
             }
 
             [Fact]
@@ -105,7 +105,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_contain_a_message_that_it_would_have_run_powershell_modification_script()
             {
-                MockLogger.ContainsMessage("chocolateyBeforeModify.ps1").ShouldBeTrue();
+                MockLogger.ContainsMessage("chocolateyBeforeModify.ps1").Should().BeTrue();
             }
         }
 
@@ -132,7 +132,7 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("somethingnonexisting is not installed. Cannot uninstall a non-existent package")) expectedMessage = true;
                 }
 
-                expectedMessage.ShouldBeTrue();
+                expectedMessage.Should().BeTrue();
             }
         }
 
@@ -199,31 +199,31 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("1/1")) installedSuccessfully = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                installedSuccessfully.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
@@ -231,7 +231,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script()
             {
-                MockLogger.ContainsMessage("installpackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("installpackage 1.0.0 Before Modification", LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -239,7 +239,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyUninstall_script()
             {
-                MockLogger.ContainsMessage("installpackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("installpackage 1.0.0 Uninstalled", LogLevel.Info).Should().BeTrue();
             }
         }
 
@@ -300,31 +300,31 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("1/1")) installedSuccessfully = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                installedSuccessfully.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
         }
 
@@ -346,7 +346,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Action m = () => Service.Uninstall(Configuration);
 
-                m.ShouldThrow<ApplicationException>();
+                m.Should().Throw<ApplicationException>();
             }
         }
 
@@ -395,25 +395,25 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("uninstalled 1/1")) expectedMessage = true;
                 }
 
-                expectedMessage.ShouldBeTrue();
+                expectedMessage.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
         }
 
@@ -482,25 +482,25 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("uninstalled 1/1")) expectedMessage = true;
                 }
 
-                expectedMessage.ShouldBeTrue();
+                expectedMessage.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
         }
 
@@ -577,7 +577,7 @@ namespace chocolatey.tests.integration.scenarios
                     }
                 }
 
-                expectedMessage.ShouldBeTrue();
+                expectedMessage.Should().BeTrue();
             }
 
             [Fact]
@@ -589,25 +589,25 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("uninstalled 0/1")) expectedMessage = true;
                 }
 
-                expectedMessage.ShouldBeTrue();
+                expectedMessage.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeFalse();
+                _packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
         }
 
@@ -643,7 +643,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 foreach (var file in files.OrEmpty())
                 {
-                    Path.GetFileName(file).ShouldEqual("dude.txt", "Expected files were not deleted.");
+                    Path.GetFileName(file).Should().Be("dude.txt", "Expected files were not deleted.");
                 }
             }
 
@@ -684,31 +684,31 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("1/1")) installedSuccessfully = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                installedSuccessfully.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
         }
 
@@ -744,7 +744,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 foreach (var file in files.OrEmpty())
                 {
-                    Path.GetFileName(file).ShouldEqual("chocolateyInstall.ps1", "Expected files were not deleted.");
+                    Path.GetFileName(file).Should().Be("chocolateyInstall.ps1", "Expected files were not deleted.");
                 }
             }
 
@@ -785,31 +785,31 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("1/1")) installedSuccessfully = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                installedSuccessfully.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
         }
 
@@ -894,31 +894,31 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("1/1")) installedSuccessfully = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                installedSuccessfully.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
         }
 
@@ -947,7 +947,7 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("somethingnonexisting is not installed. Cannot uninstall a non-existent package")) expectedMessage = true;
                 }
 
-                expectedMessage.ShouldBeTrue();
+                expectedMessage.Should().BeTrue();
             }
 
             [Fact]
@@ -959,25 +959,25 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("0/1")) installedSuccessfully = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                installedSuccessfully.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
@@ -992,7 +992,7 @@ namespace chocolatey.tests.integration.scenarios
                     }
                 }
 
-                errorFound.ShouldBeTrue();
+                errorFound.Should().BeTrue();
             }
         }
 
@@ -1054,25 +1054,25 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("0/1")) installedSuccessfully = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                installedSuccessfully.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
@@ -1087,7 +1087,7 @@ namespace chocolatey.tests.integration.scenarios
                     }
                 }
 
-                errorFound.ShouldBeTrue();
+                errorFound.Should().BeTrue();
             }
 
             [Fact]
@@ -1102,7 +1102,7 @@ namespace chocolatey.tests.integration.scenarios
                     }
                 }
 
-                errorFound.ShouldBeTrue();
+                errorFound.Should().BeTrue();
             }
         }
 
@@ -1150,31 +1150,31 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("1/1")) installedSuccessfully = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                installedSuccessfully.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
@@ -1256,31 +1256,31 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("1/1")) installedSuccessfully = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                installedSuccessfully.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
@@ -1288,7 +1288,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script()
             {
-                MockLogger.ContainsMessage("installpackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("installpackage 1.0.0 Before Modification", LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -1296,7 +1296,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyUninstall_script()
             {
-                MockLogger.ContainsMessage("installpackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("installpackage 1.0.0 Uninstalled", LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -1304,7 +1304,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_pre_all_hook_script()
             {
-                MockLogger.ContainsMessage("pre-uninstall-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("pre-uninstall-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -1312,7 +1312,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_post_all_hook_script()
             {
-                MockLogger.ContainsMessage("post-uninstall-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("post-uninstall-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -1320,7 +1320,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_pre_installpackage_hook_script()
             {
-                MockLogger.ContainsMessage("pre-uninstall-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("pre-uninstall-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -1328,7 +1328,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_post_installpackage_hook_script()
             {
-                MockLogger.ContainsMessage("post-uninstall-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("post-uninstall-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -1336,7 +1336,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_upgradepackage_hook_script()
             {
-                MockLogger.ContainsMessage("pre-uninstall-upgradepackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.ContainsMessage("pre-uninstall-upgradepackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).Should().BeFalse();
             }
 
             [Fact]
@@ -1344,7 +1344,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_pre_beforemodify_hook_script()
             {
-                MockLogger.ContainsMessage("pre-beforemodify-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("pre-beforemodify-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -1352,7 +1352,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_post_beforemodify_hook_script()
             {
-                MockLogger.ContainsMessage("post-beforemodify-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("post-beforemodify-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).Should().BeTrue();
             }
         }
 
@@ -1400,31 +1400,31 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("1/1")) installedSuccessfully = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                installedSuccessfully.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
@@ -1432,7 +1432,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script()
             {
-                MockLogger.ContainsMessage("UpperCase 1.1.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("UpperCase 1.1.0 Before Modification", LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -1440,7 +1440,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyUninstall_script()
             {
-                MockLogger.ContainsMessage("UpperCase 1.1.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("UpperCase 1.1.0 Uninstalled", LogLevel.Info).Should().BeTrue();
             }
         }
 
@@ -1448,8 +1448,7 @@ namespace chocolatey.tests.integration.scenarios
         {
             private PackageResult packageResult;
 
-            private const string NonNormalizedVersion = "0004.0004.00005.00";
-            private const string NormalizedVersion = "4.4.5";
+            private string NonNormalizedVersion = "0004.0004.00005.00";
 
             public override void Context()
             {
@@ -1519,31 +1518,31 @@ namespace chocolatey.tests.integration.scenarios
                     if (message.Contains("1/1")) installedSuccessfully = true;
                 }
 
-                installedSuccessfully.ShouldBeTrue();
+                installedSuccessfully.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
@@ -1551,7 +1550,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script()
             {
-                MockLogger.ContainsMessage("upgradepackage {0} Before Modification".FormatWith(NormalizedVersion), LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage {0} Before Modification".FormatWith(NonNormalizedVersion), LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -1559,7 +1558,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyUninstall_script()
             {
-                MockLogger.ContainsMessage("upgradepackage {0} Uninstalled".FormatWith(NormalizedVersion), LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage {0} Uninstalled".FormatWith(NonNormalizedVersion), LogLevel.Info).Should().BeTrue();
             }
         }
 
@@ -1590,20 +1589,20 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_uninstall_the_package()
             {
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", TargetPackageName, "{0}.nupkg".FormatWith(TargetPackageName));
-                File.Exists(packageFile).ShouldBeFalse();
+                File.Exists(packageFile).Should().BeFalse();
             }
 
             [Fact]
             public void Should_uninstall_the_dependency()
             {
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", DependencyName, "{0}.nupkg".FormatWith(DependencyName));
-                File.Exists(packageFile).ShouldBeFalse();
+                File.Exists(packageFile).Should().BeFalse();
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_uninstalled_successfully()
             {
-                MockLogger.ContainsMessage("uninstalled 2/2", LogLevel.Warn).ShouldBeTrue();
+                MockLogger.ContainsMessage("uninstalled 2/2", LogLevel.Warn).Should().BeTrue();
             }
 
             [Fact]
@@ -1611,7 +1610,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_target_package_beforeModify()
             {
-                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(TargetPackageName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(TargetPackageName, "1.0.0"), LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -1619,7 +1618,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_dependency_package_beforeModify()
             {
-                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "1.0.0"), LogLevel.Info).Should().BeTrue();
             }
 
             [Fact]
@@ -1627,7 +1626,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    packageResult.Value.Success.ShouldBeTrue();
+                    packageResult.Value.Success.Should().BeTrue();
                 }
             }
 
@@ -1636,7 +1635,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                    packageResult.Value.Inconclusive.Should().BeFalse();
                 }
             }
 
@@ -1645,7 +1644,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    packageResult.Value.Warning.ShouldBeFalse();
+                    packageResult.Value.Warning.Should().BeFalse();
                 }
 
             }

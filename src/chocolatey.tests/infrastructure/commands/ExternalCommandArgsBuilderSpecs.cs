@@ -20,7 +20,7 @@ namespace chocolatey.tests.infrastructure.commands
     using System.Collections.Generic;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.commands;
-    using Should;
+    using FluentAssertions;
 
     public class ExternalCommandArgsBuilderSpecs
     {
@@ -53,7 +53,7 @@ namespace chocolatey.tests.infrastructure.commands
                     {
                         ArgumentOption = "-source "
                     });
-                buildConfigs().ShouldEqual("-source " + configuration.Sources);
+                buildConfigs().Should().Be("-source " + configuration.Sources);
             }
 
             [Fact]
@@ -66,7 +66,7 @@ namespace chocolatey.tests.infrastructure.commands
                     {
                         ArgumentOption = "-apikey "
                     });
-                buildConfigs().ShouldEqual("-apikey " + configuration.ApiKeyCommand.Key);
+                buildConfigs().Should().Be("-apikey " + configuration.ApiKeyCommand.Key);
             }
 
             [Fact]
@@ -79,7 +79,7 @@ namespace chocolatey.tests.infrastructure.commands
                     {
                         ArgumentOption = "-source "
                     });
-                buildConfigs().ShouldEqual("");
+                buildConfigs().Should().Be("");
             }
 
             [Fact]
@@ -92,7 +92,7 @@ namespace chocolatey.tests.infrastructure.commands
                     {
                         ArgumentOption = "-source "
                     });
-                ExternalCommandArgsBuilder.BuildArguments(configuration, ignoreCaseDictionary).ShouldEqual("-source yo");
+                ExternalCommandArgsBuilder.BuildArguments(configuration, ignoreCaseDictionary).Should().Be("-source yo");
             }
 
             [Fact]
@@ -106,7 +106,7 @@ namespace chocolatey.tests.infrastructure.commands
                         ArgumentOption = "-source ",
                         ArgumentValue = "bob"
                     });
-                buildConfigs().ShouldEqual("-source bob");
+                buildConfigs().Should().Be("-source bob");
             }
 
             [Fact]
@@ -119,7 +119,7 @@ namespace chocolatey.tests.infrastructure.commands
                     {
                         ArgumentOption = "-version "
                     });
-                buildConfigs().ShouldEqual("");
+                buildConfigs().Should().Be("");
             }
 
             [Fact]
@@ -133,7 +133,7 @@ namespace chocolatey.tests.infrastructure.commands
                         ArgumentOption = "install",
                         Required = true
                     });
-                buildConfigs().ShouldEqual("install");
+                buildConfigs().Should().Be("install");
             }
 
             [Fact]
@@ -146,7 +146,7 @@ namespace chocolatey.tests.infrastructure.commands
                     {
                         ArgumentOption = "install"
                     });
-                buildConfigs().ShouldEqual("");
+                buildConfigs().Should().Be("");
             }
 
             [Fact]
@@ -160,7 +160,7 @@ namespace chocolatey.tests.infrastructure.commands
                         ArgumentOption = "install",
                         Required = true
                     });
-                buildConfigs().ShouldEqual("install");
+                buildConfigs().Should().Be("install");
             }
 
             [Fact]
@@ -173,7 +173,7 @@ namespace chocolatey.tests.infrastructure.commands
                     {
                         ArgumentOption = "-verbose"
                     });
-                buildConfigs().ShouldEqual("-verbose");
+                buildConfigs().Should().Be("-verbose");
             }
 
             [Fact]
@@ -186,7 +186,7 @@ namespace chocolatey.tests.infrastructure.commands
                     {
                         ArgumentOption = "-pre"
                     });
-                buildConfigs().ShouldEqual("");
+                buildConfigs().Should().Be("");
             }
 
             [Fact]
@@ -200,7 +200,7 @@ namespace chocolatey.tests.infrastructure.commands
                         ArgumentOption = "-source ",
                         QuoteValue = true
                     });
-                buildConfigs().ShouldEqual("-source \"yo\"");
+                buildConfigs().Should().Be("-source \"yo\"");
             }
 
             [Fact]
@@ -213,7 +213,7 @@ namespace chocolatey.tests.infrastructure.commands
                     {
                         ArgumentOption = "-command "
                     });
-                buildConfigs().ShouldEqual("-command \"{0}\"".FormatWith(configuration.CommandName));
+                buildConfigs().Should().Be("-command \"{0}\"".FormatWith(configuration.CommandName));
             }
 
             [Fact]
@@ -227,7 +227,7 @@ namespace chocolatey.tests.infrastructure.commands
                         ArgumentOption = "-source you know = ",
                         QuoteValue = true
                     });
-                buildConfigs().ShouldEqual("-source you know = \"yo\"");
+                buildConfigs().Should().Be("-source you know = \"yo\"");
             }
 
             [Fact]
@@ -241,7 +241,7 @@ namespace chocolatey.tests.infrastructure.commands
                         ArgumentOption = "-source ",
                         UseValueOnly = true
                     });
-                buildConfigs().ShouldEqual("yo");
+                buildConfigs().Should().Be("yo");
             }
 
             [Fact]
@@ -257,7 +257,7 @@ namespace chocolatey.tests.infrastructure.commands
                         UseValueOnly = true,
                         Required = true
                     });
-                buildConfigs().ShouldEqual("bob");
+                buildConfigs().Should().Be("bob");
             }
 
             [Fact]
@@ -271,7 +271,7 @@ namespace chocolatey.tests.infrastructure.commands
                         ArgumentOption = "-version ",
                         UseValueOnly = true
                     });
-                buildConfigs().ShouldEqual("");
+                buildConfigs().Should().Be("");
             }
 
             [Fact]
@@ -291,7 +291,7 @@ namespace chocolatey.tests.infrastructure.commands
                     {
                         ArgumentOption = "-source "
                     });
-                buildConfigs().ShouldEqual("install -source yo");
+                buildConfigs().Should().Be("install -source yo");
             }
 
             [Fact]
@@ -336,7 +336,7 @@ namespace chocolatey.tests.infrastructure.commands
                         Required = true
                     });
 
-                buildConfigs().ShouldEqual("install -outputdirectory \"bob\" -source \"{0}\" -noninteractive -nocache".FormatWith(configuration.Sources));
+                buildConfigs().Should().Be("install -outputdirectory \"bob\" -source \"{0}\" -noninteractive -nocache".FormatWith(configuration.Sources));
             }
         }
     }

@@ -18,7 +18,7 @@ namespace chocolatey.tests.integration.scenarios
 
     using NUnit.Framework;
 
-    using Should;
+    using FluentAssertions;
 
     public class InfoScenarios
     {
@@ -83,8 +83,8 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain("installpackage 1.0.0");
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain("installpackage 1.0.0");
             }
 
             [Fact]
@@ -93,15 +93,15 @@ namespace chocolatey.tests.integration.scenarios
                 var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
             }
 
             [Fact]
             public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.ToStringSafe());
-                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Warn.ToStringSafe());
+                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].Should().Contain("1 packages found.");
             }
         }
 
@@ -122,8 +122,8 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain("installpackage 1.0.0");
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain("installpackage 1.0.0");
             }
 
             [Fact]
@@ -132,15 +132,15 @@ namespace chocolatey.tests.integration.scenarios
                 var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
             }
 
             [Fact]
             public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.ToStringSafe());
-                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Warn.ToStringSafe());
+                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].Should().Contain("1 packages found.");
             }
         }
 
@@ -161,8 +161,8 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain("installpackage 1.0.0");
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain("installpackage 1.0.0");
             }
 
             [Fact]
@@ -171,15 +171,15 @@ namespace chocolatey.tests.integration.scenarios
                 var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
             }
 
             [Fact]
             public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.ToStringSafe());
-                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Warn.ToStringSafe());
+                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].Should().Contain("1 packages found.");
             }
         }
 
@@ -202,8 +202,8 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain("installpackage {0}".FormatWith(NormalizedVersion));
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain("installpackage {0}".FormatWith(NormalizedVersion));
             }
 
             [Fact]
@@ -212,15 +212,15 @@ namespace chocolatey.tests.integration.scenarios
                 var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".FormatWith(NonNormalizedVersion) + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
             }
 
             [Fact]
             public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.ToStringSafe());
-                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Warn.ToStringSafe());
+                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].Should().Contain("1 packages found.");
             }
         }
 
@@ -245,8 +245,8 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain("installpackage {0}".FormatWith(NormalizedVersion));
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain("installpackage {0}".FormatWith(NormalizedVersion));
             }
 
             [Fact]
@@ -255,15 +255,15 @@ namespace chocolatey.tests.integration.scenarios
                 var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".FormatWith(NonNormalizedVersion) + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
             }
 
             [Fact]
             public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.ToStringSafe());
-                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Warn.ToStringSafe());
+                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].Should().Contain("1 packages found.");
             }
         }
 
@@ -288,8 +288,8 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain("installpackage {0}".FormatWith(NormalizedVersion));
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain("installpackage {0}".FormatWith(NormalizedVersion));
             }
 
             [Fact]
@@ -298,15 +298,15 @@ namespace chocolatey.tests.integration.scenarios
                 var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".FormatWith(NonNormalizedVersion) + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
             }
 
             [Fact]
             public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.ToStringSafe());
-                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Warn.ToStringSafe());
+                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].Should().Contain("1 packages found.");
             }
         }
 
@@ -336,8 +336,8 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public new void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain("installpackage 1.0.0");
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain("installpackage 1.0.0");
             }
 
             [Fact]
@@ -346,15 +346,15 @@ namespace chocolatey.tests.integration.scenarios
                 var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.ToStringSafe());
-                MockLogger.Messages[LogLevel.Info.ToStringSafe()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Info.ToStringSafe());
+                MockLogger.Messages[LogLevel.Info.ToStringSafe()].Should().Contain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate));
             }
 
             [Fact]
             public new void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.ToStringSafe());
-                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Keys.Should().Contain(LogLevel.Warn.ToStringSafe());
+                MockLogger.Messages[LogLevel.Warn.ToStringSafe()].Should().Contain("1 packages found.");
             }
         }
 
@@ -372,31 +372,31 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_show_only_one_result()
             {
-                Results.Count.ShouldEqual(1, "Expected 1 package to be returned!");
+                Results.Count.Should().Be(1, "Expected 1 package to be returned!");
             }
 
             [Fact]
             public void Should_set_exit_code_to_zero()
             {
-                Results[0].ExitCode.ShouldEqual(0);
+                Results[0].ExitCode.Should().Be(0);
             }
 
             [Fact]
             public void Should_not_be_reported_as_inconclusive()
             {
-                Results[0].Inconclusive.ShouldBeFalse();
+                Results[0].Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_report_expected_name()
             {
-                Results[0].Name.ShouldEqual("installpackage");
+                Results[0].Name.Should().Be("installpackage");
             }
 
             [Fact]
             public void Should_set_source_to_expected_value()
             {
-                Results[0].Source.ShouldEqual(
+                Results[0].Source.Should().Be(
                     ((Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://") + Path.Combine(Environment.CurrentDirectory, "PackageOutput"))
                     .Replace("\\","/"));
             }
@@ -404,7 +404,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_set_expected_version()
             {
-                Results[0].Version.ShouldEqual("1.0.0");
+                Results[0].Version.Should().Be("1.0.0");
             }
         }
 
@@ -422,25 +422,25 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_show_only_one_result()
             {
-                Results.Count.ShouldEqual(1, "Expected 1 package to be returned!");
+                Results.Count.Should().Be(1, "Expected 1 package to be returned!");
             }
 
             [Fact]
             public void Should_set_exit_code_to_zero()
             {
-                Results[0].ExitCode.ShouldEqual(0);
+                Results[0].ExitCode.Should().Be(0);
             }
 
             [Fact]
             public void Should_not_be_reported_as_inconclusive()
             {
-                Results[0].Inconclusive.ShouldBeFalse();
+                Results[0].Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_report_expected_name()
             {
-                Results[0].Name.ShouldEqual("test-package");
+                Results[0].Name.Should().Be("test-package");
             }
 
             [Fact]
@@ -451,13 +451,13 @@ namespace chocolatey.tests.integration.scenarios
                     "PrioritySources",
                     "Priority1").Replace('\\', '/');
 
-                Results[0].Source.ShouldEqual(expectedSource);
+                Results[0].Source.Should().Be(expectedSource);
             }
 
             [Fact]
             public void Should_set_expected_version()
             {
-                Results[0].Version.ShouldEqual("0.1.0");
+                Results[0].Version.Should().Be("0.1.0");
             }
         }
 
@@ -478,25 +478,25 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_show_only_one_result()
             {
-                Results.Count.ShouldEqual(1, "Expected 1 package to be returned!");
+                Results.Count.Should().Be(1, "Expected 1 package to be returned!");
             }
 
             [Fact]
             public void Should_set_exit_code_to_zero()
             {
-                Results[0].ExitCode.ShouldEqual(0);
+                Results[0].ExitCode.Should().Be(0);
             }
 
             [Fact]
             public void Should_not_be_reported_as_inconclusive()
             {
-                Results[0].Inconclusive.ShouldBeFalse();
+                Results[0].Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_report_expected_name()
             {
-                Results[0].Name.ShouldEqual("upgradepackage");
+                Results[0].Name.Should().Be("upgradepackage");
             }
 
             [Fact]
@@ -507,13 +507,13 @@ namespace chocolatey.tests.integration.scenarios
                     "PrioritySources",
                     "Priority1").Replace('\\', '/');
 
-                Results[0].Source.ShouldEqual(expectedSource);
+                Results[0].Source.Should().Be(expectedSource);
             }
 
             [Fact]
             public void Should_set_expected_version()
             {
-                Results[0].Version.ShouldEqual("1.0.0");
+                Results[0].Version.Should().Be("1.0.0");
             }
         }
     }

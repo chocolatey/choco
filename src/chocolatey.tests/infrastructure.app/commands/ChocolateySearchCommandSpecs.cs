@@ -25,7 +25,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class ChocolateySearchCommandSpecs
     {
@@ -55,19 +55,19 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_not_implement_list()
             {
-                results.ShouldNotContain("list");
+                results.Should().NotContain("list");
             }
 
             [Fact]
             public void Should_implement_search()
             {
-                results.ShouldContain("search");
+                results.Should().Contain("search");
             }
 
             [Fact]
             public void Should_implement_find()
             {
-                results.ShouldContain("find");
+                results.Should().Contain("find");
             }
         }
 
@@ -90,73 +90,73 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_add_source_to_the_option_set()
             {
-                optionSet.Contains("source").ShouldBeTrue();
+                optionSet.Contains("source").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_source_to_the_option_set()
             {
-                optionSet.Contains("s").ShouldBeTrue();
+                optionSet.Contains("s").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_prerelease_to_the_option_set()
             {
-                optionSet.Contains("prerelease").ShouldBeTrue();
+                optionSet.Contains("prerelease").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_prerelease_to_the_option_set()
             {
-                optionSet.Contains("pre").ShouldBeTrue();
+                optionSet.Contains("pre").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_includeprograms_to_the_option_set()
             {
-                optionSet.Contains("includeprograms").ShouldBeTrue();
+                optionSet.Contains("includeprograms").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_includeprograms_to_the_option_set()
             {
-                optionSet.Contains("i").ShouldBeTrue();
+                optionSet.Contains("i").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_allversions_to_the_option_set()
             {
-                optionSet.Contains("allversions").ShouldBeTrue();
+                optionSet.Contains("allversions").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_allversions_to_the_option_set()
             {
-                optionSet.Contains("a").ShouldBeTrue();
+                optionSet.Contains("a").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_user_to_the_option_set()
             {
-                optionSet.Contains("user").ShouldBeTrue();
+                optionSet.Contains("user").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_user_to_the_option_set()
             {
-                optionSet.Contains("u").ShouldBeTrue();
+                optionSet.Contains("u").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_password_to_the_option_set()
             {
-                optionSet.Contains("password").ShouldBeTrue();
+                optionSet.Contains("password").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_password_to_the_option_set()
             {
-                optionSet.Contains("p").ShouldBeTrue();
+                optionSet.Contains("p").Should().BeTrue();
             }
         }
 
@@ -185,73 +185,73 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_add_source_to_the_option_set()
             {
-                optionSet.Contains("source").ShouldBeTrue();
+                optionSet.Contains("source").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_source_to_the_option_set()
             {
-                optionSet.Contains("s").ShouldBeTrue();
+                optionSet.Contains("s").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_prerelease_to_the_option_set()
             {
-                optionSet.Contains("prerelease").ShouldBeTrue();
+                optionSet.Contains("prerelease").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_prerelease_to_the_option_set()
             {
-                optionSet.Contains("pre").ShouldBeTrue();
+                optionSet.Contains("pre").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_includeprograms_to_the_option_set()
             {
-                optionSet.Contains("includeprograms").ShouldBeTrue();
+                optionSet.Contains("includeprograms").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_includeprograms_to_the_option_set()
             {
-                optionSet.Contains("i").ShouldBeTrue();
+                optionSet.Contains("i").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_allversions_to_the_option_set()
             {
-                optionSet.Contains("allversions").ShouldBeTrue();
+                optionSet.Contains("allversions").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_allversions_to_the_option_set()
             {
-                optionSet.Contains("a").ShouldBeTrue();
+                optionSet.Contains("a").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_user_to_the_option_set()
             {
-                optionSet.Contains("user").ShouldBeTrue();
+                optionSet.Contains("user").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_user_to_the_option_set()
             {
-                optionSet.Contains("u").ShouldBeTrue();
+                optionSet.Contains("u").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_password_to_the_option_set()
             {
-                optionSet.Contains("password").ShouldBeTrue();
+                optionSet.Contains("password").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_password_to_the_option_set()
             {
-                optionSet.Contains("p").ShouldBeTrue();
+                optionSet.Contains("p").Should().BeTrue();
             }
         }
 
@@ -278,7 +278,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_set_unparsed_arguments_to_configuration_input()
             {
                 because();
-                configuration.Input.ShouldEqual("pkg1 pkg2");
+                configuration.Input.Should().Be("pkg1 pkg2");
             }
 
             [Fact]
@@ -286,7 +286,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 configuration.ListCommand.LocalOnly = false;
                 because();
-                configuration.Sources.ShouldEqual(source);
+                configuration.Sources.Should().Be(source);
             }
         }
 
@@ -326,7 +326,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_not_report_any_warning_messages()
             {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
+                MockLogger.Messages.Keys.Should().NotContain("Warn");
             }
         }
 
@@ -366,7 +366,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_not_report_any_warning_messages()
             {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
+                MockLogger.Messages.Keys.Should().NotContain("Warn");
             }
         }
 

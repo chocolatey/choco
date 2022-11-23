@@ -8,8 +8,7 @@
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.services;
     using Moq;
-    using Should;
-    using Assert = Should.Core.Assertions.Assert;
+    using FluentAssertions;
 
     public class ChocolateyConfigSettingsServiceSpecs
     {
@@ -61,14 +60,14 @@
             [Fact]
             public void Should_not_report_feature_being_unsupported()
             {
-                MockLogger.Messages["Warn"].ShouldNotContain("Feature '{0}' is not supported. Any change have no effect on running Chocolatey.".FormatWith(ApplicationParameters.Features.ChecksumFiles));
+                MockLogger.Messages["Warn"].Should().NotContain("Feature '{0}' is not supported. Any change have no effect on running Chocolatey.".FormatWith(ApplicationParameters.Features.ChecksumFiles));
             }
 
             [Fact]
             public void Should_report_feature_being_disabled()
             {
-                MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain("Disabled {0}".FormatWith(ApplicationParameters.Features.ChecksumFiles));
+                MockLogger.Messages.Keys.Should().Contain("Warn");
+                MockLogger.Messages["Warn"].Should().Contain("Disabled {0}".FormatWith(ApplicationParameters.Features.ChecksumFiles));
             }
 
             [Fact]
@@ -102,13 +101,13 @@
             [Fact]
             public void Should_not_contain_any_warnings()
             {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
+                MockLogger.Messages.Keys.Should().NotContain("Warn");
             }
 
             [Fact]
             public void Should_throw_exception_on_unknown_feature()
             {
-                Assert.ThrowsDelegate action = () =>
+                Action action = () =>
                 {
                     var config = new ChocolateyConfiguration()
                     {
@@ -121,8 +120,8 @@
                     Service.DisableFeature(config);
                 };
 
-                Assert.Throws<ApplicationException>(action)
-                    .Message.ShouldEqual("Feature 'unknown' not found");
+                action.Should().Throw<ApplicationException>()
+                    .WithMessage("Feature 'unknown' not found");
             }
         }
 
@@ -156,7 +155,7 @@
             [Fact]
             public void Should_throw_exception_on_unsupported_feature()
             {
-                Assert.Throws<ApplicationException>(() =>
+                Action action = () =>
                 {
                     var config = new ChocolateyConfiguration()
                     {
@@ -167,7 +166,9 @@
                     };
 
                     Service.DisableFeature(config);
-                }).Message.ShouldEqual("Feature '{0}' is not supported.".FormatWith(FeatureName));
+                };
+                    action.Should().Throw<ApplicationException>()
+                        .WithMessage("Feature '{0}' is not supported.".FormatWith(FeatureName));
             }
         }
 
@@ -208,14 +209,14 @@
             [Fact]
             public void Should_not_report_feature_being_unsupported()
             {
-                MockLogger.Messages["Warn"].ShouldNotContain("Feature '{0}' is not supported. Any change have no effect on running Chocolatey.".FormatWith(ApplicationParameters.Features.ChecksumFiles));
+                MockLogger.Messages["Warn"].Should().NotContain("Feature '{0}' is not supported. Any change have no effect on running Chocolatey.".FormatWith(ApplicationParameters.Features.ChecksumFiles));
             }
 
             [Fact]
             public void Should_report_feature_being_enabled()
             {
-                MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain("Enabled {0}".FormatWith(ApplicationParameters.Features.ChecksumFiles));
+                MockLogger.Messages.Keys.Should().Contain("Warn");
+                MockLogger.Messages["Warn"].Should().Contain("Enabled {0}".FormatWith(ApplicationParameters.Features.ChecksumFiles));
             }
 
             [Fact]
@@ -249,13 +250,13 @@
             [Fact]
             public void Should_not_contain_any_warnings()
             {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
+                MockLogger.Messages.Keys.Should().NotContain("Warn");
             }
 
             [Fact]
             public void Should_throw_exception_on_unknown_feature()
             {
-                Assert.ThrowsDelegate action = () =>
+                Action action = () =>
                 {
                     var config = new ChocolateyConfiguration()
                     {
@@ -268,8 +269,8 @@
                     Service.EnableFeature(config);
                 };
 
-                Assert.Throws<ApplicationException>(action)
-                    .Message.ShouldEqual("Feature 'unknown' not found");
+                action.Should().Throw<ApplicationException>()
+                    .WithMessage("Feature 'unknown' not found");
             }
         }
 
@@ -303,7 +304,7 @@
             [Fact]
             public void Should_throw_exception_on_unsupported_feature()
             {
-                Assert.Throws<ApplicationException>(() =>
+                Action action = () =>
                 {
                     var config = new ChocolateyConfiguration()
                     {
@@ -314,7 +315,10 @@
                     };
 
                     Service.EnableFeature(config);
-                }).Message.ShouldEqual("Feature '{0}' is not supported.".FormatWith(FeatureName));
+                }
+                ;
+                action.Should().Throw<ApplicationException>()
+                    .WithMessage("Feature '{0}' is not supported.".FormatWith(FeatureName));
             }
         }
 
@@ -356,12 +360,12 @@
             [Fact]
             public void Should_output_features_in_alphabetical_order()
             {
-                MockLogger.Messages.Keys.ShouldContain("Info");
+                MockLogger.Messages.Keys.Should().Contain("Info");
 
                 var infoMessages = MockLogger.Messages["Info"];
-                infoMessages.Count.ShouldEqual(2);
-                infoMessages[0].ShouldContain("allowEmptyChecksums");
-                infoMessages[1].ShouldContain("virusCheck");
+                infoMessages.Count.Should().Be(2);
+                infoMessages[0].Should().Contain("allowEmptyChecksums");
+                infoMessages[1].Should().Contain("virusCheck");
             }
         }
 
@@ -403,12 +407,12 @@
             [Fact]
             public void Should_output_config_in_alphabetical_order()
             {
-                MockLogger.Messages.Keys.ShouldContain("Info");
+                MockLogger.Messages.Keys.Should().Contain("Info");
 
                 var infoMessages = MockLogger.Messages["Info"];
-                infoMessages.Count.ShouldEqual(2);
-                infoMessages[0].ShouldContain("cacheLocation");
-                infoMessages[1].ShouldContain("webRequestTimeoutSeconds");
+                infoMessages.Count.Should().Be(2);
+                infoMessages[0].Should().Contain("cacheLocation");
+                infoMessages[1].Should().Contain("webRequestTimeoutSeconds");
             }
         }
 
@@ -450,12 +454,12 @@
             [Fact]
             public void Should_output_sources_in_alphabetical_order()
             {
-                MockLogger.Messages.Keys.ShouldContain("Info");
+                MockLogger.Messages.Keys.Should().Contain("Info");
 
                 var infoMessages = MockLogger.Messages["Info"];
-                infoMessages.Count.ShouldEqual(2);
-                infoMessages[0].ShouldContain("alpha");
-                infoMessages[1].ShouldContain("beta");
+                infoMessages.Count.Should().Be(2);
+                infoMessages[0].Should().Contain("alpha");
+                infoMessages[1].Should().Contain("beta");
             }
         }
 
@@ -516,9 +520,9 @@
                     _error = ex;
                 }
 
-                _error.ShouldNotBeNull();
-                _error.ShouldBeType<ApplicationException>();
-                _error.Message.ShouldContain("No feature value by the name 'unknown'");
+                _error.Should().NotBeNull();
+                _error.Should().BeOfType<ApplicationException>();
+                _error.Message.Should().Contain("No feature value by the name 'unknown'");
             }
         }
 
@@ -562,10 +566,10 @@
             [Fact]
             public void Should_return_feature_status()
             {
-                MockLogger.Messages.Keys.ShouldContain("Info");
+                MockLogger.Messages.Keys.Should().Contain("Info");
                 var infoMessages = MockLogger.Messages["Info"];
-                infoMessages.Count.ShouldEqual(1);
-                infoMessages[0].ShouldContain("Enabled");
+                infoMessages.Count.Should().Be(1);
+                infoMessages[0].Should().Contain("Enabled");
             }
         }
     }
