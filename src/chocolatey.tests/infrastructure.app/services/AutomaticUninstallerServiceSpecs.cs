@@ -31,7 +31,8 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.results;
     using Moq;
-    using NuGet;
+    using NuGet.Packaging;
+    using NuGet.Versioning;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
     public class AutomaticUninstallerServiceSpecs
@@ -45,7 +46,7 @@ namespace chocolatey.tests.infrastructure.app.services
             protected Mock<IRegistryService> registryService = new Mock<IRegistryService>();
             protected Mock<ICommandExecutor> commandExecutor = new Mock<ICommandExecutor>();
             protected ChocolateyConfiguration config = new ChocolateyConfiguration();
-            protected Mock<IPackage> package = new Mock<IPackage>();
+            protected Mock<IPackageMetadata> package = new Mock<IPackageMetadata>();
             protected ConcurrentDictionary<string, PackageResult> packageResults = new ConcurrentDictionary<string, PackageResult>();
             protected PackageResult packageResult;
             protected ChocolateyPackageInformation packageInformation;
@@ -66,7 +67,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 config.PromptForConfirmation = false;
                 config.PackageNames = "regular";
                 package.Setup(p => p.Id).Returns("regular");
-                package.Setup(p => p.Version).Returns(new SemanticVersion("1.2.0"));
+                package.Setup(p => p.Version).Returns(new NuGetVersion("1.2.0"));
                 packageResult = new PackageResult(package.Object, "c:\\packages\\thispackage");
                 packageInformation = new ChocolateyPackageInformation(package.Object);
                 registryKeys.Add(
@@ -115,7 +116,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_not_get_package_information()
             {
-                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Never);
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackageMetadata>()), Times.Never);
             }
 
             [Fact]
@@ -299,7 +300,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
@@ -454,7 +455,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
@@ -502,7 +503,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
@@ -551,7 +552,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
@@ -601,7 +602,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
@@ -693,7 +694,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
@@ -748,7 +749,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackage>()), Times.Once);
+                packageInfoService.Verify(s => s.get_package_information(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]

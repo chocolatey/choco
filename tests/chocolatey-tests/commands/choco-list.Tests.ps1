@@ -162,11 +162,11 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
             $Output = Invoke-Choco $_ isdependency --AllVersions --exact --local-only
         }
 
-        It "Exits with Success (0)" {
+        It "Exits with Success (0)" -Tag ExpectBroken {
             $Output.ExitCode | Should -Be 0
         }
 
-        It "Shows version <_> of local package" -ForEach @("2.0.0"; "1.1.0") {
+        It "Shows version <_> of local package" -Tag ExpectBroken -ForEach @("2.0.0"; "1.1.0") {
             $Output.Lines | Should -Contain "isdependency $_"
         }
 

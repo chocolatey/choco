@@ -19,7 +19,6 @@ namespace chocolatey.infrastructure.app.commands
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using NuGet;
     using attributes;
     using commandline;
     using configuration;
@@ -28,6 +27,9 @@ namespace chocolatey.infrastructure.app.commands
     using infrastructure.configuration;
     using logging;
     using nuget;
+    using NuGet.Common;
+    using NuGet.PackageManagement;
+    using NuGet.Versioning;
     using services;
 
     [CommandFor("pin", "suppress upgrades for a package")]
@@ -145,24 +147,19 @@ If you find other exit codes that we have not yet documented, please
 
         public virtual void run(ChocolateyConfiguration configuration)
         {
-            var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
-                                                               new PackageDownloader(),
-                                                               installSuccessAction: null,
-                                                               uninstallSuccessAction: null,
-                                                               addUninstallHandler: false);
             switch (configuration.PinCommand.Command)
             {
                 case PinCommandType.list:
-                    list_pins(packageManager, configuration);
+                    list_pins(configuration);
                     break;
                 case PinCommandType.add:
                 case PinCommandType.remove:
-                    set_pin(packageManager, configuration);
+                    set_pin(configuration);
                     break;
             }
         }
 
-        public virtual void list_pins(IPackageManager packageManager, ChocolateyConfiguration config)
+        public virtual void list_pins(ChocolateyConfiguration config)
         {
             var input = config.Input;
             config.Input = string.Empty;
@@ -174,7 +171,7 @@ If you find other exit codes that we have not yet documented, please
 
             foreach (var pkg in packages.or_empty_list_if_null())
             {
-                var pkgInfo = _packageInfoService.get_package_information(pkg.Package);
+                var pkgInfo = _packageInfoService.get_package_information(pkg.PackageMetadata);
                 if (pkgInfo != null && pkgInfo.IsPinned)
                 {
                     this.Log().Info(() => "{0}|{1}".format_with(pkgInfo.Package.Id, pkgInfo.Package.Version));
@@ -182,29 +179,29 @@ If you find other exit codes that we have not yet documented, please
             }
         }
 
-        public virtual void set_pin(IPackageManager packageManager, ChocolateyConfiguration config)
+        public virtual void set_pin(ChocolateyConfiguration config)
         {
             var addingAPin = config.PinCommand.Command == PinCommandType.add;
             this.Log().Info("Trying to {0} a pin for {1}".format_with(config.PinCommand.Command.to_string(), config.PinCommand.Name));
             var versionUnspecified = string.IsNullOrWhiteSpace(config.Version);
-            SemanticVersion semanticVersion = versionUnspecified ? null : new SemanticVersion(config.Version);
-            IPackage installedPackage = packageManager.LocalRepository.FindPackage(config.PinCommand.Name, semanticVersion);
+            NuGetVersion semanticVersion = versionUnspecified ? null : NuGetVersion.Parse(config.Version);
+
+            var input = config.Input;
+            config.Input = config.PinCommand.Name;
+            config.Version = semanticVersion.to_string();
+            config.ListCommand.ByIdOnly = true;
+            var quiet = config.QuietOutput;
+            config.QuietOutput = true;
+            var installedPackage = _nugetService.list_run(config).FirstOrDefault();
+            config.QuietOutput = quiet;
+            config.Input = input;
+
             if (installedPackage == null)
             {
-                var pathResolver = packageManager.PathResolver as ChocolateyPackagePathResolver;
-                if (pathResolver != null)
-                {
-                    pathResolver.UseSideBySidePaths = true;
-                    installedPackage = packageManager.LocalRepository.FindPackage(config.PinCommand.Name, semanticVersion);
-                }
-
-                if (installedPackage == null)
-                {
-                    throw new ApplicationException("Unable to find package named '{0}'{1} to pin. Please check to ensure it is installed.".format_with(config.PinCommand.Name, versionUnspecified ? "" : " (version '{0}')".format_with(config.Version)));
-                }
+                throw new ApplicationException("Unable to find package named '{0}'{1} to pin. Please check to ensure it is installed.".format_with(config.PinCommand.Name, versionUnspecified ? "" : " (version '{0}')".format_with(config.Version)));
             }
 
-            var pkgInfo = _packageInfoService.get_package_information(installedPackage);
+            var pkgInfo = _packageInfoService.get_package_information(installedPackage.PackageMetadata);
 
             bool changeMessage = pkgInfo.IsPinned != addingAPin;
 

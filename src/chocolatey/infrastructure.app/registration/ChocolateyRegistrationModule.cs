@@ -26,10 +26,12 @@ namespace chocolatey.infrastructure.app.registration
     using chocolatey.infrastructure.services;
     using chocolatey.infrastructure.tasks;
     using chocolatey.infrastructure.validations;
-    using NuGet;
     using CryptoHashProvider = cryptography.CryptoHashProvider;
     using IFileSystem = filesystem.IFileSystem;
     using IHashProvider = cryptography.IHashProvider;
+    using NuGet.Common;
+    using NuGet.PackageManagement;
+    using NuGet.Packaging;
 
     internal class ChocolateyRegistrationModule : IExtensionModule
     {
@@ -44,7 +46,7 @@ namespace chocolatey.infrastructure.app.registration
             //nuget
             registrator.register_service<ILogger, ChocolateyNugetLogger>();
             registrator.register_service<INugetService, NugetService>();
-            registrator.register_service<IPackageDownloader, PackageDownloader>();
+            //registrator.register_service<IPackageDownloader, PackageDownloader>();
             registrator.register_service<IPowershellService, PowershellService>();
             registrator.register_service<IChocolateyPackageInformationService, ChocolateyPackageInformationService>();
             registrator.register_service<IShimGenerationService, ShimGenerationService>();

@@ -154,11 +154,11 @@ If you find other exit codes that we have not yet documented, please
                             foreach (var packageResult in packageResults)
                             {
                                 xw.WriteStartElement("package");
-                                xw.WriteAttributeString("id", packageResult.Package.Id);
+                                xw.WriteAttributeString("id", packageResult.PackageMetadata.Id);
 
                                 if (configuration.ExportCommand.IncludeVersionNumbers)
                                 {
-                                    xw.WriteAttributeString("version", packageResult.Package.Version.ToString());
+                                    xw.WriteAttributeString("version", packageResult.PackageMetadata.Version.ToString());
                                 }
 
                                 xw.WriteEndElement();

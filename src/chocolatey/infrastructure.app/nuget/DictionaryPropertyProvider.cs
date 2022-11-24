@@ -17,11 +17,10 @@
 namespace chocolatey.infrastructure.app.nuget
 {
     using System.Collections.Generic;
-    using NuGet;
 
     // ReSharper disable InconsistentNaming
 
-    public sealed class DictionaryPropertyProvider : IPropertyProvider
+    public sealed class DictionaryPropertyProvider
     {
         private readonly IDictionary<string, string> _properties;
 
@@ -30,7 +29,7 @@ namespace chocolatey.infrastructure.app.nuget
             _properties = properties;
         }
 
-        public dynamic GetPropertyValue(string propertyName)
+        public string GetPropertyValue(string propertyName)
         {
             string value;
             if (_properties.TryGetValue(propertyName, out value))

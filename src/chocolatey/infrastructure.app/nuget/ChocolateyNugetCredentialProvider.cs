@@ -21,9 +21,12 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Net;
     using System.Text.RegularExpressions;
     using commandline;
-    using NuGet;
     using configuration;
     using logging;
+    using NuGet.Credentials;
+    using System.Threading.Tasks;
+    using NuGet.Configuration;
+    using System.Threading;
 
     // ReSharper disable InconsistentNaming
 
@@ -33,19 +36,25 @@ namespace chocolatey.infrastructure.app.nuget
 
         private const string INVALID_URL = "http://somewhere123zzaafasd.invalid";
 
+        /// <summary>
+        /// Unique identifier of this credential provider
+        /// </summary>
+        public string Id { get; }
+
         public ChocolateyNugetCredentialProvider(ChocolateyConfiguration config)
         {
             _config = config;
+            Id = $"{nameof(ChocolateyNugetCredentialProvider)}_{Guid.NewGuid()}";
         }
 
-        public ICredentials GetCredentials(Uri uri, IWebProxy proxy, CredentialType credentialType, bool retrying)
+        public Task<CredentialResponse> GetAsync(Uri uri, IWebProxy proxy, CredentialRequestType credentialType, string message, bool isRetry, bool nonInteractive, CancellationToken cancellationToken)
         {
             if (uri == null)
             {
                 throw new ArgumentNullException("uri");
             }
 
-            if (retrying)
+            if (isRetry)
             {
                 this.Log().Warn("Invalid credentials specified.");
             }
@@ -74,7 +83,7 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     this.Log().Debug("Using passed in credentials");
 
-                    return new NetworkCredential(_config.SourceCommand.Username, _config.SourceCommand.Password);
+                    return Task.FromResult(new CredentialResponse(new NetworkCredential(_config.SourceCommand.Username, _config.SourceCommand.Password)));
                 }
             }
 
@@ -122,7 +131,7 @@ namespace chocolatey.infrastructure.app.nuget
                     }
                 }
 
-                if (source == null && !retrying)
+                if (source == null && !isRetry)
                 {
                     // use the first source. If it fails, fall back to grabbing credentials from the user
                     var candidateSource = candidateSources.First();
@@ -134,17 +143,18 @@ namespace chocolatey.infrastructure.app.nuget
             if (source == null)
             {
                 this.Log().Debug("Asking user for credentials for '{0}'".format_with(uri.OriginalString));
-                return get_credentials_from_user(uri, proxy, credentialType);
+                return Task.FromResult(new CredentialResponse(get_credentials_from_user(uri, proxy, credentialType)));
             }
             else
             {
                 this.Log().Debug("Using saved credentials");
             }
 
-            return new NetworkCredential(source.Username, NugetEncryptionUtility.DecryptString(source.EncryptedPassword));
+            return Task.FromResult(new CredentialResponse(new NetworkCredential(source.Username, NugetEncryptionUtility.DecryptString(source.EncryptedPassword))));
         }
 
-        public ICredentials get_credentials_from_user(Uri uri, IWebProxy proxy, CredentialType credentialType)
+
+        public ICredentials get_credentials_from_user(Uri uri, IWebProxy proxy, CredentialRequestType credentialType)
         {
             if (!_config.Information.IsInteractive)
             {
@@ -153,7 +163,7 @@ namespace chocolatey.infrastructure.app.nuget
                 return CredentialCache.DefaultCredentials;
             }
 
-            string message = credentialType == CredentialType.ProxyCredentials ?
+            string message = credentialType == CredentialRequestType.Proxy ?
                                  "Please provide proxy credentials:" :
                                  "Please provide credentials for: {0}".format_with(uri.OriginalString);
             this.Log().Info(ChocolateyLoggers.Important, message);
@@ -166,14 +176,13 @@ namespace chocolatey.infrastructure.app.nuget
             if (string.IsNullOrWhiteSpace(password))
             {
                 this.Log().Warn("No password specified, this will probably error.");
-                //return CredentialCache.DefaultNetworkCredentials;
+                return CredentialCache.DefaultNetworkCredentials;
             }
 
             var credentials = new NetworkCredential
                 {
                     UserName = username,
-                    Password = password,
-                    //SecurePassword = password.to_secure_string(),
+                    Password = password
                 };
 
             return credentials;

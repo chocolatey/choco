@@ -21,12 +21,32 @@ namespace chocolatey.infrastructure.app.nuget
     using System.ComponentModel;
     using System.Linq;
     using System.Net;
+    using System.Net.Http;
+    using System.Net.Security;
+    using System.Security.Cryptography.X509Certificates;
     using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
     using adapters;
+    using Alphaleonis.Win32.Filesystem;
     using infrastructure.configuration;
-    using NuGet;
     using configuration;
+    using domain;
+    using filesystem;
     using logging;
+    using NuGet;
+    using NuGet.Common;
+    using NuGet.Configuration;
+    using NuGet.Credentials;
+    using NuGet.Frameworks;
+    using NuGet.PackageManagement;
+    using NuGet.Packaging;
+    using NuGet.Packaging.Core;
+    using NuGet.ProjectManagement;
+    using NuGet.Protocol;
+    using NuGet.Protocol.Core.Types;
+    using NuGet.Versioning;
+    using results;
     using Console = adapters.Console;
     using Environment = adapters.Environment;
 
@@ -47,26 +67,40 @@ namespace chocolatey.infrastructure.app.nuget
             get { return _console.Value; }
         }
 
+        /*
         public static IFileSystem GetNuGetFileSystem(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
             return new ChocolateyPhysicalFileSystem(ApplicationParameters.PackagesLocation) { Logger = nugetLogger };
-        }
+        }*/
 
-        public static IPackagePathResolver GetPathResolver(ChocolateyConfiguration configuration, IFileSystem nugetPackagesFileSystem)
+        public static ChocolateyPackagePathResolver GetPathResolver(ChocolateyConfiguration configuration, IFileSystem nugetPackagesFileSystem)
         {
-            return new ChocolateyPackagePathResolver(nugetPackagesFileSystem, configuration.AllowMultipleVersions);
+            return new ChocolateyPackagePathResolver(ApplicationParameters.PackagesLocation, nugetPackagesFileSystem, configuration.AllowMultipleVersions);
         }
 
+
+        public static SourceRepository GetLocalRepository()
+        {
+            var nugetSource = new PackageSource(ApplicationParameters.PackagesLocation);
+            return Repository.Factory.GetCoreV3(nugetSource);
+        }
+
+        /*
         public static IPackageRepository GetLocalRepository(IPackagePathResolver pathResolver, IFileSystem nugetPackagesFileSystem, ILogger nugetLogger)
         {
             return new ChocolateyLocalPackageRepository(pathResolver, nugetPackagesFileSystem) { Logger = nugetLogger, PackageSaveMode = PackageSaveModes.Nupkg | PackageSaveModes.Nuspec };
         }
+        */
 
-        public static IPackageRepository GetRemoteRepository(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader)
+        public static IEnumerable<SourceRepository> GetRemoteRepositories(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
+
+            //TODO, fix
+            /*
             if (configuration.Features.ShowDownloadProgress)
             {
-                packageDownloader.ProgressAvailable += (sender, e) =>
+                PackageDownloader.
+                PackageDownloader.ProgressAvailable += (sender, e) =>
                 {
                     // http://stackoverflow.com/a/888569/18475
                     Console.Write("\rProgress: {0} {1}%".format_with(e.Operation, e.PercentComplete.to_string()).PadRight(Console.WindowWidth));
@@ -76,18 +110,16 @@ namespace chocolatey.infrastructure.app.nuget
                     }
                 };
             }
+            */
 
-            IEnumerable<string> sources = configuration.Sources.to_string().Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
-
-            IList<IPackageRepository> repositories = new List<IPackageRepository>();
 
             // ensure credentials can be grabbed from configuration
-            HttpClient.DefaultCredentialProvider = new ChocolateyNugetCredentialProvider(configuration);
-            HttpClient.DefaultCertificateProvider = new ChocolateyClientCertificateProvider(configuration);
+            SetHttpHandlerCredentialService(configuration);
+
             if (!string.IsNullOrWhiteSpace(configuration.Proxy.Location))
             {
                 "chocolatey".Log().Debug("Using proxy server '{0}'.".format_with(configuration.Proxy.Location));
-                var proxy = new WebProxy(configuration.Proxy.Location, true);
+                var proxy = new System.Net.WebProxy(configuration.Proxy.Location, true);
 
                 if (!String.IsNullOrWhiteSpace(configuration.Proxy.User) && !String.IsNullOrWhiteSpace(configuration.Proxy.EncryptedPassword))
                 {
@@ -105,12 +137,24 @@ namespace chocolatey.infrastructure.app.nuget
                 ProxyCache.Instance.Override(proxy);
             }
 
+            IEnumerable<string> sources = configuration.Sources.to_string().Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+
+            IList<SourceRepository> repositories = new List<SourceRepository>();
+
             var updatedSources = new StringBuilder();
             foreach (var sourceValue in sources.or_empty_list_if_null())
             {
 
                 var source = sourceValue;
                 var bypassProxy = false;
+
+                var sourceClientCertificates = new List<X509Certificate>();
+                if (!string.IsNullOrWhiteSpace(configuration.SourceCommand.Certificate))
+                {
+                    "chocolatey".Log().Debug("Using passed in certificate for source {0}".format_with(source));
+                    sourceClientCertificates.Add(new X509Certificate2(configuration.SourceCommand.Certificate, configuration.SourceCommand.CertificatePassword));
+                }
+
                 if (configuration.MachineSources.Any(m => m.Name.is_equal_to(source) || m.Key.is_equal_to(source)))
                 {
                     try
@@ -127,6 +171,12 @@ namespace chocolatey.infrastructure.app.nuget
                         {
                             bypassProxy = machineSource.BypassProxy;
                             if (bypassProxy) "chocolatey".Log().Debug("Source '{0}' is configured to bypass proxies.".format_with(source));
+
+                            if (!string.IsNullOrWhiteSpace(machineSource.Certificate))
+                            {
+                                "chocolatey".Log().Debug("Using configured certificate for source {0}".format_with(source));
+                                sourceClientCertificates.Add(new X509Certificate2(machineSource.Certificate, NugetEncryptionUtility.DecryptString(machineSource.EncryptedCertificatePassword)));
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -137,22 +187,10 @@ namespace chocolatey.infrastructure.app.nuget
 
                 updatedSources.AppendFormat("{0};", source);
 
-                try
-                {
-                    var uri = new Uri(source);
-                    if (uri.IsFile || uri.IsUnc)
-                    {
-                        repositories.Add(new ChocolateyLocalPackageRepository(uri.LocalPath) { Logger = nugetLogger });
-                    }
-                    else
-                    {
-                        repositories.Add(new DataServicePackageRepository(new RedirectedHttpClient(uri, bypassProxy) { UserAgent = "Chocolatey Core" }, packageDownloader) { Logger = nugetLogger });
-                    }
-                }
-                catch (Exception)
-                {
-                    repositories.Add(new ChocolateyLocalPackageRepository(source) { Logger = nugetLogger });
-                }
+                var nugetSource = new PackageSource(source);
+                nugetSource.ClientCertificates = sourceClientCertificates;
+                var repo = Repository.Factory.GetCoreV3(nugetSource);
+                repositories.Add(repo);
             }
 
             if (updatedSources.Length != 0)
@@ -160,36 +198,42 @@ namespace chocolatey.infrastructure.app.nuget
                 configuration.Sources = updatedSources.Remove(updatedSources.Length - 1, 1).to_string();
             }
 
-            var repository = new AggregateRepository(repositories, ignoreFailingRepositories: true)
-            {
-                IgnoreFailingRepositories = true,
-                Logger = nugetLogger,
-                ResolveDependenciesVertically = true
-            };
-
-            return repository;
+            return repositories;
         }
 
+        /*
         // keep this here for the licensed edition for now
-        public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
+        public static NuGetPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<ChocolateyPackageOperationEventArgs> installSuccessAction, Action<ChocolateyPackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
         {
             return GetPackageManager(configuration, nugetLogger, new PackageDownloader(), installSuccessAction, uninstallSuccessAction, addUninstallHandler);
         }
+        */
 
-        public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
+        /*
+        // keep this here for the licensed edition for now
+        public static NuGetPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<ChocolateyPackageOperationEventArgs> installSuccessAction, Action<ChocolateyPackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
+        //public static NuGetPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, bool addUninstallHandler)
         {
-            IFileSystem nugetPackagesFileSystem = GetNuGetFileSystem(configuration, nugetLogger);
-            IPackagePathResolver pathResolver = GetPathResolver(configuration, nugetPackagesFileSystem);
-            var packageManager = new PackageManager(GetRemoteRepository(configuration, nugetLogger, packageDownloader), pathResolver, nugetPackagesFileSystem, GetLocalRepository(pathResolver, nugetPackagesFileSystem, nugetLogger))
+            //IFileSystem nugetPackagesFileSystem = GetNuGetFileSystem(configuration, nugetLogger);
+            //IPackagePathResolver pathResolver = GetPathResolver(configuration, nugetPackagesFileSystem);
+
+
+            var packageManager = new NuGetPackageManager(GetRemoteRepositories(configuration, nugetLogger, packageDownloader), pathResolver, nugetPackagesFileSystem, GetLocalRepository(pathResolver, nugetPackagesFileSystem, nugetLogger))
                 {
                     DependencyVersion = DependencyVersion.Highest,
                     Logger = nugetLogger,
                 };
 
+
+        //TODO - see if wee need to implement ISettings to set something instead of nullsettings
+        //TODO - properly implement everything for ChocolateySourceRepositoryProvider
+        var repositoryProvider = new ChocolateySourceRepositoryProvider(NugetCommon.GetRemoteRepositories(configuration, nugetLogger));
+            var packageManager = new NuGetPackageManager(repositoryProvider, new NullSettings(), ApplicationParameters.PackagesLocation);
+
+
             // GH-1548
             //note: is this a good time to capture a backup (for dependencies) / maybe grab remembered arguments here instead / and somehow get out of the endless loop!
             //NOTE DO NOT EVER use this method - packageManager.PackageInstalling += (s, e) => { };
-
             packageManager.PackageInstalled += (s, e) =>
                 {
                     var pkg = e.Package;
@@ -198,12 +242,15 @@ namespace chocolatey.infrastructure.app.nuget
                         pkg.Id,
                         pkg.Version.to_string(),
                         configuration.Force ? " (forced)" : string.Empty,
-                        pkg.IsApproved ? " [Approved]" : string.Empty,
-                        pkg.PackageTestResultStatus == "Failing" && pkg.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : pkg.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
+                        string.Empty, string.Empty
+                        //pkg.IsApproved ? " [Approved]" : string.Empty,
+                        //pkg.PackageTestResultStatus == "Failing" && pkg.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : pkg.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
                         ));
 
                     if (installSuccessAction != null) installSuccessAction.Invoke(e);
                 };
+
+
 
             if (addUninstallHandler)
             {
@@ -211,6 +258,8 @@ namespace chocolatey.infrastructure.app.nuget
 
                 packageManager.PackageUninstalled += (s, e) =>
                     {
+
+
                         IPackage pkg = packageManager.LocalRepository.FindPackage(e.Package.Id, e.Package.Version);
                         if (pkg != null)
                         {
@@ -237,11 +286,201 @@ namespace chocolatey.infrastructure.app.nuget
                         {
                             if (uninstallSuccessAction != null) uninstallSuccessAction.Invoke(e);
                         }
+                        if (uninstallSuccessAction != null) uninstallSuccessAction.Invoke(e);
                     };
             }
 
             return packageManager;
+
         }
+        */
+
+        public static IEnumerable<T> GetRepositoryResource<T>(IEnumerable<SourceRepository> packageRepositories) where T : class, INuGetResource
+        {
+            foreach (var repository in packageRepositories)
+            {
+                var resource = repository.GetResource<T>();
+                if (resource is null)
+                {
+                    "chocolatey".Log().Warn("The source {0} failed to get a {1} resource".format_with(repository.PackageSource.Source, typeof(T)));
+                }
+                else
+                {
+                    yield return resource;
+                }
+            }
+        }
+
+        public static IEnumerable<(SourceRepository repository,
+                PackageSearchResource searchResource,
+                FindPackageByIdResource findPackageByIdResource,
+                PackageMetadataResource packageMetadataResource,
+                ListResource listResource
+                )> GetRepositoryResources(IEnumerable<SourceRepository> packageRepositories)
+        {
+            foreach (var repository in packageRepositories)
+            {
+                yield return (
+                    repository,
+                    repository.GetResource<PackageSearchResource>(),
+                    repository.GetResource<FindPackageByIdResource>(),
+                    repository.GetResource<PackageMetadataResource>(),
+                    repository.GetResource<ListResource>());
+            }
+        }
+
+        public static void SetHttpHandlerCredentialService(ChocolateyConfiguration configuration)
+        {
+            HttpHandlerResourceV3.CredentialService = new Lazy<ICredentialService>(
+                () => new CredentialService(
+                    new AsyncLazy<IEnumerable<ICredentialProvider>>(
+                        () => GetCredentialProvidersAsync(configuration)), false, true));
+        }
+
+        private static async Task<IEnumerable<ICredentialProvider>> GetCredentialProvidersAsync(ChocolateyConfiguration configuration)
+        {
+            return new List<ICredentialProvider>() { new ChocolateyNugetCredentialProvider(configuration) };
+        }
+
+        public static void GetLocalPackageDependencies(PackageIdentity package,
+            NuGetFramework framework,
+            IEnumerable<PackageResult> allLocalPackages,
+            ISet<SourcePackageDependencyInfo> dependencyInfos
+        )
+        {
+            if (dependencyInfos.Contains(package)) return;
+
+            var metadata = allLocalPackages
+                .FirstOrDefault(p => p.PackageMetadata.Id.Equals(package.Id, StringComparison.OrdinalIgnoreCase) && p.PackageMetadata.Version.Equals(package.Version))
+                .PackageMetadata;
+
+            var group = NuGetFrameworkUtility.GetNearest<PackageDependencyGroup>(metadata.DependencyGroups, framework);
+            var dependencies = group?.Packages ?? Enumerable.Empty<PackageDependency>();
+
+            var result = new SourcePackageDependencyInfo(
+                package,
+                dependencies,
+                true,
+                null,
+                null,
+                null);
+
+            dependencyInfos.Add(result);
+
+            foreach (var dependency in dependencies)
+            {
+                GetLocalPackageDependencies(dependency.Id, dependency.VersionRange, framework, allLocalPackages, dependencyInfos);
+            }
+        }
+
+        public static void GetLocalPackageDependencies(string packageId,
+            VersionRange versionRange,
+            NuGetFramework framework,
+            IEnumerable<PackageResult> allLocalPackages,
+            ISet<SourcePackageDependencyInfo> dependencyInfos
+        )
+        {
+            var versionsMetadata = allLocalPackages
+                .Where(p => p.PackageMetadata.Id.Equals(packageId, StringComparison.OrdinalIgnoreCase) && versionRange.Satisfies(p.PackageMetadata.Version))
+                .Select(p => p.PackageMetadata);
+
+            foreach (var metadata in versionsMetadata)
+            {
+                var group = NuGetFrameworkUtility.GetNearest<PackageDependencyGroup>(metadata.DependencyGroups, framework);
+                var dependencies = group?.Packages ?? Enumerable.Empty<PackageDependency>();
+
+                var result = new SourcePackageDependencyInfo(
+                    metadata.Id,
+                    metadata.Version,
+                    dependencies,
+                    true,
+                    null,
+                    null,
+                    null);
+
+                if (dependencyInfos.Contains(result)) return;
+                dependencyInfos.Add(result);
+
+                foreach (var dependency in dependencies)
+                {
+                    GetLocalPackageDependencies(dependency.Id, dependency.VersionRange, framework, allLocalPackages, dependencyInfos);
+                }
+            }
+        }
+
+        public static async Task GetPackageDependencies(PackageIdentity package,
+            NuGetFramework framework,
+            SourceCacheContext cacheContext,
+            ILogger logger,
+            IEnumerable<DependencyInfoResource> dependencyInfoResources,
+            ISet<SourcePackageDependencyInfo> availablePackages,
+            ISet<PackageDependency> dependencyCache)
+        {
+            if (availablePackages.Contains(package)) return;
+
+            foreach (var dependencyInfoResource in dependencyInfoResources)
+            {
+                var dependencyInfo = await dependencyInfoResource.ResolvePackage(
+                    package, framework, cacheContext, logger, CancellationToken.None);
+
+                if (dependencyInfo == null) continue;
+
+                availablePackages.Add(dependencyInfo);
+                foreach (var dependency in dependencyInfo.Dependencies)
+                {
+                    if (dependencyCache.Contains(dependency)) continue;
+                    dependencyCache.Add(dependency);
+                    await GetPackageDependencies(
+                        dependency.Id, framework, cacheContext, logger, dependencyInfoResources, availablePackages, dependencyCache);
+                }
+            }
+        }
+
+        public static async Task GetPackageDependencies(string packageId,
+            NuGetFramework framework,
+            SourceCacheContext cacheContext,
+            ILogger logger,
+            IEnumerable<DependencyInfoResource> dependencyInfoResources,
+            ISet<SourcePackageDependencyInfo> availablePackages,
+            ISet<PackageDependency> dependencyCache)
+        {
+            //if (availablePackages.Contains(packageID)) return;
+
+            foreach (var dependencyInfoResource in dependencyInfoResources)
+            {
+                var dependencyInfos = await dependencyInfoResource.ResolvePackages(
+                    packageId, framework, cacheContext, logger, CancellationToken.None);
+
+                if (!dependencyInfos.Any()) continue;
+
+                availablePackages.AddRange(dependencyInfos);
+                foreach (var dependency in dependencyInfos.SelectMany(p => p.Dependencies))
+                {
+                    if (dependencyCache.Contains(dependency)) continue;
+                    dependencyCache.Add(dependency);
+
+                    // Recursion is fun, kids
+                    await GetPackageDependencies(
+                        dependency.Id, framework, cacheContext, logger, dependencyInfoResources, availablePackages, dependencyCache);
+                }
+            }
+        }
+
+        public static async Task GetPackageParents(string packageId,
+            ISet<SourcePackageDependencyInfo> parentPackages,
+            IEnumerable<SourcePackageDependencyInfo> locallyInstalledPackages)
+        {
+            foreach (var package in locallyInstalledPackages.Where(p => !parentPackages.Contains(p)))
+            {
+                if (parentPackages.Contains(package)) continue;
+                if (package.Dependencies.Any(p => p.Id.Equals(packageId, StringComparison.OrdinalIgnoreCase)))
+                {
+                    parentPackages.Add(package);
+                    await GetPackageParents(package.Id, parentPackages, locallyInstalledPackages);
+                }
+            }
+        }
+
     }
 
     // ReSharper restore InconsistentNaming

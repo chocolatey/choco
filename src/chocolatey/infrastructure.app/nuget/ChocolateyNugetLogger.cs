@@ -16,43 +16,150 @@
 
 namespace chocolatey.infrastructure.app.nuget
 {
+    using System.Threading.Tasks;
     using logging;
-    using NuGet;
+    using NuGet.Common;
 
     // ReSharper disable InconsistentNaming
 
     public sealed class ChocolateyNugetLogger : ILogger
     {
-        public FileConflictResolution ResolveFileConflict(string message)
+        public void LogDebug(string message)
         {
-            this.Log().Debug("[NuGet] {0}{1} Resolving by automatic overwrite.".format_with(message.escape_curly_braces(),System.Environment.NewLine));
-
-            return FileConflictResolution.OverwriteAll;
+            this.Log().Debug("[NuGet] " + message);
         }
 
-        public void Log(MessageLevel level, string message, params object[] args)
+        public void LogVerbose(string message)
+        {
+            this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
+        }
+
+        public void LogWarning(string message)
+        {
+            this.Log().Warn("[NuGet] " + message);
+        }
+
+        public void LogError(string message)
+        {
+            this.Log().Error("[NuGet] " + message);
+        }
+
+        public void LogMinimal(string message)
+        {
+            this.Log().Info( "[NuGet] " + message);
+        }
+
+        public void LogInformation(string message)
+        {
+            this.Log().Info("[NuGet] " + message);
+        }
+
+        public void LogInformationSummary(string message)
+        {
+            this.Log().Info("[NuGet] " + message);
+        }
+
+        public void Log(LogLevel level, string message)
         {
             switch (level)
             {
-                case MessageLevel.Debug:
-                    this.Log().Debug("[NuGet] " + message, args);
+                case LogLevel.Debug:
+                    this.Log().Debug("[NuGet] " + message);
                     break;
-                case MessageLevel.Info:
-                    this.Log().Info("[NuGet] " + message, args);
+                case LogLevel.Warning:
+                    this.Log().Warn("[NuGet] " + message);
                     break;
-                case MessageLevel.Warning:
-                    this.Log().Warn("[NuGet] " + message, args);
+                case LogLevel.Error:
+                    this.Log().Error("[NuGet] " + message);
                     break;
-                case MessageLevel.Error:
-                    this.Log().Error("[NuGet] " + message, args);
+                case LogLevel.Verbose:
+                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
                     break;
-                case MessageLevel.Fatal:
-                    this.Log().Fatal("[NuGet] " + message, args);
+                case LogLevel.Information:
+                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
                     break;
-                case MessageLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message, args);
+                case LogLevel.Minimal:
+                    this.Log().Info("[NuGet] " + message);
                     break;
             }
+        }
+
+        public Task LogAsync(LogLevel level, string message)
+        {
+            switch (level)
+            {
+                case LogLevel.Debug:
+                    this.Log().Debug("[NuGet] " + message);
+                    break;
+                case LogLevel.Warning:
+                    this.Log().Warn("[NuGet] " + message);
+                    break;
+                case LogLevel.Error:
+                    this.Log().Error("[NuGet] " + message);
+                    break;
+                case LogLevel.Verbose:
+                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
+                    break;
+                case LogLevel.Information:
+                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
+                    break;
+                case LogLevel.Minimal:
+                    this.Log().Info("[NuGet] " + message);
+                    break;
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public void Log(ILogMessage log)
+        {
+            switch (log.Level)
+            {
+                case LogLevel.Debug:
+                    this.Log().Debug("[NuGet] " + log.Message);
+                    break;
+                case LogLevel.Warning:
+                    this.Log().Warn("[NuGet] " + log.Message);
+                    break;
+                case LogLevel.Error:
+                    this.Log().Error("[NuGet] " + log.Message);
+                    break;
+                case LogLevel.Verbose:
+                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
+                    break;
+                case LogLevel.Information:
+                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
+                    break;
+                case LogLevel.Minimal:
+                    this.Log().Info("[NuGet] " + log.Message);
+                    break;
+            }
+        }
+
+        public Task LogAsync(ILogMessage log)
+        {
+            switch (log.Level)
+            {
+                case LogLevel.Debug:
+                    this.Log().Debug("[NuGet] " + log.Message);
+                    break;
+                case LogLevel.Warning:
+                    this.Log().Warn("[NuGet] " + log.Message);
+                    break;
+                case LogLevel.Error:
+                    this.Log().Error("[NuGet] " + log.Message);
+                    break;
+                case LogLevel.Verbose:
+                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
+                    break;
+                case LogLevel.Information:
+                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
+                    break;
+                case LogLevel.Minimal:
+                    this.Log().Info("[NuGet] " + log.Message);
+                    break;
+            }
+            return Task.CompletedTask;
         }
     }
 

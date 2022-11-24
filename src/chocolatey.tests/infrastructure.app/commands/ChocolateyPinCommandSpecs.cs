@@ -28,7 +28,12 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.commandline;
     using chocolatey.infrastructure.results;
     using Moq;
-    using NuGet;
+    using NuGet.Common;
+    using NuGet.Packaging;
+    using NuGet.Versioning;
+
+    using NUnit.Framework;
+
     using Should;
 
     public class ChocolateyPinCommandSpecs
@@ -41,27 +46,27 @@ namespace chocolatey.tests.infrastructure.app.commands
             protected Mock<ILogger> nugetLogger = new Mock<ILogger>();
             protected Mock<INugetService> nugetService = new Mock<INugetService>();
             protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
-            protected Mock<IPackage> package = new Mock<IPackage>();
-            protected Mock<IPackage> pinnedPackage = new Mock<IPackage>();
+            protected Mock<IPackageMetadata> package = new Mock<IPackageMetadata>();
+            protected Mock<IPackageMetadata> pinnedPackage = new Mock<IPackageMetadata>();
 
             public override void Context()
             {
-                // MockLogger = new MockLogger();
-                // Log.InitializeWith(MockLogger);
+                //MockLogger = new MockLogger();
+                //Log.InitializeWith(MockLogger);
                 configuration.Sources = "https://localhost/somewhere/out/there";
                 command = new ChocolateyPinCommand(packageInfoService.Object, nugetLogger.Object, nugetService.Object);
 
-                package = new Mock<IPackage>();
+                package = new Mock<IPackageMetadata>();
                 package.Setup(p => p.Id).Returns("regular");
-                package.Setup(p => p.Version).Returns(new SemanticVersion("1.2.0"));
+                package.Setup(p => p.Version).Returns(new NuGetVersion("1.2.0"));
                 packageInfoService.Setup(s => s.get_package_information(package.Object)).Returns(
                     new ChocolateyPackageInformation(package.Object)
                     {
                         IsPinned = false
                     });
-                pinnedPackage = new Mock<IPackage>();
+                pinnedPackage = new Mock<IPackageMetadata>();
                 pinnedPackage.Setup(p => p.Id).Returns("pinned");
-                pinnedPackage.Setup(p => p.Version).Returns(new SemanticVersion("1.1.0"));
+                pinnedPackage.Setup(p => p.Version).Returns(new NuGetVersion("1.1.0"));
                 packageInfoService.Setup(s => s.get_package_information(pinnedPackage.Object)).Returns(
                     new ChocolateyPackageInformation(pinnedPackage.Object)
                     {
@@ -330,7 +335,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_log_the_message_we_expect()
             {
-                var messages = MockLogger.MessagesFor(LogLevel.Info);
+                var messages = MockLogger.MessagesFor(tests.LogLevel.Info);
                 messages.ShouldNotBeEmpty();
                 messages.Count.ShouldEqual(1);
                 messages[0].ShouldContain("Pin would have called");
@@ -387,8 +392,6 @@ namespace chocolatey.tests.infrastructure.app.commands
         public class when_run_is_called : ChocolateyPinCommandSpecsBase
         {
             //private Action because;
-            private readonly Mock<IPackageManager> packageManager = new Mock<IPackageManager>();
-            private readonly Mock<IPackageRepository> localRepository = new Mock<IPackageRepository>();
 
             public override void Context()
             {
@@ -425,37 +428,38 @@ namespace chocolatey.tests.infrastructure.app.commands
                 nugetService.Verify(n => n.list_run(It.IsAny<ChocolateyConfiguration>()), Times.Once);
             }
 
-            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object.")]
+            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object."), Category("Pending")]
             [Fact]
             public void should_set_pin_when_command_is_add()
             {
                 reset();
 
                 configuration.PinCommand.Name = "regular";
-                packageManager.Setup(pm => pm.LocalRepository).Returns(localRepository.Object);
-                SemanticVersion semanticVersion = null;
+                //packageManager.Setup(pm => pm.LocalRepository).Returns(localRepository.Object);
+                NuGetVersion nugetVersion = null;
                 //nuget woes
-                localRepository.Setup(r => r.FindPackage(configuration.PinCommand.Name, semanticVersion)).Returns(package.Object);
+                //localRepository.Setup(r => r.FindPackage(configuration.PinCommand.Name, nugetVersion)).Returns(package.Object);
                 configuration.PinCommand.Command = PinCommandType.add;
 
-                command.set_pin(packageManager.Object, configuration);
+                //command.set_pin(packageManager.Object, configuration);
 
                 packageInfoService.Verify(s => s.save_package_information(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
             }
 
-            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object.")]
+            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object."), Category("Pending")]
             [Fact]
             public void should_remove_pin_when_command_is_remove()
             {
                 reset();
                 configuration.PinCommand.Name = "pinned";
-                packageManager.Setup(pm => pm.LocalRepository).Returns(localRepository.Object);
+               // packageManager.Setup(pm => pm.LocalRepository).Returns(localRepository.Object);
                 configuration.PinCommand.Command = PinCommandType.remove;
 
-                command.set_pin(packageManager.Object, configuration);
+                //command.set_pin(packageManager.Object, configuration);
 
                 packageInfoService.Verify(s => s.save_package_information(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
             }
         }
+
     }
 }

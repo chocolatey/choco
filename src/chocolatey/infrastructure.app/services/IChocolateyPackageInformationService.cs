@@ -17,12 +17,12 @@
 namespace chocolatey.infrastructure.app.services
 {
     using domain;
-    using NuGet;
+    using NuGet.Packaging;
 
     public interface IChocolateyPackageInformationService
     {
-        ChocolateyPackageInformation get_package_information(IPackage package);
+        ChocolateyPackageInformation get_package_information(IPackageMetadata package);
         void save_package_information(ChocolateyPackageInformation packageInformation);
-        void remove_package_information(IPackage package);
+        void remove_package_information(IPackageMetadata package);
     }
 }

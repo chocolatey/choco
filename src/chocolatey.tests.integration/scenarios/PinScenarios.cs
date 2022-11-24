@@ -26,10 +26,10 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.results;
-    using NuGet;
 
     using NUnit.Framework;
 
+    using NuGet.Configuration;
     using Should;
 
     public class PinScenarios
@@ -45,8 +45,8 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Configuration = Scenario.pin();
                 Scenario.reset(Configuration);
-                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + Constants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "installpackage*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + NuGetConstants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "installpackage*" + NuGetConstants.PackageExtension);
                 Scenario.install_package(Configuration, "installpackage", "1.0.0");
                 Scenario.install_package(Configuration, "upgradepackage", "1.0.0");
                 Scenario.install_package(Configuration, "hasdependency", "1.0.0");

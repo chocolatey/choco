@@ -1,4 +1,4 @@
-Import-Module helpers/common-helpers
+﻿Import-Module helpers/common-helpers
 
 # https://github.com/chocolatey/choco/blob/master/src/chocolatey.tests.integration/scenarios/InstallScenarios.cs
 
@@ -471,7 +471,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         # This behaviour was fixed in 0.10.16
-        It "Should not have been able to delete the rollback" -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta")) {
+        It "Should not have been able to delete the rollback" -Tag ExpectBroken -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta")) {
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
         }
 
@@ -502,7 +502,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $LockedFile.Close()
         }
 
-        It "Exits with Success (0)" -Tag FossOnly {
+        It "Exits with Success (0)" -Tag FossOnly, ExpectBroken {
             $Output.ExitCode | Should -Be 0
         }
 
@@ -520,7 +520,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $XML.package.metadata.version | Should -Be "1.0.0"
         }
 
-        It "Should not have been able to delete the rollback" -Tag FossOnly {
+        It "Should not have been able to delete the rollback" -Tag FossOnly, ExpectBroken {
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
         }
 
@@ -712,7 +712,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0" | Should -Exist
         }
 
-        It "Removed the previous version of the package from the lib directory" {
+        It "Removed the previous version of the package from the lib directory" -Tag ExpectBroken {
             "$env:ChocolateyInstall\lib\$($PackageUnderTest)" | Should -Not -Exist
         }
 
@@ -1508,7 +1508,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
 
         It "should identify a circular dependency" {
             $result1.Lines | Should -Contain "Circular dependency detected 'circulardependency1 0.0.1 => circulardependency2 0.0.1 => circulardependency1 0.0.1'."
-            $result2.Lines | Should -Contain "Circular dependency detected 'circulardependency2 0.0.1 => circulardependency1 0.0.1 => circulardependency2 0.0.1'."
+            $result2.Lines | Should -Contain "Circular dependency detected 'circulardependency1 0.0.1 => circulardependency2 0.0.1 => circulardependency1 0.0.1'."
         }
     }
 

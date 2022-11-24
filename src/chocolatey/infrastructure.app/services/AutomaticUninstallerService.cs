@@ -71,7 +71,8 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
 
-            var pkgInfo = _packageInfoService.get_package_information(packageResult.Package);
+
+            var pkgInfo = _packageInfoService.get_package_information(packageResult.PackageMetadata);
             if (pkgInfo.RegistrySnapshot == null)
             {
                 this.Log().Info(" Skipping auto uninstaller - No registry snapshot.");
@@ -110,7 +111,7 @@ namespace chocolatey.infrastructure.app.services
         {
             var userProvidedUninstallArguments = string.Empty;
             var userOverrideUninstallArguments = false;
-            var package = packageResult.Package;
+            var package = packageResult.PackageMetadata;
             if (package != null)
             {
                 if (!PackageUtility.package_is_a_dependency(config, package.Id) || config.ApplyInstallArgumentsToDependencies)
@@ -271,7 +272,7 @@ namespace chocolatey.infrastructure.app.services
             }
             else
             {
-                this.Log().Info(() => " Auto uninstaller has successfully uninstalled {0} or detected previous uninstall.".format_with(packageResult.Package.Id));
+                this.Log().Info(() => " Auto uninstaller has successfully uninstalled {0} or detected previous uninstall.".format_with(packageResult.PackageMetadata.Id));
             }
         }
 

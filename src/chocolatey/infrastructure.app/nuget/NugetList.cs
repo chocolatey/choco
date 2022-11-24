@@ -17,32 +17,48 @@
 namespace chocolatey.infrastructure.app.nuget
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO.Packaging;
     using System.Linq;
-
-    using NuGet;
+    using System.Runtime.CompilerServices;
+    using System.Threading;
+    using System.Threading.Tasks;
     using configuration;
+    using NuGet.Common;
+    using NuGet.Configuration;
+    using NuGet.PackageManagement;
+    using NuGet.Packaging;
+    using NuGet.Packaging.Core;
+    using NuGet.Protocol;
+    using NuGet.Protocol.Core.Types;
+    using NuGet.Versioning;
 
     // ReSharper disable InconsistentNaming
 
     public static class NugetList
     {
-        public static IEnumerable<IPackage> GetPackages(ChocolateyConfiguration configuration, ILogger nugetLogger)
+        public static IEnumerable<IPackageSearchMetadata> GetPackages(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
-            return execute_package_search(configuration, nugetLogger);
+            return execute_package_search(configuration, nugetLogger).GetAwaiter().GetResult();
         }
 
         public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
-            return execute_package_search(configuration, nugetLogger).Count();
+            return execute_package_search(configuration, nugetLogger).GetAwaiter().GetResult().Count();
         }
 
-        private static IQueryable<IPackage> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger)
+        private async static Task<IQueryable<IPackageSearchMetadata>> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
-            var packageRepository = NugetCommon.GetRemoteRepository(configuration, nugetLogger, new PackageDownloader());
-            var searchTermLower = configuration.Input.to_lower();
+            var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger);
+            var packageRepositoriesResources = NugetCommon.GetRepositoryResources(packageRepositories);
+            string searchTermLower = configuration.Input.to_lower();
+            SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
+            searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
+            var cacheContext = new ChocolateySourceCacheContext(configuration);
 
+            /*
             // Whether or not the package is remote determines two things:
             // 1. Does the repository have a notion of "listed"?
             // 2. Does it support prerelease in a straight-forward way?
@@ -58,79 +74,169 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 isServiceBased = packageRepository is IServiceBasedRepository;
             }
+            */
 
-            SemanticVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? new SemanticVersion(configuration.Version) : null;
-            IQueryable<IPackage> results;
+            NuGetVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? NuGetVersion.Parse(configuration.Version) : null;
+            var results = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadata());
 
             if (!configuration.ListCommand.Exact)
             {
-                results = packageRepository.Search(searchTermLower, configuration.Prerelease);
+                foreach (var repositoryResources in packageRepositoriesResources)
+                {
+
+                    if (repositoryResources.listResource != null)
+                    {
+                        var tempResults = await repositoryResources.listResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, CancellationToken.None);
+                        var enumerator = tempResults.GetEnumeratorAsync();
+
+                        while (await enumerator.MoveNextAsync())
+                        {
+                            results.Add(enumerator.Current);
+                        }
+                    }
+                    else
+                    {
+                        var skipNumber = 0;
+                        var takeNumber = configuration.ListCommand.PageSize;
+                        //searchTermLower = string.IsNullOrWhiteSpace(searchTermLower) ? "*" : searchTermLower;
+                        var partResults = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadataIdOnly());
+                        var latestResults = new List<IPackageSearchMetadata>();
+                        do
+                        {
+                            partResults.AddRange(await repositoryResources.searchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
+                            skipNumber += takeNumber;
+                            latestResults.AddRange(partResults);
+                            //TODO, add check and warn if over 5000, maybe adjust number?
+                        } while (partResults.Count >= takeNumber && takeNumber < 5000);
+
+                        if (configuration.AllVersions)
+                        {
+                            foreach (var result in latestResults)
+                            {
+                                foreach (var versionInfo in await result.GetVersionsAsync())
+                                {
+                                    if (versionInfo.PackageSearchMetadata == null)
+                                    {
+                                        //This is horribly inefficient, having to get the metadata again but that is the NuGet resources for you
+                                        results.Add(await repositoryResources.packageMetadataResource.GetMetadataAsync(new PackageIdentity(result.Identity.Id, versionInfo.Version), cacheContext, nugetLogger, CancellationToken.None));
+                                    }
+                                    else
+                                    {
+                                        results.Add(versionInfo.PackageSearchMetadata);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            results.AddRange(latestResults);
+                        }
+                    }
+                }
+
+
+                //TODO - deduplicate package ids
             }
             else
             {
                 if (configuration.AllVersions)
                 {
-                    // convert from a search to getting packages by id.
-                    // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
-                    results = packageRepository.GetPackages().Where(p => p.Id.ToLower() == searchTermLower)
-                        .AsEnumerable()
-                        .Where(p => configuration.Prerelease || p.IsReleaseVersion())
-                        .AsQueryable();
-                }
+                    foreach (var repositoryResources in packageRepositoriesResources)
+                    {
+                        results.AddRange(await repositoryResources.packageMetadataResource.GetMetadataAsync(
+                            searchTermLower, configuration.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None));
+                    }
+
+
+                    /*
+                    var versions = new SortedSet<NuGetVersion>();
+                    foreach (var repositoryResources in packageRepositoriesResources)
+                    {
+                        //We want all versions available across all repositories
+                        versions.AddRange((await repositoryResources.findPackageByIdResource.GetAllVersionsAsync(searchTermLower, cacheContext, nugetLogger, CancellationToken.None))
+                            .Where(a => configuration.Prerelease || !a.IsPrerelease));
+                    }
+
+                    foreach (var packageVersion in versions)
+                    {
+                        results.Add(find_package(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoriesResources.Select(x => x.packageMetadataResource), packageVersion));
+                    }
+                    */
+
+
+
+                        /*
+                        // convert from a search to getting packages by id.
+                        // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
+                        results = packageRepository.GetPackages().Where(p => p.Identity.Id.ToLower() == searchTermLower)
+                            .AsEnumerable()
+                            .Where(p => configuration.Prerelease || p.IsReleaseVersion())
+                            .AsQueryable();
+                        */
+                    }
                 else
                 {
-                    var exactPackage = find_package(searchTermLower, version, configuration, packageRepository);
+                    if (version == null)
+                    {
+                        var versions = new SortedSet<NuGetVersion>(VersionComparer.Default);
+                        foreach (var repositoryResources in packageRepositoriesResources)
+                        {
+                            //We want all versions available across all repositories
+                            versions.AddRange((await repositoryResources.findPackageByIdResource.GetAllVersionsAsync(searchTermLower, cacheContext, nugetLogger, CancellationToken.None))
+                                .Where(a => configuration.Prerelease || !a.IsPrerelease));
+                        }
+                        version = versions.Max();
+                        if (version == null) return new List<IPackageSearchMetadata>().AsQueryable();
+                    }
 
-                    if (exactPackage == null) return new List<IPackage>().AsQueryable();
+                    var exactPackage = find_package(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoriesResources.Select(x => x.packageMetadataResource), version);
 
-                    return new List<IPackage>()
+                    if (exactPackage == null) return new List<IPackageSearchMetadata>().AsQueryable();
+
+                    return new List<IPackageSearchMetadata>()
                     {
                         exactPackage
                     }.AsQueryable();
                 }
             }
-
+            /*
             if (configuration.ListCommand.Page.HasValue)
             {
                 results = results.Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
             }
+            */
 
             if (configuration.ListCommand.ByIdOnly)
             {
-                results = isServiceBased ?
-                    results.Where(p => p.Id.ToLower().Contains(searchTermLower))
-                  : results.Where(p => p.Id.contains(searchTermLower, StringComparison.OrdinalIgnoreCase));
+                results = results.Where(p => p.Identity.Id.ToLower().Contains(searchTermLower)).ToHashSet();
             }
 
             if (configuration.ListCommand.ByTagOnly)
             {
-                results = isServiceBased
-                    ? results.Where(p => p.Tags.Contains(searchTermLower))
-                    : results.Where(p => p.Tags.contains(searchTermLower, StringComparison.InvariantCultureIgnoreCase));
+                results = results.Where(p => p.Tags.contains(searchTermLower, StringComparison.InvariantCultureIgnoreCase)).ToHashSet();
             }
 
             if (configuration.ListCommand.IdStartsWith)
             {
-                results = isServiceBased ?
-                    results.Where(p => p.Id.ToLower().StartsWith(searchTermLower))
-                  : results.Where(p => p.Id.StartsWith(searchTermLower, StringComparison.OrdinalIgnoreCase));
+                results = results.Where(p => p.Identity.Id.ToLower().StartsWith(searchTermLower)).ToHashSet();
             }
 
             if (configuration.ListCommand.ApprovedOnly)
             {
-                results = results.Where(p => p.IsApproved);
+                results = results.Where(p => p.IsApproved).ToHashSet();
             }
 
             if (configuration.ListCommand.DownloadCacheAvailable)
             {
-                results = results.Where(p => p.IsDownloadCacheAvailable);
+                results = results.Where(p => p.IsDownloadCacheAvailable).ToHashSet();
             }
 
             if (configuration.ListCommand.NotBroken)
             {
-                results = results.Where(p => (p.IsDownloadCacheAvailable && configuration.Information.IsLicensedVersion) || p.PackageTestResultStatus != "Failing");
+                results = results.Where(p => (p.IsDownloadCacheAvailable && configuration.Information.IsLicensedVersion) || p.PackageTestResultStatus != "Failing").ToHashSet();
             }
 
+            /*
             if (configuration.AllVersions || !string.IsNullOrWhiteSpace(configuration.Version))
             {
                 if (isServiceBased)
@@ -143,15 +249,6 @@ namespace chocolatey.infrastructure.app.nuget
                 }
             }
 
-            if (configuration.Prerelease && packageRepository.SupportsPrereleasePackages)
-            {
-                results = results.Where(p => p.IsAbsoluteLatestVersion);
-            }
-            else
-            {
-                results = results.Where(p => p.IsLatestVersion);
-            }
-
             if (!isServiceBased)
             {
                 results =
@@ -161,24 +258,60 @@ namespace chocolatey.infrastructure.app.nuget
                         .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
                         .AsQueryable();
             }
+            */
 
             results = configuration.ListCommand.OrderByPopularity ?
-                 results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Id)
-                 : results;
+                 results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Identity.Id).ToHashSet()
+                 : results.OrderBy(p => p.Identity.Id).ThenByDescending(p => p.Identity.Version).ToHashSet();
 
-            return results;
+            return results.AsQueryable();
+        }
+
+        public static ISet<IPackageSearchMetadata> find_all_package_versions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources)
+        {
+            var metadataList = new HashSet<IPackageSearchMetadata>();
+            foreach (var resource in resources)
+            {
+                metadataList.AddRange(resource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
+            }
+            return metadataList;
         }
 
         /// <summary>
         ///   Searches for packages that are available based on name and other options
         /// </summary>
         /// <param name="packageName">Name of package to search for</param>
-        /// <param name="version">Optional version to search for</param>
         /// <param name="config">Chocolatey configuration used to help supply the search parameters</param>
-        /// <param name="repository">Repository (aggregate for multiple) to search in</param>
+        /// <param name="nugetLogger">fill me in</param>
+        /// <param name="resources">fill me in</param>
+        /// <param name="version">Version to search for</param>
+        /// <param name="cacheContext">Settings for cacheing of results from sources</param>
         /// <returns>One result or nothing</returns>
-        public static IPackage find_package(string packageName, SemanticVersion version, ChocolateyConfiguration config, IPackageRepository repository)
+        public static IPackageSearchMetadata find_package(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources, NuGetVersion version = null)
         {
+            if (version is null)
+            {
+                var metadataList = new HashSet<IPackageSearchMetadata>();
+                foreach (var resource in resources)
+                {
+                    metadataList.AddRange(resource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
+                }
+                return metadataList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
+            }
+
+            foreach (var resource in resources)
+            {
+                var metadata = resource.GetMetadataAsync(new PackageIdentity(packageName, version), cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
+                if (metadata != null)
+                {
+                    return metadata;
+                }
+            }
+
+            //If no packages found, then return nothing
+            return null;
+
+            /*
             // use old method when newer method causes issues
             if (!config.Features.UsePackageRepositoryOptimizations) return repository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
 
@@ -261,9 +394,63 @@ namespace chocolatey.infrastructure.app.nuget
 
             // get only one result, should be the latest - similar to TryFindLatestPackageById
             return results.ToList().OrderByDescending(x => x.Version).FirstOrDefault();
+            */
+        }
+    }
+
+    public class ComparePackageSearchMetadataIdOnly: IEqualityComparer<IPackageSearchMetadata>
+    {
+        public bool Equals(IPackageSearchMetadata x, IPackageSearchMetadata y)
+        {
+            if (ReferenceEquals(x, y))
+            {
+                return true;
+            }
+
+            if (ReferenceEquals(x, null) || ReferenceEquals(y, null))
+            {
+                return false;
+            }
+            return x.Identity.Id.Equals(y.Identity.Id, StringComparison.OrdinalIgnoreCase);
         }
 
+        public int GetHashCode(IPackageSearchMetadata obj)
+        {
+            if (ReferenceEquals(obj, null))
+            {
+                return 0;
+            }
+            return obj.Identity.Id.GetHashCode();
+        }
     }
+
+    public class ComparePackageSearchMetadata : IEqualityComparer<IPackageSearchMetadata>
+    {
+        public bool Equals(IPackageSearchMetadata x, IPackageSearchMetadata y)
+        {
+            if (ReferenceEquals(x, y))
+            {
+                return true;
+            }
+
+            if (ReferenceEquals(x, null) || ReferenceEquals(y, null))
+            {
+                return false;
+            }
+
+            return x.Identity.Equals(y.Identity);
+        }
+
+        public int GetHashCode(IPackageSearchMetadata obj)
+        {
+            if (ReferenceEquals(obj, null))
+            {
+                return 0;
+            }
+            return obj.Identity.GetHashCode();
+        }
+    }
+
 
     // ReSharper restore InconsistentNaming
 }

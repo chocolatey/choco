@@ -1,4 +1,4 @@
-﻿// ==============================================================================
+// ==============================================================================
 //
 // Fervent Coder Copyright © 2011 - Released under the Apache 2.0 License
 //
@@ -143,6 +143,15 @@ namespace chocolatey.tests
     {
         public PendingAttribute(string reason)
             : base("Pending test - {0}".format_with(reason))
+        {
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public class BrokenAttribute : CategoryAttribute
+    {
+        public BrokenAttribute()
+            : base("Broken")
         {
         }
     }

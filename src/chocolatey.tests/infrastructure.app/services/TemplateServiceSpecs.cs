@@ -28,8 +28,10 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.services;
     using Moq;
+    using NuGet.Common;
     using NUnit.Framework;
     using Should;
+    using LogLevel = tests.LogLevel;
 
     public class TemplateServiceSpecs
     {
@@ -38,13 +40,13 @@ namespace chocolatey.tests.infrastructure.app.services
             protected TemplateService service;
             protected Mock<IFileSystem> fileSystem = new Mock<IFileSystem>();
             protected Mock<IXmlService> xmlService = new Mock<IXmlService>();
+            protected Mock<ILogger> logger = new Mock<ILogger>();
 
             public override void Context()
             {
                 fileSystem.ResetCalls();
                 xmlService.ResetCalls();
-
-                service = new TemplateService(fileSystem.Object, xmlService.Object);
+                service = new TemplateService(fileSystem.Object, xmlService.Object, logger.Object);
             }
         }
 

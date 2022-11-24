@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="ensureAction">The action to continue with as part of the install</param>
-        void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult> ensureAction);
+        void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction);
 
         /// <summary>
         ///     Retrieve the listed packages from the source feed cout
@@ -67,7 +67,7 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="continueAction">The action to continue with for each noop test install.</param>
-        void install_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction);
+        void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
 
         /// <summary>
         ///   Installs packages from the source feed
@@ -75,14 +75,14 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="config">The configuration.</param>
         /// <param name="continueAction">The action to continue with when install is successful.</param>
         /// <returns>results of installs</returns>
-        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction);
+        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
 
         /// <summary>
         ///   Run upgrade in noop mode
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="continueAction">The action to continue with for each noop test upgrade.</param>
-        ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction);
+        ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
 
         /// <summary>
         ///   Upgrades packages from NuGet related feeds
@@ -91,14 +91,14 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
         /// <param name="beforeUpgradeAction">The action (if any) to run on any currently installed package before triggering the upgrade.</param>
         /// <returns>results of installs</returns>
-        ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction = null);
+        ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null);
 
         /// <summary>
         ///   Run uninstall in noop mode
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="continueAction">The action to continue with for each noop test upgrade.</param>
-        void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult> continueAction);
+        void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
 
         /// <summary>
         ///   Uninstalls packages from NuGet related feeds
@@ -107,6 +107,6 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
         /// <param name="beforeUninstallAction">The action (if any) to run on any currently installed package before triggering the uninstall.</param>
         /// <returns>results of installs</returns>
-        ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUninstallAction = null);
+        ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null);
     }
 }

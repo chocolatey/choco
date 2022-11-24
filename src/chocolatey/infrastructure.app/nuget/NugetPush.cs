@@ -17,14 +17,19 @@
 namespace chocolatey.infrastructure.app.nuget
 {
     using System;
-    using System.IO;
-    using NuGet;
     using configuration;
     using logging;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using NuGet.Common;
+    using NuGet.Configuration;
+    using NuGet.Protocol;
+    using NuGet.Protocol.Core.Types;
 
     public class NugetPush
     {
-        public static void push_package(ChocolateyConfiguration config, string nupkgFilePath)
+        public static void push_package(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName)
         {
             var timeout = TimeSpan.FromSeconds(Math.Abs(config.CommandExecutionTimeoutSeconds));
             if (timeout.Seconds <= 0)
@@ -33,23 +38,32 @@ namespace chocolatey.infrastructure.app.nuget
             }
             const bool disableBuffering = false;
 
-            var packageServer = new PackageServer(config.Sources, ApplicationParameters.UserAgent);
+            // Controls adding /api/v2/packages to the end of the source url
+            const bool noServiceEndpoint = true;
 
-            packageServer.SendingRequest += (sender, e) => { if (config.Verbose) "chocolatey".Log().Info(ChocolateyLoggers.Verbose, "{0} {1}".format_with(e.Request.Method, e.Request.RequestUri)); };
-
-            var package = new OptimizedZipPackage(nupkgFilePath);
+            //OK to use FirstOrDefault in this case as the command validates that there is only one source
+            SourceRepository sourceRepository = NugetCommon.GetRemoteRepositories(config, nugetLogger).FirstOrDefault();
+            PackageUpdateResource packageUpdateResource = sourceRepository.GetResource<PackageUpdateResource>();
+            var nupkgFilePaths = new List<string>() { nupkgFilePath };
+            UserAgent.SetUserAgentString(new UserAgentStringBuilder("{0}/{1} via NuGet Client".format_with(ApplicationParameters.UserAgent, config.Information.ChocolateyProductVersion)));
 
             try
             {
-                packageServer.PushPackage(
-                    config.PushCommand.Key,
-                    package,
-                    new FileInfo(nupkgFilePath).Length,
-                    Convert.ToInt32(timeout.TotalMilliseconds),
-                    disableBuffering);
+                packageUpdateResource.Push(
+                    nupkgFilePaths,
+                    "",
+                    Convert.ToInt32(timeout.TotalSeconds),
+                    disableBuffering,
+                    endpoint => config.PushCommand.Key,
+                    null,
+                    noServiceEndpoint,
+                    true,
+                    null,
+                    nugetLogger).GetAwaiter().GetResult();
             }
             catch (InvalidOperationException ex)
             {
+
                 var message = ex.Message;
                 if (!string.IsNullOrWhiteSpace(message))
                 {
@@ -68,7 +82,7 @@ namespace chocolatey.infrastructure.app.nuget
                 throw;
             }
 
-            "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} was pushed successfully to {1}".format_with(package.GetFullName(), config.Sources));
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} was pushed successfully to {1}".format_with(nupkgFileName, config.Sources));
         }
     }
 }

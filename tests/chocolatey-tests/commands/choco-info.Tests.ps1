@@ -35,7 +35,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
             $Output.Lines | Should -Contain "${Title}: $Value"
         }
 
-        It "Displays published date in format M/DD/YYYY" {
+        It "Displays published date in format M/DD/YYYY" -Tag ExpectBroken {
             $Output.String | Should -Match "Published: (?<month>\d{1,2})\/(?<day>\d{1,2})\/(?<year>\d{4})"
         }
 

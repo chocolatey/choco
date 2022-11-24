@@ -92,7 +92,7 @@ namespace chocolatey.tests.infrastructure.app.configuration
                 because();
             }
 
-            [Fact, Explicit]
+            [Fact]
             public void should_show_help_menu_when_help_is_requested()
             {
                 args.Add("-h");
@@ -102,7 +102,7 @@ namespace chocolatey.tests.infrastructure.app.configuration
                 config.HelpRequested.ShouldBeTrue();
             }
 
-            [Fact, Explicit]
+            [Fact]
             public void should_have_a_helpMessage_with_contents_when_help_is_requested()
             {
                 args.Add("-h");
@@ -112,7 +112,7 @@ namespace chocolatey.tests.infrastructure.app.configuration
                 helpMessageContents.ToString().ShouldNotBeEmpty();
             }
 
-            [Fact, Explicit]
+            [Fact]
             public void should_not_run_validate_configuration_when_help_is_requested()
             {
                 args.Add("-h");

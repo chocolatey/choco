@@ -20,7 +20,8 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Generic;
     using System.Management.Automation.Runspaces;
     using configuration;
-    using NuGet;
+    using NuGet.Packaging;
+    using NuGet.Protocol.Core.Types;
     using results;
 
     public interface IPowershellService
@@ -67,7 +68,7 @@ namespace chocolatey.infrastructure.app.services
         /// <returns>true if the chocolateyBeforeModify.ps1 was found, even if it has failures</returns>
         bool before_modify(ChocolateyConfiguration configuration, PackageResult packageResult);
 
-        void prepare_powershell_environment(IPackage package, ChocolateyConfiguration configuration, string packageDirectory);
+        void prepare_powershell_environment(IPackageSearchMetadata package, ChocolateyConfiguration configuration, string packageDirectory);
 
         [Obsolete("This version of running the powershell host do not support running additional hooks. Use the appropriate overload instead")]
         PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript);

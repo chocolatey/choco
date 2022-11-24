@@ -28,9 +28,14 @@ namespace chocolatey.infrastructure.app.registration
     using chocolatey.infrastructure.logging;
     using chocolatey.infrastructure.services;
     using infrastructure.configuration;
-    using NuGet;
     using SimpleInjector;
     using Assembly = adapters.Assembly;
+    using nuget;
+    using NuGet.Common;
+    using NuGet.Versioning;
+    using CryptoHashProvider = cryptography.CryptoHashProvider;
+    using IFileSystem = filesystem.IFileSystem;
+    using IHashProvider = cryptography.IHashProvider;
 
     // ReSharper disable InconsistentNaming
 
@@ -75,7 +80,7 @@ namespace chocolatey.infrastructure.app.registration
             var disableCompatibilityChecks = ConfigurationBuilder.is_compatibility_checks_disabled(fileSystem, xmlService) ||
                 arguments.Any(a => a.is_equal_to("--skip-compatibility-checks"));
 
-            var chocoVersion = new SemanticVersion(VersionInformation.get_current_assembly_version());
+            var chocoVersion = NuGetVersion.Parse(VersionInformation.get_current_assembly_version());
             registrator = register_extensions(availableExtensions, configuration, registrator, assemblies, currentAssemblyVersion, chocoVersion, disableCompatibilityChecks);
 
             container = registrator.build_container(container);
