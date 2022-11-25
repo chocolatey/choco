@@ -3150,13 +3150,13 @@ namespace chocolatey.tests.integration.scenarios
                 }
             }
 
-            [Fact, Broken]
+            [Fact]
             public void should_contain_a_message_that_it_was_unable_to_install_any_packages()
             {
                 bool expectedMessage = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
                 {
-                    if (message.Contains("installed 0/3")) expectedMessage = true;
+                    if (message.Contains("installed 0/1")) expectedMessage = true;
                 }
 
                 expectedMessage.ShouldBeTrue();
@@ -3252,13 +3252,13 @@ namespace chocolatey.tests.integration.scenarios
                 }
             }
 
-            [Fact, Broken]
+            [Fact]
             public void should_contain_a_message_that_it_was_unable_to_install_any_packages()
             {
                 bool expectedMessage = false;
                 foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
                 {
-                    if (message.Contains("installed 0/3")) expectedMessage = true;
+                    if (message.Contains("installed 0/1")) expectedMessage = true;
                 }
 
                 expectedMessage.ShouldBeTrue();
