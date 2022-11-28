@@ -18,11 +18,15 @@ namespace chocolatey.infrastructure.registration
 {
     using System;
     using System.Collections.Concurrent;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using adapters;
     using chocolatey.infrastructure.app;
+    using chocolatey.infrastructure.app.runners;
     using filesystem;
+    using Assembly = adapters.Assembly;
 
     public class AssemblyResolution
     {
@@ -135,9 +139,10 @@ namespace chocolatey.infrastructure.registration
                 try
                 {
                     IAssembly tempAssembly;
-#if FORCE_OFFICIAL_KEY
+#if FORCE_CHOCOLATEY_OFFICIAL_KEY
                     tempAssembly = Assembly.Load(FileSystem.read_binary_file_into_byte_array(assemblyFileLocation));
 #else
+
                     var symbolFile = System.IO.Path.ChangeExtension(assemblyFileLocation, ".pdb");
                     if (System.IO.File.Exists(symbolFile))
                     {
@@ -286,6 +291,72 @@ namespace chocolatey.infrastructure.registration
             if (assembly != null)
             {
                 return Assembly.set_assembly(assembly);
+            }
+
+            return null;
+        }
+
+        public static System.Reflection.Assembly resolve_extension_or_merged_assembly(object sender, ResolveEventArgs args)
+        {
+            var requestedAssembly = new AssemblyName(args.Name);
+
+#if FORCE_CHOCOLATEY_OFFICIAL_KEY
+            var chocolateyPublicKey = ApplicationParameters.OfficialChocolateyPublicKey;
+#else
+            var chocolateyPublicKey = ApplicationParameters.UnofficialChocolateyPublicKey;
+#endif
+
+            if (!requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey))
+            {
+                // This resolver is only loading official extensions for Chocolatey and ILMerged assemblies.
+                // Everything else is not handled by this resolver.
+                return null;
+            }
+
+            // Check if the requested assembly is already loaded
+            var resolvedAssembly = resolve_existing_assembly(requestedAssembly.Name, chocolateyPublicKey);
+
+            if (resolvedAssembly != null)
+            {
+                return resolvedAssembly.UnderlyingType;
+            }
+
+            if (Directory.Exists(ApplicationParameters.ExtensionsLocation))
+            {
+                bool extensionsFound = false;
+                foreach (var extensionDll in Directory.EnumerateFiles(ApplicationParameters.ExtensionsLocation, requestedAssembly.Name + ".dll", SearchOption.AllDirectories))
+                {
+                    extensionsFound = true;
+                    try
+                    {
+                        resolvedAssembly = load_assembly(requestedAssembly.Name, extensionDll, chocolateyPublicKey);
+
+                        if (resolvedAssembly != null)
+                        {
+                            return resolvedAssembly.UnderlyingType;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // This catch statement is empty on purpose, we do
+                        // not want to do anything if it fails to load.
+                    }
+                }
+
+                if (extensionsFound)
+                {
+                    // Return to avoid an extension load call accidentally loading the `chocolatey` assembly.
+                    // This is necessary as loading `chocolatey` itself as an extension can overwrite
+                    // command registration for other extensions and break their functionality.
+                    return null;
+                }
+            }
+
+            // There are things that are ILMerged into Chocolatey. Anything with
+            // the right public key except extensions should use the choco/chocolatey assembly
+            if (!requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
+            {
+                return typeof(ConsoleApplication).Assembly;
             }
 
             return null;
