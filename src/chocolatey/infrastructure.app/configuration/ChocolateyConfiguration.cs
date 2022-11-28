@@ -31,7 +31,7 @@ namespace chocolatey.infrastructure.app.configuration
     public class ChocolateyConfiguration
     {
         [NonSerialized]
-        private ChocolateyConfiguration _originalConfiguration;
+        private Stack<ChocolateyConfiguration> _configurationBackups;
 
         public ChocolateyConfiguration()
         {
@@ -67,9 +67,14 @@ namespace chocolatey.infrastructure.app.configuration
         /// <exception cref="System.Runtime.Serialization.SerializationException">One or more objects in the class or child classes are not serializable.</exception>
         public void start_backup()
         {
+            if (_configurationBackups == null)
+            {
+                _configurationBackups = new Stack<ChocolateyConfiguration>();
+            }
+
             // We do this the easy way to ensure that we have a clean copy
             // of the original configuration file.
-            _originalConfiguration = this.deep_copy();
+            _configurationBackups.Push(this.deep_copy());
         }
 
         /// <summary>
@@ -86,33 +91,42 @@ namespace chocolatey.infrastructure.app.configuration
         /// </remarks>
         public void reset_config(bool removeBackup = false)
         {
-            if (_originalConfiguration == null)
+            if (_configurationBackups == null || _configurationBackups.Count == 0)
             {
                 if (removeBackup)
                 {
                     // If we will also be removing the backup, we do not care if it is already
                     // null or not, as that is the intended state when this method returns.
+                    this.Log().Debug("Requested removal of a configuration backup that does not exist: the backup stack is empty.");
                     return;
                 }
 
                 throw new InvalidOperationException("No backup has been created before trying to reset the current configuration, and removal of the backup was not requested.");
             }
 
+            // Runtime type lookup ensures this also fully works with derived classes (for example: licensed configuration)
+            // without needing to re-implement this method / make it overridable.
             var t = this.GetType();
+
+            var backup = removeBackup ? _configurationBackups.Pop() : _configurationBackups.Peek();
 
             foreach (var property in t.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
+                if (property.Name == "_configurationBackups")
+                {
+                    continue;
+                }
+
                 try
                 {
-                    var originalValue = property.GetValue(_originalConfiguration, new object[0]);
+                    var originalValue = property.GetValue(backup, new object[0]);
 
                     if (removeBackup || property.DeclaringType.IsPrimitive || property.DeclaringType.IsValueType || property.DeclaringType == typeof(string))
                     {
                         // If the property is a primitive, a value type or a string, then a copy of the value
                         // will be created by the .NET Runtime automatically, and we do not need to create a deep clone of the value.
                         // Additionally, if we will be removing the backup there is no need to create a deep copy
-                        // for any reference types, as such we also set the reference itself so it is not needed
-                        // to allocate more memory.
+                        // for any reference types. We won't have any duplicate references because the backup is being discarded.
                         property.SetValue(this, originalValue, new object[0]);
                     }
                     else if (originalValue != null)
@@ -130,14 +144,6 @@ namespace chocolatey.infrastructure.app.configuration
                 {
                     throw new ApplicationException("Unable to restore the value for the property '{0}'.".format_with(property.Name), ex);
                 }
-            }
-
-            if (removeBackup)
-            {
-                // It is enough to set the original configuration to null to
-                // allow GC to clean it up the next time it runs on the stored Generation
-                // Heap Table.
-                _originalConfiguration = null;
             }
         }
 
