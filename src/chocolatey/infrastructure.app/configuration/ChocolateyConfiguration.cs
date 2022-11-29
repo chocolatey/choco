@@ -119,6 +119,14 @@ namespace chocolatey.infrastructure.app.configuration
 
                 try
                 {
+                    if (property.Name == "PromptForConfirmation")
+                    {
+                        // We do not overwrite this value between backups as it is intended to be a global setting;
+                        // if a user has selected a "[A] yes to all" prompt interactively, this option is
+                        // set and should be retained for the duration of the operations.
+                        continue;
+                    }
+
                     var originalValue = property.GetValue(backup, new object[0]);
 
                     if (removeBackup || property.DeclaringType.IsPrimitive || property.DeclaringType.IsValueType || property.DeclaringType == typeof(string))
