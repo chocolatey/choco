@@ -284,13 +284,28 @@ namespace chocolatey.infrastructure.registration
                 assemblySimpleName,
                 chocolateyPublicKey);
 
-            // We use Reflection Assembly Load directly to allow .NET assembly resolving
-            // to handle everything.
-            var assembly = System.Reflection.Assembly.Load(fullName);
-
-            if (assembly != null)
+            try
             {
-                return Assembly.set_assembly(assembly);
+                // We use Reflection Assembly Load directly to allow .NET assembly resolving
+                // to handle everything.
+                var assembly = System.Reflection.Assembly.Load(fullName);
+
+                if (assembly != null)
+                {
+                    return Assembly.set_assembly(assembly);
+                }
+            }
+            // Ignore load failures, so we return null and let the caller handle the failure to load the extension.
+            // A failure here will pretty much always be a public key mismatch, an invalid DLL, or a failure to find
+            // the licensed extension, all of which should be handled by the caller.
+            catch (FileNotFoundException)
+            {
+            }
+            catch (FileLoadException)
+            {
+            }
+            catch (BadImageFormatException)
+            {
             }
 
             return null;
