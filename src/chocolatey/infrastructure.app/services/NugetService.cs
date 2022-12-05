@@ -180,7 +180,7 @@ namespace chocolatey.infrastructure.app.services
                     if (config.RegularOutput)
                     {
                         this.Log().Info(logger, () => "{0}{1}".format_with(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : " {0}{1}{2}{3}".format_with(
-                                packageLocalMetadata != null ? packageLocalMetadata.Version.to_string() : package.Identity.Version.to_string(),
+                                packageLocalMetadata != null ? packageLocalMetadata.Version.to_full_string() : package.Identity.Version.to_full_string(),
                                 package.IsApproved ? " [Approved]" : string.Empty,
                                 package.IsDownloadCacheAvailable ? " Downloads cached for licensed users" : string.Empty,
                                 package.PackageTestResultStatus == "Failing" && package.IsDownloadCacheAvailable ? " - Possibly broken for FOSS users (due to original download location changes by vendor)" : package.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
@@ -236,12 +236,12 @@ namespace chocolatey.infrastructure.app.services
                     }
                     else
                     {
-                        this.Log().Info(logger, () => "{0}{1}".format_with(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : "|{0}".format_with(package.Identity.Version.to_string())));
+                        this.Log().Info(logger, () => "{0}{1}".format_with(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : "|{0}".format_with(package.Identity.Version.to_full_string())));
                     }
                 }
                 else
                 {
-                    this.Log().Debug(() => "{0}{1}".format_with(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : " {0}".format_with(package.Identity.Version.to_string())));
+                    this.Log().Debug(() => "{0}{1}".format_with(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : " {0}".format_with(package.Identity.Version.to_full_string())));
                 }
                 count++;
 
@@ -334,7 +334,7 @@ namespace chocolatey.infrastructure.app.services
                 builder.Version = new NuGetVersion(config.Version);
             }
 
-            string outputFile = builder.Id + "." + builder.Version + NuGetConstants.PackageExtension;
+            string outputFile = builder.Id + "." + builder.Version.to_normalized_string() + NuGetConstants.PackageExtension;
             string outputFolder = config.OutputDirectory ?? _fileSystem.get_current_directory();
             string outputPath = _fileSystem.combine_paths(outputFolder, outputFile);
 
@@ -545,12 +545,12 @@ If the package version is a prerelease and you didn't specify `--pre`,
                             ? String.Empty
                             : @"
 Version was specified as '{0}'. It is possible that version
- does not exist for '{1}' at the source specified.".format_with(config.Version.to_string(), packageName),
+ does not exist for '{1}' at the source specified.".format_with(config.Version, packageName),
                         @"
 Please see https://docs.chocolatey.org/en-us/troubleshooting for more
  assistance.");
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                    var noPkgResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
+                    var noPkgResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(packageName, version.to_full_string(), null));
                     noPkgResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     continue;
                 }
@@ -771,7 +771,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         this.Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".format_with(
                             System.Environment.NewLine,
                             packageMetadata.Id,
-                            packageMetadata.Version.to_string(),
+                            packageMetadata.Version.to_full_string(),
                             config.Force ? " (forced)" : string.Empty,
                             packageRemoteMetadata.IsApproved ? " [Approved]" : string.Empty,
                             packageRemoteMetadata.PackageTestResultStatus == "Failing" && packageRemoteMetadata.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : packageRemoteMetadata.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
@@ -797,7 +797,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".format_with(packageDependencyInfo.Id, Environment.NewLine, message);
                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                        var errorResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, new PackageResult(packageDependencyInfo.Id, version.to_string(), null));
+                        var errorResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, new PackageResult(packageDependencyInfo.Id, version.to_full_string(), null));
                         errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         if (errorResult.ExitCode == 0) errorResult.ExitCode = 1;
                         if (continueAction != null) continueAction.Invoke(errorResult, config);
@@ -967,7 +967,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     if (config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated) continue;
 
                     string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"; Source(s): \"{3}\"".format_with(packageName, Environment.NewLine, config.Version, config.Sources);
-                    var unfoundResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(packageName, version.to_string(), null));
+                    var unfoundResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(packageName, version.to_full_string(), null));
 
                     if (config.UpgradeCommand.FailOnUnfound)
                     {
@@ -1307,7 +1307,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 this.Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".format_with(
                                     System.Environment.NewLine,
                                     packageMetadata.Id,
-                                    packageMetadata.Version.to_string(),
+                                    packageMetadata.Version.to_full_string(),
                                     config.Force ? " (forced)" : string.Empty,
                                     packageRemoteMetadata.IsApproved ? " [Approved]" : string.Empty,
                                     packageRemoteMetadata.PackageTestResultStatus == "Failing" && packageRemoteMetadata.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : packageRemoteMetadata.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
@@ -1332,7 +1332,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                 var logMessage = "{0} not upgraded. An error occurred during installation:{1} {2}".format_with(packageName, Environment.NewLine, message);
                                 this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                                var errorResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, new PackageResult(packageDependencyInfo.Id, version.to_string(), null));
+                                var errorResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, new PackageResult(packageDependencyInfo.Id, version.to_full_string(), null));
                                 errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                                 if (errorResult.ExitCode == 0) errorResult.ExitCode = 1;
                                 if (continueAction != null) continueAction.Invoke(errorResult, config);
@@ -1719,7 +1719,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
             foreach (var packageResult in results.or_empty_list_if_null())
             {
                 var package = packageResult.Value.PackageMetadata;
-                if (package != null) this.Log().Warn("Would have uninstalled {0} v{1}.".format_with(package.Id, package.Version.to_string()));
+                if (package != null) this.Log().Warn("Would have uninstalled {0} v{1}.".format_with(package.Id, package.Version.to_full_string()));
             }
         }
 
@@ -1843,7 +1843,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                         choices.Add(abortChoice);
                         foreach (var installedVersion in installedPackageVersions.or_empty_list_if_null())
                         {
-                            choices.Add(installedVersion.Version.to_string());
+                            choices.Add(installedVersion.Version);
                         }
 
                         const string allVersionsChoice = "All versions";
@@ -1867,9 +1867,9 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                         }
                         else
                         {
-                            PackageResult pkg = installedPackageVersions.FirstOrDefault((p) => p.Version.to_string().is_equal_to(selection));
+                            PackageResult pkg = installedPackageVersions.FirstOrDefault((p) => p.Version.is_equal_to(selection));
                             packageVersionsToRemove.Add(pkg);
-                            if (config.RegularOutput) this.Log().Info(() => "You selected {0} v{1}".format_with(pkg.Name, pkg.Version.to_string()));
+                            if (config.RegularOutput) this.Log().Info(() => "You selected {0} v{1}".format_with(pkg.Name, pkg.Version));
                         }
                     }
                 }
