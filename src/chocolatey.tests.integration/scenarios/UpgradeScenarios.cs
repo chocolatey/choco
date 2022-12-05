@@ -246,7 +246,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 
@@ -406,7 +406,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 
@@ -484,11 +484,13 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.1.0");
-                    packageReader.NuspecReader.GetVersion().OriginalVersion.to_string().ShouldEqual("1.1.1-beta2");
+                    var version = packageReader.NuspecReader.GetVersion();
+                    version.Version.to_string().ShouldEqual("1.1.1.0");
+                    version.OriginalVersion.to_string().ShouldEqual("1.1.1-beta2");
+                    version.ToString().ShouldEqual("1.1.1-beta2");
                 }
             }
 
@@ -586,6 +588,161 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Category("SemVer 2.0")]
+        public class when_upgrading_an_existing_package_with_semver_2_0_prerelease_available_and_prerelease_specified : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Prerelease = true;
+                Scenario.remove_packages_from_destination_location(Configuration, "upgradepackage.1.1.1-beta2.nupkg");
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_upgrade_where_install_location_reports()
+            {
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
+            }
+
+            [Fact]
+            public void should_upgrade_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                DirectoryAssert.Exists(packageDir);
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void should_contain_newer_version_in_directory()
+            {
+                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+
+                File.ReadAllText(shimFile).ShouldEqual("1.1.1-beta.1");
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    var version = packageReader.NuspecReader.GetVersion();
+                    version.Version.to_string().ShouldEqual("1.1.1.0");
+                    version.OriginalVersion.to_string().ShouldEqual("1.1.1-beta.1");
+                    version.ToString().ShouldEqual("1.1.1-beta.1");
+                }
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_with_old_and_new_versions()
+            {
+                bool upgradeMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.1-beta.1 is available based on your source")) upgradeMessage = true;
+                }
+
+                upgradeMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_match_the_upgrade_version_of_the_new_beta()
+            {
+                _packageResult.Version.ShouldEqual("1.1.1-beta.1");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_before_chocolateyInstall()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null()
+                    .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
+                    .Any(p => p.EndsWith("upgradepackage 1.1.1-beta.1 Installed"))
+                    .ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyUninstall_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.1-beta.1 Before Modification", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyInstall_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.1-beta.1 Installed", LogLevel.Info).ShouldBeTrue();
+            }
+        }
+
         public class when_upgrading_an_existing_prerelease_package_without_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -637,11 +794,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.1.0");
-                    packageReader.NuspecReader.GetVersion().OriginalVersion.to_string().ShouldEqual("1.1.1-beta2");
+                    var version = packageReader.NuspecReader.GetVersion();
+
+                    version.Version.to_string().ShouldEqual("1.1.1.0");
+                    version.OriginalVersion.to_string().ShouldEqual("1.1.1-beta2");
+                    version.to_string().ShouldEqual("1.1.1-beta2");
                 }
             }
 
@@ -739,6 +899,321 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Category("SemVer 2.0")]
+        public class when_upgrading_an_existing_prerelease_package_to_semver_2_0_without_prerelease_specified : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Prerelease = true;
+                Scenario.install_package(Configuration, "upgradepackage", "1.1.1-beta");
+                Scenario.remove_packages_from_destination_location(Configuration, "upgradepackage.1.1.1-beta2.nupkg");
+                Configuration.Prerelease = false;
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_upgrade_where_install_location_reports()
+            {
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
+            }
+
+            [Fact]
+            public void should_upgrade_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                DirectoryAssert.Exists(packageDir);
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void should_contain_newer_version_in_directory()
+            {
+                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+
+                File.ReadAllText(shimFile).ShouldEqual("1.1.1-beta.1");
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    var version = packageReader.NuspecReader.GetVersion();
+
+                    version.Version.to_string().ShouldEqual("1.1.1.0");
+                    version.OriginalVersion.to_string().ShouldEqual("1.1.1-beta.1");
+                    version.to_string().ShouldEqual("1.1.1-beta.1");
+                }
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_with_old_and_new_versions()
+            {
+                bool upgradeMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("You have upgradepackage v1.1.1-beta installed. Version 1.1.1-beta.1 is available based on your source")) upgradeMessage = true;
+                }
+
+                upgradeMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_match_the_upgrade_version_of_the_new_beta()
+            {
+                _packageResult.Version.ShouldEqual("1.1.1-beta.1");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.1-beta Before Modification", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_before_chocolateyInstall()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null()
+                    .SkipWhile(p => !p.Contains("upgradepackage 1.1.1-beta Before Modification"))
+                    .Any(p => p.EndsWith("upgradepackage 1.1.1-beta.1 Installed"))
+                    .ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyUninstall_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.1-beta Uninstalled", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.1-beta.1 Before Modification", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyInstall_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.1-beta.1 Installed", LogLevel.Info).ShouldBeTrue();
+            }
+        }
+
+        [Category("SemVer 2.0")]
+        public class when_upgrading_an_existing_semver_2_0_prerelease_package_to_legacy_semver_without_prerelease_specified : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Prerelease = true;
+                Scenario.install_package(Configuration, "upgradepackage", "1.1.1-beta.1");
+                Configuration.Prerelease = false;
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_upgrade_where_install_location_reports()
+            {
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
+            }
+
+            [Fact]
+            public void should_upgrade_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                DirectoryAssert.Exists(packageDir);
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void should_contain_newer_version_in_directory()
+            {
+                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+
+                File.ReadAllText(shimFile).ShouldEqual("1.1.1-beta2");
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    var version = packageReader.NuspecReader.GetVersion();
+
+                    version.Version.to_string().ShouldEqual("1.1.1.0");
+                    version.OriginalVersion.to_string().ShouldEqual("1.1.1-beta2");
+                    version.to_string().ShouldEqual("1.1.1-beta2");
+                }
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_with_old_and_new_versions()
+            {
+                bool upgradeMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("You have upgradepackage v1.1.1-beta.1 installed. Version 1.1.1-beta2 is available based on your source")) upgradeMessage = true;
+                }
+
+                upgradeMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_match_the_upgrade_version_of_the_new_beta()
+            {
+                _packageResult.Version.ShouldEqual("1.1.1-beta2");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.1-beta.1 Before Modification", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_before_chocolateyInstall()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null()
+                    .SkipWhile(p => !p.Contains("upgradepackage 1.1.1-beta.1 Before Modification"))
+                    .Any(p => p.EndsWith("upgradepackage 1.1.1-beta2 Installed"))
+                    .ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyUninstall_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.1-beta.1 Uninstalled", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.1-beta2 Before Modification", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyInstall_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.1-beta2 Installed", LogLevel.Info).ShouldBeTrue();
+            }
+        }
+
         public class when_upgrading_an_existing_prerelease_package_with_prerelease_available_with_excludeprerelease_and_without_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -804,7 +1279,10 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.1.0");
+                    var version = packageReader.NuspecReader.GetVersion();
+                    version.Version.to_string().ShouldEqual("1.1.1.0");
+                    version.OriginalVersion.ShouldEqual("1.1.1-beta");
+                    version.to_string().ShouldEqual("1.1.1-beta");
                 }
             }
 
@@ -899,7 +1377,10 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.1.0");
+                    var version = packageReader.NuspecReader.GetVersion();
+                    version.Version.to_string().ShouldEqual("1.1.1.0");
+                    version.OriginalVersion.ShouldEqual("1.1.1-beta");
+                    version.to_string().ShouldEqual("1.1.1-beta");
                 }
             }
 
@@ -964,7 +1445,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 
@@ -1101,7 +1582,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -1193,7 +1674,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -1284,7 +1765,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 
@@ -1395,7 +1876,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 
@@ -1518,7 +1999,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -1604,7 +2085,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 
@@ -1684,7 +2165,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 
@@ -2013,7 +2494,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2031,7 +2512,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.0.0");
                 }
             }
 
@@ -2128,7 +2609,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.1.0");
                 }
             }
 
@@ -2138,7 +2619,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.1.0");
                 }
             }
 
@@ -2148,7 +2629,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.0.0");
                 }
             }
 
@@ -2216,7 +2697,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2226,7 +2707,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2236,7 +2717,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2343,7 +2824,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.1.0");
                 }
             }
 
@@ -2353,7 +2834,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2363,7 +2844,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2431,7 +2912,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 
@@ -2441,7 +2922,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2451,7 +2932,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2535,7 +3016,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 
@@ -2559,7 +3040,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency.1.0.0", "hasdependency.1.0.0.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2583,7 +3064,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency.1.0.0", "isexactversiondependency.1.0.0.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2665,7 +3146,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.1.0");
                 }
             }
 
@@ -2675,7 +3156,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.1.0");
                 }
             }
 
@@ -2685,7 +3166,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.0.0");
                 }
             }
 
@@ -2761,7 +3242,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.1.0");
                 }
             }
 
@@ -2785,7 +3266,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.1.0");
                 }
             }
 
@@ -2810,7 +3291,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.0.0");
                 }
             }
 
@@ -2897,7 +3378,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 
@@ -2997,7 +3478,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 
@@ -3170,7 +3651,10 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "upgradepackage", "upgradepackage" +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().OriginalVersion.ShouldEqual("1.1.1-beta2");
+                    var version = packageReader.NuspecReader.GetVersion();
+                    version.Version.to_string().ShouldEqual("1.1.1.0");
+                    version.OriginalVersion.ShouldEqual("1.1.1-beta2");
+                    version.to_string().ShouldEqual("1.1.1-beta2");
                 }
             }
 
@@ -3222,7 +3706,10 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "upgradepackage", "upgradepackage" +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().OriginalVersion.to_string().ShouldEqual("1.1.1-beta");
+                    var version = packageReader.NuspecReader.GetVersion();
+                    version.Version.to_string().ShouldEqual("1.1.1.0");
+                    version.OriginalVersion.ShouldEqual("1.1.1-beta");
+                    version.to_string().ShouldEqual("1.1.1-beta");
                 }
             }
 
@@ -3232,6 +3719,169 @@ namespace chocolatey.tests.integration.scenarios
                 var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
                 installPackageResult.Count.ShouldEqual(1, "installpackage must be there once");
                 installPackageResult.First().Value.Version.ShouldEqual("1.0.0");
+            }
+        }
+
+        [Category("SemVer 2.0")]
+        public class when_upgrading_package_to_an_explicit_semver_2_0_version : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "upgradepackage";
+                Configuration.Version = "1.1.1-beta.1";
+                Configuration.Prerelease = true;
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.Select(r => r.Value).FirstOrDefault();
+            }
+
+            [Fact]
+            public void should_have_a_single_package_result()
+            {
+                Results.Count.ShouldEqual(1, "The returned package results do not have a single value!");
+            }
+
+            [Fact]
+            public void should_upgrade_where_install_location_reports()
+            {
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
+            }
+
+            [Fact]
+            public void should_upgrade_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                DirectoryAssert.Exists(packageDir);
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void should_contain_newer_version_in_directory()
+            {
+                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+
+                FileAssert.Exists(shimFile);
+
+                File.ReadAllText(shimFile).ShouldEqual("1.1.1-beta.1");
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.1-beta.1");
+                }
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_with_old_and_new_versions()
+            {
+                bool upgradeMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.1-beta.1 is available based on your source")) upgradeMessage = true;
+                }
+
+                upgradeMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_match_the_upgrade_version_of_one_dot_one_dot_zero()
+            {
+                _packageResult.Version.ShouldEqual("1.1.1-beta.1");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_before_chocolateyInstall()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null()
+                    .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
+                    .Any(p => p.EndsWith("upgradepackage 1.1.1-beta.1 Installed"))
+                    .ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyUninstall_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.1.0 Before Modification", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyInstall_script_for_new_package()
+            {
+                const string expectedMessage = "upgradepackage 1.1.1-beta.1 Installed";
+
+                MockLogger.contains_message(expectedMessage, LogLevel.Info).ShouldBeTrue("No log message containing the sentence '{0}' could be found!".format_with(expectedMessage));
             }
         }
 
@@ -3311,7 +3961,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("2.0.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.0.0");
                 }
             }
 
@@ -3457,7 +4107,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().Version.to_string().ShouldEqual("1.1.0.0");
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
                 }
             }
 

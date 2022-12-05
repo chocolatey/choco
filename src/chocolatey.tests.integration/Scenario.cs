@@ -85,6 +85,21 @@ namespace chocolatey.tests.integration
             }
         }
 
+        public static void remove_packages_from_destination_location(ChocolateyConfiguration config, string pattern)
+        {
+            if (!_fileSystem.directory_exists(config.Sources))
+            {
+                return;
+            }
+
+            var files = _fileSystem.get_files(config.Sources, pattern, SearchOption.AllDirectories);
+
+            foreach (var file in files)
+            {
+                _fileSystem.delete_file(file);
+            }
+        }
+
         public static void install_package(ChocolateyConfiguration config, string packageId, string version)
         {
             if (_service == null)
