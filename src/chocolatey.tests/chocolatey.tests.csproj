@@ -68,6 +68,24 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Chocolatey.NuGet.Common, Version=3.0.0.80, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Common.3.0.0-alpha-20221213-80\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Configuration, Version=3.0.0.80, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.0.0-alpha-20221213-80\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Frameworks, Version=3.0.0.80, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.0.0-alpha-20221213-80\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Packaging, Version=3.0.0.80, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.0.0-alpha-20221213-80\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Protocol, Version=3.0.0.80, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.0.0-alpha-20221213-80\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Versioning, Version=3.0.0.80, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.0.0-alpha-20221213-80\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
     </Reference>
@@ -79,24 +97,6 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Common, Version=3.0.0.42, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Common.3.0.0-alpha-20221121-42\lib\net472\NuGet.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Configuration, Version=3.0.0.42, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.0.0-alpha-20221121-42\lib\net472\NuGet.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Frameworks, Version=3.0.0.42, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NuGet.Frameworks.3.0.0-alpha-20221121-42\lib\net472\NuGet.Frameworks.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Packaging, Version=3.0.0.42, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.0.0-alpha-20221121-42\lib\net472\NuGet.Packaging.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Protocol, Version=3.0.0.42, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.0.0-alpha-20221121-42\lib\net472\NuGet.Protocol.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Versioning, Version=3.0.0.42, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.0.0-alpha-20221121-42\lib\net472\NuGet.Versioning.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=3.13.3.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.13.3\lib\net40\nunit.framework.dll</HintPath>

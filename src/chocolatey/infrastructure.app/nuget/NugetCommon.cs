@@ -29,6 +29,7 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Threading.Tasks;
     using adapters;
     using Alphaleonis.Win32.Filesystem;
+    using Chocolatey.NuGet.Frameworks;
     using infrastructure.configuration;
     using configuration;
     using domain;
@@ -38,7 +39,6 @@ namespace chocolatey.infrastructure.app.nuget
     using NuGet.Common;
     using NuGet.Configuration;
     using NuGet.Credentials;
-    using NuGet.Frameworks;
     using NuGet.PackageManagement;
     using NuGet.Packaging;
     using NuGet.Packaging.Core;
