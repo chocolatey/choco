@@ -26,6 +26,19 @@ param(
 )
 $packageRegex = 'chocolatey\.\d.*\.nupkg'
 
+# Check if there are any tests that exceed Test Kitchen maximum lengths
+$TestsLocation = Join-Path $PSScriptRoot tests
+$MaxFileNameLength = 110
+$LongFiles = Get-ChildItem $TestsLocation -Recurse |
+    Where-Object { ($_.FullName.Length - $TestsLocation.Length) -gt $MaxFileNameLength } |
+    Select-Object -Property @{Name = 'RelativePath' ; Expression = { $_.FullName.Replace($TestsLocation, [string]::Empty)}}, @{ Name = 'ReductionNeeded' ; Expression = { $_.FullName.Length - $TestsLocation.Length - $MaxFileNameLength } }
+
+if ($LongFiles) {
+    Write-Host "Tests' file paths may be too long for Test Kitchen use. Please shorten file names or paths:"
+    $LongFiles | Format-List | Out-String | Out-Host
+    throw "Unable to complete tests due to long file paths"
+}
+
 # Use TstPkg as TestPackage has ValidateScript that can't be circumvented
 if (-not $TestPackage) {
     $TstPkg = Get-ChildItem $PSScriptRoot/code_drop/Packages/Chocolatey -Filter *.nupkg | Where-Object Name -Match $packageRegex
