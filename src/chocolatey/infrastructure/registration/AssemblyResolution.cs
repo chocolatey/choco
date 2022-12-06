@@ -369,7 +369,8 @@ namespace chocolatey.infrastructure.registration
 
             // There are things that are ILMerged into Chocolatey. Anything with
             // the right public key except extensions should use the choco/chocolatey assembly
-            if (!requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
+            if (!requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase)
+                && !requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName))
             {
                 return typeof(ConsoleApplication).Assembly;
             }
