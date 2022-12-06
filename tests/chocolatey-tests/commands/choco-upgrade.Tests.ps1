@@ -234,4 +234,26 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
             $line | Should -Not -Match "-forceX86"
         }
     }
+
+
+    Context "Upgrading multiple packages at once" {
+
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "installpackage", "packagewithscript"
+
+            $Output = Invoke-Choco upgrade @PackageUnderTest --confirm
+        }
+
+        It "Installs successfully and exits with success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Installed the packages to the lib directory" {
+            $PackageUnderTest | ForEach-Object {
+                "$env:ChocolateyInstall\lib\$_" | Should -Exist
+            }
+        }
+    }
 }
