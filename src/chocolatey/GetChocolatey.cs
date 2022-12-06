@@ -42,6 +42,7 @@ namespace chocolatey
     using Assembly = infrastructure.adapters.Assembly;
     using IFileSystem = infrastructure.filesystem.IFileSystem;
     using ILog = infrastructure.logging.ILog;
+    using System.Linq;
 
     // ReSharper disable InconsistentNaming
 
@@ -69,82 +70,9 @@ namespace chocolatey
             return GlobalMutex.enter(() => set_up(initializeLogging), 10);
         }
 
-        private static ResolveEventHandler _handler = null;
-
         private static void add_assembly_resolver()
         {
-            _handler = (sender, args) =>
-            {
-                var requestedAssembly = new AssemblyName(args.Name);
-
-#if FORCE_CHOCOLATEY_OFFICIAL_KEY
-                var chocolateyPublicKey = ApplicationParameters.OfficialChocolateyPublicKey;
-#else
-                var chocolateyPublicKey = ApplicationParameters.UnofficialChocolateyPublicKey;
-#endif
-
-                if (requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey))
-                {
-                    // Check if it is already loaded
-                    var resolvedAssembly = AssemblyResolution.resolve_existing_assembly(requestedAssembly.Name, chocolateyPublicKey);
-
-                    if (resolvedAssembly != null)
-                    {
-                        return resolvedAssembly.UnderlyingType;
-                    }
-
-                    if (Directory.Exists(ApplicationParameters.ExtensionsLocation))
-                    {
-                        foreach (var extensionDll in Directory.EnumerateFiles(ApplicationParameters.ExtensionsLocation, requestedAssembly.Name + ".dll", SearchOption.AllDirectories))
-                        {
-                            try
-                            {
-                                resolvedAssembly = AssemblyResolution.load_assembly(requestedAssembly.Name, extensionDll, chocolateyPublicKey);
-
-                                if (resolvedAssembly != null)
-                                {
-                                    return resolvedAssembly.UnderlyingType;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                // This catch statement is empty on purpose, we do
-                                // not want to do anything if it fails to load.
-                            }
-                        }
-                    }
-                }
-
-                // There are things that are ILMerged into Chocolatey. Anything with
-                // the right public key except extensions should use the choco/chocolatey assembly
-                if (requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey)
-                    && !requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName)
-                    && !requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
-                {
-                    return typeof(Lets).Assembly;
-                }
-
-                try
-                {
-                    if (requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey)
-                        && requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName))
-                    {
-                        _logger.Debug("Resolving reference to chocolatey.licensed...");
-                        return AssemblyResolution.resolve_or_load_assembly(
-                            ApplicationParameters.LicensedChocolateyAssemblySimpleName,
-                            requestedAssembly.get_public_key_token(),
-                            ApplicationParameters.LicensedAssemblyLocation).UnderlyingType;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    "chocolatey".Log().Warn("Unable to load chocolatey.licensed assembly. {0}".format_with(ex.Message));
-                }
-
-                return null;
-            };
-
-            AppDomain.CurrentDomain.AssemblyResolve += _handler;
+            AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolution.resolve_extension_or_merged_assembly;
         }
     }
 

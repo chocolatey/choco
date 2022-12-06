@@ -1594,4 +1594,34 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $Output.Lines | Should -Contain "$($_ -replace '<installPath>',$env:ChocolateyInstall)" -Because $Output.String
         }
     }
+
+
+    Context "Installing multiple packages at once without allowGlobalConfirmation" {
+
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            Disable-ChocolateyFeature -Name allowGlobalConfirmation
+
+            $PackageUnderTest = "installpackage", "packagewithscript"
+
+            $Output = "a`n"*2 | Invoke-Choco install @PackageUnderTest
+        }
+
+        It "Installs successfully and exits with success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Installed the packages to the lib directory" {
+            $PackageUnderTest | ForEach-Object {
+                "$env:ChocolateyInstall\lib\$_" | Should -Exist
+            }
+        }
+
+        It "Ran both installation scripts after selecting [A] Yes to all at the first prompt" {
+            $promptLine = "Do you want to run the script?([Y]es/[A]ll - yes to all/[N]o/[P]rint):"
+            $prompts = $Output.Lines | Where-Object { $_ -eq $promptLine }
+
+            $prompts.Count | Should -Be 1
+        }
+    }
 }
