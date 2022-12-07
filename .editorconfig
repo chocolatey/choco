@@ -9,3 +9,8 @@ end_of_line = CRLF
 [*.ps1]
 indent_style = space
 indent_size = 4
+
+[*.cs]
+dotnet_diagnostic.RS0030.severity=error
+dotnet_diagnostic.RS0031.severity=error
+dotnet_diagnostic.RS0035.severity=error
