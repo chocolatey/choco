@@ -39,7 +39,6 @@ namespace chocolatey.infrastructure.app.services
     using DateTime = adapters.DateTime;
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
-    using chocolatey.infrastructure.app.utility;
     using NuGet.Common;
     using NuGet.Configuration;
     using NuGet.PackageManagement;

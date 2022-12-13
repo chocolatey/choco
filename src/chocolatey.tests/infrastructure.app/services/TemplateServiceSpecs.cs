@@ -670,7 +670,6 @@ namespace chocolatey.tests.infrastructure.app.services
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
-            private string verifiedDirectoryPath;
 
             public override void Context()
             {
@@ -705,7 +704,6 @@ namespace chocolatey.tests.infrastructure.app.services
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
-            private string verifiedDirectoryPath;
 
             public override void Context()
             {

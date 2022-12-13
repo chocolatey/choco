@@ -436,7 +436,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
                 configuration.PinCommand.Name = "regular";
                 //packageManager.Setup(pm => pm.LocalRepository).Returns(localRepository.Object);
-                NuGetVersion nugetVersion = null;
+                //NuGetVersion nugetVersion = null;
                 //nuget woes
                 //localRepository.Setup(r => r.FindPackage(configuration.PinCommand.Name, nugetVersion)).Returns(package.Object);
                 configuration.PinCommand.Command = PinCommandType.add;
