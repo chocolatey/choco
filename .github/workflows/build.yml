@@ -13,11 +13,11 @@ jobs:
   ubuntu-build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Cache Tools
-      uses: actions/cache@v2.1.6
+      uses: actions/cache@v3.0.11
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
@@ -26,7 +26,7 @@ jobs:
         chmod +x build.sh
         $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=all
     - name: Upload Ubuntu build results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       # Always upload build results
       if: ${{ always() }}
       with:
@@ -40,18 +40,18 @@ jobs:
   windows-build:
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Cache Tools
-      uses: actions/cache@v2.1.6
+      uses: actions/cache@v3.0.11
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Build with .Net Framework
       run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=all --shouldRunOpenCover=false
     - name: Upload Windows build results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       # Always upload build results
       if: ${{ always() }}
       with:
@@ -77,11 +77,11 @@ jobs:
   macos-build:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Cache Tools
-      uses: actions/cache@v2.1.6
+      uses: actions/cache@v3.0.11
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
@@ -90,7 +90,7 @@ jobs:
         chmod +x build.sh
         $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=all
     - name: Upload MacOS build results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       # Always upload build results
       if: ${{ always() }}
       with:
@@ -105,20 +105,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Cache Tools
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v3.0.11
         with:
           path: tools
           key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: docker/Dockerfile.linux
