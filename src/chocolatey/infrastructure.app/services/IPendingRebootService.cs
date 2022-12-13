@@ -22,7 +22,6 @@ namespace chocolatey.infrastructure.app.services
     ///   Test to see if there are any known situations that require
     ///   a System reboot.
     /// </summary>
-    /// <param name="config">The current Chocolatey Configuration</param>
     /// <returns><c>true</c> if reboot is required; otherwise <c>false</c>.</returns>
     public interface IPendingRebootService
     {

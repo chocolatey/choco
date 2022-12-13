@@ -24,7 +24,7 @@ namespace chocolatey.infrastructure.results
     public interface IResult
     {
         /// <summary>
-        ///   Gets a value indicating whether this <see cref="IResults" /> is successful.
+        ///   Gets a value indicating whether this <see cref="IResult" /> is successful.
         /// </summary>
         /// <value>
         ///   <c>true</c> if success; otherwise, <c>false</c>.

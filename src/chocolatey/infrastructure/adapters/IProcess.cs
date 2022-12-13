@@ -27,7 +27,7 @@ namespace chocolatey.infrastructure.adapters
         event EventHandler<DataReceivedEventArgs> ErrorDataReceived;
 
         /// <summary>
-        ///   Gets or sets the properties to pass into the <see cref='System.Diagnostics.Process.Start' /> method for the
+        ///   Gets or sets the properties to pass into the <see cref='System.Diagnostics.Process.Start()' /> method for the
         ///   <see
         ///     cref='System.Diagnostics.Process' />
         ///   .

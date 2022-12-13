@@ -75,7 +75,6 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="nugetLogger">The nuget logger</param>
         /// <param name="packageInfoService">Package information service</param>
         /// <param name="filesService">The files service</param>
-        /// <param name="packageDownloader">The downloader used to download packages</param>
         public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService, IFilesService filesService)
         {
             _fileSystem = fileSystem;

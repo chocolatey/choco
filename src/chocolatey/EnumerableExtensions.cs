@@ -31,7 +31,7 @@ namespace chocolatey
         /// <typeparam name="T"></typeparam>
         /// <param name="source">The source.</param>
         /// <returns>
-        ///   Source if not null; otherwise Enumerable.Empty&lt;<see cref="T" />&gt;
+        ///   Source if not null; otherwise Enumerable.Empty&lt;<see cref="or_empty_list_if_null{T}" />&gt;
         /// </returns>
         public static IEnumerable<T> or_empty_list_if_null<T>(this IEnumerable<T> source)
         {
