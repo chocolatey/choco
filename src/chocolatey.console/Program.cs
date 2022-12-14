@@ -21,6 +21,7 @@ namespace chocolatey.console
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using Microsoft.Win32;
     using chocolatey.infrastructure.information;
     using infrastructure.app;
     using infrastructure.app.builders;
@@ -30,6 +31,7 @@ namespace chocolatey.console
     using infrastructure.extractors;
     using infrastructure.licensing;
     using infrastructure.logging;
+    using infrastructure.platforms;
     using infrastructure.registration;
     using infrastructure.tolerance;
     using SimpleInjector;
@@ -123,6 +125,8 @@ namespace chocolatey.console
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "Please run 'choco -?' or 'choco <command> -?' for help menu.");
                     }
                 }
+
+                check_installed_dotnetfx_version();
 
                 if (warnings.Count != 0 && config.RegularOutput)
                 {
@@ -296,6 +300,28 @@ choco feature enable --name=""'disableCompatibilityChecks'""
 
 Or by passing the --skip-compatibility-checks option when executing a
 command.");
+        }
+
+        private static void check_installed_dotnetfx_version()
+        {
+            if (Platform.get_platform() == PlatformType.Windows)
+            {
+                // https://learn.microsoft.com/en-us/dotnet/framework/migration-guide/how-to-determine-which-versions-are-installed#minimum-version
+                const int NET48RELEASEBUILD = 528040;
+                const string REGKEY = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
+
+                using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(REGKEY))
+                {
+                    if (ndpKey == null || ndpKey.GetValue("Release") == null || (int)ndpKey.GetValue("Release") < NET48RELEASEBUILD)
+                    {
+                        throw new ApplicationException(
+                            @".NET 4.8 is not installed or may need a reboot to complete installation.
+Please install .NET Framework 4.8 manually and reboot the system.
+Download at 'https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe'"
+                                .format_with(Environment.NewLine));
+                    }
+                }
+            }
         }
     }
 }
