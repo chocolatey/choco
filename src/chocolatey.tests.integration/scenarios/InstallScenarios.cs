@@ -368,13 +368,13 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("SemVer 2.0")]
+        [Categories.SemVer20]
         public class when_installing_a_package_with_semver_2_0_meta_data : when_installing_a_package_happy_path
         {
             protected override string TestSemVersion => "0.9.9+build.543";
         }
 
-        [Category("SemVer 2.0")]
+        [Categories.SemVer20]
         public class when_installing_a_package_with_semver_2_0_pre_release_tag : when_installing_a_package_happy_path
         {
             protected override string TestSemVersion => "1.0.0-alpha.34";
@@ -1429,7 +1429,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("Side-by-Side")]
+        [Categories.SideBySide]
         public class when_installing_a_side_by_side_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1563,7 +1563,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("Side-by-Side")]
+        [Categories.SideBySide]
         public class when_switching_a_normal_package_to_a_side_by_side_package : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1683,7 +1683,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("Side-by-Side")]
+        [Categories.SideBySide]
         public class when_installing_an_older_version_side_by_side_with_a_newer_version : ScenariosBase
         {
             private PackageResult packageResult;
@@ -1805,7 +1805,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("Side-by-Side")]
+        [Categories.SideBySide]
         public class when_switching_a_side_by_side_package_to_a_normal_package : ScenariosBase
         {
             private PackageResult packageResult;

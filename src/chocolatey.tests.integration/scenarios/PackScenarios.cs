@@ -63,7 +63,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("Exception handling")]
+        [Categories.ExceptionHandling]
         public class when_invalid_data_is_used_in_nuspec_file : ScenariosInvalidBase
         {
             [Fact]
@@ -214,7 +214,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("Legacy SemVer")]
+        [Categories.LegacySemVer]
         public class when_packing_with_only_major_minor_version : ScenariosBase
         {
             protected override string PackagePath => Path.Combine("PackageOutput", "test-package.0.3.0.nupkg");
@@ -233,7 +233,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("Legacy SemVer")]
+        [Categories.LegacySemVer]
         public class when_packing_with_full_4_part_versioning_scheme : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.5.0.5";
@@ -251,7 +251,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("SemVer 2.0")]
+        [Categories.SemVer20]
         public class when_packaging_with_build_metadata : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.1.0+build.543";
@@ -270,7 +270,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("SemVer 2.0")]
+        [Categories.SemVer20]
         public class when_packaging_with_semver_20_pre_release_tag : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.1.0-rc.5+build.999";
@@ -289,7 +289,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("Legacy SemVer")]
+        [Categories.LegacySemVer]
         public class when_packaging_with_legacy_pre_release_tag : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.1.0-rc-5";

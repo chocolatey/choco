@@ -588,7 +588,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("SemVer 2.0")]
+        [Categories.SemVer20]
         public class when_upgrading_an_existing_package_with_semver_2_0_prerelease_available_and_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -899,7 +899,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("SemVer 2.0")]
+        [Categories.SemVer20]
         public class when_upgrading_an_existing_prerelease_package_to_semver_2_0_without_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -1057,7 +1057,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("SemVer 2.0")]
+        [Categories.SemVer20]
         public class when_upgrading_an_existing_semver_2_0_prerelease_package_to_legacy_semver_without_prerelease_specified : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -3722,7 +3722,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Category("SemVer 2.0")]
+        [Categories.SemVer20]
         public class when_upgrading_package_to_an_explicit_semver_2_0_version : ScenariosBase
         {
             private PackageResult _packageResult;
