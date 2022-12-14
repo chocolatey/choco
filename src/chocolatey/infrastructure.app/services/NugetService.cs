@@ -24,6 +24,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Net;
     using System.Text.RegularExpressions;
     using System.Threading;
+    using Chocolatey.NuGet.Frameworks;
     using adapters;
     using chocolatey.infrastructure.app.utility;
     using commandline;
@@ -41,7 +42,6 @@ namespace chocolatey.infrastructure.app.services
     using chocolatey.infrastructure.app.utility;
     using NuGet.Common;
     using NuGet.Configuration;
-    using NuGet.Frameworks;
     using NuGet.PackageManagement;
     using NuGet.Packaging;
     using NuGet.Packaging.Core;
