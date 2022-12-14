@@ -1,0 +1,29 @@
+issue-labels-include:
+- Breaking change
+- Feature
+- C4B Feature
+- Bug
+- Improvement
+- Documentation
+issue-labels-exclude:
+- Internal Refactoring
+- Build
+issue-labels-alias:
+    - name:    Documentation
+      header:  Documentation
+      plural:  Documentation
+create:
+    include-sha-section: true
+    sha-section-heading: "SHA256 Hashes of the release artifacts"
+    sha-section-line-format: "- `{1}\t{0}`"
+close:
+  use-issue-comments: true
+  issue-comment: |-
+    :tada: This issue has been resolved in version {milestone} :tada:
+
+    The release is available on:
+
+    - [GitHub Release](https://github.com/{owner}/{repository}/releases/tag/{milestone})
+    - [Chocolatey Package](https://chocolatey.org/packages/chocolatey/{milestone})
+
+    Your **[GitReleaseManager](https://github.com/GitTools/GitReleaseManager)** bot :package::rocket:
