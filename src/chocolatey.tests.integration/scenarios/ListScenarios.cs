@@ -61,8 +61,8 @@ namespace chocolatey.tests.integration.scenarios
 
                 Configuration.Sources = string.Join(";", new[]
                 {
-                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.0" + Constants.PackageExtension, name: "NormalPriority"),
-                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + Constants.PackageExtension, priority: 1)
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.0" + NuGetConstants.PackageExtension, name: "NormalPriority"),
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + NuGetConstants.PackageExtension, priority: 1)
                 });
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
@@ -95,12 +95,12 @@ namespace chocolatey.tests.integration.scenarios
 
                 Configuration.Sources = string.Join(";", new[]
                 {
-                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.0" + Constants.PackageExtension, name: "NormalPriority"),
-                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + Constants.PackageExtension, priority: 1)
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.0" + NuGetConstants.PackageExtension, name: "NormalPriority"),
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + NuGetConstants.PackageExtension, priority: 1)
                 });
 
-                Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.1-beta2" + Constants.PackageExtension, name: "NormalPriority");
-                Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.1-beta" + Constants.PackageExtension, priority: 1);
+                Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.1-beta2" + NuGetConstants.PackageExtension, name: "NormalPriority");
+                Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.1-beta" + NuGetConstants.PackageExtension, priority: 1);
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
             }
@@ -133,13 +133,13 @@ namespace chocolatey.tests.integration.scenarios
 
                 Configuration.Sources = string.Join(";", new[]
                 {
-                    Scenario.add_packages_to_priority_source_location(Configuration, "hasdependency.*" + Constants.PackageExtension, name: "NormalPriority"),
-                    Scenario.add_packages_to_priority_source_location(Configuration, "isdependency.*" + Constants.PackageExtension, priority: 1)
+                    Scenario.add_packages_to_priority_source_location(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension, name: "NormalPriority"),
+                    Scenario.add_packages_to_priority_source_location(Configuration, "isdependency.*" + NuGetConstants.PackageExtension, priority: 1)
                 });
 
-                Scenario.add_packages_to_priority_source_location(Configuration, "isexactdependency.1.1.0" + Constants.PackageExtension, name: "NormalPriority");
-                Scenario.add_packages_to_priority_source_location(Configuration, "isexactdependency.2.0.0" + Constants.PackageExtension, priority: 1);
-                Scenario.add_packages_to_priority_source_location(Configuration, "conflictingdependency.2.0.0" + Constants.PackageExtension, priority: 1);
+                Scenario.add_packages_to_priority_source_location(Configuration, "isexactdependency.1.1.0" + NuGetConstants.PackageExtension, name: "NormalPriority");
+                Scenario.add_packages_to_priority_source_location(Configuration, "isexactdependency.2.0.0" + NuGetConstants.PackageExtension, priority: 1);
+                Scenario.add_packages_to_priority_source_location(Configuration, "conflictingdependency.2.0.0" + NuGetConstants.PackageExtension, priority: 1);
 
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();

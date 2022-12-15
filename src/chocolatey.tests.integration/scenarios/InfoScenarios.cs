@@ -1,4 +1,4 @@
-﻿namespace chocolatey.tests.integration.scenarios
+namespace chocolatey.tests.integration.scenarios
 {
     using System;
     using System.Collections.Generic;
@@ -13,6 +13,7 @@
     using chocolatey.infrastructure.results;
 
     using NuGet;
+    using NuGet.Configuration;
 
     using NUnit.Framework;
 
@@ -66,6 +67,7 @@
             }
         }
 
+        [Broken, Pending("Need to be fixed in either NuGet.Client or before calling code in NuGet.Client")]
         public class when_searching_for_exact_package_through_command : CommandScenariosBase
         {
             public override void Context()
@@ -75,7 +77,7 @@
                 Configuration.PackageNames = Configuration.Input = "installpackage";
 
                 Configuration.Sources = "PackageOutput";
-                Scenario.add_packages_to_source_location(Configuration, "installpackage.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
             }
 
             [Fact]
@@ -88,7 +90,7 @@
             [Fact]
             public void should_log_package_information()
             {
-                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + Constants.PackageExtension))
+                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
                 MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
@@ -103,6 +105,7 @@
             }
         }
 
+        [Broken, Pending("Need to be fixed in either NuGet.Client or before calling code in NuGet.Client")]
         public class when_searching_for_exact_package_with_dot_relative_path_source : when_searching_for_exact_package_through_command
         {
             public override void Context()
@@ -136,7 +139,7 @@
             [Fact]
             public new void should_log_package_information()
             {
-                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + Constants.PackageExtension))
+                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
                 MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
@@ -151,6 +154,7 @@
             }
         }
 
+        [Broken, Pending("Need to be fixed in either NuGet.Client or before calling code in NuGet.Client")]
         public class when_searching_for_exact_package_with_verbose_output : ScenariosBase
         {
             public override void Context()
@@ -159,7 +163,7 @@
 
                 Configuration.PackageNames = Configuration.Input = "installpackage";
                 Configuration.Sources = "PackageOutput";
-                Scenario.add_packages_to_source_location(Configuration, "installpackage.*" + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
             }
 
             [Fact]
@@ -207,7 +211,7 @@
                 base.Context();
 
                 Configuration.PackageNames = Configuration.Input = "test-package";
-                Configuration.Sources = Scenario.add_packages_to_priority_source_location(Configuration, "test-package.*" + Constants.PackageExtension, priority: 1);
+                Configuration.Sources = Scenario.add_packages_to_priority_source_location(Configuration, "test-package.*" + NuGetConstants.PackageExtension, priority: 1);
             }
 
             [Fact]
@@ -261,9 +265,9 @@
 
                 Configuration.PackageNames = Configuration.Input = "upgradepackage";
                 Configuration.Sources = string.Join(",",
-                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + Constants.PackageExtension, priority: 1),
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + NuGetConstants.PackageExtension, priority: 1),
                     Scenario.add_packages_to_priority_source_location(Configuration,
-                      "upgradepackage.1.1.0" + Constants.PackageExtension, priority: 0));
+                      "upgradepackage.1.1.0" + NuGetConstants.PackageExtension, priority: 0));
             }
 
             [Fact]

@@ -353,8 +353,8 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.Sources = string.Join(",",
-                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + Constants.PackageExtension, priority: 1),
-                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.0" + Constants.PackageExtension, priority: 0));
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + NuGetConstants.PackageExtension, priority: 1),
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.0" + NuGetConstants.PackageExtension, priority: 0));
                 Scenario.install_package(Configuration, "upgradepackage", "1.0.0");
             }
 
@@ -393,7 +393,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeFalse();
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
@@ -401,15 +401,18 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 
-                Directory.Exists(packageDir).ShouldBeTrue();
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
             public void should_be_the_same_version_of_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + Constants.PackageExtension);
-                var package = new OptimizedZipPackage(packageFile);
-                package.Version.ToNormalizedString().ShouldEqual("1.0.0");
+                var packageFolder = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+
+                using (var reader = new PackageFolderReader(packageFolder))
+                {
+                    reader.NuspecReader.GetVersion().ToNormalizedString().ShouldEqual("1.0.0");
+                }
             }
 
             [Fact]
