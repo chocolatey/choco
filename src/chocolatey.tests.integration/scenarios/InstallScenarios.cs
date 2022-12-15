@@ -733,7 +733,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedString().ShouldEqual("1.0.0");
                 }
             }
 
@@ -1285,7 +1285,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.Input, Configuration.Input + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedString().ShouldEqual("1.0.0");
                 }
             }
 
