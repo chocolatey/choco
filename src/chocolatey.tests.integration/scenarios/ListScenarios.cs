@@ -17,6 +17,7 @@
 namespace chocolatey.tests.integration.scenarios
 {
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.commands;
@@ -46,6 +47,122 @@ namespace chocolatey.tests.integration.scenarios
                 Scenario.install_package(Configuration, "upgradepackage", "1.0.0");
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+            }
+        }
+
+        [Categories.SourcePriority]
+        public class when_searching_packages_with_source_priority : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = "upgradepackage";
+                Configuration.AllVersions = false;
+
+                Configuration.Sources = string.Join(";", new[]
+                {
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.0" + Constants.PackageExtension, name: "NormalPriority"),
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + Constants.PackageExtension, priority: 1)
+                });
+
+                Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+            [Fact]
+            public void should_only_pick_up_package_from_highest_priority()
+            {
+                Results.Count.ShouldEqual(1);
+                Results[0].Name.ShouldEqual("upgradepackage");
+                Results[0].Version.ShouldEqual("1.0.0");
+            }
+        }
+
+        [Categories.SourcePriority]
+        public class when_searching_packages_with_source_priority_and_pre_release : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = "upgradepackage";
+                Configuration.AllVersions = false;
+                Configuration.Prerelease = true;
+
+                Configuration.Sources = string.Join(";", new[]
+                {
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.0" + Constants.PackageExtension, name: "NormalPriority"),
+                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + Constants.PackageExtension, priority: 1)
+                });
+
+                Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.1-beta2" + Constants.PackageExtension, name: "NormalPriority");
+                Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.1-beta" + Constants.PackageExtension, priority: 1);
+
+                Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+            [Fact]
+            public void should_only_pick_up_package_from_highest_priority()
+            {
+                Results.Count.ShouldEqual(2);
+                Results[0].Name.ShouldEqual("upgradepackage");
+                Results[0].Version.ShouldEqual("1.1.1-beta");
+                Results[1].Name.ShouldEqual("upgradepackage");
+                Results[1].Version.ShouldEqual("1.0.0");
+            }
+        }
+
+        [Categories.SourcePriority]
+        public class when_searching_packages_with_source_priority_and_different_package_in_different_feed : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = "dependency";
+                Configuration.AllVersions = false;
+
+                Configuration.Sources = string.Join(";", new[]
+                {
+                    Scenario.add_packages_to_priority_source_location(Configuration, "hasdependency.*" + Constants.PackageExtension, name: "NormalPriority"),
+                    Scenario.add_packages_to_priority_source_location(Configuration, "isdependency.*" + Constants.PackageExtension, priority: 1)
+                });
+
+                Scenario.add_packages_to_priority_source_location(Configuration, "isexactdependency.1.1.0" + Constants.PackageExtension, name: "NormalPriority");
+                Scenario.add_packages_to_priority_source_location(Configuration, "isexactdependency.2.0.0" + Constants.PackageExtension, priority: 1);
+                Scenario.add_packages_to_priority_source_location(Configuration, "conflictingdependency.2.0.0" + Constants.PackageExtension, priority: 1);
+
+
+                Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+            [Fact]
+            public void should_pick_up_packages_from_all_feeds_except_those_with_same_name()
+            {
+                Results.Count.ShouldEqual(4);
+                Results[0].Name.ShouldEqual("conflictingdependency");
+                Results[0].Version.ShouldEqual("2.0.0");
+                Results[1].Name.ShouldEqual("hasdependency");
+                Results[1].Version.ShouldEqual("2.1.0");
+                Results[2].Name.ShouldEqual("isdependency");
+                Results[2].Version.ShouldEqual("2.1.0");
+                Results[3].Name.ShouldEqual("isexactdependency");
+                Results[3].Version.ShouldEqual("2.0.0");
             }
         }
 
