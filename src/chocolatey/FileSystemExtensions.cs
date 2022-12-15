@@ -49,7 +49,7 @@ namespace chocolatey
 
                     if (assembly == null)
                     {
-                        "chocolatey".Log().Warn("Unable to load extension from path {0}.\n The assembly is not signed with official key token.", extensionFile);
+                        "chocolatey".Log().Debug("Unable to load extension from path {0}.\n The assembly is not signed with official key token.", extensionFile);
                     }
                     else
                     {

@@ -68,6 +68,15 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficialNo7zip|AnyCPU'">
+    <OutputPath>bin\ReleaseOfficialNo7zip\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Chocolatey.NuGet.Common, Version=3.0.0.80, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
       <HintPath>..\packages\Chocolatey.NuGet.Common.3.0.0-alpha-20221213-80\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
