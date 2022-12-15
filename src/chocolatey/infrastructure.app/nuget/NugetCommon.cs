@@ -311,6 +311,7 @@ namespace chocolatey.infrastructure.app.nuget
             }
         }
 
+        // TODO: Refactor this to not use a tuple, or make private method.
         public static IEnumerable<(SourceRepository repository,
                 PackageSearchResource searchResource,
                 FindPackageByIdResource findPackageByIdResource,

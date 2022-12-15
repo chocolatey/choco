@@ -37,6 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chocolatey.lib", "chocolate
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "toplevel", "toplevel", "{18FEFF9F-7352-4230-8B4E-E8D8BE976095}"
 	ProjectSection(SolutionItems) = preProject
+		..\.editorconfig = ..\.editorconfig
 		..\CHANGELOG.md = ..\CHANGELOG.md
 		..\CHANGELOG_LICENSED.md = ..\CHANGELOG_LICENSED.md
 		..\COMMITTERS.md = ..\COMMITTERS.md

@@ -142,7 +142,7 @@ If you find other exit codes that we have not yet documented, please
 
         public virtual void noop(ChocolateyConfiguration configuration)
         {
-            this.Log().Info("Pin would have called {0} with other options:{1} Name={2}{1} Version={3}".format_with(configuration.PinCommand.Command.to_string(), Environment.NewLine, configuration.PinCommand.Name.to_string(), configuration.Version.to_string()));
+            this.Log().Info("Pin would have called {0} with other options:{1} Name={2}{1} Version={3}".format_with(configuration.PinCommand.Command.to_string(), Environment.NewLine, configuration.PinCommand.Name, configuration.Version));
         }
 
         public virtual void run(ChocolateyConfiguration configuration)
@@ -188,7 +188,7 @@ If you find other exit codes that we have not yet documented, please
 
             var input = config.Input;
             config.Input = config.PinCommand.Name;
-            config.Version = semanticVersion.to_string();
+            config.Version = semanticVersion.to_full_string();
             config.ListCommand.ByIdOnly = true;
             var quiet = config.QuietOutput;
             config.QuietOutput = true;
@@ -210,7 +210,7 @@ If you find other exit codes that we have not yet documented, please
 
             if (changeMessage)
             {
-                this.Log().Warn("Successfully {0} a pin for {1} v{2}.".format_with(addingAPin ? "added" : "removed", pkgInfo.Package.Id, pkgInfo.Package.Version.to_string()));
+                this.Log().Warn("Successfully {0} a pin for {1} v{2}.".format_with(addingAPin ? "added" : "removed", pkgInfo.Package.Id, pkgInfo.Package.Version.to_full_string()));
             }
             else
             {

@@ -168,11 +168,51 @@ namespace chocolatey.tests
         }
     }
 
-    public class IntegrationAttribute : CategoryAttribute
+    public static class Categories
     {
-        public IntegrationAttribute()
-            : base("Integration")
+        [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class IntegrationAttribute : CategoryAttribute
         {
+            public IntegrationAttribute()
+                : base("Integration")
+            {
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class SemVer20Attribute : CategoryAttribute
+        {
+            public SemVer20Attribute()
+                : base("SemVer 2.0")
+            {
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class LegacySemVerAttribute : CategoryAttribute
+        {
+            public LegacySemVerAttribute()
+                : base("Legacy SemVer")
+            {
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class ExceptionHandlingAttribute : CategoryAttribute
+        {
+            public ExceptionHandlingAttribute()
+                : base("Exception Handling")
+            {
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class SideBySideAttribute : CategoryAttribute
+        {
+            public SideBySideAttribute()
+                : base("Side-by-Side")
+            {
+            }
         }
     }
 

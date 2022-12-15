@@ -1,0 +1,4 @@
+﻿M:NuGet.Versioning.SemanticVersion.ToFullString;Use to_full_string() extension method instead.
+M:Chocolatey.NuGet.Versioning.SemanticVersion.ToFullString();Use to_full_string() extension method instead.
+M:NuGet.Versioning.SemanticVersion.ToNormalizedString;Use to_normalized_string() extension method instead.
+M:Chocolatey.NuGet.Versioning.SemanticVersion.ToNormalizedString();Use to_normalized_string() extension method instead.
