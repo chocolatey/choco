@@ -21,6 +21,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
     using System.Linq;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.nuget;
+    using chocolatey.infrastructure.filesystem;
     using Moq;
     using NuGet.Common;
     using NuGet.Packaging;
@@ -35,6 +36,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             private Action because;
             private readonly Mock<ILogger> nugetLogger = new Mock<ILogger>();
             private readonly Mock<IPackageDownloader> packageDownloader = new Mock<IPackageDownloader>();
+            private readonly Mock<IFileSystem> filesystem = new Mock<IFileSystem>();
             private ChocolateyConfiguration configuration;
             private IEnumerable<SourceRepository> packageRepositories;
 
@@ -47,7 +49,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
             public override void Because()
             {
-                because = () => packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger.Object);
+                because = () => packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger.Object, filesystem.Object);
             }
 
             [Fact]

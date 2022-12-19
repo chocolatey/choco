@@ -22,6 +22,7 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using filesystem;
     using NuGet.Common;
     using NuGet.Configuration;
     using NuGet.Protocol;
@@ -29,7 +30,7 @@ namespace chocolatey.infrastructure.app.nuget
 
     public class NugetPush
     {
-        public static void push_package(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName)
+        public static void push_package(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName, IFileSystem filesystem)
         {
             var timeout = TimeSpan.FromSeconds(Math.Abs(config.CommandExecutionTimeoutSeconds));
             if (timeout.Seconds <= 0)
@@ -42,7 +43,7 @@ namespace chocolatey.infrastructure.app.nuget
             const bool noServiceEndpoint = true;
 
             //OK to use FirstOrDefault in this case as the command validates that there is only one source
-            SourceRepository sourceRepository = NugetCommon.GetRemoteRepositories(config, nugetLogger).FirstOrDefault();
+            SourceRepository sourceRepository = NugetCommon.GetRemoteRepositories(config, nugetLogger, filesystem).FirstOrDefault();
             PackageUpdateResource packageUpdateResource = sourceRepository.GetResource<PackageUpdateResource>();
             var nupkgFilePaths = new List<string>() { nupkgFilePath };
             UserAgent.SetUserAgentString(new UserAgentStringBuilder("{0}/{1} via NuGet Client".format_with(ApplicationParameters.UserAgent, config.Information.ChocolateyProductVersion)));

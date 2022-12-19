@@ -108,7 +108,7 @@ namespace chocolatey.infrastructure.app.services
             int? pageValue = config.ListCommand.Page;
             try
             {
-                return NugetList.GetCount(config, _nugetLogger);
+                return NugetList.GetCount(config, _nugetLogger, _fileSystem);
             }
             finally
             {
@@ -147,7 +147,7 @@ namespace chocolatey.infrastructure.app.services
 
             if (config.RegularOutput) this.Log().Debug(() => "Running list with the following filter = '{0}'".format_with(config.Input));
             if (config.RegularOutput) this.Log().Debug(ChocolateyLoggers.Verbose, () => "--- Start of List ---");
-            foreach (var pkg in NugetList.GetPackages(config, _nugetLogger))
+            foreach (var pkg in NugetList.GetPackages(config, _nugetLogger, _fileSystem))
             {
                 var package = pkg; // for lamda access
 
@@ -378,7 +378,7 @@ namespace chocolatey.infrastructure.app.services
             string nupkgFileName = _fileSystem.get_file_name(nupkgFilePath);
             if (config.RegularOutput) this.Log().Info(() => "Attempting to push {0} to {1}".format_with(nupkgFileName, config.Sources));
 
-            NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath), _nugetLogger, nupkgFileName);
+            NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath), _nugetLogger, nupkgFileName, _fileSystem);
 
             if (config.RegularOutput && (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) || config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)))
             {
@@ -438,7 +438,7 @@ folder.");
             if (config.Force) config.AllowDowngrade = true;
 
             var sourceCacheContext = new ChocolateySourceCacheContext(config);
-            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger);
+            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
             var localRepositorySource = NugetCommon.GetLocalRepository();
             var pathResolver = NugetCommon.GetPathResolver(config, _fileSystem);
             var nugetProject = new FolderNuGetProject(ApplicationParameters.PackagesLocation, pathResolver, NuGetFramework.AnyFramework);
@@ -868,7 +868,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             if (config.Force) config.AllowDowngrade = true;
 
             var sourceCacheContext = new ChocolateySourceCacheContext(config);
-            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger);
+            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
             var localRepositorySource = NugetCommon.GetLocalRepository();
             var projectContext = new ChocolateyNuGetProjectContext(config, _nugetLogger);
 
@@ -1365,7 +1365,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         public virtual ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config)
         {
 
-            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger);
+            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
             var pathResolver = NugetCommon.GetPathResolver(config, _fileSystem);
 
             var outdatedPackages = new ConcurrentDictionary<string, PackageResult>();

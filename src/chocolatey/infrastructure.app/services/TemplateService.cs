@@ -274,7 +274,7 @@ namespace chocolatey.infrastructure.app.services
 
         protected void list_custom_template_info(ChocolateyConfiguration configuration)
         {
-            var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, _nugetLogger);
+            var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, _nugetLogger, _fileSystem);
             var sourceCacheContext = new ChocolateySourceCacheContext(configuration);
             var pkg = NugetList.find_package(
                     "{0}.template".format_with(configuration.TemplateCommand.Name),
