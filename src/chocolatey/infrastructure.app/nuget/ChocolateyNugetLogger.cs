@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.nuget
 {
+    using System;
     using System.Threading.Tasks;
     using logging;
     using NuGet.Common;
@@ -26,22 +27,22 @@ namespace chocolatey.infrastructure.app.nuget
     {
         public void LogDebug(string message)
         {
-            this.Log().Debug("[NuGet] " + message);
+            Log(LogLevel.Debug, message);
         }
 
         public void LogVerbose(string message)
         {
-            this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
+            Log(LogLevel.Verbose, message);
         }
 
         public void LogWarning(string message)
         {
-            this.Log().Warn("[NuGet] " + message);
+            Log(LogLevel.Warning, message);
         }
 
         public void LogError(string message)
         {
-            this.Log().Error("[NuGet] " + message);
+            Log(LogLevel.Error, message);
         }
 
         public void LogMinimal(string message)
@@ -66,7 +67,9 @@ namespace chocolatey.infrastructure.app.nuget
 
         public void LogInformationSummary(string message)
         {
-            this.Log().Info("[NuGet] " + message);
+            // We log it as minimal as we want the output to
+            // be shown as an informational message in this case.
+            Log(LogLevel.Minimal, message);
         }
 
         public void Log(LogLevel level, string message)
@@ -91,85 +94,27 @@ namespace chocolatey.infrastructure.app.nuget
                 case LogLevel.Minimal:
                     this.Log().Info("[NuGet] " + message);
                     break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(level));
             }
         }
 
         public Task LogAsync(LogLevel level, string message)
         {
-            switch (level)
-            {
-                case LogLevel.Debug:
-                    this.Log().Debug("[NuGet] " + message);
-                    break;
-                case LogLevel.Warning:
-                    this.Log().Warn("[NuGet] " + message);
-                    break;
-                case LogLevel.Error:
-                    this.Log().Error("[NuGet] " + message);
-                    break;
-                case LogLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
-                    break;
-                case LogLevel.Information:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
-                    break;
-                case LogLevel.Minimal:
-                    this.Log().Info("[NuGet] " + message);
-                    break;
-            }
+            Log(level, message);
 
             return Task.CompletedTask;
         }
 
         public void Log(ILogMessage log)
         {
-            switch (log.Level)
-            {
-                case LogLevel.Debug:
-                    this.Log().Debug("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Warning:
-                    this.Log().Warn("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Error:
-                    this.Log().Error("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Information:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Minimal:
-                    this.Log().Info("[NuGet] " + log.Message);
-                    break;
-            }
+            Log(log.Level, log.Message);
         }
 
         public Task LogAsync(ILogMessage log)
         {
-            switch (log.Level)
-            {
-                case LogLevel.Debug:
-                    this.Log().Debug("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Warning:
-                    this.Log().Warn("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Error:
-                    this.Log().Error("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Information:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Minimal:
-                    this.Log().Info("[NuGet] " + log.Message);
-                    break;
-            }
-            return Task.CompletedTask;
+            return LogAsync(log.Level, log.Message);
         }
     }
 
