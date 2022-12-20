@@ -127,9 +127,8 @@ There is a `build.bat`/`build.sh` file that creates a necessary generated file n
 #### Windows
 Prerequisites:
 
- * .NET Framework 3.5 (This is a windows feature installation).
- * .NET Framework 4+
- * Visual Studio is helpful for working on source.
+ * .NET Framework 4.8+
+ * Visual Studio 2019+
  * ReSharper is immensely helpful (and there is a `.sln.DotSettings` file to help with code conventions).
 
 Build Process:
@@ -141,35 +140,18 @@ Running the build on Windows should produce an artifact that is tested and ready
 #### Other Platforms
 ##### Prerequisites:
 
- * Install and configure Mono. Mono 5.20 or newer should work, see the Dockerfile for the currently recommended version.
-  * [Debian based](https://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives)
+ * Install and configure Mono. Mono 6.6 or newer should work, see `docker/Dockerfile.linux` for the currently recommended version of Mono.
+    * Linux systems; see [Mono install instructions for Linux](https://www.mono-project.com/download/stable/#download-lin)
+    * Mac systems; see [Mono install instructions for Mac](https://www.mono-project.com/download/stable/#download-mac)
+ * Install .NET 6.0 SDK or newer. This is used in the build scripts.
+    * Linux systems; see [Install .NET on Linux](https://learn.microsoft.com/en-us/dotnet/core/install/linux)
+    * Mac systems; see [Install .NET on macOS](https://learn.microsoft.com/en-us/dotnet/core/install/macos)
+    * This is required for some Dotnet Global Tools used during the Cake build. The .NET Frameworks equivalent builds do not work on Mono.
+ * If building from Git, then having Git 2.22+ installed is required.
+ * MonoDevelop is helpful for working on source.
 
-```sh
-# install prerequisites
-sudo apt install apt-transport-https dirmngr gnupg ca-certificates
-# add the key
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-
-# add the package repository
-# Debian 10
-echo "deb https://download.mono-project.com/repo/debian stable-buster main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-# Debian 9
-echo "deb https://download.mono-project.com/repo/debian stable-stretch main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-#Ubuntu 20.04
-echo "deb https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-# Ubuntu 18.04
-echo "deb https://download.mono-project.com/repo/ubuntu stable-bionic main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-# Ubuntu 16.04
-echo "deb https://download.mono-project.com/repo/ubuntu stable-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-
-# update package indexes
-sudo apt-get update
-# install
-sudo apt-get install mono-devel -y
-```
-
- * Other Linux systems; see [Mono install instructions for Linux](https://www.mono-project.com/download/stable/#download-lin)
- * Xamarin Studio is helpful for working on source.
+##### Before building: 
+ 
  * Consider adding the following to your `~/.profile` (or other relevant dot source file):
 
 ```sh
