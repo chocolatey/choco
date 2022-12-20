@@ -45,6 +45,12 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 configuration = new ChocolateyConfiguration();
                 nugetLogger.ResetCalls();
                 packageDownloader.ResetCalls();
+                filesystem.ResetCalls();
+
+                filesystem.Setup(f => f.get_full_path(It.IsAny<string>())).Returns((string a) =>
+                {
+                    return "C:\\packages\\" + a;
+                });
             }
 
             public override void Because()
@@ -61,6 +67,99 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 because();
 
                 packageRepositories.Count().ShouldEqual(0);
+            }
+
+            [Fact]
+            public void should_parse_http_source()
+            {
+                Context();
+                var source = "http://nexus.example.com:8081/repository/choco";
+                configuration.Sources = source;
+                configuration.CacheLocation = "C:\\temp";
+
+                because();
+
+                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.to_string().ShouldEqual(source);
+                packageRepositories.First().PackageSource.IsHttp.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_parse_https_source()
+            {
+                Context();
+                var source = "https://nexus.example.com/repository/choco";
+                configuration.Sources = source;
+                configuration.CacheLocation = "C:\\temp";
+
+                because();
+
+                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.to_string().ShouldEqual(source);
+                packageRepositories.First().PackageSource.IsHttps.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_parse_absolute_path_source()
+            {
+                Context();
+                var source = "C:\\packages";
+                configuration.Sources = source;
+
+                because();
+
+                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.to_string()
+                    .ShouldEqual(("file:///" + source).Replace("\\","/"));
+                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_parse_relative_path_source()
+            {
+                Context();
+                var source = "choco";
+                var fullsource = "C:\\packages\\choco";
+                configuration.Sources = source;
+
+                because();
+
+                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.to_string()
+                    .ShouldEqual(("file:///" + fullsource).Replace("\\", "/"));
+                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_parse_dot_relative_path_source()
+            {
+                Context();
+                var source = ".";
+                var fullsource = "C:\\packages";
+                configuration.Sources = source;
+
+                because();
+
+                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.to_string()
+                    .ShouldEqual(("file:///" + fullsource + "/").Replace("\\", "/"));
+                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_parse_unc_source()
+            {
+                Context();
+                var source = "\\\\samba-server\\choco-share";
+                configuration.Sources = source;
+
+                because();
+
+                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.to_string()
+                    .ShouldEqual(("file:" + source).Replace("\\", "/"));
+                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
+                packageRepositories.First().PackageSource.SourceUri.IsUnc.ShouldBeTrue();
             }
         }
     }
