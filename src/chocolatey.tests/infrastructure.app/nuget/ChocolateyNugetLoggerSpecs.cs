@@ -48,6 +48,21 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
+            public void should_log_debug_level_with_nuget_prefix_on_all_lines_when_calling_LogDebug()
+            {
+                const string testMessage = "This should be a debug message.\r\nThis is the second line after CRLF line ending.\nThis is the third line after LF line ending.";
+                var expectedMessage = "[NuGet] This should be a debug message.{0}[NuGet] This is the second line after CRLF line ending.{0}[NuGet] This is the third line after LF line ending.".format_with(Environment.NewLine);
+
+                _logger.LogDebug(testMessage);
+
+                var loggerName = LogLevel.Debug.to_string();
+                MockLogger.LoggerNames.Count.ShouldEqual(1);
+                MockLogger.LoggerNames.ShouldContain(typeof(ChocolateyNugetLogger).FullName);
+                MockLogger.Messages.Keys.ShouldContain(loggerName);
+                MockLogger.Messages[loggerName].ShouldContain(expectedMessage);
+            }
+
+            [Fact]
             public void should_log_debug_level_with_nuget_prefix_when_calling_LogDebug()
             {
                 const string testMessage = "This should be a debug message";
@@ -56,6 +71,21 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogDebug(testMessage);
 
                 var loggerName = LogLevel.Debug.to_string();
+                MockLogger.LoggerNames.Count.ShouldEqual(1);
+                MockLogger.LoggerNames.ShouldContain(typeof(ChocolateyNugetLogger).FullName);
+                MockLogger.Messages.Keys.ShouldContain(loggerName);
+                MockLogger.Messages[loggerName].ShouldContain(expectedMessage);
+            }
+
+            [Fact]
+            public void should_log_error_level_with_nuget_prefix_on_all_lines_when_calling_LogError()
+            {
+                const string testMessage = "This should be a error message.\r\nThis is the second line after CRLF line ending.\nThis is the third line after LF line ending.";
+                var expectedMessage = "[NuGet] This should be a error message.{0}[NuGet] This is the second line after CRLF line ending.{0}[NuGet] This is the third line after LF line ending.".format_with(Environment.NewLine);
+
+                _logger.LogError(testMessage);
+
+                var loggerName = LogLevel.Error.to_string();
                 MockLogger.LoggerNames.Count.ShouldEqual(1);
                 MockLogger.LoggerNames.ShouldContain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.ShouldContain(loggerName);
@@ -130,6 +160,21 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
+            public void should_log_info_level_with_nuget_prefix_on_all_lines_when_calling_LogInformationSummary()
+            {
+                const string testMessage = "This should be a error message.\r\nThis is the second line after CRLF line ending.\nThis is the third line after LF line ending.";
+                var expectedMessage = "[NuGet] This should be a error message.{0}[NuGet] This is the second line after CRLF line ending.{0}[NuGet] This is the third line after LF line ending.".format_with(Environment.NewLine);
+
+                _logger.LogInformationSummary(testMessage);
+
+                var loggerName = LogLevel.Info.to_string();
+                MockLogger.LoggerNames.Count.ShouldEqual(1);
+                MockLogger.LoggerNames.ShouldContain(typeof(ChocolateyNugetLogger).FullName);
+                MockLogger.Messages.Keys.ShouldContain(loggerName);
+                MockLogger.Messages[loggerName].ShouldContain(expectedMessage);
+            }
+
+            [Fact]
             public void should_log_info_level_with_nuget_prefix_when_calling_LogInformationSummary()
             {
                 const string testMessage = "This should be a informational message";
@@ -189,6 +234,51 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
+            public void should_log_verbose_level_with_nuget_prefix_on_all_lines_when_calling_LogInformation()
+            {
+                const string testMessage = "This should be a informational verbose message.\r\nThis is the second line after CRLF line ending.\nThis is the third line after LF line ending.";
+                var expectedMessage = "[NuGet] This should be a informational verbose message.{0}[NuGet] This is the second line after CRLF line ending.{0}[NuGet] This is the third line after LF line ending.".format_with(Environment.NewLine);
+
+                _logger.LogInformation(testMessage);
+
+                var loggerName = LogLevel.Info.to_string();
+                MockLogger.LoggerNames.Count.ShouldEqual(2);
+                MockLogger.LoggerNames.ShouldContain("Verbose");
+                MockLogger.Messages.Keys.ShouldContain(loggerName);
+                MockLogger.Messages[loggerName].ShouldContain(expectedMessage);
+            }
+
+            [Fact]
+            public void should_log_verbose_level_with_nuget_prefix_on_all_lines_when_calling_LogMinimal()
+            {
+                const string testMessage = "This should be a error message.\r\nThis is the second line after CRLF line ending.\nThis is the third line after LF line ending.";
+                var expectedMessage = "[NuGet] This should be a error message.{0}[NuGet] This is the second line after CRLF line ending.{0}[NuGet] This is the third line after LF line ending.".format_with(Environment.NewLine);
+
+                _logger.LogMinimal(testMessage);
+
+                var loggerName = LogLevel.Info.to_string();
+                MockLogger.LoggerNames.Count.ShouldEqual(2);
+                MockLogger.LoggerNames.ShouldContain("Verbose");
+                MockLogger.Messages.Keys.ShouldContain(loggerName);
+                MockLogger.Messages[loggerName].ShouldContain(expectedMessage);
+            }
+
+            [Fact]
+            public void should_log_verbose_level_with_nuget_prefix_on_all_lines_when_calling_LogVerbose()
+            {
+                const string testMessage = "This should be a verbose message.\r\nThis is the second line after CRLF line ending.\nThis is the third line after LF line ending.";
+                var expectedMessage = "[NuGet] This should be a verbose message.{0}[NuGet] This is the second line after CRLF line ending.{0}[NuGet] This is the third line after LF line ending.".format_with(Environment.NewLine);
+
+                _logger.LogVerbose(testMessage);
+
+                var loggerName = LogLevel.Info.to_string();
+                MockLogger.LoggerNames.Count.ShouldEqual(2);
+                MockLogger.LoggerNames.ShouldContain("Verbose");
+                MockLogger.Messages.Keys.ShouldContain(loggerName);
+                MockLogger.Messages[loggerName].ShouldContain(expectedMessage);
+            }
+
+            [Fact]
             public void should_log_verbose_level_with_nuget_prefix_when_calling_LogInformation()
             {
                 const string testMessage = "This should be a informational verbose message";
@@ -234,6 +324,21 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
+            public void should_log_warn_level_with_nuget_prefix_on_all_lines_when_calling_LogWarning()
+            {
+                const string testMessage = "This should be a warning message.\r\nThis is the second line after CRLF line ending.\nThis is the third line after LF line ending.";
+                var expectedMessage = "[NuGet] This should be a warning message.{0}[NuGet] This is the second line after CRLF line ending.{0}[NuGet] This is the third line after LF line ending.".format_with(Environment.NewLine);
+
+                _logger.LogWarning(testMessage);
+
+                var loggerName = LogLevel.Warn.to_string();
+                MockLogger.LoggerNames.Count.ShouldEqual(1);
+                MockLogger.LoggerNames.ShouldContain(typeof(ChocolateyNugetLogger).FullName);
+                MockLogger.Messages.Keys.ShouldContain(loggerName);
+                MockLogger.Messages[loggerName].ShouldContain(expectedMessage);
+            }
+
+            [Fact]
             public void should_log_warn_level_with_nuget_prefix_when_calling_LogWarning()
             {
                 const string testMessage = "This should be a warning message";
@@ -246,6 +351,40 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 MockLogger.LoggerNames.ShouldContain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.ShouldContain(loggerName);
                 MockLogger.Messages[loggerName].ShouldContain(expectedMessage);
+            }
+
+            [TestCase("")]
+            [TestCase("       ")]
+            public void should_not_output_whitespace_only_line_in_multiline_logging(string testType)
+            {
+                var testValue = "I will be containing\n{0}\nsome whitespace".format_with(testType);
+                var expectedValue = "[NuGet] I will be containing{0}[NuGet]{0}[NuGet] some whitespace".format_with(Environment.NewLine);
+
+                _logger.Log(NuGetLogLevel.Minimal, testValue);
+                MockLogger.Messages.Keys.ShouldContain("Info");
+                MockLogger.Messages["Info"].ShouldContain(expectedValue);
+            }
+
+            [TestCase(null)]
+            [TestCase("")]
+            [TestCase("    ")]
+            public void should_only_output_prefix_for_null_or_empty_values(string testValue)
+            {
+                _logger.Log(NuGetLogLevel.Minimal, testValue);
+
+                MockLogger.Messages.Keys.ShouldContain("Info");
+                MockLogger.Messages["Info"].ShouldContain("[NuGet]");
+            }
+
+            [TestCase("\n\n\n\n\n")]
+            [TestCase("\r\n\r\n\r\n\r\n\r\n")]
+            public void should_only_output_prefixes_on_every_line(string testValue)
+            {
+                var expectedValue = "[NuGet]{0}[NuGet]{0}[NuGet]{0}[NuGet]{0}[NuGet]".format_with(Environment.NewLine);
+
+                _logger.Log(NuGetLogLevel.Information, testValue);
+                MockLogger.Messages.Keys.ShouldContain("Info");
+                MockLogger.Messages["Info"].ShouldContain(expectedValue);
             }
         }
     }

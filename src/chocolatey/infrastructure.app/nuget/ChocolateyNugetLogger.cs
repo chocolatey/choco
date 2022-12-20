@@ -17,6 +17,8 @@
 namespace chocolatey.infrastructure.app.nuget
 {
     using System;
+    using System.IO;
+    using System.Text;
     using System.Threading.Tasks;
     using logging;
     using NuGet.Common;
@@ -74,25 +76,27 @@ namespace chocolatey.infrastructure.app.nuget
 
         public void Log(LogLevel level, string message)
         {
+            var prefixedMessage = prefix_all_lines("[NuGet]", message);
+
             switch (level)
             {
                 case LogLevel.Debug:
-                    this.Log().Debug("[NuGet] " + message);
+                    this.Log().Debug(prefixedMessage);
                     break;
                 case LogLevel.Warning:
-                    this.Log().Warn("[NuGet] " + message);
+                    this.Log().Warn(prefixedMessage);
                     break;
                 case LogLevel.Error:
-                    this.Log().Error("[NuGet] " + message);
+                    this.Log().Error(prefixedMessage);
                     break;
                 case LogLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
+                    this.Log().Info(ChocolateyLoggers.Verbose, prefixedMessage);
                     break;
                 case LogLevel.Information:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
+                    this.Log().Info(ChocolateyLoggers.Verbose, prefixedMessage);
                     break;
                 case LogLevel.Minimal:
-                    this.Log().Info("[NuGet] " + message);
+                    this.Log().Info(prefixedMessage);
                     break;
 
                 default:
@@ -115,6 +119,39 @@ namespace chocolatey.infrastructure.app.nuget
         public Task LogAsync(ILogMessage log)
         {
             return LogAsync(log.Level, log.Message);
+        }
+
+        private static string prefix_all_lines(string prefix, string message)
+        {
+            if (message == null || (string.IsNullOrWhiteSpace(message) && message.IndexOf('\n') < 0))
+            {
+                return prefix;
+            }
+            else if (message.IndexOf('\n') < 0)
+            {
+                return "{0} {1}".format_with(prefix, message);
+            }
+
+            var builder = new StringBuilder(message.Length);
+            using (var reader = new StringReader(message))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    builder.Append(prefix);
+
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        builder.Append(' ').Append(line);
+                    }
+
+                    builder.AppendLine();
+                }
+            }
+
+            // We specify the length we want, to ensure that we doesn't add any
+            // new newlines to the output.
+            return builder.ToString(0, builder.Length - Environment.NewLine.Length);
         }
     }
 
