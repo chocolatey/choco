@@ -46,12 +46,22 @@ namespace chocolatey.infrastructure.app.nuget
 
         public void LogMinimal(string message)
         {
-            this.Log().Info( "[NuGet] " + message);
+            // We log this as informational as we do not want
+            // the output being shown to the user by default.
+            // This includes information such as the time taken
+            // to resolve dependencies, where the package was added
+            // and so on.
+            Log(LogLevel.Information, message);
         }
 
         public void LogInformation(string message)
         {
-            this.Log().Info("[NuGet] " + message);
+            // We log this as informational as we do not want
+            // the output being shown to the user by default.
+            // This includes information such as the time taken
+            // to resolve dependencies, where the package was added
+            // and so on.
+            Log(LogLevel.Information, message);
         }
 
         public void LogInformationSummary(string message)

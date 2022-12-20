@@ -35,6 +35,7 @@ namespace chocolatey.tests
     {
         public MockLogger()
         {
+            LoggerNames = new HashSet<string>();
         }
 
         public void reset()
@@ -42,6 +43,7 @@ namespace chocolatey.tests
             Messages.Clear();
             this.ResetCalls();
             LogMessagesToConsole = false;
+            LoggerNames.Clear();
         }
 
         public bool contains_message(string expectedMessage)
@@ -91,6 +93,8 @@ namespace chocolatey.tests
 
         private readonly Lazy<ConcurrentDictionary<string, IList<string>>> _messages = new Lazy<ConcurrentDictionary<string, IList<string>>>();
 
+        public HashSet<string> LoggerNames { get; private set; }
+
         public ConcurrentDictionary<string, IList<string>> Messages
         {
             get { return _messages.Value; }
@@ -103,6 +107,7 @@ namespace chocolatey.tests
 
         public void InitializeFor(string loggerName)
         {
+            LoggerNames.Add(loggerName);
         }
 
         public void LogMessage(LogLevel logLevel, string message)

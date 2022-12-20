@@ -227,6 +227,15 @@ namespace chocolatey.tests
             {
             }
         }
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class LoggingAttribute : CategoryAttribute
+        {
+            public LoggingAttribute()
+                : base("Logging")
+            {
+            }
+        }
     }
 
     // ReSharper restore InconsistentNaming
