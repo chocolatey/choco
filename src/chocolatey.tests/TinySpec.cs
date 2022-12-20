@@ -214,6 +214,19 @@ namespace chocolatey.tests
             {
             }
         }
+
+        /// <summary>
+        /// Attribute used to define a test class or method as belonging to source priorities.
+        /// </summary>
+        /// <remarks>This need to be changed to inherit from <see cref="CategoryAttribute"/> once we have a working implementation of source priorities.</remarks>
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class SourcePriorityAttribute : IgnoreAttribute
+        {
+            public SourcePriorityAttribute()
+                : base("Source priority is not implemented")
+            {
+            }
+        }
     }
 
     // ReSharper restore InconsistentNaming
