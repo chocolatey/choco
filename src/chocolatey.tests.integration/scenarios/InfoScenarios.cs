@@ -10,6 +10,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commands;
+    using chocolatey.infrastructure.platforms;
     using chocolatey.infrastructure.results;
 
     using NuGet;
@@ -67,7 +68,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Broken, Pending("Need to be fixed in either NuGet.Client or before calling code in NuGet.Client")]
         public class when_searching_for_exact_package_through_command : CommandScenariosBase
         {
             public override void Context()
@@ -94,7 +94,7 @@ namespace chocolatey.tests.integration.scenarios
                     .ToShortDateString();
 
                 MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: 14.12.2022\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
             }
 
             [Fact]
@@ -105,7 +105,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Broken, Pending("Need to be fixed in either NuGet.Client or before calling code in NuGet.Client")]
         public class when_searching_for_exact_package_with_dot_relative_path_source : when_searching_for_exact_package_through_command
         {
             public override void Context()
@@ -143,7 +142,7 @@ namespace chocolatey.tests.integration.scenarios
                     .ToShortDateString();
 
                 MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: 14.12.2022\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
             }
 
             [Fact]
@@ -154,7 +153,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Broken, Pending("Need to be fixed in either NuGet.Client or before calling code in NuGet.Client")]
         public class when_searching_for_exact_package_with_verbose_output : ScenariosBase
         {
             public override void Context()
@@ -193,7 +191,9 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void should_set_source_to_expected_value()
             {
-                Results[0].Source.ShouldEqual("PackageOutput");
+                Results[0].Source.ShouldEqual(
+                    ((Platform.get_platform() == PlatformType.Windows ? "file:///" : "file://") + Path.Combine(Environment.CurrentDirectory, "PackageOutput"))
+                    .Replace("\\","/"));
             }
 
             [Fact]
