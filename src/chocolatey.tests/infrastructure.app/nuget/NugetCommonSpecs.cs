@@ -67,7 +67,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.Count().Should().Be(0);
+                packageRepositories.Should().BeEmpty();
             }
 
             [Fact]

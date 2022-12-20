@@ -31,6 +31,7 @@ namespace chocolatey.tests.integration.scenarios
 
     using NuGet.Configuration;
     using FluentAssertions;
+    using Moq;
 
     public class PinScenarios
     {
@@ -83,9 +84,9 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_contain_list_results()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Info).Should().BeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Warn).Should().BeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Error).Should().BeFalse();
+                MockLogger.Messages.Should()
+                    .NotContainKeys(new string[]
+                        { LogLevel.Info.ToStringSafe(), LogLevel.Warn.ToStringSafe(), LogLevel.Error.ToStringSafe() });
             }
 
             [Fact]
@@ -115,9 +116,11 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_contain_list_results()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Info).Should().BeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Warn).Should().BeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Error).Should().BeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.0.0"));
+                MockLogger.Messages.Should()
+                    .NotContainKeys(new string[]
+                        { LogLevel.Warn.ToStringSafe(), LogLevel.Error.ToStringSafe() });
             }
 
             [Fact]
@@ -149,9 +152,11 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_contain_list_results()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Info).Should().BeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Warn).Should().BeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Error).Should().BeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.0.0"));
+                MockLogger.Messages.Should()
+                    .NotContainKeys(new string[]
+                        { LogLevel.Warn.ToStringSafe(), LogLevel.Error.ToStringSafe() });
             }
 
             [Fact]

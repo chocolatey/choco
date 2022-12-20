@@ -336,8 +336,8 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_log_the_message_we_expect()
             {
                 var messages = MockLogger.MessagesFor(tests.LogLevel.Info);
-                messages.Should().NotBeEmpty();
-                messages.Count.Should().Be(1);
+                messages.Should().NotBeEmpty()
+                    .And.ContainSingle();
                 messages[0].Should().Contain("Pin would have called");
             }
         }
@@ -385,7 +385,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_log_one_message()
             {
-                MockLogger.Messages.Count.Should().Be(1);
+                MockLogger.Messages.Should().ContainSingle();
             }
         }
 

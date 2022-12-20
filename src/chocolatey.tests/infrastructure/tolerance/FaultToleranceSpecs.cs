@@ -79,7 +79,7 @@ namespace chocolatey.tests.infrastructure.tolerance
                     // don't care
                 }
 
-                MockLogger.MessagesFor(LogLevel.Warn).Count.Should().Be(2);
+                MockLogger.MessagesFor(LogLevel.Warn).Should().HaveCount(2);
             }
 
             [Fact]
@@ -117,7 +117,7 @@ namespace chocolatey.tests.infrastructure.tolerance
 
                 i.Should().Be(1);
 
-                MockLogger.MessagesFor(LogLevel.Warn).Count.Should().Be(0);
+                MockLogger.MessagesFor(LogLevel.Warn).Should().BeEmpty();
             }
         }
 
@@ -137,7 +137,7 @@ namespace chocolatey.tests.infrastructure.tolerance
                     "You have an error"
                 );
 
-                MockLogger.MessagesFor(LogLevel.Error).Count.Should().Be(1);
+                MockLogger.MessagesFor(LogLevel.Error).Should().ContainSingle();
             }
 
             [Fact]
@@ -164,7 +164,7 @@ namespace chocolatey.tests.infrastructure.tolerance
                     logWarningInsteadOfError: true
                 );
 
-                MockLogger.MessagesFor(LogLevel.Warn).Count.Should().Be(1);
+                MockLogger.MessagesFor(LogLevel.Warn).Should().ContainSingle();
             }
 
             [Fact]

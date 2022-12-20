@@ -22,6 +22,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.results;
     using NuGet.Configuration;
     using FluentAssertions;
+    using FluentAssertions.Execution;
 
     public class ListScenarios
     {
@@ -80,10 +81,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -138,8 +143,9 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_only_have_messages_related_to_package_information()
             {
-                var count = MockLogger.MessagesFor(LogLevel.Info).OrEmpty().Count();
-                count.Should().Be(2);
+                MockLogger.Messages.Should()
+                    .ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().HaveCount(2);
             }
 
             [Fact]
@@ -157,10 +163,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeFalse();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeFalse();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeFalse();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeFalse();
+                MockLogger.Messages.Should().NotContainKey(LogLevel.Debug.ToStringSafe());
             }
         }
 
@@ -241,10 +244,17 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeTrue();
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                        .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                    MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                        .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                    MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                        .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                    MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                        .WhoseValue.Should().Contain(m => m.Contains("End of List"));
+                }
             }
         }
     }

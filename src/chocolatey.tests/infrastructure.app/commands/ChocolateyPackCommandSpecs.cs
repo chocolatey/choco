@@ -129,7 +129,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_log_warning_on_duplicate_foo()
             {
                 var warnings = MockLogger.MessagesFor(LogLevel.Warn);
-                warnings.Count.Should().Be(1);
+                warnings.Should().HaveCount(1);
                 warnings[0].Should().BeEquivalentTo("A value for 'foo' has already been added with the value '1'. Ignoring foo='2'.");
             }
         }

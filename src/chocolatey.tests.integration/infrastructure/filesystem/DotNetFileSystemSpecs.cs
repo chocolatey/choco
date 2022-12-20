@@ -23,6 +23,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
     using chocolatey.infrastructure.platforms;
     using NUnit.Framework;
     using FluentAssertions;
+    using FluentAssertions.Extensions;
 
     public class DotNetFileSystemSpecs
     {
@@ -85,13 +86,13 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_null()
             {
-                FileSystem.GetExecutablePath(null).Should().Be(string.Empty);
+                FileSystem.GetExecutablePath(null).Should().BeEmpty();
             }
 
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_empty_string()
             {
-                FileSystem.GetExecutablePath(string.Empty).Should().Be(string.Empty);
+                FileSystem.GetExecutablePath(string.Empty).Should().BeEmpty();
             }
         }
 
@@ -130,8 +131,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
                 var actual = FileSystem.GetFiles(ContextPath, "chocolateyInstall.ps1", SearchOption.AllDirectories).ToList();
                 FileSystem.DeleteFile(filePath);
 
-                actual.Should().NotBeEmpty();
-                actual.Count().Should().Be(1);
+                actual.Should().ContainSingle();
             }
 
             [Fact]
@@ -145,8 +145,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
                 var actual = FileSystem.GetFiles(ContextPath, "chocolateyinstall.ps1", SearchOption.AllDirectories).ToList();
                 FileSystem.DeleteFile(filePath);
 
-                actual.Should().NotBeEmpty();
-                actual.Count().Should().Be(1);
+                actual.Should().ContainSingle();
             }
 
             [Fact]
@@ -205,7 +204,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void Visible_file_should_now_be_hidden()
             {
-                ((FileAttributes)FileSystem.GetFileInfoFor(SourceFile).Attributes & FileAttributes.Hidden).Should().Be(FileAttributes.Hidden);
+                ((FileAttributes)FileSystem.GetFileInfoFor(SourceFile).Attributes).Should().HaveFlag(FileAttributes.Hidden);
             }
 
             public override void AfterObservations()
@@ -232,7 +231,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void Readonly_file_should_no_longer_be_readonly()
             {
-                ((FileAttributes)FileSystem.GetFileInfoFor(SourceFile).Attributes & FileAttributes.ReadOnly).Should().NotBe(FileAttributes.ReadOnly);
+                ((FileAttributes)FileSystem.GetFileInfoFor(SourceFile).Attributes).Should().NotHaveFlag(FileAttributes.ReadOnly);
             }
         }
 
@@ -351,7 +350,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void Should_have_correct_modified_date()
             {
-                FileSystem.GetFileModifiedDate(TheTestFile).ToShortDateString().Should().Be(DateTime.Now.AddDays(-1).ToShortDateString());
+                FileSystem.GetFileModifiedDate(TheTestFile).Should().BeCloseTo(1.Days().Before(DateTime.Now), 5.Seconds());
             }
         }
     }

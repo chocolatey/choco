@@ -261,7 +261,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_contain_the_correct_number_of_package_files()
             {
-                result.Files.Count.Should().Be(files.Count);
+                result.Files.Should().HaveCount(files.Count);
             }
 
             [Fact]

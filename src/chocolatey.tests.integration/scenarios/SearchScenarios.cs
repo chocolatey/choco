@@ -74,7 +74,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_only_pick_up_package_from_highest_priority()
             {
-                Results.Count.Should().Be(1);
+                Results.Should().ContainSingle();
                 Results[0].Name.Should().Be("upgradepackage");
                 Results[0].Version.Should().Be("1.0.0");
             }
@@ -111,7 +111,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_only_pick_up_package_from_highest_priority()
             {
-                Results.Count.Should().Be(2);
+                Results.Should().HaveCount(2);
                 Results[0].Name.Should().Be("upgradepackage");
                 Results[0].Version.Should().Be("1.1.1-beta");
                 Results[1].Name.Should().Be("upgradepackage");
@@ -151,7 +151,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_pick_up_packages_from_all_feeds_except_those_with_same_name()
             {
-                Results.Count.Should().Be(4);
+                Results.Should().HaveCount(4);
                 Results[0].Name.Should().Be("conflictingdependency");
                 Results[0].Version.Should().Be("2.0.0");
                 Results[1].Name.Should().Be("hasdependency");
@@ -200,10 +200,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -242,10 +246,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -291,10 +299,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -351,10 +363,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -375,13 +391,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_no_sources_enabled_result()
             {
-                MockLogger.ContainsMessage("Unable to search for packages when there are no sources enabled for", LogLevel.Error).Should().BeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Error.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Unable to search for packages when there are no sources enabled for"));
             }
 
             [Fact]
             public void Should_not_list_any_packages()
             {
-                Results.Count().Should().Be(0);
+                Results.Should().BeEmpty();
             }
         }
 
@@ -413,7 +430,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_find_exactly_one_result()
             {
-                Results.Count.Should().Be(1);
+                Results.Should().ContainSingle();
             }
 
             [Fact]
@@ -437,10 +454,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -474,7 +495,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_have_any_results()
             {
-                Results.Count.Should().Be(0);
+                Results.Should().BeEmpty();
             }
 
             [Fact]
@@ -492,10 +513,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).Should().BeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).Should().BeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -528,7 +553,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_find_two_results()
             {
-                Results.Count.Should().Be(2);
+                Results.Should().HaveCount(2);
             }
 
             [Fact]
@@ -576,7 +601,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_find_three_results()
             {
-                Results.Count.Should().Be(3);
+                Results.Should().HaveCount(3);
             }
 
             [Fact]

@@ -133,7 +133,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 reset();
                 because();
-                configuration.NewCommand.TemplateProperties.Count.Should().Be(0);
+                configuration.NewCommand.TemplateProperties.Should().HaveCount(0);
             }
 
             [Fact]
@@ -144,7 +144,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
 
                 var properties = configuration.NewCommand.TemplateProperties;
-                properties.Count.Should().Be(1);
+                properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
                 templateProperty.Value.Should().Be("new");
@@ -159,7 +159,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
 
                 var properties = configuration.NewCommand.TemplateProperties;
-                properties.Count.Should().Be(1);
+                properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
                 templateProperty.Value.Should().Be("one");
@@ -174,7 +174,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
 
                 var properties = configuration.NewCommand.TemplateProperties;
-                properties.Count.Should().Be(1);
+                properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
                 templateProperty.Value.Should().Be("one");
@@ -190,7 +190,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
 
                 var properties = configuration.NewCommand.TemplateProperties;
-                properties.Count.Should().Be(1);
+                properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("PackageName");
                 templateProperty.Value.Should().Be("bill");
@@ -206,7 +206,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
 
                 var properties = configuration.NewCommand.TemplateProperties;
-                properties.Count.Should().Be(1);
+                properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("PackageName");
                 templateProperty.Value.Should().Be("bill");
@@ -235,7 +235,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
 
                 var properties = configuration.NewCommand.TemplateProperties;
-                properties.Count.Should().Be(1);
+                properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
                 templateProperty.Value.Should().Be("new");
@@ -249,7 +249,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
 
                 var properties = configuration.NewCommand.TemplateProperties;
-                properties.Count.Should().Be(1);
+                properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
                 templateProperty.Value.Should().Be("new this");
@@ -263,7 +263,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
                 var properties = configuration.NewCommand.TemplateProperties;
 
-                properties.Count.Should().Be(1);
+                properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
                 templateProperty.Value.Should().Be("new \"this");
@@ -277,7 +277,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
                 var properties = configuration.NewCommand.TemplateProperties;
 
-                properties.Count.Should().Be(1);
+                properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
                 templateProperty.Value.Should().Be("new this");
@@ -291,7 +291,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
                 var properties = configuration.NewCommand.TemplateProperties;
 
-                properties.Count.Should().Be(1);
+                properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
                 templateProperty.Value.Should().Be("new 'this");

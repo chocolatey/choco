@@ -531,7 +531,7 @@ namespace chocolatey.tests.infrastructure.guards
             //    {
             //       var messages = MockLogger.MessagesFor(LogLevel.Error);
             //        messages.Should().NotBeEmpty();
-            //        messages.Count.Should().Be(1);
+            //        messages.Should().ContainSingle();
             //        messages[0].Should().Contain("Trying to call ensureFunction on");
             //    }
         }

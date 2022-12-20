@@ -161,8 +161,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_log_the_message_we_expect()
             {
                 var messages = MockLogger.MessagesFor(LogLevel.Info);
-                messages.Should().NotBeEmpty();
-                messages.Count.Should().Be(1);
+                messages.Should().ContainSingle();
                 messages[0].Should().Contain("Export would have been with options");
             }
         }

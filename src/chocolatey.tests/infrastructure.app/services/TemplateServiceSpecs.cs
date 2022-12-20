@@ -80,8 +80,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.Should().Be(1);
-                infos[0].Should().Be("Would have generated a new package specification at c:\\chocolatey\\Bob");
+                infos.Should().ContainSingle();
+                infos.Should().HaveElementAt(0,"Would have generated a new package specification at c:\\chocolatey\\Bob");
             }
 
             [Fact]
@@ -92,8 +92,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.Should().Be(1);
-                infos[0].Should().Be("Would have generated a new package specification at c:\\packages\\Bob");
+                infos.Should().ContainSingle();
+                infos.Should().HaveElementAt(0,"Would have generated a new package specification at c:\\packages\\Bob");
             }
         }
 
@@ -132,8 +132,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var debugs = MockLogger.MessagesFor(LogLevel.Debug);
-                debugs.Count.Should().Be(1);
-                debugs[0].Should().Be("Bob");
+                debugs.Should().ContainSingle();
+                debugs.Should().HaveElementAt(0,"Bob");
             }
 
             [Fact]
@@ -144,12 +144,12 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var debugs = MockLogger.MessagesFor(LogLevel.Debug);
-                debugs.Count.Should().Be(1);
-                debugs[0].Should().Be("Bob");
+                debugs.Should().ContainSingle();
+                debugs.Should().HaveElementAt(0,"Bob");
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.Should().Be(1);
-                infos[0].Should().Be(string.Format(@"Generating template to a file{0} at 'c:\packages\bob.nuspec'", Environment.NewLine));
+                infos.Should().ContainSingle();
+                infos.Should().HaveElementAt(0,string.Format(@"Generating template to a file{0} at 'c:\packages\bob.nuspec'", Environment.NewLine));
             }
         }
 
@@ -294,13 +294,13 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.Should().Be(2, "There should be 2 directories, but there was: " + string.Join(", ", directories));
-                directories[0].Should().Be("c:\\chocolatey\\Bob");
-                directories[1].Should().Be("c:\\chocolatey\\Bob\\tools");
+                directories.Should().HaveCount(2, "There should be 2 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\chocolatey\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\tools");
 
-                files.Count.Should().Be(2, "There should be 2 files, but there was: " + string.Join(", ", files));
-                files[0].Should().Be("c:\\chocolatey\\Bob\\__name_replace__.nuspec");
-                files[1].Should().Be("c:\\chocolatey\\Bob\\random.txt");
+                files.Should().HaveCount(2, "There should be 2 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\chocolatey\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\random.txt");
 
                 MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\chocolatey\Bob'", Environment.NewLine));
             }
@@ -313,13 +313,13 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.Should().Be(2, "There should be 2 directories, but there was: " + string.Join(", ", directories));
-                directories[0].Should().Be("c:\\packages\\Bob");
-                directories[1].Should().Be("c:\\packages\\Bob\\tools");
+                directories.Should().HaveCount(2, "There should be 2 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\packages\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\packages\\Bob\\tools");
 
-                files.Count.Should().Be(2, "There should be 2 files, but there was: " + string.Join(", ", files));
-                files[0].Should().Be("c:\\packages\\Bob\\__name_replace__.nuspec");
-                files[1].Should().Be("c:\\packages\\Bob\\random.txt");
+                files.Should().HaveCount(2, "There should be 2 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\packages\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\packages\\Bob\\random.txt");
 
                 MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
             }
@@ -392,16 +392,16 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.Should().Be(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
-                directories[0].Should().Be("c:\\chocolatey\\Bob");
-                directories[1].Should().Be("c:\\chocolatey\\Bob\\tools");
-                directories[2].Should().Be("c:\\chocolatey\\Bob\\tools\\lower");
+                directories.Should().HaveCount(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\chocolatey\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\tools");
+                directories.Should().HaveElementAt(2,"c:\\chocolatey\\Bob\\tools\\lower");
 
-                files.Count.Should().Be(4, "There should be 4 files, but there was: " + string.Join(", ", files));
-                files[0].Should().Be("c:\\chocolatey\\Bob\\__name_replace__.nuspec");
-                files[1].Should().Be("c:\\chocolatey\\Bob\\random.txt");
-                files[2].Should().Be("c:\\chocolatey\\Bob\\tools\\chocolateyInstall.ps1");
-                files[3].Should().Be("c:\\chocolatey\\Bob\\tools\\lower\\another.ps1");
+                files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\chocolatey\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\random.txt");
+                files.Should().HaveElementAt(2,"c:\\chocolatey\\Bob\\tools\\chocolateyInstall.ps1");
+                files.Should().HaveElementAt(3,"c:\\chocolatey\\Bob\\tools\\lower\\another.ps1");
 
                 MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\chocolatey\Bob'", Environment.NewLine));
             }
@@ -414,16 +414,16 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.Should().Be(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
-                directories[0].Should().Be("c:\\packages\\Bob");
-                directories[1].Should().Be("c:\\packages\\Bob\\tools");
-                directories[2].Should().Be("c:\\packages\\Bob\\tools\\lower");
+                directories.Should().HaveCount(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\packages\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\packages\\Bob\\tools");
+                directories.Should().HaveElementAt(2,"c:\\packages\\Bob\\tools\\lower");
 
-                files.Count.Should().Be(4, "There should be 4 files, but there was: " + string.Join(", ", files));
-                files[0].Should().Be("c:\\packages\\Bob\\__name_replace__.nuspec");
-                files[1].Should().Be("c:\\packages\\Bob\\random.txt");
-                files[2].Should().Be("c:\\packages\\Bob\\tools\\chocolateyInstall.ps1");
-                files[3].Should().Be("c:\\packages\\Bob\\tools\\lower\\another.ps1");
+                files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\packages\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\packages\\Bob\\random.txt");
+                files.Should().HaveElementAt(2,"c:\\packages\\Bob\\tools\\chocolateyInstall.ps1");
+                files.Should().HaveElementAt(3,"c:\\packages\\Bob\\tools\\lower\\another.ps1");
 
                 MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
             }
@@ -496,18 +496,18 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.Should().Be(5, "There should be 5 directories, but there was: " + string.Join(", ", directories));
-                directories[0].Should().Be("c:\\chocolatey\\Bob");
-                directories[1].Should().Be("c:\\chocolatey\\Bob\\tools");
-                directories[2].Should().Be("c:\\chocolatey\\Bob\\tools\\lower");
-                directories[3].Should().Be("c:\\chocolatey\\Bob\\empty");
-                directories[4].Should().Be("c:\\chocolatey\\Bob\\empty\\nested");
+                directories.Should().HaveCount(5, "There should be 5 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\chocolatey\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\tools");
+                directories.Should().HaveElementAt(2,"c:\\chocolatey\\Bob\\tools\\lower");
+                directories.Should().HaveElementAt(3,"c:\\chocolatey\\Bob\\empty");
+                directories.Should().HaveElementAt(4,"c:\\chocolatey\\Bob\\empty\\nested");
 
-                files.Count.Should().Be(4, "There should be 4 files, but there was: " + string.Join(", ", files));
-                files[0].Should().Be("c:\\chocolatey\\Bob\\__name_replace__.nuspec");
-                files[1].Should().Be("c:\\chocolatey\\Bob\\random.txt");
-                files[2].Should().Be("c:\\chocolatey\\Bob\\tools\\chocolateyInstall.ps1");
-                files[3].Should().Be("c:\\chocolatey\\Bob\\tools\\lower\\another.ps1");
+                files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\chocolatey\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\random.txt");
+                files.Should().HaveElementAt(2,"c:\\chocolatey\\Bob\\tools\\chocolateyInstall.ps1");
+                files.Should().HaveElementAt(3,"c:\\chocolatey\\Bob\\tools\\lower\\another.ps1");
 
                 MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\chocolatey\Bob'", Environment.NewLine));
             }
@@ -520,18 +520,18 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.Should().Be(5, "There should be 5 directories, but there was: " + string.Join(", ", directories));
-                directories[0].Should().Be("c:\\packages\\Bob");
-                directories[1].Should().Be("c:\\packages\\Bob\\tools");
-                directories[2].Should().Be("c:\\packages\\Bob\\tools\\lower");
-                directories[3].Should().Be("c:\\packages\\Bob\\empty");
-                directories[4].Should().Be("c:\\packages\\Bob\\empty\\nested");
+                directories.Should().HaveCount(5, "There should be 5 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\packages\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\packages\\Bob\\tools");
+                directories.Should().HaveElementAt(2,"c:\\packages\\Bob\\tools\\lower");
+                directories.Should().HaveElementAt(3,"c:\\packages\\Bob\\empty");
+                directories.Should().HaveElementAt(4,"c:\\packages\\Bob\\empty\\nested");
 
-                files.Count.Should().Be(4, "There should be 4 files, but there was: " + string.Join(", ", files));
-                files[0].Should().Be("c:\\packages\\Bob\\__name_replace__.nuspec");
-                files[1].Should().Be("c:\\packages\\Bob\\random.txt");
-                files[2].Should().Be("c:\\packages\\Bob\\tools\\chocolateyInstall.ps1");
-                files[3].Should().Be("c:\\packages\\Bob\\tools\\lower\\another.ps1");
+                files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\packages\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\packages\\Bob\\random.txt");
+                files.Should().HaveElementAt(2,"c:\\packages\\Bob\\tools\\chocolateyInstall.ps1");
+                files.Should().HaveElementAt(3,"c:\\packages\\Bob\\tools\\lower\\another.ps1");
 
                 MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
             }
@@ -849,8 +849,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.Should().Be(1);
-                infos[0].Should().Be("Would have listed templates in {0}".FormatWith(ApplicationParameters.TemplatesLocation));
+                infos.Should().ContainSingle();
+                infos.Should().HaveElementAt(0,"Would have listed templates in {0}".FormatWith(ApplicationParameters.TemplatesLocation));
             }
 
             [Fact]
@@ -860,8 +860,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 because();
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.Should().Be(1);
-                infos[0].Should().Be("Would have listed information about {0}".FormatWith(config.TemplateCommand.Name));
+                infos.Should().ContainSingle();
+                infos.Should().HaveElementAt(0,"Would have listed information about {0}".FormatWith(config.TemplateCommand.Name));
             }
         }
     }

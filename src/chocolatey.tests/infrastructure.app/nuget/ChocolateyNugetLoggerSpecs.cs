@@ -56,7 +56,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogDebug(testMessage);
 
                 var loggerName = LogLevel.Debug.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -71,7 +71,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogDebug(testMessage);
 
                 var loggerName = LogLevel.Debug.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -86,7 +86,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogError(testMessage);
 
                 var loggerName = LogLevel.Error.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -101,7 +101,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogError(testMessage);
 
                 var loggerName = LogLevel.Error.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -114,7 +114,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             public void Should_log_expected_log_level_when_calling_Log_with_log_message(NuGetLogLevel nugetLogLevel, LogLevel logLevel, string testMessage, string expectedMessage)
             {
                 _logger.Log(new LogMessage(nugetLogLevel, testMessage));
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(logLevel.ToStringSafe());
                 MockLogger.Messages[logLevel.ToStringSafe()].Should().Contain(expectedMessage);
@@ -127,7 +127,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             public void Should_log_expected_log_level_when_calling_Log_with_nuget_log_level(NuGetLogLevel nugetLogLevel, LogLevel logLevel, string testMessage, string expectedMessage)
             {
                 _logger.Log(nugetLogLevel, testMessage);
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(logLevel.ToStringSafe());
                 MockLogger.Messages[logLevel.ToStringSafe()].Should().Contain(expectedMessage);
@@ -140,7 +140,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             public async Task Should_log_expected_log_level_when_calling_LogAsync_with_nuget_log_level(NuGetLogLevel nugetLogLevel, LogLevel logLevel, string testMessage, string expectedMessage)
             {
                 await _logger.LogAsync(nugetLogLevel, testMessage);
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(logLevel.ToStringSafe());
                 MockLogger.Messages[logLevel.ToStringSafe()].Should().Contain(expectedMessage);
@@ -153,7 +153,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             public async Task Should_log_expected_log_level_when_calling_LogAsync_with_nuget_log_message(NuGetLogLevel nugetLogLevel, LogLevel logLevel, string testMessage, string expectedMessage)
             {
                 await _logger.LogAsync(new LogMessage(nugetLogLevel, testMessage));
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(logLevel.ToStringSafe());
                 MockLogger.Messages[logLevel.ToStringSafe()].Should().Contain(expectedMessage);
@@ -168,7 +168,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogInformationSummary(testMessage);
 
                 var loggerName = LogLevel.Info.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -183,7 +183,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogInformationSummary(testMessage);
 
                 var loggerName = LogLevel.Info.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -194,7 +194,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             public void Should_log_verbose_level_when_calling_Log_with_nuget_log_level(NuGetLogLevel nuGetLogLevel, string testMessage, string expectedMessage)
             {
                 _logger.Log(nuGetLogLevel, testMessage);
-                MockLogger.LoggerNames.Count.Should().Be(2);
+                MockLogger.LoggerNames.Should().HaveCount(2);
                 MockLogger.LoggerNames.Should().Contain("Verbose");
                 MockLogger.Messages.Keys.Should().Contain("Info");
                 MockLogger.Messages["Info"].Should().Contain(expectedMessage);
@@ -205,7 +205,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             public void Should_log_verbose_level_when_calling_Log_with_nuget_log_message(NuGetLogLevel nuGetLogLevel, string testMessage, string expectedMessage)
             {
                 _logger.Log(new LogMessage(nuGetLogLevel, testMessage));
-                MockLogger.LoggerNames.Count.Should().Be(2);
+                MockLogger.LoggerNames.Should().HaveCount(2);
                 MockLogger.LoggerNames.Should().Contain("Verbose");
                 MockLogger.Messages.Keys.Should().Contain("Info");
                 MockLogger.Messages["Info"].Should().Contain(expectedMessage);
@@ -216,7 +216,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             public async Task Should_log_verbose_level_when_calling_LogAsync_with_nuget_log_level(NuGetLogLevel nuGetLogLevel, string testMessage, string expectedMessage)
             {
                 await _logger.LogAsync(nuGetLogLevel, testMessage);
-                MockLogger.LoggerNames.Count.Should().Be(2);
+                MockLogger.LoggerNames.Should().HaveCount(2);
                 MockLogger.LoggerNames.Should().Contain("Verbose");
                 MockLogger.Messages.Keys.Should().Contain("Info");
                 MockLogger.Messages["Info"].Should().Contain(expectedMessage);
@@ -227,7 +227,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             public async Task Should_log_verbose_level_when_calling_LogAsync_with_nuget_log_message(NuGetLogLevel nuGetLogLevel, string testMessage, string expectedMessage)
             {
                 await _logger.LogAsync(new LogMessage(nuGetLogLevel, testMessage));
-                MockLogger.LoggerNames.Count.Should().Be(2);
+                MockLogger.LoggerNames.Should().HaveCount(2);
                 MockLogger.LoggerNames.Should().Contain("Verbose");
                 MockLogger.Messages.Keys.Should().Contain("Info");
                 MockLogger.Messages["Info"].Should().Contain(expectedMessage);
@@ -242,7 +242,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogInformation(testMessage);
 
                 var loggerName = LogLevel.Info.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(2);
+                MockLogger.LoggerNames.Should().HaveCount(2);
                 MockLogger.LoggerNames.Should().Contain("Verbose");
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -257,7 +257,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogMinimal(testMessage);
 
                 var loggerName = LogLevel.Info.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(2);
+                MockLogger.LoggerNames.Should().HaveCount(2);
                 MockLogger.LoggerNames.Should().Contain("Verbose");
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -272,7 +272,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogVerbose(testMessage);
 
                 var loggerName = LogLevel.Info.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(2);
+                MockLogger.LoggerNames.Should().HaveCount(2);
                 MockLogger.LoggerNames.Should().Contain("Verbose");
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -287,7 +287,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogInformation(testMessage);
 
                 var loggerName = LogLevel.Info.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(2);
+                MockLogger.LoggerNames.Should().HaveCount(2);
                 MockLogger.LoggerNames.Should().Contain("Verbose");
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -302,7 +302,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogMinimal(testMessage);
 
                 var loggerName = LogLevel.Info.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(2);
+                MockLogger.LoggerNames.Should().HaveCount(2);
                 MockLogger.LoggerNames.Should().Contain("Verbose");
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -317,7 +317,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogVerbose(testMessage);
 
                 var loggerName = LogLevel.Info.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(2);
+                MockLogger.LoggerNames.Should().HaveCount(2);
                 MockLogger.LoggerNames.Should().Contain("Verbose");
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -332,7 +332,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogWarning(testMessage);
 
                 var loggerName = LogLevel.Warn.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);
@@ -347,7 +347,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _logger.LogWarning(testMessage);
 
                 var loggerName = LogLevel.Warn.ToStringSafe();
-                MockLogger.LoggerNames.Count.Should().Be(1);
+                MockLogger.LoggerNames.Should().ContainSingle();
                 MockLogger.LoggerNames.Should().Contain(typeof(ChocolateyNugetLogger).FullName);
                 MockLogger.Messages.Keys.Should().Contain(loggerName);
                 MockLogger.Messages[loggerName].Should().Contain(expectedMessage);

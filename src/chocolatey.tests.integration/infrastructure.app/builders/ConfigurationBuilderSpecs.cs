@@ -140,7 +140,7 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
                 if (!SystemSet && !ArgumentSet && !ConfigSet &&
                     !EnvironmentVariableSet)
                 {
-                    Configuration.Proxy.Location.Should().Be(string.Empty);
+                    Configuration.Proxy.Location.Should().BeEmpty();
                     return;
                 }
 
@@ -211,7 +211,7 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
                 if (!ArgumentSet && !ConfigSet &&
                     !EnvironmentVariableSet)
                 {
-                    Configuration.Proxy.BypassList.Should().Be(string.Empty);
+                    Configuration.Proxy.BypassList.Should().BeEmpty();
                     return;
                 }
 

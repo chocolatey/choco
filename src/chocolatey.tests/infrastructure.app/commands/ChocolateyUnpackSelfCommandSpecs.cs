@@ -76,7 +76,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_log_one_message()
             {
-                MockLogger.Messages.Count.Should().Be(1);
+                MockLogger.Messages.Should().HaveCount(1);
             }
 
             [Fact]

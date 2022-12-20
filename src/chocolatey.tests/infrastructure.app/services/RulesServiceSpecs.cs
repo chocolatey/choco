@@ -62,12 +62,16 @@ namespace chocolatey.tests.infrastructure.app.services
         [Fact]
         public void GetsRulesFromService()
         {
-            _detectedRules.Count().Should().Be(4);
+            _detectedRules.Should().HaveCount(4);
             IEnumerable<string> ruleIds = _detectedRules.Select(t => t.Id);
-            ruleIds.Should().Contain(UnsupportedElementUsed);
-            ruleIds.Should().Contain(EmptyRequiredElement);
-            ruleIds.Should().Contain(InvalidTypeElement);
-            ruleIds.Should().Contain(MissingElementOnRequiringLicenseAcceptance);
+
+            ruleIds.Should().Contain(new[]
+            {
+                UnsupportedElementUsed,
+                EmptyRequiredElement,
+                InvalidTypeElement,
+                MissingElementOnRequiringLicenseAcceptance
+            });
         }
     }
 }

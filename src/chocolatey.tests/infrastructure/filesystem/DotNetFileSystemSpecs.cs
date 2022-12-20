@@ -180,13 +180,13 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_null()
             {
-                FileSystem.GetExecutablePath(null).Should().Be(string.Empty);
+                FileSystem.GetExecutablePath(null).Should().BeEmpty();
             }
 
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_empty_string()
             {
-                FileSystem.GetExecutablePath(string.Empty).Should().Be(string.Empty);
+                FileSystem.GetExecutablePath(string.Empty).Should().BeEmpty();
             }
         }
 
@@ -218,10 +218,10 @@ namespace chocolatey.tests.infrastructure.filesystem
                 }
                 else
                 {
-                    new string[]
+                    FileSystem.GetExecutablePath("ls").Should().BeOneOf(new string[]
                     {
                         "/bin/ls", "/usr/bin/ls"
-                    }.Should().Contain(FileSystem.GetExecutablePath("ls"));
+                    });
                 }
             }
 
@@ -234,13 +234,13 @@ namespace chocolatey.tests.infrastructure.filesystem
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_null()
             {
-                FileSystem.GetExecutablePath(null).Should().Be(string.Empty);
+                FileSystem.GetExecutablePath(null).Should().BeEmpty();
             }
 
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_empty_string()
             {
-                FileSystem.GetExecutablePath(string.Empty).Should().Be(string.Empty);
+                FileSystem.GetExecutablePath(string.Empty).Should().BeEmpty();
             }
         }
     }

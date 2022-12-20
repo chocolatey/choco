@@ -363,7 +363,7 @@
                 MockLogger.Messages.Keys.Should().Contain("Info");
 
                 var infoMessages = MockLogger.Messages["Info"];
-                infoMessages.Count.Should().Be(2);
+                infoMessages.Should().HaveCount(2);
                 infoMessages[0].Should().Contain("allowEmptyChecksums");
                 infoMessages[1].Should().Contain("virusCheck");
             }
@@ -410,7 +410,7 @@
                 MockLogger.Messages.Keys.Should().Contain("Info");
 
                 var infoMessages = MockLogger.Messages["Info"];
-                infoMessages.Count.Should().Be(2);
+                infoMessages.Should().HaveCount(2);
                 infoMessages[0].Should().Contain("cacheLocation");
                 infoMessages[1].Should().Contain("webRequestTimeoutSeconds");
             }
@@ -457,7 +457,7 @@
                 MockLogger.Messages.Keys.Should().Contain("Info");
 
                 var infoMessages = MockLogger.Messages["Info"];
-                infoMessages.Count.Should().Be(2);
+                infoMessages.Should().HaveCount(2);
                 infoMessages[0].Should().Contain("alpha");
                 infoMessages[1].Should().Contain("beta");
             }
@@ -568,7 +568,7 @@
             {
                 MockLogger.Messages.Keys.Should().Contain("Info");
                 var infoMessages = MockLogger.Messages["Info"];
-                infoMessages.Count.Should().Be(1);
+                infoMessages.Should().ContainSingle();
                 infoMessages[0].Should().Contain("Enabled");
             }
         }

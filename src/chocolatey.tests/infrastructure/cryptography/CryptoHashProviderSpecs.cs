@@ -91,7 +91,7 @@ namespace chocolatey.tests.infrastructure.cryptography
             [Fact]
             public void Should_log_a_warning()
             {
-                MockLogger.MessagesFor(LogLevel.Warn).Count.Should().Be(1);
+                MockLogger.MessagesFor(LogLevel.Warn).Should().HaveCount(1);
             }
 
             [Fact]

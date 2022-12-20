@@ -29,6 +29,7 @@ namespace chocolatey.tests.integration.scenarios
     using NUnit.Framework;
 
     using FluentAssertions;
+    using FluentAssertions.Execution;
 
     public class PackScenarios
     {
@@ -154,9 +155,13 @@ namespace chocolatey.tests.integration.scenarios
             public void Generated_package_should_be_in_current_directory()
             {
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.Should().Be(2);
-                infos[0].Should().Be("Attempting to build package from 'myPackage.nuspec'.");
-                infos[1].Should().Be(string.Concat("Successfully created package '", PackagePath, "'"));
+
+                using (new AssertionScope())
+                {
+                    infos.Should().HaveCount(2);
+                    infos.Should().HaveElementAt(0, "Attempting to build package from 'myPackage.nuspec'.");
+                    infos.Should().HaveElementAt(1, string.Concat("Successfully created package '", PackagePath, "'"));
+                }
 
                 FileAssert.Exists(PackagePath);
             }
@@ -426,9 +431,13 @@ namespace chocolatey.tests.integration.scenarios
             public void Property_settings_should_be_logged_as_debug_messages()
             {
                 var messages = MockLogger.MessagesFor(LogLevel.Debug);
-                messages.Count.Should().Be(2);
-                messages.Should().ContainEquivalentOf("Setting property 'commitId': 1234abcd");
-                messages.Should().ContainEquivalentOf("Setting property 'version': 0.1.0");
+
+                using (new AssertionScope())
+                {
+                    messages.Should().HaveCount(2);
+                    messages.Should().ContainEquivalentOf("Setting property 'commitId': 1234abcd");
+                    messages.Should().ContainEquivalentOf("Setting property 'version': 0.1.0");
+                }
             }
         }
 
