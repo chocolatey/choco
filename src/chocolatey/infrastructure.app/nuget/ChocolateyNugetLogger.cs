@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,9 @@
 
 namespace chocolatey.infrastructure.app.nuget
 {
+    using System;
+    using System.IO;
+    using System.Text;
     using System.Threading.Tasks;
     using logging;
     using NuGet.Common;
@@ -26,140 +29,129 @@ namespace chocolatey.infrastructure.app.nuget
     {
         public void LogDebug(string message)
         {
-            this.Log().Debug("[NuGet] " + message);
+            Log(LogLevel.Debug, message);
         }
 
         public void LogVerbose(string message)
         {
-            this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
+            Log(LogLevel.Verbose, message);
         }
 
         public void LogWarning(string message)
         {
-            this.Log().Warn("[NuGet] " + message);
+            Log(LogLevel.Warning, message);
         }
 
         public void LogError(string message)
         {
-            this.Log().Error("[NuGet] " + message);
+            Log(LogLevel.Error, message);
         }
 
         public void LogMinimal(string message)
         {
-            this.Log().Info( "[NuGet] " + message);
+            // We log this as informational as we do not want
+            // the output being shown to the user by default.
+            // This includes information such as the time taken
+            // to resolve dependencies, where the package was added
+            // and so on.
+            Log(LogLevel.Information, message);
         }
 
         public void LogInformation(string message)
         {
-            this.Log().Info("[NuGet] " + message);
+            // We log this as informational as we do not want
+            // the output being shown to the user by default.
+            // This includes information such as the time taken
+            // to resolve dependencies, where the package was added
+            // and so on.
+            Log(LogLevel.Information, message);
         }
 
         public void LogInformationSummary(string message)
         {
-            this.Log().Info("[NuGet] " + message);
+            // We log it as minimal as we want the output to
+            // be shown as an informational message in this case.
+            Log(LogLevel.Minimal, message);
         }
 
         public void Log(LogLevel level, string message)
         {
+            var prefixedMessage = prefix_all_lines("[NuGet]", message);
+
             switch (level)
             {
                 case LogLevel.Debug:
-                    this.Log().Debug("[NuGet] " + message);
+                    this.Log().Debug(prefixedMessage);
                     break;
                 case LogLevel.Warning:
-                    this.Log().Warn("[NuGet] " + message);
+                    this.Log().Warn(prefixedMessage);
                     break;
                 case LogLevel.Error:
-                    this.Log().Error("[NuGet] " + message);
+                    this.Log().Error(prefixedMessage);
                     break;
                 case LogLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
+                    this.Log().Info(ChocolateyLoggers.Verbose, prefixedMessage);
                     break;
                 case LogLevel.Information:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
+                    this.Log().Info(ChocolateyLoggers.Verbose, prefixedMessage);
                     break;
                 case LogLevel.Minimal:
-                    this.Log().Info("[NuGet] " + message);
+                    this.Log().Info(prefixedMessage);
                     break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(level));
             }
         }
 
         public Task LogAsync(LogLevel level, string message)
         {
-            switch (level)
-            {
-                case LogLevel.Debug:
-                    this.Log().Debug("[NuGet] " + message);
-                    break;
-                case LogLevel.Warning:
-                    this.Log().Warn("[NuGet] " + message);
-                    break;
-                case LogLevel.Error:
-                    this.Log().Error("[NuGet] " + message);
-                    break;
-                case LogLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
-                    break;
-                case LogLevel.Information:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message);
-                    break;
-                case LogLevel.Minimal:
-                    this.Log().Info("[NuGet] " + message);
-                    break;
-            }
+            Log(level, message);
 
             return Task.CompletedTask;
         }
 
         public void Log(ILogMessage log)
         {
-            switch (log.Level)
-            {
-                case LogLevel.Debug:
-                    this.Log().Debug("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Warning:
-                    this.Log().Warn("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Error:
-                    this.Log().Error("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Information:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Minimal:
-                    this.Log().Info("[NuGet] " + log.Message);
-                    break;
-            }
+            Log(log.Level, log.Message);
         }
 
         public Task LogAsync(ILogMessage log)
         {
-            switch (log.Level)
+            return LogAsync(log.Level, log.Message);
+        }
+
+        private static string prefix_all_lines(string prefix, string message)
+        {
+            if (message == null || (string.IsNullOrWhiteSpace(message) && message.IndexOf('\n') < 0))
             {
-                case LogLevel.Debug:
-                    this.Log().Debug("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Warning:
-                    this.Log().Warn("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Error:
-                    this.Log().Error("[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Information:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + log.Message);
-                    break;
-                case LogLevel.Minimal:
-                    this.Log().Info("[NuGet] " + log.Message);
-                    break;
+                return prefix;
             }
-            return Task.CompletedTask;
+            else if (message.IndexOf('\n') < 0)
+            {
+                return "{0} {1}".format_with(prefix, message);
+            }
+
+            var builder = new StringBuilder(message.Length);
+            using (var reader = new StringReader(message))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    builder.Append(prefix);
+
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        builder.Append(' ').Append(line);
+                    }
+
+                    builder.AppendLine();
+                }
+            }
+
+            // We specify the length we want, to ensure that we doesn't add any
+            // new newlines to the output.
+            return builder.ToString(0, builder.Length - Environment.NewLine.Length);
         }
     }
 

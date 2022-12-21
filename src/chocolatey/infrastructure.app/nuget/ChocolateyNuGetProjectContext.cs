@@ -17,6 +17,8 @@ namespace chocolatey.infrastructure.app.nuget
 
     public class ChocolateyNuGetProjectContext : INuGetProjectContext
     {
+        private readonly ILogger _logger;
+
         public ChocolateyNuGetProjectContext(ChocolateyConfiguration config, ILogger logger)
         {
             //TODO, set client policy correctly here with settings, fix in chocolatey implementation of ISettings for this purpose
@@ -28,6 +30,7 @@ namespace chocolatey.infrastructure.app.nuget
                 clientPolicyContext,
                 logger
                 );
+            _logger = logger;
         }
 
         private PackageExtractionContext _extractionContext;
@@ -37,78 +40,38 @@ namespace chocolatey.infrastructure.app.nuget
             switch (level)
             {
                 case MessageLevel.Debug:
-                    this.Log().Debug("[NuGet] " + message, args);
+                    _logger.LogDebug(message.format_with(args));
                     break;
                 case MessageLevel.Info:
-                    this.Log().Info("[NuGet] " + message, args);
+                    _logger.LogInformation(message.format_with(args));
                     break;
                 case MessageLevel.Warning:
-                    this.Log().Warn("[NuGet] " + message, args);
+                    _logger.LogWarning(message.format_with(args));
                     break;
                 case MessageLevel.Error:
-                    this.Log().Error("[NuGet] " + message, args);
+                    _logger.LogError(message.format_with(args));
                     break;
             }
         }
 
         public void Log(ILogMessage message)
         {
-            switch (message.Level)
-            {
-                case LogLevel.Debug:
-                    this.Log().Debug("[NuGet] " + message.Message);
-                    break;
-                case LogLevel.Warning:
-                    this.Log().Warn("[NuGet] " + message.Message);
-                    break;
-                case LogLevel.Error:
-                    this.Log().Error("[NuGet] " + message.Message);
-                    break;
-                case LogLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message.Message);
-                    break;
-                case LogLevel.Information:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message.Message);
-                    break;
-                case LogLevel.Minimal:
-                    this.Log().Info("[NuGet] " + message.Message);
-                    break;
-            }
+            _logger.Log(message);
         }
 
         public void ReportError(string message)
         {
-            this.Log().Error("[NuGet] " + message);
+            _logger.LogError(message);
         }
 
         public void ReportError(ILogMessage message)
         {
-            switch (message.Level)
-            {
-                case LogLevel.Debug:
-                    this.Log().Debug("[NuGet] " + message.Message);
-                    break;
-                case LogLevel.Warning:
-                    this.Log().Warn("[NuGet] " + message.Message);
-                    break;
-                case LogLevel.Error:
-                    this.Log().Error("[NuGet] " + message.Message);
-                    break;
-                case LogLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message.Message);
-                    break;
-                case LogLevel.Information:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message.Message);
-                    break;
-                case LogLevel.Minimal:
-                    this.Log().Info("[NuGet] " + message.Message);
-                    break;
-            }
+            _logger.Log(message);
         }
 
         public FileConflictAction ResolveFileConflict(string message)
         {
-            this.Log().Warn("[NuGet] File conflict, overwriting all: " + message);
+            _logger.LogWarning("File conflict, overwriting all: {0}".format_with(message));
             return FileConflictAction.OverwriteAll;
         }
 
