@@ -76,6 +76,9 @@ namespace chocolatey.infrastructure.app.nuget
             }
             */
 
+            // TODO: maybe adjust number if no page specified? Or adjust check to have no max value
+            var totalToGet = configuration.ListCommand.Page.HasValue ? (configuration.ListCommand.Page + 1) * configuration.ListCommand.PageSize : 100000;
+
             NuGetVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? NuGetVersion.Parse(configuration.Version) : null;
             var results = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadata());
 
@@ -92,6 +95,10 @@ namespace chocolatey.infrastructure.app.nuget
                         while (await enumerator.MoveNextAsync())
                         {
                             results.Add(enumerator.Current);
+                            if (results.Count > totalToGet)
+                            {
+                                break;
+                            }
                         }
                     }
                     else
@@ -106,8 +113,7 @@ namespace chocolatey.infrastructure.app.nuget
                             partResults.AddRange(await repositoryResources.searchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
                             skipNumber += takeNumber;
                             latestResults.AddRange(partResults);
-                            //TODO, add check and warn if over 5000, maybe adjust number?
-                        } while (partResults.Count >= takeNumber && takeNumber < 5000);
+                        } while (partResults.Count >= takeNumber && takeNumber < totalToGet);
 
                         if (configuration.AllVersions)
                         {
@@ -264,7 +270,14 @@ namespace chocolatey.infrastructure.app.nuget
                  results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Identity.Id).ToHashSet()
                  : results.OrderBy(p => p.Identity.Id).ThenByDescending(p => p.Identity.Version).ToHashSet();
 
-            return results.AsQueryable();
+            if (configuration.ListCommand.Page.HasValue)
+            {
+                return results.AsQueryable().Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
+            }
+            else
+            {
+                return results.AsQueryable();
+            }
         }
 
         public static ISet<IPackageSearchMetadata> find_all_package_versions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources)
