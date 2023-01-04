@@ -190,6 +190,16 @@ namespace chocolatey.infrastructure.app.nuget
                 var nugetSource = new PackageSource(source);
                 nugetSource.ClientCertificates = sourceClientCertificates;
                 var repo = Repository.Factory.GetCoreV3(nugetSource);
+
+                if (nugetSource.IsHttp || nugetSource.IsHttps)
+                {
+                    var httpSourceResource = repo.GetResource<HttpSourceResource>();
+                    if (httpSourceResource != null)
+                    {
+                        httpSourceResource.HttpSource.HttpCacheDirectory = System.IO.Path.Combine(configuration.CacheLocation, "NuGetHttpCache");
+                    }
+                }
+
                 repositories.Add(repo);
             }
 
