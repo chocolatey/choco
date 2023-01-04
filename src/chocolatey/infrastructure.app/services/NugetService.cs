@@ -771,12 +771,14 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         }
 
+                        var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
+
+                        fix_nuspec_casing(availablePackage, installedPath);
+
                         remove_nuget_cache_for_package(availablePackage);
 
                         var manifestPath = nugetProject.GetInstalledManifestFilePath(packageDependencyInfo);
                         var packageMetadata = new ChocolateyPackageMetadata(manifestPath, _fileSystem);
-
-                        var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
 
                         this.Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".format_with(
                             System.Environment.NewLine,
@@ -1307,10 +1309,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                 }
 
+                                var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
+
+                                fix_nuspec_casing(availablePackage, installedPath);
+
                                 var manifestPath = nugetProject.GetInstalledManifestFilePath(packageDependencyInfo);
                                 var packageMetadata = new ChocolateyPackageMetadata(manifestPath, _fileSystem);
-
-                                var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
 
                                 remove_nuget_cache_for_package(availablePackage);
 
@@ -2023,6 +2027,25 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                 () => _fileSystem.delete_file(nupkg),
                 "Error deleting nupkg file",
                 throwError: true);
+        }
+
+        private void fix_nuspec_casing(IPackageSearchMetadata packageMetadata, string packageLocation)
+        {
+            if (Platform.get_platform() == PlatformType.Windows) return;
+            this.Log().Debug(ChocolateyLoggers.Verbose, "Fixing nuspec casing if required");
+
+            var expectedNuspec = _fileSystem.combine_paths(packageLocation, "{0}{1}"
+                .format_with(packageMetadata.Identity.Id, NuGetConstants.ManifestExtension));
+            var lowercaseNuspec = _fileSystem.combine_paths(packageLocation, "{0}{1}"
+                .format_with(packageMetadata.Identity.Id.to_lower(), NuGetConstants.ManifestExtension));
+
+            if (!_fileSystem.file_exists(expectedNuspec) && _fileSystem.file_exists(lowercaseNuspec))
+            {
+                FaultTolerance.try_catch_with_logging_exception(
+                    () => _fileSystem.move_file(lowercaseNuspec, expectedNuspec),
+                    "Error moving nuspec file {0} to {1}".format_with(lowercaseNuspec, expectedNuspec),
+                    throwError: true);
+            }
         }
 
         public virtual void remove_installation_files_unsafe(IPackageMetadata removedPackage, ChocolateyPackageInformation pkgInfo)
