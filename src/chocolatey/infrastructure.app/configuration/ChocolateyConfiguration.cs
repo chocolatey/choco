@@ -657,6 +657,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         }
 
         public IDictionary<string, string> Properties { get; private set; }
+        public bool PackThrowOnUnsupportedElements = true;
     }
 
     [Serializable]
