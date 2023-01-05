@@ -1943,7 +1943,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                                 remove_rollback_directory_if_exists(packageName);
                                 backup_existing_version(config, packageToUninstall.PackageMetadata, uninstallPkgInfo);
 
-                                var packageResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name.to_lower() + "." + packageToUninstall.Version.to_string(), packageToUninstall);
+                                var packageResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name + "." + packageToUninstall.Version.to_string(), packageToUninstall);
                                 packageResult.InstallLocation = packageToUninstall.InstallLocation;
                                 string logMessage = "{0}{1} v{2}{3}".format_with(Environment.NewLine, packageToUninstall.Name, packageToUninstall.Version.to_string(), config.Force ? " (forced)" : string.Empty);
                                 packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
@@ -1978,12 +1978,12 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                             {
                                 var logMessage = "{0} not uninstalled. An error occurred during uninstall:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
                                 this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                                var result = packageResultsToReturn.GetOrAdd(packageToUninstall.Name.to_lower() + "." + packageToUninstall.Version.to_string(), new PackageResult(packageToUninstall.PackageMetadata, pathResolver.GetInstallPath(packageToUninstall.PackageMetadata.Id, packageToUninstall.PackageMetadata.Version)));
+                                var result = packageResultsToReturn.GetOrAdd(packageToUninstall.Name + "." + packageToUninstall.Version.to_string(), new PackageResult(packageToUninstall.PackageMetadata, pathResolver.GetInstallPath(packageToUninstall.PackageMetadata.Id, packageToUninstall.PackageMetadata.Version)));
                                 result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                                 if (result.ExitCode == 0) result.ExitCode = 1;
                                 if (config.Features.StopOnFirstPackageFailure)
                                 {
-                                    throw new ApplicationException("Stopping further execution as {0} has failed uninstallation".format_with(packageToUninstall.Name.to_lower()));
+                                    throw new ApplicationException("Stopping further execution as {0} has failed uninstallation".format_with(packageToUninstall.Name));
                                 }
                                 // do not call continueAction - will result in multiple passes
                             }
@@ -1992,7 +1992,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                     else
                     {
                         // continue action won't be found b/c we are not actually uninstalling (this is noop)
-                        var result = packageResultsToReturn.GetOrAdd(installedPackage.Name.to_lower() + "." + installedPackage.Version.to_string(), new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id, installedPackage.PackageMetadata.Version)));
+                        var result = packageResultsToReturn.GetOrAdd(installedPackage.Name + "." + installedPackage.Version.to_string(), new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id, installedPackage.PackageMetadata.Version)));
                         if (continueAction != null) continueAction.Invoke(result, config);
                     }
                 }

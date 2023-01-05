@@ -54,17 +54,17 @@ namespace chocolatey.infrastructure.results
         {
             PackageMetadata = metadata;
             SearchMetadata = search;
-            Name = metadata.Id.to_lower();
+            Name = metadata.Id;
             Version = metadata.Version.to_string();
         }
 
-        public PackageResult(IPackageMetadata packageMetadata, string installLocation, string source = null) : this(packageMetadata.Id.to_lower(), packageMetadata.Version.to_string(), installLocation)
+        public PackageResult(IPackageMetadata packageMetadata, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.to_string(), installLocation)
         {
             PackageMetadata = packageMetadata;
             Source = source;
         }
 
-        public PackageResult(IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageSearch.Identity.Id.to_lower(), packageSearch.Identity.Version.to_string(), installLocation)
+        public PackageResult(IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageSearch.Identity.Id, packageSearch.Identity.Version.to_string(), installLocation)
         {
             SearchMetadata = packageSearch;
             Source = source;
@@ -103,7 +103,7 @@ namespace chocolatey.infrastructure.results
             */
         }
 
-        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageMetadata.Id.to_lower(), packageMetadata.Version.to_string(), installLocation)
+        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.to_string(), installLocation)
         {
             SearchMetadata = packageSearch;
             PackageMetadata = packageMetadata;
