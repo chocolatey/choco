@@ -141,6 +141,7 @@ namespace chocolatey.tests.integration
 
             var files = fileSystem.get_files(contextDir, "*.nuspec", SearchOption.AllDirectories);
 
+            config.PackCommand.PackThrowOnUnsupportedElements = false;
             var command = container.GetInstance<ChocolateyPackCommand>();
             foreach (var file in files.or_empty_list_if_null())
             {
@@ -148,6 +149,7 @@ namespace chocolatey.tests.integration
                 Console.WriteLine("Building {0}".format_with(file));
                 command.run(config);
             }
+            config.PackCommand.PackThrowOnUnsupportedElements = true;
 
             Console.WriteLine("Moving all nupkgs in {0} to context directory.".format_with(fileSystem.get_current_directory()));
             var nupkgs = fileSystem.get_files(fileSystem.get_current_directory(), "*.nupkg");
