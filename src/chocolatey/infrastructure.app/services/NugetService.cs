@@ -100,6 +100,11 @@ namespace chocolatey.infrastructure.app.services
             {
                 config.Sources = ApplicationParameters.PackagesLocation;
                 config.Prerelease = true;
+
+                if (!_fileSystem.directory_exists(ApplicationParameters.PackagesLocation))
+                {
+                    return 0;
+                }
             }
 
             int? pageValue = config.ListCommand.Page;
@@ -135,6 +140,11 @@ namespace chocolatey.infrastructure.app.services
                 config.Sources = ApplicationParameters.PackagesLocation;
                 config.Prerelease = true;
                 config.ListCommand.IncludeVersionOverrides = true;
+
+                if (!_fileSystem.directory_exists(ApplicationParameters.PackagesLocation))
+                {
+                    yield break;
+                }
             }
 
             if (config.RegularOutput) this.Log().Debug(() => "Running list with the following filter = '{0}'".format_with(config.Input));
