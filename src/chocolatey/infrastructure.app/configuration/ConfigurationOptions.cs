@@ -135,6 +135,7 @@ namespace chocolatey.infrastructure.app.configuration
         ///   Shows the help menu and prints the options
         /// </summary>
         /// <param name="optionSet">The option_set.</param>
+        /// <param name="helpMessage">The action that displays the message</param>
         private static void show_help(OptionSet optionSet, Action helpMessage)
         {
             if (helpMessage != null)

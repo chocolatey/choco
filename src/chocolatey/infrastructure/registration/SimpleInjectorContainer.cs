@@ -95,6 +95,7 @@ namespace chocolatey.infrastructure.registration
         /// </summary>
         /// <param name="componentRegistry">The component registry.</param>
         /// <param name="container">The container.</param>
+        /// <param name="extensions">Any extension libraries</param>
         private static void load_component_registry(Type componentRegistry, Container container, IEnumerable<ExtensionInformation> extensions)
         {
             if (componentRegistry == null)

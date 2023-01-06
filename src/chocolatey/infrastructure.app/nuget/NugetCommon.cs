@@ -348,7 +348,10 @@ namespace chocolatey.infrastructure.app.nuget
                         () => GetCredentialProvidersAsync(configuration)), false, true));
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously.
+        // We don't care about this method being synchronous because this is just used to pass in the credential provider to Lazy<ICredentialService>
         private static async Task<IEnumerable<ICredentialProvider>> GetCredentialProvidersAsync(ChocolateyConfiguration configuration)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             return new List<ICredentialProvider>() { new ChocolateyNugetCredentialProvider(configuration) };
         }

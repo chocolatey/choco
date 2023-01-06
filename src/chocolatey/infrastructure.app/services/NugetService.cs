@@ -39,7 +39,6 @@ namespace chocolatey.infrastructure.app.services
     using DateTime = adapters.DateTime;
     using Environment = System.Environment;
     using IFileSystem = filesystem.IFileSystem;
-    using chocolatey.infrastructure.app.utility;
     using NuGet.Common;
     using NuGet.Configuration;
     using NuGet.PackageManagement;
@@ -75,7 +74,6 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="nugetLogger">The nuget logger</param>
         /// <param name="packageInfoService">Package information service</param>
         /// <param name="filesService">The files service</param>
-        /// <param name="packageDownloader">The downloader used to download packages</param>
         public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService, IFilesService filesService)
         {
             _fileSystem = fileSystem;

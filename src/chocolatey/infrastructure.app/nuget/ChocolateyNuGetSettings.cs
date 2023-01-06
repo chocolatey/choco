@@ -14,7 +14,7 @@ namespace chocolatey.infrastructure.app.nuget
     {
         //private ClientPolicyContext
         private const string CONFIG_SECTION_NAME = "config";
-        private SettingSection _configSettingSection;
+        //private SettingSection _configSettingSection;
 
         public ChocolateyNuGetSettings(ChocolateyConfiguration config)
         {
@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.app.nuget
                 case CONFIG_SECTION_NAME:
                     //TODO fix
                     return null;
-                    break;
+                    //break;
                 default:
                     return null;
             }

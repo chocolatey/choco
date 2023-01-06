@@ -351,7 +351,7 @@ namespace chocolatey.infrastructure.registration
                             return resolvedAssembly.UnderlyingType;
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         // This catch statement is empty on purpose, we do
                         // not want to do anything if it fails to load.
