@@ -339,7 +339,10 @@ Pro / Business supports a single, ubiquitous install directory option.
             "$msiArgs $additionalInstallArgs"
         }
         else {
-            "$msiArgs $silentArgs $additionalInstallArgs"
+            "$msiArgs $silentArgs"
+            if ($additionalInstallArgs) {
+                " " + $additionalInstallArgs
+            }
         }
 
         $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
@@ -352,7 +355,10 @@ Pro / Business supports a single, ubiquitous install directory option.
             $msiArgs = "$msiArgs $additionalInstallArgs";
         }
         else {
-            $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
+            $msiArgs = "$msiArgs $silentArgs";
+            if ($additionalInstallArgs) {
+                $msiArgs += " " + $additionalInstallArgs
+            }
         }
 
         $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
@@ -364,7 +370,11 @@ Pro / Business supports a single, ubiquitous install directory option.
             $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $fileFullPath -validExitCodes $validExitCodes -workingDirectory $workingDirectory
         }
         else {
-            $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $fileFullPath -validExitCodes $validExitCodes -workingDirectory $workingDirectory
+            $exeArgs = $silentArgs
+            if ($additionalInstallArgs) {
+                $exeArgs += " " + $additionalInstallArgs
+            }
+            $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin -Statements "$exeArgs" -ExeToRun $fileFullPath -validExitCodes $validExitCodes -workingDirectory $workingDirectory
         }
     }
 
@@ -374,7 +384,10 @@ Pro / Business supports a single, ubiquitous install directory option.
             $msuArgs = "`"$fileFullPath`" $additionalInstallArgs"
         }
         else {
-            $msuArgs = "`"$fileFullPath`" $silentArgs $additionalInstallArgs"
+            $msuArgs = "`"$fileFullPath`" $silentArgs"
+            if ($additionalInstallArgs) {
+                $msuArgs += " " + $additionalInstallArgs
+            }
         }
         $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
     }
