@@ -66,14 +66,14 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
             # Get the features this way so we're working with the entire list, and not just what was in the config file initially.
             # We additionally want to ignore any presence of removed features
             # as these are not intended to work as expected, even when present.
-            $FeaturesToTest = (Invoke-Choco feature list -r).Lines | ConvertFrom-ChocolateyOutput -Command Feature | Where-Object Name -ne 'scriptsCheckLastExitCode'
+            $FeaturesToTest = (Invoke-Choco feature list -r).Lines | ConvertFrom-ChocolateyOutput -Command Feature | Where-Object Name -NE 'scriptsCheckLastExitCode'
         }
 
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
         }
 
-        Context "Enabling <_.Name> feature" -Foreach $FeaturesToTest {
+        Context "Enabling <_.Name> feature" -ForEach $FeaturesToTest {
             BeforeAll {
                 $Name = $_.Name
                 # Disable feature before trying to enable it.
@@ -90,7 +90,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
             }
         }
 
-        Context "Disabling <_.Name> feature" -Foreach $FeaturesToTest {
+        Context "Disabling <_.Name> feature" -ForEach $FeaturesToTest {
             BeforeAll {
                 $Name = $_.Name
                 # Enable feature before trying to enable it.

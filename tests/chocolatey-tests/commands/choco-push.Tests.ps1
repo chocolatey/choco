@@ -39,8 +39,8 @@ Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY
 
             $NewChocolateyTestPackage = @{
                 TestPath = "$PSScriptRoot\testpackages"
-                Name = $PackageUnderTest
-                Version = $VersionUnderTest
+                Name     = $PackageUnderTest
+                Version  = $VersionUnderTest
             }
             New-ChocolateyTestPackage @NewChocolateyTestPackage
 
@@ -70,8 +70,8 @@ Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY
 
             $NewChocolateyTestPackage = @{
                 TestPath = "$PSScriptRoot\testpackages"
-                Name = $PackageUnderTest
-                Version = $VersionUnderTest
+                Name     = $PackageUnderTest
+                Version  = $VersionUnderTest
             }
             New-ChocolateyTestPackage @NewChocolateyTestPackage
 
@@ -101,8 +101,8 @@ Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY
 
             $NewChocolateyTestPackage = @{
                 TestPath = "$PSScriptRoot\testpackages"
-                Name = $PackageUnderTest
-                Version = $VersionUnderTest
+                Name     = $PackageUnderTest
+                Version  = $VersionUnderTest
             }
             New-ChocolateyTestPackage @NewChocolateyTestPackage
 

@@ -110,7 +110,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it requires signed executables.
-    Context "File signing (<_.FullName>)" -Foreach @($PowerShellFiles; $ExecutableFiles; $StrongNamingKeyFiles) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0"))) {
+    Context "File signing (<_.FullName>)" -ForEach @($PowerShellFiles; $ExecutableFiles; $StrongNamingKeyFiles) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0"))) {
         BeforeAll {
             $FileUnderTest = $_
             $SignerCert = (Get-AuthenticodeSignature (Get-ChocoPath)).SignerCertificate
@@ -146,7 +146,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     }
 
-    Context "PowerShell script formatting (<_.FullName>)" -Foreach $PowerShellFiles {
+    Context "PowerShell script formatting (<_.FullName>)" -ForEach $PowerShellFiles {
         BeforeAll {
             $FileUnderTest = $_
         }
@@ -258,7 +258,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it requires signed executables
-    Context 'Ensure we <Removal> shims during upgrade' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -Foreach @(
+    Context 'Ensure we <Removal> shims during upgrade' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -ForEach @(
         @{
             RemovedShims = $RemovedShims
             Signed       = $true
@@ -320,7 +320,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'Get-FileEncoding works under <_>' -Tag PowerShell7 -Foreach @(
+    Context 'Get-FileEncoding works under <_>' -Tag PowerShell7 -ForEach @(
         'pwsh'
         'powershell'
     ) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {

@@ -14,7 +14,7 @@ Describe "Python Source" -Tag Chocolatey, UpgradeCommand, PythonSource -Skip:(-n
         Remove-ChocolateyTestInstall
     }
 
-    Context "upgrade <Argument>" -Foreach @(
+    Context "upgrade <Argument>" -ForEach @(
         @{ Argument = 'all' ; ExitCode = 1 ; Count = 0 }
         @{ Argument = 'wheel' ; ExitCode = 0 ; Count = 1 }
     )  -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0')) {

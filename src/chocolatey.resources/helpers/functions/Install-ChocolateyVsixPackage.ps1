@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Install-ChocolateyVsixPackage {
-<#
+    <#
 .SYNOPSIS
 Downloads and installs a VSIX package for Visual Studio
 
@@ -136,16 +136,16 @@ Install-ChocolateyInstallPackage
 .LINK
 Install-ChocolateyZipPackage
 #>
-param(
-  [alias("name")][parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [alias("url")][parameter(Mandatory=$false, Position=1)][string] $vsixUrl,
-  [alias("visualStudioVersion")][parameter(Mandatory=$false, Position=2)][int] $vsVersion = 0,
-  [parameter(Mandatory=$false)][string] $checksum = '',
-  [parameter(Mandatory=$false)][string] $checksumType = '',
-  [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
-  [alias("fileFullPath")][parameter(Mandatory=$false)][string] $file = '',
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param(
+        [alias("name")][parameter(Mandatory = $true, Position = 0)][string] $packageName,
+        [alias("url")][parameter(Mandatory = $false, Position = 1)][string] $vsixUrl,
+        [alias("visualStudioVersion")][parameter(Mandatory = $false, Position = 2)][int] $vsVersion = 0,
+        [parameter(Mandatory = $false)][string] $checksum = '',
+        [parameter(Mandatory = $false)][string] $checksumType = '',
+        [parameter(Mandatory = $false)][hashtable] $options = @{Headers = @{} },
+        [alias("fileFullPath")][parameter(Mandatory = $false)][string] $file = '',
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
     Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
@@ -153,49 +153,46 @@ param(
         $vsixUrl = $file
     }
 
-    if($vsVersion -eq 0) {
-        if ([System.IntPtr]::Size -eq 4)
-        {
+    if ($vsVersion -eq 0) {
+        if ([System.IntPtr]::Size -eq 4) {
             <# 32bits system case #>
             $versions = Get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue |
-              Where-Object { ($_.PSChildName -match "^[0-9\.]+$") } |
-              Where-Object { $_.property -contains "InstallDir" } |
-              Sort-Object { [int]($_.PSChildName) } -descending
+                Where-Object { ($_.PSChildName -match "^[0-9\.]+$") } |
+                Where-Object { $_.property -contains "InstallDir" } |
+                Sort-Object { [int]($_.PSChildName) } -Descending
         }
-        else
-        {
-            $versions=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName -match "^[0-9\.]+$") } | Where-Object {$_.property -contains "InstallDir"} | Sort-Object {[int]($_.PSChildName)} -descending)
+        else {
+            $versions = (Get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName -match "^[0-9\.]+$") } | Where-Object { $_.property -contains "InstallDir" } | Sort-Object { [int]($_.PSChildName) } -Descending)
         }
-        if($versions -and $versions.Length){
+        if ($versions -and $versions.Length) {
             $version = $versions[0]
-        }elseif($versions){
+        }
+        elseif ($versions) {
             $version = $versions
         }
     }
     else {
-        if ([System.IntPtr]::Size -eq 4)
-        {
+        if ([System.IntPtr]::Size -eq 4) {
             <# 32bits system case #>
-            $versions=(get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName.EndsWith("$vsVersion.0")) } | Where-Object {$_.property -contains "InstallDir"})
+            $versions = (Get-ChildItem HKLM:SOFTWARE\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName.EndsWith("$vsVersion.0")) } | Where-Object { $_.property -contains "InstallDir" })
         }
-        else
-        {
-            $version=(get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName.EndsWith("$vsVersion.0")) } | Where-Object {$_.property -contains "InstallDir"})
+        else {
+            $version = (Get-ChildItem HKLM:SOFTWARE\Wow6432Node\Microsoft\VisualStudio -ErrorAction SilentlyContinue | Where-Object { ($_.PSChildName.EndsWith("$vsVersion.0")) } | Where-Object { $_.property -contains "InstallDir" })
         }
     }
 
     if ($version) {
-        $vnum=$version.PSPath.Substring($version.PSPath.LastIndexOf('\')+1)
-        if($vnum -as [int] -lt 10) {
+        $vnum = $version.PSPath.Substring($version.PSPath.LastIndexOf('\') + 1)
+        if ($vnum -as [int] -lt 10) {
             throw "This installed VS version, $vnum, does not support installing VSIX packages. Version 10 is the minimum acceptable version."
         }
-        $dir=(get-itemProperty $version.PSPath "InstallDir").InstallDir
+        $dir = (Get-ItemProperty $version.PSPath "InstallDir").InstallDir
         $installer = Join-Path $dir "VsixInstaller.exe"
     }
 
     if ($installer) {
-        $download="$env:TEMP\$($packageName.Replace(' ','')).vsix"
-        try{
+        $download = "$env:TEMP\$($packageName.Replace(' ','')).vsix"
+        try {
             Get-ChocolateyWebFile $packageName $download $vsixUrl -checksum $checksum -checksumType $checksumType -Options $options
         }
         catch {
@@ -204,8 +201,9 @@ param(
 
         Write-Debug "Installing VSIX using $installer"
         $exitCode = Install-Vsix "$installer" "$download"
-        if($exitCode -gt 0 -and $exitCode -ne 1001) { #1001: Already installed
-           throw "There was an error installing '$packageName'. The exit code returned was $exitCode."
+        if ($exitCode -gt 0 -and $exitCode -ne 1001) {
+            #1001: Already installed
+            throw "There was an error installing '$packageName'. The exit code returned was $exitCode."
         }
     }
     else {

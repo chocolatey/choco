@@ -46,7 +46,7 @@ Param(
     [Alias("WhatIf", "Noop")]
     [switch]$DryRun,
     [switch]$SkipToolPackageRestore,
-    [Parameter(Position=0,Mandatory=$false,ValueFromRemainingArguments=$true)]
+    [Parameter(Position = 0, Mandatory = $false, ValueFromRemainingArguments = $true)]
     [string[]]$ScriptArgs
 )
 
@@ -54,44 +54,38 @@ Param(
 # PowerShell will not set this by default (until maybe .NET 4.6.x). This
 # will typically produce a message for PowerShell v2 (just an info
 # message though)
-try
-{
+try {
     # Set TLS 1.2 (3072), then TLS 1.1 (768), then TLS 1.0 (192), finally SSL 3.0 (48)
     # Use integers because the enumeration values for TLS 1.2 and TLS 1.1 won't
     # exist in .NET 4.0, even though they are addressable if .NET 4.5+ is
     # installed (.NET 4.5 is an in-place upgrade).
     [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192
-} catch {
+}
+catch {
     Write-Output 'Unable to set PowerShell to use TLS 1.2 and TLS 1.1 due to old .NET Framework installed. If you see underlying connection closed or trust errors, you may need to upgrade to .NET Framework 4.5+ and PowerShell v3'
 }
 
 [Reflection.Assembly]::LoadWithPartialName("System.Security") | Out-Null
-function MD5HashFile([string] $filePath)
-{
-    if ([string]::IsNullOrEmpty($filePath) -or !(Test-Path $filePath -PathType Leaf))
-    {
+function MD5HashFile([string] $filePath) {
+    if ([string]::IsNullOrEmpty($filePath) -or !(Test-Path $filePath -PathType Leaf)) {
         return $null
     }
 
     [System.IO.Stream] $file = $null;
     [System.Security.Cryptography.MD5] $md5 = $null;
-    try
-    {
+    try {
         $md5 = [System.Security.Cryptography.MD5]::Create()
         $file = [System.IO.File]::OpenRead($filePath)
         return [System.BitConverter]::ToString($md5.ComputeHash($file))
     }
-    finally
-    {
-        if ($file -ne $null)
-        {
+    finally {
+        if ($file -ne $null) {
             $file.Dispose()
         }
     }
 }
 
-function GetProxyEnabledWebClient
-{
+function GetProxyEnabledWebClient {
     $wc = New-Object System.Net.WebClient
     $proxy = [System.Net.WebRequest]::GetSystemWebProxy()
     $proxy.Credentials = [System.Net.CredentialCache]::DefaultCredentials
@@ -101,7 +95,7 @@ function GetProxyEnabledWebClient
 
 Write-Host "Preparing to run build script..."
 
-if(!$PSScriptRoot){
+if (!$PSScriptRoot) {
     $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
 }
 
@@ -119,7 +113,7 @@ $MODULES_PACKAGES_CONFIG = Join-Path $MODULES_DIR "packages.config"
 # Make sure tools folder exists
 if ((Test-Path $PSScriptRoot) -and !(Test-Path $TOOLS_DIR)) {
     Write-Verbose -Message "Creating tools directory..."
-    New-Item -Path $TOOLS_DIR -Type directory | out-null
+    New-Item -Path $TOOLS_DIR -Type directory | Out-Null
 }
 
 # Make sure that packages.config exist.
@@ -128,7 +122,8 @@ if (!(Test-Path $PACKAGES_CONFIG)) {
     try {
         $wc = GetProxyEnabledWebClient
         $wc.DownloadFile("https://cakebuild.net/download/bootstrapper/packages", $PACKAGES_CONFIG)
-    } catch {
+    }
+    catch {
         Throw "Could not download packages.config."
     }
 }
@@ -137,7 +132,7 @@ if (!(Test-Path $PACKAGES_CONFIG)) {
 if (!(Test-Path $NUGET_EXE)) {
     Write-Verbose -Message "Trying to find nuget.exe in PATH..."
     $existingPaths = $Env:Path -Split ';' | Where-Object { (![string]::IsNullOrEmpty($_)) -and (Test-Path $_ -PathType Container) }
-    $NUGET_EXE_IN_PATH = Get-ChildItem -Path $existingPaths -Filter "nuget.exe" | Select -First 1
+    $NUGET_EXE_IN_PATH = Get-ChildItem -Path $existingPaths -Filter "nuget.exe" | Select-Object -First 1
     if ($NUGET_EXE_IN_PATH -ne $null -and (Test-Path $NUGET_EXE_IN_PATH.FullName)) {
         Write-Verbose -Message "Found in PATH at $($NUGET_EXE_IN_PATH.FullName)."
         $NUGET_EXE = $NUGET_EXE_IN_PATH.FullName
@@ -150,7 +145,8 @@ if (!(Test-Path $NUGET_EXE)) {
     try {
         $wc = GetProxyEnabledWebClient
         $wc.DownloadFile($NUGET_URL, $NUGET_EXE)
-    } catch {
+    }
+    catch {
         Throw "Could not download NuGet.exe."
     }
 }
@@ -159,17 +155,17 @@ if (!(Test-Path $NUGET_EXE)) {
 $ENV:NUGET_EXE = $NUGET_EXE
 
 # Restore tools from NuGet?
-if(-Not $SkipToolPackageRestore.IsPresent) {
+if (-Not $SkipToolPackageRestore.IsPresent) {
     Push-Location
     Set-Location $TOOLS_DIR
 
     # Check for changes in packages.config and remove installed tools if true.
     [string] $md5Hash = MD5HashFile($PACKAGES_CONFIG)
-    if((!(Test-Path $PACKAGES_CONFIG_MD5)) -Or
+    if ((!(Test-Path $PACKAGES_CONFIG_MD5)) -Or
       ($md5Hash -ne (Get-Content $PACKAGES_CONFIG_MD5 ))) {
         Write-Verbose -Message "Missing or changed package.config hash..."
-        Get-ChildItem -Exclude packages.config,nuget.exe,Cake.Bakery |
-        Remove-Item -Recurse
+        Get-ChildItem -Exclude packages.config, nuget.exe, Cake.Bakery |
+            Remove-Item -Recurse
     }
 
     Write-Verbose -Message "Restoring tools from NuGet..."
@@ -178,11 +174,10 @@ if(-Not $SkipToolPackageRestore.IsPresent) {
     if ($LASTEXITCODE -ne 0) {
         Throw "An error occurred while restoring NuGet tools."
     }
-    else
-    {
+    else {
         $md5Hash | Out-File $PACKAGES_CONFIG_MD5 -Encoding "ASCII"
     }
-    Write-Verbose -Message ($NuGetOutput | out-string)
+    Write-Verbose -Message ($NuGetOutput | Out-String)
 
     Pop-Location
 }
@@ -199,7 +194,7 @@ if (Test-Path $ADDINS_PACKAGES_CONFIG) {
         Throw "An error occurred while restoring NuGet addins."
     }
 
-    Write-Verbose -Message ($NuGetOutput | out-string)
+    Write-Verbose -Message ($NuGetOutput | Out-String)
 
     Pop-Location
 }
@@ -216,7 +211,7 @@ if (Test-Path $MODULES_PACKAGES_CONFIG) {
         Throw "An error occurred while restoring NuGet modules."
     }
 
-    Write-Verbose -Message ($NuGetOutput | out-string)
+    Write-Verbose -Message ($NuGetOutput | Out-String)
 
     Pop-Location
 }
@@ -230,19 +225,28 @@ if (!(Test-Path $CAKE_EXE)) {
 
 # Build Cake arguments
 $cakeArguments = @("$Script");
-if ($Target) { $cakeArguments += "-target=$Target" }
-if ($Configuration) { $cakeArguments += "-configuration=$Configuration" }
-if ($Verbosity) { $cakeArguments += "-verbosity=$Verbosity" }
-if ($ShowDescription) { $cakeArguments += "-showdescription" }
-if ($DryRun) { $cakeArguments += "-dryrun" }
+if ($Target) {
+    $cakeArguments += "-target=$Target"
+}
+if ($Configuration) {
+    $cakeArguments += "-configuration=$Configuration"
+}
+if ($Verbosity) {
+    $cakeArguments += "-verbosity=$Verbosity"
+}
+if ($ShowDescription) {
+    $cakeArguments += "-showdescription"
+}
+if ($DryRun) {
+    $cakeArguments += "-dryrun"
+}
 $cakeArguments += $ScriptArgs
 
 # Start Cake
 Write-Host "Running build script..."
 
 & "$CAKE_EXE" ./recipe.cake --bootstrap
-if ($LASTEXITCODE -eq 0)
-{
+if ($LASTEXITCODE -eq 0) {
     & "$CAKE_EXE" $cakeArguments
 }
 

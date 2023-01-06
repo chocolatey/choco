@@ -10,7 +10,7 @@
     param(
         [NuGet.Versioning.SemanticVersion]$Version
     )
-    $installedVersion = ((Invoke-Choco list -lo -r).Lines | ConvertFrom-ChocolateyOutput -Command List | Where-Object Name -eq 'chocolatey').Version
+    $installedVersion = ((Invoke-Choco list -lo -r).Lines | ConvertFrom-ChocolateyOutput -Command List | Where-Object Name -EQ 'chocolatey').Version
 
     return Test-VersionEqualOrHigher -InstalledVersion $installedVersion -CompareVersion $Version
 }

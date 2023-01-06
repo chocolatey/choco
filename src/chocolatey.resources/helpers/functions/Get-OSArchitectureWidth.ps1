@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Get-OSArchitectureWidth {
-<#
+    <#
 .SYNOPSIS
 Get the operating system architecture address width.
 
@@ -46,40 +46,43 @@ None
 This optional parameter causes the function to return $true or $false,
 depending on whether or not the bit width matches.
 #>
-param(
-  $compare
-)
+    param(
+        $compare
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  $bits = 64
-  if (([System.IntPtr]::Size -eq 4) -and (Test-Path env:\PROCESSOR_ARCHITEW6432)) {
     $bits = 64
-  } elseif ([System.IntPtr]::Size -eq 4) {
-    $bits = 32
-  } 
+    if (([System.IntPtr]::Size -eq 4) -and (Test-Path env:\PROCESSOR_ARCHITEW6432)) {
+        $bits = 64
+    }
+    elseif ([System.IntPtr]::Size -eq 4) {
+        $bits = 32
+    }
 
-  # ARM64 has a x86 32bit emulator, so we need to select 32 bit if we detect 
-  # ARM64 - According to Microsoft on 2019 APR 18 (jkunkee), there are no 
-  # current plans to ship 64-bit emulation for ARM64.
-  $processorArchitecture = $env:PROCESSOR_ARCHITECTURE
-  if ($processorArchitecture -and $processorArchitecture -eq 'ARM64') {
-    $bits = 32
-  }
+    # ARM64 has a x86 32bit emulator, so we need to select 32 bit if we detect
+    # ARM64 - According to Microsoft on 2019 APR 18 (jkunkee), there are no
+    # current plans to ship 64-bit emulation for ARM64.
+    $processorArchitecture = $env:PROCESSOR_ARCHITECTURE
+    if ($processorArchitecture -and $processorArchitecture -eq 'ARM64') {
+        $bits = 32
+    }
 
-  $processorArchiteW6432 = $env:PROCESSOR_ARCHITEW6432
-  if ($processorArchiteW6432 -and $processorArchiteW6432 -eq 'ARM64') {
-    $bits = 32
-  }
+    $processorArchiteW6432 = $env:PROCESSOR_ARCHITEW6432
+    if ($processorArchiteW6432 -and $processorArchiteW6432 -eq 'ARM64') {
+        $bits = 32
+    }
 
-  # Return bool|int
-  if ("$compare" -ne '' -and $compare -eq $bits) {
-    return $true
-  } elseif ("$compare" -ne '') {
-    return $false
-  } else {
-    return $bits
-  }
+    # Return bool|int
+    if ("$compare" -ne '' -and $compare -eq $bits) {
+        return $true
+    }
+    elseif ("$compare" -ne '') {
+        return $false
+    }
+    else {
+        return $bits
+    }
 }
 
 Set-Alias Get-ProcessorBits Get-OSArchitectureWidth

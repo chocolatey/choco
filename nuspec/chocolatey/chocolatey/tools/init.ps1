@@ -1,20 +1,20 @@
 ﻿param($installPath, $toolsPath, $package, $project)
 
 $modules = Get-ChildItem $ToolsPath -Filter *.psm1
-$modules | ForEach-Object { import-module -name  $_.FullName }
+$modules | ForEach-Object { Import-Module -Name  $_.FullName }
 
 @"
 ========================
 Chocolatey
 ========================
-Welcome to Chocolatey, your local machine repository built on the NuGet infrastructure. Chocolatey allows you to install application packages to your machine with the goodness of a #chocolatey #nuget combo. 
+Welcome to Chocolatey, your local machine repository built on the NuGet infrastructure. Chocolatey allows you to install application packages to your machine with the goodness of a #chocolatey #nuget combo.
 Application executables get added to the path automatically so you can call them from anywhere (command line/powershell prompt), not just in Visual Studio.
 
 Lets get Chocolatey!
 ----------
 Visual Studio -
 ----------
-Please run Initialize-Chocolatey one time per machine to set up the repository. 
+Please run Initialize-Chocolatey one time per machine to set up the repository.
 If you are upgrading, please remember to run Initialize-Chocolatey again.
 After you have run Initialize-Chocolatey, you can safely uninstall the chocolatey package from your current Visual Studio solution.
 ----------

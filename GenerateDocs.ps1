@@ -19,7 +19,7 @@
 
 $ErrorActionPreference = 'Stop'
 
-$thisDirectory = (Split-Path -parent $MyInvocation.MyCommand.Definition);
+$thisDirectory = (Split-Path -Parent $MyInvocation.MyCommand.Definition);
 $psModuleName = 'chocolateyInstaller'
 $psModuleLocation = [System.IO.Path]::GetFullPath("$thisDirectory\src\chocolatey.resources\helpers\chocolateyInstaller.psm1")
 $docsFolder = [System.IO.Path]::GetFullPath("$thisDirectory\docs\generated")
@@ -96,20 +96,20 @@ These are the functions from above as one list.
 
 '@
 
-function Get-Aliases($commandName){
+function Get-Aliases($commandName) {
 
-  $aliasOutput = ''
-  Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | ForEach-Object { $aliasOutput += "``$($_.Name)``$lineFeed"}
+    $aliasOutput = ''
+    Get-Alias -Definition $commandName -ErrorAction SilentlyContinue | ForEach-Object { $aliasOutput += "``$($_.Name)``$lineFeed" }
 
-  if ($aliasOutput -eq $null -or $aliasOutput -eq '') {
-    $aliasOutput = 'None'
-  }
+    if ($aliasOutput -eq $null -or $aliasOutput -eq '') {
+        $aliasOutput = 'None'
+    }
 
-  Write-Output $aliasOutput
+    Write-Output $aliasOutput
 }
 
 function Convert-Example($objItem) {
-  @"
+    @"
 **$($objItem.title.Replace('-','').Trim())**
 
 ~~~powershell
@@ -120,69 +120,85 @@ $($objItem.remarks | Where-Object { $_.Text } | ForEach-Object { $_.Text.Replace
 }
 
 function Replace-CommonItems($text) {
-  if ($text -eq $null) {return $text}
+    if ($text -eq $null) {
+        return $text
+    }
 
-  $text = $text.Replace("`n",$lineFeed)
-  $text = $text -replace "\*\*NOTE:\*\*", '> :choco-info: **NOTE**
+    $text = $text.Replace("`n", $lineFeed)
+    $text = $text -replace "\*\*NOTE:\*\*", '> :choco-info: **NOTE**
 >
 >'
-  $text = $text -replace '(community feed[s]?[^\]]|community repository)', '[$1](https://community.chocolatey.org/packages)'
-  $text = $text -replace '(Chocolatey for Business|Chocolatey Professional|Chocolatey Pro)(?=[^\w])', '[$1](https://chocolatey.org/compare)'
-  $text = $text -replace '(Pro[fessional]\s?/\s?Business)', '[$1](https://chocolatey.org/compare)'
-  $text = $text -replace '([Ll]icensed editions)', '[$1](https://chocolatey.org/compare)'
-  $text = $text -replace '([Ll]icensed versions)', '[$1](https://chocolatey.org/compare)'
-  $text = $text -replace '\(https://docs.chocolatey.org/en-us/create/automatic-packages\)', '(xref:automatic-packaging)'
-  $text = $text -replace 'Learn more about using this at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument', '[Learn more](xref:parse-package-parameters)'
-  $text = $text -replace 'at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument#step-3---use-core-community-extension', 'in [the docs](xref:parse-package-parameters#step-3-use-core-community-extension)'
-  $text = $text -replace 'https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument', 'https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument'
-  $text = $text -replace '\[community feed\)\]\(https://community.chocolatey.org/packages\)', '[community feed](https://community.chocolatey.org/packages))'
+    $text = $text -replace '(community feed[s]?[^\]]|community repository)', '[$1](https://community.chocolatey.org/packages)'
+    $text = $text -replace '(Chocolatey for Business|Chocolatey Professional|Chocolatey Pro)(?=[^\w])', '[$1](https://chocolatey.org/compare)'
+    $text = $text -replace '(Pro[fessional]\s?/\s?Business)', '[$1](https://chocolatey.org/compare)'
+    $text = $text -replace '([Ll]icensed editions)', '[$1](https://chocolatey.org/compare)'
+    $text = $text -replace '([Ll]icensed versions)', '[$1](https://chocolatey.org/compare)'
+    $text = $text -replace '\(https://docs.chocolatey.org/en-us/create/automatic-packages\)', '(xref:automatic-packaging)'
+    $text = $text -replace 'Learn more about using this at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument', '[Learn more](xref:parse-package-parameters)'
+    $text = $text -replace 'at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument#step-3---use-core-community-extension', 'in [the docs](xref:parse-package-parameters#step-3-use-core-community-extension)'
+    $text = $text -replace 'https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument', 'https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument'
+    $text = $text -replace '\[community feed\)\]\(https://community.chocolatey.org/packages\)', '[community feed](https://community.chocolatey.org/packages))'
 
-  Write-Output $text
+    Write-Output $text
 }
 
 function Convert-Syntax($objItem, $hasCmdletBinding) {
-  $cmd = $objItem.Name
+    $cmd = $objItem.Name
 
-  if ($objItem.parameter -ne $null) {
-    $objItem.parameter | ForEach-Object {
-      $cmd += ' `' + $lineFeed
-      $cmd += "  "
-      if ($_.required -eq $false) { $cmd += '['}
-      $cmd += "-$($_.name.substring(0,1).toupper() + $_.name.substring(1))"
+    if ($objItem.parameter -ne $null) {
+        $objItem.parameter | ForEach-Object {
+            $cmd += ' `' + $lineFeed
+            $cmd += "  "
+            if ($_.required -eq $false) {
+                $cmd += '['
+            }
+            $cmd += "-$($_.name.substring(0,1).toupper() + $_.name.substring(1))"
 
 
-      if ($_.parameterValue -ne $null) { $cmd += " <$($_.parameterValue)>" }
-      if ($_.parameterValueGroup -ne $null) { $cmd += " {" + ($_.parameterValueGroup.parameterValue -join ' | ') + "}"}
-      if ($_.required -eq $false) { $cmd += ']'}
+            if ($_.parameterValue -ne $null) {
+                $cmd += " <$($_.parameterValue)>"
+            }
+            if ($_.parameterValueGroup -ne $null) {
+                $cmd += " {" + ($_.parameterValueGroup.parameterValue -join ' | ') + "}"
+            }
+            if ($_.required -eq $false) {
+                $cmd += ']'
+            }
+        }
     }
-  }
-  if ($hasCmdletBinding) { $cmd += " [<CommonParameters>]"}
-  Write-Output "$lineFeed~~~powershell$lineFeed$($cmd)$lineFeed~~~"
+    if ($hasCmdletBinding) {
+        $cmd += " [<CommonParameters>]"
+    }
+    Write-Output "$lineFeed~~~powershell$lineFeed$($cmd)$lineFeed~~~"
 }
 
 function Convert-Parameter($objItem, $commandName) {
-  $paramText = $lineFeed + "###  -$($objItem.name.substring(0,1).ToUpper() + $objItem.name.substring(1))"
-  if ( ($objItem.parameterValue -ne $null) -and ($objItem.parameterValue -ne 'SwitchParameter') ) {
-    $paramText += ' '
-    if ([string]($objItem.required) -eq 'false') { $paramText += "["}
-    $paramText += "&lt;$($objItem.parameterValue)&gt;"
-    if ([string]($objItem.required) -eq 'false') { $paramText += "]"}
-  }
-  $paramText += $lineFeed
-  if ($objItem.description -ne $null) {
-    $parmText += (($objItem.description | ForEach-Object { Replace-CommonItems $_.Text }) -join "$lineFeed") + $lineFeed + $lineFeed
-  }
-  if ($objItem.parameterValueGroup -ne $null) {
-    $paramText += "$($lineFeed)Valid options: " + ($objItem.parameterValueGroup.parameterValue -join ", ") + $lineFeed + $lineFeed
-  }
+    $paramText = $lineFeed + "###  -$($objItem.name.substring(0,1).ToUpper() + $objItem.name.substring(1))"
+    if ( ($objItem.parameterValue -ne $null) -and ($objItem.parameterValue -ne 'SwitchParameter') ) {
+        $paramText += ' '
+        if ([string]($objItem.required) -eq 'false') {
+            $paramText += "["
+        }
+        $paramText += "&lt;$($objItem.parameterValue)&gt;"
+        if ([string]($objItem.required) -eq 'false') {
+            $paramText += "]"
+        }
+    }
+    $paramText += $lineFeed
+    if ($objItem.description -ne $null) {
+        $parmText += (($objItem.description | ForEach-Object { Replace-CommonItems $_.Text }) -join "$lineFeed") + $lineFeed + $lineFeed
+    }
+    if ($objItem.parameterValueGroup -ne $null) {
+        $paramText += "$($lineFeed)Valid options: " + ($objItem.parameterValueGroup.parameterValue -join ", ") + $lineFeed + $lineFeed
+    }
 
-  $aliases = [string]((Get-Command -Name $commandName).parameters."$($objItem.Name)".Aliases -join ', ')
-  $required = [string]($objItem.required)
-  $position = [string]($objItem.position)
-  $defValue = [string]($objItem.defaultValue)
-  $acceptPipeline = [string]($objItem.pipelineInput)
+    $aliases = [string]((Get-Command -Name $commandName).parameters."$($objItem.Name)".Aliases -join ', ')
+    $required = [string]($objItem.required)
+    $position = [string]($objItem.position)
+    $defValue = [string]($objItem.defaultValue)
+    $acceptPipeline = [string]($objItem.pipelineInput)
 
-  $padding = ($aliases.Length, $required.Length, $position.Length, $defValue.Length, $acceptPipeline.Length | Measure-Object -Maximum).Maximum
+    $padding = ($aliases.Length, $required.Length, $position.Length, $defValue.Length, $acceptPipeline.Length | Measure-Object -Maximum).Maximum
 
     $paramText += @"
 Property               | Value
@@ -195,58 +211,58 @@ Accept Pipeline Input? | $($acceptPipeline)
 
 "@
 
-  Write-Output $paramText
+    Write-Output $paramText
 }
 
 function Convert-CommandText {
-param(
-  [string]$commandText,
-  [string]$commandName = ''
-)
-  if ( $commandText -match '^\s?NOTE: Options and switches apply to all items passed, so if you are\s?$' `
-   -or $commandText -match '^\s?installing multiple packages, and you use \`\-\-version\=1\.0\.0\`, it is\s?$' `
-   -or $commandText -match '^\s?going to look for and try to install version 1\.0\.0 of every package\s?$' `
-   -or $commandText -match '^\s?passed\. So please split out multiple package calls when wanting to\s?$' `
-   -or $commandText -match '^\s?pass specific options\.\s?$' `
-     ) {
-    return
-  }
-  $commandText = $commandText -creplace '^(.+)(\s+Command\s*)$', "# `$1`$2 (choco $commandName)"
-  $commandText = $commandText -creplace '^(DEPRECATION NOTICE|Usage|Troubleshooting|Examples|Exit Codes|Connecting to Chocolatey.org|See It In Action|Alternative Sources|Resources|Packages.config|Scripting \/ Integration - Best Practices \/ Style Guide)', '## $1'
-  $commandText = $commandText -replace '^(Commands|How To Pass Options)', '## $1'
-  $commandText = $commandText -replace '^(WebPI|Windows Features|Ruby|Cygwin|Python)\s*$', '### $1'
-  $commandText = $commandText -replace '(?<!\s)NOTE:', '> :choco-info: **NOTE**'
-  $commandText = $commandText -replace '\*> :choco-info: \*\*NOTE\*\*\*', '> :choco-info: **NOTE**'
-  $commandText = $commandText -replace 'the command reference', '[how to pass arguments](xref:choco-commands#how-to-pass-options-switches)'
-  $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://community.chocolatey.org/packages)'
-  #$commandText = $commandText -replace '\`(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[[`$1`|Commands$1]]'
-  $commandText = $commandText -replace '\`([choco\s]*)(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[`$1$2`](xref:choco-command-$2)'
-  $commandText = $commandText -replace '^(.+):\s(.+.gif)$', '![$1]($2)'
-  $commandText = $commandText -replace '^(\s+)\<\?xml', "~~~xml$lineFeed`$1<?xml"
-  $commandText = $commandText -replace '^(\s+)</packages>', "`$1</packages>$lineFeed~~~"
-  $commandText = $commandText -replace '(Chocolatey for Business|Chocolatey Professional|Chocolatey Pro)(?=[^\w])', '[$1](https://chocolatey.org/compare)'
-  $commandText = $commandText -replace '(Pro[fessional]\s?/\s?Business)', '[$1](https://chocolatey.org/compare)'
-  $commandText = $commandText -replace '([Ll]icensed editions)', '[$1](https://chocolatey.org/compare)'
-  $commandText = $commandText -replace '([Ll]icensed versions)', '[$1](https://chocolatey.org/compare)'
-  $commandText = $commandText -replace 'https://raw.githubusercontent.com/wiki/chocolatey/choco/images', '/assets/images'
-  $commandText = $commandText -replace 'https://chocolatey.org/docs/features-automatically-recompile-packages', 'https://docs.chocolatey.org/en-us/guides/create/recompile-packages'
-  $commandText = $commandText -replace 'https://chocolatey.org/docs/features-private-cdn', 'https://docs.chocolatey.org/en-us/features/private-cdn'
-  $commandText = $commandText -replace 'https://chocolatey.org/docs/features-virus-check', 'https://docs.chocolatey.org/en-us/features/virus-check'
-  $commandText = $commandText -replace 'https://chocolatey.org/docs/features-synchronize', 'https://docs.chocolatey.org/en-us/features/package-synchronization'
-  $commandText = $commandText -replace 'explicity', 'explicit'
-  $commandText = $commandText -replace 'https://chocolatey.org/docs/features-create-packages-from-installers', 'https://docs.chocolatey.org/en-us/features/package-builder'
-  $commandText = $commandText -replace 'See https://chocolatey.org/docs/features-create-packages-from-installers', 'See more information about [Package Builder features](xref:package-builder)'
-  $commandText = $commandText -replace 'See https://docs.chocolatey.org/en-us/features/package-builder', 'See more information about [Package Builder features](xref:package-builder)'
-  $commandText = $commandText -replace 'https://chocolatey.org/docs/features-install-directory-override', 'https://docs.chocolatey.org/en-us/features/install-directory-override'
-  $commandText = $commandText -replace 'y.org/docs/features-package-reducer', 'y.org/docs/en-us/features/package-reducer'
-  $commandText = $commandText -replace 'https://chocolatey.org/docs/features-package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
-  $commandText = $commandText -replace 'https://chocolatey.org/docs/en-us/features/package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
-  $commandText = $commandText -replace '\[community feed\)\]\(https://community.chocolatey.org/packages\)', '[community feed](https://community.chocolatey.org/packages))'
+    param(
+        [string]$commandText,
+        [string]$commandName = ''
+    )
+    if ( $commandText -match '^\s?NOTE: Options and switches apply to all items passed, so if you are\s?$' `
+            -or $commandText -match '^\s?installing multiple packages, and you use \`\-\-version\=1\.0\.0\`, it is\s?$' `
+            -or $commandText -match '^\s?going to look for and try to install version 1\.0\.0 of every package\s?$' `
+            -or $commandText -match '^\s?passed\. So please split out multiple package calls when wanting to\s?$' `
+            -or $commandText -match '^\s?pass specific options\.\s?$' `
+    ) {
+        return
+    }
+    $commandText = $commandText -creplace '^(.+)(\s+Command\s*)$', "# `$1`$2 (choco $commandName)"
+    $commandText = $commandText -creplace '^(DEPRECATION NOTICE|Usage|Troubleshooting|Examples|Exit Codes|Connecting to Chocolatey.org|See It In Action|Alternative Sources|Resources|Packages.config|Scripting \/ Integration - Best Practices \/ Style Guide)', '## $1'
+    $commandText = $commandText -replace '^(Commands|How To Pass Options)', '## $1'
+    $commandText = $commandText -replace '^(WebPI|Windows Features|Ruby|Cygwin|Python)\s*$', '### $1'
+    $commandText = $commandText -replace '(?<!\s)NOTE:', '> :choco-info: **NOTE**'
+    $commandText = $commandText -replace '\*> :choco-info: \*\*NOTE\*\*\*', '> :choco-info: **NOTE**'
+    $commandText = $commandText -replace 'the command reference', '[how to pass arguments](xref:choco-commands#how-to-pass-options-switches)'
+    $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://community.chocolatey.org/packages)'
+    #$commandText = $commandText -replace '\`(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[[`$1`|Commands$1]]'
+    $commandText = $commandText -replace '\`([choco\s]*)(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[`$1$2`](xref:choco-command-$2)'
+    $commandText = $commandText -replace '^(.+):\s(.+.gif)$', '![$1]($2)'
+    $commandText = $commandText -replace '^(\s+)\<\?xml', "~~~xml$lineFeed`$1<?xml"
+    $commandText = $commandText -replace '^(\s+)</packages>', "`$1</packages>$lineFeed~~~"
+    $commandText = $commandText -replace '(Chocolatey for Business|Chocolatey Professional|Chocolatey Pro)(?=[^\w])', '[$1](https://chocolatey.org/compare)'
+    $commandText = $commandText -replace '(Pro[fessional]\s?/\s?Business)', '[$1](https://chocolatey.org/compare)'
+    $commandText = $commandText -replace '([Ll]icensed editions)', '[$1](https://chocolatey.org/compare)'
+    $commandText = $commandText -replace '([Ll]icensed versions)', '[$1](https://chocolatey.org/compare)'
+    $commandText = $commandText -replace 'https://raw.githubusercontent.com/wiki/chocolatey/choco/images', '/assets/images'
+    $commandText = $commandText -replace 'https://chocolatey.org/docs/features-automatically-recompile-packages', 'https://docs.chocolatey.org/en-us/guides/create/recompile-packages'
+    $commandText = $commandText -replace 'https://chocolatey.org/docs/features-private-cdn', 'https://docs.chocolatey.org/en-us/features/private-cdn'
+    $commandText = $commandText -replace 'https://chocolatey.org/docs/features-virus-check', 'https://docs.chocolatey.org/en-us/features/virus-check'
+    $commandText = $commandText -replace 'https://chocolatey.org/docs/features-synchronize', 'https://docs.chocolatey.org/en-us/features/package-synchronization'
+    $commandText = $commandText -replace 'explicity', 'explicit'
+    $commandText = $commandText -replace 'https://chocolatey.org/docs/features-create-packages-from-installers', 'https://docs.chocolatey.org/en-us/features/package-builder'
+    $commandText = $commandText -replace 'See https://chocolatey.org/docs/features-create-packages-from-installers', 'See more information about [Package Builder features](xref:package-builder)'
+    $commandText = $commandText -replace 'See https://docs.chocolatey.org/en-us/features/package-builder', 'See more information about [Package Builder features](xref:package-builder)'
+    $commandText = $commandText -replace 'https://chocolatey.org/docs/features-install-directory-override', 'https://docs.chocolatey.org/en-us/features/install-directory-override'
+    $commandText = $commandText -replace 'y.org/docs/features-package-reducer', 'y.org/docs/en-us/features/package-reducer'
+    $commandText = $commandText -replace 'https://chocolatey.org/docs/features-package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
+    $commandText = $commandText -replace 'https://chocolatey.org/docs/en-us/features/package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
+    $commandText = $commandText -replace '\[community feed\)\]\(https://community.chocolatey.org/packages\)', '[community feed](https://community.chocolatey.org/packages))'
   $commandText = $commandText -replace '> :choco-info: \*\*NOTE\*\*\s', '> :choco-info: **NOTE**
 >
 > '
 
-  $optionsSwitches = @'
+    $optionsSwitches = @'
 ## $1
 
 > :choco-info: **NOTE**
@@ -262,9 +278,9 @@ Includes [default options/switches](xref:choco-commands#default-options-and-swit
 ~~~
 '@
 
-  $commandText = $commandText -replace '^(Options and Switches)', $optionsSwitches
+    $commandText = $commandText -replace '^(Options and Switches)', $optionsSwitches
 
-   $optionsSwitches = @'
+    $optionsSwitches = @'
 ## $1
 
 > :choco-info: **NOTE**
@@ -278,98 +294,103 @@ Includes [default options/switches](xref:choco-commands#default-options-and-swit
 ~~~
 '@
 
-  $commandText = $commandText -replace '^(Default Options and Switches)', $optionsSwitches
+    $commandText = $commandText -replace '^(Default Options and Switches)', $optionsSwitches
 
-  Write-Output $commandText
+    Write-Output $commandText
 }
 
 function Convert-CommandReferenceSpecific($commandText) {
-  $commandText = [Regex]::Replace($commandText, '\s?\s?\*\s(\w+)\s\-',
-    {
-        param($m)
-        $commandName = $m.Groups[1].Value
-        $commandNameUpper = $($commandName.Substring(0,1).ToUpper() + $commandName.Substring(1))
-        " * [$commandName](xref:choco-command-$($commandName)) -"
-    }
-  )
-  #$commandText = $commandText -replace '\s?\s?\*\s(\w+)\s\-', ' * [[$1|Commands$1]] -'
-  $commandText = $commandText.Replace("## Default Options and Switches", "## See Help Menu In Action$lineFeed$lineFeed![choco help in action](/assets/images/gifs/choco_help.gif)$lineFeed$lineFeed## Default Options and Switches")
+    $commandText = [Regex]::Replace($commandText, '\s?\s?\*\s(\w+)\s\-',
+        {
+            param($m)
+            $commandName = $m.Groups[1].Value
+            $commandNameUpper = $($commandName.Substring(0, 1).ToUpper() + $commandName.Substring(1))
+            " * [$commandName](xref:choco-command-$($commandName)) -"
+        }
+    )
+    #$commandText = $commandText -replace '\s?\s?\*\s(\w+)\s\-', ' * [[$1|Commands$1]] -'
+    $commandText = $commandText.Replace("## Default Options and Switches", "## See Help Menu In Action$lineFeed$lineFeed![choco help in action](/assets/images/gifs/choco_help.gif)$lineFeed$lineFeed## Default Options and Switches")
 
-  Write-Output $commandText
+    Write-Output $commandText
 }
 
 function Generate-TopLevelCommandReference {
-  Write-Host "Generating Top Level Command Reference"
-  $fileName = "$docsFolder\choco\commands\index.md"
-  $commandOutput = @("---")
-  $commandOutput += @("Order: 40")
-  $commandOutput += @("xref: choco-commands")
-  $commandOutput += @("Title: Commands")
-  $commandOutput += @("Description: Full list of all available Chocolatey commands")
-  $commandOutput += @("RedirectFrom:")
-  $commandOutput += @("  - docs/commandsreference")
-  $commandOutput += @("  - docs/commands-reference")
-  $commandOutput += @("---$lineFeed")
-  $commandOutput += @("# Command Reference$lineFeed")
-  $commandOutput += @("<!-- This file is automatically generated based on output from the files at $sourceCommands using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). --> $lineFeed")
-  $commandOutput += $(& $chocoExe -? -r)
-  $commandOutput += @("$lineFeed~~~$lineFeed")
-  $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco -h``. $lineFeed")
+    Write-Host "Generating Top Level Command Reference"
+    $fileName = "$docsFolder\choco\commands\index.md"
+    $commandOutput = @("---")
+    $commandOutput += @("Order: 40")
+    $commandOutput += @("xref: choco-commands")
+    $commandOutput += @("Title: Commands")
+    $commandOutput += @("Description: Full list of all available Chocolatey commands")
+    $commandOutput += @("RedirectFrom:")
+    $commandOutput += @("  - docs/commandsreference")
+    $commandOutput += @("  - docs/commands-reference")
+    $commandOutput += @("---$lineFeed")
+    $commandOutput += @("# Command Reference$lineFeed")
+    $commandOutput += @("<!-- This file is automatically generated based on output from the files at $sourceCommands using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). --> $lineFeed")
+    $commandOutput += $(& $chocoExe -? -r)
+    $commandOutput += @("$lineFeed~~~$lineFeed")
+    $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco -h``. $lineFeed")
 
-  $commandOutput | 
-      ForEach-Object { Convert-CommandText($_) } |
-      ForEach-Object { Convert-CommandReferenceSpecific($_) } |
-      Out-File $fileName -Encoding UTF8 -Force
+    $commandOutput |
+        ForEach-Object { Convert-CommandText($_) } |
+        ForEach-Object { Convert-CommandReferenceSpecific($_) } |
+        Out-File $fileName -Encoding UTF8 -Force
 }
 
 function Move-GeneratedFiles {
-  if(-not(Test-Path "$docsFolder\create\commands")){ mkdir "$docsFolder\create\commands" -EA Continue | Out-Null }
+    if (-not(Test-Path "$docsFolder\create\commands")) {
+        New-Item -ItemType Directory -Path "$docsFolder\create\commands" -ErrorAction Continue | Out-Null
+    }
 
-  Move-Item -Path "$docsFolder\choco\commands\apikey.md" -Destination "$docsFolder\create\commands\api-key.md"
-  Move-Item -Path "$docsFolder\choco\commands\new.md" -Destination "$docsFolder\create\commands\new.md"
-  Move-Item -Path "$docsFolder\choco\commands\pack.md" -Destination "$docsFolder\create\commands\pack.md"
-  Move-Item -Path "$docsFolder\choco\commands\push.md" -Destination "$docsFolder\create\commands\push.md"
-  Move-Item -Path "$docsFolder\choco\commands\template.md" -Destination "$docsFolder\create\commands\template.md"
-  Move-Item -Path "$docsFolder\choco\commands\templates.md" -Destination "$docsFolder\create\commands\templates.md"
-  Move-Item -Path "$docsFolder\choco\commands\convert.md" -Destination "$docsFolder\create\commands\convert.md"
+    Move-Item -Path "$docsFolder\choco\commands\apikey.md" -Destination "$docsFolder\create\commands\api-key.md"
+    Move-Item -Path "$docsFolder\choco\commands\new.md" -Destination "$docsFolder\create\commands\new.md"
+    Move-Item -Path "$docsFolder\choco\commands\pack.md" -Destination "$docsFolder\create\commands\pack.md"
+    Move-Item -Path "$docsFolder\choco\commands\push.md" -Destination "$docsFolder\create\commands\push.md"
+    Move-Item -Path "$docsFolder\choco\commands\template.md" -Destination "$docsFolder\create\commands\template.md"
+    Move-Item -Path "$docsFolder\choco\commands\templates.md" -Destination "$docsFolder\create\commands\templates.md"
+    Move-Item -Path "$docsFolder\choco\commands\convert.md" -Destination "$docsFolder\create\commands\convert.md"
 }
 
 function Generate-CommandReference($commandName, $order) {
-  if(-not(Test-Path "$docsFolder\choco\commands")){ mkdir "$docsFolder\choco\commands" -EA Continue | Out-Null }
-  $fileName = Join-Path "$docsFolder\choco\commands" "$($commandName.ToLower()).md"
-  $commandNameLower = $commandName.ToLower()
+    if (-not(Test-Path "$docsFolder\choco\commands")) {
+        New-Item -ItemType Directory -Path "$docsFolder\choco\commands" -ErrorAction Continue | Out-Null
+    }
+    $fileName = Join-Path "$docsFolder\choco\commands" "$($commandName.ToLower()).md"
+    $commandNameLower = $commandName.ToLower()
 
-  Write-Host "Generating $fileName ..."
-  $commandOutput += @("---")
-  $commandOutput += @("Order: $order")
-  $commandOutput += @("xref: choco-command-$commandNameLower")
+    Write-Host "Generating $fileName ..."
+    $commandOutput += @("---")
+    $commandOutput += @("Order: $order")
+    $commandOutput += @("xref: choco-command-$commandNameLower")
 
-  if($commandName -eq 'List') {
-    $commandOutput += @("Title: $commandName/Search")
-    $commandOutput += @("Description: $commandName/Search Command (choco $commandNameLower)")
-  } else {
-    $commandOutput += @("Title: $commandName")
-    $commandOutput += @("Description: $commandName Command (choco $commandNameLower)")
-  }
+    if ($commandName -eq 'List') {
+        $commandOutput += @("Title: $commandName/Search")
+        $commandOutput += @("Description: $commandName/Search Command (choco $commandNameLower)")
+    }
+    else {
+        $commandOutput += @("Title: $commandName")
+        $commandOutput += @("Description: $commandName Command (choco $commandNameLower)")
+    }
 
-  $commandOutput += @("RedirectFrom:")
-  $commandOutput += @("  - docs/commands$commandNameLower")
-  $commandOutput += @("  - docs/commands-$commandNameLower")
+    $commandOutput += @("RedirectFrom:")
+    $commandOutput += @("  - docs/commands$commandNameLower")
+    $commandOutput += @("  - docs/commands-$commandNameLower")
 
-  if($commandName -eq 'Features') {
-    $commandOutput += @("ShowInNavbar: false")
-    $commandOutput += @("ShowInSidebar: false")
-  }
+    if ($commandName -eq 'Features') {
+        $commandOutput += @("ShowInNavbar: false")
+        $commandOutput += @("ShowInSidebar: false")
+    }
 
-  if($commandName -eq 'Templates') {
-    $commandOutput += @("ShowInNavbar: false")
-    $commandOutput += @("ShowInSidebar: false")
-  }
+    if ($commandName -eq 'Templates') {
+        $commandOutput += @("ShowInNavbar: false")
+        $commandOutput += @("ShowInSidebar: false")
+    }
 
-  $commandOutput += @("---$lineFeed")
-  $commandOutput += @("<!-- This file is automatically generated based on output from $($sourceCommands)/Chocolatey$($commandName)Command.cs using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). If the file is not found, it is not part of the open source edition of Chocolatey or the name of the file is different. --> $lineFeed")
+    $commandOutput += @("---$lineFeed")
+    $commandOutput += @("<!-- This file is automatically generated based on output from $($sourceCommands)/Chocolatey$($commandName)Command.cs using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). If the file is not found, it is not part of the open source edition of Chocolatey or the name of the file is different. --> $lineFeed")
 
-  $commandOutput += @(@"
+    $commandOutput += @(@"
 > :choco-warning: **WARNING** SHIM DEPRECATION
 >
 > With the release of Chocolatey CLI v1.0.0 we have deprecated the following shims/shortcuts:
@@ -385,49 +406,56 @@ function Generate-CommandReference($commandName, $order) {
 
 "@)
 
-  $commandOutput += $(& $chocoExe $commandName.ToLower() -h -r)
-  $commandOutput += @("$lineFeed~~~$lineFeed$lineFeed[Command Reference](xref:choco-commands)")
-  $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco $($commandName.ToLower()) -h``. $lineFeed")
-  $commandOutput | 
-      ForEach-Object { Convert-CommandText $_ $commandName.ToLower() } | 
-      Out-File $fileName -Encoding UTF8 -Force
+    $commandOutput += $(& $chocoExe $commandName.ToLower() -h -r)
+    $commandOutput += @("$lineFeed~~~$lineFeed$lineFeed[Command Reference](xref:choco-commands)")
+    $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco $($commandName.ToLower()) -h``. $lineFeed")
+    $commandOutput |
+        ForEach-Object { Convert-CommandText $_ $commandName.ToLower() } |
+        Out-File $fileName -Encoding UTF8 -Force
 }
 
-try
-{
-  Write-Host "Importing the Module $psModuleName ..."
-  Import-Module "$psModuleLocation" -Force -Verbose
+try {
+    Write-Host "Importing the Module $psModuleName ..."
+    Import-Module "$psModuleLocation" -Force -Verbose
 
-  # Switch Get-PackageParameters back for documentation
-  Remove-Item alias:Get-PackageParameters
-  Remove-Item function:Get-PackageParametersBuiltIn
-  Set-Alias -Name Get-PackageParametersBuiltIn -Value Get-PackageParameters -Scope Global
+    # Switch Get-PackageParameters back for documentation
+    Remove-Item alias:Get-PackageParameters
+    Remove-Item function:Get-PackageParametersBuiltIn
+    Set-Alias -Name Get-PackageParametersBuiltIn -Value Get-PackageParameters -Scope Global
 
-  if (Test-Path($docsFolder)) { Remove-Item $docsFolder -Force -Recurse -EA SilentlyContinue }
-  if(-not(Test-Path $docsFolder)){ mkdir $docsFolder -EA Continue | Out-Null }
-  if(-not(Test-Path "$docsFolder\create\functions")){ mkdir "$docsFolder\create\functions" -EA Continue | Out-Null }
-
-  Write-Host 'Creating per PowerShell function markdown files...'
-  $helperOrder = 10;
-  Get-Command -Module $psModuleName -CommandType Function | ForEach-Object -Process { Get-Help $_ -Full } | ForEach-Object -Process { `
-    $commandName = $_.Name
-    $fileName = Join-Path "$docsFolder\create\functions" "$($_.Name.ToLower()).md"
-    $global:powerShellReferenceTOC += "$lineFeed * [$commandName](xref:$([System.IO.Path]::GetFileNameWithoutExtension($fileName)))"
-    $hasCmdletBinding = (Get-Command -Name $commandName).CmdLetBinding
-
-    Write-Host "Generating $fileName ..."
-    $SplitName = $_.Name -split "-"
-    $NameNoHyphen = $_.Name -replace '-', ''
-
-    if($_.Name -eq 'Get-OSArchitectureWidth') {
-      $FormattedName = "get-os-architecture-width"
-    } elseif($_.Name -eq 'Get-UACEnabled') {
-      $FormattedName = "get-uac-enabled"
-    }else {
-      $FormattedName = $SplitName[0].ToLower() + ($SplitName[1] -creplace '[A-Z]', '-$&').ToLower()
+    if (Test-Path($docsFolder)) {
+        Remove-Item $docsFolder -Force -Recurse -ErrorAction SilentlyContinue
+    }
+    if (-not(Test-Path $docsFolder)) {
+        New-Item -ItemType Directory -Path $docsFolder -ErrorAction Continue | Out-Null
+    }
+    if (-not(Test-Path "$docsFolder\create\functions")) {
+        New-Item -ItemType Directory -Path "$docsFolder\create\functions" -ErrorAction Continue | Out-Null
     }
 
-    @"
+    Write-Host 'Creating per PowerShell function markdown files...'
+    $helperOrder = 10;
+    Get-Command -Module $psModuleName -CommandType Function | ForEach-Object -Process { Get-Help $_ -Full } | ForEach-Object -Process { `
+            $commandName = $_.Name
+        $fileName = Join-Path "$docsFolder\create\functions" "$($_.Name.ToLower()).md"
+        $global:powerShellReferenceTOC += "$lineFeed * [$commandName](xref:$([System.IO.Path]::GetFileNameWithoutExtension($fileName)))"
+        $hasCmdletBinding = (Get-Command -Name $commandName).CmdLetBinding
+
+        Write-Host "Generating $fileName ..."
+        $SplitName = $_.Name -split "-"
+        $NameNoHyphen = $_.Name -replace '-', ''
+
+        if ($_.Name -eq 'Get-OSArchitectureWidth') {
+            $FormattedName = "get-os-architecture-width"
+        }
+        elseif ($_.Name -eq 'Get-UACEnabled') {
+            $FormattedName = "get-uac-enabled"
+        }
+        else {
+            $FormattedName = $SplitName[0].ToLower() + ($SplitName[1] -creplace '[A-Z]', '-$&').ToLower()
+        }
+
+        @"
 ---
 Order: $($helperOrder)
 xref: $($_.Name.ToLower())
@@ -474,13 +502,13 @@ $( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$line
 
 View the source for [$($_.Name)]($sourceFunctions/$($_.Name)`.ps1)
 "@  | Out-File $fileName -Encoding UTF8 -Force
-  $helperOrder = $helperOrder + 10
-  }
+        $helperOrder = $helperOrder + 10
+    }
 
-  Write-Host "Generating Top Level PowerShell Reference"
-  $fileName = Join-Path "$docsFolder\create\functions" 'index.md'
+    Write-Host "Generating Top Level PowerShell Reference"
+    $fileName = Join-Path "$docsFolder\create\functions" 'index.md'
 
-  $global:powerShellReferenceTOC += @'
+    $global:powerShellReferenceTOC += @'
 
 
 ## Chocolatey for Business Functions
@@ -568,48 +596,47 @@ The following are experimental or use not recommended:
  * ChocolateyToolsLocation - Not for use in package automation scripts. Recommend using Get-ToolsLocation instead
 '@
 
-  $global:powerShellReferenceTOC | Out-File $fileName -Encoding UTF8 -Force
+    $global:powerShellReferenceTOC | Out-File $fileName -Encoding UTF8 -Force
 
-  Write-Host "Generating command reference markdown files"
-  Generate-CommandReference 'Config' '10'
-  Generate-CommandReference 'Download' '20'
-  Generate-CommandReference 'Export' '30'
-  Generate-CommandReference 'Find' '35'
-  Generate-CommandReference 'Feature' '40'
-  Generate-CommandReference 'Features' '45'
-  Generate-CommandReference 'Help' '50'
-  Generate-CommandReference 'Info' '60'
-  Generate-CommandReference 'Install' '70'
-  Generate-CommandReference 'List' '80'
-  Generate-CommandReference 'Optimize' '90'
-  Generate-CommandReference 'Outdated' '100'
-  Generate-CommandReference 'Pin' '110'
-  Generate-CommandReference 'Search' '120'
-  Generate-CommandReference 'SetApiKey' '130'
-  Generate-CommandReference 'Source' '140'
-  Generate-CommandReference 'Sources' '150'
-  Generate-CommandReference 'Support' '160'
-  Generate-CommandReference 'Sync' '170'
-  Generate-CommandReference 'Synchronize' '180'
-  Generate-CommandReference 'Uninstall' '190'
-  Generate-CommandReference 'UnpackSelf' '200'
-  Generate-CommandReference 'Upgrade' '220'
+    Write-Host "Generating command reference markdown files"
+    Generate-CommandReference 'Config' '10'
+    Generate-CommandReference 'Download' '20'
+    Generate-CommandReference 'Export' '30'
+    Generate-CommandReference 'Find' '35'
+    Generate-CommandReference 'Feature' '40'
+    Generate-CommandReference 'Features' '45'
+    Generate-CommandReference 'Help' '50'
+    Generate-CommandReference 'Info' '60'
+    Generate-CommandReference 'Install' '70'
+    Generate-CommandReference 'List' '80'
+    Generate-CommandReference 'Optimize' '90'
+    Generate-CommandReference 'Outdated' '100'
+    Generate-CommandReference 'Pin' '110'
+    Generate-CommandReference 'Search' '120'
+    Generate-CommandReference 'SetApiKey' '130'
+    Generate-CommandReference 'Source' '140'
+    Generate-CommandReference 'Sources' '150'
+    Generate-CommandReference 'Support' '160'
+    Generate-CommandReference 'Sync' '170'
+    Generate-CommandReference 'Synchronize' '180'
+    Generate-CommandReference 'Uninstall' '190'
+    Generate-CommandReference 'UnpackSelf' '200'
+    Generate-CommandReference 'Upgrade' '220'
 
-  Generate-CommandReference 'New' '10'
-  Generate-CommandReference 'Pack' '20'
-  Generate-CommandReference 'ApiKey' '30'
-  Generate-CommandReference 'Push' '40'
-  Generate-CommandReference 'Template' '50'
-  Generate-CommandReference 'Templates' '55'
-  Generate-CommandReference 'Convert' '60'
+    Generate-CommandReference 'New' '10'
+    Generate-CommandReference 'Pack' '20'
+    Generate-CommandReference 'ApiKey' '30'
+    Generate-CommandReference 'Push' '40'
+    Generate-CommandReference 'Template' '50'
+    Generate-CommandReference 'Templates' '55'
+    Generate-CommandReference 'Convert' '60'
 
-  Generate-TopLevelCommandReference
-  Move-GeneratedFiles
+    Generate-TopLevelCommandReference
+    Move-GeneratedFiles
 
-  Exit 0
+    Exit 0
 }
-catch
-{
-  Throw "Failed to generate documentation.  $_"
-  Exit 255
+catch {
+    Throw "Failed to generate documentation.  $_"
+    Exit 255
 }

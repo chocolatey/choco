@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Get-VirusCheckValid {
-<#
+    <#
 .SYNOPSIS
 Used in Pro/Business editions. Runtime virus check against downloaded
 resources.
@@ -43,10 +43,10 @@ The full file path to the file to verify against anti-virus scanners.
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 #>
-param(
-  [parameter(Mandatory=$false, Position=0)][string] $url,
-  [parameter(Mandatory=$false, Position=1)][string] $file = '',
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
-  Write-Debug "No runtime virus checking built into FOSS Chocolatey. Check out Pro/Business - https://chocolatey.org/compare"
+    param(
+        [parameter(Mandatory = $false, Position = 0)][string] $url,
+        [parameter(Mandatory = $false, Position = 1)][string] $file = '',
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
+    Write-Debug "No runtime virus checking built into FOSS Chocolatey. Check out Pro/Business - https://chocolatey.org/compare"
 }

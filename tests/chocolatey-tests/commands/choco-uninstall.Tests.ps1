@@ -1,4 +1,4 @@
-Import-Module helpers/common-helpers
+﻿Import-Module helpers/common-helpers
 
 Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
     BeforeAll {
@@ -62,7 +62,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             'Package Path in Uninstall Script: <installPath>\lib\test-chocolateypath'
             'Install Path in Uninstall Script: <installPath>'
         ) {
-            $Output.Lines | Should -Contain ($_ -replace '<installPath>',$env:ChocolateyInstall) -Because $Output.String
+            $Output.Lines | Should -Contain ($_ -replace '<installPath>', $env:ChocolateyInstall) -Because $Output.String
         }
     }
 }

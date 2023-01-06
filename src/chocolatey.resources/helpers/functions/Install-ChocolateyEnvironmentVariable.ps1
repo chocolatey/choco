@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Install-ChocolateyEnvironmentVariable {
-<#
+    <#
 .SYNOPSIS
 **NOTE:** Administrative Access Required when `-VariableType 'Machine'.`
 
@@ -87,36 +87,40 @@ Set-EnvironmentVariable
 .LINK
 Install-ChocolateyPath
 #>
-param(
-  [parameter(Mandatory=$false, Position=0)][string] $variableName,
-  [parameter(Mandatory=$false, Position=1)][string] $variableValue,
-  [parameter(Mandatory=$false, Position=2)]
-  [System.EnvironmentVariableTarget] $variableType = [System.EnvironmentVariableTarget]::User,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param(
+        [parameter(Mandatory = $false, Position = 0)][string] $variableName,
+        [parameter(Mandatory = $false, Position = 1)][string] $variableValue,
+        [parameter(Mandatory = $false, Position = 2)]
+        [System.EnvironmentVariableTarget] $variableType = [System.EnvironmentVariableTarget]::User,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
-  ## Called from chocolateysetup.psm1 - wrap any Write-Host in try/catch
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    ## Called from chocolateysetup.psm1 - wrap any Write-Host in try/catch
 
-  if ($variableType -eq [System.EnvironmentVariableTarget]::Machine) {
-    if (Test-ProcessAdminRights) {
-      Set-EnvironmentVariable -Name $variableName -Value $variableValue -Scope $variableType
-    } else {
-      $psArgs = "Install-ChocolateyEnvironmentVariable -variableName `'$variableName`' -variableValue `'$variableValue`' -variableType `'$variableType`'"
-      Start-ChocolateyProcessAsAdmin "$psArgs"
+    if ($variableType -eq [System.EnvironmentVariableTarget]::Machine) {
+        if (Test-ProcessAdminRights) {
+            Set-EnvironmentVariable -Name $variableName -Value $variableValue -Scope $variableType
+        }
+        else {
+            $psArgs = "Install-ChocolateyEnvironmentVariable -variableName `'$variableName`' -variableValue `'$variableValue`' -variableType `'$variableType`'"
+            Start-ChocolateyProcessAsAdmin "$psArgs"
+        }
     }
-  } else {
-    try {
-      Set-EnvironmentVariable -Name $variableName -Value $variableValue -Scope $variableType
-    } catch {
-      if (Test-ProcessAdminRights) {
-        # HKCU:\Environment may not exist, which happens sometimes with Server Core
-        Set-EnvironmentVariable -Name $variableName -Value $variableValue -Scope Machine
-      } else {
-        throw $_.Exception
-      }
+    else {
+        try {
+            Set-EnvironmentVariable -Name $variableName -Value $variableValue -Scope $variableType
+        }
+        catch {
+            if (Test-ProcessAdminRights) {
+                # HKCU:\Environment may not exist, which happens sometimes with Server Core
+                Set-EnvironmentVariable -Name $variableName -Value $variableValue -Scope Machine
+            }
+            else {
+                throw $_.Exception
+            }
+        }
     }
-  }
 
-  Set-Content env:\$variableName $variableValue
+    Set-Content env:\$variableName $variableValue
 }

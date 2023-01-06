@@ -4,10 +4,10 @@
         [Parameter(Mandatory = $true)]
         [string[]]
         $Name,
-        [Parameter(Mandatory = $true, ParameterSetName='Enable')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Enable')]
         [switch]
         $Enable,
-        [Parameter(Mandatory = $true, ParameterSetName='Disable')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Disable')]
         [switch]
         $Disable
     )

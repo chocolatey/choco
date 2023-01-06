@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Uninstall-ChocolateyEnvironmentVariable {
-<#
+    <#
 .SYNOPSIS
 **NOTE:** Administrative Access Required when `-VariableType 'Machine'.`
 
@@ -71,25 +71,27 @@ Set-EnvironmentVariable
 .LINK
 Install-ChocolateyPath
 #>
-param(
-  [parameter(Mandatory=$true, Position=0)][string] $variableName,
-  [parameter(Mandatory=$false, Position=1)]
-  [System.EnvironmentVariableTarget] $variableType = [System.EnvironmentVariableTarget]::User,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param(
+        [parameter(Mandatory = $true, Position = 0)][string] $variableName,
+        [parameter(Mandatory = $false, Position = 1)]
+        [System.EnvironmentVariableTarget] $variableType = [System.EnvironmentVariableTarget]::User,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  if ($variableType -eq [System.EnvironmentVariableTarget]::Machine) {
-    if (Test-ProcessAdminRights) {
-      Set-EnvironmentVariable -Name $variableName -Value $null -Scope $variableType
-    } else {
-      $psArgs = "Install-ChocolateyEnvironmentVariable -variableName `'$variableName`' -variableValue $null -variableType `'$variableType`'"
-      Start-ChocolateyProcessAsAdmin "$psArgs"
+    if ($variableType -eq [System.EnvironmentVariableTarget]::Machine) {
+        if (Test-ProcessAdminRights) {
+            Set-EnvironmentVariable -Name $variableName -Value $null -Scope $variableType
+        }
+        else {
+            $psArgs = "Install-ChocolateyEnvironmentVariable -variableName `'$variableName`' -variableValue $null -variableType `'$variableType`'"
+            Start-ChocolateyProcessAsAdmin "$psArgs"
+        }
     }
-  } else {
-    Set-EnvironmentVariable -Name $variableName -Value $null -Scope $variableType
-  }
+    else {
+        Set-EnvironmentVariable -Name $variableName -Value $null -Scope $variableType
+    }
 
-  Set-Content env:\$variableName $null
+    Set-Content env:\$variableName $null
 }

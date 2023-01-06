@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Install-ChocolateyPackage {
-<#
+    <#
 .SYNOPSIS
 **NOTE:** Administrative Access Required.
 
@@ -224,7 +224,7 @@ Allows splatting with arguments that do not apply. Do not use directly.
 Specifies the commands to run after download has completed but before install steps have begun.
 Available in 0.11.0+.
 
-Use this for starting an auxiliary process such as AutoHotkey, so that any timeouts are not 
+Use this for starting an auxiliary process such as AutoHotkey, so that any timeouts are not
 affected by the time to download.
 
 .EXAMPLE
@@ -345,80 +345,86 @@ Get-UninstallRegistryKey
 .LINK
 Install-ChocolateyZipPackage
 #>
-param(
-  [parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [parameter(Mandatory=$false, Position=1)]
-  [alias("installerType","installType")][string] $fileType = 'exe',
-  [parameter(Mandatory=$false, Position=2)][string[]] $silentArgs = '',
-  [parameter(Mandatory=$false, Position=3)][string] $url = '',
-  [parameter(Mandatory=$false, Position=4)]
-  [alias("url64")][string] $url64bit = '',
-  [parameter(Mandatory=$false)] $validExitCodes = @(0),
-  [parameter(Mandatory=$false)][string] $checksum = '',
-  [parameter(Mandatory=$false)][string] $checksumType = '',
-  [parameter(Mandatory=$false)][string] $checksum64 = '',
-  [parameter(Mandatory=$false)][string] $checksumType64 = '',
-  [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
-  [alias("fileFullPath")][parameter(Mandatory=$false)][string] $file = '',
-  [alias("fileFullPath64")][parameter(Mandatory=$false)][string] $file64 = '',
-  [parameter(Mandatory=$false)]
-  [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
-  [parameter(Mandatory=$false)][switch]$useOriginalLocation,
-  [parameter(Mandatory=$false)][scriptblock] $beforeInstall,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
-  [string]$silentArgs = $silentArgs -join ' '
+    param(
+        [parameter(Mandatory = $true, Position = 0)][string] $packageName,
+        [parameter(Mandatory = $false, Position = 1)]
+        [alias("installerType", "installType")][string] $fileType = 'exe',
+        [parameter(Mandatory = $false, Position = 2)][string[]] $silentArgs = '',
+        [parameter(Mandatory = $false, Position = 3)][string] $url = '',
+        [parameter(Mandatory = $false, Position = 4)]
+        [alias("url64")][string] $url64bit = '',
+        [parameter(Mandatory = $false)] $validExitCodes = @(0),
+        [parameter(Mandatory = $false)][string] $checksum = '',
+        [parameter(Mandatory = $false)][string] $checksumType = '',
+        [parameter(Mandatory = $false)][string] $checksum64 = '',
+        [parameter(Mandatory = $false)][string] $checksumType64 = '',
+        [parameter(Mandatory = $false)][hashtable] $options = @{Headers = @{} },
+        [alias("fileFullPath")][parameter(Mandatory = $false)][string] $file = '',
+        [alias("fileFullPath64")][parameter(Mandatory = $false)][string] $file64 = '',
+        [parameter(Mandatory = $false)]
+        [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
+        [parameter(Mandatory = $false)][switch]$useOriginalLocation,
+        [parameter(Mandatory = $false)][scriptblock] $beforeInstall,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
+    [string]$silentArgs = $silentArgs -join ' '
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  $chocoTempDir = $env:TEMP
-  $tempDir = Join-Path $chocoTempDir "$($env:chocolateyPackageName)"
-  if ($env:chocolateyPackageVersion -ne $null) { $tempDir = Join-Path $tempDir "$($env:chocolateyPackageVersion)"; }
-  $tempDir = $tempDir -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
-  if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
-  $downloadFilePath = Join-Path $tempDir "$($packageName)Install.$fileType"
-
-  if ($url -eq '' -or $url -eq $null) {
-    $url = $file
-  }
-  if ($url64bit -eq '' -or $url64bit -eq $null) {
-    $url64bit = $file64
-  }
-
-  [string]$filePath = $downloadFilePath
-  if ($useOriginalLocation) {
-    $filePath = $url
-    if (Get-OSArchitectureWidth 64) {
-      $forceX86 = $env:chocolateyForceX86
-      if ($forceX86) {
-        Write-Debug "User specified '-x86' so forcing 32-bit"
-      } else {
-        if ($url64bit -ne $null -and $url64bit -ne '') {
-          $filePath = $url64bit
-        }
-      }
+    $chocoTempDir = $env:TEMP
+    $tempDir = Join-Path $chocoTempDir "$($env:chocolateyPackageName)"
+    if ($env:chocolateyPackageVersion -ne $null) {
+        $tempDir = Join-Path $tempDir "$($env:chocolateyPackageVersion)";
     }
-  } else {
-    $filePath = Get-ChocolateyWebFile -PackageName $packageName `
-                                      -FileFullPath $downloadFilePath `
-                                      -Url $url `
-                                      -Url64bit $url64bit `
-                                      -Checksum $checksum `
-                                      -ChecksumType $checksumType `
-                                      -Checksum64 $checksum64 `
-                                      -ChecksumType64 $checksumType64 `
-                                      -Options $options `
-                                      -GetOriginalFileName
-  }
+    $tempDir = $tempDir -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+    if (![System.IO.Directory]::Exists($tempDir)) {
+        [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null
+    }
+    $downloadFilePath = Join-Path $tempDir "$($packageName)Install.$fileType"
 
-  if ($beforeInstall) {
-    & $beforeInstall
-  }
+    if ($url -eq '' -or $url -eq $null) {
+        $url = $file
+    }
+    if ($url64bit -eq '' -or $url64bit -eq $null) {
+        $url64bit = $file64
+    }
 
-  Install-ChocolateyInstallPackage -PackageName $packageName `
-                                   -FileType $fileType `
-                                   -SilentArgs $silentArgs `
-                                   -File $filePath `
-                                   -ValidExitCodes $validExitCodes `
-                                   -UseOnlyPackageSilentArguments:$useOnlyPackageSilentArguments
+    [string]$filePath = $downloadFilePath
+    if ($useOriginalLocation) {
+        $filePath = $url
+        if (Get-OSArchitectureWidth 64) {
+            $forceX86 = $env:chocolateyForceX86
+            if ($forceX86) {
+                Write-Debug "User specified '-x86' so forcing 32-bit"
+            }
+            else {
+                if ($url64bit -ne $null -and $url64bit -ne '') {
+                    $filePath = $url64bit
+                }
+            }
+        }
+    }
+    else {
+        $filePath = Get-ChocolateyWebFile -PackageName $packageName `
+            -FileFullPath $downloadFilePath `
+            -Url $url `
+            -Url64bit $url64bit `
+            -Checksum $checksum `
+            -ChecksumType $checksumType `
+            -Checksum64 $checksum64 `
+            -ChecksumType64 $checksumType64 `
+            -Options $options `
+            -GetOriginalFileName
+    }
+
+    if ($beforeInstall) {
+        & $beforeInstall
+    }
+
+    Install-ChocolateyInstallPackage -packageName $packageName `
+        -fileType $fileType `
+        -silentArgs $silentArgs `
+        -file $filePath `
+        -validExitCodes $validExitCodes `
+        -UseOnlyPackageSilentArguments:$useOnlyPackageSilentArguments
 }

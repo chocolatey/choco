@@ -18,7 +18,7 @@
     )
     begin {
         $chocoPath = Get-ChocoPath
-        $firstArgument, [string[]]$remainingArguments = $Arguments
+    $firstArgument, [string[]]$remainingArguments = $Arguments
         $arguments = @($firstArgument; '--allow-unofficial'; $remainingArguments)
     }
     end {
@@ -33,7 +33,12 @@
             # We trim all the lines, so we do not take into account
             # trimming the lines when asserting, and that extra whitespace
             # is not considered in our assertions.
-            Lines    = if ($output) { $output.Trim() } else { @() }
+            Lines    = if ($output) {
+                $output.Trim()
+            }
+            else {
+                @()
+            }
             String   = $output -join "`r`n"
             ExitCode = $LastExitCode
         }

@@ -18,7 +18,7 @@ Import-Module helpers/common-helpers
 
 BeforeDiscovery {
     $AllTopLevelCommands = (Invoke-Choco $Command[0]).Lines -match " \* (?<Command>\w+) -" -replace " \* (?<Command>\w+) -.+", '$1'
-    $TopLevelCommands = $AllTopLevelCommands.Where{$_ -notin $SkipCommand}
+    $TopLevelCommands = $AllTopLevelCommands.Where{ $_ -notin $SkipCommand }
 }
 
 Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolatey, HelpCommand {
@@ -51,7 +51,7 @@ Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolate
         }
     }
 
-    Context "choco <_> $helpArgument" -Foreach $TopLevelCommands {
+    Context "choco <_> $helpArgument" -ForEach $TopLevelCommands {
         BeforeDiscovery {
             $comandsWithoutExitCodes = @(
                 "help"

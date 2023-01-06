@@ -138,7 +138,7 @@ Describe "choco new" -Tag Chocolatey, NewCommand {
     }
 
     # https://github.com/chocolatey/choco/issues/1003
-    Context "Create new package with template containing empty folders" -Foreach @{ EmptyFolders = $EmptyFolders } {
+    Context "Create new package with template containing empty folders" -ForEach @{ EmptyFolders = $EmptyFolders } {
         BeforeAll {
             New-ChocolateyInstallSnapshot -SetWorkDir
 

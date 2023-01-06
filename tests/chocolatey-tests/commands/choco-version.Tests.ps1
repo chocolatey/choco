@@ -29,7 +29,7 @@ Describe "choco version" -Tag Chocolatey, VersionCommand -Skip:(Test-ChocolateyV
         }
     }
 
-    Context "Help Documentation (<_>)" -Foreach @("--help", "-?", "-help") {
+    Context "Help Documentation (<_>)" -ForEach @("--help", "-?", "-help") {
         BeforeAll {
             $Output = Invoke-Choco version $_
         }
