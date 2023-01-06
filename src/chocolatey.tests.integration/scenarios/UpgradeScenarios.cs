@@ -4364,5 +4364,148 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("pre-beforemodify-all.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeFalse();
             }
         }
+        public class when_upgrading_an_existing_package_with_uppercase_id : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Scenario.add_packages_to_source_location(Configuration, "UpperCase" + "*" + NuGetConstants.PackageExtension);
+                Scenario.install_package(Configuration, "UpperCase", "1.0.0");
+
+                Configuration.PackageNames = Configuration.Input = "UpperCase";
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_have_the_correct_casing_for_the_nuspec()
+            {
+                var nuspecFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.ManifestExtension);
+                FileAssert.Exists(nuspecFile);
+            }
+
+            [Fact]
+            public void should_upgrade_where_install_location_reports()
+            {
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
+            }
+
+            [Fact]
+            public void should_upgrade_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                DirectoryAssert.Exists(packageDir);
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.1.0");
+                }
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_with_old_and_new_versions()
+            {
+                bool upgradeMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("You have UpperCase v1.0.0 installed. Version 1.1.0 is available based on your source")) upgradeMessage = true;
+                }
+
+                upgradeMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_match_the_upgrade_version_of_one_dot_one_dot_zero()
+            {
+                _packageResult.Version.ShouldEqual("1.1.0");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
+            {
+                MockLogger.contains_message("UpperCase 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_before_chocolateyInstall()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null()
+                    .SkipWhile(p => !p.Contains("UpperCase 1.0.0 Before Modification"))
+                    .Any(p => p.EndsWith("UpperCase 1.1.0 Installed"))
+                    .ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyUninstall_script_for_original_package()
+            {
+                MockLogger.contains_message("UpperCase 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
+            {
+                MockLogger.contains_message("UpperCase 1.1.0 Before Modification", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyInstall_script_for_new_package()
+            {
+                MockLogger.contains_message("UpperCase 1.1.0 Installed", LogLevel.Info).ShouldBeTrue();
+            }
+        }
     }
 }

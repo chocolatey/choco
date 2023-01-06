@@ -4818,5 +4818,120 @@ namespace chocolatey.tests.integration.scenarios
                 }
             }
         }
+
+        public class when_installing_a_package_with_an_uppercase_id : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+                Scenario.add_packages_to_source_location(Configuration, "UpperCase.1.0.0" + NuGetConstants.PackageExtension);
+                Configuration.PackageNames = Configuration.Input = "UpperCase";
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_install_where_install_location_reports()
+            {
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
+            }
+
+            [Fact]
+            public void should_install_the_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                DirectoryAssert.Exists(packageDir);
+            }
+
+            [Fact]
+            public void should_have_the_correct_casing_for_the_nuspec()
+            {
+                var nuspecFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.ManifestExtension);
+                FileAssert.Exists(nuspecFile);
+            }
+
+            [Fact]
+            public void should_install_the_expected_version_of_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
+                }
+            }
+
+            [Fact]
+            public void should_not_create_an_extensions_folder_for_the_package()
+            {
+                var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(extensionsDirectory);
+            }
+
+            [Fact]
+            public void should_not_create_an_hooks_folder_for_the_package()
+            {
+                var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(hooksDirectory);
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_installed_successfully()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("1/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_have_a_version_of_one_dot_zero_dot_zero()
+            {
+                _packageResult.Version.ShouldEqual("1.0.0");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyInstall_script()
+            {
+                MockLogger.contains_message("UpperCase 1.0.0 Installed", LogLevel.Info).ShouldBeTrue();
+            }
+        }
     }
 }

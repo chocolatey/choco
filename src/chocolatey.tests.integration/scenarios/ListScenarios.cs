@@ -759,5 +759,57 @@ namespace chocolatey.tests.integration.scenarios
                 Results[2].PackageMetadata.Version.ToNormalizedString().ShouldEqual("0.9.0");
             }
         }
+
+        public class when_listing_local_packages_with_uppercase_id_package_installed : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Scenario.add_packages_to_source_location(Configuration, "UpperCase" + "*" + NuGetConstants.PackageExtension);
+                Scenario.install_package(Configuration, "UpperCase", "1.1.0");
+
+                Configuration.ListCommand.LocalOnly = true;
+                Configuration.Sources = ApplicationParameters.PackagesLocation;
+            }
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Results = Service.list_run(Configuration).ToList();
+            }
+
+            [Fact]
+            public void should_contain_packages_and_versions_with_a_space_between_them()
+            {
+                MockLogger.contains_message("upgradepackage 1.0.0").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_uppercase_id_package()
+            {
+                MockLogger.contains_message("UpperCase 1.1.0").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_contain_packages_and_versions_with_a_pipe_between_them()
+            {
+                MockLogger.contains_message("upgradepackage|1.0.0").ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_summary()
+            {
+                MockLogger.contains_message("packages installed").ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_debugging_messages()
+            {
+                MockLogger.contains_message("Searching for package information", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("Start of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.contains_message("End of List", LogLevel.Debug).ShouldBeTrue();
+            }
+        }
     }
 }

@@ -771,12 +771,14 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         }
 
+                        var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
+
+                        fix_nuspec_casing(availablePackage, installedPath);
+
                         remove_nuget_cache_for_package(availablePackage);
 
                         var manifestPath = nugetProject.GetInstalledManifestFilePath(packageDependencyInfo);
                         var packageMetadata = new ChocolateyPackageMetadata(manifestPath, _fileSystem);
-
-                        var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
 
                         this.Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".format_with(
                             System.Environment.NewLine,
@@ -1307,10 +1309,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                 }
 
+                                var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
+
+                                fix_nuspec_casing(availablePackage, installedPath);
+
                                 var manifestPath = nugetProject.GetInstalledManifestFilePath(packageDependencyInfo);
                                 var packageMetadata = new ChocolateyPackageMetadata(manifestPath, _fileSystem);
-
-                                var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
 
                                 remove_nuget_cache_for_package(availablePackage);
 
@@ -1939,7 +1943,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                                 remove_rollback_directory_if_exists(packageName);
                                 backup_existing_version(config, packageToUninstall.PackageMetadata, uninstallPkgInfo);
 
-                                var packageResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name.to_lower() + "." + packageToUninstall.Version.to_string(), packageToUninstall);
+                                var packageResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name + "." + packageToUninstall.Version.to_string(), packageToUninstall);
                                 packageResult.InstallLocation = packageToUninstall.InstallLocation;
                                 string logMessage = "{0}{1} v{2}{3}".format_with(Environment.NewLine, packageToUninstall.Name, packageToUninstall.Version.to_string(), config.Force ? " (forced)" : string.Empty);
                                 packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
@@ -1974,12 +1978,12 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                             {
                                 var logMessage = "{0} not uninstalled. An error occurred during uninstall:{1} {2}".format_with(packageName, Environment.NewLine, ex.Message);
                                 this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                                var result = packageResultsToReturn.GetOrAdd(packageToUninstall.Name.to_lower() + "." + packageToUninstall.Version.to_string(), new PackageResult(packageToUninstall.PackageMetadata, pathResolver.GetInstallPath(packageToUninstall.PackageMetadata.Id, packageToUninstall.PackageMetadata.Version)));
+                                var result = packageResultsToReturn.GetOrAdd(packageToUninstall.Name + "." + packageToUninstall.Version.to_string(), new PackageResult(packageToUninstall.PackageMetadata, pathResolver.GetInstallPath(packageToUninstall.PackageMetadata.Id, packageToUninstall.PackageMetadata.Version)));
                                 result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                                 if (result.ExitCode == 0) result.ExitCode = 1;
                                 if (config.Features.StopOnFirstPackageFailure)
                                 {
-                                    throw new ApplicationException("Stopping further execution as {0} has failed uninstallation".format_with(packageToUninstall.Name.to_lower()));
+                                    throw new ApplicationException("Stopping further execution as {0} has failed uninstallation".format_with(packageToUninstall.Name));
                                 }
                                 // do not call continueAction - will result in multiple passes
                             }
@@ -1988,7 +1992,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                     else
                     {
                         // continue action won't be found b/c we are not actually uninstalling (this is noop)
-                        var result = packageResultsToReturn.GetOrAdd(installedPackage.Name.to_lower() + "." + installedPackage.Version.to_string(), new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id, installedPackage.PackageMetadata.Version)));
+                        var result = packageResultsToReturn.GetOrAdd(installedPackage.Name + "." + installedPackage.Version.to_string(), new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id, installedPackage.PackageMetadata.Version)));
                         if (continueAction != null) continueAction.Invoke(result, config);
                     }
                 }
@@ -2023,6 +2027,25 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                 () => _fileSystem.delete_file(nupkg),
                 "Error deleting nupkg file",
                 throwError: true);
+        }
+
+        private void fix_nuspec_casing(IPackageSearchMetadata packageMetadata, string packageLocation)
+        {
+            if (Platform.get_platform() == PlatformType.Windows) return;
+            this.Log().Debug(ChocolateyLoggers.Verbose, "Fixing nuspec casing if required");
+
+            var expectedNuspec = _fileSystem.combine_paths(packageLocation, "{0}{1}"
+                .format_with(packageMetadata.Identity.Id, NuGetConstants.ManifestExtension));
+            var lowercaseNuspec = _fileSystem.combine_paths(packageLocation, "{0}{1}"
+                .format_with(packageMetadata.Identity.Id.to_lower(), NuGetConstants.ManifestExtension));
+
+            if (!_fileSystem.file_exists(expectedNuspec) && _fileSystem.file_exists(lowercaseNuspec))
+            {
+                FaultTolerance.try_catch_with_logging_exception(
+                    () => _fileSystem.move_file(lowercaseNuspec, expectedNuspec),
+                    "Error moving nuspec file {0} to {1}".format_with(lowercaseNuspec, expectedNuspec),
+                    throwError: true);
+            }
         }
 
         public virtual void remove_installation_files_unsafe(IPackageMetadata removedPackage, ChocolateyPackageInformation pkgInfo)
