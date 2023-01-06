@@ -809,6 +809,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         _fileSystem.delete_file(pathResolver.GetInstalledPackageFilePath(packageDependencyInfo));
 
+                        ChocolateyProgressInfo.ShouldDisplayDownloadProgress = config.Features.ShowDownloadProgress;
+
                         using (var downloadResult = downloadResource.GetDownloadResourceResultAsync(
                                    packageDependencyInfo,
                                    new PackageDownloadContext(sourceCacheContext),
@@ -1353,6 +1355,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 var downloadResource = packageDependencyInfo.Source.GetResource<DownloadResource>();
 
                                 _fileSystem.delete_file(pathResolver.GetInstalledPackageFilePath(packageDependencyInfo));
+
+                                ChocolateyProgressInfo.ShouldDisplayDownloadProgress = config.Features.ShowDownloadProgress;
 
                                 using (var downloadResult = downloadResource.GetDownloadResourceResultAsync(
                                            packageDependencyInfo,
