@@ -337,6 +337,73 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        public class when_packing_with_unsupported_elements : ScenariosInvalidBase
+        {
+            [Fact]
+            public void should_throw_exception_on_all_unsupported_elements()
+            {
+                AddFile("myPackage.nuspec", NuspecContentWithAllUnsupportedElements);
+
+                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+            }
+
+            [Fact]
+            public void should_throw_exception_on_serviceable_element()
+            {
+                AddFile("myPackage.nuspec", NuspecContentWithServiceableElement);
+
+                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+            }
+
+            [Fact]
+            public void should_throw_exception_on_license_element()
+            {
+                AddFile("myPackage.nuspec", NuspecContentWithLicenseElement);
+
+                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+            }
+
+            [Fact]
+            public void should_throw_exception_on_repository_element()
+            {
+                AddFile("myPackage.nuspec", NuspecContentWithRepositoryElement);
+
+                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+            }
+
+            [Fact]
+            public void should_throw_exception_on_package_types_element()
+            {
+                AddFile("myPackage.nuspec", NuspecContentWithPackageTypesElement);
+
+                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+            }
+
+            [Fact]
+            public void should_throw_exception_on_framework_references_element()
+            {
+                AddFile("myPackage.nuspec", NuspecContentWithFrameWorkReferencesElement);
+
+                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+            }
+
+            [Fact]
+            public void should_throw_exception_on_readme_element()
+            {
+                AddFile("myPackage.nuspec", NuspecContentWithReadmeElement);
+
+                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+            }
+
+            [Fact]
+            public void should_throw_exception_on_icon_element()
+            {
+                AddFile("myPackage.nuspec", NuspecContentWithIconElement);
+
+                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+            }
+        }
+
         private const string NuspecContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
   <metadata>
@@ -479,6 +546,217 @@ namespace chocolatey.tests.integration.scenarios
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
   </metadata>
+</package>";
+
+        private const string NuspecContentWithAllUnsupportedElements = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>1.0.0</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <serviceable>true</serviceable>
+    <license type=""expression"">MIT</license>
+    <repository type=""git"" url=""https://github.com/NuGet/NuGet.Client.git"" branch=""dev"" commit=""e1c65e4524cd70ee6e22abe33e6cb6ec73938cb3"" />
+    <packageTypes>
+        <packageType name=""ContosoExtension"" />
+    </packageTypes>
+    <frameworkReferences>
+      <group targetFramework="".NETCoreApp3.1"">
+        <frameworkReference name=""Chocolatey.Cake.Recipe"" />
+      </group>
+    </frameworkReferences>
+    <readme>readme.md</readme>
+    <icon>icon.png</icon>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
+</package>";
+
+        private const string NuspecContentWithServiceableElement = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>1.0.0</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <serviceable>true</serviceable>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
+</package>";
+
+
+        private const string NuspecContentWithLicenseElement = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>1.0.0</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <license type=""expression"">MIT</license>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
+</package>";
+
+        private const string NuspecContentWithRepositoryElement = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>1.0.0</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <repository type=""git"" url=""https://github.com/NuGet/NuGet.Client.git"" branch=""dev"" commit=""e1c65e4524cd70ee6e22abe33e6cb6ec73938cb3"" />
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
+</package>";
+
+        private const string NuspecContentWithPackageTypesElement = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>1.0.0</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <packageTypes>
+        <packageType name=""ContosoExtension"" />
+    </packageTypes>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
+</package>";
+
+        private const string NuspecContentWithFrameWorkReferencesElement = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>1.0.0</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <frameworkReferences>
+      <group targetFramework="".NETCoreApp3.1"">
+        <frameworkReference name=""Chocolatey.Cake.Recipe"" />
+      </group>
+    </frameworkReferences>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
+</package>";
+
+        private const string NuspecContentWithReadmeElement = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>1.0.0</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <readme>readme.md</readme>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
+</package>";
+
+        private const string NuspecContentWithIconElement = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>1.0.0</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <icon>icon.png</icon>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
 </package>";
     }
 }
