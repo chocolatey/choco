@@ -23,6 +23,7 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Net;
     using System.Net.Http;
     using System.Net.Security;
+    using System.Runtime.CompilerServices;
     using System.Security.Cryptography.X509Certificates;
     using System.Text;
     using System.Threading;
@@ -92,7 +93,7 @@ namespace chocolatey.infrastructure.app.nuget
         }
         */
 
-        public static IEnumerable<SourceRepository> GetRemoteRepositories(ChocolateyConfiguration configuration, ILogger nugetLogger)
+        public static IEnumerable<SourceRepository> GetRemoteRepositories(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
 
             //TODO, fix
@@ -185,9 +186,39 @@ namespace chocolatey.infrastructure.app.nuget
                     }
                 }
 
-                updatedSources.AppendFormat("{0};", source);
-
                 var nugetSource = new PackageSource(source);
+
+                // If not parsed as a http(s) or local source, let's try resolving the path
+                // Since NuGet.Client is not able to parse all relative paths
+                // Conversion to absolute paths is handled by clients, not by the libraries as per
+                // https://github.com/NuGet/NuGet.Client/pull/3783
+                if (nugetSource.TrySourceAsUri is null)
+                {
+                    string fullsource;
+                    try
+                    {
+                        fullsource = filesystem.get_full_path(source);
+                    }
+                    catch
+                    {
+                        // If an invalid source was passed in, we don't care here, pass it along
+                        fullsource = source;
+                    }
+                    nugetSource = new PackageSource(fullsource);
+
+                    if (!nugetSource.IsLocal)
+                    {
+                        throw new ApplicationException("Source '{0}' is unable to be parsed".format_with(source));
+                    }
+
+                    "chocolatey".Log().Debug("Updating Source path from {0} to {1}".format_with(source, fullsource));
+                    updatedSources.AppendFormat("{0};", fullsource);
+                }
+                else
+                {
+                    updatedSources.AppendFormat("{0};", source);
+                }
+
                 nugetSource.ClientCertificates = sourceClientCertificates;
                 var repo = Repository.Factory.GetCoreV3(nugetSource);
 

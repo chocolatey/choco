@@ -108,7 +108,7 @@ namespace chocolatey.infrastructure.app.services
             int? pageValue = config.ListCommand.Page;
             try
             {
-                return NugetList.GetCount(config, _nugetLogger);
+                return NugetList.GetCount(config, _nugetLogger, _fileSystem);
             }
             finally
             {
@@ -147,7 +147,7 @@ namespace chocolatey.infrastructure.app.services
 
             if (config.RegularOutput) this.Log().Debug(() => "Running list with the following filter = '{0}'".format_with(config.Input));
             if (config.RegularOutput) this.Log().Debug(ChocolateyLoggers.Verbose, () => "--- Start of List ---");
-            foreach (var pkg in NugetList.GetPackages(config, _nugetLogger))
+            foreach (var pkg in NugetList.GetPackages(config, _nugetLogger, _fileSystem))
             {
                 var package = pkg; // for lamda access
 
@@ -198,7 +198,7 @@ namespace chocolatey.infrastructure.app.services
                         if (config.Verbose && !config.ListCommand.IdOnly) this.Log().Info(() =>
                             @" Title: {0} | Published: {1}{2}{3}
  Number of Downloads: {4} | Downloads for this version: {5}
- Package url: {6}
+ Package url{6}
  Chocolatey Package Source: {7}{8}
  Tags: {9}
  Software Site: {10}
@@ -217,12 +217,12 @@ namespace chocolatey.infrastructure.app.services
                                         package.PackageTestResultStatus,
                                         package.PackageValidationResultDate.GetValueOrDefault().ToString("MMM dd yyyy HH:mm:ss")
                                     ),
-                                package.DownloadCount <= 0 ? "n/a" : package.DownloadCount.to_string(),
-                                package.VersionDownloadCount <= 0 ? "n/a" : package.VersionDownloadCount.to_string(),
-                                package.PackageDetailsUrl == null || string.IsNullOrWhiteSpace(package.PackageDetailsUrl.AbsoluteUri) ? "N/A" : package.PackageDetailsUrl.AbsoluteUri,
+                                (package.DownloadCount == null || package.DownloadCount <= 0)  ? "n/a" : package.DownloadCount.to_string(),
+                                (package.VersionDownloadCount == null || package.VersionDownloadCount <= 0) ? "n/a" : package.VersionDownloadCount.to_string(),
+                                package.PackageDetailsUrl == null || string.IsNullOrWhiteSpace(package.PackageDetailsUrl.AbsoluteUri) ? string.Empty : " " + package.PackageDetailsUrl.AbsoluteUri,
                                 packageLocalMetadata != null && packageLocalMetadata.PackageSourceUrl != null && !string.IsNullOrWhiteSpace(packageLocalMetadata.PackageSourceUrl.to_string())
                                     ? packageLocalMetadata.PackageSourceUrl.to_string()
-                                    : "N/A",
+                                    : "n/a",
                                 string.IsNullOrWhiteSpace(package.PackageHash) ? string.Empty : "{0} Package Checksum: '{1}' ({2})".format_with(
                                         Environment.NewLine,
                                         package.PackageHash,
@@ -235,7 +235,7 @@ namespace chocolatey.infrastructure.app.services
                                 packageLocalMetadata != null && packageLocalMetadata.DocsUrl != null && !string.IsNullOrWhiteSpace(packageLocalMetadata.DocsUrl.to_string()) ? "{0} Documentation: {1}".format_with(Environment.NewLine, packageLocalMetadata.DocsUrl.to_string()) : string.Empty,
                                 packageLocalMetadata != null && packageLocalMetadata.MailingListUrl != null && !string.IsNullOrWhiteSpace(packageLocalMetadata.MailingListUrl.to_string()) ? "{0} Mailing List: {1}".format_with(Environment.NewLine, packageLocalMetadata.MailingListUrl.to_string()) : string.Empty,
                                 packageLocalMetadata != null && packageLocalMetadata.BugTrackerUrl != null && !string.IsNullOrWhiteSpace(packageLocalMetadata.BugTrackerUrl.to_string()) ? "{0} Issues: {1}".format_with(Environment.NewLine, packageLocalMetadata.BugTrackerUrl.to_string()) : string.Empty,
-                                package.Summary != null && !string.IsNullOrWhiteSpace(package.Summary.to_string()) ? "{0} Summary: {1}".format_with(Environment.NewLine, package.Summary.escape_curly_braces().to_string()) : string.Empty,
+                                package.Summary != null && !string.IsNullOrWhiteSpace(package.Summary.to_string()) ? "\r\n Summary: {0}".format_with(package.Summary.escape_curly_braces().to_string()) : string.Empty,
                                 package.Description.escape_curly_braces().Replace("\n    ", "\n").Replace("\n", "\n  "),
                                 packageLocalMetadata != null && packageLocalMetadata.ReleaseNotes != null && !string.IsNullOrWhiteSpace(packageLocalMetadata.ReleaseNotes.to_string()) ? "{0} Release Notes: {1}".format_with(Environment.NewLine, packageLocalMetadata.ReleaseNotes.escape_curly_braces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty
                             ));
@@ -378,7 +378,7 @@ namespace chocolatey.infrastructure.app.services
             string nupkgFileName = _fileSystem.get_file_name(nupkgFilePath);
             if (config.RegularOutput) this.Log().Info(() => "Attempting to push {0} to {1}".format_with(nupkgFileName, config.Sources));
 
-            NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath), _nugetLogger, nupkgFileName);
+            NugetPush.push_package(config, _fileSystem.get_full_path(nupkgFilePath), _nugetLogger, nupkgFileName, _fileSystem);
 
             if (config.RegularOutput && (config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSource) || config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)))
             {
@@ -438,7 +438,7 @@ folder.");
             if (config.Force) config.AllowDowngrade = true;
 
             var sourceCacheContext = new ChocolateySourceCacheContext(config);
-            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger);
+            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
             var localRepositorySource = NugetCommon.GetLocalRepository();
             var pathResolver = NugetCommon.GetPathResolver(config, _fileSystem);
             var nugetProject = new FolderNuGetProject(ApplicationParameters.PackagesLocation, pathResolver, NuGetFramework.AnyFramework);
@@ -868,7 +868,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             if (config.Force) config.AllowDowngrade = true;
 
             var sourceCacheContext = new ChocolateySourceCacheContext(config);
-            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger);
+            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
             var localRepositorySource = NugetCommon.GetLocalRepository();
             var projectContext = new ChocolateyNuGetProjectContext(config, _nugetLogger);
 
@@ -1365,7 +1365,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         public virtual ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config)
         {
 
-            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger);
+            var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
             var pathResolver = NugetCommon.GetPathResolver(config, _fileSystem);
 
             var outdatedPackages = new ConcurrentDictionary<string, PackageResult>();

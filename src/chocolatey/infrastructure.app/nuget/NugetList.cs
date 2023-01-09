@@ -26,6 +26,7 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Threading;
     using System.Threading.Tasks;
     using configuration;
+    using filesystem;
     using NuGet.Common;
     using NuGet.Configuration;
     using NuGet.PackageManagement;
@@ -39,19 +40,19 @@ namespace chocolatey.infrastructure.app.nuget
 
     public static class NugetList
     {
-        public static IEnumerable<IPackageSearchMetadata> GetPackages(ChocolateyConfiguration configuration, ILogger nugetLogger)
+        public static IEnumerable<IPackageSearchMetadata> GetPackages(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-            return execute_package_search(configuration, nugetLogger).GetAwaiter().GetResult();
+            return execute_package_search(configuration, nugetLogger, filesystem).GetAwaiter().GetResult();
         }
 
-        public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger)
+        public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-            return execute_package_search(configuration, nugetLogger).GetAwaiter().GetResult().Count();
+            return execute_package_search(configuration, nugetLogger, filesystem).GetAwaiter().GetResult().Count();
         }
 
-        private async static Task<IQueryable<IPackageSearchMetadata>> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger)
+        private async static Task<IQueryable<IPackageSearchMetadata>> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-            var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger);
+            var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger, filesystem);
             var packageRepositoriesResources = NugetCommon.GetRepositoryResources(packageRepositories);
             string searchTermLower = configuration.Input.to_lower();
             SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
