@@ -27,6 +27,12 @@ namespace chocolatey.infrastructure.licensing
         public static ChocolateyLicense validate_license()
         {
             var license = LicenseValidation.validate();
+
+            ////////////////////////////////////////////
+            // REMOVE THIS BEFORE CHOCOLATEY CLI V2.0 //
+            ////////////////////////////////////////////
+            return license;
+
             if (license.is_licensed_version())
             {
                 try
