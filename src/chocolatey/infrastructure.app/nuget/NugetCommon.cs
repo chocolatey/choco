@@ -137,6 +137,10 @@ namespace chocolatey.infrastructure.app.nuget
 
                 ProxyCache.Instance.Override(proxy);
             }
+            else
+            {
+                ProxyCache.Instance.Override(new System.Net.WebProxy());
+            }
 
             IEnumerable<string> sources = configuration.Sources.to_string().Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
 
