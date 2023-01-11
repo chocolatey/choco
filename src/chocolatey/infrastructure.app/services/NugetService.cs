@@ -323,12 +323,12 @@ namespace chocolatey.infrastructure.app.services
 
             if (!(metadataNode.Elements(XName.Get("repository", metadataNamespace)).FirstOrDefault() is null))
             {
-                issuesList.Add("<repository> elements are not supported in Chocolatey CLI, used <packageSourceUrl> instead");
+                issuesList.Add("<repository> elements are not supported in Chocolatey CLI, use <packageSourceUrl> instead");
             }
 
             if (!(nuspecReader.GetLicenseMetadata() is null))
             {
-                issuesList.Add("<license> elements are not supported in Chocolatey CLI, used <licenseUrl> instead");
+                issuesList.Add("<license> elements are not supported in Chocolatey CLI, use <licenseUrl> instead");
             }
 
             if (!(metadataNode.Elements(XName.Get("packageTypes", metadataNamespace)).FirstOrDefault() is null))
