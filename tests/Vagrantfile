@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "StefanScherer/windows_2019"
+  config.vm.box = "StefanScherer/windows_2022"
   config.vm.boot_timeout = 600
 
   # windows
@@ -44,14 +44,14 @@ Vagrant.configure("2") do |config|
     iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
     Write-Host "We are going to install some prerequisites now. This could take some time"
-    $null = choco install dotnet3.5 git pester visualstudio2019community visualstudio2019-workload-manageddesktop -y
+    $null = choco install git pester visualstudio2022community visualstudio2022-workload-manageddesktop netfx-4.8-devpack -y
     Import-Module $env:ChocolateyInstall/helpers/chocolateyProfile.psm1
     Update-SessionEnvironment
     Write-Host "Done installing software, now copying files"
     $null = robocopy c:/chocoRoot c:/code/choco /mir
     Push-Location c:/code/choco
-    Write-Host "Files have been copied, beginning build process. You may see some red warning text regarding VsVersionToYearString, this can be safely ignored"
-    $CakeOutput = ./build.bat
+    Write-Host "Files have been copied, beginning build process."
+    $CakeOutput = ./build.bat 2>&1
     if ($LastExitCode -ne 0) {
       Set-Content c:/chocoRoot/buildOutput.txt -Value $CakeOutput
       Write-Host "The build has failed. Please see the buildOutput.txt file at the root of the repository for details"
