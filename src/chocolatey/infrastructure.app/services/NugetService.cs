@@ -261,7 +261,7 @@ namespace chocolatey.infrastructure.app.services
                 }
                 else
                 {
-                    yield return new PackageResult(packageLocalMetadata, package, packageInstallLocation, config.Sources);
+                    yield return new PackageResult(packageLocalMetadata, package, config.ListCommand.LocalOnly ? packageInstallLocation : null, config.Sources);
                 }
             }
 
