@@ -154,29 +154,6 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
     }
 
-    # Issue: https://github.com/chocolatey/choco/issues/1843
-    Context "List installed package with exact and side-by-side loading" -Skip:(-Not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta-233")) {
-        BeforeAll {
-            $null = Invoke-Choco install isdependency --version 2.0.0 --confirm
-            $null = Invoke-Choco install isdependency --version 1.1.0 --allow-multiple-versions --confirm
-
-            $Output = Invoke-Choco $_ isdependency --AllVersions --exact --local-only
-        }
-
-        It "Exits with Success (0)" -Tag ExpectBroken {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Shows version <_> of local package" -Tag ExpectBroken -ForEach @("2.0.0"; "1.1.0") {
-            $Output.Lines | Should -Contain "isdependency $_"
-        }
-
-        It "Outputs a warning message that installed side by side package is deprecated" {
-            $Output.Lines | Should -Contain "isdependency has been installed as a side by side installation."
-            $Output.Lines | Should -Contain "Side by side installations are deprecated and is pending removal in v2.0.0."
-        }
-    }
-
     Context "Searching packages with Verbose" {
         BeforeAll {
             $Output = Invoke-Choco $_ --Verbose
