@@ -369,6 +369,62 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
     }
 
+    Context 'Attempting to pack a package with unsupported nuspec elements throws an error' {
+
+        BeforeDiscovery {
+            $testCases = @(
+                '<license>'
+                '<packageTypes>'
+                '<readme>'
+                '<repository>'
+                '<serviceable>'
+            )
+        }
+
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $nuspec = @'
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>unsupportedmetadata</id>
+    <version>1.0.0</version>
+    <title>unsupportedmetadata (Install)</title>
+    <authors>Chocolatey Software</authors>
+    <tags>unsupportedmetadata</tags>
+
+    <license type="expression">MIT</license>
+    <packageTypes>
+        <packageType name="Unsupported" />
+    </packageTypes>
+    <readme>readme.md</readme>
+    <repository type="git" url="https://github.com/chocolatey/choco.git" />
+    <serviceable>true</serviceable>
+
+    <summary>Test of unsupported metadata</summary>
+    <description>Some metadata fields are not supported by chocolatey. `choco pack` should fail to pack them, while `choco install` or `upgrade` should allow them with a warning.</description>
+  </metadata>
+</package>
+'@
+            $packageName = 'unsupportedmetadata'
+            $nuspecPath = "$packageName\$packageName.nuspec"
+
+            $null = New-Item -Path $packageName -ItemType Directory
+            $nuspec | Set-Content -Path $nuspecPath
+            "readme content" | Set-Content -Path "$packageName\readme.md"
+
+            $Output = Invoke-Choco pack $nuspecPath
+        }
+
+        It 'Fails to pack and exits with an error (1)' {
+            $Output.ExitCode | Should -Be 1
+        }
+
+        It 'Shows an error about the unsupported nuspec metadata element "<_>"' -TestCases $testCases {
+            $Output.String | Should -Match "$_ elements are not supported in Chocolatey CLI"
+        }
+    }
+    
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     Test-NuGetPaths
 }
