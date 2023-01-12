@@ -78,23 +78,23 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Chocolatey.NuGet.Common, Version=3.0.0.85, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Common.3.0.0-alpha-20221219-85\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Common, Version=3.0.0.108, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Common.3.0.0-alpha-20230112-108\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Configuration, Version=3.0.0.85, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.0.0-alpha-20221219-85\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Configuration, Version=3.0.0.108, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.0.0-alpha-20230112-108\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Frameworks, Version=3.0.0.85, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.0.0-alpha-20221219-85\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Frameworks, Version=3.0.0.108, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.0.0-alpha-20230112-108\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Packaging, Version=3.0.0.85, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.0.0-alpha-20221219-85\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Packaging, Version=3.0.0.108, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.0.0-alpha-20230112-108\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Protocol, Version=3.0.0.85, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.0.0-alpha-20221219-85\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Protocol, Version=3.0.0.108, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.0.0-alpha-20230112-108\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Versioning, Version=3.0.0.85, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.0.0-alpha-20221219-85\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Versioning, Version=3.0.0.108, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.0.0-alpha-20230112-108\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
