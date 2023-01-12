@@ -2,6 +2,7 @@ Import-Module helpers/common-helpers
 
 Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
@@ -256,4 +257,8 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
             }
         }
     }
+
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

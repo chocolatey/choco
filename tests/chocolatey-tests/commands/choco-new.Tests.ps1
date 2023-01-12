@@ -17,6 +17,7 @@ $EmptyFolders = @(
 )
 Describe "choco new" -Tag Chocolatey, NewCommand {
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
 
         $expectedHeader = Get-ExpectedChocolateyHeader
@@ -157,4 +158,7 @@ Describe "choco new" -Tag Chocolatey, NewCommand {
             "$PWD\emptyfolder\$_" | Should -Exist
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

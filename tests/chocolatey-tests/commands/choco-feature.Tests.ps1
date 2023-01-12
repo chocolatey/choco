@@ -14,6 +14,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         $CommandUnderTest = $_
         Initialize-ChocolateyTestInstall
 
@@ -212,4 +213,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
             $Output.String | Should -Match "Feature 'nonExistingFeature' not found"
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

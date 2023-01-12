@@ -22,6 +22,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall -Source $PSScriptRoot\testpackages
         Invoke-Choco install installpackage --version 1.0.0 --confirm
         Invoke-Choco install upgradepackage --version 1.0.0 --confirm
@@ -428,4 +429,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
             $Output.Lines | Should -Contain 'The `webpi` source is deprecated and will be removed in Chocolatey v2.0.0.' -Because $Output.String
         }
     }
+
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

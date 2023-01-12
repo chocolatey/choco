@@ -2,6 +2,7 @@
 
 Describe "choco config" -Tag Chocolatey, ConfigCommand {
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
         New-ChocolateyInstallSnapshot
 
@@ -352,4 +353,7 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
             $value | Should -HaveCount 0
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

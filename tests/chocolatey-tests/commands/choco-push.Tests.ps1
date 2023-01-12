@@ -13,6 +13,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         # Ideally this comes from an environment variable, but that's proving harder to put into the tests than is desired.
         $ApiKey = $env:API_KEY
         # Using Chocolatey Community Repository for pushing as choco-test could be blown away at any time, and we'd have to reset up the user and packages.
@@ -123,4 +124,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $
             $Output.Lines | Should -Contain "The remote server returned an error: (409) Conflict.."
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

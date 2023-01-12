@@ -10,6 +10,7 @@ Import-Module helpers/common-helpers
 
 Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
         $CurrentCommand = $_
 
@@ -234,4 +235,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
             $Output.Lines | Should -Contain "https://test.com/api - (Authenticated)"
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

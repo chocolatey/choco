@@ -23,6 +23,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         BeforeAll {
+            Remove-NuGetPaths
             $Output = Invoke-Choco info mvcmusicstore-web
             $Output.Lines = $Output.Lines
         }
@@ -162,4 +163,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
             $Output.Lines | Should -Contain "Side by side installations are deprecated and is pending removal in v2.0.0." -Because $Output.String
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }
