@@ -481,7 +481,24 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Force Installing a Package that is already installed (with an exclusively locked file)" {
+    Context "Force Installing a Package that is already installed (with an exclusively locked file)" -Tag Broken {
+        BeforeDiscovery {
+            $PackageUnderTest = "installpackage"
+            $expectedFiles = @(
+                "$PackageUnderTest.nuspec"
+                "$PackageUnderTest.nupkg"
+                'tools\casemismatch.exe'
+                'tools\chocolateyinstall.ps1'
+                'tools\chocolateyuninstall.ps1'
+                'console.exe'
+                'graphical.exe'
+                'graphical.exe.gui'
+                'not.installed.exe'
+                'not.installed.exe.ignored'
+                'simplefile.txt'
+            )
+        }
+
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -503,16 +520,12 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $LockedFile.Close()
         }
 
-        It "Exits with Success (0)" -Tag FossOnly, ExpectBroken {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Exits with Failure (1)" -Tag Licensed {
+        It "Exits with Failure (1)" {
             $Output.ExitCode | Should -Be 1
         }
 
         It "Has successfully retained an install of the original package" {
-            "$env:ChocolateyInstall\lib\$PackageUnderTest\"
+            "$env:ChocolateyInstall\lib\$PackageUnderTest\" | Should -Exist
         }
 
         It "Has successfully retained the original version" {
@@ -521,12 +534,24 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $XML.package.metadata.version | Should -Be "1.0.0"
         }
 
-        It "Should not have been able to delete the rollback" -Tag FossOnly, ExpectBroken {
+        It "Should not have been able to delete the rollback" -Tag Broken {
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
+        }
+
+        It "Should have kept file in rollback folder (<_>)" -ForEach $expectedFiles {
+            "$env:ChocolateyInstall\lib-bkp\$_" | Should -Exist
         }
 
         It "Should have been able to delete the rollback" -Tag Licensed {
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Should have created the package in lib-bad" {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest" | Should -Exist
+        }
+
+        It "Should have stored file in bad folder (<_>)" -ForEach $expectedFiles {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$_" | Should -Exist
         }
 
         It "Outputs a message showing that installation succeeded." {
