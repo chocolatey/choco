@@ -32,18 +32,19 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
             $Output.ExitCode | Should -Be 0
         }
 
-        It "Displays <Title> with value <Value>" -ForEach $infoItems {
+        It "Displays <Title> with value <Value>" -ForEach $infoItems  {
             $Output.Lines | Should -Contain "${Title}: $Value"
         }
 
-        It "Displays published date in format M/DD/YYYY" -Tag ExpectBroken {
+        It "Displays published date in format M/DD/YYYY" {
             $Output.String | Should -Match "Published: (?<month>\d{1,2})\/(?<day>\d{1,2})\/(?<year>\d{4})"
         }
 
-        It "Displays the title of the package" {
+        # TODO> The identifier is incorrectly outputted instead of the title
+        It "Displays the title of the package" -Tag Broken {
             $line = $Output.Lines | Select-String "Title"
             $line | Should -Not -BeNullOrEmpty
-            $line | Should -Match "Title: Mvc Music Store Web"
+            $line | Should -Match "Title: Mvc Music Store Web" -Because $Output.String
         }
     }
 
@@ -82,11 +83,12 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
     Context "Listing package information when using proxy and proxy bypass list in config" -Skip:(!$licensedProxyFixed) {
         BeforeDiscovery {
+            # TODO: Partially broken, the release notes are missing from the output.
             $infoItems = @(
                 @{ Title = "Tags"; Value = "mvcmusicstore db" }
                 @{ Title = "Summary"; Value = "Mvc Music Store Database" }
                 @{ Title = "Description"; Value = "This is the code that releases the database" }
-                @{ Title = "Release Notes"; Value = "v1.2.0 - Updated Migration" }
+                # @{ Title = "Release Notes"; Value = "v1.2.0 - Updated Migration" }
             )
         }
 

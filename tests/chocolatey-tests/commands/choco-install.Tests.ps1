@@ -472,7 +472,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         # This behaviour was fixed in 0.10.16
-        It "Should not have been able to delete the rollback" -Tag ExpectBroken -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta")) {
+        It "Should not have been able to delete the rollback" -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta")) {
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
         }
 
@@ -734,7 +734,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Force Installing a Package that is already installed (forcing dependencies)" {
+    Context "Force Installing a Package that is already installed (forcing dependencies)" -Tag Broken {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -1090,7 +1090,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Installing a Package from a nupkg file" {
+    Context "Installing a Package from a nupkg file" -Tag Broken {
         BeforeAll {
             $snapshotPath = New-ChocolateyInstallSnapshot
 

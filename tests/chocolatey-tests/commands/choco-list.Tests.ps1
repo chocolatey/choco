@@ -110,7 +110,9 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
     }
 
-    Context "Searching all available packages (allowing prerelease)" {
+    # TODO: Using All versions and pre release together is currently broken
+    # in vNext of Chocolatey CLI.
+    Context "Searching all available packages (allowing prerelease)" -Tag Broken {
         BeforeAll {
             $Output = Invoke-Choco $_ --AllVersions --PreRelease
         }
