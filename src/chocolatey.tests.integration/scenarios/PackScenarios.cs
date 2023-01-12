@@ -514,7 +514,12 @@ namespace chocolatey.tests.integration.scenarios
     <licenseUrl>http://apache.org/2</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
   </metadata>
+  <files>
+  </files>
 </package>";
 
         private const string NuspecContentWithBuildMetadata = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -532,7 +537,12 @@ namespace chocolatey.tests.integration.scenarios
     <licenseUrl>http://apache.org/2</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
   </metadata>
+  <files>
+  </files>
 </package>";
 
         private const string NuspecContentWithChocolateyData = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -550,7 +560,12 @@ namespace chocolatey.tests.integration.scenarios
     <licenseUrl>http://apache.org/2</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
   </metadata>
+  <files>
+  </files>
 </package>";
 
         private const string NuspecContentWithVariables = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -568,7 +583,12 @@ namespace chocolatey.tests.integration.scenarios
     <licenseUrl>https://github.com/chocolatey/choco/tree/$commitId$/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
   </metadata>
+  <files>
+  </files>
 </package>";
 
         private const string NuspecContentWithSemVer20PreReleaseVersioning = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -586,7 +606,12 @@ namespace chocolatey.tests.integration.scenarios
     <licenseUrl>http://apache.org/2</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
   </metadata>
+  <files>
+  </files>
 </package>";
 
         private const string NuspecContentWithLegacySemVerPreReleaseVersioning = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -604,7 +629,12 @@ namespace chocolatey.tests.integration.scenarios
     <licenseUrl>http://apache.org/2</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
   </metadata>
+  <files>
+  </files>
 </package>";
 
         private const string NuspecContentWithOnlyMajorMinorVersion = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -622,7 +652,12 @@ namespace chocolatey.tests.integration.scenarios
     <licenseUrl>http://apache.org/2</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
   </metadata>
+  <files>
+  </files>
 </package>";
 
         private const string NuspecContentWithFull4PartVersioning = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -640,7 +675,12 @@ namespace chocolatey.tests.integration.scenarios
     <licenseUrl>http://apache.org/2</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
   </metadata>
+  <files>
+  </files>
 </package>";
 
         private const string NuspecContentWithAllUnsupportedElements = @"<?xml version=""1.0"" encoding=""utf-8""?>
