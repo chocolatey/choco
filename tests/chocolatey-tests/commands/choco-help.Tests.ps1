@@ -27,6 +27,7 @@ Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolate
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         $helpArgument = $_
         Initialize-ChocolateyTestInstall
         New-ChocolateyInstallSnapshot
@@ -90,4 +91,7 @@ Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolate
             $Output.Lines | Should -Contain "Options and Switches"
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

@@ -8,6 +8,7 @@ Describe "choco <_>" -ForEach @(
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
@@ -295,4 +296,7 @@ Describe "choco <_>" -ForEach @(
             "$env:ChocolateyInstall\templates\$_\.parameters" | Should -Exist
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

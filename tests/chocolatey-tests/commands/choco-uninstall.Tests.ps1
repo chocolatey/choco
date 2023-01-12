@@ -1,7 +1,8 @@
-﻿Import-Module helpers/common-helpers
+Import-Module helpers/common-helpers
 
 Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
@@ -65,4 +66,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             $Output.Lines | Should -Contain ($_ -replace '<installPath>', $env:ChocolateyInstall) -Because $Output.String
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

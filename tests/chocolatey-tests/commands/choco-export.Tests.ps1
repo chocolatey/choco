@@ -12,6 +12,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         $expectedHeader = Get-ExpectedChocolateyHeader
         Initialize-ChocolateyTestInstall
 
@@ -466,4 +467,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
             $Output.Lines | Should -Contain "Export all currently installed packages to a file."
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }
