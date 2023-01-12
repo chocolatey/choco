@@ -1,4 +1,4 @@
-﻿Import-Module helpers/common-helpers
+Import-Module helpers/common-helpers
 
 Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolatey {
     BeforeDiscovery {
@@ -363,6 +363,29 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         It 'LastExitCode should be Success (0)' {
             & $_ -NoProfile -Command $Command
             $LASTEXITCODE | Should -Be 0
+        }
+    }
+
+    # This is skipped when not run in CI because it modifies the local system.
+    Context '.Net Registry is not set' -Skip:(-not $env:TEST_KITCHEN) {
+        BeforeAll {
+            $RegistryPath = 'SOFTWARE\Wow6432Node\Microsoft\NET Framework Setup\NDP\v4\Full\'
+            Set-RegistryKeyOwner -Key $RegistryPath
+            $OriginalRelease = Get-ItemPropertyValue -Path "HKLM:\$RegistryPath" -Name Release
+            Remove-ItemProperty -Path "HKLM:\$RegistryPath" -Name Release
+            $Output = Invoke-Choco help
+        }
+
+        AfterAll {
+            New-ItemProperty -Path "HKLM:\$RegistryPath" -Name Release -Value $OriginalRelease
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        }
+
+        It "Reports .NET Framework 4.8 is required" {
+            $Output.Lines | Should -Contain '.NET 4.8 is not installed or may need a reboot to complete installation.'
         }
     }
 }
