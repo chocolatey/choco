@@ -153,11 +153,6 @@ namespace chocolatey.infrastructure.app.services
             {
                 var package = pkg; // for lamda access
 
-                if (!string.IsNullOrWhiteSpace(config.Version))
-                {
-                    if (!pkg.Identity.Version.to_string().is_equal_to(config.Version)) continue;
-                }
-
                 ChocolateyPackageMetadata packageLocalMetadata;
                 string packageInstallLocation = null;
                 if (package.PackagePath != null && !string.IsNullOrWhiteSpace(package.PackagePath))

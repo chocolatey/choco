@@ -163,6 +163,11 @@ namespace chocolatey.infrastructure.app.nuget
                 }
             }
 
+            if (version != null)
+            {
+                results = results.Where(p => p.Identity.Version.Equals(version)).ToHashSet();
+            }
+
             if (configuration.ListCommand.ByIdOnly)
             {
                 results = results.Where(p => p.Identity.Id.ToLower().Contains(searchTermLower)).ToHashSet();
