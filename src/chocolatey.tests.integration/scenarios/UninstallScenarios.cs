@@ -1409,5 +1409,123 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("UpperCase 1.1.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
             }
         }
+
+        public class when_uninstalling_a_package_with_non_normalized_version : ScenariosBase
+        {
+            private PackageResult packageResult;
+
+            private string NonNormalizedVersion = "0004.0004.00005.00";
+
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration.PackageNames = Configuration.Input = "upgradepackage";
+                Scenario.add_changed_version_package_to_source_location(Configuration, "upgradepackage.1.1.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
+                Scenario.install_package(Configuration, "upgradepackage", NonNormalizedVersion);
+            }
+
+            public override void Because()
+            {
+                Results = Service.uninstall_run(Configuration);
+                packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_remove_the_package_from_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_delete_a_shim_for_console_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+
+                FileAssert.DoesNotExist(shimfile);
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_delete_a_shim_for_graphical_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+
+                FileAssert.DoesNotExist(shimfile);
+            }
+
+            [Fact]
+            public void should_delete_any_files_created_during_the_install()
+            {
+                var generatedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "simplefile.txt");
+
+                FileAssert.DoesNotExist(generatedFile);
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_uninstalled_successfully()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("1/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_script()
+            {
+                MockLogger.contains_message("upgradepackage {0} Before Modification".format_with(NonNormalizedVersion), LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyUninstall_script()
+            {
+                MockLogger.contains_message("upgradepackage {0} Uninstalled".format_with(NonNormalizedVersion), LogLevel.Info).ShouldBeTrue();
+            }
+        }
     }
 }
