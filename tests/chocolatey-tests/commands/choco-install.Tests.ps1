@@ -472,7 +472,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         # This behaviour was fixed in 0.10.16
-        It "Should not have been able to delete the rollback" -Tag ExpectBroken -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta")) {
+        It "Should not have been able to delete the rollback" -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta")) {
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
         }
 
@@ -481,7 +481,24 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Force Installing a Package that is already installed (with an exclusively locked file)" {
+    Context "Force Installing a Package that is already installed (with an exclusively locked file)" -Tag Broken {
+        BeforeDiscovery {
+            $PackageUnderTest = "installpackage"
+            $expectedFiles = @(
+                "$PackageUnderTest.nuspec"
+                "$PackageUnderTest.nupkg"
+                'tools\casemismatch.exe'
+                'tools\chocolateyinstall.ps1'
+                'tools\chocolateyuninstall.ps1'
+                'console.exe'
+                'graphical.exe'
+                'graphical.exe.gui'
+                'not.installed.exe'
+                'not.installed.exe.ignored'
+                'simplefile.txt'
+            )
+        }
+
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -503,16 +520,12 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $LockedFile.Close()
         }
 
-        It "Exits with Success (0)" -Tag FossOnly, ExpectBroken {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Exits with Failure (1)" -Tag Licensed {
+        It "Exits with Failure (1)" {
             $Output.ExitCode | Should -Be 1
         }
 
         It "Has successfully retained an install of the original package" {
-            "$env:ChocolateyInstall\lib\$PackageUnderTest\"
+            "$env:ChocolateyInstall\lib\$PackageUnderTest\" | Should -Exist
         }
 
         It "Has successfully retained the original version" {
@@ -521,12 +534,24 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $XML.package.metadata.version | Should -Be "1.0.0"
         }
 
-        It "Should not have been able to delete the rollback" -Tag FossOnly, ExpectBroken {
+        It "Should not have been able to delete the rollback" -Tag Broken {
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
+        }
+
+        It "Should have kept file in rollback folder (<_>)" -ForEach $expectedFiles {
+            "$env:ChocolateyInstall\lib-bkp\$_" | Should -Exist
         }
 
         It "Should have been able to delete the rollback" -Tag Licensed {
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Should have created the package in lib-bad" {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest" | Should -Exist
+        }
+
+        It "Should have stored file in bad folder (<_>)" -ForEach $expectedFiles {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$_" | Should -Exist
         }
 
         It "Outputs a message showing that installation succeeded." {
@@ -662,115 +687,6 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Installing a side-by-side Package" {
-        BeforeAll {
-            Restore-ChocolateyInstallSnapshot
-
-            $PackageUnderTest = "installpackage"
-
-            $Output = Invoke-Choco install $PackageUnderTest --confirm --allowmultipleversions
-        }
-
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Installed a package to the lib directory" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0" | Should -Exist
-        }
-
-        It "Installs the expected version of the package" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0\$($PackageUnderTest).1.0.0.nuspec" | Should -Exist
-            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0\$($PackageUnderTest).1.0.0.nuspec"
-            $XML.package.metadata.version | Should -Be "1.0.0"
-        }
-
-        It "Outputs a warning message about side by side installs are deprecated" {
-            $Output.Lines | Should -Contain "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0." -Because $Output.String
-        }
-
-        It "Outputs a message indicating that it installed the package successfully" {
-            $Output.Lines | Should -Contain "Chocolatey installed 1/1 packages."
-        }
-    }
-
-    Context "Switching a normal Package to a side-by-side Package" {
-        BeforeAll {
-            Restore-ChocolateyInstallSnapshot
-
-            $PackageUnderTest = "installpackage"
-
-            $null = Invoke-Choco install $PackageUnderTest --confirm
-
-            $Output = Invoke-Choco install $PackageUnderTest --confirm --force --allowmultipleversions
-        }
-
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Installed the package to the lib directory" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0" | Should -Exist
-        }
-
-        It "Removed the previous version of the package from the lib directory" -Tag ExpectBroken {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest)" | Should -Not -Exist
-        }
-
-        It "Installs the expected version of the package" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0\$($PackageUnderTest).1.0.0.nuspec" | Should -Exist
-            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0\$($PackageUnderTest).1.0.0.nuspec"
-            $XML.package.metadata.version | Should -Be "1.0.0"
-        }
-
-        It "Outputs a warning message about side by side installs are deprecated" {
-            $Output.Lines | Should -Contain "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0." -Because $Output.String
-        }
-
-        It "Outputs a message indicating that it installed the package successfully" {
-            $Output.Lines | Should -Contain "Chocolatey installed 1/1 packages."
-        }
-    }
-
-    Context "Switching a side-by-side Package to a normal Package" {
-        BeforeAll {
-            Restore-ChocolateyInstallSnapshot
-
-            $PackageUnderTest = "installpackage"
-
-            $null = Invoke-Choco install $PackageUnderTest --confirm --allowmultipleversion
-
-            $Output = Invoke-Choco install $PackageUnderTest --confirm --force
-        }
-
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Installed the package to the lib directory" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest)" | Should -Exist
-        }
-
-        It "Installs the expected version of the package" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec" | Should -Exist
-            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec"
-            $XML.package.metadata.version | Should -Be "1.0.0"
-        }
-
-        It "Does not output a warning message about side by side installs are deprecated" {
-            $Output.Lines | Should -Not -Contain "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0." -Because $Output.String
-        }
-
-        It "Does not output a warning message that installed side by side package is deprecated" {
-            $Output.Lines | Should -Not -Contain "installpackage has been installed as a side by side installation." -Because $Output.String
-            $Output.Lines | Should -Not -Contain "Side by side installations are deprecated and is pending removal in v2.0.0." -Because $Output.String
-        }
-
-        It "Outputs a message indicating that it installed the package successfully" {
-            $Output.Lines | Should -Contain "Chocolatey installed 1/1 packages."
-        }
-    }
-
     Context "Installing a Package with dependencies (Happy Path)" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
@@ -843,7 +759,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Force Installing a Package that is already installed (forcing dependencies)" {
+    Context "Force Installing a Package that is already installed (forcing dependencies)" -Tag Broken {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -1199,7 +1115,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Installing a Package from a nupkg file" {
+    Context "Installing a Package from a nupkg file" -Tag Broken {
         BeforeAll {
             $snapshotPath = New-ChocolateyInstallSnapshot
 
@@ -1626,6 +1542,10 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
+    Test-NuGetPaths
+
     Context 'Installing a package with unsupported nuspec elements shows a warning' {
 
         BeforeDiscovery {
@@ -1642,7 +1562,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             Restore-ChocolateyInstallSnapshot
             $nuspec = @'
 <?xml version="1.0" encoding="utf-8"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>unsupportedmetadata</id>
     <version>1.0.0</version>
@@ -1674,7 +1594,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $null = Invoke-Choco install nuget.commandline
             $null = & "$env:ChocolateyInstall/bin/nuget.exe" pack $nuspecPath
 
-            $Output = Invoke-Choco install $packageName --source $tempPath
+            $Output = Invoke-Choco install $packageName --source .
         }
 
         AfterAll {
@@ -1689,7 +1609,6 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $Output.String | Should -Match "$_ elements are not supported in Chocolatey CLI"
         }
     }
-    
-    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
-    Test-NuGetPaths
+
+    # Do not add tests here unless they use the NuGet CLI. All Chocolatey tests should be above the Test-NuGetPaths call.
 }

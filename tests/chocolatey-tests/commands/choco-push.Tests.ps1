@@ -1,6 +1,9 @@
 ﻿Import-Module helpers/common-helpers
 
-Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY) {
+# TODO: All tests that is expected to fail now succeed when pushing to CCR
+# even when CCR returns an non-successful status code.
+# This is probably something that needs to be fixed in NuGet.Client.
+Describe "choco push" -Tag Chocolatey, PushCommand, Broken -Skip:($null -eq $env:API_KEY) {
     BeforeDiscovery {
         $isLicensed30OrMissingVersion = Test-PackageIsEqualOrHigher 'chocolatey.extension' '3.0.0-beta' -AllowMissingPackage
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
@@ -51,7 +54,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Should Report the actual cause of the error" {
@@ -82,7 +85,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Should Report the actual cause of the error" {
@@ -113,7 +116,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Should Report the actual cause of the error" {

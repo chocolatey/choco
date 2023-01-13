@@ -87,7 +87,7 @@ if (Test-Path $extensionsPath) {
 
     Write-Debug 'Loading community extensions'
     Get-ChildItem -Path $extensionsPath -Recurse -Filter '*.psm1' |
-        Where-Object { $_.Name -ne 'chocolatey.extensions.psm1' } # REMOVE THIS LINE BEFORE CHOCOLATEY CLI V2.0
+        Where-Object { $_.Name -ne 'chocolatey.extensions.psm1' } | # REMOVE THIS LINE BEFORE CHOCOLATEY CLI V2.0
         Select-Object -ExpandProperty FullName |
         ForEach-Object {
             Write-Debug "Importing '$_'"
