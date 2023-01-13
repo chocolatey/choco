@@ -1626,6 +1626,70 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
+    Context 'Installing a package with unsupported nuspec elements shows a warning' {
+
+        BeforeDiscovery {
+            $testCases = @(
+                '<license>'
+                '<packageTypes>'
+                '<readme>'
+                '<repository>'
+                '<serviceable>'
+            )
+        }
+
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $nuspec = @'
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>unsupportedmetadata</id>
+    <version>1.0.0</version>
+    <title>unsupportedmetadata (Install)</title>
+    <authors>Chocolatey Software</authors>
+    <tags>unsupportedmetadata</tags>
+
+    <license type="expression">MIT</license>
+    <packageTypes>
+        <packageType name="Unsupported" />
+    </packageTypes>
+    <readme>readme.md</readme>
+    <repository type="git" url="https://github.com/chocolatey/choco.git" />
+    <serviceable>true</serviceable>
+
+    <summary>Test of unsupported metadata</summary>
+    <description>Some metadata fields are not supported by chocolatey. `choco pack` should fail to pack them, while `choco install` or `upgrade` should allow them with a warning.</description>
+  </metadata>
+</package>
+'@
+            $tempPath = "$env:TEMP/$(New-Guid)"
+            $packageName = 'unsupportedmetadata'
+            $nuspecPath = "$tempPath/$packageName/$packageName.nuspec"
+
+            $null = New-Item -Path "$tempPath/$packageName" -ItemType Directory
+            $nuspec | Set-Content -Path $nuspecPath
+            "readme content" | Set-Content -Path "$tempPath/$packageName/readme.md"
+
+            $null = Invoke-Choco install nuget.commandline
+            $null = & "$env:ChocolateyInstall/bin/nuget.exe" pack $nuspecPath
+
+            $Output = Invoke-Choco install $packageName --source $tempPath
+        }
+
+        AfterAll {
+            Remove-Item $tempPath -Recurse -Force
+        }
+
+        It 'Installs successfully and exits with success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Shows a warning about the unsupported nuspec metadata element "<_>"' -TestCases $testCases {
+            $Output.String | Should -Match "$_ elements are not supported in Chocolatey CLI"
+        }
+    }
+    
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     Test-NuGetPaths
 }
