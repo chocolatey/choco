@@ -427,7 +427,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
             $Output.String | Should -Match "$_ elements are not supported in Chocolatey CLI"
         }
     }
-    
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     Test-NuGetPaths
 }

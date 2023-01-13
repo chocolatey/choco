@@ -1542,6 +1542,10 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
+    Test-NuGetPaths
+
     Context 'Installing a package with unsupported nuspec elements shows a warning' {
 
         BeforeDiscovery {
@@ -1558,7 +1562,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             Restore-ChocolateyInstallSnapshot
             $nuspec = @'
 <?xml version="1.0" encoding="utf-8"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>unsupportedmetadata</id>
     <version>1.0.0</version>
@@ -1590,7 +1594,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $null = Invoke-Choco install nuget.commandline
             $null = & "$env:ChocolateyInstall/bin/nuget.exe" pack $nuspecPath
 
-            $Output = Invoke-Choco install $packageName --source $tempPath
+            $Output = Invoke-Choco install $packageName --source .
         }
 
         AfterAll {
@@ -1605,7 +1609,6 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $Output.String | Should -Match "$_ elements are not supported in Chocolatey CLI"
         }
     }
-    
-    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
-    Test-NuGetPaths
+
+    # Do not add tests here unless they use the NuGet CLI. All Chocolatey tests should be above the Test-NuGetPaths call.
 }
