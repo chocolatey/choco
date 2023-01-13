@@ -105,6 +105,211 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        public class when_searching_for_exact_package_with_version_specified : CommandScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration.PackageNames = Configuration.Input = "installpackage";
+
+                Configuration.Sources = "PackageOutput";
+                Scenario.add_packages_to_source_location(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
+
+                Configuration.Version = "1.0.0";
+            }
+
+            [Fact]
+            public void should_log_standalone_header_with_package_name_and_version()
+            {
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage 1.0.0");
+            }
+
+            [Fact]
+            public void should_log_package_information()
+            {
+                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
+                    .ToShortDateString();
+
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+            }
+
+            [Fact]
+            public void should_log_package_count_as_warning()
+            {
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
+                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+            }
+        }
+
+        public class when_searching_for_exact_package_with_non_normalized_version_specified : CommandScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration.PackageNames = Configuration.Input = "installpackage";
+
+                Configuration.Sources = "PackageOutput";
+                Scenario.add_packages_to_source_location(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
+
+                Configuration.Version = "01.0.0.0";
+            }
+
+            [Fact]
+            public void should_log_standalone_header_with_package_name_and_version()
+            {
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage 1.0.0");
+            }
+
+            [Fact]
+            public void should_log_package_information()
+            {
+                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
+                    .ToShortDateString();
+
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+            }
+
+            [Fact]
+            public void should_log_package_count_as_warning()
+            {
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
+                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+            }
+        }
+
+        public class when_searching_for_non_normalized_exact_package : CommandScenariosBase
+        {
+            private string NonNormalizedVersion = "004.0.01.0";
+            private string NormalizedVersion = "4.0.1";
+
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration.PackageNames = Configuration.Input = "installpackage";
+
+                Configuration.Sources = "PackageOutput";
+
+                Scenario.add_changed_version_package_to_source_location(Configuration, "installpackage.1.0.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
+            }
+
+            [Fact]
+            public void should_log_standalone_header_with_package_name_and_version()
+            {
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage {0}".format_with(NormalizedVersion));
+            }
+
+            [Fact]
+            public void should_log_package_information()
+            {
+                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".format_with(NonNormalizedVersion) + NuGetConstants.PackageExtension))
+                    .ToShortDateString();
+
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+            }
+
+            [Fact]
+            public void should_log_package_count_as_warning()
+            {
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
+                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+            }
+        }
+
+        public class when_searching_for_non_normalized_exact_package_with_version_specified : CommandScenariosBase
+        {
+            private string NonNormalizedVersion = "004.0.01.0";
+            private string NormalizedVersion = "4.0.1";
+
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration.PackageNames = Configuration.Input = "installpackage";
+
+                Configuration.Sources = "PackageOutput";
+
+                Scenario.add_changed_version_package_to_source_location(Configuration, "installpackage.1.0.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
+
+                Configuration.Version = "4.0.1";
+            }
+
+            [Fact]
+            public void should_log_standalone_header_with_package_name_and_version()
+            {
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage {0}".format_with(NormalizedVersion));
+            }
+
+            [Fact]
+            public void should_log_package_information()
+            {
+                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".format_with(NonNormalizedVersion) + NuGetConstants.PackageExtension))
+                    .ToShortDateString();
+
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+            }
+
+            [Fact]
+            public void should_log_package_count_as_warning()
+            {
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
+                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+            }
+        }
+
+        public class when_searching_for_non_normalized_exact_package_with_non_normalized_version_specified : CommandScenariosBase
+        {
+            private string NonNormalizedVersion = "004.0.01.0";
+            private string NormalizedVersion = "4.0.1";
+
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration.PackageNames = Configuration.Input = "installpackage";
+
+                Configuration.Sources = "PackageOutput";
+
+                Scenario.add_changed_version_package_to_source_location(Configuration, "installpackage.1.0.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
+
+                Configuration.Version = NonNormalizedVersion;
+            }
+
+            [Fact]
+            public void should_log_standalone_header_with_package_name_and_version()
+            {
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage {0}".format_with(NormalizedVersion));
+            }
+
+            [Fact]
+            public void should_log_package_information()
+            {
+                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".format_with(NonNormalizedVersion) + NuGetConstants.PackageExtension))
+                    .ToShortDateString();
+
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
+                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+            }
+
+            [Fact]
+            public void should_log_package_count_as_warning()
+            {
+                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
+                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+            }
+        }
+
         public class when_searching_for_exact_package_with_dot_relative_path_source : when_searching_for_exact_package_through_command
         {
             public override void Context()
