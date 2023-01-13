@@ -14,6 +14,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
@@ -1624,4 +1625,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $prompts.Count | Should -Be 1
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

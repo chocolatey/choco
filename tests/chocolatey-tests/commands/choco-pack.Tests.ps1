@@ -26,6 +26,7 @@ $invalidFailures = @(
 
 Describe "choco pack" -Tag Chocolatey, PackCommand {
     BeforeAll {
+        Remove-NuGetPaths
         $testPackageLocation = "$(Get-TempDirectory)ChocolateyTests\packages"
         Initialize-ChocolateyTestInstall -Source $testPackageLocation
 
@@ -367,4 +368,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
             "$PWD\archiveContents\tools\purpose.txt" | Should -Exist
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

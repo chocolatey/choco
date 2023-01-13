@@ -4,6 +4,7 @@
 
 Describe "choco pin" -Tag Chocolatey, PinCommand {
     BeforeAll {
+        Remove-NuGetPaths
         $testPackageLocation = "$(Get-TempDirectory)ChocolateyTests\packages"
         Initialize-ChocolateyTestInstall -Source $testPackageLocation
 
@@ -185,4 +186,7 @@ Describe "choco pin" -Tag Chocolatey, PinCommand {
             $Output.Lines | Should -Contain "Unable to find package named 'whatisthis' to pin. Please check to ensure it is installed."
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

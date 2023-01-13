@@ -2,6 +2,7 @@
 
 Describe "choco outdated" -Tag Chocolatey, OutdatedCommand {
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
         # Pin all of the Chocolatey packages
         @(
@@ -41,4 +42,7 @@ Describe "choco outdated" -Tag Chocolatey, OutdatedCommand {
             $Output.Lines | Should -Not:($ExitCode -eq 0) -Contain 'upgradepackage|1.0.0|1.1.0|true'
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }
