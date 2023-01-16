@@ -1,7 +1,7 @@
 ﻿Import-Module helpers/common-helpers
 
 Describe 'Ensuring correct version of <Name> is installed' -Tag BundledApplications -ForEach @(
-    @{ Name = 'shimgen' ; Version = '1.0.0' ; ChocolateyVersion = '1.0.0' ; IsSigned = $true }
+    @{ Name = 'shimgen' ; Version = '2.0.0' ; ChocolateyVersion = '2.0.0-alpha' ; IsSigned = $true }
     @{ Name = '7z' ; Version = '21.07' ; ChocolateyVersion = '1.1.0' ; IsSigned = $false }
 ) -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0")) {
     Context '<Name> is correctly installed' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan $ChocolateyVersion)) {
