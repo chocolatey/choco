@@ -5052,5 +5052,262 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("unsupportedelements 1.0.0 Installed", LogLevel.Info).ShouldBeTrue();
             }
         }
+
+        public class when_installing_a_package_with_non_normalized_version : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            protected virtual string NonNormalizedVersion => "2.02.0.0";
+            protected virtual string NormalizedVersion => "2.2.0";
+
+            public override void Context()
+            {
+                base.Context();
+                Scenario.add_changed_version_package_to_source_location(Configuration, "installpackage.1.0.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
+                Configuration.PackageNames = Configuration.Input = "installpackage";
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_install_where_install_location_reports()
+            {
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
+            }
+
+            [Fact]
+            public void should_install_the_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                DirectoryAssert.Exists(packageDir);
+            }
+
+            [Fact]
+            public void should_install_the_expected_version_of_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual(NonNormalizedVersion);
+                }
+            }
+
+            [Fact]
+            public void should_not_create_an_extensions_folder_for_the_package()
+            {
+                var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(extensionsDirectory);
+            }
+
+            [Fact]
+            public void should_not_create_an_hooks_folder_for_the_package()
+            {
+                var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(hooksDirectory);
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_installed_successfully()
+            {
+                bool installedSuccessfully = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("1/1")) installedSuccessfully = true;
+                }
+
+                installedSuccessfully.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void result_should_have_the_correct_version()
+            {
+                _packageResult.Version.ShouldEqual(NonNormalizedVersion);
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyInstall_script()
+            {
+                var message = "installpackage v{0} has been installed".format_with(NonNormalizedVersion);
+
+                MockLogger.contains_message(message, LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_create_a_shim_for_console_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+
+                FileAssert.Exists(shimfile);
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_create_a_shim_for_graphical_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+
+                FileAssert.Exists(shimfile);
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_ignored_executable_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "not.installed.exe");
+
+                FileAssert.DoesNotExist(shimfile);
+            }
+
+            [Fact]
+            public void should_not_create_a_shim_for_mismatched_case_ignored_executable_in_the_bin_directory()
+            {
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "casemismatch.exe");
+
+                FileAssert.DoesNotExist(shimfile);
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_a_console_shim_that_is_set_for_non_gui_access()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                );
+
+                var messageFound = false;
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains("is gui? False")) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("GUI false message not found");
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_a_graphical_shim_that_is_set_for_gui_access()
+            {
+                var messages = new List<string>();
+
+                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+                CommandExecutor.execute(
+                    shimfile,
+                    "--shimgen-noop",
+                    10,
+                    stdOutAction: (s, e) => messages.Add(e.Data),
+                    stdErrAction: (s, e) => messages.Add(e.Data)
+                );
+
+                var messageFound = false;
+
+                foreach (var message in messages.or_empty_list_if_null())
+                {
+                    if (string.IsNullOrWhiteSpace(message)) continue;
+                    if (message.Contains("is gui? True")) messageFound = true;
+                }
+
+                messageFound.ShouldBeTrue("GUI true message not found");
+            }
+        }
+
+        public class when_installing_a_package_specifying_normalized_version : when_installing_a_package_with_non_normalized_version
+        {
+            protected override string NormalizedVersion => "2.2.0";
+            protected override string NonNormalizedVersion => "2.02.0.0";
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Version = NormalizedVersion;
+            }
+        }
+
+        public class when_installing_a_package_specifying_non_normalized_version : when_installing_a_package_with_non_normalized_version
+        {
+            protected override string NormalizedVersion => "2.2.0";
+            protected override string NonNormalizedVersion => "2.02.0.0";
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Version = NonNormalizedVersion;
+            }
+        }
+
+        public class when_installing_a_package_with_multiple_leading_zeros : when_installing_a_package_with_non_normalized_version
+        {
+            protected override string NormalizedVersion => "4.4.5.1";
+            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+        }
+
+        public class when_installing_a_package_with_multiple_leading_zeros_specifying_normalized_version : when_installing_a_package_with_non_normalized_version
+        {
+            protected override string NormalizedVersion => "4.4.5.1"  ;
+            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Version = NormalizedVersion;
+            }
+        }
+
+        public class when_installing_a_package_with_multiple_leading_zeros_specifying_non_normalized_version : when_installing_a_package_with_non_normalized_version
+        {
+            protected override string NormalizedVersion => "4.4.5.1";
+            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Version = NonNormalizedVersion;
+            }
+        }
     }
 }

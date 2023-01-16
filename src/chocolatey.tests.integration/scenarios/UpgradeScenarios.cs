@@ -19,6 +19,7 @@ namespace chocolatey.tests.integration.scenarios
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Configuration;
     using System.IO;
     using System.Linq;
     using System.Threading;
@@ -32,6 +33,7 @@ namespace chocolatey.tests.integration.scenarios
     using NuGet.Packaging;
     using NUnit.Framework;
     using Should;
+    using static chocolatey.tests.integration.scenarios.InstallScenarios;
 
     public class UpgradeScenarios
     {
@@ -4654,5 +4656,206 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("unsupportedelements 1.1.0 Installed", LogLevel.Info).ShouldBeTrue();
             }
         }
+
+        public class when_upgrading_an_existing_package_non_normalized_version : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            protected virtual string NonNormalizedVersion => "2.02.0.0";
+            protected virtual string NormalizedVersion => "2.2.0";
+
+            public override void Context()
+            {
+                base.Context();
+                Scenario.add_changed_version_package_to_source_location(Configuration, "upgradepackage.1.1.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
+                Configuration.PackageNames = Configuration.Input = "upgradepackage";
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void should_upgrade_where_install_location_reports()
+            {
+                DirectoryAssert.Exists(_packageResult.InstallLocation);
+            }
+
+            [Fact]
+            public void should_upgrade_a_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+
+                DirectoryAssert.Exists(packageDir);
+            }
+
+            [Fact]
+            public void should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual(NonNormalizedVersion);
+                }
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_that_it_upgraded_successfully()
+            {
+                bool upgradedSuccessMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
+                }
+
+                upgradedSuccessMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_contain_a_warning_message_with_old_and_new_versions()
+            {
+                bool upgradeMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version {0} is available based on your source".format_with(NonNormalizedVersion))) upgradeMessage = true;
+                }
+
+                upgradeMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                _packageResult.Success.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void config_should_match_package_result_name()
+            {
+                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void should_match_the_upgrade_version()
+            {
+                _packageResult.Version.ShouldEqual(NonNormalizedVersion);
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyBeforeModify_before_chocolateyInstall()
+            {
+                MockLogger.MessagesFor(LogLevel.Info).or_empty_list_if_null()
+                    .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
+                    .Any(p => p.EndsWith("upgradepackage {0} Installed".format_with(NonNormalizedVersion)))
+                    .ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyUninstall_script_for_original_package()
+            {
+                MockLogger.contains_message("upgradepackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage {0} Before Modification".format_with(NonNormalizedVersion), LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_have_executed_chocolateyInstall_script_for_new_package()
+            {
+                MockLogger.contains_message("upgradepackage {0} Installed".format_with(NonNormalizedVersion), LogLevel.Info).ShouldBeTrue();
+            }
+        }
+
+        public class when_upgrading_an_existing_package_specifying_normalized_version : when_upgrading_an_existing_package_non_normalized_version
+        {
+            protected override string NormalizedVersion => "2.2.0";
+            protected override string NonNormalizedVersion => "2.02.0.0";
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Version = NormalizedVersion;
+            }
+        }
+
+        public class when_upgrading_an_existing_package_specifying_non_normalized_version : when_upgrading_an_existing_package_non_normalized_version
+        {
+            protected override string NormalizedVersion => "2.2.0";
+            protected override string NonNormalizedVersion => "2.02.0.0";
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Version = NonNormalizedVersion;
+            }
+        }
+
+        public class when_upgrading_an_existing_package_with_multiple_leading_zeros : when_upgrading_an_existing_package_non_normalized_version
+        {
+            protected override string NormalizedVersion => "4.4.5.1";
+            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+        }
+
+        public class when_upgrading_an_existing_package_with_multiple_leading_zeros_specifying_normalized_version : when_upgrading_an_existing_package_non_normalized_version
+        {
+            protected override string NormalizedVersion => "4.4.5.1";
+            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Version = NormalizedVersion;
+            }
+        }
+
+        public class when_upgrading_an_existing_package_with_multiple_leading_zeros_specifying_non_normalized_version : when_upgrading_an_existing_package_non_normalized_version
+        {
+            protected override string NormalizedVersion => "4.4.5.1";
+            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Version = NonNormalizedVersion;
+            }
+        }
+
     }
 }

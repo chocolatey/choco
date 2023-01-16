@@ -19,8 +19,9 @@ namespace chocolatey.tests.integration
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.IO.Compression;
     using System.Linq;
-
+    using System.Xml.Linq;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.domain;
@@ -29,6 +30,8 @@ namespace chocolatey.tests.integration
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.guards;
     using chocolatey.infrastructure.platforms;
+    using NuGet.Configuration;
+    using NuGet.Packaging;
 
     public class Scenario
     {
@@ -199,6 +202,53 @@ namespace chocolatey.tests.integration
         public static void create_directory(string directoryPath)
         {
             _fileSystem.create_directory(directoryPath);
+        }
+
+        public static void add_changed_version_package_to_source_location(ChocolateyConfiguration config, string pattern, string newVersion)
+        {
+            _fileSystem.create_directory_if_not_exists(config.Sources);
+            var contextDir = _fileSystem.combine_paths(get_top_level(), "context");
+            var files = _fileSystem.get_files(contextDir, pattern, SearchOption.AllDirectories);
+
+            foreach (var file in files.or_empty_list_if_null())
+            {
+                var copyToPath = _fileSystem.combine_paths(config.Sources, _fileSystem.get_file_name(file));
+                _fileSystem.copy_file(_fileSystem.get_full_path(file), copyToPath, overwriteExisting: true);
+                change_package_version(copyToPath, newVersion);
+            }
+        }
+
+        public static void change_package_version(string existingPackagePath, string newVersion)
+        {
+            string packageId;
+            XDocument nuspecXml;
+
+            using (var packageStream = new FileStream(existingPackagePath, FileMode.Open, FileAccess.ReadWrite))
+            {
+                using (var packageReader = new PackageArchiveReader(packageStream, true))
+                {
+                    nuspecXml = packageReader.NuspecReader.Xml;
+                    var metadataNode = nuspecXml.Root.Elements().FirstOrDefault(e => StringComparer.Ordinal.Equals(e.Name.LocalName, "metadata"));
+                    var metadataNamespace = metadataNode.GetDefaultNamespace().NamespaceName;
+                    var node = metadataNode.Elements(XName.Get("version", metadataNamespace)).FirstOrDefault();
+                    node.Value = newVersion;
+                    packageId = packageReader.GetIdentity().Id;
+                }
+
+                using (var zipArchive = new ZipArchive(packageStream, ZipArchiveMode.Update))
+                {
+                    var entry = zipArchive.GetEntry("{0}{1}".format_with(packageId, NuGetConstants.ManifestExtension));
+                    using (var nuspecStream = entry.Open())
+                    {
+                        nuspecXml.Save(nuspecStream);
+                    }
+                }
+            }
+
+            var renamedPath = _fileSystem.combine_paths(
+                _fileSystem.get_directory_name(existingPackagePath),
+                "{0}.{1}{2}".format_with(packageId, newVersion, NuGetConstants.PackageExtension));
+            _fileSystem.move_file(existingPackagePath, renamedPath);
         }
 
         private static ChocolateyConfiguration baseline_configuration()
