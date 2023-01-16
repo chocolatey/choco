@@ -1,0 +1,943 @@
+#compdef chocolatey.exe
+
+#
+# name: _chocolatey
+# auth: hltdev [hltdev8642@gmail.com]
+# desc: completion file for chocolatey (mainly intended for use in WSL/WSL2)
+#
+
+function _chocolatey
+{
+    local _line
+
+    _arguments -C \
+        "1: :('search' 'list' 'info' 'install' 'outdated' 'upgrade' 'uninstall' 'new' 'download' 'optimize' 'pack' 'push' 'sync' '-h' '--help' 'pin' 'source' 'config' 'feature' 'apikey' 'export' 'help' 'template' '--version')" \
+        "-?" \
+        "*::arg:->args"
+
+    case $line[1] in
+        'search')
+            __choco_search
+            ;;
+        'list')
+            __choco_list
+            ;;
+        'info')
+            __choco_info
+            ;;
+        'install')
+            __choco_install
+            ;;
+        'outdated')
+            __choco_outdated
+            ;;
+        'upgrade')
+            __choco_upgrade
+            ;;
+        'uninstall')
+            __choco_uninstall
+            ;;
+        'new')
+            __choco_new
+            ;;
+        'download')
+            __choco_download
+            ;;
+        'optimize')
+            __choco_optimize
+            ;;
+        'pack')
+            __choco_pack
+            ;;
+        'push')
+            __choco_push
+            ;;
+        'sync')
+            __choco_sync
+            ;;
+        'pin')
+            __choco_pin
+            ;;
+        'source')
+            __choco_source
+            ;;
+        'config')
+            __choco_config
+            ;;
+        'feature')
+            __choco_feature
+            ;;
+        'apikey')
+            __choco_apikey
+            ;;
+        'export')
+            __choco_export
+            ;;
+        'template')
+            __choco_template
+            ;;
+    esac
+}
+
+
+function __choco_apikey ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--api-key'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--limit-output'
+        '--log-file'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--remove'
+        '--skip-compatibility-checks'
+        '--source'
+        '--trace'
+        '--verbose '
+        '-?'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_config ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--limit-output'
+        '--log-file'
+        '--name'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--trace'
+        '--value'
+        '--verbose '
+        '-?'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_download ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--append-use-original-location'
+        '--cache-location'
+        '--cert'
+        '--certpassword'
+        '--confirm'
+        '--debug'
+        '--disable-package-repository-optimizations'
+        '--download-location'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--ignore-dependencies'
+        '--ignore-unfound-packages'
+        '--installed-packages'
+        '--internalize'
+        '--internalize-all-urls'
+        '--limit-output'
+        '--log-file'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--outputdirectory'
+        '--password'
+        '--prerelease'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--recompile'
+        '--resources-location'
+        '--skip-compatibility-checks'
+        '--source'
+        '--trace'
+        '--use-self-service'
+        '--user'
+        '--verbose '
+        '--version'
+        '-?'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_export ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--include-version-numbers'
+        '--limit-output'
+        '--log-file'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--output-file-path'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--trace'
+        '--verbose '
+        '-?'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_feature ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--limit-output'
+        '--log-file'
+        '--name'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--trace'
+        '--verbose '
+        '-?'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_info ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--disable-package-repository-optimizations'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--limit-output'
+        '--lo'
+        '--local-only'
+        '--log-file'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--password'
+        '--pre'
+        '--prerelease'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--source'
+        '--trace'
+        '--use-self-service'
+        '--user'
+        '--verbose'
+    )
+
+    _describe 'command' subcmds
+}
+function __choco_install ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--allow-downgrade'
+        '--allow-empty-checksums'
+        '--allow-empty-checksums-secure'
+        '--allow-multiple-versions'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--deflate-nupkg-only'
+        '--deflate-package-size'
+        '--disable-package-repository-optimizations'
+        '--download-checksum'
+        '--download-checksum-type'
+        '--download-checksum-type-x64'
+        '--download-checksum-x64'
+        '--execution-timeout'
+        '--exit-when-reboot-detected'
+        '--force'
+        '--force-dependencies'
+        '--forcex86'
+        '--help'
+        '--ignore-checksums'
+        '--ignore-dependencies'
+        '--ignore-detected-reboot'
+        '--ignore-package-exit-codes'
+        '--install-arguments'
+        '--install-arguments-sensitive'
+        '--install-directory'
+        '--limit-output'
+        '--log-file'
+        '--max-download-rate'
+        '--no-color'
+        '--no-deflate-package-size'
+        '--no-progress'
+        '--noop'
+        '--not-silent'
+        '--override-arguments'
+        '--package-parameters'
+        '--package-parameters-sensitive'
+        '--params'
+        '--password'
+        '--pin'
+        '--pre'
+        '--prerelease'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--require-checksums'
+        '--skip-automation-scripts'
+        '--skip-compatibility-checks'
+        '--skip-download-cache'
+        '--skip-virus-check'
+        '--source'
+        '--stop-on-first-package-failure'
+        '--trace'
+        '--use-download-cache'
+        '--use-package-exit-codes'
+        '--use-self-service'
+        '--user'
+        '--verbose'
+        '--version'
+        '--virus-check'
+        '--virus-positives-minimum'
+        '-?'
+        '-whatif'
+        '-y'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_list ()
+{
+
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--approved-only'
+        '--audit'
+        '--by-id-only'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--detailed'
+        '--disable-package-repository-optimizations'
+        '--download-cache-only'
+        '--exact'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--id-only'
+        '--id-starts-with'
+        '--include-programs'
+        '--limit-output'
+        '--lo'
+        '--local-only'
+        '--log-file'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--not-broken'
+        '--order-by-popularity'
+        '--page'
+        '--page-size'
+        '--password'
+        '--pre'
+        '--prerelease'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--source'
+        '--trace'
+        '--use-self-service'
+        '--user'
+        '--verbose'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_new ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--automaticpackage'
+        '--build-package'
+        '--cache-location'
+        '--checksum'
+        '--checksum64'
+        '--checksumtype'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--file'
+        '--file64'
+        '--force'
+        '--from-programs-and-features'
+        '--help'
+        '--include-architecture-in-name'
+        '--keep-remote'
+        '--limit-output'
+        '--log-file'
+        '--maintainer'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--output-directory'
+        '--pause-on-error'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--remove-architecture-from-name'
+        '--skip-compatibility-checks'
+        '--template-name'
+        '--trace'
+        '--url'
+        '--url64'
+        '--use-built-in-template '
+        '--use-original-location'
+        '--verbose '
+        '--version'
+        '-?'
+        'installertype'
+        'maintainername'
+        'maintainerrepo'
+        'packageversion'
+        'silentargs'
+        'url'
+        'url64'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_optimize ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--deflate-nupkg-only'
+        '--id'
+        '-?'
+        '--use-self-service'
+        '--accept-license'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--limit-output'
+        '--log-file'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--trace'
+        '--verbose '
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_outdated ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--disable-package-repository-optimizations'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--ignore-pinned'
+        '--ignore-unfound'
+        '--limit-output'
+        '--log-file'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--password'
+        '--pre'
+        '--prerelease'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--source'
+        '--trace'
+        '--use-self-service'
+        '--user'
+        '--verbose '
+        '-?'
+    )
+
+    _describe 'command' subcmds
+}
+function __choco_pack ()
+{
+    local -a subcmds
+
+    subcmds=(
+
+        '--accept-license'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--limit-output'
+        '--log-file'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--output-directory'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--trace'
+        '--verbose '
+        '--version'
+        '-?'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_pin ()
+{
+    local -a subcmds
+    subcmds=(
+        '--accept-license'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--limit-output'
+        '--log-file'
+        '--name'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--note'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--trace'
+        '--use-self-service'
+        '--verbose '
+        '--version'
+        '-?'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_push ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--api-key'
+        '--source'
+        '--timeout'
+        '--use-self-service'
+        '-?'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_search ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--approved-only'
+        '--audit'
+        '--by-id-only'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--detailed'
+        '--disable-package-repository-optimizations'
+        '--download-cache-only'
+        '--exact'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--id-starts-with'
+        '--include-programs'
+        '--limit-output'
+        '--local-only'
+        '--log-file'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--not-broken'
+        '--order-by-popularity'
+        '--page'
+        '--page-size'
+        '--password'
+        '--pre'
+        '--prerelease'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--source'
+        '--trace'
+        '--use-self-service'
+        '--user'
+        '--verbose'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_source ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--allow-self-service'
+        '--bypass-proxy'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--limit-output'
+        '--log-file'
+        '--name'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--password'
+        '--priority'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--source'
+        '--trace'
+        '--user'
+        '--verbose '
+        '-?'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_sync ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--id'
+        '--limit-output'
+        '--log-file'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--output-directory'
+        '--package-id'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--trace'
+        '--use-self-service'
+        '--verbose '
+        '-?'
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_template ()
+{
+    local -a subcmds
+    subcmds=(
+        '--accept-license'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--force'
+        '--help'
+        '--limit-output'
+        '--log-file'
+        '--name'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--skip-compatibility-checks'
+        '--trace'
+        '--verbose '
+    )
+    _describe 'command' subcmds
+
+}
+function __choco_uninstall ()
+{
+    local -a subcmds
+
+    subcmds=(
+
+        '--accept-license'
+        '--all-versions'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--execution-timeout'
+        '--exit-when-reboot-detected'
+        '--fail-on-autouninstaller'
+        '--force'
+        '--force-dependencies'
+        '--from-programs-and-features'
+        '--help'
+        '--ignore-autouninstaller-failure'
+        '--ignore-detected-reboot'
+        '--ignore-package-exit-codes'
+        '--limit-output'
+        '--log-file'
+        '--no-color'
+        '--no-progress'
+        '--noop'
+        '--not-silent'
+        '--override-arguments'
+        '--package-parameters'
+        '--params'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--remove-dependencies'
+        '--skip-automation-scripts'
+        '--skip-autouninstaller'
+        '--skip-compatibility-checks'
+        '--source'
+        '--stop-on-first-package-failure'
+        '--trace'
+        '--uninstall-arguments'
+        '--use-autouninstaller'
+        '--use-package-exit-codes'
+        '--use-self-service'
+        '--verbose '
+        '--version='
+        '-?'
+        '-whatif '
+        '-y '
+
+    )
+
+    _describe 'command' subcmds
+
+}
+function __choco_upgrade ()
+{
+    local -a subcmds
+
+    subcmds=(
+        '--accept-license'
+        '--allow-downgrade'
+        '--allow-empty-checksums'
+        '--allow-empty-checksums-secure'
+        '--allow-multiple-versions'
+        '--cache-location'
+        '--confirm'
+        '--debug'
+        '--deflate-nupkg-only'
+        '--deflate-package-size'
+        '--disable-package-repository-optimizations'
+        '--download-checksum'
+        '--download-checksum-type'
+        '--download-checksum-type-x64'
+        '--download-checksum-x64'
+        '--except'
+        '--exclude-prerelease'
+        '--execution-timeout'
+        '--exit-when-reboot-detected'
+        '--fail-on-not-installed'
+        '--fail-on-unfound'
+        '--force'
+        '--forcex86'
+        '--help'
+        '--ignore-checksums'
+        '--ignore-dependencies'
+        '--ignore-detected-reboot'
+        '--ignore-package-exit-codes'
+        '--ignore-remembered-options'
+        '--install-arguments'
+        '--install-arguments-sensitive'
+        '--install-directory'
+        '--install-if-not-installed'
+        '--limit-output'
+        '--log-file'
+        '--max-download-rate'
+        '--no-color'
+        '--no-deflate-package-size'
+        '--no-progress'
+        '--noop'
+        '--not-silent'
+        '--override-arguments'
+        '--package-parameters'
+        '--package-parameters-sensitive'
+        '--params'
+        '--password'
+        '--pin'
+        '--pre'
+        '--prerelease'
+        '--proxy'
+        '--proxy-bypass-list'
+        '--proxy-bypass-on-local'
+        '--proxy-password'
+        '--proxy-user'
+        '--require-checksums'
+        '--skip-automation-scripts'
+        '--skip-compatibility-checks'
+        '--skip-download-cache'
+        '--skip-virus-check'
+        '--skip-when-not-installed'
+        '--source'
+        '--stop-on-first-package-failure'
+        '--trace'
+        '--use-download-cache'
+        '--use-package-exit-codes'
+        '--use-remembered-options'
+        '--use-self-service'
+        '--user'
+        '--verbose '
+        '--version'
+        '--virus-check'
+        '--virus-positives-minimum'
+        '-?'
+        '-whatif'
+        '-y'
+    )
+
+    _describe 'command' subcmds
+
+}
+
+_chocolatey
