@@ -113,6 +113,8 @@ namespace chocolatey.infrastructure.app.nuget
             }
             */
 
+            // Set user agent for all NuGet library calls. Should not affect any HTTP calls that Chocolatey itself would make.
+            UserAgent.SetUserAgentString(new UserAgentStringBuilder("{0}/{1} via NuGet Client".format_with(ApplicationParameters.UserAgent, configuration.Information.ChocolateyProductVersion)));
 
             // ensure credentials can be grabbed from configuration
             SetHttpHandlerCredentialService(configuration);

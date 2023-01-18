@@ -46,7 +46,6 @@ namespace chocolatey.infrastructure.app.nuget
             SourceRepository sourceRepository = NugetCommon.GetRemoteRepositories(config, nugetLogger, filesystem).FirstOrDefault();
             PackageUpdateResource packageUpdateResource = sourceRepository.GetResource<PackageUpdateResource>();
             var nupkgFilePaths = new List<string>() { nupkgFilePath };
-            UserAgent.SetUserAgentString(new UserAgentStringBuilder("{0}/{1} via NuGet Client".format_with(ApplicationParameters.UserAgent, config.Information.ChocolateyProductVersion)));
 
             try
             {
