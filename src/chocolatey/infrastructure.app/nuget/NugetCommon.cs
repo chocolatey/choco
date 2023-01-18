@@ -68,12 +68,6 @@ namespace chocolatey.infrastructure.app.nuget
             get { return _console.Value; }
         }
 
-        /*
-        public static IFileSystem GetNuGetFileSystem(ChocolateyConfiguration configuration, ILogger nugetLogger)
-        {
-            return new ChocolateyPhysicalFileSystem(ApplicationParameters.PackagesLocation) { Logger = nugetLogger };
-        }*/
-
         public static ChocolateyPackagePathResolver GetPathResolver(ChocolateyConfiguration configuration, IFileSystem nugetPackagesFileSystem)
         {
             return new ChocolateyPackagePathResolver(ApplicationParameters.PackagesLocation, nugetPackagesFileSystem, configuration.AllowMultipleVersions);
@@ -86,32 +80,8 @@ namespace chocolatey.infrastructure.app.nuget
             return Repository.Factory.GetCoreV3(nugetSource);
         }
 
-        /*
-        public static IPackageRepository GetLocalRepository(IPackagePathResolver pathResolver, IFileSystem nugetPackagesFileSystem, ILogger nugetLogger)
-        {
-            return new ChocolateyLocalPackageRepository(pathResolver, nugetPackagesFileSystem) { Logger = nugetLogger, PackageSaveMode = PackageSaveModes.Nupkg | PackageSaveModes.Nuspec };
-        }
-        */
-
         public static IEnumerable<SourceRepository> GetRemoteRepositories(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-
-            //TODO, fix
-            /*
-            if (configuration.Features.ShowDownloadProgress)
-            {
-                PackageDownloader.
-                PackageDownloader.ProgressAvailable += (sender, e) =>
-                {
-                    // http://stackoverflow.com/a/888569/18475
-                    Console.Write("\rProgress: {0} {1}%".format_with(e.Operation, e.PercentComplete.to_string()).PadRight(Console.WindowWidth));
-                    if (e.PercentComplete == 100)
-                    {
-                        Console.WriteLine("");
-                    }
-                };
-            }
-            */
 
             // Set user agent for all NuGet library calls. Should not affect any HTTP calls that Chocolatey itself would make.
             UserAgent.SetUserAgentString(new UserAgentStringBuilder("{0}/{1} via NuGet Client".format_with(ApplicationParameters.UserAgent, configuration.Information.ChocolateyProductVersion)));
@@ -247,100 +217,6 @@ namespace chocolatey.infrastructure.app.nuget
 
             return repositories;
         }
-
-        /*
-        // keep this here for the licensed edition for now
-        public static NuGetPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<ChocolateyPackageOperationEventArgs> installSuccessAction, Action<ChocolateyPackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
-        {
-            return GetPackageManager(configuration, nugetLogger, new PackageDownloader(), installSuccessAction, uninstallSuccessAction, addUninstallHandler);
-        }
-        */
-
-        /*
-        // keep this here for the licensed edition for now
-        public static NuGetPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<ChocolateyPackageOperationEventArgs> installSuccessAction, Action<ChocolateyPackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
-        //public static NuGetPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, bool addUninstallHandler)
-        {
-            //IFileSystem nugetPackagesFileSystem = GetNuGetFileSystem(configuration, nugetLogger);
-            //IPackagePathResolver pathResolver = GetPathResolver(configuration, nugetPackagesFileSystem);
-
-
-            var packageManager = new NuGetPackageManager(GetRemoteRepositories(configuration, nugetLogger, packageDownloader), pathResolver, nugetPackagesFileSystem, GetLocalRepository(pathResolver, nugetPackagesFileSystem, nugetLogger))
-                {
-                    DependencyVersion = DependencyVersion.Highest,
-                    Logger = nugetLogger,
-                };
-
-
-        //TODO - see if wee need to implement ISettings to set something instead of nullsettings
-        //TODO - properly implement everything for ChocolateySourceRepositoryProvider
-        var repositoryProvider = new ChocolateySourceRepositoryProvider(NugetCommon.GetRemoteRepositories(configuration, nugetLogger));
-            var packageManager = new NuGetPackageManager(repositoryProvider, new NullSettings(), ApplicationParameters.PackagesLocation);
-
-
-            // GH-1548
-            //note: is this a good time to capture a backup (for dependencies) / maybe grab remembered arguments here instead / and somehow get out of the endless loop!
-            //NOTE DO NOT EVER use this method - packageManager.PackageInstalling += (s, e) => { };
-            packageManager.PackageInstalled += (s, e) =>
-                {
-                    var pkg = e.Package;
-                    "chocolatey".Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".format_with(
-                        System.Environment.NewLine,
-                        pkg.Id,
-                        pkg.Version.to_string(),
-                        configuration.Force ? " (forced)" : string.Empty,
-                        string.Empty, string.Empty
-                        //pkg.IsApproved ? " [Approved]" : string.Empty,
-                        //pkg.PackageTestResultStatus == "Failing" && pkg.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : pkg.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
-                        ));
-
-                    if (installSuccessAction != null) installSuccessAction.Invoke(e);
-                };
-
-
-
-            if (addUninstallHandler)
-            {
-                // NOTE DO NOT EVER use this method, or endless loop - packageManager.PackageUninstalling += (s, e) =>
-
-                packageManager.PackageUninstalled += (s, e) =>
-                    {
-
-
-                        IPackage pkg = packageManager.LocalRepository.FindPackage(e.Package.Id, e.Package.Version);
-                        if (pkg != null)
-                        {
-                            // install not actually removed, let's clean it up. This is a bug with nuget, where it reports it removed some package and did NOTHING
-                            // this is what happens when you are switching from AllowMultiple to just one and back
-                            var chocoPathResolver = packageManager.PathResolver as ChocolateyPackagePathResolver;
-                            if (chocoPathResolver != null)
-                            {
-                                chocoPathResolver.UseSideBySidePaths = !chocoPathResolver.UseSideBySidePaths;
-
-                                // an unfound package folder can cause an endless loop.
-                                // look for it and ignore it if doesn't line up with versioning
-                                if (nugetPackagesFileSystem.DirectoryExists(chocoPathResolver.GetInstallPath(pkg)))
-                                {
-                                    //todo: This causes an issue with upgrades.
-                                    // this causes this to be called again, which should then call the uninstallSuccessAction below
-                                    packageManager.UninstallPackage(pkg, forceRemove: configuration.Force, removeDependencies: false);
-                                }
-
-                                chocoPathResolver.UseSideBySidePaths = configuration.AllowMultipleVersions;
-                            }
-                        }
-                        else
-                        {
-                            if (uninstallSuccessAction != null) uninstallSuccessAction.Invoke(e);
-                        }
-                        if (uninstallSuccessAction != null) uninstallSuccessAction.Invoke(e);
-                    };
-            }
-
-            return packageManager;
-
-        }
-        */
 
         public static IEnumerable<T> GetRepositoryResource<T>(IEnumerable<SourceRepository> packageRepositories) where T : class, INuGetResource
         {
