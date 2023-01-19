@@ -62,6 +62,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         It "Outputs Error Message" {
             $Output.String | Should -Match "No \.nuspec files \(or more than 1\) were found to build in .*Please specify the \.nuspec file or try in a different directory\."
         }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
+        }
     }
 
     Context "Package <_> metadata in current directory" -ForEach $successPack {
@@ -86,6 +94,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         It "Creates nuget package" {
             "$_\$_.1.0.0.nupkg" | Should -Exist
         }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
+        }
     }
 
     Context "Package <_> metadata with path" -ForEach $successPack {
@@ -107,6 +123,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
 
         It "Creates nuget package" {
             "$_.1.0.0.nupkg" | Should -Exist
+        }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
         }
     }
 
@@ -131,6 +155,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         It "Does not create the nuget package" {
             "required.1.0.0.nupkg" | Should -Not -Exist
         }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
+        }
     }
 
     # TODO: Validation messages are incomplete and are missing some items
@@ -154,6 +186,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         It "Does not create the nuget package" {
             "empty.1.0.0.nupkg" | Should -Not -Exist
         }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
+        }
     }
 
     # This empty element must be in a seperate nuspec file as it will be a serializing error
@@ -172,6 +212,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
 
         It "Does not create the nuget package" {
             "requireLicenseAcceptance.1.0.0.nupkg" | Should -Not -Exist
+        }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
         }
     }
 
@@ -194,6 +242,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
 
         It "Does not create the nuget package" {
             "missing.1.0.0.nupkg" | Should -Not -Exist
+        }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
         }
     }
 
@@ -218,6 +274,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         It "Does not create the nuget package" {
             "invalid-$($_.id).1.0.0.nupkg" | Should -Not -Exist
         }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
+        }
     }
 
     Context "Package with invalid character '&'" {
@@ -239,6 +303,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
 
         It "Does not create the nuget package" {
             "invalid-character-and.1.0.0.nupkg" | Should -Not -Exist
+        }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
         }
     }
 
@@ -262,6 +334,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         It "Does not create the nuget package" {
             "invalid-character-lesser.1.0.0.nupkg" | Should -Not -Exist
         }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
+        }
     }
 
     Context "Package with version override" {
@@ -283,6 +363,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
 
         It "Does create the nuget package" {
             "basic.3.0.4.nupkg" | Should -Exist
+        }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
         }
     }
 
@@ -316,6 +404,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         It "Does create the nuget package" {
             "$OutDirectory\basic.1.0.0.nupkg" | Should -Exist
         }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
+        }
     }
 
     Context "Package with custom equals out directory" -ForEach @(
@@ -345,6 +441,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         It "Does create the nuget package" {
             "$OutDirectory\basic.1.0.0.nupkg" | Should -Exist
         }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
+        }
     }
 
     # Issue: https://github.com/chocolatey/choco/issues/2166
@@ -369,6 +473,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
             # otherwise if the extraction fails, so will the previous test
             Expand-ZipArchive "$PWD\forward-slash.1.0.0.nupkg" "archiveContents"
             "$PWD\archiveContents\tools\purpose.txt" | Should -Exist
+        }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
         }
     }
 
@@ -425,6 +537,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
 
         It 'Shows an error about the unsupported nuspec metadata element "<_>"' -TestCases $testCases {
             $Output.String | Should -Match "$_ elements are not supported in Chocolatey CLI"
+        }
+
+        It "Should not output message about license url being deprecated" {
+            $Output.String | Should -Not -Match "The 'licenseUrl' element will be deprecated"
+        }
+
+        It "Should not output message about iconUrl being deprecated" {
+            $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
         }
     }
 
