@@ -326,6 +326,11 @@ namespace chocolatey.infrastructure.app.services
                 issuesList.Add("<license> elements are not supported in Chocolatey CLI, use <licenseUrl> instead");
             }
 
+            if (string.IsNullOrWhiteSpace(nuspecReader.GetLicenseUrl()) && nuspecReader.GetRequireLicenseAcceptance())
+            {
+                issuesList.Add("Enabling license acceptance requires a license url.");
+            }
+
             if (!(metadataNode.Elements(XName.Get("packageTypes", metadataNamespace)).FirstOrDefault() is null))
             {
                 issuesList.Add("<packageTypes> elements are not supported in Chocolatey CLI");
