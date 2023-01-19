@@ -134,7 +134,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
     }
 
     # TODO: Validation messages are incomplete and are missing some items
-    Context "Package with empty elements" -Tag Broken {
+    Context "Package with empty elements" -Tag PartiallyBroken {
         BeforeAll {
             $Output = Invoke-Choco pack "empty.nuspec"
         }
@@ -147,7 +147,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
             $Output.Lines | Should -Contain $expectedHeader
         }
 
-        It "Displays empty error message for <_>" -ForEach $emptyFailures {
+        It "Displays empty error message for <_>" -ForEach ($emptyFailures | ? { $_ -eq 'licenseUrl' }) {
             $Output.Lines | Should -Contain "$_ cannot be empty."
         }
 
@@ -198,7 +198,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
     }
 
     # TODO: Message about verifying version string has changed, and should be fixed
-    Context "Package with invalid <_.id>" -ForEach ($invalidFailures | ? id -NotIn 'version','requirelicenseacceptance') -Tag PartiallyBroken {
+    Context "Package with invalid <_.id>" -ForEach ($invalidFailures | ? id -NotIn 'version') -Tag PartiallyBroken {
         BeforeAll {
             $Output = Invoke-Choco pack "invalid-$($_.id).nuspec"
         }
