@@ -28,6 +28,6 @@
             $featurePlurality = 's'
         }
 
-        throw "{0} occured setting ($action) feature{1}: {2}" -f $errorCountMessage, $featurePlurality, ($failures -join ', ')
+        throw "{0} occurred setting ($action) feature{1}: {2}" -f $errorCountMessage, $featurePlurality, ($failures -join ', ')
     }
 }

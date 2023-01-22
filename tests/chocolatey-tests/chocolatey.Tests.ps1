@@ -16,7 +16,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             "\bin\cver.exe"
         )
         $PowerShellFiles = Get-ChildItem -Path $ChocolateyDirectoriesToCheck -Include "*.ps1", "*.psm1" -Recurse -ErrorAction Ignore
-        # For certain test scenarious we run, there are additional files available in the bin directory.
+        # For certain test scenarios we run, there are additional files available in the bin directory.
         # These files should not be tested as part of the signing check.
         $ExecutableFiles = Get-ChildItem -Path $ChocolateyDirectoriesToCheck -Include "*.exe", "*.dll" -Recurse -ErrorAction Ignore | Where-Object Name -NotMatch 'driver\.exe$'
         $StrongNamingKeyFiles = Get-ChildItem -Path $StrongNamingKeyFilesToCheck -ErrorAction Ignore

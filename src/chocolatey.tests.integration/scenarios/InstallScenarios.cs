@@ -4502,7 +4502,7 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_not_install_a_pakcage_in_the_lib_directory()
+            public void should_not_install_a_package_in_the_lib_directory()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
 

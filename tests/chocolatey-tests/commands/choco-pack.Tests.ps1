@@ -196,7 +196,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
     }
 
-    # This empty element must be in a seperate nuspec file as it will be a serializing error
+    # This empty element must be in a separate nuspec file as it will be a serializing error
     Context "Package with empty requireLicenseAcceptance" {
         BeforeAll {
             $Output = Invoke-Choco pack "empty-requireLicenseAcceptance.nuspec"

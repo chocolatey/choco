@@ -11,7 +11,7 @@
         "unpackself"  # Out of spec
         "version"     # Deprecated
         "update"      # Deprecated
-        "support"     # This should be tested seperately
+        "support"     # This should be tested separately
     )
 )
 Import-Module helpers/common-helpers

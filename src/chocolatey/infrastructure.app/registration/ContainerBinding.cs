@@ -55,7 +55,7 @@ namespace chocolatey.infrastructure.app.registration
 
             var registrator = new SimpleInjectorContainerRegistrator();
 
-            // We can not resolve this class, as that wil prevent future registrations
+            // We can not resolve this class, as that will prevent future registrations
             var fileSystem = new DotNetFileSystem();
             var xmlService = new XmlService(fileSystem, new cryptography.CryptoHashProvider(fileSystem));
 

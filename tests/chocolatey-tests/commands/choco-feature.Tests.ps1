@@ -181,7 +181,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
         }
     }
 
-    Context "Enabling a non-existant feature" {
+    Context "Enabling a non-existent feature" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -197,7 +197,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
         }
     }
 
-    Context "Disabling a non-existant feature" {
+    Context "Disabling a non-existent feature" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 

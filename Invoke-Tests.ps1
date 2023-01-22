@@ -83,7 +83,7 @@ try {
 
     $env:ChocolateyInstall = "$TestPath/base"
     $null = Initialize-Chocolatey
-    # It seems this is getting clobbered by Intialize-Chocolatey... No idea why...
+    # It seems this is getting clobbered by Initialize-Chocolatey... No idea why...
     $env:ChocolateyInstall = "$TestPath/base"
 
     Pop-Location
