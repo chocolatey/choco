@@ -289,13 +289,13 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
                 @{ Option = "DownloadChecksumType" ; ExpectedValue = "downloadChecksumType" }
                 @{ Option = "DownloadChecksumType64" ; ExpectedValue = "downloadChecksumType64" }
                 # UsePackageExitCodes and IgnorePackageExitCodes set the same setting, but are opposite of each other.
-                # UsePackageExitCodes is evaluated last, so takes precidence.
+                # UsePackageExitCodes is evaluated last, so takes precedence.
                 # @{ Option = "IgnorePackageExitCodes" ; ExpectedValue = "True" }
                 @{ Option = "UsePackageExitCodes" ; ExpectedValue = "True" }
                 # StopOnFirstFailure is expanded to StopOnFirstPackageFailure
                 @{ Option = "StopOnFirstPackageFailure" ; ExpectedValue = "True" }
                 # ExitWhenRebootDetected and IgnoreDetectedReboot both set ExitOnRebootDetected.
-                # IgnoreDetectedReboot is evaluated last, so takes precidence.
+                # IgnoreDetectedReboot is evaluated last, so takes precedence.
                 # @{ Option = "ExitWhenRebootDetected" ; ExpectedValue = "True" }
                 # @{ Option = "IgnoreDetectedReboot" ; ExpectedValue = "True" }
                 @{ Option = "ExitOnRebootDetected" ; ExpectedValue = "False" }
@@ -1047,7 +1047,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Force Installing a Package that depends on a newer version of an installed dependency (that is unavailable, forcing depedencies)" {
+    Context "Force Installing a Package that depends on a newer version of an installed dependency (that is unavailable, forcing dependencies)" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 

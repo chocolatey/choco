@@ -278,7 +278,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool RegularOutput { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether console logging should be supressed.
+        /// Gets or sets a value indicating whether console logging should be suppressed.
         /// This is for use by API calls which surface results in alternate forms.
         /// </summary>
         /// <value><c>true</c> for no output; <c>false</c> for regular or limited output.</value>
