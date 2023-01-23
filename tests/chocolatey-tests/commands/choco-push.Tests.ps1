@@ -130,3 +130,84 @@ Describe "choco push" -Tag Chocolatey, PushCommand, Broken -Skip:($null -eq $env
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     Test-NuGetPaths
 }
+
+Describe 'choco push nuget <_> repository' -Tag Chocolatey, PushCommand -Skip:($null -eq $env:NUGET_API_KEY -or $null -eq $env:NUGET_PUSH_REPO) -ForEach @('v2', 'v3') {
+    BeforeDiscovery {
+        $TestCases = @(
+            @{ Wording = 'using config' ; UseConfig = $true }
+            @{ Wording = 'using command line parameters' ; UseConfig = $false }
+        )
+    }
+
+    BeforeAll {
+        $RepositoryEndpoint = switch ($_) {
+            'v2' { '' }
+            'v3' { 'index.json' }
+        }
+
+        $ApiKey = $env:NUGET_API_KEY
+        $RepositoryToUse = $env:NUGET_PUSH_REPO
+
+        Initialize-ChocolateyTestInstall
+
+        New-ChocolateyInstallSnapshot
+    }
+
+    AfterAll {
+        Remove-ChocolateyTestInstall
+    }
+
+    Context "Pushing package successfully <Wording>" -ForEach $TestCases {
+        BeforeAll {
+            $snapshotPath = New-ChocolateyInstallSnapshot
+            $PackageUnderTest = "chocolatey-dummy-package"
+            $TestPath = "$PSScriptRoot\testpackages"
+            $VersionUnderTest = '1.0.0'
+            $AddedVersion = "a$(((New-Guid) -split '-')[0])"
+            $NewChocolateyTestPackage = @{
+                TestPath     = $TestPath
+                Name         = $PackageUnderTest
+                Version      = $VersionUnderTest
+                AddedVersion = $AddedVersion
+            }
+            $PackagePath = New-ChocolateyTestPackage @NewChocolateyTestPackage
+
+            if ($UseConfig) {
+                # TODO: These really should use the full parameter names
+                $null = Invoke-Choco apikey -s $RepositoryToUse$RepositoryEndpoint -k $ApiKey
+                # Ensure the key is null (should always be, but scoping can be wonky)
+                $KeyParameter = $null
+            } else {
+                # PowerShell requires this for reasons that only PowerShell knows
+                $KeyParameter = @("--api-key", $ApiKey)
+            }
+
+            $Output = Invoke-Choco push $PackagePath --source $RepositoryToUse$RepositoryEndpoint @KeyParameter
+            $VerifyPackagesSplat = @(
+                "find"
+                "$PackageUnderTest"
+                "--pre"
+                "--source"
+                "$RepositoryToUse$RepositoryEndpoint"
+                "--api-key"
+                "$ApiKey"
+                "--version"
+                "$VersionUnderTest-$AddedVersion"
+            )
+            $Packages = (Invoke-Choco @VerifyPackagesSplat --Limit-Output).Lines | ConvertFrom-ChocolateyOutput -Command List
+        }
+
+        AfterAll {
+            $null = Invoke-Choco install nuget.commandline -y
+            & "$env:ChocolateyInstall/bin/nuget.exe" delete $PackageUnderTest "$VersionUnderTest-$AddedVersion" -Source $RepositoryToUse -ApiKey $ApiKey -NonInteractive
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Successfully pushed the package to the repository' {
+            $Packages | Should -Not -BeNullOrEmpty
+        }
+    }
+}
