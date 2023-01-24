@@ -1,13 +1,14 @@
 issue-labels-include:
-- Breaking change
+- Breaking Change
 - Feature
 - C4B Feature
 - Bug
-- Improvement
+- Enhancement
 - Documentation
 issue-labels-exclude:
 - Internal Refactoring
 - Build
+- NO RELEASE NOTES
 issue-labels-alias:
     - name:    Documentation
       header:  Documentation
