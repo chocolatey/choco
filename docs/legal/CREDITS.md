@@ -11,7 +11,7 @@
   - [Checksum @ 0.2.0](#checksum--020)
   - [log4net @ 2.0.12](#log4net--2012)
   - [Microsoft.Web.Xdt @ 2.1.1](#microsoftwebxdt--211)
-  - [NuGet.Core @ 2.11.0.20220901 (modified)](#nugetcore--211020220901-modified)
+  - [NuGet.Client @ 3.0.0-alpha-20230123-128 (modified)](#nugetclient--300alpha20230123128-modified)
   - [Rhino.Licensing @ 1.4.1 (modified)](#rhinolicensing--141-modified)
   - [Rx (Reactive Extensions) @ 2.1.30214.0](#rx-reactive-extensions--21302140)
   - [Shim Generator (shimgen) @ 1.0.0](#shim-generator-shimgen--100)
@@ -75,7 +75,7 @@ Their details are below.
 - [Checksum @ 0.2.0](#checksum--020)
 - [log4net @ 2.0.12](#log4net--2012)
 - [Microsoft.Web.Xdt @ 2.1.1](#microsoftwebxdt--211)
-- [NuGet.Core @ 2.11.0.20220901 (modified)](#nugetcore--211020220901-modified)
+- [NuGet.Client @ 3.0.0-alpha-20230123-128 (modified)](#nugetclient--300alpha20230123128-modified)
 - [Rhino.Licensing @ 1.4.1 (modified)](#rhinolicensing--141-modified)
 - [Rx (Reactive Extensions) @ 2.1.30214.0](#rx-reactive-extensions--21302140)
 - [Shim Generator (shimgen) @ 1.0.0](#shim-generator-shimgen--100)
@@ -685,25 +685,27 @@ It is also a requirement of NuGet.Core.
   It also applies even if Microsoft knew or should have known about the possibility of the damages. The above limitation or exclusion may not apply to you because your country may not allow the exclusion or limitation of incidental, consequential or other damages.
 ```
 
-### NuGet.Core @ 2.11.0.20220901 (modified)
+### NuGet.Client @ 3.0.0-alpha-20230123-128 (modified)
 
-Chocolatey uses [NuGet.Core](https://github.com/NuGet/NuGet2) [(modified)](https://github.com/chocolatey/nuget-chocolatey) to work with packaging.
-[License terms](https://github.com/NuGet/NuGet2/blob/c3d1027a51b31fd0c41e9abbe90810cf1c924c9f/COPYRIGHT.txt):
+Chocolatey uses [NuGet.Client](https://github.com/NuGet/NuGet.Client) [(modified)](https://github.com/chocolatey/NuGet.Client) to work with packaging.
+[License terms](https://github.com/NuGet/NuGet.Client/blob/72f9f2b2eab28c9d91a22065c55aa7702abf7e01/LICENSE.txt):
 
 ```txt
-  Copyright 2010-2014 Outercurve Foundation
+Copyright (c) .NET Foundation and Contributors.
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+All rights reserved.
 
-     http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+these files except in compliance with the License. You may obtain a copy of the
+License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
 ```
 
 ### Rhino.Licensing @ 1.4.1 (modified)
