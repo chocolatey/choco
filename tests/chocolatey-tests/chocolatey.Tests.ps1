@@ -207,10 +207,8 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     }
 
-    # TODO: We are using --exact to get the version of the currently installed chocolatey
-    # CLI. This is currently broken.
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'PowerShell Profile comments updated correctly' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -Tag Broken {
+    Context 'PowerShell Profile comments updated correctly' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
             Remove-Item $Profile.CurrentUserCurrentHost -ErrorAction Ignore
             New-Item $Profile.CurrentUserCurrentHost -Force
@@ -259,9 +257,8 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     }
 
-    # Broken because the test makes use of --exact
     # This is skipped when not run in CI because it requires signed executables
-    Context 'Ensure we <Removal> shims during upgrade' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -Tag Broken -ForEach @(
+    Context 'Ensure we <Removal> shims during upgrade' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -ForEach @(
         @{
             RemovedShims = $RemovedShims
             Signed       = $true

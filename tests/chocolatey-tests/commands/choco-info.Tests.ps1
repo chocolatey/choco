@@ -1,4 +1,4 @@
-﻿Import-Module helpers/common-helpers
+Import-Module helpers/common-helpers
 
 Describe "choco info" -Tag Chocolatey, InfoCommand {
     BeforeDiscovery {
@@ -41,7 +41,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         # TODO> The identifier is incorrectly outputted instead of the title
-        It "Displays the title of the package" -Tag Broken {
+        It "Displays the title of the package" {
             $line = $Output.Lines | Select-String "Title"
             $line | Should -Not -BeNullOrEmpty
             $line | Should -Match "Title: Mvc Music Store Web" -Because $Output.String
@@ -83,12 +83,11 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
     Context "Listing package information when using proxy and proxy bypass list in config" -Skip:(!$licensedProxyFixed) {
         BeforeDiscovery {
-            # TODO: Partially broken, the release notes are missing from the output.
             $infoItems = @(
                 @{ Title = "Tags"; Value = "mvcmusicstore db" }
                 @{ Title = "Summary"; Value = "Mvc Music Store Database" }
                 @{ Title = "Description"; Value = "This is the code that releases the database" }
-                # @{ Title = "Release Notes"; Value = "v1.2.0 - Updated Migration" }
+                @{ Title = "Release Notes"; Value = "v1.2.0 - Updated Migration" }
             )
         }
 
@@ -117,12 +116,11 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
     Context "Listing package information when using proxy and proxy bypass list on command" -Skip:(!$licensedProxyFixed) {
         BeforeDiscovery {
-            # TODO: Partially broken, the release notes are missing from the output.
             $infoItems = @(
                 @{ Title = "Tags"; Value = "mvcmusicstore db" }
                 @{ Title = "Summary"; Value = "Mvc Music Store Database" }
                 @{ Title = "Description"; Value = "This is the code that releases the database" }
-                # @{ Title = "Release Notes"; Value = "v1.2.0 - Updated Migration" }
+                @{ Title = "Release Notes"; Value = "v1.2.0 - Updated Migration" }
             )
         }
 

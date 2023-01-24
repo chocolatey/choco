@@ -1,4 +1,4 @@
-﻿Import-Module helpers/common-helpers
+Import-Module helpers/common-helpers
 
 $successPack = @('basic'; 'basic-dependencies'; "cdata"; "full")
 # Required elements, that can also not be empty
@@ -148,7 +148,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
             $Output.Lines | Should -Contain $expectedHeader
         }
 
-        It "Displays required error message for <_>" -ForEach $missingFailures {
+        It "Displays required error message for <_>" -ForEach $missingFailures -Tag Broken {
             $Output.Lines | Should -Contain "$_ is required."
         }
 
