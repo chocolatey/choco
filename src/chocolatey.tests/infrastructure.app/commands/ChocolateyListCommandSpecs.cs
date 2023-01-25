@@ -520,7 +520,7 @@ Repository).");
             }
 
             [Fact]
-            public void should_ouput_removal_in_v2_0_0()
+            public void should_output_removal_in_v2_0_0()
             {
                 MockLogger.Messages.Keys.ShouldContain("Warn");
                 MockLogger.Messages["Warn"].ShouldContain(@"

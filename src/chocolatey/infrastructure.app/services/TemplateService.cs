@@ -225,7 +225,7 @@ namespace chocolatey.infrastructure.app.services
         public void list(ChocolateyConfiguration configuration)
         {
             var templateDirList = _fileSystem.get_directories(ApplicationParameters.TemplatesLocation).ToList();
-            var isBuiltInTemplateOverriden = templateDirList.Contains(_fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, _builtInTemplateOverrideName));
+            var isBuiltInTemplateOverridden = templateDirList.Contains(_fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, _builtInTemplateOverrideName));
             var isBuiltInOrDefaultTemplateDefault = string.IsNullOrWhiteSpace(configuration.DefaultTemplateName) || !templateDirList.Contains(_fileSystem.combine_paths(ApplicationParameters.TemplatesLocation, configuration.DefaultTemplateName));
 
             if (string.IsNullOrWhiteSpace(configuration.TemplateCommand.Name))
@@ -245,7 +245,7 @@ namespace chocolatey.infrastructure.app.services
                     this.Log().Info(configuration.RegularOutput ? "No custom templates installed in {0}{1}".format_with(ApplicationParameters.TemplatesLocation, Environment.NewLine) : string.Empty);
                 }
 
-                list_built_in_template_info(configuration, isBuiltInTemplateOverriden, isBuiltInOrDefaultTemplateDefault);
+                list_built_in_template_info(configuration, isBuiltInTemplateOverridden, isBuiltInOrDefaultTemplateDefault);
             }
             else
             {
@@ -254,15 +254,15 @@ namespace chocolatey.infrastructure.app.services
                     list_custom_template_info(configuration);
                     if (configuration.TemplateCommand.Name == _builtInTemplateName || configuration.TemplateCommand.Name == _builtInTemplateOverrideName)
                     {
-                        list_built_in_template_info(configuration, isBuiltInTemplateOverriden, isBuiltInOrDefaultTemplateDefault);
+                        list_built_in_template_info(configuration, isBuiltInTemplateOverridden, isBuiltInOrDefaultTemplateDefault);
                     }
                 }
                 else
                 {
                     if (configuration.TemplateCommand.Name.ToLowerInvariant() == _builtInTemplateName || configuration.TemplateCommand.Name.ToLowerInvariant() == _builtInTemplateOverrideName)
                     {
-                        // We know that the template is not overriden since the template directory was checked
-                        list_built_in_template_info(configuration, isBuiltInTemplateOverriden, isBuiltInOrDefaultTemplateDefault);
+                        // We know that the template is not overridden since the template directory was checked
+                        list_built_in_template_info(configuration, isBuiltInTemplateOverridden, isBuiltInOrDefaultTemplateDefault);
                     }
                     else
                     {
@@ -337,7 +337,7 @@ List of Parameters:
             {
                 if (isOverridden)
                 {
-                    this.Log().Info("Built-in template overriden by 'default' template.{0}".format_with(Environment.NewLine));
+                    this.Log().Info("Built-in template overridden by 'default' template.{0}".format_with(Environment.NewLine));
                 }
                 else
                 {
@@ -357,7 +357,7 @@ List of Parameters:
             }
             else
             {
-                //If reduced output, only print out the built in template if it is not overriden
+                //If reduced output, only print out the built in template if it is not overridden
                 if (!isOverridden)
                 {
                     this.Log().Info("built-in|0.0.0");

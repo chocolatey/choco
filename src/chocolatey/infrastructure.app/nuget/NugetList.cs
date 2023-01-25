@@ -230,7 +230,7 @@ namespace chocolatey.infrastructure.app.nuget
         /// <param name="nugetLogger">fill me in</param>
         /// <param name="resources">fill me in</param>
         /// <param name="version">Version to search for</param>
-        /// <param name="cacheContext">Settings for cacheing of results from sources</param>
+        /// <param name="cacheContext">Settings for caching of results from sources</param>
         /// <returns>One result or nothing</returns>
         public static IPackageSearchMetadata find_package(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources, NuGetVersion version = null)
         {

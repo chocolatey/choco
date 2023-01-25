@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.registration
     public interface IExtensionEnvironment
     {
         /// <summary>
-        /// Returns all of the availabe configuration values that are related to the implementing Chocolatey extension.
+        /// Returns all of the available configuration values that are related to the implementing Chocolatey extension.
         /// </summary>
         /// <param name="config">The configuration used for the entire chocolatey ecosystem.</param>
         /// <returns>The configuration values that needs to be set as environment variables.</returns>
