@@ -399,6 +399,13 @@ namespace chocolatey.tests.infrastructure.app.commands
                 configuration.Sources = ApplicationParameters.PackagesLocation;
                 configuration.ListCommand.LocalOnly = true;
                 configuration.AllVersions = true;
+
+                var packageResults = new[]
+                {
+                    new PackageResult(package.Object, null),
+                    new PackageResult(pinnedPackage.Object, null)
+                };
+                nugetService.Setup(n => n.list_run(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
             }
 
             public new void reset()
@@ -428,34 +435,27 @@ namespace chocolatey.tests.infrastructure.app.commands
                 nugetService.Verify(n => n.list_run(It.IsAny<ChocolateyConfiguration>()), Times.Once);
             }
 
-            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object."), Category("Pending")]
             [Fact]
             public void should_set_pin_when_command_is_add()
             {
                 reset();
 
                 configuration.PinCommand.Name = "regular";
-                //packageManager.Setup(pm => pm.LocalRepository).Returns(localRepository.Object);
-                //NuGetVersion nugetVersion = null;
-                //nuget woes
-                //localRepository.Setup(r => r.FindPackage(configuration.PinCommand.Name, nugetVersion)).Returns(package.Object);
                 configuration.PinCommand.Command = PinCommandType.add;
 
-                //command.set_pin(packageManager.Object, configuration);
+                command.set_pin(configuration);
 
                 packageInfoService.Verify(s => s.save_package_information(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
             }
 
-            [Pending("NuGet is killing me with extension methods. Need to find proper item to mock out to return the package object."), Category("Pending")]
             [Fact]
             public void should_remove_pin_when_command_is_remove()
             {
                 reset();
                 configuration.PinCommand.Name = "pinned";
-               // packageManager.Setup(pm => pm.LocalRepository).Returns(localRepository.Object);
                 configuration.PinCommand.Command = PinCommandType.remove;
 
-                //command.set_pin(packageManager.Object, configuration);
+                command.set_pin(configuration);
 
                 packageInfoService.Verify(s => s.save_package_information(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
             }
