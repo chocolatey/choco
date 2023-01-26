@@ -1,30 +1,10 @@
 ﻿Import-Module helpers/common-helpers
 
-# TODO: All tests that is expected to fail now succeed when pushing to CCR
-# even when CCR returns an non-successful status code.
-# This is probably something that needs to be fixed in NuGet.Client.
-Describe "choco push" -Tag Chocolatey, PushCommand, Broken -Skip:($null -eq $env:API_KEY) {
-    BeforeDiscovery {
-        $isLicensed30OrMissingVersion = Test-PackageIsEqualOrHigher 'chocolatey.extension' '3.0.0-beta' -AllowMissingPackage
-        $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
-        # The destination alias was implemented in Chocolatey v0.10.16/0.11.0,
-        # but was not implemenented in Chocolatey Licensed at the time.
-        # Implementation in Chocolatey Licensed is scheduled for v3.0.0.
-        $destinationAliasAvailable = $isLicensed30OrMissingVersion -and (Test-ChocolateyVersionEqualOrHigherThan '0.10.16-beta')
-        $hasBeforeInstallBlock = $isLicensed30OrMissingVersion -and (Test-ChocolateyVersionEqualOrHigherThan '0.11.0')
-    }
-
+Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY -or $null -eq $env:PUSH_REPO) {
     BeforeAll {
         Remove-NuGetPaths
-        # Ideally this comes from an environment variable, but that's proving harder to put into the tests than is desired.
         $ApiKey = $env:API_KEY
-        # Using Chocolatey Community Repository for pushing as choco-test could be blown away at any time, and we'd have to reset up the user and packages.
-        $RepositoryToUse = if ($env:PUSH_REPO) {
-            $env:PUSH_REPO
-        }
-        else {
-            "https://push.chocolatey.org"
-        }
+        $RepositoryToUse = $env:PUSH_REPO
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
@@ -60,8 +40,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand, Broken -Skip:($null -eq $env
         It "Should Report the actual cause of the error" {
             $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse"
             $Output.Lines | Should -Contain "An error has occurred. It's possible the package version already exists on the repository or a nuspec element is invalid. See error below..."
-            $Output.String | Should -Match "Failed to process request. '"
-            $Output.Lines | Should -Contain "The remote server returned an error: (409) Conflict.."
+            $Output.Lines | Should -Contain "Response status code does not indicate success: 409 (Conflict)."
         }
     }
 
@@ -91,8 +70,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand, Broken -Skip:($null -eq $env
         It "Should Report the actual cause of the error" {
             $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse"
             $Output.Lines | Should -Contain "An error has occurred. It's possible the package version already exists on the repository or a nuspec element is invalid. See error below..."
-            $Output.String | Should -Match "Failed to process request. '"
-            $Output.Lines | Should -Contain "The remote server returned an error: (409) Conflict.."
+            $Output.Lines | Should -Contain "Response status code does not indicate success: 409 (Conflict)."
         }
     }
 
@@ -122,8 +100,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand, Broken -Skip:($null -eq $env
         It "Should Report the actual cause of the error" {
             $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse"
             $Output.Lines | Should -Contain "An error has occurred. It's possible the package version already exists on the repository or a nuspec element is invalid. See error below..."
-            $Output.String | Should -Match "Failed to process request. '"
-            $Output.Lines | Should -Contain "The remote server returned an error: (409) Conflict.."
+            $Output.Lines | Should -Contain "Response status code does not indicate success: 409 (Conflict)."
         }
     }
 
@@ -207,7 +184,7 @@ Describe 'choco push nuget <_> repository' -Tag Chocolatey, PushCommand -Skip:($
         }
 
         It 'Successfully pushed the package to the repository' {
-            $Packages | Should -Not -BeNullOrEmpty
+            $Packages | Should -Not -BeNullOrEmpty -Because "Package $PackageUnderTest with version '$VersionUnderTest-$AddedVersion' should be found on $RepositoryToUse$RepositoryEndpoint"
         }
     }
 }
