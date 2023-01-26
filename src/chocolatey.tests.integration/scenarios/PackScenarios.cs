@@ -499,6 +499,27 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        public class when_packing_with_min_client_version : ScenariosBase
+        {
+            protected override string ExpectedNuspecVersion => "0.1.0";
+            protected override string ExpectedSubDirectory => "PackageOutput";
+
+            // This high version is to ensure that pack does not throw, even if the min client version is well
+            // above both the Chocolatey and NuGet assembly versions.
+            private string MinClientVersion = "100.0.0";
+
+            public override void Because()
+            {
+                MockLogger.reset();
+                Service.pack_run(Configuration);
+            }
+
+            protected override string GetNuspecContent()
+            {
+                return NuspecContentWithFormatableMinClientVersion.format_with(MinClientVersion);
+            }
+        }
+
         private const string NuspecContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
   <metadata>
@@ -900,6 +921,29 @@ namespace chocolatey.tests.integration.scenarios
     <id>test-package</id>
     <title>Test Package</title>
     <version>{0}</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
+</package>";
+
+    private const string NuspecContentWithFormatableMinClientVersion = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata minClientVersion=""{0}"">
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>0.1.0</version>
     <authors>package author</authors>
     <owners>package owner</owners>
     <summary>A brief summary</summary>
