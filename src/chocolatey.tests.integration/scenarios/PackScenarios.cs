@@ -439,7 +439,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithAllUnsupportedElements);
 
-                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -447,7 +447,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithServiceableElement);
 
-                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -455,7 +455,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithLicenseElement);
 
-                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -463,7 +463,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithRepositoryElement);
 
-                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -471,7 +471,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithPackageTypesElement);
 
-                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -479,7 +479,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithFrameWorkReferencesElement);
 
-                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -487,7 +487,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithReadmeElement);
 
-                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
             }
 
             [Fact]
@@ -495,7 +495,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 AddFile("myPackage.nuspec", NuspecContentWithIconElement);
 
-                ServiceAct.ShouldThrow<System.IO.FileFormatException>();
+                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
             }
         }
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.props')" />
   <PropertyGroup>
@@ -216,6 +216,13 @@
     <Compile Include="infrastructure.app\nuget\ChocolateyNuGetSettings.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateySourceCacheContext.cs" />
     <Compile Include="infrastructure.app\rules\MetadataRuleBase.cs" />
+    <Compile Include="infrastructure.app\rules\FrameWorkReferencesMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\IconMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\LicenseMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\PackageTypesMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\ReadmeMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\RepositoryMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\ServicableMetadataRule.cs" />
     <Compile Include="infrastructure.app\services\RuleService.cs" />
     <Compile Include="infrastructure\cryptography\DefaultEncryptionUtility.cs" />
     <Compile Include="infrastructure\adapters\IEncryptionUtility.cs" />
