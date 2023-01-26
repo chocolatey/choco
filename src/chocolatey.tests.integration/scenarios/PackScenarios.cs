@@ -499,24 +499,24 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        public class when_packing_with_min_client_version : ScenariosBase
+        public class When_packing_with_min_client_version : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.1.0";
             protected override string ExpectedSubDirectory => "PackageOutput";
 
             // This high version is to ensure that pack does not throw, even if the min client version is well
             // above both the Chocolatey and NuGet assembly versions.
-            private string MinClientVersion = "100.0.0";
+            private string _minClientVersion = "100.0.0";
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             protected override string GetNuspecContent()
             {
-                return NuspecContentWithFormatableMinClientVersion.format_with(MinClientVersion);
+                return NuspecContentWithFormatableMinClientVersion.FormatWith(_minClientVersion);
             }
         }
 

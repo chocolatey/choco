@@ -19,6 +19,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.nuget;
     using chocolatey.infrastructure.filesystem;
@@ -160,6 +161,22 @@ namespace chocolatey.tests.infrastructure.app.nuget
                     .ShouldEqual(("file:" + source).Replace("\\", "/"));
                 packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
                 packageRepositories.First().PackageSource.SourceUri.IsUnc.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void Should_set_user_agent_string()
+            {
+                Context();
+                var source = "https://community.chocolatey.org/api/v2/";
+                configuration.Sources = source;
+                configuration.Information.ChocolateyProductVersion = "vNext";
+
+                because();
+
+                // Change this when the NuGet version is updated.
+                string nugetClientVersion = "6.4.1";
+                string expectedUserAgentString = "{0}/{1} via NuGet Client/{2}".FormatWith(ApplicationParameters.UserAgent, configuration.Information.ChocolateyProductVersion, nugetClientVersion);
+                UserAgent.UserAgentString.ShouldStartWith(expectedUserAgentString);
             }
         }
     }
