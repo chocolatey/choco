@@ -27,6 +27,7 @@ namespace chocolatey.infrastructure.app.nuget
     using NuGet.Configuration;
     using NuGet.Protocol;
     using NuGet.Protocol.Core.Types;
+    using System.Net.Http;
 
     public class NugetPush
     {
@@ -39,8 +40,10 @@ namespace chocolatey.infrastructure.app.nuget
             }
             const bool disableBuffering = false;
 
-            // Controls adding /api/v2/packages to the end of the source url
-            const bool noServiceEndpoint = true;
+            // Controls adding /api/v2/packages to the end of the source url, IF that source url is missing an endpoint (is just a host with no path like https://push.chocolatey.org/)
+            const bool noServiceEndpoint = false;
+            // Controls if NuGet throws on 409 HTTP response
+            const bool skipDuplicate = false;
 
             //OK to use FirstOrDefault in this case as the command validates that there is only one source
             SourceRepository sourceRepository = NugetCommon.GetRemoteRepositories(config, nugetLogger, filesystem).FirstOrDefault();
@@ -51,17 +54,17 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 packageUpdateResource.Push(
                     nupkgFilePaths,
-                    "",
+                    symbolSource: "",
                     Convert.ToInt32(timeout.TotalSeconds),
                     disableBuffering,
                     endpoint => config.PushCommand.Key,
-                    null,
+                    getSymbolApiKey: null,
                     noServiceEndpoint,
-                    true,
-                    null,
+                    skipDuplicate,
+                    symbolPackageUpdateResource: null,
                     nugetLogger).GetAwaiter().GetResult();
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex) when (ex is InvalidOperationException || ex is HttpRequestException)
             {
 
                 var message = ex.Message;
@@ -72,7 +75,7 @@ namespace chocolatey.infrastructure.app.nuget
                         throw new ApplicationException("An error has occurred. This package version already exists on the repository and cannot be modified.{0}Package versions that are approved, rejected, or exempted cannot be modified.{0}See https://docs.chocolatey.org/en-us/community-repository/moderation/ for more information".format_with(Environment.NewLine), ex);
                     }
 
-                    if (message.Contains("(406)") || message.Contains("(409)"))
+                    if (message.Contains("406") || message.Contains("409"))
                     {
                         // Let this fall through so the actual error message is shown when the exception is re-thrown
                         "chocolatey".Log().Error("An error has occurred. It's possible the package version already exists on the repository or a nuspec element is invalid. See error below...");
