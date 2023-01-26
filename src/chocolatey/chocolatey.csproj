@@ -216,13 +216,17 @@
     <Compile Include="infrastructure.app\nuget\ChocolateyNuGetSettings.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateySourceCacheContext.cs" />
     <Compile Include="infrastructure.app\rules\MetadataRuleBase.cs" />
+    <Compile Include="infrastructure.app\rules\RequiredMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\EmptyOrInvalidUrlMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\FrameWorkReferencesMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\IconMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\LicenseMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\PackageTypesMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\ReadmeMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\RepositoryMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\RequireLicenseAcceptanceMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\ServicableMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\VersionMetadataRule.cs" />
     <Compile Include="infrastructure.app\services\RuleService.cs" />
     <Compile Include="infrastructure\cryptography\DefaultEncryptionUtility.cs" />
     <Compile Include="infrastructure\adapters\IEncryptionUtility.cs" />
