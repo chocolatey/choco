@@ -17,10 +17,17 @@
 namespace chocolatey.infrastructure.guards
 {
     using System;
+    using System.IO;
     using System.Linq.Expressions;
 
     public static class Ensure
     {
+        public static EnsureString that(Expression<Func<string>> expression)
+        {
+            var memberName = expression.get_name_on_right().Member.Name;
+            return new EnsureString(memberName, expression.Compile().Invoke());
+        }
+
         public static Ensure<TypeToEnsure> that<TypeToEnsure>(Expression<Func<TypeToEnsure>> expression) where TypeToEnsure : class
         {
             var memberName = expression.get_name_on_right().Member.Name;
@@ -49,6 +56,41 @@ namespace chocolatey.infrastructure.guards
             }
 
             throw new Exception("Unable to find member for {0}".format_with(e.to_string()));
+        }
+    }
+
+    public class EnsureString : Ensure<string>
+    {
+        public EnsureString(string name, string value)
+            : base(name, value)
+        {
+        }
+
+        public EnsureString is_not_null_or_whitespace()
+        {
+            is_not_null();
+
+            if (string.IsNullOrWhiteSpace(Value))
+            {
+                throw new ArgumentException(Name, "Value for {0} cannot be empty or only contain whitespace.".format_with(Name));
+            }
+
+            return this;
+        }
+
+        public EnsureString has_any_extension(params string[] extensions)
+        {
+            var actualExtension = Path.GetExtension(Value);
+
+            foreach (var extension in extensions)
+            {
+                if (extension.is_equal_to(actualExtension))
+                {
+                    return this;
+                }
+            }
+
+            throw new ArgumentException(Name, "Value for {0} must contain one of the following extensions: {1}".format_with(Name, string.Join(", ", extensions)));
         }
     }
 
