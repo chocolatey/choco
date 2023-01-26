@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+// Copyright © 2017 - 2023 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,6 +52,7 @@ namespace chocolatey.infrastructure.app.services
     using NuGet.Versioning;
     using System.Xml.Linq;
     using infrastructure.configuration;
+    using chocolatey.infrastructure.services;
 
     //todo: #2575 - this monolith is too large. Refactor once test coverage is up.
 
@@ -61,6 +62,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly ILogger _nugetLogger;
         private readonly IChocolateyPackageInformationService _packageInfoService;
         private readonly IFilesService _filesService;
+        private readonly IRuleService _ruleService;
         //private readonly PackageDownloader _packageDownloader;
         private readonly Lazy<IDateTime> datetime_initializer = new Lazy<IDateTime>(() => new DateTime());
 
@@ -76,12 +78,18 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="nugetLogger">The nuget logger</param>
         /// <param name="packageInfoService">Package information service</param>
         /// <param name="filesService">The files service</param>
-        public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService, IFilesService filesService)
+        public NugetService(
+            IFileSystem fileSystem,
+            ILogger nugetLogger,
+            IChocolateyPackageInformationService packageInfoService,
+            IFilesService filesService,
+            IRuleService ruleService)
         {
             _fileSystem = fileSystem;
             _nugetLogger = nugetLogger;
             _packageInfoService = packageInfoService;
             _filesService = filesService;
+            _ruleService = ruleService;
         }
 
         public string SourceType
@@ -1571,6 +1579,43 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
             if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword)) config.SourceCommand.CertificatePassword = originalConfig.SourceCommand.CertificatePassword;
 
             return originalConfig;
+        }
+
+        private void validate_nuspec(string nuspecFilePath)
+        {
+            var results = _ruleService.validate_rules(nuspecFilePath);
+
+            if (!config.PackCommand.PackThrowOnUnsupportedElements)
+            {
+                results = results.Where(r => !r.Message.contains("not supported"));
+            }
+
+            var hasErrors = false;
+
+            foreach (var rule in results)
+            {
+                switch (rule.Severity)
+                {
+                    case infrastructure.rules.RuleType.Error:
+                        this.Log().Error("ERROR: " + rule.Message);
+                        hasErrors = true;
+                        break;
+
+                    case infrastructure.rules.RuleType.Warning:
+                        this.Log().Warn("WARNING: " + rule.Message);
+                        break;
+
+                    case infrastructure.rules.RuleType.Information:
+                        this.Log().Info("INFO: " + rule.Message);
+                        break;
+                }
+            }
+
+            if (hasErrors)
+            {
+                this.Log().Info(string.Empty);
+                throw new InvalidDataException("One or more issues found with {0}, please fix all validation items above listed as errors.".format_with(nuspecFilePath));
+            }
         }
 
         private string get_install_directory(ChocolateyConfiguration config, IPackageMetadata installedPackage)
