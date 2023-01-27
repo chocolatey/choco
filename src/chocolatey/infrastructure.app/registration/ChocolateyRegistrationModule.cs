@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2023 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,9 @@ namespace chocolatey.infrastructure.app.registration
     using NuGet.Common;
     using NuGet.PackageManagement;
     using NuGet.Packaging;
+    using chocolatey.infrastructure.rules;
+    using chocolatey.infrastructure.app.rules;
+    using System.Linq;
 
     internal class ChocolateyRegistrationModule : IExtensionModule
     {
@@ -78,6 +81,16 @@ namespace chocolatey.infrastructure.app.registration
             registrator.register_service<IValidation>(
                 typeof(GlobalConfigurationValidation),
                 typeof(SystemStateValidation));
+
+            // Rule registrations
+            registrator.register_service<IRuleService, RuleService>();
+
+            var availableRules = GetType().Assembly
+                .GetTypes()
+                .Where(t => !t.IsInterface && !t.IsAbstract && typeof(IMetadataRule).IsAssignableFrom(t))
+                .ToArray();
+
+            registrator.register_service<IMetadataRule>(availableRules);
         }
     }
 }

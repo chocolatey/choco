@@ -34,6 +34,30 @@ namespace chocolatey.tests.infrastructure.guards
         public class when_Ensure_is_being_set_to_a_type : EnsureSpecsBase
         {
             private object result;
+            private readonly object bob = "something";
+
+            public override void Because()
+            {
+                result = Ensure.that(() => bob);
+            }
+
+            [Fact]
+            public void should_return_a_type_of_object_for_ensuring()
+            {
+                result.ShouldBeType<Ensure<object>>();
+            }
+
+            [Fact]
+            public void should_have_the_value_specified()
+            {
+                var bobEnsure = result as Ensure<object>;
+                bobEnsure.Value.ShouldEqual(bob);
+            }
+        }
+
+        public class when_Ensure_is_a_string_type : EnsureSpecsBase
+        {
+            private object result;
             private readonly string bob = "something";
 
             public override void Because()
@@ -42,16 +66,77 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void should_return_a_type_of_string_for_ensuring()
+            public void should_return_a_ensure_string_type()
             {
-                result.ShouldBeType<Ensure<string>>();
+                result.ShouldBeType<EnsureString>();
             }
 
             [Fact]
             public void should_have_the_value_specified()
             {
-                var bobEnsure = result as Ensure<string>;
+                var bobEnsure = result as EnsureString;
                 bobEnsure.Value.ShouldEqual(bob);
+            }
+        }
+
+        public class when_using_EnsureString : EnsureSpecsBase
+        {
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void when_testing_a_string_against_null_value_should_fail()
+            {
+                string test = null;
+
+                Action a = () => Ensure.that(() => test).is_not_null_or_whitespace();
+
+                a.ShouldThrow<ArgumentNullException>();
+            }
+
+            [Fact]
+            public void when_testing_a_string_against_an_empty_value_should_fail()
+            {
+                Action a = () => Ensure.that(() => string.Empty).is_not_null_or_whitespace();
+
+                a.ShouldThrow<ArgumentException>();
+            }
+
+            [Fact]
+            public void when_testing_a_string_against_a_whitespace_value_should_fail()
+            {
+                var test = "      ";
+
+                Action a = () => Ensure.that(() => test).is_not_null_or_whitespace();
+
+                a.ShouldThrow<ArgumentException>();
+            }
+
+            [Fact]
+            public void when_testing_a_string_against_a_non_empty_value_should_pass()
+            {
+                var test = "some value";
+
+                Ensure.that(() => test).is_not_null_or_whitespace();
+            }
+
+            [Fact]
+            public void when_testing_a_string_without_expected_extension_should_fail()
+            {
+                var test = "some-file.png";
+
+                Action a = () => Ensure.that(() => test).has_any_extension(".jpg", ".bmp", ".gif");
+
+                a.ShouldThrow<ArgumentException>();
+            }
+
+            [Fact]
+            public void when_testing_a_string_with_expected_extension_should_pass()
+            {
+                var test = "some-file.png";
+
+                Ensure.that(() => test).has_any_extension(".jpg", ".bmp", ".gif", ".png");
             }
         }
 

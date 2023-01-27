@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2023 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,6 +52,7 @@ namespace chocolatey.infrastructure.app.services
     using NuGet.Versioning;
     using System.Xml.Linq;
     using infrastructure.configuration;
+    using chocolatey.infrastructure.services;
 
     //todo: #2575 - this monolith is too large. Refactor once test coverage is up.
 
@@ -61,6 +62,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly ILogger _nugetLogger;
         private readonly IChocolateyPackageInformationService _packageInfoService;
         private readonly IFilesService _filesService;
+        private readonly IRuleService _ruleService;
         //private readonly PackageDownloader _packageDownloader;
         private readonly Lazy<IDateTime> datetime_initializer = new Lazy<IDateTime>(() => new DateTime());
 
@@ -76,12 +78,18 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="nugetLogger">The nuget logger</param>
         /// <param name="packageInfoService">Package information service</param>
         /// <param name="filesService">The files service</param>
-        public NugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService, IFilesService filesService)
+        public NugetService(
+            IFileSystem fileSystem,
+            ILogger nugetLogger,
+            IChocolateyPackageInformationService packageInfoService,
+            IFilesService filesService,
+            IRuleService ruleService)
         {
             _fileSystem = fileSystem;
             _nugetLogger = nugetLogger;
             _packageInfoService = packageInfoService;
             _filesService = filesService;
+            _ruleService = ruleService;
         }
 
         public string SourceType
@@ -298,67 +306,10 @@ namespace chocolatey.infrastructure.app.services
             return filePath;
         }
 
-        public virtual IEnumerable<string> validate_nuspec_elements(string filePath)
-        {
-            var nuspecReader = new NuspecReader(filePath);
-            var metadataNode = nuspecReader.Xml.Root.Elements().FirstOrDefault(e => StringComparer.Ordinal.Equals(e.Name.LocalName, "metadata"));
-            var metadataNamespace = metadataNode.GetDefaultNamespace().NamespaceName;
-
-            var issuesList = new List<string>();
-
-            if (!(nuspecReader.GetReadme() is null))
-            {
-                issuesList.Add("<readme> elements are not supported in Chocolatey CLI");
-            }
-
-            if (!(nuspecReader.GetIcon() is null))
-            {
-                issuesList.Add("<icon> elements are not supported in Chocolatey CLI, use <iconUrl> instead");
-            }
-
-            if (!(metadataNode.Elements(XName.Get("repository", metadataNamespace)).FirstOrDefault() is null))
-            {
-                issuesList.Add("<repository> elements are not supported in Chocolatey CLI, use <packageSourceUrl> instead");
-            }
-
-            if (!(nuspecReader.GetLicenseMetadata() is null))
-            {
-                issuesList.Add("<license> elements are not supported in Chocolatey CLI, use <licenseUrl> instead");
-            }
-
-            if (string.IsNullOrWhiteSpace(nuspecReader.GetLicenseUrl()) && nuspecReader.GetRequireLicenseAcceptance())
-            {
-                issuesList.Add("Enabling license acceptance requires a license url.");
-            }
-
-            if (!(metadataNode.Elements(XName.Get("packageTypes", metadataNamespace)).FirstOrDefault() is null))
-            {
-                issuesList.Add("<packageTypes> elements are not supported in Chocolatey CLI");
-            }
-
-            if (!(metadataNode.Elements(XName.Get("serviceable", metadataNamespace)).FirstOrDefault() is null))
-            {
-                issuesList.Add("<serviceable> elements are not supported in Chocolatey CLI");
-            }
-
-            if (!(metadataNode.Elements(XName.Get("frameworkReferences", metadataNamespace)).FirstOrDefault() is null))
-            {
-                issuesList.Add("<frameworkReferences> elements are not supported in Chocolatey CLI");
-            }
-
-            return issuesList;
-        }
-
         public virtual void pack_run(ChocolateyConfiguration config)
         {
             var nuspecFilePath = validate_and_return_package_file(config, PackagingConstants.ManifestExtension);
-
-            var nuspecIssuesList = validate_nuspec_elements(nuspecFilePath);
-            if (nuspecIssuesList.Any() && config.PackCommand.PackThrowOnUnsupportedElements)
-            {
-                this.Log().Warn("Issues found with {0}, please remove the unsupported elements listed below".format_with(nuspecFilePath));
-                throw new System.IO.FileFormatException(nuspecIssuesList.join("\r\n"));
-            }
+            validate_nuspec(nuspecFilePath, config);
 
             var nuspecDirectory = _fileSystem.get_full_path(_fileSystem.get_directory_name(nuspecFilePath));
             if (string.IsNullOrWhiteSpace(nuspecDirectory)) nuspecDirectory = _fileSystem.get_current_directory();
@@ -850,7 +801,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         packageResult.InstallLocation = installedPath;
                         packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                        var elementsList = validate_nuspec_elements(manifestPath);
+                        var elementsList = _ruleService.validate_rules(manifestPath)
+                            .Where(r => r.Severity == infrastructure.rules.RuleType.Error)
+                            .Select(r => r.Message)
+                            .ToList();
+
                         if (elementsList.Any())
                         {
                             var message = "Issues found with nuspec elements\r\n" + elementsList.join("\r\n");
@@ -1397,7 +1352,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 upgradePackageResult.InstallLocation = installedPath;
                                 upgradePackageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                                var elementsList = validate_nuspec_elements(manifestPath);
+                                var elementsList = _ruleService.validate_rules(manifestPath)
+                                    .Where(r => r.Severity == infrastructure.rules.RuleType.Error)
+                                    .Select(r => r.Message)
+                                    .ToList();
+
                                 if (elementsList.Any())
                                 {
                                     var message = "Issues found with nuspec elements\r\n" + elementsList.join("\r\n");
@@ -1571,6 +1530,43 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
             if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword)) config.SourceCommand.CertificatePassword = originalConfig.SourceCommand.CertificatePassword;
 
             return originalConfig;
+        }
+
+        private void validate_nuspec(string nuspecFilePath, ChocolateyConfiguration config)
+        {
+            var results = _ruleService.validate_rules(nuspecFilePath);
+
+            if (!config.PackCommand.PackThrowOnUnsupportedElements)
+            {
+                results = results.Where(r => !r.Message.contains("not supported"));
+            }
+
+            var hasErrors = false;
+
+            foreach (var rule in results)
+            {
+                switch (rule.Severity)
+                {
+                    case infrastructure.rules.RuleType.Error:
+                        this.Log().Error("ERROR: " + rule.Message);
+                        hasErrors = true;
+                        break;
+
+                    case infrastructure.rules.RuleType.Warning:
+                        this.Log().Warn("WARNING: " + rule.Message);
+                        break;
+
+                    case infrastructure.rules.RuleType.Information:
+                        this.Log().Info("INFO: " + rule.Message);
+                        break;
+                }
+            }
+
+            if (hasErrors)
+            {
+                this.Log().Info(string.Empty);
+                throw new InvalidDataException("One or more issues found with {0}, please fix all validation items above listed as errors.".format_with(nuspecFilePath));
+            }
         }
 
         private string get_install_directory(ChocolateyConfiguration config, IPackageMetadata installedPackage)

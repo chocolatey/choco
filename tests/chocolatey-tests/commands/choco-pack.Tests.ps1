@@ -1,4 +1,4 @@
-Import-Module helpers/common-helpers
+﻿Import-Module helpers/common-helpers
 
 $successPack = @('basic'; 'basic-dependencies'; "cdata"; "full")
 # Required elements, that can also not be empty
@@ -15,13 +15,17 @@ $emptyFailures = @(
 )
 # Elements that will return an invalid failure (usually due to serialization)
 $invalidFailures = @(
-    $emptyFailures | ForEach-Object {
-        @{id = $_; message = "Invalid URI: The format of the URI could not be determined." }
-    }
-    @{id = "version"; message = "'INVALID' is not a valid version string." }
-    @{id = "no-content"; message = "Cannot create a package that has no dependencies nor content." }
-    @{id = "id"; message = "The package ID 'invalid id' contains invalid characters. Examples of valid package IDs include 'MyPackage' and 'MyPackage.Sample'." }
-    @{id = "requirelicenseacceptance"; message = "Enabling license acceptance requires a license url." }
+    @{id = 'projectUrl'; message = "ERROR: 'invalid project url' is not a valid URL for the projectUrl element in the package nuspec file." }
+    @{id = 'projectSourceUrl'; message = "ERROR: 'invalid project source url' is not a valid URL for the projectSourceUrl element in the package nuspec file." }
+    @{id = 'docsUrl'; message = "ERROR: 'invalid docs url' is not a valid URL for the docsUrl element in the package nuspec file." }
+    @{id = 'bugTrackerUrl'; message = "ERROR: 'invalid bug tracker url' is not a valid URL for the bugTrackerUrl element in the package nuspec file." }
+    @{id = 'mailingListUrl'; message = "ERROR: 'invalid mailing list url' is not a valid URL for the mailingListUrl element in the package nuspec file." }
+    @{id = 'iconUrl'; message = "ERROR: 'invalid icon url' is not a valid URL for the iconUrl element in the package nuspec file." }
+    @{id = 'licenseUrl'; message = "ERROR: 'invalid license url' is not a valid URL for the licenseUrl element in the package nuspec file." }
+    @{id = "version"; message = "ERROR: 'INVALID' is not a valid version string in the package nuspec file." }
+    @{id = "no-content"; message = "Cannot create a package that has no dependencies nor content." } # This is a message from NuGet.Client, we may want to take ownership of it eventually.
+    @{id = "id"; message = "The package ID 'invalid id' contains invalid characters. Examples of valid package IDs include 'MyPackage' and 'MyPackage.Sample'." } # This is a message from NuGet.Client, we may want to take ownership of it eventually.
+    @{id = "requirelicenseacceptance"; message = "ERROR: Enabling license acceptance requires a license url." }
 )
 
 Describe "choco pack" -Tag Chocolatey, PackCommand {
@@ -135,7 +139,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
     }
 
     # Message has changed and is missing almost all items in the validation message
-    Context "Package with required elements" -Tag Broken {
+    Context "Package with required elements" {
         BeforeAll {
             $Output = Invoke-Choco pack "required.nuspec"
         }
@@ -148,8 +152,8 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
             $Output.Lines | Should -Contain $expectedHeader
         }
 
-        It "Displays required error message for <_>" -ForEach $missingFailures -Tag Broken {
-            $Output.Lines | Should -Contain "$_ is required."
+        It "Displays required error message for <_>" -ForEach $missingFailures {
+            $Output.Lines | Should -Contain "ERROR: $_ is a required element in the package nuspec file."
         }
 
         It "Does not create the nuget package" {
@@ -163,10 +167,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         It "Should not output message about iconUrl being deprecated" {
             $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
         }
+
+        It "Should output message about validation issues found" {
+            $Output.Lines | Should -Contain "One or more issues found with required.nuspec, please fix all validation items above listed as errors." -Because $Output.String
+        }
     }
 
     # TODO: Validation messages are incomplete and are missing some items
-    Context "Package with empty elements" -Tag PartiallyBroken {
+    Context "Package with empty elements" {
         BeforeAll {
             $Output = Invoke-Choco pack "empty.nuspec"
         }
@@ -179,8 +187,8 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
             $Output.Lines | Should -Contain $expectedHeader
         }
 
-        It "Displays empty error message for <_>" -ForEach ($emptyFailures | ? { $_ -eq 'licenseUrl' }) {
-            $Output.Lines | Should -Contain "$_ cannot be empty."
+        It "Displays empty error message for <_>" -ForEach $emptyFailures {
+            $Output.Lines | Should -Contain "ERROR: The $_ element in the package nuspec file cannot be empty."
         }
 
         It "Does not create the nuget package" {
@@ -193,6 +201,10 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
 
         It "Should not output message about iconUrl being deprecated" {
             $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
+        }
+
+        It "Should output message about validation issues found" {
+            $Output.Lines | Should -Contain "One or more issues found with empty.nuspec, please fix all validation items above listed as errors."
         }
     }
 
@@ -221,6 +233,12 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         It "Should not output message about iconUrl being deprecated" {
             $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
         }
+
+        # We currently do not have a custom validation message for this element.
+        # As such we do not know when or if it failed because of an empty/invalid require license acceptance value.
+        It "Should not output message about validation issues found" {
+            $Output.Lines | Should -Not -Contain "One or more issues found with empty-requireLicenseAcceptance.nuspec, please fix all validation items above listed as errors."
+        }
     }
 
     Context "Package with missing elements" {
@@ -236,8 +254,8 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
             $Output.Lines | Should -Contain $expectedHeader
         }
 
-        It "Displays possible element message <_>" -ForEach $missingFailures {
-            $Output.String | Should -Match "The element 'metadata' in namespace.*has incomplete content\..*$_"
+        It "Displays empty error message for <_>" -ForEach $missingFailures {
+            $Output.Lines | Should -Contain "ERROR: $_ is a required element in the package nuspec file."
         }
 
         It "Does not create the nuget package" {
@@ -251,10 +269,14 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         It "Should not output message about iconUrl being deprecated" {
             $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
         }
+
+        It "Should output message about validation issues found" {
+            $Output.Lines | Should -Contain "One or more issues found with missing.nuspec, please fix all validation items above listed as errors."
+        }
     }
 
     # TODO: Message about verifying version string has changed, and should be fixed
-    Context "Package with invalid <_.id>" -ForEach ($invalidFailures | ? id -NotIn 'version') -Tag PartiallyBroken {
+    Context "Package with invalid <_.id>" -ForEach $invalidFailures {
         BeforeAll {
             $Output = Invoke-Choco pack "invalid-$($_.id).nuspec"
         }
@@ -281,6 +303,16 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
 
         It "Should not output message about iconUrl being deprecated" {
             $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
+        }
+
+        It "Should output message about validation issues found if needed" {
+            $message = "One or more issues found with invalid-$($_.id).nuspec, please fix all validation items above listed as errors."
+
+            if ($_.id -in @('no-content', 'id')) {
+                $Output.Lines | Should -Not -Contain $message
+            } else {
+                $Output.Lines | Should -Contain $message
+            }
         }
     }
 
@@ -536,7 +568,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It 'Shows an error about the unsupported nuspec metadata element "<_>"' -TestCases $testCases {
-            $Output.String | Should -Match "$_ elements are not supported in Chocolatey CLI"
+            $Output.String | Should -Match "ERROR: $_ elements are not supported in Chocolatey CLI"
         }
 
         It "Should not output message about license url being deprecated" {
@@ -545,6 +577,10 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
 
         It "Should not output message about iconUrl being deprecated" {
             $Output.String | Should -Not -Match "The 'PackageIconUrl'/'iconUrl' element is deprecated"
+        }
+
+        It "Should output message about validation issues found" {
+            $Output.Lines | Should -Contain "One or more issues found with $nuspecPath, please fix all validation items above listed as errors."
         }
     }
 
