@@ -524,7 +524,7 @@ folder.");
             if (packageNames.Count == 1)
             {
                 var packageName = packageNames.DefaultIfEmpty(string.Empty).FirstOrDefault();
-                if (packageName.EndsWith(NuGetConstants.PackageExtension) || packageName.EndsWith(PackagingConstants.ManifestExtension))
+                if (packageName.EndsWith(NuGetConstants.PackageExtension, StringComparison.OrdinalIgnoreCase) || packageName.EndsWith(PackagingConstants.ManifestExtension, StringComparison.OrdinalIgnoreCase))
                 {
                     this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION WARNING");
                     this.Log().Warn(InstallWithFilePathDeprecationMessage);
@@ -534,7 +534,7 @@ folder.");
 
                     config.Sources = _fileSystem.GetDirectoryName(_fileSystem.GetFullPath(packageName));
 
-                    if (packageName.EndsWith(PackagingConstants.ManifestExtension))
+                    if (packageName.EndsWith(PackagingConstants.ManifestExtension, StringComparison.OrdinalIgnoreCase))
                     {
                         packageNames.Add(_fileSystem.GetFilenameWithoutExtension(packageName));
 
@@ -578,7 +578,7 @@ folder.");
 
                 var installedPackage = allLocalPackages.FirstOrDefault(p => p.Name.IsEqualTo(packageName));
 
-                if (Platform.GetPlatform() != PlatformType.Windows && !packageName.EndsWith(".template"))
+                if (Platform.GetPlatform() != PlatformType.Windows && !packageName.EndsWith(".template", StringComparison.OrdinalIgnoreCase))
                 {
                     var logMessage = "{0} is not a supported package on non-Windows systems.{1}Only template packages are currently supported.".FormatWith(packageName, Environment.NewLine);
                     this.Log().Warn(ChocolateyLoggers.Important, logMessage);
