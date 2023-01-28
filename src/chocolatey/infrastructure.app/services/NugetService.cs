@@ -1968,6 +1968,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             ConfigurationOptions.OptionSet.Parse(packageArguments);
 
             // there may be overrides from the user running upgrade
+            if (!string.IsNullOrWhiteSpace(originalConfig.PackageParameters)) 
+            {
+                config.PackageParameters = originalConfig.PackageParameters;
+            }
+            
+            if (!string.IsNullOrWhiteSpace(originalConfig.InstallArguments))
+            {
+                config.InstallArguments = originalConfig.InstallArguments;
+            }
+            
             if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Username))
             {
                 config.SourceCommand.Username = originalConfig.SourceCommand.Username;
@@ -1986,6 +1996,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword))
             {
                 config.SourceCommand.CertificatePassword = originalConfig.SourceCommand.CertificatePassword;
+            }
+
+            if (originalConfig.CacheLocationArgumentWasPassed && !string.IsNullOrWhiteSpace(originalConfig.CacheLocation))
+            {
+                config.CacheLocation = originalConfig.CacheLocation;
+            }
+
+            if (originalConfig.CommandExecutionTimeoutSecondsArgumentWasPassed)
+            {
+                config.CommandExecutionTimeoutSeconds = originalConfig.CommandExecutionTimeoutSeconds;
             }
 
             return originalConfig;
