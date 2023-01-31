@@ -206,6 +206,7 @@
     <Compile Include="MockLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TinySpec.cs" />
+    <Compile Include="UNCHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

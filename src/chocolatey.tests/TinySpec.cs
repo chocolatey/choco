@@ -236,6 +236,16 @@ namespace chocolatey.tests
             {
             }
         }
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class UncAttribute : PlatformAttribute
+        {
+            public UncAttribute()
+                : base("Win")
+            {
+                Reason = "UNC Test paths are only available when running on Windows";
+            }
+        }
     }
 
     // ReSharper restore InconsistentNaming

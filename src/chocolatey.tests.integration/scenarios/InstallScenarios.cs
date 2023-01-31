@@ -16,11 +16,13 @@
 
 namespace chocolatey.tests.integration.scenarios
 {
+    using System;
     using System.Collections;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Xml.XPath;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
@@ -3460,7 +3462,7 @@ namespace chocolatey.tests.integration.scenarios
 
         public class when_installing_a_package_from_a_nupkg_file : ScenariosBase
         {
-            private PackageResult packageResult;
+            private Exception _exception;
 
             public override void Context()
             {
@@ -3470,180 +3472,315 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                Results = Service.install_run(Configuration);
-                packageResult = Results.FirstOrDefault().Value;
+                try
+                {
+                    Results = Service.install_run(Configuration);
+                }
+                catch (Exception ex)
+                {
+                    _exception = ex;
+                }
             }
 
             [Fact]
-            public void should_install_where_install_location_reports()
+            public void should_have_thrown_exception_when_installing()
             {
-                DirectoryAssert.Exists(packageResult.InstallLocation);
+                _exception.ShouldBeType<ApplicationException>();
             }
 
             [Fact]
-            public void should_install_the_package_in_the_lib_directory()
+            public void should_have_outputted_expected_exception_message()
+            {
+                // We use a string builder here to ensure that the same line endings are used.
+                var expectedMessage = new StringBuilder("Package name cannot be a path to a file on a remote, or local file system.")
+                    .AppendLine()
+                    .AppendLine()
+                    .AppendLine("To install a local, or remote file, you may use:")
+                    .AppendLine("  choco install installpackage --version=\"1.0.0\" --source=\"{0}\"".format_with(Configuration.Sources))
+                    .ToString();
+
+                _exception.Message.ShouldEqual(expectedMessage);
+            }
+
+            [Fact]
+            public void should_not_install_the_package_in_the_lib_directory()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "installpackage");
 
-                DirectoryAssert.Exists(packageDir);
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
-            public void should_install_the_expected_version_of_the_package()
+            public void should_not_install_the_package_in_the_lib_bad_directory()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "installpackage", "installpackage" + NuGetConstants.PackageExtension);
-                using (var packageReader = new PackageArchiveReader(packageFile))
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bad", "installpackage");
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void should_not_install_the_package_in_the_lib_backup_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", "installpackage");
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+        }
+
+        public class when_installing_a_package_from_a_prerelease_nupkg_file : ScenariosBase
+        {
+            private Exception _exception;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "{0}{1}installpackage.0.56-alpha-0544.nupkg".format_with(Configuration.Sources, Path.DirectorySeparatorChar);
+            }
+
+            public override void Because()
+            {
+                try
                 {
-                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
+                    Results = Service.install_run(Configuration);
+                }
+                catch (Exception ex)
+                {
+                    _exception = ex;
                 }
             }
 
             [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
-            public void should_create_a_shim_for_console_in_the_bin_directory()
+            public void should_have_thrown_exception_when_installing()
             {
-                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
-
-                FileAssert.Exists(shimfile);
+                _exception.ShouldBeType<ApplicationException>();
             }
 
             [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
-            public void should_create_a_shim_for_graphical_in_the_bin_directory()
+            public void should_have_outputted_expected_exception_message()
             {
-                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
+                // We use a string builder here to ensure that the same line endings are used.
+                var expectedMessage = new StringBuilder("Package name cannot be a path to a file on a remote, or local file system.")
+                    .AppendLine()
+                    .AppendLine()
+                    .AppendLine("To install a local, or remote file, you may use:")
+                    .AppendLine("  choco install installpackage --version=\"0.56.0-alpha-0544\" --prerelease --source=\"{0}\"".format_with(Configuration.Sources))
+                    .ToString();
 
-                FileAssert.Exists(shimfile);
+                _exception.Message.ShouldEqual(expectedMessage);
             }
 
             [Fact]
-            public void should_not_create_a_shim_for_ignored_executable_in_the_bin_directory()
+            public void should_not_install_the_package_in_the_lib_directory()
             {
-                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "not.installed.exe");
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "installpackage");
 
-                FileAssert.DoesNotExist(shimfile);
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
-            public void should_not_create_a_shim_for_mismatched_case_ignored_executable_in_the_bin_directory()
+            public void should_not_install_the_package_in_the_lib_bad_directory()
             {
-                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "casemismatch.exe");
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bad", "installpackage");
 
-                FileAssert.DoesNotExist(shimfile);
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
-            public void should_not_create_an_extensions_folder_for_the_package()
+            public void should_not_install_the_package_in_the_lib_backup_directory()
             {
-                var extensionsDirectory = Path.Combine(Scenario.get_top_level(), "extensions", "installpackage");
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", "installpackage");
 
-                DirectoryAssert.DoesNotExist(extensionsDirectory);
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+        }
+
+        [Categories.Unc]
+        public class when_installing_a_package_from_a_nupkg_file_and_unc_path : ScenariosBase
+        {
+            private Exception _exception;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Sources = UNCHelper.convert_local_folder_path_to_ip_based_unc_path(Configuration.Sources);
+
+                Configuration.PackageNames = Configuration.Input = "{0}{1}installpackage.1.0.0.nupkg".format_with(Configuration.Sources, Path.DirectorySeparatorChar);
             }
 
-            [Fact]
-            public void should_not_create_an_hooks_folder_for_the_package()
+            public override void Because()
             {
-                var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", "installpackage");
-
-                DirectoryAssert.DoesNotExist(hooksDirectory);
-            }
-
-            [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
-            public void should_have_a_console_shim_that_is_set_for_non_gui_access()
-            {
-                var messages = new List<string>();
-
-                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "console.exe");
-                CommandExecutor.execute(
-                    shimfile,
-                    "--shimgen-noop",
-                    10,
-                    stdOutAction: (s, e) => messages.Add(e.Data),
-                    stdErrAction: (s, e) => messages.Add(e.Data)
-                );
-
-                var messageFound = false;
-
-                foreach (var message in messages.or_empty_list_if_null())
+                try
                 {
-                    if (string.IsNullOrWhiteSpace(message)) continue;
-                    if (message.Contains("is gui? False")) messageFound = true;
+                    Results = Service.install_run(Configuration);
                 }
-
-                messageFound.ShouldBeTrue("GUI false message not found");
-            }
-
-            [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
-            public void should_have_a_graphical_shim_that_is_set_for_gui_access()
-            {
-                var messages = new List<string>();
-
-                var shimfile = Path.Combine(Scenario.get_top_level(), "bin", "graphical.exe");
-                CommandExecutor.execute(
-                    shimfile,
-                    "--shimgen-noop",
-                    10,
-                    stdOutAction: (s, e) => messages.Add(e.Data),
-                    stdErrAction: (s, e) => messages.Add(e.Data)
-                );
-
-                var messageFound = false;
-
-                foreach (var message in messages.or_empty_list_if_null())
+                catch (Exception ex)
                 {
-                    if (string.IsNullOrWhiteSpace(message)) continue;
-                    if (message.Contains("is gui? True")) messageFound = true;
+                    _exception = ex;
                 }
-
-                messageFound.ShouldBeTrue("GUI true message not found");
             }
 
             [Fact]
-            public void should_contain_a_warning_message_that_it_installed_successfully()
+            public void should_have_thrown_exception_when_installing()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                _exception.ShouldBeType<ApplicationException>();
+            }
+
+            [Fact]
+            public void should_have_outputted_expected_exception_message()
+            {
+                // We use a string builder here to ensure that the same line endings are used.
+                var expectedMessage = new StringBuilder("Package name cannot be a path to a file on a UNC location.")
+                    .AppendLine()
+                    .AppendLine()
+                    .AppendLine("To install a file in a UNC location, you may use:")
+                    .AppendLine("  choco install installpackage --version=\"1.0.0\" --source=\"{0}\"".format_with(Configuration.Sources))
+                    .ToString();
+
+                _exception.Message.ShouldEqual(expectedMessage);
+            }
+
+            [Fact]
+            public void should_not_install_the_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "installpackage");
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void should_not_install_the_package_in_the_lib_bad_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bad", "installpackage");
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void should_not_install_the_package_in_the_lib_backup_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", "installpackage");
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+        }
+
+        public class when_installing_a_package_from_a_remote_nupkg_file : ScenariosBase
+        {
+            private Exception _exception;
+
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration.PackageNames = Configuration.Input = "https://testing.com/raw/installpackage.1.0.0.nupkg";
+            }
+
+            public override void Because()
+            {
+                try
                 {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
+                    Results = Service.install_run(Configuration);
                 }
-
-                installedSuccessfully.ShouldBeTrue();
+                catch (Exception ex)
+                {
+                    _exception = ex;
+                }
             }
 
             [Fact]
-            public void should_have_a_successful_package_result()
+            public void should_have_thrown_exception_when_installing()
             {
-                packageResult.Success.ShouldBeTrue();
+                _exception.ShouldBeType<ApplicationException>();
             }
 
             [Fact]
-            public void should_not_have_inconclusive_package_result()
+            public void should_have_outputted_expected_exception_message()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                _exception.Message.ShouldEqual("Package name cannot point directly to a local, or remote file. Please use the --source argument and point it to a local file directory, UNC directory path or a NuGet feed instead.");
             }
 
             [Fact]
-            public void should_not_have_warning_package_result()
+            public void should_not_install_the_package_in_the_lib_directory()
             {
-                packageResult.Warning.ShouldBeFalse();
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "installpackage");
+
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
-            public void config_should_match_package_result_name()
+            public void should_not_install_the_package_in_the_lib_bad_directory()
             {
-                packageResult.Name.ShouldEqual("installpackage");
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bad", "installpackage");
+
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]
-            public void should_have_a_version_of_one_dot_zero_dot_zero()
+            public void should_not_install_the_package_in_the_lib_backup_directory()
             {
-                packageResult.Version.ShouldEqual("1.0.0");
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", "installpackage");
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+        }
+
+        public class when_installing_a_package_from_a_manifest_file : ScenariosBase
+        {
+            private Exception _exception;
+
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration.PackageNames = Configuration.Input = "{0}{1}installpackage.nuspec".format_with(Configuration.Sources, Path.DirectorySeparatorChar);
+            }
+
+            public override void Because()
+            {
+                try
+                {
+                    Results = Service.install_run(Configuration);
+                }
+                catch (Exception ex)
+                {
+                    _exception = ex;
+                }
+            }
+
+            [Fact]
+            public void should_have_thrown_exception_when_installing()
+            {
+                _exception.ShouldBeType<ApplicationException>();
+            }
+
+            [Fact]
+            public void should_have_outputted_expected_exception_message()
+            {
+                _exception.Message.ShouldEqual("Package name cannot point directly to a package manifest file. Please create a package by running 'choco pack' on the .nuspec file first.");
+            }
+
+            [Fact]
+            public void should_not_install_the_package_in_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", "installpackage");
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void should_not_install_the_package_in_the_lib_bad_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bad", "installpackage");
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void should_not_install_the_package_in_the_lib_backup_directory()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", "installpackage");
+
+                DirectoryAssert.DoesNotExist(packageDir);
             }
         }
 

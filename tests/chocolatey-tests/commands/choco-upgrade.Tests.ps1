@@ -149,6 +149,48 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
     }
 
+    Context "Upgrading a Package from a nupkg file" -Tag Testing {
+        BeforeAll {
+            $snapshotPath = New-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "installpackage"
+
+            New-ChocolateyTestPackage `
+                -TestPath "$PSScriptRoot\testpackages" `
+                -Name $PackageUnderTest `
+                -Version "1.0.0"
+
+            $PackagePath = "$($snapshotPath.PackagesPath)\$PackageUnderTest.1.0.0.nupkg"
+
+            $Output = Invoke-Choco upgrade $PackagePath --confirm --params '/ParameterOne:FirstOne /ParameterTwo:AnotherOne'
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1
+        }
+
+        It "Not Installed a package to the lib directory" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Not Installed a package to the lib bad directory" {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Not Installed a package to the lib backup directory" {
+            "$env:ChocolateyInstall\lib-backup\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Outputs expected error message" {
+            $Output.String | Should -Match @"
+Package name cannot be a path to a file on a remote or local file system.
+
+To install or upgrade a local or remote file, you may use:
+  choco upgrade $packageUnderTest --version="1.0.0" --source="$([regex]::Escape($snapshotPath.PackagesPath))
+"@
+        }
+    }
+
     # This needs to be (almost) the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

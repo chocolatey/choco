@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2023 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,8 +31,10 @@ namespace chocolatey.infrastructure.app.services
     using infrastructure.services;
     using logging;
     using nuget;
+    using NuGet.Configuration;
     using NuGet.Packaging;
     using NuGet.Protocol.Core.Types;
+    using NuGet.Versioning;
     using platforms;
     using results;
     using tolerance;
@@ -288,6 +290,8 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public void install_noop(ChocolateyConfiguration config)
         {
+            validate_package_names(config);
+
             // each package can specify its own configuration values
             foreach (var packageConfig in set_config_from_package_names_and_packages_config(config, new ConcurrentDictionary<string, PackageResult>()).or_empty_list_if_null())
             {
@@ -575,6 +579,8 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
 
         public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
         {
+            validate_package_names(config);
+
             if (config.AllowMultipleVersions)
             {
                 this.Log().Warn(ChocolateyLoggers.Important, "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0.");
@@ -803,6 +809,8 @@ Would have determined packages that are out of date based on what is
 
         public void upgrade_noop(ChocolateyConfiguration config)
         {
+            validate_package_names(config);
+
             Action<PackageResult, ChocolateyConfiguration> action = null;
             if (config.SourceType.is_equal_to(SourceTypes.NORMAL))
             {
@@ -820,6 +828,8 @@ Would have determined packages that are out of date based on what is
 
         public virtual ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config)
         {
+            validate_package_names(config);
+
             if (config.AllowMultipleVersions)
             {
                 this.Log().Warn(ChocolateyLoggers.Important, "Upgrading the same package with multiple versions is deprecated and will be removed in v2.0.0.");
@@ -971,6 +981,128 @@ If a package is failing because it is a dependency of another package
             }
 
             return packageUninstalls;
+        }
+
+        private void validate_package_names(ChocolateyConfiguration config)
+        {
+            foreach (var packageName in config.PackageNames.Split(';'))
+            {
+                if (packageName.EndsWith(NuGetConstants.PackageExtension))
+                {
+                    if (Uri.TryCreate(packageName, UriKind.Absolute, out var uri) && (uri.IsFile || uri.IsUnc))
+                    {
+                        throw_invalid_path_used(uri.LocalPath, uri.IsUnc, config.CommandName);
+                    }
+                    else if (_fileSystem.file_exists(packageName))
+                    {
+                        var fullPath = _fileSystem.get_full_path(packageName);
+
+                        if (!string.IsNullOrWhiteSpace(fullPath) && Uri.TryCreate(fullPath, UriKind.Absolute, out uri))
+                        {
+                            throw_invalid_path_used(uri.LocalPath, uri.IsUnc, config.CommandName);
+                        }
+
+                        throw_invalid_path_used(fullPath, isUncPath: false, commandName: config.CommandName);
+                    }
+                    else
+                    {
+                        throw new ApplicationException("Package name cannot point directly to a local, or remote file. Please use the --source argument and point it to a local file directory, UNC directory path or a NuGet feed instead.");
+
+                    }
+                }
+                else if (packageName.EndsWith(NuGetConstants.ManifestExtension))
+                {
+                    throw new ApplicationException("Package name cannot point directly to a package manifest file. Please create a package by running 'choco pack' on the .nuspec file first.");
+
+                }
+            }
+        }
+
+        private void throw_invalid_path_used(string packageName, bool isUncPath, string commandName)
+        {
+            var sb = new StringBuilder("Package name cannot be a path to a file ");
+
+            if (isUncPath)
+            {
+                sb.AppendLine("on a UNC location.")
+                  .AppendLine()
+                  .Append("To ")
+                  .Append(commandName)
+                  .AppendLine(" a file in a UNC location, you may use:");
+            }
+            else
+            {
+                sb.AppendLine("on a remote, or local file system.")
+                  .AppendLine()
+                  .Append("To ")
+                  .Append(commandName)
+                  .AppendLine(" a local, or remote file, you may use:");
+
+            }
+
+            build_install_example(packageName, sb, commandName);
+
+            throw new ApplicationException(sb.AppendLine().ToString());
+        }
+
+        private void build_install_example(string packageName, StringBuilder sb, string commandName)
+        {
+            var fileName = _fileSystem.get_file_name_without_extension(packageName);
+            var version = string.Empty;
+            // We need to get the directory name in this way in case it is a UNC path.
+            // Using normal way to get the directory name may trim out parts of the necessary path.
+            var length = packageName.Length - _fileSystem.get_file_name(packageName).Length - 1;
+            var directory = length > 0 ? packageName.Substring(0, length) : string.Empty;
+
+            if (fileName.Contains('.'))
+            {
+                var originalFileName = fileName;
+                fileName = string.Empty;
+
+                while (fileName.Length < originalFileName.Length)
+                {
+                    if (NuGetVersion.TryParse(originalFileName.Substring(fileName.Length + 1), out var nugetVersion))
+                    {
+                        version = nugetVersion.to_normalized_string();
+                        break;
+                    }
+
+                    var index = originalFileName.IndexOf('.', fileName.Length + 1);
+
+                    if (index <= 0)
+                    {
+                        fileName = originalFileName;
+                        break;
+                    }
+
+                    fileName = originalFileName.Substring(0, index);
+                }
+            }
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentException(sb.ToString());
+            }
+
+            sb.Append("  choco ")
+              .Append(commandName)
+              .Append(' ')
+              .Append(fileName.wrap_spaces_in_quotes());
+
+            if (!string.IsNullOrWhiteSpace(version))
+            {
+                sb.AppendFormat(" --version=\"{0}\"", version);
+
+                if (version.Contains('-'))
+                {
+                    sb.Append(" --prerelease");
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                sb.AppendFormat(" --source=\"{0}\"", directory);
+            }
         }
 
         private int report_action_summary(ConcurrentDictionary<string, PackageResult> packageResults, string actionName)
