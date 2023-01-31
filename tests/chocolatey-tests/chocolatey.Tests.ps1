@@ -213,6 +213,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             Remove-Item $Profile.CurrentUserCurrentHost -ErrorAction Ignore
             New-Item $Profile.CurrentUserCurrentHost -Force
             $chocolatey = (Invoke-Choco list chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
+            Enable-ChocolateySource -Name local
             $null = Invoke-Choco install chocolatey -f --version $chocolatey.Version
         }
 
@@ -284,6 +285,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
                 }
             }
 
+            Enable-ChocolateySource -Name local
             $Output = Invoke-Choco install chocolatey -f --version $chocolatey.Version --no-progress
         }
 
