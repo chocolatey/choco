@@ -1,4 +1,4 @@
-﻿Import-Module helpers/common-helpers
+Import-Module helpers/common-helpers
 
 Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY -or $null -eq $env:PUSH_REPO) {
     BeforeAll {
@@ -108,7 +108,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY
     Test-NuGetPaths
 }
 
-Describe 'choco push nuget <_> repository' -Tag Chocolatey, PushCommand -Skip:($null -eq $env:NUGET_API_KEY -or $null -eq $env:NUGET_PUSH_REPO) -ForEach @('v2', 'v3') {
+Describe 'choco push nuget <_> repository' -Tag Chocolatey, PushCommand -Skip:($null -eq $env:NUGET_SOURCE_USERNAME -or $null -eq $env:NUGET_SOURCE_PASSWORD -or $null -eq $env:NUGET_API_KEY -or $null -eq $env:NUGET_PUSH_REPO) -ForEach @('v2', 'v3') {
     BeforeDiscovery {
         $TestCases = @(
             @{ Wording = 'using config' ; UseConfig = $true }
@@ -160,23 +160,34 @@ Describe 'choco push nuget <_> repository' -Tag Chocolatey, PushCommand -Skip:($
             }
 
             $Output = Invoke-Choco push $PackagePath --source $RepositoryToUse$RepositoryEndpoint @KeyParameter
+
             $VerifyPackagesSplat = @(
-                "find"
-                "$PackageUnderTest"
                 "--pre"
                 "--source"
                 "$RepositoryToUse$RepositoryEndpoint"
-                "--api-key"
-                "$ApiKey"
+                "--user"
+                $env:NUGET_SOURCE_USERNAME
+                "--password"
+                $env:NUGET_SOURCE_PASSWORD
                 "--version"
                 "$VersionUnderTest-$AddedVersion"
             )
-            $Packages = (Invoke-Choco @VerifyPackagesSplat --Limit-Output).Lines | ConvertFrom-ChocolateyOutput -Command List
+
+            # Nexus can take a moment to index the package, but we want to validate that it was successfully pushed
+            $Timer =  [System.Diagnostics.Stopwatch]::StartNew()
+            while ($Timer.Elapsed.TotalSeconds -lt 60 -and -not (
+                $Packages = (Invoke-Choco find $PackageUnderTest @VerifyPackagesSplat --Limit-Output).Lines | ConvertFrom-ChocolateyOutput -Command List
+            )) {
+                Write-Verbose "$($PackageUnderTest) was not found on $($RepositoryToUse)$($RepositoryEndpoint). Waiting for 5 seconds before trying again."
+                Start-Sleep -Seconds 5
+            }
         }
 
         AfterAll {
-            $null = Invoke-Choco install nuget.commandline -y
-            & "$env:ChocolateyInstall/bin/nuget.exe" delete $PackageUnderTest "$VersionUnderTest-$AddedVersion" -Source $RepositoryToUse -ApiKey $ApiKey -NonInteractive
+            if ($Packages) {
+                $null = Invoke-Choco install nuget.commandline -y
+                & "$env:ChocolateyInstall/bin/nuget.exe" delete $PackageUnderTest "$VersionUnderTest-$AddedVersion" -Source $RepositoryToUse -ApiKey $ApiKey -NonInteractive
+            }
         }
 
         It 'Exits with Success (0)' {
