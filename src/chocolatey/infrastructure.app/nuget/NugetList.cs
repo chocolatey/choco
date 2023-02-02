@@ -47,7 +47,26 @@ namespace chocolatey.infrastructure.app.nuget
 
         public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-            return execute_package_search(configuration, nugetLogger, filesystem).GetAwaiter().GetResult().Count();
+            var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger, filesystem);
+            var packageRepositoriesResources = NugetCommon.GetRepositoryResources(packageRepositories);
+            string searchTermLower = configuration.Input.to_lower();
+
+            SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
+            searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
+
+
+            int totalCount = 0;
+            foreach (var repositoryResources in packageRepositoriesResources)
+            {
+                if (repositoryResources.searchResource == null)
+                {
+                    continue;
+                }
+
+                totalCount += repositoryResources.searchResource.SearchCountAsync(searchTermLower, searchFilter, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
+            }
+
+            return totalCount;
         }
 
         private async static Task<IQueryable<IPackageSearchMetadata>> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
@@ -55,49 +74,54 @@ namespace chocolatey.infrastructure.app.nuget
             var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger, filesystem);
             var packageRepositoriesResources = NugetCommon.GetRepositoryResources(packageRepositories);
             string searchTermLower = configuration.Input.to_lower();
+
             SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
             searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
+            searchFilter.OrderBy = SearchOrderBy.Id;
+
+            if (configuration.ListCommand.OrderByPopularity)
+            {
+                searchFilter.OrderBy = SearchOrderBy.DownloadCount;
+            }
+
             var cacheContext = new ChocolateySourceCacheContext(configuration);
-
-
-            // TODO: maybe adjust number if no page specified? Or adjust check to have no max value
-            var totalToGet = configuration.ListCommand.Page.HasValue ? (configuration.ListCommand.Page + 1) * configuration.ListCommand.PageSize : 100000;
 
             NuGetVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? NuGetVersion.Parse(configuration.Version) : null;
             var results = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadata());
+
+            // TODO: maybe adjust number if no page specified? Or adjust check to have no max value
+            var totalToGet = configuration.ListCommand.Page.HasValue ? (configuration.ListCommand.Page + 1) * configuration.ListCommand.PageSize : 100000;
 
             if (!configuration.ListCommand.Exact)
             {
                 foreach (var repositoryResources in packageRepositoriesResources)
                 {
-
-                    if (repositoryResources.listResource != null)
-                    {
-                        var tempResults = await repositoryResources.listResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, CancellationToken.None);
-                        var enumerator = tempResults.GetEnumeratorAsync();
-
-                        while (await enumerator.MoveNextAsync())
-                        {
-                            results.Add(enumerator.Current);
-                            if (results.Count > totalToGet)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    else
+                    if (repositoryResources.searchResource != null)
                     {
                         var skipNumber = 0;
-                        var takeNumber = configuration.ListCommand.PageSize;
-                        //searchTermLower = string.IsNullOrWhiteSpace(searchTermLower) ? "*" : searchTermLower;
+                        var takeNumber = 30;
+
                         var partResults = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadataIdOnly());
                         var latestResults = new List<IPackageSearchMetadata>();
-                        do
+
+                        if (configuration.ListCommand.Page.HasValue)
                         {
+                            skipNumber = configuration.ListCommand.PageSize * configuration.ListCommand.Page.GetValueOrDefault(0);
+                            takeNumber = configuration.ListCommand.PageSize;
+
                             partResults.AddRange(await repositoryResources.searchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
-                            skipNumber += takeNumber;
                             latestResults.AddRange(partResults);
-                        } while (partResults.Count >= takeNumber && takeNumber < totalToGet);
+                        }
+                        else
+                        {
+                            do
+                            {
+                                partResults.Clear();
+                                partResults.AddRange(await repositoryResources.searchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
+                                skipNumber += takeNumber;
+                                latestResults.AddRange(partResults);
+                            } while (partResults.Count >= takeNumber && skipNumber < totalToGet);
+                        }
 
                         if (configuration.AllVersions)
                         {
@@ -122,8 +146,21 @@ namespace chocolatey.infrastructure.app.nuget
                             results.AddRange(latestResults);
                         }
                     }
-                }
+                    else
+                    {
+                        var tempResults = await repositoryResources.listResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, CancellationToken.None);
+                        var enumerator = tempResults.GetEnumeratorAsync();
 
+                        while (await enumerator.MoveNextAsync())
+                        {
+                            results.Add(enumerator.Current);
+                            if (results.Count > totalToGet)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
 
                 //TODO - deduplicate package ids
             }
@@ -202,14 +239,7 @@ namespace chocolatey.infrastructure.app.nuget
                  results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Identity.Id).ToHashSet()
                  : results.OrderBy(p => p.Identity.Id).ThenByDescending(p => p.Identity.Version).ToHashSet();
 
-            if (configuration.ListCommand.Page.HasValue)
-            {
-                return results.AsQueryable().Skip(configuration.ListCommand.PageSize * configuration.ListCommand.Page.Value).Take(configuration.ListCommand.PageSize);
-            }
-            else
-            {
-                return results.AsQueryable();
-            }
+            return results.AsQueryable();
         }
 
         public static ISet<IPackageSearchMetadata> find_all_package_versions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources)
