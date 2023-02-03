@@ -156,6 +156,12 @@ namespace chocolatey.infrastructure.app.commands
                 System.Console.Write("User name '{0}' provided. Password: ".format_with(configuration.SourceCommand.Username));
                 configuration.SourceCommand.Password = InteractivePrompt.get_password(configuration.PromptForConfirmation);
             }
+
+            if (configuration.ListCommand.PageSize < 1 || configuration.ListCommand.PageSize > 100)
+            {
+                var message = "The page size has been specified to be {0:N0} packages. The page size cannot be lower than 1 package, and no larger than 100 packages.".format_with(configuration.ListCommand.PageSize);
+                throw new ApplicationException(message);
+            }
         }
 
         public virtual void help_message(ChocolateyConfiguration configuration)
