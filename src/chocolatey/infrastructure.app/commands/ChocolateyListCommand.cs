@@ -98,7 +98,11 @@ namespace chocolatey.infrastructure.app.commands
                          })
                 .Add("page-size=",
                      "Page Size - the amount of package results to return per page. Defaults to 25. Available in 0.9.10+.",
-                     option => configuration.ListCommand.PageSize = int.Parse(option))
+                     option =>
+                     {
+                         configuration.ListCommand.PageSize = int.Parse(option);
+                         configuration.ListCommand.ExplicitPageSize = true;
+                     })
                 .Add("e|exact",
                      "Exact - Only return packages with this exact name. Available in 0.9.10+.",
                      option => configuration.ListCommand.Exact = option != null)
