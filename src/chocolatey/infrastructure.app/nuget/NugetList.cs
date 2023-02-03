@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -95,22 +95,26 @@ namespace chocolatey.infrastructure.app.nuget
 
             NuGetVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? NuGetVersion.Parse(configuration.Version) : null;
             var results = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadata());
+            var thresholdLimit = 0;
 
             if (configuration.ListCommand.ExplicitPageSize)
             {
                 LastPackageLimitUsed = configuration.ListCommand.PageSize;
+                thresholdLimit = LastPackageLimitUsed;
             }
             else
             {
                 LastPackageLimitUsed = configuration.ListCommand.LocalOnly ? 10000 : 1000;
+                thresholdLimit = LastPackageLimitUsed;
             }
 
             if (configuration.ListCommand.Page.HasValue)
             {
                 LastPackageLimitUsed = (configuration.ListCommand.Page.Value + 1) * configuration.ListCommand.PageSize;
+                thresholdLimit = configuration.ListCommand.PageSize;
             }
 
-            var lowerThresholdLimit = (int)(LastPackageLimitUsed * 0.9);
+            var lowerThresholdLimit = (int)(thresholdLimit * 0.9);
 
             var totalToGet = LastPackageLimitUsed;
 
@@ -129,13 +133,28 @@ namespace chocolatey.infrastructure.app.nuget
                         if (configuration.ListCommand.Page.HasValue)
                         {
                             skipNumber = configuration.ListCommand.PageSize * configuration.ListCommand.Page.GetValueOrDefault(0);
-                            takeNumber = configuration.ListCommand.PageSize;
-
-                            partResults.AddRange(await repositoryResources.searchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
-                            latestResults.AddRange(partResults);
                         }
-                        ThresholdHit = ThresholdHit || skipNumber >= LastPackageLimitUsed;
-                        LowerThresholdHit = LowerThresholdHit || skipNumber >= lowerThresholdLimit;
+
+                        var perSourceThresholdLimit = thresholdLimit;
+                        var perSourceThresholdMinLimit = lowerThresholdLimit;
+
+                        do
+                        {
+                            if (perSourceThresholdLimit < takeNumber)
+                            {
+                                takeNumber = perSourceThresholdLimit;
+                            }
+
+                            partResults.Clear();
+                            partResults.AddRange(await repositoryResources.searchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
+                            skipNumber += takeNumber;
+                            perSourceThresholdLimit -= partResults.Count;
+                            perSourceThresholdMinLimit -= partResults.Count;
+                            latestResults.AddRange(partResults);
+                        } while (partResults.Count >= takeNumber && skipNumber < totalToGet);
+
+                        ThresholdHit = perSourceThresholdLimit <= 0;
+                        LowerThresholdHit = perSourceThresholdMinLimit <= 0;
 
                         if (configuration.AllVersions)
                         {
@@ -165,19 +184,23 @@ namespace chocolatey.infrastructure.app.nuget
                         var tempResults = await repositoryResources.listResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, CancellationToken.None);
                         var enumerator = tempResults.GetEnumeratorAsync();
 
+                        var perSourceThresholdLimit = thresholdLimit;
+                        var perSourceThresholdMinLimit = lowerThresholdLimit;
+
                         while (await enumerator.MoveNextAsync())
                         {
                             results.Add(enumerator.Current);
+                            perSourceThresholdLimit--;
+                            perSourceThresholdMinLimit--;
+
                             if (results.Count >= totalToGet)
                             {
-                                ThresholdHit = true;
                                 break;
                             }
-                            else if (results.Count >= lowerThresholdLimit)
-                            {
-                                LowerThresholdHit = true;
-                            }
                         }
+
+                        ThresholdHit = ThresholdHit || perSourceThresholdLimit <= 0;
+                        LowerThresholdHit = LowerThresholdHit || perSourceThresholdMinLimit <= 0;
                     }
                 }
 
