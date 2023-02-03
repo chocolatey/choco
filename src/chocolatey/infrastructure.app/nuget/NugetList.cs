@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,6 +40,10 @@ namespace chocolatey.infrastructure.app.nuget
 
     public static class NugetList
     {
+        public static int LastPackageLimitUsed { get; private set; }
+        public static bool ThresholdHit { get; private set; }
+        public static bool LowerThresholdHit { get; private set; }
+
         public static IEnumerable<IPackageSearchMetadata> GetPackages(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
             return execute_package_search(configuration, nugetLogger, filesystem).GetAwaiter().GetResult();
@@ -71,6 +75,9 @@ namespace chocolatey.infrastructure.app.nuget
 
         private async static Task<IQueryable<IPackageSearchMetadata>> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
+            ThresholdHit = false;
+            LowerThresholdHit = false;
+
             var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger, filesystem);
             var packageRepositoriesResources = NugetCommon.GetRepositoryResources(packageRepositories);
             string searchTermLower = configuration.Input.to_lower();
@@ -89,8 +96,23 @@ namespace chocolatey.infrastructure.app.nuget
             NuGetVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? NuGetVersion.Parse(configuration.Version) : null;
             var results = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadata());
 
-            // TODO: maybe adjust number if no page specified? Or adjust check to have no max value
-            var totalToGet = configuration.ListCommand.Page.HasValue ? (configuration.ListCommand.Page + 1) * configuration.ListCommand.PageSize : 100000;
+            if (configuration.ListCommand.ExplicitPageSize)
+            {
+                LastPackageLimitUsed = configuration.ListCommand.PageSize;
+            }
+            else
+            {
+                LastPackageLimitUsed = configuration.ListCommand.LocalOnly ? 10000 : 1000;
+            }
+
+            if (configuration.ListCommand.Page.HasValue)
+            {
+                LastPackageLimitUsed = (configuration.ListCommand.Page.Value + 1) * configuration.ListCommand.PageSize;
+            }
+
+            var lowerThresholdLimit = (int)(LastPackageLimitUsed * 0.9);
+
+            var totalToGet = LastPackageLimitUsed;
 
             if (!configuration.ListCommand.Exact)
             {
@@ -99,7 +121,7 @@ namespace chocolatey.infrastructure.app.nuget
                     if (repositoryResources.searchResource != null)
                     {
                         var skipNumber = 0;
-                        var takeNumber = 30;
+                        var takeNumber = get_take_numbers(configuration);
 
                         var partResults = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadataIdOnly());
                         var latestResults = new List<IPackageSearchMetadata>();
@@ -112,16 +134,8 @@ namespace chocolatey.infrastructure.app.nuget
                             partResults.AddRange(await repositoryResources.searchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
                             latestResults.AddRange(partResults);
                         }
-                        else
-                        {
-                            do
-                            {
-                                partResults.Clear();
-                                partResults.AddRange(await repositoryResources.searchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
-                                skipNumber += takeNumber;
-                                latestResults.AddRange(partResults);
-                            } while (partResults.Count >= takeNumber && skipNumber < totalToGet);
-                        }
+                        ThresholdHit = ThresholdHit || skipNumber >= LastPackageLimitUsed;
+                        LowerThresholdHit = LowerThresholdHit || skipNumber >= lowerThresholdLimit;
 
                         if (configuration.AllVersions)
                         {
@@ -154,9 +168,14 @@ namespace chocolatey.infrastructure.app.nuget
                         while (await enumerator.MoveNextAsync())
                         {
                             results.Add(enumerator.Current);
-                            if (results.Count > totalToGet)
+                            if (results.Count >= totalToGet)
                             {
+                                ThresholdHit = true;
                                 break;
+                            }
+                            else if (results.Count >= lowerThresholdLimit)
+                            {
+                                LowerThresholdHit = true;
                             }
                         }
                     }
@@ -240,6 +259,20 @@ namespace chocolatey.infrastructure.app.nuget
                  : results.OrderBy(p => p.Identity.Id).ThenByDescending(p => p.Identity.Version).ToHashSet();
 
             return results.AsQueryable();
+        }
+
+        private static int get_take_numbers(ChocolateyConfiguration configuration)
+        {
+            // We calculate the amount of items we take at the same time, while making
+            // sure to take the minimum value of 30 packages which we know is a safe value
+            // to take from CCR and other feeds to minimize any issues that can happen.
+
+            if (configuration.ListCommand.Page.HasValue || configuration.ListCommand.ExplicitPageSize)
+            {
+                return Math.Min(configuration.ListCommand.PageSize, 30);
+            }
+
+            return 30;
         }
 
         public static ISet<IPackageSearchMetadata> find_all_package_versions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources)
