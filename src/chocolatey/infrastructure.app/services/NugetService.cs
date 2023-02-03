@@ -277,6 +277,20 @@ namespace chocolatey.infrastructure.app.services
             config.Sources = sources;
             config.Prerelease = prerelease;
             config.ListCommand.IncludeVersionOverrides = includeVersionOverrides;
+
+            if (!config.ListCommand.Page.HasValue && !config.ListCommand.LocalOnly)
+            {
+                var logType = config.RegularOutput ? ChocolateyLoggers.Important : ChocolateyLoggers.LogFileOnly;
+
+                if (NugetList.ThresholdHit)
+                {
+                    this.Log().Warn(logType, "The threshold of {0:N0} packages per source has been met. Please refine your search, or specify a page to find any more results.".format_with(NugetList.LastPackageLimitUsed));
+                }
+                else if (NugetList.LowerThresholdHit)
+                {
+                    this.Log().Warn(logType, "Over {0:N0} packages was found per source, there may be more packages available that was filtered out. Please refine your search, or specify a page to check for more packages.".format_with(NugetList.LastPackageLimitUsed * 0.9));
+                }
+            }
         }
 
         public void pack_noop(ChocolateyConfiguration config)

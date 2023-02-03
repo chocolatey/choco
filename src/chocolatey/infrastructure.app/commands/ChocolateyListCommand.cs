@@ -98,7 +98,11 @@ namespace chocolatey.infrastructure.app.commands
                          })
                 .Add("page-size=",
                      "Page Size - the amount of package results to return per page. Defaults to 25. Available in 0.9.10+.",
-                     option => configuration.ListCommand.PageSize = int.Parse(option))
+                     option =>
+                     {
+                         configuration.ListCommand.PageSize = int.Parse(option);
+                         configuration.ListCommand.ExplicitPageSize = true;
+                     })
                 .Add("e|exact",
                      "Exact - Only return packages with this exact name. Available in 0.9.10+.",
                      option => configuration.ListCommand.Exact = option != null)
@@ -151,6 +155,12 @@ namespace chocolatey.infrastructure.app.commands
                 this.Log().Debug(ChocolateyLoggers.LogFileOnly, "Username '{0}' provided. Asking for password.".format_with(configuration.SourceCommand.Username));
                 System.Console.Write("User name '{0}' provided. Password: ".format_with(configuration.SourceCommand.Username));
                 configuration.SourceCommand.Password = InteractivePrompt.get_password(configuration.PromptForConfirmation);
+            }
+
+            if (configuration.ListCommand.PageSize < 1 || configuration.ListCommand.PageSize > 100)
+            {
+                var message = "The page size has been specified to be {0:N0} packages. The page size cannot be lower than 1 package, and no larger than 100 packages.".format_with(configuration.ListCommand.PageSize);
+                throw new ApplicationException(message);
             }
         }
 
