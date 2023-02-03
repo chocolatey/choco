@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2023 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -111,8 +111,6 @@ namespace chocolatey.console
 
                 trap_exit_scenarios(config);
 
-                warn_on_nuspec_or_nupkg_usage(args, config);
-
                 if (config.RegularOutput)
                 {
 #if DEBUG
@@ -218,15 +216,6 @@ namespace chocolatey.console
             // if it has been loaded using old method.
 
             return true;
-        }
-
-        private static void warn_on_nuspec_or_nupkg_usage(string[] args, ChocolateyConfiguration config)
-        {
-            var commandLine = Environment.CommandLine;
-            if (!(commandLine.contains(" pack ") || commandLine.contains(" push ") || commandLine.contains("convert")) && (commandLine.contains(".nupkg") || commandLine.contains(".nuspec")))
-            {
-                if (config.RegularOutput) "chocolatey".Log().Warn("The use of .nupkg or .nuspec in for package name or source is known to cause issues. Please use the package id from the nuspec `<id />` with `-s .` (for local folder where nupkg is found).");
-            }
         }
 
         private static void add_assembly_resolver()

@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2023 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,7 @@ using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
 namespace chocolatey.tests.infrastructure.app.services
 {
+    using System.IO;
     using NuGet.Packaging;
 
     public class ChocolateyPackageServiceSpecs
@@ -140,6 +141,255 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 // The normal source runners will be called with an argument
                 NormalRunner.Verify(r => r.install_run(It.Is<ChocolateyConfiguration>(c => c.PackageNames != string.Empty), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()), Times.Never);
+            }
+        }
+
+        public class when_ChocolateyPackageService_tries_to_install_nupkg_file : ChocolateyPackageServiceSpecsBase
+        {
+            protected Action Action;
+
+            public override void Context()
+            {
+                base.Context();
+                Action = () => Service.install_noop(Configuration);
+                Configuration.CommandName = "install";
+            }
+
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void should_throw_exception_when_full_path_is_passed_to_install_run()
+            {
+                var directory = Path.Combine(Path.GetPathRoot(Environment.CurrentDirectory), "testing");
+                Configuration.PackageNames = Path.Combine(
+                    directory,
+                    "my-package.nupkg");
+                FileSystem.Setup(f => f.get_file_name_without_extension(Configuration.PackageNames))
+                    .Returns("my-package");
+                FileSystem.Setup(f => f.get_file_name(Configuration.PackageNames))
+                    .Returns("my-package.nupkg");
+                FileSystem.Setup(f => f.get_directory_name(Configuration.PackageNames))
+                    .Returns(directory);
+
+                var ex = try_run(Action);
+                var message = get_expected_local_value(directory, "my-package");
+
+                ex.Message.ShouldEqual(message);
+            }
+
+            [Fact]
+            public void should_throw_exception_when_full_file_prefixed_path_is_passed_to_install_run()
+            {
+                var directory = Path.Combine(Path.GetPathRoot(Environment.CurrentDirectory), "testing");
+                var filePath = Path.Combine(directory, "my-package.nupkg");
+                Configuration.PackageNames = new Uri(filePath).AbsoluteUri;
+                FileSystem.Setup(f => f.get_file_name_without_extension(filePath))
+                    .Returns("my-package");
+                FileSystem.Setup(f => f.get_file_name(filePath))
+                    .Returns("my-package.nupkg");
+                FileSystem.Setup(f => f.get_directory_name(filePath))
+                    .Returns(directory);
+
+                var ex = try_run(Action);
+                var message = get_expected_local_value(directory, "my-package");
+                ex.Message.ShouldEqual(message);
+            }
+
+            [Fact, Categories.Unc]
+            public void should_throw_exception_when_UNC_path_is_passed_to_install_run()
+            {
+                var directory = UNCHelper.convert_local_folder_path_to_ip_based_unc_path(Path.Combine(Path.GetPathRoot(Environment.CurrentDirectory), "testing"));
+                var filePath = Path.Combine(directory, "my-package.nupkg");
+                Configuration.PackageNames = new Uri(filePath).AbsoluteUri;
+                FileSystem.Setup(f => f.get_file_name_without_extension(filePath))
+                    .Returns("my-package");
+                FileSystem.Setup(f => f.get_file_name(filePath))
+                    .Returns("my-package.nupkg");
+                FileSystem.Setup(f => f.get_directory_name(filePath))
+                    .Returns(directory);
+
+                var ex = try_run(Action);
+                var message = get_expected_unc_value(directory, "my-package");
+                ex.Message.ShouldEqual(message);
+            }
+
+            [Fact]
+            public void should_throw_exception_when_remote_path_is_passed_to_install_run()
+            {
+                Configuration.PackageNames = "https://test.com/repository/awesome-package.nupkg";
+
+                var ex = try_run(Action);
+                ex.Message.ShouldEqual("Package name cannot point directly to a local, or remote file. Please use the --source argument and point it to a local file directory, UNC directory path or a NuGet feed instead.");
+            }
+
+            [Fact]
+            public void should_throw_exception_when_passed_in_path_to_nupkg_is_relative_and_it_exists()
+            {
+                Configuration.PackageNames = "test.1.5.0.nupkg";
+                var directory = Environment.CurrentDirectory;
+                var fullPath = Path.Combine(directory, Configuration.PackageNames);
+                FileSystem.Setup(f => f.file_exists(Configuration.PackageNames)).Returns(true);
+                FileSystem.Setup(f => f.get_full_path(Configuration.PackageNames)).Returns(fullPath);
+                FileSystem.Setup(f => f.get_directory_name(fullPath)).Returns(directory);
+                FileSystem.Setup(f => f.get_file_name(fullPath)).Returns("test.1.5.0.nupkg");
+                FileSystem.Setup(f => f.get_file_name_without_extension(fullPath)).Returns("test.1.5.0");
+
+                var ex = try_run(Action);
+                var expectedMessage = get_expected_local_value(Environment.CurrentDirectory, "test", "1.5.0");
+                ex.Message.ShouldEqual(expectedMessage);
+            }
+
+            [Fact]
+            public void should_throw_exception_with_expected_message_when_installing_pre_release_nupkg()
+            {
+                Configuration.PackageNames = "test.2.0-alpha.nupkg";
+                var directory = Environment.CurrentDirectory;
+                var fullPath = Path.Combine(directory, Configuration.PackageNames);
+                FileSystem.Setup(f => f.file_exists(Configuration.PackageNames)).Returns(true);
+                FileSystem.Setup(f => f.get_full_path(Configuration.PackageNames)).Returns(fullPath);
+                FileSystem.Setup(f => f.get_directory_name(fullPath)).Returns(directory);
+                FileSystem.Setup(f => f.get_file_name(fullPath)).Returns(Configuration.PackageNames);
+                FileSystem.Setup(f => f.get_file_name_without_extension(fullPath)).Returns("test.2.0-alpha");
+
+                var ex = try_run(Action);
+                var expectedMessage = get_expected_local_value(Environment.CurrentDirectory, "test", "2.0.0-alpha", prerelease: true);
+                ex.Message.ShouldEqual(expectedMessage);
+            }
+
+            [Fact]
+            public void should_throw_exception_with_expected_message_when_installing_nupkg_and_directory_path_is_null()
+            {
+                Configuration.PackageNames = "test.2.0.nupkg";
+                FileSystem.Setup(f => f.file_exists(Configuration.PackageNames)).Returns(true);
+                FileSystem.Setup(f => f.get_full_path(Configuration.PackageNames)).Returns(Configuration.PackageNames);
+                FileSystem.Setup(f => f.get_file_name(Configuration.PackageNames)).Returns(Configuration.PackageNames);
+                FileSystem.Setup(f => f.get_file_name_without_extension(Configuration.PackageNames)).Returns("test.2.0");
+
+                var ex = try_run(Action);
+                var expectedMessage = get_expected_local_value(string.Empty, "test", "2.0.0", prerelease: false);
+                ex.Message.ShouldEqual(expectedMessage);
+            }
+
+            [Fact]
+            public void should_throw_exception_when_passed_in_path_to_nupkg_is_relative_and_it_does_not_exist()
+            {
+                Configuration.PackageNames = "package.nupkg";
+
+                var ex = try_run(Action);
+
+                ex.Message.ShouldEqual("Package name cannot point directly to a local, or remote file. Please use the --source argument and point it to a local file directory, UNC directory path or a NuGet feed instead.");
+            }
+
+            [Fact]
+            public void should_throw_exception_when_nuspec_file_is_passed_as_package_name()
+            {
+                Configuration.PackageNames = "test-package.nuspec";
+
+                var ex = try_run(Action);
+                ex.Message.ShouldEqual("Package name cannot point directly to a package manifest file. Please create a package by running 'choco pack' on the .nuspec file first.");
+            }
+
+            private string get_expected_unc_value(string path, string name, string version = null, bool prerelease = false)
+            {
+                var sb = new StringBuilder("Package name cannot be a path to a file on a UNC location.")
+                    .AppendLine()
+                    .AppendLine()
+                    .Append("To ")
+                    .Append(Configuration.CommandName)
+                    .AppendLine(" a file in a UNC location, you may use:")
+                    .Append("  choco ").Append(Configuration.CommandName).Append(" ")
+                    .Append(name);
+
+                if (!string.IsNullOrEmpty(version))
+                {
+                    sb.Append(" --version=\"").Append(version).Append("\"");
+                }
+
+                if (prerelease)
+                {
+                    sb.Append(" --prerelease");
+                }
+
+                if (!string.IsNullOrEmpty(path))
+                {
+                    sb.Append(" --source=\"").Append(path).Append("\"");
+                }
+
+                return sb.AppendLine().ToString();
+            }
+
+            private string get_expected_local_value(string path, string name, string version = null, bool prerelease = false)
+            {
+                var sb = new StringBuilder("Package name cannot be a path to a file on a remote, or local file system.")
+                    .AppendLine()
+                    .AppendLine()
+                    .Append("To ")
+                    .Append(Configuration.CommandName)
+                    .AppendLine(" a local, or remote file, you may use:")
+                    .Append("  choco ").Append(Configuration.CommandName).Append(" ")
+                    .Append(name);
+
+                if (!string.IsNullOrEmpty(version))
+                {
+                    sb.Append(" --version=\"").Append(version).Append("\"");
+                }
+
+                if (prerelease)
+                {
+                    sb.Append(" --prerelease");
+                }
+
+                if (!string.IsNullOrEmpty(path))
+                {
+                    sb.Append(" --source=\"").Append(path).Append("\"");
+                }
+
+                return sb.AppendLine().ToString();
+            }
+
+            private static Exception try_run(Action action)
+            {
+                try
+                {
+                    action();
+                    return null;
+                }
+                catch (Exception ex)
+                {
+                    ex.ShouldBeType<ApplicationException>();
+                    return ex;
+                }
+            }
+        }
+
+        public class when_ChocolateyPackageService_tries_to_install_noop_nupkg_file : when_ChocolateyPackageService_tries_to_install_nupkg_file
+        {
+            public override void Context()
+            {
+                base.Context();
+                Action = () => Service.install_noop(Configuration);
+            }
+        }
+
+        public class when_ChocolateyPackageService_tries_to_upgrade_nupkg_file : when_ChocolateyPackageService_tries_to_install_nupkg_file
+        {
+            public override void Context()
+            {
+                base.Context();
+                Action = () => Service.upgrade_run(Configuration);
+                Configuration.CommandName = "upgrade";
+            }
+        }
+
+        public class when_ChocolateyPackageService_tries_to_upgrade_noop_nupkg_file : when_ChocolateyPackageService_tries_to_install_nupkg_file
+        {
+            public override void Context()
+            {
+                base.Context();
+                Action = () => Service.upgrade_noop(Configuration);
+                Configuration.CommandName = "upgrade";
             }
         }
     }

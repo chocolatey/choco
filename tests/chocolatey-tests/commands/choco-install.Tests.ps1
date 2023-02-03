@@ -1131,69 +1131,29 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $Output = Invoke-Choco install $PackagePath --confirm --params '/ParameterOne:FirstOne /ParameterTwo:AnotherOne'
         }
 
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1
         }
 
-        It "Installed a package to the lib directory" {
-            "$env:ChocolateyInstall\lib\$PackageUnderTest" | Should -Exist
+        It "Not Installed a package to the lib directory" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest" | Should -Not -Exist
         }
 
-        # We are skipping this for now, until we have stabilized the directory
-        # path reporting functionality. There are times that this test will
-        # fail due to Chocolatey not reporting the path.
-        # This failure seems to happen randomly, and is therefore not a
-        # reliable test we can make.
-        It "Outputs the installation directory" -Skip {
-            $directoryPath = "$env:ChocolateyInstall\lib\$PackageUnderTest"
-            $lineRegex = [regex]::Escape($directoryPath)
-
-            $Output.String | Should -Match "$lineRegex"
+        It "Not Installed a package to the lib bad directory" {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest" | Should -Not -Exist
         }
 
-        It "Has created the installation directory" {
-            $Output.Lines -Match "$([Regex]::Escape((Join-Path $env:ChocolateyInstall "lib\$PackageUnderTest")))" | Should -Exist
+        It "Not Installed a package to the lib backup directory" {
+            "$env:ChocolateyInstall\lib-backup\$PackageUnderTest" | Should -Not -Exist
         }
 
-        It "Installs the expected version of the package" {
-            "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec" | Should -Exist
-            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec"
-            $XML.package.metadata.version | Should -Be "1.0.0"
-        }
+        It "Outputs expected error message" {
+            $Output.String | Should -Match @"
+Package name cannot be a path to a file on a remote or local file system.
 
-        It "Creates a Console Shim in the Bin Directory" {
-            "$env:ChocolateyInstall\bin\console.exe" | Should -Exist
-        }
-
-        It "Creates a Graphical Shim in the Bin Directory" {
-            "$env:ChocolateyInstall\bin\graphical.exe" | Should -Exist
-        }
-
-        It "Does not create a Shim for Ignored Executable in the Bin Directory" {
-            "$env:ChocolateyInstall\bin\not.installed.exe" | Should -Not -Exist
-        }
-
-        It "Does not create a Shim for Ignored Executable (with mismatched case) in the Bin Directory" {
-            "$env:ChocolateyInstall\bin\casemismatch.exe" | Should -Not -Exist
-        }
-
-        It "Does not create an extensions folder for the package" {
-            "$env:ChocolateyInstall\extensions\$PackageUnderTest" | Should -Not -Exist
-        }
-
-        It "Contains the output of the ChocolateyInstall.ps1 script" {
-            $Output.Lines | Should -Contain "Ya!"
-        }
-
-        # https://github.com/chocolatey/choco/issues/2089
-        It "Reports the Package Parameters expected" -Tag Broken {
-            $Output.Lines | Should -Contain "Package Parameters:"
-            $Output.Lines | Should -Contain "ParameterOne - FirstOne"
-            $Output.Lines | Should -Contain "ParameterTwo - AnotherOne"
-        }
-
-        It "Outputs a message showing that installation was successful" {
-            $Output.String | Should -Match "Chocolatey installed 1/1 packages\."
+To install or upgrade a local or remote file, you may use:
+  choco install $packageUnderTest --version="1.0.0" --source="$([regex]::Escape($snapshotPath.PackagesPath))
+"@
         }
     }
 
