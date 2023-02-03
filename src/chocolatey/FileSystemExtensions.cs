@@ -43,15 +43,6 @@ namespace chocolatey
             {
                 var name = fileSystem.get_file_name_without_extension(extensionFile);
 
-                ////////////////////////////////////////////
-                // REMOVE THIS BEFORE CHOCOLATEY CLI V2.0 //
-                ////////////////////////////////////////////
-                if (name == ApplicationParameters.LicensedChocolateyAssemblySimpleName)
-                {
-                    "chocolatey".Log().Warn("Loading the Chocolatey Licensed Extension is disabled in this pre-release version of Chocolatey.");
-                    continue;
-                }
-
                 try
                 {
                     var assembly = AssemblyResolution.load_extension(name);

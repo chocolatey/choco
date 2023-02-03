@@ -57,7 +57,6 @@ $currentAssemblies = [System.AppDomain]::CurrentDomain.GetAssemblies()
 # Load community extensions if they exist
 $extensionsPath = Join-Path $helpersPath -ChildPath '..\extensions'
 if (Test-Path $extensionsPath) {
-    <# RESTORE THIS BEFORE CHOCOLATEY CLI V2.0
     $licensedExtensionPath = Join-Path $extensionsPath -ChildPath 'chocolatey\chocolatey.licensed.dll'
     if (Test-Path $licensedExtensionPath) {
         Write-Debug "Importing '$licensedExtensionPath'"
@@ -83,11 +82,9 @@ if (Test-Path $extensionsPath) {
             Write-Warning "Import failed for Chocolatey Licensed Extension. Error: '$_'"
         }
     }
-    #>
 
     Write-Debug 'Loading community extensions'
     Get-ChildItem -Path $extensionsPath -Recurse -Filter '*.psm1' |
-        Where-Object { $_.Name -ne 'chocolatey.extensions.psm1' } | # REMOVE THIS LINE BEFORE CHOCOLATEY CLI V2.0
         Select-Object -ExpandProperty FullName |
         ForEach-Object {
             Write-Debug "Importing '$_'"
