@@ -100,7 +100,7 @@ namespace chocolatey.infrastructure.app.registration
             return availableExtensionsArray;
         }
 
-        private SimpleInjectorContainerRegistrator register_extensions(List<ExtensionInformation> availableExtensions, ChocolateyConfiguration configuration, SimpleInjectorContainerRegistrator registrator, IEnumerable<adapters.IAssembly> assemblies, Version currentAssemblyVersion, SemanticVersion chocoVersion, bool disableCompatibilityChecks)
+        private SimpleInjectorContainerRegistrator register_extensions(List<ExtensionInformation> availableExtensions, ChocolateyConfiguration configuration, SimpleInjectorContainerRegistrator registrator, IEnumerable<adapters.IAssembly> assemblies, Version currentAssemblyVersion, NuGetVersion chocoVersion, bool disableCompatibilityChecks)
         {
             foreach (var assembly in assemblies)
             {
@@ -198,7 +198,7 @@ choco feature enable --name=""disableCompatibilityChecks""",
             return registrator;
         }
 
-        private bool validate_minimum_chocolatey_version(Type instanceType, SemanticVersion chocoVersion)
+        private bool validate_minimum_chocolatey_version(Type instanceType, NuGetVersion chocoVersion)
         {
             if (instanceType == null)
             {

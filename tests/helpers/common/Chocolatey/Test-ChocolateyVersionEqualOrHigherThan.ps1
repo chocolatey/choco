@@ -8,7 +8,7 @@
     [CmdletBinding()]
     [OutputType([boolean])]
     param(
-        [NuGet.Versioning.SemanticVersion]$Version
+        [NuGet.Versioning.NuGetVersion]$Version
     )
     $installedVersion = ((Invoke-Choco list -lo -r).Lines | ConvertFrom-ChocolateyOutput -Command List | Where-Object Name -EQ 'chocolatey').Version
 

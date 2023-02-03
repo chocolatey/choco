@@ -6,7 +6,7 @@ function Test-PackageIsEqualOrHigher {
         [Parameter(Mandatory)]
         [string]$PackageName,
         [Parameter(Mandatory)]
-        [NuGet.Versioning.SemanticVersion]$Version,
+        [NuGet.Versioning.NuGetVersion]$Version,
         [switch]$AllowMissingPackage
     )
 
@@ -18,7 +18,7 @@ function Test-PackageIsEqualOrHigher {
         return $AllowMissingPackage.IsPresent
     }
 
-    [NuGet.Versioning.SemanticVersion]$installedVersion = $package.Version
+    [NuGet.Versioning.NuGetVersion]$installedVersion = $package.Version
 
     return Test-VersionEqualOrHigher -InstalledVersion $installedVersion -CompareVersion $Version
 }
