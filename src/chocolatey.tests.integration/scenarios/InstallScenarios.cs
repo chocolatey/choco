@@ -2153,9 +2153,13 @@ namespace chocolatey.tests.integration.scenarios
 
         public class when_force_installing_an_already_installed_package_forcing_dependencies : ScenariosBase
         {
+            private IEnumerable<string> _installedPackagePaths;
             public override void Context()
             {
                 base.Context();
+
+                Scenario.add_packages_to_source_location(Configuration, "installpackage*" + NuGetConstants.PackageExtension);
+                Scenario.install_package(Configuration, "installpackage", "1.0.0");
 
                 Configuration.PackageNames = Configuration.Input = "hasdependency";
                 Scenario.add_packages_to_source_location(Configuration, "hasdependency.1*" + NuGetConstants.PackageExtension);
@@ -2163,6 +2167,8 @@ namespace chocolatey.tests.integration.scenarios
                 Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
                 Scenario.install_package(Configuration, "hasdependency", "1.0.0");
                 Scenario.add_packages_to_source_location(Configuration, "isdependency*" + NuGetConstants.PackageExtension);
+                _installedPackagePaths = Scenario.get_installed_package_paths().ToList();
+
                 Configuration.Force = true;
                 Configuration.ForceDependencies = true;
             }
@@ -2196,6 +2202,15 @@ namespace chocolatey.tests.integration.scenarios
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("1.0.0");
+                }
+            }
+
+            [Fact]
+            public void should_not_remove_any_existing_packages_in_the_lib_directory()
+            {
+                foreach (var packagePath in _installedPackagePaths)
+                {
+                    FileAssert.Exists(packagePath);
                 }
             }
 

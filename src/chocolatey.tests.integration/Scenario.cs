@@ -49,6 +49,11 @@ namespace chocolatey.tests.integration
             return _fileSystem.combine_paths(get_top_level(), "lib");
         }
 
+        public static IEnumerable<string> get_installed_package_paths()
+        {
+            return _fileSystem.get_files(get_package_install_path(), "*" + NuGetConstants.PackageExtension, SearchOption.AllDirectories);
+        }
+
         public static void reset(ChocolateyConfiguration config)
         {
             string packagesInstallPath = get_package_install_path();
