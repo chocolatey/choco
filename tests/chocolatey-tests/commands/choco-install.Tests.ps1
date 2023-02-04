@@ -1,4 +1,4 @@
-﻿Import-Module helpers/common-helpers
+Import-Module helpers/common-helpers
 
 # https://github.com/chocolatey/choco/blob/master/src/chocolatey.tests.integration/scenarios/InstallScenarios.cs
 
@@ -769,7 +769,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $Output = Invoke-Choco install $PackageUnderTest --force --forcedependencies --confirm
         }
 
-        It "Exits with Success (0)" -Tag Broken {
+        It "Exits with Success (0)" {
             $Output.ExitCode | Should -Be 0
         }
 
@@ -803,7 +803,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $XML.package.metadata.version | Should -Be "1.0.0"
         }
 
-        It "Outputs a message indicating that it installed the package(s) successfully" -Tag Broken {
+        It "Outputs a message indicating that it installed the package(s) successfully" {
             $Output.Lines | Should -Contain "Chocolatey installed 3/3 packages."
         }
     }
