@@ -1,4 +1,4 @@
-Import-Module helpers/common-helpers
+﻿Import-Module helpers/common-helpers
 
 Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY -or $null -eq $env:PUSH_REPO) {
     BeforeAll {
@@ -175,7 +175,7 @@ Describe 'choco push nuget <_> repository' -Tag Chocolatey, PushCommand -Skip:($
 
             # Nexus can take a moment to index the package, but we want to validate that it was successfully pushed
             $Timer =  [System.Diagnostics.Stopwatch]::StartNew()
-            while ($Timer.Elapsed.TotalSeconds -lt 60 -and -not (
+            while ($Timer.Elapsed.TotalSeconds -lt 300 -and -not (
                 $Packages = (Invoke-Choco find $PackageUnderTest @VerifyPackagesSplat --Limit-Output).Lines | ConvertFrom-ChocolateyOutput -Command List
             )) {
                 Write-Verbose "$($PackageUnderTest) was not found on $($RepositoryToUse)$($RepositoryEndpoint). Waiting for 5 seconds before trying again."
