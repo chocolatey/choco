@@ -1149,9 +1149,9 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
 
         It "Outputs expected error message" {
             $Output.String | Should -Match @"
-Package name cannot be a path to a file on a remote or local file system.
+Package name cannot be a path to a file on a remote, or local file system.
 
-To install or upgrade a local or remote file, you may use:
+To install a local, or remote file, you may use:
   choco install $packageUnderTest --version="1.0.0" --source="$([regex]::Escape($snapshotPath.PackagesPath))
 "@
         }
