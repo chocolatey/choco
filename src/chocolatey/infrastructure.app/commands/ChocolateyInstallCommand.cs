@@ -264,6 +264,7 @@ Instead of using side by side installations, distinct packages should be created
 if similar functionality is needed going forward.
 ");
             "chocolatey".Log().Warn(NugetService.InstallWithFilePathDeprecationMessage);
+            "chocolatey".Log().Warn(WebPiService.DeprecationMessage);
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
@@ -398,7 +399,7 @@ This specifies the source is Ruby Gems and that we are installing a
  the command will install that first.
  e.g. `choco install compass -source ruby`
 
-WebPI
+WebPI (DEPRECATED)
 This specifies the source is Web PI (Web Platform Installer) and that
  we are installing a WebPI product, such as IISExpress. If you do not
  have the Web PI command line installed, it will install that first and
