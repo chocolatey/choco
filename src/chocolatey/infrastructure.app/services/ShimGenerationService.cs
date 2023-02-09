@@ -43,7 +43,7 @@ namespace chocolatey.infrastructure.app.services
         }
 
         /// <summary>
-        ///   Sets webpicmd install dictionary
+        /// Sets up shimgen arguments
         /// </summary>
         private void set_shimgen_args_dictionary()
         {
