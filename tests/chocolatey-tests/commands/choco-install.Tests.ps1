@@ -1,4 +1,4 @@
-Import-Module helpers/common-helpers
+﻿Import-Module helpers/common-helpers
 
 # https://github.com/chocolatey/choco/blob/master/src/chocolatey.tests.integration/scenarios/InstallScenarios.cs
 
@@ -1216,6 +1216,15 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
 
         It "Exits with Success (0)" {
             $Output.ExitCode | Should -Be 0
+        }
+
+        It "Warns that this functionality is deprecated" {
+            $pattern = @(
+                "The ability to specify a direct path to a .nuspec or .nupkg file for installation"
+                "is deprecated and will be removed in v2.0.0."
+            ) -join "\r?\n"
+
+            $Output.String | Should -Match $pattern
         }
 
         It "Installed a package to the lib directory" {

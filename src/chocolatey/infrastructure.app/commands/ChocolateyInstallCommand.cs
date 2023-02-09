@@ -263,6 +263,7 @@ Side by side installations has been deprecated and will be removed in v2.0.0.
 Instead of using side by side installations, distinct packages should be created
 if similar functionality is needed going forward.
 ");
+            "chocolatey".Log().Warn(NugetService.InstallWithFilePathDeprecationMessage);
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
@@ -302,7 +303,7 @@ NOTE: Chocolatey Pro / Business builds on top of a great open source
     choco install git -s ""'https://somewhere/out/there'""
     choco install git -s ""'https://somewhere/protected'"" -u user -p pass
 
-Choco can also install directly from a nuspec/nupkg file. This aids in
+(DEPRECATED) Choco can also install directly from a nuspec/nupkg file. This aids in
  testing packages:
 
     choco install <path/to/nuspec>
