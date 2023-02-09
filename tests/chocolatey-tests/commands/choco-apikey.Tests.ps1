@@ -167,11 +167,15 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
             $Output.Lines | Should -Contain "Removed ApiKey for https://remove.test.com/api"
         }
 
+        It "Displays a deprecation warning about --rem/--remove" {
+            $message = "The --rem / --remove option is deprecated and will be removed in v2.0.0."
+            $Output.Lines | Should -Contain $message -Because "--remove is being deprecated in v2.0.0."
+        }
+
         # Skipping for now, may need to read the file twice to compare the values
         It "Removed apikey do not exist in file" -Skip {
             $config = $apiKeys.Where{ $_.source -eq "https://remove.test.com/api" }
             $config | Should -BeNullOrEmpty
-
         }
     }
 
