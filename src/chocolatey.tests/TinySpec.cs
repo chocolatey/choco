@@ -23,6 +23,7 @@ namespace chocolatey.tests
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.logging;
     using System.IO;
+    using chocolatey.infrastructure.app.nuget;
 
     // ReSharper disable InconsistentNaming
 
@@ -68,6 +69,7 @@ namespace chocolatey.tests
         {
             if (MockLogger != null) MockLogger.reset();
             //Log.InitializeWith(MockLogger);
+            NugetCommon.ClearRepositoriesCache();
             Context();
             Because();
         }

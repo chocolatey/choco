@@ -76,6 +76,10 @@ namespace chocolatey.infrastructure.app.nuget
             return new ChocolateyPackagePathResolver(ApplicationParameters.PackagesLocation, nugetPackagesFileSystem, configuration.AllowMultipleVersions);
         }
 
+        public static void ClearRepositoriesCache()
+        {
+            _repositories.Clear();
+        }
 
         public static SourceRepository GetLocalRepository()
         {
