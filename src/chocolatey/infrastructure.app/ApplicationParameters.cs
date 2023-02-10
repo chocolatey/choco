@@ -22,6 +22,7 @@ namespace chocolatey.infrastructure.app
     using filesystem;
     using Environment = System.Environment;
     using chocolatey.infrastructure.platforms;
+    using chocolatey.infrastructure.information;
 
     /// <summary>
     ///   Application constants and settings for the application
@@ -72,6 +73,9 @@ namespace chocolatey.infrastructure.app
         public static readonly string UserProfilePath = !string.IsNullOrWhiteSpace(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)) ?
               System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)
             : CommonAppDataChocolatey;
+        public static readonly string HttpCacheUserLocation = _fileSystem.combine_paths(UserProfilePath, ".chocolatey", "http-cache");
+        public static readonly string HttpCacheLocation = get_http_cache_location();
+
         public static readonly string UserLicenseFileLocation = _fileSystem.combine_paths(UserProfilePath, "chocolatey.license.xml");
         public static readonly string LicensedChocolateyAssemblySimpleName = "chocolatey.licensed";
         public static readonly string LicensedComponentRegistry = @"chocolatey.licensed.infrastructure.app.registration.ContainerBinding";
@@ -103,6 +107,20 @@ namespace chocolatey.infrastructure.app
         public static readonly string PowerShellModulePathProcessDocuments = _fileSystem.combine_paths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "WindowsPowerShell\\Modules");
         public static readonly string LocalSystemSidString = "S-1-5-18";
         public static readonly SecurityIdentifier LocalSystemSid = new SecurityIdentifier(LocalSystemSidString);
+
+        private static string get_http_cache_location()
+        {
+            if (ProcessInformation.process_is_elevated() || string.IsNullOrEmpty(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)))
+            {
+                // CommonAppDataChocolatey is always set to ProgramData\Chocolatey.
+                // So we append HttpCache to that name if it is possible.
+                return CommonAppDataChocolatey + "HttpCache";
+            }
+            else
+            {
+                return HttpCacheUserLocation;
+            }
+        }
 
         public static class Environment
         {

@@ -1502,6 +1502,64 @@ To install a local, or remote file, you may use:
         }
     }
 
+    Context "Installing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, Testing {
+        BeforeAll {
+            $paths = Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePathLong)" --verbose
+        }
+
+        AfterAll {
+            $null = Invoke-Choco uninstall install-chocolateyzip --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Runs under background Service' -Tag Background {
+            $Output.Lines | Should -Contain 'Running in background mode'
+        }
+
+        It 'Outputs downloading 64bit package' {
+            $Output.Lines | Should -Contain 'Downloading install-chocolateyzip 64 bit'
+        }
+
+        It 'Outputs download completed' {
+            $Output.Lines | Should -Contain "Download of 'cmake-3.21.2-windows-x86_64.zip'."
+        }
+
+        It 'Outputs download completed' {
+            $Output.Lines | Should -Contain "Download of 'cmake-3.21.2-windows-x86_64.zip' (36.01 MB) completed."
+        }
+
+        It 'Outputs extracting correct archive' {
+            $Output.Lines | Should -Contain "Extracting cmake-3.21.2-windws-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
+        }
+
+        It 'Created shim for <_>' -ForEach 'cmake-gui.exe', 'cmake.exe', 'cmcldeps.exe', 'cpack.exe', 'ctest.exe' {
+            $Output.Lines | Should -Contain "ShimGen has successfully created a shim for $_"
+            "$env:ChocolateyInstall\bin\$_" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of install-chocolateyzip was successful.'
+        }
+
+        It 'Outputs software installation directory' {
+            $Output.Lines | Should -Contain "Software installed to '$env:ChocolateyInstall\lib\install-chocolateyzip\tools'"
+        }
+
+        It 'Should have cached installed directory in custom cache' {
+            # Need to be verified, but the file may not exist on licensed edition
+            "$($paths.CachePathLong)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip"
+        }
+
+        It 'Installed software to expected directory' {
+            "$env:ChocolateyInstall\lib\install-chocolateyzip\tools\cmake-3.21.2-windows-x86_64.zip\bin\cmake" | Should -Exist
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

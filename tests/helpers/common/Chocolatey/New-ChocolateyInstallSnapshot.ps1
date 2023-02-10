@@ -62,5 +62,7 @@
     [PSCustomObject]@{
         InstallPath  = $env:ChocolateyInstall
         PackagesPath = $env:CHOCOLATEY_TEST_PACKAGES_PATH
+        CachePathLong= "$SnapshotPath\ChocolateyCache\This\Cache\Is\Intended\to\Be\Very\Long\On\Purpose" # This path will most likely not be removed due to long path errors
+        CachePath    = "$SnapshotPath\Cache"
     }
 }
