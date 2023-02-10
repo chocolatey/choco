@@ -50,11 +50,14 @@ namespace chocolatey.infrastructure.app.nuget
     using results;
     using Console = adapters.Console;
     using Environment = adapters.Environment;
+    using System.Collections.Concurrent;
 
     // ReSharper disable InconsistentNaming
 
     public sealed class NugetCommon
     {
+        private static readonly ConcurrentDictionary<string, SourceRepository> _repositories = new ConcurrentDictionary<string, SourceRepository>();
+
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -82,7 +85,6 @@ namespace chocolatey.infrastructure.app.nuget
 
         public static IEnumerable<SourceRepository> GetRemoteRepositories(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-
             // Set user agent for all NuGet library calls. Should not affect any HTTP calls that Chocolatey itself would make.
             UserAgent.SetUserAgentString(new UserAgentStringBuilder("{0}/{1} via NuGet Client".format_with(ApplicationParameters.UserAgent, configuration.Information.ChocolateyProductVersion)));
 
@@ -121,8 +123,7 @@ namespace chocolatey.infrastructure.app.nuget
             var updatedSources = new StringBuilder();
             foreach (var sourceValue in sources.or_empty_list_if_null())
             {
-
-                var source = sourceValue;
+var source = sourceValue;
                 var bypassProxy = false;
 
                 var sourceClientCertificates = new List<X509Certificate>();
@@ -162,52 +163,60 @@ namespace chocolatey.infrastructure.app.nuget
                     }
                 }
 
-                var nugetSource = new PackageSource(source);
-
-                // If not parsed as a http(s) or local source, let's try resolving the path
-                // Since NuGet.Client is not able to parse all relative paths
-                // Conversion to absolute paths is handled by clients, not by the libraries as per
-                // https://github.com/NuGet/NuGet.Client/pull/3783
-                if (nugetSource.TrySourceAsUri is null)
+                if (_repositories.ContainsKey(source))
                 {
-                    string fullsource;
-                    try
-                    {
-                        fullsource = filesystem.get_full_path(source);
-                    }
-                    catch
-                    {
-                        // If an invalid source was passed in, we don't care here, pass it along
-                        fullsource = source;
-                    }
-                    nugetSource = new PackageSource(fullsource);
-
-                    if (!nugetSource.IsLocal)
-                    {
-                        throw new ApplicationException("Source '{0}' is unable to be parsed".format_with(source));
-                    }
-
-                    "chocolatey".Log().Debug("Updating Source path from {0} to {1}".format_with(source, fullsource));
-                    updatedSources.AppendFormat("{0};", fullsource);
+                    repositories.Add(_repositories[source]);
                 }
                 else
                 {
-                    updatedSources.AppendFormat("{0};", source);
-                }
+                    var nugetSource = new PackageSource(source);
 
-                nugetSource.ClientCertificates = sourceClientCertificates;
-                var repo = Repository.Factory.GetCoreV3(nugetSource);
-
-                if (nugetSource.IsHttp || nugetSource.IsHttps)
-                {
-                    var httpSourceResource = repo.GetResource<HttpSourceResource>();
-                    if (httpSourceResource != null)
+                    // If not parsed as a http(s) or local source, let's try resolving the path
+                    // Since NuGet.Client is not able to parse all relative paths
+                    // Conversion to absolute paths is handled by clients, not by the libraries as per
+                    // https://github.com/NuGet/NuGet.Client/pull/3783
+                    if (nugetSource.TrySourceAsUri is null)
                     {
-                        httpSourceResource.HttpSource.HttpCacheDirectory = System.IO.Path.Combine(configuration.CacheLocation, "NuGetHttpCache");
-                    }
-                }
+                        string fullsource;
+                        try
+                        {
+                            fullsource = filesystem.get_full_path(source);
+                        }
+                        catch
+                        {
+                            // If an invalid source was passed in, we don't care here, pass it along
+                            fullsource = source;
+                        }
+                        nugetSource = new PackageSource(fullsource);
 
-                repositories.Add(repo);
+                        if (!nugetSource.IsLocal)
+                        {
+                            throw new ApplicationException("Source '{0}' is unable to be parsed".format_with(source));
+                        }
+
+                        "chocolatey".Log().Debug("Updating Source path from {0} to {1}".format_with(source, fullsource));
+                        updatedSources.AppendFormat("{0};", fullsource);
+                    }
+                    else
+                    {
+                        updatedSources.AppendFormat("{0};", source);
+                    }
+
+                    nugetSource.ClientCertificates = sourceClientCertificates;
+                    var repo = Repository.Factory.GetCoreV3(nugetSource);
+
+                    if (nugetSource.IsHttp || nugetSource.IsHttps)
+                    {
+                        var httpSourceResource = repo.GetResource<HttpSourceResource>();
+                        if (httpSourceResource != null)
+                        {
+                            httpSourceResource.HttpSource.HttpCacheDirectory = System.IO.Path.Combine(configuration.CacheLocation, "NuGetHttpCache");
+                        }
+                    }
+
+                    _repositories.TryAdd(source, repo);
+                    repositories.Add(repo);
+                }
             }
 
             if (updatedSources.Length != 0)
