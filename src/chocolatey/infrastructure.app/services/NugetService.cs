@@ -787,7 +787,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         using (var downloadResult = downloadResource.GetDownloadResourceResultAsync(
                                    packageDependencyInfo,
                                    new PackageDownloadContext(sourceCacheContext),
-                                   config.CacheLocation,
+                                   NuGetEnvironment.GetFolderPath(NuGetFolderPath.Temp),
                                    _nugetLogger, CancellationToken.None).GetAwaiter().GetResult())
                         {
                             //TODO, do check on downloadResult
@@ -1338,7 +1338,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 using (var downloadResult = downloadResource.GetDownloadResourceResultAsync(
                                            packageDependencyInfo,
                                            new PackageDownloadContext(sourceCacheContext),
-                                           config.CacheLocation,
+                                           NuGetEnvironment.GetFolderPath(NuGetFolderPath.Temp),
                                            _nugetLogger, CancellationToken.None).GetAwaiter().GetResult())
                                 {
                                     //TODO, do check on downloadResult
@@ -1802,19 +1802,37 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
         /// <param name="installedPackage">The installed package.</param>
         private void remove_nuget_cache_for_package(IPackageSearchMetadata installedPackage)
         {
-            var localAppData = Environment.GetEnvironmentVariable("LocalAppData");
-            if (string.IsNullOrWhiteSpace(localAppData)) return;
+            var tempFolder = NuGetEnvironment.GetFolderPath(NuGetFolderPath.Temp);
+
+            if (string.IsNullOrWhiteSpace(tempFolder))
+            {
+                return;
+            }
 
             FaultTolerance.try_catch_with_logging_exception(
                 () =>
                 {
-                    var nugetCachedFile = _fileSystem.combine_paths(localAppData, "NuGet", "Cache", "{0}.{1}.nupkg".format_with(installedPackage.Identity.Id, installedPackage.Identity.Version.to_string()));
+                    var packageFolderPath = _fileSystem.combine_paths(tempFolder, "{0}/{1}".format_with(installedPackage.Identity.Id, installedPackage.Identity.Version.to_string()));
+                    var nugetCachedFile = _fileSystem.combine_paths(packageFolderPath, "{0}.{1}.nupkg".format_with(installedPackage.Identity.Id, installedPackage.Identity.Version.to_string()));
+                    var nupkgMetaDataFile = _fileSystem.combine_paths(packageFolderPath, ".nupkg.metadata");
+                    var nupkgShaFile = nugetCachedFile + ".sha512";
+
                     if (_fileSystem.file_exists(nugetCachedFile))
                     {
                         _fileSystem.delete_file(nugetCachedFile);
                     }
+
+                    if (_fileSystem.file_exists(nupkgMetaDataFile))
+                    {
+                        _fileSystem.delete_file(nupkgMetaDataFile);
+                    }
+
+                    if (_fileSystem.file_exists(nupkgShaFile))
+                    {
+                        _fileSystem.delete_file(nupkgShaFile);
+                    }
                 },
-                "Unable to removed cached NuGet package file");
+                "Unable to removed cached NuGet package files.");
         }
 
         public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
