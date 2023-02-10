@@ -214,7 +214,7 @@ var source = sourceValue;
                         var httpSourceResource = repo.GetResource<HttpSourceResource>();
                         if (httpSourceResource != null)
                         {
-                            httpSourceResource.HttpSource.HttpCacheDirectory = System.IO.Path.Combine(configuration.CacheLocation, "NuGetHttpCache");
+                            httpSourceResource.HttpSource.HttpCacheDirectory = ApplicationParameters.HttpCacheLocation;
                         }
                     }
 
