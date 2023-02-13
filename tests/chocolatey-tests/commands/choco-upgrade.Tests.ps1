@@ -150,7 +150,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
     }
 
-    Context "Upgrading a Package from a nupkg file" -Tag Testing {
+    Context "Upgrading a Package from a nupkg file" {
         BeforeAll {
             $snapshotPath = New-ChocolateyInstallSnapshot
 
