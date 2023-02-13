@@ -395,7 +395,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         BeforeAll {
             New-ChocolateyInstallSnapshot
             Remove-Item -Path $env:ChocolateyInstall/lib/ -Recurse -Force
-            $Output = Invoke-Choco
+            $Output = Invoke-Choco list --local-only
         }
 
         AfterAll {
@@ -404,6 +404,14 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
 
         It 'Exits with success (0)' {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Does not emit a warning about the missing directory' {
+            $Output.Lines | Should -Not -Contain "Directory '$($env:ChocolateyInstall)\lib' does not exist." -Because $Output.String
+        }
+
+        It 'Creates Chocolatey Lib directory' {
+            "$($env:ChocolateyInstall)/lib/" | Should -Exist -Because $Output.String
         }
     }
 }
