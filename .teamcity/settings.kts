@@ -79,6 +79,10 @@ object Chocolatey : BuildType({
             }
         }
     }
+
+    requirements {
+        doesNotExist("docker.server.version")
+    }
 })
 
 object ChocolateyDockerWin : BuildType({
@@ -97,6 +101,10 @@ object ChocolateyDockerWin : BuildType({
     steps {
         step {
             name = "Login Docker"
+            conditions {
+                exists("system.DockerUsername")
+                exists("system.DockerPassword")
+            }
             type = "DockerLogin"
         }
 
@@ -124,6 +132,10 @@ object ChocolateyDockerWin : BuildType({
 
         dockerCommand {
             name = "Push Docker Image"
+            conditions {
+                exists("system.DockerUsername")
+                exists("system.DockerPassword")
+            }
             commandType = push {
                 namesAndTags = "chocolatey/choco:latest-windows"
                 removeImageAfterPush = false
@@ -140,6 +152,10 @@ object ChocolateyDockerWin : BuildType({
 
         dockerCommand {
             name = "Push Versioned Tag"
+            conditions {
+                exists("system.DockerUsername")
+                exists("system.DockerPassword")
+            }
             commandType = push {
                 namesAndTags = "chocolatey/choco:v%env.CHOCOLATEY_VERSION%-windows"
             }
@@ -170,6 +186,11 @@ object ChocolateyDockerWin : BuildType({
             }
         }
     }
+
+    requirements {
+        contains("docker.server.osType", "windows")
+        exists("docker.server.version")
+    }
 })
 
 object ChocolateyPosix : BuildType({
@@ -196,11 +217,18 @@ object ChocolateyPosix : BuildType({
     steps {
         step {
             name = "Load Key"
+            conditions {
+                doesNotContain("teamcity.serverUrl", "-dev")
+            }
             type = "StrongNameKeyLinux"
         }
 
         step {
             name = "Login Docker"
+            conditions {
+                exists("system.DockerUsername")
+                exists("system.DockerPassword")
+            }
             type = "DockerLogin"
         }
 
@@ -223,6 +251,9 @@ object ChocolateyPosix : BuildType({
         // Please note that this method will need to be changed to some form of CD after we lock agents down
         script {
             name = "Publish TarGz to GitHub Release"
+            conditions {
+                exists("env.GITHUB_PAT")
+            }
             scriptContent = """
                 curl \
                     -X POST \
@@ -250,6 +281,10 @@ object ChocolateyPosix : BuildType({
 
         dockerCommand {
             name = "Push Docker Image"
+            conditions {
+                exists("system.DockerUsername")
+                exists("system.DockerPassword")
+            }
             commandType = push {
                 namesAndTags = "chocolatey/choco:latest-linux"
                 removeImageAfterPush = false
@@ -266,6 +301,10 @@ object ChocolateyPosix : BuildType({
 
         dockerCommand {
             name = "Push Versioned Tag"
+            conditions {
+                exists("system.DockerUsername")
+                exists("system.DockerPassword")
+            }
             commandType = push {
                 namesAndTags = "chocolatey/choco:v%env.CHOCOLATEY_VERSION%-linux"
             }
@@ -290,6 +329,11 @@ object ChocolateyPosix : BuildType({
             synchronizeRevisions = false
         }
     }
+
+    requirements {
+        contains("docker.server.osType", "linux")
+        exists("docker.server.version")
+    }
 })
 
 object ChocolateyDockerManifest : BuildType({
@@ -307,6 +351,10 @@ object ChocolateyDockerManifest : BuildType({
     steps {
         step {
             name = "Login Docker"
+            conditions {
+                exists("system.DockerUsername")
+                exists("system.DockerPassword")
+            }
             type = "DockerLogin"
         }
 
@@ -320,6 +368,10 @@ object ChocolateyDockerManifest : BuildType({
 
         dockerCommand {
             name = "Push Combined Manifest"
+            conditions {
+                exists("system.DockerUsername")
+                exists("system.DockerPassword")
+            }
             commandType = other {
                 subCommand = "manifest"
                 commandArgs = "push chocolatey/choco:latest"
@@ -336,6 +388,10 @@ object ChocolateyDockerManifest : BuildType({
 
         dockerCommand {
             name = "Push Versioned Manifest"
+            conditions {
+                exists("system.DockerUsername")
+                exists("system.DockerPassword")
+            }
             commandType = other {
                 subCommand = "manifest"
                 commandArgs = "push chocolatey/choco:v%env.CHOCOLATEY_VERSION%"
@@ -365,5 +421,9 @@ object ChocolateyDockerManifest : BuildType({
             onDependencyFailure = FailureAction.FAIL_TO_START
             synchronizeRevisions = false
         }
+    }
+
+    requirements {
+        exists("docker.server.version")
     }
 })
