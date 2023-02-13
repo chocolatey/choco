@@ -390,4 +390,20 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             $Output.Lines | Should -Contain '.NET 4.8 is not installed or may need a reboot to complete installation.'
         }
     }
+
+    Context 'Chocolatey lib directory missing' {
+        BeforeAll {
+            New-ChocolateyInstallSnapshot
+            Remove-Item -Path $env:ChocolateyInstall/lib/ -Recurse -Force
+            $Output = Invoke-Choco
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It 'Exits with success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+    }
 }

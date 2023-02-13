@@ -162,6 +162,7 @@ namespace chocolatey.console
 #if !NoResources
                 AssemblyFileExtractor.extract_all_resources_to_relative_directory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources, throwError: false);
 #endif
+                ensure_lib_directory_exists(fileSystem);
                 var application = new ConsoleApplication();
                 application.run(args, config, container);
             }
@@ -311,6 +312,18 @@ Download at 'https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-22
                     }
                 }
             }
+        }
+
+        private static void ensure_lib_directory_exists(IFileSystem fileSystem)
+        {
+            FaultTolerance.try_catch_with_logging_exception(
+                () =>
+                {
+                    fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
+                },
+                errorMessage: "Attempting to create lib directory ran into an issue",
+                throwError: true,
+                isSilent: true);
         }
     }
 }
