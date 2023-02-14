@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.rules
         None = 0,
         Error,
         Warning,
-        Information
+        Information,
+        Note
     }
 }

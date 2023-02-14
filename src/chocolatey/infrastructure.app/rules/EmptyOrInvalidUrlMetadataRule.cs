@@ -43,11 +43,11 @@ namespace chocolatey.infrastructure.app.rules
 
                     if (string.IsNullOrWhiteSpace(value))
                     {
-                        yield return new RuleResult(RuleType.Error, "The {0} element in the package nuspec file cannot be empty.".format_with(item));
+                        yield return new RuleResult(RuleType.Error, RuleIdentifiers.EmptyRequiredElement, "The {0} element in the package nuspec file cannot be empty.".format_with(item));
                     }
                     else if (!Uri.TryCreate(value, UriKind.Absolute, out _))
                     {
-                        yield return new RuleResult(RuleType.Error, "'{0}' is not a valid URL for the {1} element in the package nuspec file.".format_with(value, item));
+                        yield return new RuleResult(RuleType.Error, RuleIdentifiers.InvalidTypeElement, "'{0}' is not a valid URL for the {1} element in the package nuspec file.".format_with(value, item));
                     }
                 }
             }

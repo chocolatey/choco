@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.rules
         {
             if (has_element(reader, "frameworkReferences"))
             {
-                yield return new RuleResult(RuleType.Error, "<frameworkReferences> elements are not supported in Chocolatey CLI.");
+                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<frameworkReferences> elements are not supported in Chocolatey CLI.");
             }
         }
     }

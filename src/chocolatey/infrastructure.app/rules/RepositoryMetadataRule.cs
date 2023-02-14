@@ -29,7 +29,7 @@ namespace chocolatey.infrastructure.app.rules
 
             if (has_element(reader, "repository"))
             {
-                yield return new RuleResult(RuleType.Error, "<repository> elements are not supported in Chocolatey CLI, use <packageSourceUrl> instead.");
+                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<repository> elements are not supported in Chocolatey CLI, use <packageSourceUrl> instead.");
             }
         }
     }

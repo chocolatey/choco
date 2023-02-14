@@ -26,11 +26,11 @@ namespace chocolatey.infrastructure.app.rules
         {
             var version = get_element_value(reader, "version");
 
-            // We need to check for the $version$ substitution value,
-            // as it will not be replaced before the package gets created
+            // We need to check for the $version$ substitution value, as it will not be replaced
+            // before the package gets created
             if (!string.IsNullOrEmpty(version) && !version.is_equal_to("$version$") && !NuGetVersion.TryParse(version, out _))
             {
-                yield return new RuleResult(RuleType.Error, "'{0}' is not a valid version string in the package nuspec file.".format_with(version));
+                yield return new RuleResult(RuleType.Error, RuleIdentifiers.InvalidTypeElement, "'{0}' is not a valid version string in the package nuspec file.".format_with(version));
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2023 Chocolatey Software, Inc
+// Copyright © 2017 - 2023 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -823,11 +823,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
                         var elementsList = _ruleService.validate_rules(manifestPath)
-                            .Where(r => r.Severity == infrastructure.rules.RuleType.Error)
-                            .Select(r => r.Message)
+                            .Where(r => r.Severity == infrastructure.rules.RuleType.Error && !string.IsNullOrEmpty(r.Id))
+                            .where_unsupported_or_deprecated()
+                            .Select(r => "{0}: {1}".format_with(r.Id, r.Message))
                             .ToList();
 
-                        if (elementsList.Any())
+                        if (elementsList.Count > 0)
                         {
                             var message = "Issues found with nuspec elements\r\n" + elementsList.join("\r\n");
                             packageResult.Messages.Add(new ResultMessage(ResultType.Warn, message));
@@ -1398,11 +1399,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 upgradePackageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
                                 var elementsList = _ruleService.validate_rules(manifestPath)
-                                    .Where(r => r.Severity == infrastructure.rules.RuleType.Error)
-                                    .Select(r => r.Message)
+                                    .Where(r => r.Severity == infrastructure.rules.RuleType.Error && !string.IsNullOrEmpty(r.Id))
+                                    .where_unsupported_or_deprecated()
+                                    .Select(r => "{0}: {1}".format_with(r.Id, r.Message))
                                     .ToList();
 
-                                if (elementsList.Any())
+                                if (elementsList.Count > 0)
                                 {
                                     var message = "Issues found with nuspec elements\r\n" + elementsList.join("\r\n");
                                     packageResult.Messages.Add(new ResultMessage(ResultType.Warn, message));
@@ -1583,26 +1585,58 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
 
             if (!config.PackCommand.PackThrowOnUnsupportedElements)
             {
-                results = results.Where(r => !r.Message.contains("not supported"));
+                results = results.where_unsupported_or_deprecated(inverse: true);
             }
 
             var hasErrors = false;
 
             foreach (var rule in results)
             {
+                var message = string.IsNullOrEmpty(rule.Id)
+                    ? rule.Message
+                    : "{0}: {1}".format_with(rule.Id, rule.Message);
+
                 switch (rule.Severity)
                 {
                     case infrastructure.rules.RuleType.Error:
-                        this.Log().Error("ERROR: " + rule.Message);
+                        this.Log().Error("ERROR: " + message);
+
+                        if (!string.IsNullOrEmpty(rule.HelpUrl))
+                        {
+                            this.Log().Error("       See {0}", rule.HelpUrl);
+                        }
+
                         hasErrors = true;
                         break;
 
                     case infrastructure.rules.RuleType.Warning:
-                        this.Log().Warn("WARNING: " + rule.Message);
+                        this.Log().Warn("WARNING: " + message);
+
+                        if (!string.IsNullOrEmpty(rule.HelpUrl))
+                        {
+                            this.Log().Warn("         See {0}", rule.HelpUrl);
+                        }
+
                         break;
 
                     case infrastructure.rules.RuleType.Information:
-                        this.Log().Info("INFO: " + rule.Message);
+                        this.Log().Info("INFO: " + message);
+
+                        if (!string.IsNullOrEmpty(rule.HelpUrl))
+                        {
+                            this.Log().Info("      See {0}", rule.HelpUrl);
+                        }
+
+                        break;
+
+                    case infrastructure.rules.RuleType.Note:
+                        this.Log().Info("NOTE: " + message);
+
+                        if (!string.IsNullOrEmpty(rule.HelpUrl))
+                        {
+                            this.Log().Info("      See {0}", rule.HelpUrl);
+                        }
+
                         break;
                 }
             }

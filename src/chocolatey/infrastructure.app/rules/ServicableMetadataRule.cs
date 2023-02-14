@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.rules
         {
             if (has_element(reader, "serviceable"))
             {
-                yield return new RuleResult(RuleType.Error, "<serviceable> elements are not supported in Chocolatey CLI.");
+                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<serviceable> elements are not supported in Chocolatey CLI.");
             }
         }
     }

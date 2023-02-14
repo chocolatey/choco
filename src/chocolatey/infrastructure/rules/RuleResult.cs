@@ -15,18 +15,18 @@
 
 namespace chocolatey.infrastructure.rules
 {
-    public readonly struct RuleResult
+    public sealed class RuleResult
     {
-        public static readonly RuleResult Success = new RuleResult(RuleType.None, string.Empty);
-
-        public RuleResult(RuleType severity, string message)
+        public RuleResult(RuleType severity, string id, string message)
         {
             Severity = severity;
+            Id = id;
             Message = message;
         }
 
-        public readonly RuleType Severity;
-
-        public readonly string Message;
+        public string HelpUrl { get; set; }
+        public string Id { get; private set; }
+        public string Message { get; private set; }
+        public RuleType Severity { get; set; }
     }
 }

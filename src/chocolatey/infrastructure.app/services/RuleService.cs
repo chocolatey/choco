@@ -46,6 +46,7 @@ namespace chocolatey.infrastructure.app.services
 
             return rules
                 .OrderBy(r => r.Severity)
+                .ThenBy(r => r.Id)
                 .ThenBy(r => r.Message);
         }
 
