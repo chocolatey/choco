@@ -176,6 +176,7 @@ namespace chocolatey.infrastructure.app.services
             throw new NotImplementedException("Count is not supported for this source runner.");
         }
 
+        [Obsolete("This method does not need to be called publicly and may be made private or removed in a later version.")]
         public void set_root_dir_if_not_set()
         {
             if (!string.IsNullOrWhiteSpace(_rootDirectory))
@@ -200,6 +201,7 @@ namespace chocolatey.infrastructure.app.services
             return _fileSystem.combine_paths(binRoot, "cygwin");
         }
 
+        [Obsolete("This method does not need to be called publicly and may be made private or removed in a later version.")]
         public string get_exe(string rootpath)
         {
             return _fileSystem.combine_paths(rootpath, "cygwinsetup.exe");
@@ -215,6 +217,7 @@ namespace chocolatey.infrastructure.app.services
             throw new NotImplementedException("{0} does not implement list".format_with(APP_NAME));
         }
 
+        [Obsolete("This method does not need to be called publicly and may be made private or removed in a later version.")]
         public string build_args(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> argsDictionary)
         {
             var args = ExternalCommandArgsBuilder.build_arguments(config, argsDictionary);
