@@ -727,7 +727,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 foreach (SourcePackageDependencyInfo packageDependencyInfo in resolvedPackages)
                 {
-
                     var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
 
                     if (packageRemoteMetadata is null)
@@ -1195,7 +1194,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         {
                             resolvedPackages = packagesToInstall.Select(p => sourcePackageDependencyInfos.Single(x => p.Identity.Equals(new PackageIdentity(x.Id, x.Version))));
 
-
                             if (config.ForceDependencies)
                             {
                                 //TODO Log warning here about dependencies being removed and not being reinstalled?
@@ -1224,7 +1222,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             {
                                 resolvedPackages = dependencyResolver.Resolve(resolverContext, CancellationToken.None)
                                     .Select(p => sourcePackageDependencyInfos.Single(x => PackageIdentityComparer.Default.Equals(x, p)));
-
 
                                 if (!config.ForceDependencies)
                                 {
