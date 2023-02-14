@@ -720,7 +720,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
                     catch (Exception ex)
                     {
-                        this.Log().Warn("Need to add specific handling for exception type {0}".format_with(nameof(ex)));
+                        this.Log().Warn("Need to add specific handling for exception type {0}".format_with(ex.GetType().Name));
                         this.Log().Warn(ex.Message);
                     }
                 }
@@ -1268,7 +1268,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                             catch (Exception ex)
                             {
-                                this.Log().Warn("Need to add specific handling for exception type {0}".format_with(nameof(ex)));
+                                this.Log().Warn("Need to add specific handling for exception type {0}".format_with(ex.GetType().Name));
                                 this.Log().Warn(ex.Message);
                             }
                         }
