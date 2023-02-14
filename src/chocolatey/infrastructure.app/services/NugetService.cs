@@ -622,12 +622,18 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 var dependencyResolver = new PackageResolver();
 
-                var allPackagesIdentities = allLocalPackages
-                    .Select(p => p.SearchMetadata.Identity)
-                    // If we're forcing dependencies, we only need to know which dependencies are installed locally, not the entire list of packages
-                    .Where(p => config.ForceDependencies
-                        ? sourcePackageDependencyInfos.Any(s => s.Id == p.Id) 
-                        : !targetIdsToInstall.Contains(p.Id, StringComparer.OrdinalIgnoreCase)).ToList();
+                var allPackagesIdentities = Enumerable.Empty<PackageIdentity>();
+
+                if (availablePackage.DependencySets.Any() || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
+                {
+                    allPackagesIdentities = allLocalPackages
+                        .Select(p => p.SearchMetadata.Identity)
+                        // If we're forcing dependencies, we only need to know which dependencies are installed locally, not the entire list of packages
+                        .Where(p => config.ForceDependencies
+                            ? sourcePackageDependencyInfos.Any(s => s.Id == p.Id)
+                            : !targetIdsToInstall.Contains(p.Id, StringComparer.OrdinalIgnoreCase)).ToList();
+                }
+
                 var allPackagesReferences = allPackagesIdentities.Select(p => new PackageReference(p, NuGetFramework.AnyFramework));
 
                 var resolverContext = new PackageResolverContext(
@@ -1174,7 +1180,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         var dependencyResolver = new PackageResolver();
 
                         var targetIdsToInstall = packagesToInstall.Select(p => p.Identity.Id);
-                        var allPackagesIdentities = allLocalPackages.Where(x => !targetIdsToInstall.Contains(x.Identity.Id, StringComparer.OrdinalIgnoreCase)).Select(p => p.SearchMetadata.Identity).ToList();
+
+                        var allPackagesIdentities = Enumerable.Empty<PackageIdentity>();
+
+                        if (availablePackage.DependencySets.Any() || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
+                        {
+                            allPackagesIdentities = allLocalPackages
+                                .Where(x => !targetIdsToInstall.Contains(x.Identity.Id, StringComparer.OrdinalIgnoreCase))
+                                .Select(p => p.SearchMetadata.Identity).ToList();
+                        }
+
                         //var allPackagesIdentities = allLocalPackages.Select(p => p.SearchMetadata.Identity).ToList();
                         var allPackagesReferences = allPackagesIdentities.Select(p => new PackageReference(p, NuGetFramework.AnyFramework));
 
