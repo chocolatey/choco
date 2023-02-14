@@ -700,7 +700,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         if (!invalidDependencyMatch.Groups["packageId"].Success)
                         {
-                            string resolvePattern = @"Unable to resolve dependency \'(?<packageId>\w+)\'";
+                            string resolvePattern = @"Unable to resolve dependency \'(?<packageId>[\w\-\.]+)\'";
                             var resolveDependencyMatch = Regex.Match(ex.Message, resolvePattern, RegexOptions.IgnoreCase);
                             invalidDependencyName = resolveDependencyMatch.Groups["packageId"].Success ? resolveDependencyMatch.Groups["packageId"].Value : string.Empty;
 
@@ -1248,7 +1248,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                 if (!invalidDependencyMatch.Groups["packageId"].Success)
                                 {
-                                    string resolvePattern = @"Unable to resolve dependency \'(?<packageId>\w+)\'";
+                                    string resolvePattern = @"Unable to resolve dependency \'(?<packageId>[\w\-\.]+)\'";
                                     var resolveDependencyMatch = Regex.Match(ex.Message, resolvePattern, RegexOptions.IgnoreCase);
                                     invalidDependencyName = resolveDependencyMatch.Groups["packageId"].Success ? resolveDependencyMatch.Groups["packageId"].Value : string.Empty;
 
