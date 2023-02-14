@@ -622,12 +622,18 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 var dependencyResolver = new PackageResolver();
 
-                var allPackagesIdentities = allLocalPackages
-                    .Select(p => p.SearchMetadata.Identity)
-                    // If we're forcing dependencies, we only need to know which dependencies are installed locally, not the entire list of packages
-                    .Where(p => config.ForceDependencies
-                        ? sourcePackageDependencyInfos.Any(s => s.Id == p.Id) 
-                        : !targetIdsToInstall.Contains(p.Id, StringComparer.OrdinalIgnoreCase)).ToList();
+                var allPackagesIdentities = Enumerable.Empty<PackageIdentity>();
+
+                if (availablePackage.DependencySets.Any() || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
+                {
+                    allPackagesIdentities = allLocalPackages
+                        .Select(p => p.SearchMetadata.Identity)
+                        // If we're forcing dependencies, we only need to know which dependencies are installed locally, not the entire list of packages
+                        .Where(p => config.ForceDependencies
+                            ? sourcePackageDependencyInfos.Any(s => s.Id == p.Id)
+                            : !targetIdsToInstall.Contains(p.Id, StringComparer.OrdinalIgnoreCase)).ToList();
+                }
+
                 var allPackagesReferences = allPackagesIdentities.Select(p => new PackageReference(p, NuGetFramework.AnyFramework));
 
                 var resolverContext = new PackageResolverContext(
@@ -700,7 +706,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         if (!invalidDependencyMatch.Groups["packageId"].Success)
                         {
-                            string resolvePattern = @"Unable to resolve dependency \'(?<packageId>\w+)\'";
+                            string resolvePattern = @"Unable to resolve dependency \'(?<packageId>[\w\-\.]+)\'";
                             var resolveDependencyMatch = Regex.Match(ex.Message, resolvePattern, RegexOptions.IgnoreCase);
                             invalidDependencyName = resolveDependencyMatch.Groups["packageId"].Success ? resolveDependencyMatch.Groups["packageId"].Value : string.Empty;
 
@@ -720,14 +726,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
                     catch (Exception ex)
                     {
-                        this.Log().Warn("Need to add specific handling for exception type {0}".format_with(nameof(ex)));
+                        this.Log().Warn("Need to add specific handling for exception type {0}".format_with(ex.GetType().Name));
                         this.Log().Warn(ex.Message);
                     }
                 }
 
                 foreach (SourcePackageDependencyInfo packageDependencyInfo in resolvedPackages)
                 {
-
                     var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
 
                     if (packageRemoteMetadata is null)
@@ -1175,7 +1180,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         var dependencyResolver = new PackageResolver();
 
                         var targetIdsToInstall = packagesToInstall.Select(p => p.Identity.Id);
-                        var allPackagesIdentities = allLocalPackages.Where(x => !targetIdsToInstall.Contains(x.Identity.Id, StringComparer.OrdinalIgnoreCase)).Select(p => p.SearchMetadata.Identity).ToList();
+
+                        var allPackagesIdentities = Enumerable.Empty<PackageIdentity>();
+
+                        if (availablePackage.DependencySets.Any() || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
+                        {
+                            allPackagesIdentities = allLocalPackages
+                                .Where(x => !targetIdsToInstall.Contains(x.Identity.Id, StringComparer.OrdinalIgnoreCase))
+                                .Select(p => p.SearchMetadata.Identity).ToList();
+                        }
+
                         //var allPackagesIdentities = allLocalPackages.Select(p => p.SearchMetadata.Identity).ToList();
                         var allPackagesReferences = allPackagesIdentities.Select(p => new PackageReference(p, NuGetFramework.AnyFramework));
 
@@ -1194,7 +1208,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         if (config.IgnoreDependencies)
                         {
                             resolvedPackages = packagesToInstall.Select(p => sourcePackageDependencyInfos.Single(x => p.Identity.Equals(new PackageIdentity(x.Id, x.Version))));
-
 
                             if (config.ForceDependencies)
                             {
@@ -1225,7 +1238,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 resolvedPackages = dependencyResolver.Resolve(resolverContext, CancellationToken.None)
                                     .Select(p => sourcePackageDependencyInfos.Single(x => PackageIdentityComparer.Default.Equals(x, p)));
 
-
                                 if (!config.ForceDependencies)
                                 {
                                     var identitiesToUninstall = packagesToUninstall.Select(x => x.Identity);
@@ -1251,7 +1263,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                 if (!invalidDependencyMatch.Groups["packageId"].Success)
                                 {
-                                    string resolvePattern = @"Unable to resolve dependency \'(?<packageId>\w+)\'";
+                                    string resolvePattern = @"Unable to resolve dependency \'(?<packageId>[\w\-\.]+)\'";
                                     var resolveDependencyMatch = Regex.Match(ex.Message, resolvePattern, RegexOptions.IgnoreCase);
                                     invalidDependencyName = resolveDependencyMatch.Groups["packageId"].Success ? resolveDependencyMatch.Groups["packageId"].Value : string.Empty;
 
@@ -1271,7 +1283,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                             catch (Exception ex)
                             {
-                                this.Log().Warn("Need to add specific handling for exception type {0}".format_with(nameof(ex)));
+                                this.Log().Warn("Need to add specific handling for exception type {0}".format_with(ex.GetType().Name));
                                 this.Log().Warn(ex.Message);
                             }
                         }
