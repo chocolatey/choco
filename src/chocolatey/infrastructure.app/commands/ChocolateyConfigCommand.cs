@@ -33,6 +33,14 @@ namespace chocolatey.infrastructure.app.commands
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
 
+        internal const string DeprecatedConfigListResultsMessage = @"
+Starting in v2.0.0, the `config list` command will only list the
+ configuration values, instead of also listing the configured features
+ and sources.
+ Use the `choco feature` or `choco source` commands to list and interact
+ with these values.
+";
+
         public ChocolateyConfigCommand(IChocolateyConfigSettingsService configSettingsService)
         {
             _configSettingsService = configSettingsService;
@@ -58,7 +66,7 @@ namespace chocolatey.infrastructure.app.commands
         {
             configuration.Input = string.Join(" ", unparsedArguments);
             var command = ConfigCommandType.unknown;
-            string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().to_string().Replace("-",string.Empty);
+            string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().to_string().Replace("-", string.Empty);
             Enum.TryParse(unparsedCommand, true, out command);
             if (command == ConfigCommandType.unknown)
             {
@@ -73,7 +81,7 @@ namespace chocolatey.infrastructure.app.commands
                 )
                 && unparsedArguments.Count > 1) throw new ApplicationException("A single features command must be listed. Please see the help menu for those commands");
 
-            if (string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name) && unparsedArguments.Count >=2)
+            if (string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name) && unparsedArguments.Count >= 2)
             {
                 configuration.ConfigCommand.Name = unparsedArguments[1];
             }
@@ -97,6 +105,9 @@ Chocolatey will allow you to interact with the configuration file settings.
 
 NOTE: Available in 0.9.9.9+.
 ");
+
+            this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
+            this.Log().Warn(DeprecatedConfigListResultsMessage);
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"

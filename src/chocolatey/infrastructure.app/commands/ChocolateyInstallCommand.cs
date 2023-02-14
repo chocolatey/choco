@@ -263,6 +263,8 @@ Side by side installations has been deprecated and will be removed in v2.0.0.
 Instead of using side by side installations, distinct packages should be created
 if similar functionality is needed going forward.
 ");
+            "chocolatey".Log().Warn(NugetService.InstallWithFilePathDeprecationMessage);
+            "chocolatey".Log().Warn(WebPiService.DeprecationMessage);
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
@@ -302,7 +304,7 @@ NOTE: Chocolatey Pro / Business builds on top of a great open source
     choco install git -s ""'https://somewhere/out/there'""
     choco install git -s ""'https://somewhere/protected'"" -u user -p pass
 
-Choco can also install directly from a nuspec/nupkg file. This aids in
+(DEPRECATED) Choco can also install directly from a nuspec/nupkg file. This aids in
  testing packages:
 
     choco install <path/to/nuspec>
@@ -397,7 +399,7 @@ This specifies the source is Ruby Gems and that we are installing a
  the command will install that first.
  e.g. `choco install compass -source ruby`
 
-WebPI
+WebPI (DEPRECATED)
 This specifies the source is Web PI (Web Platform Installer) and that
  we are installing a WebPI product, such as IISExpress. If you do not
  have the Web PI command line installed, it will install that first and

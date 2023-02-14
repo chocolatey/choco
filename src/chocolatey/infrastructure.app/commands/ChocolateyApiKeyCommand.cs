@@ -32,6 +32,11 @@ namespace chocolatey.infrastructure.app.commands
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
 
+        private const string RemoveOptionDeprecationMessage = @"
+The --rem / --remove option is deprecated and will be removed in v2.0.0.
+In future versions, this option will be replaced with the `remove` subcommand.
+";
+
         public ChocolateyApiKeyCommand(IChocolateyConfigSettingsService configSettingsService)
         {
             _configSettingsService = configSettingsService;
@@ -49,7 +54,7 @@ namespace chocolatey.infrastructure.app.commands
                      "ApiKey - The API key for the source. This is the authentication that identifies you and allows you to push to a source. With some sources this is either a key or it could be a user name and password specified as 'user:password'.",
                      option => configuration.ApiKeyCommand.Key = option.remove_surrounding_quotes())
                 .Add("rem|remove",
-                    "Removes an API key from Chocolatey",
+                    "Removes an API key from Chocolatey (DEPRECATED)",
                     option => configuration.ApiKeyCommand.Remove = true)
                 ;
         }
@@ -82,6 +87,8 @@ This lists api keys that are set or sets an api key for a particular
 
 Anything that doesn't contain source and key will list api keys.
 ");
+            this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
+            this.Log().Warn(RemoveOptionDeprecationMessage);
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
@@ -152,6 +159,8 @@ If you find other exit codes that we have not yet documented, please
         {
             if (configuration.ApiKeyCommand.Remove)
             {
+                this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
+                this.Log().Warn(RemoveOptionDeprecationMessage);
                 _configSettingsService.remove_api_key(configuration);
             }
             else if (string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key))

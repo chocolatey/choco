@@ -125,6 +125,15 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
             $Output.Lines | Should -Contain "Use choco apikey to interact with API keys."
         }
 
+        It "Displays deprecation note about sources and features" {
+            $pattern = @(
+                'Starting in v2.0.0, the `config list` command will only list the'
+                ' configuration values, instead of also listing the configured features'
+                ' and sources.'
+            ) -join "\r?\n"
+            $Output.String | Should -Match $pattern
+        }
+
         It "Displays Available Setting <_>" -ForEach @(
             "cacheLocation =  |"
             "containsLegacyPackageInstalls = true |"
