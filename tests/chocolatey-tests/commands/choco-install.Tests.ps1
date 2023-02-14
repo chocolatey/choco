@@ -18,6 +18,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
+        $features = Get-ChocolateyFeatures
     }
 
     AfterAll {
@@ -1502,11 +1503,14 @@ To install a local, or remote file, you may use:
         }
     }
 
-    Context "Installing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, Testing {
+    # We are marking this test as internal, as the package we need to make use
+    # of downloads a zip archive from a internal server, and the package is also
+    # only located on an internal feed.
+    Context "Installing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation {
         BeforeAll {
             $paths = Restore-ChocolateyInstallSnapshot
 
-            $Output = Invoke-Choco install install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePathLong)" --verbose
+            $Output = Invoke-Choco install install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePathLong)" --no-progress
         }
 
         AfterAll {
@@ -1518,23 +1522,29 @@ To install a local, or remote file, you may use:
         }
 
         It 'Runs under background Service' -Tag Background {
-            $Output.Lines | Should -Contain 'Running in background mode'
+            $Output.Lines | Should -Contain 'Running in background mode' -Because $Output.String
         }
 
         It 'Outputs downloading 64bit package' {
-            $Output.Lines | Should -Contain 'Downloading install-chocolateyzip 64 bit'
+            $Output.Lines | Should -Contain 'Downloading install-chocolateyzip 64 bit' -Because $Output.String
         }
 
         It 'Outputs download completed' {
-            $Output.Lines | Should -Contain "Download of 'cmake-3.21.2-windows-x86_64.zip'."
-        }
-
-        It 'Outputs download completed' {
-            $Output.Lines | Should -Contain "Download of 'cmake-3.21.2-windows-x86_64.zip' (36.01 MB) completed."
+            $testMessage = if ($features.License) {
+                "Download of 'cmake-3.21.2-windows-x86_64.zip' (36.01 MB) completed."
+            } else {
+                "Download of cmake-3.21.2-windows-x86_64.zip (36.01 MB) completed."
+            }
+            $Output.Lines | Should -Contain $testMessage -Because $Output.String
         }
 
         It 'Outputs extracting correct archive' {
-            $Output.Lines | Should -Contain "Extracting cmake-3.21.2-windws-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
+            $testMessage = if ($features.License) {
+                "Extracting cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
+            } else {
+                "Extracting $($paths.CachePathLong)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
+            }
+            $Output.Lines | Should -Contain $testMessage -Because $Output.String
         }
 
         It 'Created shim for <_>' -ForEach 'cmake-gui.exe', 'cmake.exe', 'cmcldeps.exe', 'cpack.exe', 'ctest.exe' {
@@ -1543,20 +1553,20 @@ To install a local, or remote file, you may use:
         }
 
         It 'Outputs installation was successful' {
-            $Output.Lines | Should -Contain 'The install of install-chocolateyzip was successful.'
+            $Output.Lines | Should -Contain 'The install of install-chocolateyzip was successful.' -Because $Output.String
         }
 
         It 'Outputs software installation directory' {
-            $Output.Lines | Should -Contain "Software installed to '$env:ChocolateyInstall\lib\install-chocolateyzip\tools'"
+            $Output.Lines | Should -Contain "Software installed to '$env:ChocolateyInstall\lib\install-chocolateyzip\tools'" -Because $Output.String
         }
 
         It 'Should have cached installed directory in custom cache' {
             # Need to be verified, but the file may not exist on licensed edition
-            "$($paths.CachePathLong)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip"
+            "$($paths.CachePathLong)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip" | Should -Exist
         }
 
         It 'Installed software to expected directory' {
-            "$env:ChocolateyInstall\lib\install-chocolateyzip\tools\cmake-3.21.2-windows-x86_64.zip\bin\cmake" | Should -Exist
+            "$env:ChocolateyInstall\lib\install-chocolateyzip\tools\cmake-3.21.2-windows-x86_64\bin\cmake.exe" | Should -Exist
         }
     }
 
