@@ -1,17 +1,25 @@
 issue-labels-include:
-- Breaking change
+- Breaking Change
+- Deprecate
 - Feature
 - C4B Feature
 - Bug
-- Improvement
+- Enhancement
 - Documentation
 issue-labels-exclude:
 - Internal Refactoring
 - Build
+- NO RELEASE NOTES
 issue-labels-alias:
     - name:    Documentation
       header:  Documentation
       plural:  Documentation
+    - name: Bug
+      header: Bug Fix
+      plural: Bug Fixes
+    - name: Deprecate
+      header: Deprecated Feature
+      plural: Deprecated Features
 create:
     include-sha-section: true
     sha-section-heading: "SHA256 Hashes of the release artifacts"
