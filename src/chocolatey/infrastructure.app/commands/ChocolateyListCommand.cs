@@ -176,9 +176,10 @@ NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
     clist <filter> [<options/switches>] (DEPRECATED, will be removed in v2.0.0)
 ");
 
+            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
+
             if (configuration.CommandName.is_equal_to("list"))
             {
-                "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
                 "chocolatey".Log().Warn(@"
 Starting in v2.0.0 the list command will be made local only and will only
  work with the installed packages. All options available for connecting
@@ -189,10 +190,12 @@ To avoid breakage, change any calls made to remote sources to use `choco search`
  or `choco find` instead. These will continue to work as usual.
 
 Starting in v2.0.0 the shortcut `clist` will be removed and can not be used
- to list package anymore. We recommend you make sure that you always
+ to list packages anymore. We recommend you make sure that you always
  use the full command going forward (`choco list`).
 ");
             }
+
+            "chocolatey".Log().Warn(WebPiService.DeprecationMessage);
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
@@ -248,7 +251,7 @@ Will be removed for the list command in v2.0.0.");
             "chocolatey".Log().Info(@"
 Available in 0.9.10+.
 
-WebPI
+WebPI (DEPRECATED)
 This specifies the source is Web PI (Web Platform Installer) and that
  we are searching for a WebPI product, such as IISExpress. If you do
  not have the Web PI command line installed, it will install that first

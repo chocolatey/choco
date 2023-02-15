@@ -26,7 +26,7 @@ namespace chocolatey.infrastructure.app.domain
     {
         //this is what it should be when it's not set
         normal,
-
+        [Obsolete("The WebPI service has been retired, and this source type will be removed in v2.0.0 of Chocolatey.")]
         webpi,
         ruby,
         python,
