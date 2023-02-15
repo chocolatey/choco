@@ -45,7 +45,20 @@ namespace chocolatey.infrastructure.app.services
         private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
         private const string INSTALL_ROOT_TOKEN = "{{installroot}}";
         public const string CYGWIN_PACKAGE = "cygwin";
-        private string _rootDirectory = string.Empty;
+
+        private string _rootDirectory;
+        private string RootDirectory
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_rootDirectory))
+                {
+                    _rootDirectory = get_root_directory();
+                }
+
+                return _rootDirectory;
+            }
+        }
 
         private const string APP_NAME = "Cygwin";
         public const string PACKAGE_NAME_GROUP = "PkgName";
@@ -156,8 +169,6 @@ namespace chocolatey.infrastructure.app.services
                 _nugetService.install_run(runnerConfig, ensureAction.Invoke);
                 config.PromptForConfirmation = prompt;
             }
-
-            set_root_dir_if_not_set();
         }
 
         public int count_run(ChocolateyConfiguration config)
@@ -165,25 +176,32 @@ namespace chocolatey.infrastructure.app.services
             throw new NotImplementedException("Count is not supported for this source runner.");
         }
 
+        [Obsolete("This method does not need to be called publicly and may be made private or removed in a later version.")]
         public void set_root_dir_if_not_set()
         {
-            if (!string.IsNullOrWhiteSpace(_rootDirectory)) return;
+            if (!string.IsNullOrWhiteSpace(_rootDirectory))
+            {
+                return;
+            }
 
+            _rootDirectory = get_root_directory();
+        }
+
+        private string get_root_directory()
+        {
             var setupKey = _registryService.get_key(RegistryHive.LocalMachine, "SOFTWARE\\Cygwin\\setup");
             if (setupKey != null)
             {
-                _rootDirectory = setupKey.GetValue("rootdir", string.Empty).to_string();
+                return setupKey.GetValue("rootdir", string.Empty).to_string();
             }
 
-            if (string.IsNullOrWhiteSpace(_rootDirectory))
-            {
-                var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
-                if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
+            var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
+            if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
 
-                _rootDirectory = _fileSystem.combine_paths(binRoot, "cygwin");
-            }
+            return _fileSystem.combine_paths(binRoot, "cygwin");
         }
 
+        [Obsolete("This method does not need to be called publicly and may be made private or removed in a later version.")]
         public string get_exe(string rootpath)
         {
             return _fileSystem.combine_paths(rootpath, "cygwinsetup.exe");
@@ -199,11 +217,12 @@ namespace chocolatey.infrastructure.app.services
             throw new NotImplementedException("{0} does not implement list".format_with(APP_NAME));
         }
 
+        [Obsolete("This method does not need to be called publicly and may be made private or removed in a later version.")]
         public string build_args(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> argsDictionary)
         {
             var args = ExternalCommandArgsBuilder.build_arguments(config, argsDictionary);
 
-            args = args.Replace(INSTALL_ROOT_TOKEN, _rootDirectory);
+            args = args.Replace(INSTALL_ROOT_TOKEN, RootDirectory);
 
             return args;
         }
@@ -211,7 +230,7 @@ namespace chocolatey.infrastructure.app.services
         public void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
             var args = build_args(config, _installArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(get_exe(_rootDirectory).escape_curly_braces(), args.escape_curly_braces()));
+            this.Log().Info("Would have run '{0} {1}'".format_with(get_exe(RootDirectory).escape_curly_braces(), args.escape_curly_braces()));
         }
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
@@ -224,7 +243,7 @@ namespace chocolatey.infrastructure.app.services
                 var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
 
                 var exitCode = _commandExecutor.execute(
-                    get_exe(_rootDirectory),
+                    get_exe(RootDirectory),
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
                     _fileSystem.get_current_directory(),

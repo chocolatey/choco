@@ -71,6 +71,14 @@ namespace chocolatey.infrastructure.app.services
             get { return datetime_initializer.Value; }
         }
 
+        internal const string InstallWithFilePathDeprecationMessage = @"
+The ability to specify a direct path to a .nuspec or .nupkg file for installation
+is deprecated and will be removed in v2.0.0. Instead of using the full path
+to a .nupkg file, use the --source option to specify the containing directory,
+and ensure any packages have been packed into a .nupkg file before attempting to
+install them.
+";
+
         /// <summary>
         ///   Initializes a new instance of the <see cref="NugetService" /> class.
         /// </summary>
@@ -471,6 +479,9 @@ folder.");
                 var packageName = packageNames.DefaultIfEmpty(string.Empty).FirstOrDefault();
                 if (packageName.EndsWith(NuGetConstants.PackageExtension) || packageName.EndsWith(PackagingConstants.ManifestExtension))
                 {
+                    this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION WARNING");
+                    this.Log().Warn(InstallWithFilePathDeprecationMessage);
+
                     this.Log().Debug("Updating source and package name to handle *.nupkg or *.nuspec file.");
                     packageNames.Clear();
 

@@ -395,6 +395,17 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
     }
 
+    Context "WebPI source should show a deprecation message" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco $_ --source=webpi
+        }
+
+        It "Should show the deprecation warning" {
+            $Output.Lines | Should -Contain 'The `webpi` source is deprecated and will be removed in Chocolatey v2.0.0.' -Because $Output.String
+        }
+    }
 
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     Test-NuGetPaths

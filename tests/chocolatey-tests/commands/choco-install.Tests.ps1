@@ -1,4 +1,4 @@
-Import-Module helpers/common-helpers
+﻿Import-Module helpers/common-helpers
 
 # https://github.com/chocolatey/choco/blob/master/src/chocolatey.tests.integration/scenarios/InstallScenarios.cs
 
