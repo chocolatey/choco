@@ -525,6 +525,12 @@ Repository).");
                 MockLogger.Messages.Keys.ShouldContain("Warn");
                 MockLogger.Messages["Warn"].ShouldContain(@"
 Will be removed for the list command in v2.0.0.");
+                MockLogger.Messages["Warn"].ShouldContain(@"
+The `webpi` source is deprecated and will be removed in Chocolatey v2.0.0.
+ The WebPI feed provided by Microsoft was retired on December 31st, 2022. For
+ more information, see the IIS team's blog post:
+ https://blogs.iis.net/iisteam/web-platform-installer-end-of-support-feed
+");
             }
         }
 
@@ -542,10 +548,23 @@ Will be removed for the list command in v2.0.0.");
                 command.help_message(configuration);
             }
 
-            [Fact]
-            public void should_not_output_warnings()
+            [Fact, Obsolete("Will be removed in v2.0.0")]
+            public void should_output_deprecation_notice_header()
             {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
+                MockLogger.Messages.Keys.ShouldContain("Warn");
+                MockLogger.Messages["Warn"].ShouldContain("DEPRECATION NOTICE");
+            }
+
+            [Fact]
+            public void should_ouput_webpi_removal_in_v2_0_0()
+            {
+                MockLogger.Messages.Keys.ShouldContain("Warn");
+                MockLogger.Messages["Warn"].ShouldContain(@"
+The `webpi` source is deprecated and will be removed in Chocolatey v2.0.0.
+ The WebPI feed provided by Microsoft was retired on December 31st, 2022. For
+ more information, see the IIS team's blog post:
+ https://blogs.iis.net/iisteam/web-platform-installer-end-of-support-feed
+");
             }
         }
     }

@@ -258,7 +258,7 @@ function Convert-CommandText {
     $commandText = $commandText -replace 'https://chocolatey.org/docs/features-package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
     $commandText = $commandText -replace 'https://chocolatey.org/docs/en-us/features/package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
     $commandText = $commandText -replace '\[community feed\)\]\(https://community.chocolatey.org/packages\)', '[community feed](https://community.chocolatey.org/packages))'
-  $commandText = $commandText -replace '> :choco-info: \*\*NOTE\*\*\s', '> :choco-info: **NOTE**
+    $commandText = $commandText -replace '> :choco-info: \*\*NOTE\*\*\s', '> :choco-info: **NOTE**
 >
 > '
 

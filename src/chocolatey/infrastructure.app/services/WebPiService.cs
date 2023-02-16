@@ -28,6 +28,7 @@ namespace chocolatey.infrastructure.app.services
     using results;
     using platforms;
 
+    [Obsolete("The WebPI service has been retired, and this source type will be removed in v2.0.0 of Chocolatey.")]
     public sealed class WebPiService : ISourceRunner
     {
         private readonly ICommandExecutor _commandExecutor;
@@ -127,6 +128,19 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
+        internal const string DeprecationMessage = @"
+The `webpi` source is deprecated and will be removed in Chocolatey v2.0.0.
+ The WebPI feed provided by Microsoft was retired on December 31st, 2022. For
+ more information, see the IIS team's blog post:
+ https://blogs.iis.net/iisteam/web-platform-installer-end-of-support-feed
+";
+
+        private void write_deprecation_warning()
+        {
+            this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION WARNING");
+            this.Log().Warn(DeprecationMessage);
+        }
+
         public int count_run(ChocolateyConfiguration config)
         {
             throw new NotImplementedException("Count is not supported for this source runner.");
@@ -134,12 +148,14 @@ namespace chocolatey.infrastructure.app.services
 
         public void list_noop(ChocolateyConfiguration config)
         {
+            write_deprecation_warning();
             var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
             this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH.escape_curly_braces(), args.escape_curly_braces()));
         }
 
         public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
         {
+            write_deprecation_warning();
             var packageResults = new List<PackageResult>();
             var args = ExternalCommandArgsBuilder.build_arguments(config, _listArguments);
 
@@ -191,6 +207,7 @@ namespace chocolatey.infrastructure.app.services
 
         public void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
+            write_deprecation_warning();
             var args = ExternalCommandArgsBuilder.build_arguments(config, _installArguments);
             args = args.Replace(PACKAGE_NAME_TOKEN, config.PackageNames.Replace(';', ','));
             this.Log().Info("Would have run '{0} {1}'".format_with(EXE_PATH.escape_curly_braces(), args.escape_curly_braces()));
@@ -198,6 +215,7 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
+            write_deprecation_warning();
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
             var args = ExternalCommandArgsBuilder.build_arguments(config, _installArguments);
 
@@ -255,22 +273,26 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
+            write_deprecation_warning();
             this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement upgrade".format_with(APP_NAME));
             return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
         }
 
         public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null)
         {
+            write_deprecation_warning();
             throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
         }
 
         public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
+            write_deprecation_warning();
             this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement uninstall".format_with(APP_NAME));
         }
 
         public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
         {
+            write_deprecation_warning();
             throw new NotImplementedException("{0} does not implement uninstall".format_with(APP_NAME));
         }
 
