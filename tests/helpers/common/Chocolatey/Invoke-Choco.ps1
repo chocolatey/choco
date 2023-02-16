@@ -19,7 +19,21 @@
     begin {
         $chocoPath = Get-ChocoPath
         $firstArgument, [string[]]$remainingArguments = $Arguments
-        $arguments = @($firstArgument; '--allow-unofficial'; $remainingArguments)
+        $arguments = @(
+            $firstArgument
+            '--allow-unofficial'
+
+            if ($env:CHOCO_TEST_PROXY) {
+                "--proxy='$($env:CHOCO_TEST_PROXY)'"
+                if ($env:CHOCO_TEST_PROXY_USER) {
+                    "--proxy-user='$($env:CHOCO_TEST_PROXY_USER)'"
+                    "--proxy-password='$($env:CHOCO_TEST_PROXY_PASSWORD)'"
+                }
+            }
+
+            $remainingArguments
+        )
+
     }
     end {
         $output = if ($PipelineInput) {
