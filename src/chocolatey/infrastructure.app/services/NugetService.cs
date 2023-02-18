@@ -1313,24 +1313,25 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
 
                             var packageToUninstall = packagesToUninstall.FirstOrDefault(p => p.PackageMetadata.Id.Equals(packageDependencyInfo.Id, StringComparison.OrdinalIgnoreCase));
-                            var oldPkgInfo = _packageInfoService.get_package_information(packageToUninstall.PackageMetadata);
-
-                            if (beforeUpgradeAction != null && packageToUninstall.PackageMetadata != null)
-                            {
-                                beforeUpgradeAction(packageToUninstall, config);
-                            }
 
                             try
                             {
-
                                 remove_rollback_directory_if_exists(packageName);
-                                ensure_package_files_have_compatible_attributes(config, packageToUninstall.PackageMetadata, oldPkgInfo);
-                                rename_legacy_package_version(config, packageToUninstall.PackageMetadata, oldPkgInfo);
-                                backup_existing_version(config, packageToUninstall.PackageMetadata, oldPkgInfo);
-                                remove_shim_directors(config, packageToUninstall.PackageMetadata, pkgInfo);
 
                                 if (packageToUninstall != null)
                                 {
+                                    var oldPkgInfo = _packageInfoService.get_package_information(packageToUninstall.PackageMetadata);
+
+                                    if (beforeUpgradeAction != null && packageToUninstall.PackageMetadata != null)
+                                    {
+                                        beforeUpgradeAction(packageToUninstall, config);
+                                    }
+
+                                    ensure_package_files_have_compatible_attributes(config, packageToUninstall.PackageMetadata, oldPkgInfo);
+                                    rename_legacy_package_version(config, packageToUninstall.PackageMetadata, oldPkgInfo);
+                                    backup_existing_version(config, packageToUninstall.PackageMetadata, oldPkgInfo);
+                                    remove_shim_directors(config, packageToUninstall.PackageMetadata, pkgInfo);
+
                                     packageToUninstall.InstallLocation = pathResolver.GetInstallPath(packageToUninstall.Identity);
                                     try
                                     {
