@@ -2052,7 +2052,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                                     localRepositorySource,
                                     null,
                                     null)));
-                        var uninstallationContext = new UninstallationContext(removeDependencies: true, forceRemove: config.ForceDependencies);
+                        var uninstallationContext = new UninstallationContext(removeDependencies: config.ForceDependencies, forceRemove: config.Force);
                         var resolvedPackages = UninstallResolver.GetPackagesToBeUninstalled(installedPackage.Identity, localPackagesDependencyInfos, allPackagesIdentities, uninstallationContext);
                         packagesToUninstall.AddRange(allLocalPackages.Where(p => resolvedPackages.Contains(p.Identity)));
 
