@@ -596,7 +596,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 }
 
                 var dependencyResources = NugetCommon.GetRepositoryResource<DependencyInfoResource>(remoteRepositories).ToList();
-                NugetCommon.GetPackageDependencies(availablePackage.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, dependencyResources, sourcePackageDependencyInfos, new HashSet<PackageDependency>()).GetAwaiter().GetResult();
+                NugetCommon.GetPackageDependencies(availablePackage.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, dependencyResources, sourcePackageDependencyInfos, new HashSet<PackageDependency>(), config).GetAwaiter().GetResult();
 
                 if (installedPackage != null && (installedPackage.PackageMetadata.Version == availablePackage.Identity.Version) && config.Force)
                 {
@@ -619,7 +619,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 var localPackagesDependencyInfos = allLocalPackages
                     // If we're forcing dependencies, we only need to know which dependencies are installed locally
                     .Where(p => config.ForceDependencies
-                        ? targetIdsToInstall.Contains(p.Name, StringComparer.OrdinalIgnoreCase) 
+                        ? targetIdsToInstall.Contains(p.Name, StringComparer.OrdinalIgnoreCase)
                         : !targetIdsToInstall.Contains(p.Name, StringComparer.OrdinalIgnoreCase))
                     .Select(
                         p => new SourcePackageDependencyInfo(
@@ -1146,7 +1146,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     if (performAction)
                     {
 
-                        NugetCommon.GetPackageDependencies(availablePackage.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, dependencyResources, sourcePackageDependencyInfos, sourceDependencyCache).GetAwaiter().GetResult();
+                        NugetCommon.GetPackageDependencies(availablePackage.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, dependencyResources, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
 
 
                         packagesToUninstall.Add(installedPackage);
@@ -1182,7 +1182,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         {
                             foreach (var packageVersion in NugetList.find_all_package_versions(parentPackage.Id, config, _nugetLogger, sourceCacheContext, NugetCommon.GetRepositoryResource<PackageMetadataResource>(remoteRepositories).ToList()))
                             {
-                                NugetCommon.GetPackageDependencies(packageVersion.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, dependencyResources, sourcePackageDependencyInfos, sourceDependencyCache).GetAwaiter().GetResult();
+                                NugetCommon.GetPackageDependencies(packageVersion.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, dependencyResources, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
                             }
                         }
 

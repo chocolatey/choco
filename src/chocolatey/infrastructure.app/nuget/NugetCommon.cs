@@ -354,7 +354,8 @@ var source = sourceValue;
             ILogger logger,
             IEnumerable<DependencyInfoResource> dependencyInfoResources,
             ISet<SourcePackageDependencyInfo> availablePackages,
-            ISet<PackageDependency> dependencyCache)
+            ISet<PackageDependency> dependencyCache,
+            ChocolateyConfiguration configuration)
         {
             if (availablePackages.Contains(package)) return;
 
@@ -371,7 +372,7 @@ var source = sourceValue;
                     if (dependencyCache.Contains(dependency)) continue;
                     dependencyCache.Add(dependency);
                     await GetPackageDependencies(
-                        dependency.Id, framework, cacheContext, logger, dependencyInfoResources, availablePackages, dependencyCache);
+                        dependency.Id, framework, cacheContext, logger, dependencyInfoResources, availablePackages, dependencyCache, configuration);
                 }
             }
         }
@@ -382,14 +383,15 @@ var source = sourceValue;
             ILogger logger,
             IEnumerable<DependencyInfoResource> dependencyInfoResources,
             ISet<SourcePackageDependencyInfo> availablePackages,
-            ISet<PackageDependency> dependencyCache)
+            ISet<PackageDependency> dependencyCache,
+            ChocolateyConfiguration configuration)
         {
             //if (availablePackages.Contains(packageID)) return;
 
             foreach (var dependencyInfoResource in dependencyInfoResources)
             {
                 var dependencyInfos = await dependencyInfoResource.ResolvePackages(
-                    packageId, framework, cacheContext, logger, CancellationToken.None);
+                    packageId, configuration.Prerelease, framework, cacheContext, logger, CancellationToken.None);
 
                 if (!dependencyInfos.Any()) continue;
 
@@ -401,7 +403,7 @@ var source = sourceValue;
 
                     // Recursion is fun, kids
                     await GetPackageDependencies(
-                        dependency.Id, framework, cacheContext, logger, dependencyInfoResources, availablePackages, dependencyCache);
+                        dependency.Id, framework, cacheContext, logger, dependencyInfoResources, availablePackages, dependencyCache, configuration);
                 }
             }
         }
