@@ -650,7 +650,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 var resolverContext = new PackageResolverContext(
                     dependencyBehavior: DependencyBehavior.Highest,
                     targetIds: targetIdsToInstall,
-                    requiredPackageIds: Enumerable.Empty<string>(),
+                    requiredPackageIds: allPackagesIdentities.Select(p => p.Id),
                     packagesConfig: allPackagesReferences,
                     preferredVersions: allPackagesIdentities.Where(p => !p.Id.Equals(packageName, StringComparison.OrdinalIgnoreCase)),
                     availablePackages: sourcePackageDependencyInfos,
@@ -1207,7 +1207,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         var resolverContext = new PackageResolverContext(
                             dependencyBehavior: DependencyBehavior.Highest,
                             targetIds: targetIdsToInstall,
-                            requiredPackageIds: Enumerable.Empty<string>(),
+                            requiredPackageIds: allPackagesIdentities.Select(p => p.Id),
                             packagesConfig: allPackagesReferences,
                             preferredVersions: allPackagesIdentities,
                             availablePackages: sourcePackageDependencyInfos,
