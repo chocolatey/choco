@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -122,18 +122,19 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 foreach (var repositoryResources in packageRepositoriesResources)
                 {
-                    if (repositoryResources.searchResource != null)
+                    var skipNumber = 0;
+
+                    if (configuration.ListCommand.Page.HasValue)
                     {
-                        var skipNumber = 0;
+                        skipNumber = configuration.ListCommand.PageSize * configuration.ListCommand.Page.GetValueOrDefault(0);
+                    }
+
+                    if (repositoryResources.searchResource != null && version == null)
+                    {
                         var takeNumber = get_take_numbers(configuration);
 
                         var partResults = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadataIdOnly());
                         var latestResults = new List<IPackageSearchMetadata>();
-
-                        if (configuration.ListCommand.Page.HasValue)
-                        {
-                            skipNumber = configuration.ListCommand.PageSize * configuration.ListCommand.Page.GetValueOrDefault(0);
-                        }
 
                         var perSourceThresholdLimit = thresholdLimit;
                         var perSourceThresholdMinLimit = lowerThresholdLimit;
@@ -181,6 +182,9 @@ namespace chocolatey.infrastructure.app.nuget
                     }
                     else
                     {
+                        configuration.Prerelease |= version != null && version.IsPrerelease;
+                        configuration.AllVersions |= version != null;
+
                         var tempResults = await repositoryResources.listResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, CancellationToken.None);
                         var enumerator = tempResults.GetEnumeratorAsync();
 
@@ -189,6 +193,17 @@ namespace chocolatey.infrastructure.app.nuget
 
                         while (await enumerator.MoveNextAsync())
                         {
+                            if (version != null && enumerator.Current.Identity.Version != version)
+                            {
+                                continue;
+                            }
+
+                            if (skipNumber > 0)
+                            {
+                                skipNumber--;
+                                continue;
+                            }
+
                             results.Add(enumerator.Current);
                             perSourceThresholdLimit--;
                             perSourceThresholdMinLimit--;

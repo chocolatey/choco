@@ -448,6 +448,9 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
     }
 
+    # This test is opposite on how it works in Chocolatey CLI v1. In v1 we would not
+    # find any pre-release packages unless --pre is passed in as well, despite the
+    # requested version being a pre-release.
     Context "Searching for pre-release package without using --pre as an argument" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot -Quick
@@ -459,18 +462,18 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
-        It "Should not output the package found" {
-            $Output.Lines | Should -Not -Contain "upgradepackage 1.1.1-beta" -Because $Output.String
+        It "Should output the package found" {
+            $Output.Lines | Should -Contain "upgradepackage 1.1.1-beta" -Because $Output.String
         }
 
         It "Should output the amount of packages found" {
-            $Output.Lines | Should -Contain "0 packages found." -Because $Output.String
+            $Output.Lines | Should -Contain "1 packages found." -Because $Output.String
         }
     }
 
     # This test is non-functional in v1, as it can not actually find any of the packages.
     # It seems to exit out of the results too early to find them.
-    Context "Search for chocolatey on Page <Page>" -Skip -ForEach @(
+    Context "Search for chocolatey on Page <Page>" -ForEach @(
         @{
             Page = 0
             Name = 'chocolatey'
