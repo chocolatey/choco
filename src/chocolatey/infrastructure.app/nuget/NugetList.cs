@@ -94,6 +94,12 @@ namespace chocolatey.infrastructure.app.nuget
             var cacheContext = new ChocolateySourceCacheContext(configuration);
 
             NuGetVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? NuGetVersion.Parse(configuration.Version) : null;
+
+            if (version != null)
+            {
+                searchFilter.OrderBy = SearchOrderBy.Version;
+            }
+
             var results = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadata());
             var thresholdLimit = 0;
 
