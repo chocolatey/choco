@@ -29,6 +29,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         $VersionRegex = "[^v]\d+\.\d+\.\d+"
         # Ensure that we remove any compatibility package before running the tests
         $null = Invoke-Choco uninstall chocolatey-compatibility.extension -y --force
+        $currentCommand = $_
     }
 
     AfterAll {
@@ -406,7 +407,107 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
             $Output.Lines | Should -Contain 'The `webpi` source is deprecated and will be removed in Chocolatey v2.0.0.' -Because $Output.String
         }
     }
-    
+
+    Context "Searching for older stable version" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot -Quick
+
+            $Output = Invoke-Choco $_ upgradepackage --version 1.0.0
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should output the package found" {
+            $Output.Lines | Should -Contain "upgradepackage 1.0.0" -Because $Output.String
+        }
+
+        It "Should output the amount of packages found" {
+            $Output.Lines | Should -Contain "1 packages found." -Because $Output.String
+        }
+    }
+
+    Context "Searching for older pre-release version" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot -Quick
+
+            $Output = Invoke-Choco $_ upgradepackage --version 1.1.1-beta --pre
+        }
+
+        It "Exits with Sucess (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should output the package found" {
+            $Output.Lines | Should -Contain "upgradepackage 1.1.1-beta" -Because $Output.String
+        }
+
+        It "Should output the amount of packages found" {
+            $Output.Lines | Should -Contain "1 packages found." -Because $Output.String
+        }
+    }
+
+    # This test is opposite on how it works in Chocolatey CLI v1. In v1 we would not
+    # find any pre-release packages unless --pre is passed in as well, despite the
+    # requested version being a pre-release.
+    Context "Searching for pre-release package without using --pre as an argument" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot -Quick
+
+            $Output = Invoke-Choco $_ upgradepackage --version 1.1.1-beta
+        }
+
+        It "Exits with Sucess (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should output the package found" {
+            $Output.Lines | Should -Contain "upgradepackage 1.1.1-beta" -Because $Output.String
+        }
+
+        It "Should output the amount of packages found" {
+            $Output.Lines | Should -Contain "1 packages found." -Because $Output.String
+        }
+    }
+
+    # This test is non-functional in v1, as it can not actually find any of the packages.
+    # It seems to exit out of the results too early to find them.
+    Context "Search for chocolatey on Page <Page>" -ForEach @(
+        @{
+            Page = 0
+            Name = 'chocolatey'
+            NotExpected = 'chocolatey-agent'
+        }
+        @{
+            Page = 1
+            Name = 'chocolatey-agent'
+            NotExpected = 'chocolatey'
+        }
+    ) {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot -Quick
+
+            $Output = Invoke-Choco $currentCommand chocolatey --version 0.11.2 --page $Page --page-size 1
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should output package <Name> in the results" {
+            $Output.Lines | Should -Contain "$Name 0.11.2" -Because $Output.String
+        }
+
+        It "Should not output unexpected package <Name> in the results" {
+            $Output.Lines | Should -Not -Contain "$NotExpected 0.11.2" -Because $Output.String
+        }
+
+        It "Should output the amount of packages found" {
+            $Output.Lines | Should -Contain "1 packages found." -Because $Output.String
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     Test-NuGetPaths
 }
