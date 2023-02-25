@@ -709,28 +709,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
                     catch (NuGetResolverConstraintException ex)
                     {
-                        this.Log().Warn(ex.Message);
-
-                        string constraintPattern = @"constraint: (?<packageId>\w+)\s\(";
-                        var invalidDependencyMatch = Regex.Match(ex.Message, constraintPattern, RegexOptions.IgnoreCase);
-                        var invalidDependencyName = invalidDependencyMatch.Groups["packageId"].Success ? invalidDependencyMatch.Groups["packageId"].Value : string.Empty;
-
-                        if (!invalidDependencyMatch.Groups["packageId"].Success)
-                        {
-                            string resolvePattern = @"Unable to resolve dependency \'(?<packageId>[\w\-\.]+)\'";
-                            var resolveDependencyMatch = Regex.Match(ex.Message, resolvePattern, RegexOptions.IgnoreCase);
-                            invalidDependencyName = resolveDependencyMatch.Groups["packageId"].Success ? resolveDependencyMatch.Groups["packageId"].Value : string.Empty;
-
-                            if (!resolveDependencyMatch.Success)
-                            {
-                                this.Log().Warn("Unable to match dependency resolution message, add another type");
-                            }
-                        }
+                        var logMessage = get_dependency_resolution_error_message(ex);
+                        this.Log().Error(ChocolateyLoggers.Important, logMessage);
 
                         foreach (var pkgMetadata in packagesToInstall)
                         {
-                            var logMessage = "Unable to resolve dependency '{0}'".format_with(invalidDependencyName);
-                            this.Log().Error(ChocolateyLoggers.Important, logMessage);
                             var errorResult = packageResultsToReturn.GetOrAdd(pkgMetadata.Identity.Id, new PackageResult(pkgMetadata, pathResolver.GetInstallPath(pkgMetadata.Identity)));
                             errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         }
@@ -879,6 +862,39 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             config.reset_config(removeBackup: true);
 
             return packageResultsToReturn;
+        }
+
+        protected virtual string get_dependency_resolution_error_message(NuGetResolverConstraintException exception)
+        {
+            if (exception.Message.StartsWith("Unable to resolve dependency '"))
+            {
+                return exception.Message;
+            }
+
+            var errorMessagePatterns = new string[]
+            {
+                @"constraint: (?<packageId>\w+)\s\(",
+                @"Circular dependency detected '(?<packageId>\w+) "
+            };
+
+            string invalidDependencyName = null;
+            foreach (var pattern in errorMessagePatterns)
+            {
+                var invalidDependencyMatch = Regex.Match(exception.Message, pattern, RegexOptions.IgnoreCase);
+                if (invalidDependencyMatch.Groups["packageId"].Success)
+                {
+                    invalidDependencyName = invalidDependencyMatch.Groups["packageId"].Value;
+                    break;
+                }
+            }
+
+            if (invalidDependencyName == null)
+            {
+                this.Log().Debug("Could not find invalid dependency name in dependency resolution message, add another match pattern to handle this case");
+                return $"Unable to resolve dependency: {exception.Message}";
+            }
+
+            return $"Unable to resolve dependency '{invalidDependencyName}': {exception.Message}";
         }
 
         public virtual void remove_rollback_directory_if_exists(string packageName)
@@ -1266,28 +1282,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                             catch (NuGetResolverConstraintException ex)
                             {
-                                this.Log().Warn(ex.Message);
-
-                                string constraintPattern = @"constraint: (?<packageId>\w+)\s\(";
-                                var invalidDependencyMatch = Regex.Match(ex.Message, constraintPattern, RegexOptions.IgnoreCase);
-                                var invalidDependencyName = invalidDependencyMatch.Groups["packageId"].Success ? invalidDependencyMatch.Groups["packageId"].Value : string.Empty;
-
-                                if (!invalidDependencyMatch.Groups["packageId"].Success)
-                                {
-                                    string resolvePattern = @"Unable to resolve dependency \'(?<packageId>[\w\-\.]+)\'";
-                                    var resolveDependencyMatch = Regex.Match(ex.Message, resolvePattern, RegexOptions.IgnoreCase);
-                                    invalidDependencyName = resolveDependencyMatch.Groups["packageId"].Success ? resolveDependencyMatch.Groups["packageId"].Value : string.Empty;
-
-                                    if (!resolveDependencyMatch.Success)
-                                    {
-                                        this.Log().Warn("Unable to match dependency resolution message, add another type");
-                                    }
-                                }
+                                var logMessage = get_dependency_resolution_error_message(ex);
+                                this.Log().Error(ChocolateyLoggers.Important, logMessage);
 
                                 foreach (var pkgMetadata in packagesToInstall)
                                 {
-                                    var logMessage = "Unable to resolve dependency '{0}'".format_with(invalidDependencyName);
-                                    this.Log().Error(ChocolateyLoggers.Important, logMessage);
                                     var errorResult = packageResultsToReturn.GetOrAdd(pkgMetadata.Identity.Id, new PackageResult(pkgMetadata, pathResolver.GetInstallPath(pkgMetadata.Identity)));
                                     errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                                 }
