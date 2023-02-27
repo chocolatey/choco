@@ -606,7 +606,8 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
                         action = (packageResult) => handle_package_result(packageResult, packageConfig, CommandNameType.install);
                     }
 
-                    var results = perform_source_runner_function(packageConfig, r => r.install_run(packageConfig, action));
+                    var beforeModifyAction = new Action<PackageResult>(packageResult => before_package_modify(packageResult, config));
+                    var results = perform_source_runner_function(packageConfig, r => r.install_run(packageConfig, action, beforeModifyAction));
 
                     foreach (var result in results)
                     {
