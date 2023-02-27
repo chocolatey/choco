@@ -458,6 +458,11 @@ folder.");
 
         public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
+            return install_run(config, continueAction, beforeModifyAction: null);
+        }
+
+        public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
+        {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageResultsToReturn = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -1013,7 +1018,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
                     else
                     {
-                        var installResults = install_run(config, continueAction);
+                        var installResults = install_run(config, continueAction, beforeUpgradeAction);
                         foreach (var result in installResults)
                         {
                             packageResultsToReturn.GetOrAdd(result.Key, result.Value);

@@ -259,6 +259,11 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
+            return install_run(config, continueAction, beforeModifyAction: null);
+        }
+
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
+        {
             set_executable_path_if_not_set();
             var args = build_args(config, _installArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);

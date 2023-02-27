@@ -613,7 +613,8 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
                         action = (packageResult, configuration) => handle_package_result(packageResult, configuration, CommandNameType.install);
                     }
 
-                    var results = perform_source_runner_function(packageConfig, r => r.install_run(packageConfig, action));
+                    var beforeModifyAction = new Action<PackageResult, ChocolateyConfiguration>((packageResult, configuration) => before_package_modify(packageResult, configuration));
+                    var results = perform_source_runner_function(packageConfig, r => r.install_run(packageConfig, action, beforeModifyAction));
 
                     foreach (var result in results)
                     {
