@@ -78,6 +78,15 @@ namespace chocolatey.infrastructure.app.services
         ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction);
 
         /// <summary>
+        ///   Installs packages from the source feed
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="continueAction">The action to continue with when install is successful.</param>
+        /// <param name="beforeModifyAction">The action (if any) to run on any currently installed package dependencies before triggering the install or updating those dependencies.</param>
+        /// <returns>results of installs</returns>
+        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeModifyAction);
+
+        /// <summary>
         ///   Run upgrade in noop mode
         /// </summary>
         /// <param name="config">The configuration.</param>
@@ -89,7 +98,7 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
-        /// <param name="beforeUpgradeAction">The action (if any) to run on any currently installed package before triggering the upgrade.</param>
+        /// <param name="beforeUpgradeAction">The action (if any) to run on any currently installed package or its dependencies before triggering the upgrade.</param>
         /// <returns>results of installs</returns>
         ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeUpgradeAction = null);
 

@@ -385,6 +385,11 @@ folder.");
 
         public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
+            return install_run(config, continueAction, beforeModifyAction: null);
+        }
+
+        public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeModifyAction)
+        {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
