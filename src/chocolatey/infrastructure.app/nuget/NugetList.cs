@@ -359,94 +359,18 @@ namespace chocolatey.infrastructure.app.nuget
                     return metadata;
                 }
             }
-
-            //If no packages found, then return nothing
-            return null;
-
-            /*
-            // use old method when newer method causes issues
-            if (!config.Features.UsePackageRepositoryOptimizations) return repository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
-
-            packageName = packageName.to_string().ToLower(CultureInfo.CurrentCulture);
-            // find the package based on version using older method
-            if (version != null) return repository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
-
-            // we should always be using an aggregate repository
-            var aggregateRepository = repository as AggregateRepository;
-            if (aggregateRepository != null)
             {
-                var packageResults = new List<IPackage>();
-
-                foreach (var packageRepository in aggregateRepository.Repositories.or_empty_list_if_null())
                 {
-                    try
+
                     {
-                        "chocolatey".Log().Debug("Using '" + packageRepository.Source + "'.");
-                        "chocolatey".Log().Debug("- Supports prereleases? '" + packageRepository.SupportsPrereleasePackages + "'.");
-                        "chocolatey".Log().Debug("- Is ServiceBased? '" + (packageRepository is IServiceBasedRepository) + "'.");
-
-                        // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
-                        IQueryable<IPackage> combinedResults = packageRepository.GetPackages().Where(x => x.Id.ToLower() == packageName);
-
-                        if (config.Prerelease && packageRepository.SupportsPrereleasePackages)
-                        {
-                            combinedResults = combinedResults.Where(p => p.IsAbsoluteLatestVersion);
-                        }
-                        else
-                        {
-                            combinedResults = combinedResults.Where(p => p.IsLatestVersion);
-                        }
-
-                        if (!(packageRepository is IServiceBasedRepository))
-                        {
-                            combinedResults = combinedResults
-                                .Where(PackageExtensions.IsListed)
-                                .Where(p => config.Prerelease || p.IsReleaseVersion())
-                                .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
-                                .AsQueryable();
-                        }
-
-                        var packageRepositoryResults = combinedResults.ToList();
-                        if (packageRepositoryResults.Count() != 0)
-                        {
-                            "chocolatey".Log().Debug("Package '{0}' found on source '{1}'".format_with(packageName, packageRepository.Source));
-                            packageResults.AddRange(packageRepositoryResults);
-                        }
                     }
-                    catch (Exception e)
-                    {
-                        "chocolatey".Log().Warn("Error retrieving packages from source '{0}':{1} {2}".format_with(packageRepository.Source, Environment.NewLine, e.Message));
-                    }
-                }
 
-                // get only one result, should be the latest - similar to TryFindLatestPackageById
-                return packageResults.OrderByDescending(x => x.Version).FirstOrDefault();
             }
 
-            // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
-            IQueryable<IPackage> results = repository.GetPackages().Where(x => x.Id.ToLower() == packageName);
-
-            if (config.Prerelease && repository.SupportsPrereleasePackages)
             {
-                results = results.Where(p => p.IsAbsoluteLatestVersion);
-            }
-            else
-            {
-                results = results.Where(p => p.IsLatestVersion);
+
             }
 
-            if (!(repository is IServiceBasedRepository))
-            {
-                results = results
-                    .Where(PackageExtensions.IsListed)
-                    .Where(p => config.Prerelease || p.IsReleaseVersion())
-                    .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
-                    .AsQueryable();
-            }
-
-            // get only one result, should be the latest - similar to TryFindLatestPackageById
-            return results.ToList().OrderByDescending(x => x.Version).FirstOrDefault();
-            */
         }
     }
 
