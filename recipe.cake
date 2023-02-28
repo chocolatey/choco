@@ -125,6 +125,19 @@ Func<FilePathCollection> getFilesToSign = () =>
     return filesToSign;
 };
 
+Func<FilePathCollection> getMsisToSign = () =>
+{
+    var msisToSign = GetFiles(BuildParameters.Paths.Directories.Build + "/Chocolatey.msi"); // TODO: Correct
+
+    Information("The following msi's have been selected to be signed...");
+    foreach (var msiToSign in msisToSign)
+    {
+        Information(msiToSign.FullPath);
+    }
+
+    return msisToSign;
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // CUSTOM TASKS
 ///////////////////////////////////////////////////////////////////////////////
@@ -352,8 +365,10 @@ BuildParameters.SetParameters(context: Context,
                             treatWarningsAsErrors: false,
                             getScriptsToSign: getScriptsToSign,
                             getFilesToSign: getFilesToSign,
+                            getMsisToSign: getMsisToSign,
                             getILMergeConfigs: getILMergeConfigs,
                             preferDotNetGlobalToolUsage: !IsRunningOnWindows(),
+                            shouldBuildMsi: true,
                             shouldRunNuGet: IsRunningOnWindows(),
                             shouldAuthenticodeSignPowerShellScripts: IsRunningOnWindows(),
                             shouldPublishAwsLambdas: false,

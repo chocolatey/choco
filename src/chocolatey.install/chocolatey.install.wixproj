@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Setup" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\tools\WiX.3.14.0\build\wix.props" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProductVersion>$(DisplayVersion)</ProductVersion>
+    <ProjectGuid>{6B96B4AE-8FD2-4719-AAFB-BA027B798089}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <Stable Condition=" '$(Stable)' == '' ">False</Stable>
+    <OutputName>chocolatey-$(ProductVersion)</OutputName>
+    <OutputType>Package</OutputType>
+    <SuppressPdbOutput>true</SuppressPdbOutput>
+    <SetMsiAssemblyNameFileVersion>True</SetMsiAssemblyNameFileVersion>
+    <DefineSolutionProperties>false</DefineSolutionProperties>
+    <SuppressSpecificWarnings>1076</SuppressSpecificWarnings>
+    <Cultures>en-US</Cultures>
+  </PropertyGroup>
+  <Target Name="Setup">
+    <CallTarget Targets="SetConstants" />
+    <CallTarget Targets="Build" />
+  </Target>
+  <Target Name="SetConstants">
+    <ItemGroup>
+      <WixConstant Include="ProductId">
+        <Value>{671AC678-CDB7-49F1-A98A-B3F52D73BEAD}</Value>
+      </WixConstant>
+      <WixConstant Include="ProductCode">
+        <Value>{62FC4E65-47F0-488A-B841-ECA07E98A58B}</Value>
+      </WixConstant>
+      <WixConstant Include="ProductVersion" Condition=" '$(DisplayVersion)' != '' ">
+        <Value>$(DisplayVersion)</Value>
+      </WixConstant>
+      <WixConstant Include="NUPKG" Condition=" '$(NUPKG)' == '' ">
+        <Value>..\..\code_drop\Packages\Chocolatey\chocolatey.$(ProductVersion).nupkg</Value>
+      </WixConstant>
+      <WixConstant Include="NUPKG" Condition=" '$(NUPKG)' != '' ">
+        <Value>$(NUPKG)</Value>
+      </WixConstant>
+      <WixConstant Include="ProductName" Condition=" '$(ProductName)' == '' ">
+        <Value>Chocolatey (Install Only)</Value>
+      </WixConstant>
+      <WixConstant Include="ProductName" Condition=" '$(ProductName)' != '' ">
+        <Value>$(ProductName)</Value>
+      </WixConstant>
+      <WixConstant Include="ProductSummary" Condition=" '$(ProductSummary)' == '' ">
+        <Value>The Package Manager for Windows</Value>
+      </WixConstant>
+      <WixConstant Include="ProductSummary" Condition=" '$(ProductSummary)' != '' ">
+        <Value>$(ProductSummary)</Value>
+      </WixConstant>
+      <WixConstant Include="ProductVendor" Condition=" '$(ProductVendor)' == '' ">
+        <Value>Chocolatey Software, Inc.</Value>
+      </WixConstant>
+      <WixConstant Include="ProductVendor" Condition=" '$(ProductVendor)' != '' ">
+        <Value>$(ProductVendor)</Value>
+      </WixConstant>
+      <WixConstant Include="ArtifactName" Condition=" '$(ArtifactName)' == ''">
+        <Value>Chocolatey</Value>
+      </WixConstant>
+      <WixConstant Include="ArtifactName" Condition=" '$(ArtifactName)' != ''">
+        <Value>$(ArtifactName)</Value>
+      </WixConstant>
+      <WixConstant Include="InstallerIco" Condition=" '$(InstallerIco)' == '' ">
+        <Value>assets\choco.ico</Value>
+      </WixConstant>
+      <WixConstant Include="InstallerIco" Condition=" '$(InstallerIco)' != '' ">
+        <Value>$(InstallerIco)</Value>
+      </WixConstant>
+    </ItemGroup>
+    <CreateProperty Value="@(WixConstant->'%(Identity)=%(Value)')">
+      <Output TaskParameter="Value" PropertyName="CommonWixConstants" />
+    </CreateProperty>
+    <CreateProperty Value="Debug;$(CommonWixConstants)" Condition=" '$(Configuration)' == 'Debug' ">
+      <Output TaskParameter="Value" PropertyName="DefineConstants" />
+    </CreateProperty>
+    <CreateProperty Value="$(CommonWixConstants)" Condition=" '$(Configuration)' == 'Release' ">
+      <Output TaskParameter="Value" PropertyName="DefineConstants" />
+    </CreateProperty>
+  </Target>
+  <PropertyGroup>
+    <OutputPath Condition=" '$(OutputPath)' == '' ">..\code_drop\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'WIX|AnyCPU' ">
+    <OutputPath>..\..\code_drop\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'WIX|Any CPU' ">
+    <OutputPath>..\..\code_drop\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="chocolatey.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="*.wxl" />
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" />
+</Project>
