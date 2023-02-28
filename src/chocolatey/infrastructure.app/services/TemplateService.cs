@@ -281,7 +281,8 @@ namespace chocolatey.infrastructure.app.services
                     configuration,
                     _nugetLogger,
                     sourceCacheContext,
-                    NugetCommon.GetRepositoryResource<PackageMetadataResource>(packageRepositories));
+                    NugetCommon.GetRepositoryResource<PackageMetadataResource>(packageRepositories),
+                    NugetCommon.GetRepositoryResource<ListResource>(packageRepositories));
 
             var templateInstalledViaPackage = (pkg != null);
 

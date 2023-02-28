@@ -239,20 +239,7 @@ namespace chocolatey.infrastructure.app.nuget
                 }
                 else
                 {
-                    if (version == null)
-                    {
-                        var versions = new SortedSet<NuGetVersion>(VersionComparer.Default);
-                        foreach (var repositoryResources in packageRepositoriesResources)
-                        {
-                            //We want all versions available across all repositories
-                            versions.AddRange((await repositoryResources.findPackageByIdResource.GetAllVersionsAsync(searchTermLower, cacheContext, nugetLogger, CancellationToken.None))
-                                .Where(a => configuration.Prerelease || !a.IsPrerelease));
-                        }
-                        version = versions.Max();
-                        if (version == null) return new List<IPackageSearchMetadata>().AsQueryable();
-                    }
-
-                    var exactPackage = find_package(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoriesResources.Select(x => x.packageMetadataResource), version);
+                    var exactPackage = find_package(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoriesResources.Select(x => x.packageMetadataResource), packageRepositoriesResources.Select(x => x.listResource), version);
 
                     if (exactPackage == null) return new List<IPackageSearchMetadata>().AsQueryable();
 
@@ -334,43 +321,66 @@ namespace chocolatey.infrastructure.app.nuget
         /// </summary>
         /// <param name="packageName">Name of package to search for</param>
         /// <param name="config">Chocolatey configuration used to help supply the search parameters</param>
-        /// <param name="nugetLogger">fill me in</param>
-        /// <param name="resources">fill me in</param>
+        /// <param name="nugetLogger">The nuget logger</param>
+        /// <param name="packageMetadataResources">The PackageMetaDataResources that should be queried</param>
+        /// <param name="listResources">The ListResources that should be queried</param>
         /// <param name="version">Version to search for</param>
         /// <param name="cacheContext">Settings for caching of results from sources</param>
         /// <returns>One result or nothing</returns>
-        public static IPackageSearchMetadata find_package(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources, NuGetVersion version = null)
+        public static IPackageSearchMetadata find_package(
+            string packageName,
+            ChocolateyConfiguration config,
+            ILogger nugetLogger,
+            ChocolateySourceCacheContext cacheContext,
+            IEnumerable<PackageMetadataResource> packageMetadataResources,
+            IEnumerable<ListResource> listResources,
+            NuGetVersion version = null)
         {
-            if (version is null)
+            if (config.Features.UsePackageRepositoryOptimizations)
             {
-                var metadataList = new HashSet<IPackageSearchMetadata>();
-                foreach (var resource in resources)
+                if (version is null)
                 {
-                    metadataList.AddRange(resource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
+                    var metadataList = new HashSet<IPackageSearchMetadata>();
+
+                    foreach (var listResource in listResources)
+                    {
+                        var package = listResource.PackageAsync(packageName, config.Prerelease, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
+                        if (package != null)
+                        {
+                            metadataList.Add(package);
+                        }
+                    }
+
+                    return metadataList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
                 }
-                return metadataList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
+            }
+            else
+            {
+                if (version is null)
+                {
+                    var metadataList = new HashSet<IPackageSearchMetadata>();
+
+                    foreach (var packageMetadataResource in packageMetadataResources)
+                    {
+                        metadataList.AddRange(packageMetadataResource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
+                    }
+
+                    return metadataList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
+                }
             }
 
-            foreach (var resource in resources)
+            foreach (var resource in packageMetadataResources)
             {
                 var metadata = resource.GetMetadataAsync(new PackageIdentity(packageName, version), cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
+
                 if (metadata != null)
                 {
                     return metadata;
                 }
             }
-            {
-                {
 
-                    {
-                    }
-
-            }
-
-            {
-
-            }
-
+            //If no packages found, then return nothing
+            return null;
         }
     }
 
