@@ -10,7 +10,7 @@
     be valid even when & and < is being used.
     ]]></description>
     <dependencies>
-      <dependency id="basic" />
+      <dependency id="basic" version="1.0.0" />
     </dependencies>
   </metadata>
   <files />
