@@ -239,20 +239,7 @@ namespace chocolatey.infrastructure.app.nuget
                 }
                 else
                 {
-                    if (version == null)
-                    {
-                        var versions = new SortedSet<NuGetVersion>(VersionComparer.Default);
-                        foreach (var repositoryResources in packageRepositoriesResources)
-                        {
-                            //We want all versions available across all repositories
-                            versions.AddRange((await repositoryResources.findPackageByIdResource.GetAllVersionsAsync(searchTermLower, cacheContext, nugetLogger, CancellationToken.None))
-                                .Where(a => configuration.Prerelease || !a.IsPrerelease));
-                        }
-                        version = versions.Max();
-                        if (version == null) return new List<IPackageSearchMetadata>().AsQueryable();
-                    }
-
-                    var exactPackage = find_package(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoriesResources.Select(x => x.packageMetadataResource), version);
+                    var exactPackage = find_package(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoriesResources.Select(x => x.packageMetadataResource), packageRepositoriesResources.Select(x => x.listResource), version);
 
                     if (exactPackage == null) return new List<IPackageSearchMetadata>().AsQueryable();
 
@@ -334,26 +321,58 @@ namespace chocolatey.infrastructure.app.nuget
         /// </summary>
         /// <param name="packageName">Name of package to search for</param>
         /// <param name="config">Chocolatey configuration used to help supply the search parameters</param>
-        /// <param name="nugetLogger">fill me in</param>
-        /// <param name="resources">fill me in</param>
+        /// <param name="nugetLogger">The nuget logger</param>
+        /// <param name="packageMetadataResources">The PackageMetaDataResources that should be queried</param>
+        /// <param name="listResources">The ListResources that should be queried</param>
         /// <param name="version">Version to search for</param>
         /// <param name="cacheContext">Settings for caching of results from sources</param>
         /// <returns>One result or nothing</returns>
-        public static IPackageSearchMetadata find_package(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources, NuGetVersion version = null)
+        public static IPackageSearchMetadata find_package(
+            string packageName,
+            ChocolateyConfiguration config,
+            ILogger nugetLogger,
+            ChocolateySourceCacheContext cacheContext,
+            IEnumerable<PackageMetadataResource> packageMetadataResources,
+            IEnumerable<ListResource> listResources,
+            NuGetVersion version = null)
         {
-            if (version is null)
+            if (config.Features.UsePackageRepositoryOptimizations)
             {
-                var metadataList = new HashSet<IPackageSearchMetadata>();
-                foreach (var resource in resources)
+                if (version is null)
                 {
-                    metadataList.AddRange(resource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
+                    var metadataList = new HashSet<IPackageSearchMetadata>();
+
+                    foreach (var listResource in listResources)
+                    {
+                        var package = listResource.PackageAsync(packageName, config.Prerelease, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
+                        if (package != null)
+                        {
+                            metadataList.Add(package);
+                        }
+                    }
+
+                    return metadataList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
                 }
-                return metadataList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
+            }
+            else
+            {
+                if (version is null)
+                {
+                    var metadataList = new HashSet<IPackageSearchMetadata>();
+
+                    foreach (var packageMetadataResource in packageMetadataResources)
+                    {
+                        metadataList.AddRange(packageMetadataResource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
+                    }
+
+                    return metadataList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
+                }
             }
 
-            foreach (var resource in resources)
+            foreach (var resource in packageMetadataResources)
             {
                 var metadata = resource.GetMetadataAsync(new PackageIdentity(packageName, version), cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
+
                 if (metadata != null)
                 {
                     return metadata;
@@ -362,91 +381,6 @@ namespace chocolatey.infrastructure.app.nuget
 
             //If no packages found, then return nothing
             return null;
-
-            /*
-            // use old method when newer method causes issues
-            if (!config.Features.UsePackageRepositoryOptimizations) return repository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
-
-            packageName = packageName.to_string().ToLower(CultureInfo.CurrentCulture);
-            // find the package based on version using older method
-            if (version != null) return repository.FindPackage(packageName, version, config.Prerelease, allowUnlisted: false);
-
-            // we should always be using an aggregate repository
-            var aggregateRepository = repository as AggregateRepository;
-            if (aggregateRepository != null)
-            {
-                var packageResults = new List<IPackage>();
-
-                foreach (var packageRepository in aggregateRepository.Repositories.or_empty_list_if_null())
-                {
-                    try
-                    {
-                        "chocolatey".Log().Debug("Using '" + packageRepository.Source + "'.");
-                        "chocolatey".Log().Debug("- Supports prereleases? '" + packageRepository.SupportsPrereleasePackages + "'.");
-                        "chocolatey".Log().Debug("- Is ServiceBased? '" + (packageRepository is IServiceBasedRepository) + "'.");
-
-                        // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
-                        IQueryable<IPackage> combinedResults = packageRepository.GetPackages().Where(x => x.Id.ToLower() == packageName);
-
-                        if (config.Prerelease && packageRepository.SupportsPrereleasePackages)
-                        {
-                            combinedResults = combinedResults.Where(p => p.IsAbsoluteLatestVersion);
-                        }
-                        else
-                        {
-                            combinedResults = combinedResults.Where(p => p.IsLatestVersion);
-                        }
-
-                        if (!(packageRepository is IServiceBasedRepository))
-                        {
-                            combinedResults = combinedResults
-                                .Where(PackageExtensions.IsListed)
-                                .Where(p => config.Prerelease || p.IsReleaseVersion())
-                                .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
-                                .AsQueryable();
-                        }
-
-                        var packageRepositoryResults = combinedResults.ToList();
-                        if (packageRepositoryResults.Count() != 0)
-                        {
-                            "chocolatey".Log().Debug("Package '{0}' found on source '{1}'".format_with(packageName, packageRepository.Source));
-                            packageResults.AddRange(packageRepositoryResults);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        "chocolatey".Log().Warn("Error retrieving packages from source '{0}':{1} {2}".format_with(packageRepository.Source, Environment.NewLine, e.Message));
-                    }
-                }
-
-                // get only one result, should be the latest - similar to TryFindLatestPackageById
-                return packageResults.OrderByDescending(x => x.Version).FirstOrDefault();
-            }
-
-            // search based on lower case id - similar to PackageRepositoryExtensions.FindPackagesByIdCore()
-            IQueryable<IPackage> results = repository.GetPackages().Where(x => x.Id.ToLower() == packageName);
-
-            if (config.Prerelease && repository.SupportsPrereleasePackages)
-            {
-                results = results.Where(p => p.IsAbsoluteLatestVersion);
-            }
-            else
-            {
-                results = results.Where(p => p.IsLatestVersion);
-            }
-
-            if (!(repository is IServiceBasedRepository))
-            {
-                results = results
-                    .Where(PackageExtensions.IsListed)
-                    .Where(p => config.Prerelease || p.IsReleaseVersion())
-                    .distinct_last(PackageEqualityComparer.Id, PackageComparer.Version)
-                    .AsQueryable();
-            }
-
-            // get only one result, should be the latest - similar to TryFindLatestPackageById
-            return results.ToList().OrderByDescending(x => x.Version).FirstOrDefault();
-            */
         }
     }
 

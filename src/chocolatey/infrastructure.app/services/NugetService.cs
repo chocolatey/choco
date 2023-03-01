@@ -573,7 +573,7 @@ folder.");
                     latestPackageVersion = version;
                 }
 
-                var availablePackage = NugetList.find_package(packageName, config, _nugetLogger, sourceCacheContext, NugetCommon.GetRepositoryResource<PackageMetadataResource>(remoteRepositories).ToList(), latestPackageVersion);
+                var availablePackage = NugetList.find_package(packageName, config, _nugetLogger, sourceCacheContext, NugetCommon.GetRepositoryResource<PackageMetadataResource>(remoteRepositories).ToList(), NugetCommon.GetRepositoryResource<ListResource>(remoteRepositories).ToList(), latestPackageVersion);
 
                 if (availablePackage == null)
                 {
@@ -1042,7 +1042,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                var availablePackage = NugetList.find_package(packageName, config, _nugetLogger, sourceCacheContext, NugetCommon.GetRepositoryResource<PackageMetadataResource>(remoteRepositories).ToList(), version);
+                var availablePackage = NugetList.find_package(packageName, config, _nugetLogger, sourceCacheContext, NugetCommon.GetRepositoryResource<PackageMetadataResource>(remoteRepositories).ToList(), NugetCommon.GetRepositoryResource<ListResource>(remoteRepositories).ToList(), version);
 
                 config.Prerelease = originalPrerelease;
 
@@ -1483,7 +1483,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     config.Prerelease = true;
                 }
 
-                var latestPackage = NugetList.find_package(packageName, config, _nugetLogger, sourceCacheContext, NugetCommon.GetRepositoryResource<PackageMetadataResource>(remoteRepositories).ToList());
+                var latestPackage = NugetList.find_package(packageName, config, _nugetLogger, sourceCacheContext, NugetCommon.GetRepositoryResource<PackageMetadataResource>(remoteRepositories).ToList(), NugetCommon.GetRepositoryResource<ListResource>(remoteRepositories).ToList());
 
                 if (latestPackage == null)
                 {
