@@ -12,7 +12,7 @@
     <summary>This is a purposely empty dummy package for testing choco push functionality</summary>
     <description>This is a purposely empty dummy package for testing choco push functionality</description>
     <dependencies>
-      <dependency id="chocolatey" />
+      <dependency id="chocolatey" version="0.10.15" />
     </dependencies>
   </metadata>
 </package>

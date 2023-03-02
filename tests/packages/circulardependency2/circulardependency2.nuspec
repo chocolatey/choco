@@ -10,7 +10,7 @@
     <description>Circular dependencies are not supported by Chocolatey. `choco install` should fail when it encounters them.
     </description>
     <dependencies>
-      <dependency id="circulardependency1" />
+      <dependency id="circulardependency1" version="0.0.1" />
     </dependencies>
   </metadata>
 </package>

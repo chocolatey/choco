@@ -13,7 +13,7 @@
     <copyright />
     <tags>hasdependency admin</tags>
     <dependencies>
-      <dependency id="isdependency" />
+      <dependency id="isdependency" version="1.0.0" />
     </dependencies>
   </metadata>
   <files>

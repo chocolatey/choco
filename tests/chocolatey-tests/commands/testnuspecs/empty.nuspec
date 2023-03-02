@@ -14,7 +14,7 @@
     <bugTrackerUrl></bugTrackerUrl>
     <description>Test Description</description>
     <dependencies>
-      <dependency id="basic" />
+      <dependency id="basic" version="1.0.0" />
     </dependencies>
   </metadata>
   <files />
