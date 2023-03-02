@@ -35,7 +35,7 @@ namespace chocolatey.infrastructure.app.rules
             {
                 if (string.IsNullOrWhiteSpace(get_element_value(reader, item)))
                 {
-                    yield return new RuleResult(RuleType.Error, "{0} is a required element in the package nuspec file.".format_with(item));
+                    yield return new RuleResult(RuleType.Error, RuleIdentifiers.EmptyRequiredElement, "{0} is a required element in the package nuspec file.".format_with(item));
                 }
             }
         }

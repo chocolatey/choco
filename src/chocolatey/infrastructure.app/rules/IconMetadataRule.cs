@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.rules
         {
             if (!(reader.GetIcon() is null))
             {
-                yield return new RuleResult(RuleType.Error, "<icon> elements are not supported in Chocolatey CLI, use <iconUrl> instead.");
+                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<icon> elements are not supported in Chocolatey CLI, use <iconUrl> instead.");
             }
         }
     }

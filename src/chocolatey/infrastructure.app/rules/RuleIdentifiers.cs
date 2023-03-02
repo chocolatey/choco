@@ -15,19 +15,11 @@
 
 namespace chocolatey.infrastructure.app.rules
 {
-    using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
-    using chocolatey.infrastructure.rules;
-    using NuGet.Packaging;
-
-    internal sealed class LicenseMetadataRule : IMetadataRule
+    internal static class RuleIdentifiers
     {
-        public IEnumerable<RuleResult> validate(NuspecReader reader)
-        {
-            if (!(reader.GetLicenseMetadata() is null))
-            {
-                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<license> elements are not supported in Chocolatey CLI, use <licenseUrl> instead.");
-            }
-        }
+        public const string EmptyRequiredElement = "CHCR0001";
+        public const string InvalidTypeElement = "CHCU0001";
+        public const string MissingElementOnRequiringLicenseAcceptance = "CHCR0002";
+        public const string UnsupportedElementUsed = "CHCU0002";
     }
 }

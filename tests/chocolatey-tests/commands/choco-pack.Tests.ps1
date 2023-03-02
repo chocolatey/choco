@@ -15,17 +15,17 @@ $emptyFailures = @(
 )
 # Elements that will return an invalid failure (usually due to serialization)
 $invalidFailures = @(
-    @{id = 'projectUrl'; message = "ERROR: 'invalid project url' is not a valid URL for the projectUrl element in the package nuspec file." }
-    @{id = 'projectSourceUrl'; message = "ERROR: 'invalid project source url' is not a valid URL for the projectSourceUrl element in the package nuspec file." }
-    @{id = 'docsUrl'; message = "ERROR: 'invalid docs url' is not a valid URL for the docsUrl element in the package nuspec file." }
-    @{id = 'bugTrackerUrl'; message = "ERROR: 'invalid bug tracker url' is not a valid URL for the bugTrackerUrl element in the package nuspec file." }
-    @{id = 'mailingListUrl'; message = "ERROR: 'invalid mailing list url' is not a valid URL for the mailingListUrl element in the package nuspec file." }
-    @{id = 'iconUrl'; message = "ERROR: 'invalid icon url' is not a valid URL for the iconUrl element in the package nuspec file." }
-    @{id = 'licenseUrl'; message = "ERROR: 'invalid license url' is not a valid URL for the licenseUrl element in the package nuspec file." }
-    @{id = "version"; message = "ERROR: 'INVALID' is not a valid version string in the package nuspec file." }
+    @{id = 'projectUrl'; message = "ERROR: CHCU0001: 'invalid project url' is not a valid URL for the projectUrl element in the package nuspec file." }
+    @{id = 'projectSourceUrl'; message = "ERROR: CHCU0001: 'invalid project source url' is not a valid URL for the projectSourceUrl element in the package nuspec file." }
+    @{id = 'docsUrl'; message = "ERROR: CHCU0001: 'invalid docs url' is not a valid URL for the docsUrl element in the package nuspec file." }
+    @{id = 'bugTrackerUrl'; message = "ERROR: CHCU0001: 'invalid bug tracker url' is not a valid URL for the bugTrackerUrl element in the package nuspec file." }
+    @{id = 'mailingListUrl'; message = "ERROR: CHCU0001: 'invalid mailing list url' is not a valid URL for the mailingListUrl element in the package nuspec file." }
+    @{id = 'iconUrl'; message = "ERROR: CHCU0001: 'invalid icon url' is not a valid URL for the iconUrl element in the package nuspec file." }
+    @{id = 'licenseUrl'; message = "ERROR: CHCU0001: 'invalid license url' is not a valid URL for the licenseUrl element in the package nuspec file." }
+    @{id = "version"; message = "ERROR: CHCU0001: 'INVALID' is not a valid version string in the package nuspec file." }
     @{id = "no-content"; message = "Cannot create a package that has no dependencies nor content." } # This is a message from NuGet.Client, we may want to take ownership of it eventually.
     @{id = "id"; message = "The package ID 'invalid id' contains invalid characters. Examples of valid package IDs include 'MyPackage' and 'MyPackage.Sample'." } # This is a message from NuGet.Client, we may want to take ownership of it eventually.
-    @{id = "requirelicenseacceptance"; message = "ERROR: Enabling license acceptance requires a license url." }
+    @{id = "requirelicenseacceptance"; message = "ERROR: CHCR0002: Enabling license acceptance requires a license url." }
 )
 
 Describe "choco pack" -Tag Chocolatey, PackCommand {
@@ -153,7 +153,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "Displays required error message for <_>" -ForEach $missingFailures {
-            $Output.Lines | Should -Contain "ERROR: $_ is a required element in the package nuspec file."
+            $Output.Lines | Should -Contain "ERROR: CHCR0001: $_ is a required element in the package nuspec file."
         }
 
         It "Does not create the nuget package" {
@@ -188,7 +188,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "Displays empty error message for <_>" -ForEach $emptyFailures {
-            $Output.Lines | Should -Contain "ERROR: The $_ element in the package nuspec file cannot be empty."
+            $Output.Lines | Should -Contain "ERROR: CHCR0001: The $_ element in the package nuspec file cannot be empty."
         }
 
         It "Does not create the nuget package" {
@@ -255,7 +255,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "Displays empty error message for <_>" -ForEach $missingFailures {
-            $Output.Lines | Should -Contain "ERROR: $_ is a required element in the package nuspec file."
+            $Output.Lines | Should -Contain "ERROR: CHCR0001: $_ is a required element in the package nuspec file."
         }
 
         It "Does not create the nuget package" {
@@ -568,7 +568,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It 'Shows an error about the unsupported nuspec metadata element "<_>"' -TestCases $testCases {
-            $Output.String | Should -Match "ERROR: $_ elements are not supported in Chocolatey CLI"
+            $Output.String | Should -Match "ERROR: CHCU0002: $_ elements are not supported in Chocolatey CLI"
         }
 
         It "Should not output message about license url being deprecated" {

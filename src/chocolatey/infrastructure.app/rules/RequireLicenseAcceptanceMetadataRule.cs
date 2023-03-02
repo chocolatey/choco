@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.rules
         {
             if (string.IsNullOrWhiteSpace(reader.GetLicenseUrl()) && reader.GetRequireLicenseAcceptance())
             {
-                yield return new RuleResult(RuleType.Error, "Enabling license acceptance requires a license url.");
+                yield return new RuleResult(RuleType.Error, RuleIdentifiers.MissingElementOnRequiringLicenseAcceptance, "Enabling license acceptance requires a license url.");
             }
         }
     }

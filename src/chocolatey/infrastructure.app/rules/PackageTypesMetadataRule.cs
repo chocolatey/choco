@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.rules
         {
             if (has_element(reader, "packageTypes"))
             {
-                yield return new RuleResult(RuleType.Error, "<packageTypes> elements are not supported in Chocolatey CLI.");
+                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<packageTypes> elements are not supported in Chocolatey CLI.");
             }
         }
     }

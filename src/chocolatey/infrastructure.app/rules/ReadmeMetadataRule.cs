@@ -25,7 +25,7 @@ namespace chocolatey.infrastructure.app.rules
         {
             if (!(reader.GetReadme() is null))
             {
-                yield return new RuleResult(RuleType.Error, "<readme> elements are not supported in Chocolatey CLI.");
+                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<readme> elements are not supported in Chocolatey CLI.");
             }
         }
     }

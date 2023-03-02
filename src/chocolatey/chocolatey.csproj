@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.props')" />
   <PropertyGroup>
@@ -225,6 +225,7 @@
     <Compile Include="infrastructure.app\rules\ReadmeMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\RepositoryMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\RequireLicenseAcceptanceMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\RuleIdentifiers.cs" />
     <Compile Include="infrastructure.app\rules\ServicableMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\VersionMetadataRule.cs" />
     <Compile Include="infrastructure.app\services\RuleService.cs" />
@@ -460,6 +461,7 @@
     <Compile Include="NuGetVersionExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RuleResultExtensions.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
