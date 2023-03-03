@@ -638,6 +638,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 if (availablePackage.DependencySets.Any() || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
                 {
                     allPackagesIdentities = allLocalPackages
+                        // We exclude any installed package that does have a dependency that is missing,
+                        // except if that dependency is one of the targets the user requested.
+                        // If we do not exclude such packages, we will get a resolving exception later.
+                        .Where(p => is_dependent_on_target_ids(p, targetIdsToInstall) || !has_missing_dependency(p, allLocalPackages))
                         .Select(p => p.SearchMetadata.Identity)
                         // If we're forcing dependencies, we only need to know which dependencies are installed locally, not the entire list of packages
                         .Where(p => config.ForceDependencies
@@ -959,7 +963,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 // before we start reading it.
                 config.reset_config();
 
-                var allLocalPackages = get_all_installed_packages(config);
+                var allLocalPackages = get_all_installed_packages(config).ToList();
                 var installedPackage = allLocalPackages.FirstOrDefault(p => p.Name.Equals(packageName));
                 var packagesToInstall = new List<IPackageSearchMetadata>();
                 var packagesToUninstall = new HashSet<PackageResult>();
@@ -1214,8 +1218,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         if (availablePackage.DependencySets.Any() || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
                         {
                             allPackagesIdentities = allLocalPackages
-                                .Where(x => !targetIdsToInstall.Contains(x.Identity.Id, StringComparer.OrdinalIgnoreCase))
-                                .Select(p => p.SearchMetadata.Identity).ToList();
+                                // We exclude any installed package that does have a dependency that is missing,
+                                // except if that dependency is one of the targets the user requested.
+                                // If we do not exclude such packages, we will get a resolving exception later.
+                                .Where(p => is_dependent_on_target_ids(p, targetIdsToInstall) || !has_missing_dependency(p, allLocalPackages))
+                                .Select(p => p.SearchMetadata.Identity)
+                                .Where(x => !targetIdsToInstall.Contains(x.Id, StringComparer.OrdinalIgnoreCase)).ToList();
                         }
 
                         //var allPackagesIdentities = allLocalPackages.Select(p => p.SearchMetadata.Identity).ToList();
@@ -1577,6 +1585,32 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
             if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword)) config.SourceCommand.CertificatePassword = originalConfig.SourceCommand.CertificatePassword;
 
             return originalConfig;
+        }
+
+        private bool has_missing_dependency(PackageResult package, List<PackageResult> allLocalPackages)
+        {
+            foreach (var dependency in package.PackageMetadata.DependencyGroups.SelectMany(d => d.Packages))
+            {
+                if (!allLocalPackages.Any(p => p.Identity.Id.Equals(dependency.Id, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool is_dependent_on_target_ids(PackageResult package, IEnumerable<string> targetIdsToInstall)
+        {
+            foreach (var dependency in package.PackageMetadata.DependencyGroups.SelectMany(d => d.Packages))
+            {
+                if (targetIdsToInstall.Contains(dependency.Id, StringComparer.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void validate_nuspec(string nuspecFilePath, ChocolateyConfiguration config)

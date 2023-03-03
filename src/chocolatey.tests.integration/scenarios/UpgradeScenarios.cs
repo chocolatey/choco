@@ -3308,6 +3308,96 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        public class when_upgrading_a_dependency_with_parent_that_depends_on_a_range_less_than_upgrade_version_and_has_a_different_missing_dependency : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "isdependency";
+                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Configuration.IgnoreDependencies = true;
+                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Configuration.IgnoreDependencies = false;
+            }
+
+            public override void Because()
+            {
+                Results = Service.upgrade_run(Configuration);
+            }
+
+            [Fact]
+            public void should_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.1.0");
+                }
+            }
+
+            [Fact]
+            public void should_upgrade_the_parent_package_to_highest_version_that_meets_new_dependency_version()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.1.0");
+                }
+            }
+
+            [Fact]
+            public void should_upgrade_the_exact_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    packageReader.NuspecReader.GetVersion().to_string().ShouldEqual("2.0.0");
+                }
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_everything_upgraded_successfully()
+            {
+                bool expectedMessage = false;
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
+                {
+                    if (message.Contains("upgraded 3/3")) expectedMessage = true;
+                }
+
+                expectedMessage.ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+        }
+
         public class when_upgrading_a_legacy_folder_dependency_with_parent_that_depends_on_a_range_less_than_upgrade_version : ScenariosBase
         {
             public override void Context()
