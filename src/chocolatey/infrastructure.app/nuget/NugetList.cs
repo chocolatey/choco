@@ -188,8 +188,8 @@ namespace chocolatey.infrastructure.app.nuget
                     }
                     else
                     {
-                        configuration.Prerelease |= version != null && version.IsPrerelease;
-                        configuration.AllVersions |= version != null;
+                        configuration.Prerelease = configuration.Prerelease || (version != null && version.IsPrerelease);
+                        configuration.AllVersions = configuration.AllVersions || (version != null);
 
                         var tempResults = await repositoryResources.listResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, CancellationToken.None);
                         var enumerator = tempResults.GetEnumeratorAsync();
