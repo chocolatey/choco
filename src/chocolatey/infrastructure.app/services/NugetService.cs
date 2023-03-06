@@ -629,7 +629,14 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             localRepositorySource,
                             null,
                             null));
+
+                var removedSources = remove_pinned_source_dependencies(sourcePackageDependencyInfos, allLocalPackages);
                 sourcePackageDependencyInfos.AddRange(localPackagesDependencyInfos);
+
+                if (removedSources.Count > 0 && version == null)
+                {
+                    remove_invalid_dependencies_and_parents(availablePackage, removedSources, sourcePackageDependencyInfos, localPackagesDependencyInfos);
+                }
 
                 var dependencyResolver = new PackageResolver();
 
@@ -638,6 +645,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 if (availablePackage.DependencySets.Any() || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
                 {
                     allPackagesIdentities = allLocalPackages
+                        // We exclude any installed package that does have a dependency that is missing,
+                        // except if that dependency is one of the targets the user requested.
+                        // If we do not exclude such packages, we will get a resolving exception later.
+                        .Where(p => is_dependent_on_target_ids(p, targetIdsToInstall) || !has_missing_dependency(p, allLocalPackages))
                         .Select(p => p.SearchMetadata.Identity)
                         // If we're forcing dependencies, we only need to know which dependencies are installed locally, not the entire list of packages
                         .Where(p => config.ForceDependencies
@@ -959,7 +970,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 // before we start reading it.
                 config.reset_config();
 
-                var allLocalPackages = get_all_installed_packages(config);
+                var allLocalPackages = get_all_installed_packages(config).ToList();
                 var installedPackage = allLocalPackages.FirstOrDefault(p => p.Name.Equals(packageName));
                 var packagesToInstall = new List<IPackageSearchMetadata>();
                 var packagesToUninstall = new HashSet<PackageResult>();
@@ -1191,7 +1202,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     localRepositorySource,
                                     null,
                                     null));
-                        sourcePackageDependencyInfos.AddRange(localPackagesDependencyInfos);
 
                         var parentInfos = new HashSet<SourcePackageDependencyInfo>(PackageIdentityComparer.Default);
                         NugetCommon.GetPackageParents(availablePackage.Identity.Id, parentInfos, localPackagesDependencyInfos).GetAwaiter().GetResult();
@@ -1203,7 +1213,19 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                         }
 
-                        sourcePackageDependencyInfos.RemoveWhere(p => p.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase) && !p.Version.Equals(availablePackage.Identity.Version));
+                        var removedSources = remove_pinned_source_dependencies(sourcePackageDependencyInfos, allLocalPackages);
+
+                        if (version != null || removedSources.Count == 0)
+                        {
+                            sourcePackageDependencyInfos.RemoveWhere(p => p.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase) && !p.Version.Equals(availablePackage.Identity.Version));
+                        }
+
+                        sourcePackageDependencyInfos.AddRange(localPackagesDependencyInfos);
+
+                        if (removedSources.Count > 0 && version == null)
+                        {
+                            remove_invalid_dependencies_and_parents(availablePackage, removedSources, sourcePackageDependencyInfos, localPackagesDependencyInfos);
+                        }
 
                         var dependencyResolver = new PackageResolver();
 
@@ -1214,8 +1236,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         if (availablePackage.DependencySets.Any() || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
                         {
                             allPackagesIdentities = allLocalPackages
-                                .Where(x => !targetIdsToInstall.Contains(x.Identity.Id, StringComparer.OrdinalIgnoreCase))
-                                .Select(p => p.SearchMetadata.Identity).ToList();
+                                // We exclude any installed package that does have a dependency that is missing,
+                                // except if that dependency is one of the targets the user requested.
+                                // If we do not exclude such packages, we will get a resolving exception later.
+                                .Where(p => is_dependent_on_target_ids(p, targetIdsToInstall) || !has_missing_dependency(p, allLocalPackages))
+                                .Select(p => p.SearchMetadata.Identity)
+                                .Where(x => !targetIdsToInstall.Contains(x.Id, StringComparer.OrdinalIgnoreCase)).ToList();
                         }
 
                         //var allPackagesIdentities = allLocalPackages.Select(p => p.SearchMetadata.Identity).ToList();
@@ -1235,7 +1261,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         IEnumerable<SourcePackageDependencyInfo> resolvedPackages = new List<SourcePackageDependencyInfo>();
                         if (config.IgnoreDependencies)
                         {
-                            resolvedPackages = packagesToInstall.Select(p => sourcePackageDependencyInfos.Single(x => p.Identity.Equals(new PackageIdentity(x.Id, x.Version))));
+                            resolvedPackages = packagesToInstall.Select(p => sourcePackageDependencyInfos.SingleOrDefault(x => p.Identity.Equals(new PackageIdentity(x.Id, x.Version))));
 
                             if (config.ForceDependencies)
                             {
@@ -1264,7 +1290,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             try
                             {
                                 resolvedPackages = dependencyResolver.Resolve(resolverContext, CancellationToken.None)
-                                    .Select(p => sourcePackageDependencyInfos.Single(x => PackageIdentityComparer.Default.Equals(x, p)));
+                                    .Select(p => sourcePackageDependencyInfos.SingleOrDefault(x => PackageIdentityComparer.Default.Equals(x, p)));
 
                                 if (!config.ForceDependencies)
                                 {
@@ -1301,6 +1327,30 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         foreach (SourcePackageDependencyInfo packageDependencyInfo in resolvedPackages)
                         {
+                            if (packageDependencyInfo is null)
+                            {
+                                ResultMessage message = null;
+
+                                if (config.IgnoreDependencies)
+                                {
+                                    message = new ResultMessage(ResultType.Error, "Unable to resolve dependency chain. This may be caused by a parent package depending on this package, try specifying a specific version to use or don't ignore any dependencies!");
+                                }
+                                else
+                                {
+                                    message = new ResultMessage(ResultType.Error, "An unknown failure happened during the resolving of the dependency chain!");
+                                }
+
+                                var existingPackage = packageResultsToReturn.GetOrAdd(packageName, (key) =>
+                                {
+                                    // In general, this value should already be set. But just in case
+                                    // it isn't we create a new package result.
+                                    return new PackageResult(availablePackage, string.Empty);
+                                });
+                                existingPackage.Messages.Add(message);
+
+                                break;
+                            }
+
                             var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
 
                             if (packageRemoteMetadata is null)
@@ -1577,6 +1627,100 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
             if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword)) config.SourceCommand.CertificatePassword = originalConfig.SourceCommand.CertificatePassword;
 
             return originalConfig;
+        }
+
+        private bool has_missing_dependency(PackageResult package, List<PackageResult> allLocalPackages)
+        {
+            foreach (var dependency in package.PackageMetadata.DependencyGroups.SelectMany(d => d.Packages))
+            {
+                if (!allLocalPackages.Any(p => p.Identity.Id.Equals(dependency.Id, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool is_dependent_on_target_ids(PackageResult package, IEnumerable<string> targetIdsToInstall)
+        {
+            foreach (var dependency in package.PackageMetadata.DependencyGroups.SelectMany(d => d.Packages))
+            {
+                if (targetIdsToInstall.Contains(dependency.Id, StringComparer.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void remove_invalid_dependencies_and_parents(
+            IPackageSearchMetadata availablePackage,
+            HashSet<SourcePackageDependencyInfo> removedSources,
+            HashSet<SourcePackageDependencyInfo> sourcePackageDependencyInfos,
+            IEnumerable<SourcePackageDependencyInfo> localPackagesDependencyInfos)
+        {
+            var removedIds = removedSources.Select(r => r.Id).Distinct().ToList();
+            SourcePackageDependencyInfo removedAvailablePackage = null;
+
+            foreach (var localPackage in localPackagesDependencyInfos.Where(s => removedIds.Contains(s.Id, StringComparer.OrdinalIgnoreCase)))
+            {
+                var packagesToRemove = sourcePackageDependencyInfos.Where(s => s.Dependencies.Any(d => d.Id.Equals(localPackage.Id, StringComparison.OrdinalIgnoreCase) && !d.VersionRange.Satisfies(localPackage.Version))).ToList();
+
+                if (removedAvailablePackage == null)
+                {
+                    removedAvailablePackage = packagesToRemove.FirstOrDefault(p => p.Id.Equals(availablePackage.Identity.Id) && p.Version == availablePackage.Identity.Version);
+                }
+
+                sourcePackageDependencyInfos.RemoveWhere(s => packagesToRemove.Contains(s));
+                removedSources.AddRange(packagesToRemove);
+            }
+
+            if (removedAvailablePackage != null && !sourcePackageDependencyInfos.Any(s => s.Id.Equals(removedAvailablePackage.Id)))
+            {
+                removedSources.Remove(removedAvailablePackage);
+                sourcePackageDependencyInfos.Add(removedAvailablePackage);
+                removedAvailablePackage = null;
+            }
+
+            var removedIdsTargetDependency = removedSources
+                .Where(r => r.Dependencies.Any(d => d.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase)))
+                .Select(r => r.Id)
+                .Distinct();
+
+            var ranges = sourcePackageDependencyInfos
+                .Where(s => removedIdsTargetDependency.Contains(s.Id, StringComparer.OrdinalIgnoreCase))
+                .SelectMany(r => r.Dependencies)
+                .Where(d => d.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase))
+                .Select(r => r.VersionRange);
+            var maxVersion = sourcePackageDependencyInfos
+                .Where(s => s.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase) && ranges.All(r => r.Satisfies(s.Version)))
+                .Max(s => s.Version);
+
+            sourcePackageDependencyInfos.RemoveWhere(s => s.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase) && s.Version != maxVersion);
+        }
+
+        private HashSet<SourcePackageDependencyInfo> remove_pinned_source_dependencies(HashSet<SourcePackageDependencyInfo> dependencyInfos, List<PackageResult> localPackages)
+        {
+            var pinnedPackages = localPackages.Select(l => _packageInfoService.get_package_information(l.PackageMetadata))
+                .Where(p => p != null && p.IsPinned)
+                .Select(p => p.Package.Id)
+                .ToList();
+
+            var dependencyInfosToExclude = new HashSet<SourcePackageDependencyInfo>();
+
+            foreach (var dependencyInfo in dependencyInfos)
+            {
+                if (pinnedPackages.Contains(dependencyInfo.Id, StringComparer.OrdinalIgnoreCase))
+                {
+                    dependencyInfosToExclude.Add(dependencyInfo);
+                }
+            }
+
+            dependencyInfos.RemoveWhere(source => dependencyInfosToExclude.Contains(source));
+
+            return dependencyInfosToExclude;
         }
 
         private void validate_nuspec(string nuspecFilePath, ChocolateyConfiguration config)
